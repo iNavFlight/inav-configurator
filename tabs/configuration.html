@@ -152,20 +152,25 @@
                 </div>
             </div>
         </div>
-        <div class="rightWrapper acc">
+        <div class="rightWrapper system">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationAccelTrims"></div>
+                    <div class="spacer_box_title" i18n="configurationSystem"></div>
                 </div>
                 <div class="spacer_box">
+                    <div class="note">
+                        <div class="note_spacer">
+                            <p i18n="configurationLoopTimeHelp"></p>
+                        </div>
+                    </div>
                     <div class="number">
-                        <label> <input type="number" name="roll" min="-300" max="300" /> <span
-                            i18n="configurationAccelTrimRoll"></span>
+                        <label> <input type="number" name="looptime" step="100" min="0" max="9000" /> <span
+                            i18n="configurationLoopTime"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="pitch" min="-300" max="300" /> <span
-                            i18n="configurationAccelTrimPitch"></span>
+                        <label> <input type="text" name="looptimehz" readonly class="disabled" /> <span
+                            i18n="configurationCalculatedCyclesSec"></span>
                         </label>
                     </div>
                 </div>
@@ -295,53 +300,6 @@
             </div>
         </div>
         <div class="clear-both"></div>
-        <div class="leftWrapper rssi">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationRSSI"></div>
-                        <div class="helpicon cf_tip" i18n_title="configurationRSSIHelp"></div>
-                    </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features rssi">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="rightWrapper system">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationSystem"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="note">
-                        <div class="note_spacer">
-                            <p i18n="configurationLoopTimeHelp"></p>
-                        </div>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="looptime" step="100" min="0" max="9000" /> <span
-                            i18n="configurationLoopTime"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="text" name="looptimehz" readonly class="disabled" /> <span
-                            i18n="configurationCalculatedCyclesSec"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="clear-both"></div>
         <div class="leftWrapper gps">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">
@@ -412,7 +370,29 @@
                 </div>
             </div>
         </div>
-        <div class="leftWrapper 3d">
+        <div class="leftWrapper rssi">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" i18n="configurationRSSI"></div>
+                        <div class="helpicon cf_tip" i18n_title="configurationRSSIHelp"></div>
+                    </div>
+                <div class="spacer_box">
+                    <table cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th i18n="configurationFeatureEnabled"></th>
+                                <th i18n="configurationFeatureDescription"></th>
+                                <th i18n="configurationFeatureName"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="features rssi">
+                            <!-- table generated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="rightWrapper 3d">
             <div class="gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" i18n="configuration3d"></div>

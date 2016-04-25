@@ -358,10 +358,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="board_align_pitch"]').val((BF_CONFIG.board_align_pitch / 10.0).toFixed(1));
         $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
-        // fill accel trims
-        $('input[name="roll"]').val(CONFIG.accelerometerTrims[1]);
-        $('input[name="pitch"]').val(CONFIG.accelerometerTrims[0]);
-
         // fill magnetometer
         $('input[name="mag_declination"]').val(MISC.mag_declination);
 
@@ -463,8 +459,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
             BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
-            CONFIG.accelerometerTrims[1] = parseInt($('input[name="roll"]').val());
-            CONFIG.accelerometerTrims[0] = parseInt($('input[name="pitch"]').val());
             MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
             
             // motor disarm
