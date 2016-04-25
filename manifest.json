@@ -1,11 +1,11 @@
 {
     "manifest_version": 2,
     "minimum_chrome_version": "38",
-    "version": "1.2.1",
-    "author": "Hydra",
-    "name": "Cleanflight - Configurator",
-    "short_name": "cleanflight",
-    "description": "Crossplatform configuration tool for Cleanflight flight control system",
+    "version": "1.0.0",
+    "author": "Several",
+    "name": "INAVFlight - Configurator",
+    "short_name": "INAV",
+    "description": "Crossplatform configuration tool for INAVFlight flight control system",
 
     "offline_enabled": true,
 
@@ -44,6 +44,6 @@
     ],
 
     "icons": {
-        "128": "images/icon_128.png"
+        "128": "images/inav_icon_128.png"
     }
 }

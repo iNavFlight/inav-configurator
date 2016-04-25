@@ -9,12 +9,12 @@
     min-height: 100%;
     height: 100%;
     overflow-y: auto;
-    background-color: #436c2c;
+    background-color: #06235f;
 }
 
 .tab-landing .content_top {
     height: 140px;
-    background: #59aa29;
+    background: #4689c8;
     padding: 20px;
 }
 

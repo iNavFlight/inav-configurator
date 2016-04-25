@@ -482,7 +482,7 @@ input[type="number"]::-webkit-inner-spin-button {
     float: left;
     height: calc(100% - 150px);
     width: 200px;
-    border-right: 4px solid #59aa29;
+    border-right: 4px solid #4689c8;
     background-color: #2e2e2e;
     transition: all 0.2s;
 
@@ -551,14 +551,14 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 #tabs li.active a {
-    background-color: #59aa29;
+    background-color: #4689c8;
     color: #fff;
     transition: none;
 }
 
 #tabs li.active a:hover {
     cursor: default;
-    background-color: #59aa29;
+    background-color: #4689c8;
 }
 
 .tabicon {
@@ -987,9 +987,9 @@ dialog {
     margin-top: 0px;
     margin-bottom: 0px;
     margin-right: 20px;
-    background-color: #59aa29;
+    background-color: #0a3a9d;
     border-radius: 3px;
-    border: 1px solid #4c8829;
+    border: 1px solid #06235f;
     color: #fff;
     float: right;
     font-family: 'open_sansbold', Arial;
@@ -1005,12 +1005,12 @@ dialog {
 }
 
 .content_toolbar .btn a:hover {
-    background-color: #6ac435;
+    background-color: #4689c8;
     transition: all ease 0.2s;
 }
 
 .content_toolbar .btn a:active {
-    background-color: #4d9324;
+    background-color: #0a3a9d;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -1392,8 +1392,8 @@ dialog {
 }
 
 .connect_b a.connect {
-    background-color: #56ac1d;
-    border: 1px solid #5bbb1b;
+    background-color: #0a3a9d;
+    border: 1px solid #06235f;
     background-image: url(images/icons/cf_icon_usb2_white.svg);
     background-repeat: no-repeat;
     background-size: 44px;
@@ -1402,7 +1402,7 @@ dialog {
 }
 
 .connect_b a.connect:hover {
-    background-color: #68c02e;
+    background-color: #4689c8;
 }
 
 .connect_b a.connect.active {
