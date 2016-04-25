@@ -354,9 +354,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         // fill board alignment
-        $('input[name="board_align_roll"]').val(BF_CONFIG.board_align_roll);
-        $('input[name="board_align_pitch"]').val(BF_CONFIG.board_align_pitch);
-        $('input[name="board_align_yaw"]').val(BF_CONFIG.board_align_yaw);
+        $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));
+        $('input[name="board_align_pitch"]').val((BF_CONFIG.board_align_pitch / 10.0).toFixed(1));
+        $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
         // fill accel trims
         $('input[name="roll"]').val(CONFIG.accelerometerTrims[1]);
@@ -459,9 +459,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
-            BF_CONFIG.board_align_roll = parseInt($('input[name="board_align_roll"]').val());
-            BF_CONFIG.board_align_pitch = parseInt($('input[name="board_align_pitch"]').val());
-            BF_CONFIG.board_align_yaw = parseInt($('input[name="board_align_yaw"]').val());
+            BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
+            BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
+            BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
             CONFIG.accelerometerTrims[1] = parseInt($('input[name="roll"]').val());
             CONFIG.accelerometerTrims[0] = parseInt($('input[name="pitch"]').val());
