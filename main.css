@@ -60,9 +60,9 @@ a.disabled {
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
-    background-color: #59aa29;
+    background-color: #0a3a9d;
     border-radius: 3px;
-    border: 1px solid #4c8829;
+    border: 1px solid #06235f;
     color: #fff;
     float: right;
     font-family: 'open_sansbold', Arial;
@@ -75,7 +75,7 @@ a.disabled {
 }
 
 .cf_doc_version_bt a:hover {
-    background-color: #6ac435;
+    background-color: #4689c8;
     transition: all ease 0.2s;
 }
 
@@ -135,8 +135,8 @@ input[type="number"]::-webkit-inner-spin-button {
     position: absolute;
     height: 20px;
     width: 125px;
-    left: 31px;
-    top: 63px;
+    left: 0px;
+    top: 60px;
     color: #949494;
     opacity: 0.5;
 }
@@ -938,7 +938,7 @@ dialog {
 
 /* Tab Title */
 .tab_title {
-    border-bottom: 1px solid #59aa29;
+    border-bottom: 1px solid #4689c8;
     font-size: 20px;
     line-height: 24px;
     height: 30px;
@@ -1242,8 +1242,8 @@ dialog {
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
-    border: 1px solid #59aa29;
-    color: #59aa29;
+    border: 1px solid #06235f;
+    color: #06235f !important;
     font-family: 'open_sanssemibold', Arial;
     font-size: 12px;
     line-height: 13px;
@@ -1253,7 +1253,7 @@ dialog {
 }
 
 .default_btn a:hover {
-    background-color: #6ac435;
+    background-color: #4689c8;
     color: #fff;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     transition: all ease 0.2s;
