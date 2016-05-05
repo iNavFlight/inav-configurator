@@ -148,7 +148,7 @@ TABS.setup.initialize = function (callback) {
             bat_mah_drawn_e = $('.bat-mah-drawn'),
             bat_mah_drawing_e = $('.bat-mah-drawing'),
             rssi_e = $('.rssi'),
-            gpsFix_e = $('.gpsFix'),
+            gpsFix_e = $('.gpsFixType'),
             gpsSats_e = $('.gpsSats'),
             gpsLat_e = $('.gpsLat'),
             gpsLon_e = $('.gpsLon'),
@@ -168,7 +168,12 @@ TABS.setup.initialize = function (callback) {
 
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
                 MSP.send_message(MSP_codes.MSP_RAW_GPS, false, false, function () {
-                    gpsFix_e.html((GPS_DATA.fix) ? chrome.i18n.getMessage('gpsFixTrue') : chrome.i18n.getMessage('gpsFixFalse'));
+                    var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
+                    if (GPS_DATA.fix >= 2)
+                        gpsFixType = chrome.i18n.getMessage('gpsFix3D');
+                    else if (GPS_DATA.fix >= 1)
+                        gpsFixType = chrome.i18n.getMessage('gpsFix2D');
+                    gpsFix_e.html(gpsFixType);
                     gpsSats_e.text(GPS_DATA.numSat);
                     gpsLat_e.text((GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
                     gpsLon_e.text((GPS_DATA.lon / 10000000).toFixed(4) + ' deg');
