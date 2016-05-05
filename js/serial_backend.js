@@ -193,34 +193,43 @@ function onOpen(openInfo) {
                         googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
 
-                        MSP.send_message(MSP_codes.MSP_BUILD_INFO, false, false, function () {
+                        if (CONFIG.flightControllerIdentifier == 'INAV') {
 
-                            googleAnalytics.sendEvent('Firmware', 'Using', CONFIG.buildInfo);
-                            GUI.log(chrome.i18n.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
+                            MSP.send_message(MSP_codes.MSP_BUILD_INFO, false, false, function () {
 
-                            MSP.send_message(MSP_codes.MSP_BOARD_INFO, false, false, function () {
+                                googleAnalytics.sendEvent('Firmware', 'Using', CONFIG.buildInfo);
+                                GUI.log(chrome.i18n.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
 
-                                googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
-                                GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
+                                MSP.send_message(MSP_codes.MSP_BOARD_INFO, false, false, function () {
 
-                                MSP.send_message(MSP_codes.MSP_UID, false, false, function () {
-                                    GUI.log(chrome.i18n.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
+                                    googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
+                                    GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
 
-                                    // continue as usually
-                                    CONFIGURATOR.connectionValid = true;
-                                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
-                                    if (semver.lt(CONFIG.apiVersion, "1.4.0")) {
-                                        GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('led_strip'), 1);
-                                    }
+                                    MSP.send_message(MSP_codes.MSP_UID, false, false, function () {
+                                        GUI.log(chrome.i18n.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
 
-                                    GUI.canChangePidController = semver.gte(CONFIG.apiVersion, CONFIGURATOR.pidControllerChangeMinApiVersion);
+                                        // continue as usually
+                                        CONFIGURATOR.connectionValid = true;
+                                        GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
+                                        if (semver.lt(CONFIG.apiVersion, "1.4.0")) {
+                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('led_strip'), 1);
+                                        }
 
-                                    onConnect();
+                                        GUI.canChangePidController = semver.gte(CONFIG.apiVersion, CONFIGURATOR.pidControllerChangeMinApiVersion);
 
-                                    $('#tabs ul.mode-connected .tab_setup a').click();
+                                        onConnect();
+
+                                        $('#tabs ul.mode-connected .tab_setup a').click();
+                                    });
                                 });
                             });
-                        });
+                        } else  {
+                            GUI.log(chrome.i18n.getMessage('firmwareVariantNotSupported'));
+                            CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
+                            GUI.allowedTabs = ['cli'];
+                            onConnect();
+                            $('#tabs .tab_cli a').click();
+                        }
                     });
                 });
             } else {

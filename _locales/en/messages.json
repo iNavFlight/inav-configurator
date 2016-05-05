@@ -156,6 +156,9 @@
     "firmwareVersionNotSupported": {
         "message": "This firmware version is <span style=\"color: red\">not supported</span>. Please upgrade to firmware that supports api version <strong>$1</strong> or higher. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
     },
+    "firmwareVariantNotSupported": {
+        "message": "This firmware variant is <span style=\"color: red\">not supported</span>. Please upgrade to INAV firmware. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
+    },
 
     "tabSwitchConnectionRequired": {
         "message": "You need to <strong>connect</strong> before you can view any of the tabs."
