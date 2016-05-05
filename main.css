@@ -1451,7 +1451,7 @@ dialog {
 }
 
 /* GPS Fix styling*/
-.fixtrue {
+.fix3D {
     background-color: #56ac1d;
     padding: 2px;
     padding-left: 5px;
@@ -1461,7 +1461,17 @@ dialog {
     font-size: 10px;
 }
 
-.fixfalse {
+.fix2D {
+    background-color: #bcbf10;
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 10px;
+}
+
+.fixnone {
     background-color: #e60000;
     padding: 2px;
     padding-left: 5px;

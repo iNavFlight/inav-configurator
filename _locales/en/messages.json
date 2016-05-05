@@ -1126,14 +1126,17 @@
     "gpsMapMessage2": {
         "message": "Waiting for GPS 3D fix…"
     },
-    "gps3dFix": {
-        "message": "3D Fix:"
+    "gpsFix": {
+        "message": "Fix type:"
     },
-    "gpsFixTrue": {
-        "message": "<span class=\"fixtrue\">True</span>"
+    "gpsFix2D": {
+        "message": "<span class=\"fix2d\">2D</span>"
     },
-    "gpsFixFalse": {
-        "message": "<span class=\"fixfalse\">False</span>"
+    "gpsFix3D": {
+        "message": "<span class=\"fix3d\">3D</span>"
+    },
+    "gpsFixNone": {
+        "message": "<span class=\"fixnone\">None</span>"
     },
     "gpsAltitude": {
         "message": "Altitude:"

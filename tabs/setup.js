@@ -12,10 +12,6 @@ TABS.setup.initialize = function (callback) {
         googleAnalytics.sendAppView('Setup');
     }
 
-    function load_status() {
-        MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_ident);
-    }
-
     function load_ident() {
         MSP.send_message(MSP_codes.MSP_IDENT, false, false, load_config);
     }
@@ -32,7 +28,7 @@ TABS.setup.initialize = function (callback) {
         $('#content').load("./tabs/setup.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_ACC_TRIM, false, false, load_status);
+    MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_ident);
 
     function process_html() {
         // translate to user-selected language

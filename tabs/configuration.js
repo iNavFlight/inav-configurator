@@ -28,13 +28,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_misc() {
-        MSP.send_message(MSP_codes.MSP_MISC, false, false, load_acc_trim);
+        MSP.send_message(MSP_codes.MSP_MISC, false, false, load_arming_config);
     }
     
-    function load_acc_trim() {
-        MSP.send_message(MSP_codes.MSP_ACC_TRIM, false, false, load_arming_config);
-    }
-
     function load_arming_config() {
         var next_callback = load_loop_time;
         if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
