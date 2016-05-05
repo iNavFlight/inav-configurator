@@ -101,6 +101,7 @@ var MSP_codes = {
     MSP_ACC_TRIM:           240, // get acc angle trim values
     MSP_SET_ACC_TRIM:       239, // set acc angle trim values
     MSP_GPS_SV_INFO:        164, // get Signal Strength
+    MSP_GPSSTATISTICS:      166, // GPS statistics
     
     // Additional private MSP for baseflight configurator (yes thats us \o/)
     MSP_RX_MAP:              64, // get channel map (also returns number of channels total)
@@ -308,11 +309,21 @@ var MSP = {
                 GPS_DATA.alt = data.getUint16(10, 1);
                 GPS_DATA.speed = data.getUint16(12, 1);
                 GPS_DATA.ground_course = data.getUint16(14, 1);
+                GPS_DATA.hdop = data.getUint16(16, 1);
                 break;
             case MSP_codes.MSP_COMP_GPS:
                 GPS_DATA.distanceToHome = data.getUint16(0, 1);
                 GPS_DATA.directionToHome = data.getUint16(2, 1);
                 GPS_DATA.update = data.getUint8(4);
+                break;
+            case MSP_codes.MSP_GPSSTATISTICS:
+                GPS_DATA.messageDt = data.getUint16(0, 1);
+                GPS_DATA.errors = data.getUint32(2, 1);
+                GPS_DATA.timeouts = data.getUint32(6, 1);
+                GPS_DATA.packetCount = data.getUint32(10, 1);
+                GPS_DATA.hdop = data.getUint16(14, 1);
+                GPS_DATA.eph = data.getUint16(16, 1);
+                GPS_DATA.epv = data.getUint16(18, 1);
                 break;
             case MSP_codes.MSP_ATTITUDE:
                 SENSOR_DATA.kinematics[0] = data.getInt16(0, 1) / 10.0; // x
@@ -611,21 +622,6 @@ var MSP = {
                 break;
             case MSP_codes.MSP_SET_ACC_TRIM:
                 console.log('Accelerometer trimms saved.');
-                break;
-            case MSP_codes.MSP_GPS_SV_INFO:
-                if (data.byteLength > 0) {
-                    var numCh = data.getUint8(0);
-
-                    var needle = 1;
-                    for (var i = 0; i < numCh; i++) {
-                        GPS_DATA.chn[i] = data.getUint8(needle);
-                        GPS_DATA.svid[i] = data.getUint8(needle + 1);
-                        GPS_DATA.quality[i] = data.getUint8(needle + 2);
-                        GPS_DATA.cno[i] = data.getUint8(needle + 3);
-
-                        needle += 4;
-                    }
-                }
                 break;
             // Additional private MSP for baseflight configurator
             case MSP_codes.MSP_RX_MAP:

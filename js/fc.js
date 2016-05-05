@@ -145,12 +145,13 @@ var FC = {
             distanceToHome:  0,
             ditectionToHome: 0,
             update:          0,
-        
-            // baseflight specific gps stuff
-            chn:     [],
-            svid:    [],
-            quality: [],
-            cno:     []
+            hdop:            0,
+            eph:             0,
+            epv:             0,
+            messageDt:       0,
+            errors:          0,
+            timeouts:        0,
+            packetCount:     0
         };
         
         ANALOG = {

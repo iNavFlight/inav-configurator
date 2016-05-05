@@ -1114,6 +1114,9 @@
     "gpsHead": {
         "message": "GPS"
     },
+    "gpsStatHead": {
+        "message": "GPS Statistics"
+    },
     "gpsMapHead": {
         "message": "Current GPS location"
     },
@@ -1150,8 +1153,26 @@
     "gpsDistToHome": {
         "message": "Dist to Home:"
     },
-    "gpsSignalStrHead": {
-        "message": "GPS Signal Strength"
+    "gpsHDOP": {
+        "message": "HDOP:"
+    },
+    "gpsTotalMessages": {
+        "message": "Total messages:"
+    },
+    "gpsMessageRate": {
+        "message": "Update time:"
+    },
+    "gpsErrors": {
+        "message": "Errors:"
+    },
+    "gpsTimeouts": {
+        "message": "Timeouts:"
+    },
+    "gpsEPH": {
+        "message": "EPH:"
+    },
+    "gpsEPV": {
+        "message": "EPV:"
     },
     "gpsSignalStr": {
         "message": "Signal Strength"
