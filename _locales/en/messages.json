@@ -1639,6 +1639,9 @@
     "failsafeProcedureItemSelect2": {
         "message": "Drop"
     },
+    "failsafeProcedureItemSelect3": {
+        "message": "RTH"
+    },
     "failsafeKillSwitchItem": {
         "message": "Failsafe Kill Switch (setup Failsafe in Modes Tab)"
     },

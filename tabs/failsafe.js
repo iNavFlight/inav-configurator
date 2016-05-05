@@ -257,6 +257,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                     element.prop('checked', true);
                     element.change();
                     break;
+                case 2:
+                    element = $('input[id="rth"]');
+                    element.prop('checked', true);
+                    element.change();
+                    break;
             }
 
             // set stage 2 kill switch option
@@ -294,6 +299,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                     FAILSAFE_CONFIG.failsafe_procedure = 0;
                 } else if( $('input[id="drop"]').is(':checked')) {
                     FAILSAFE_CONFIG.failsafe_procedure = 1;
+                } else if( $('input[id="rth"]').is(':checked')) {
+                    FAILSAFE_CONFIG.failsafe_procedure = 2;
                 }
 
                 FAILSAFE_CONFIG.failsafe_kill_switch = $('input[name="failsafe_kill_switch"]').is(':checked') ? 1 : 0;
