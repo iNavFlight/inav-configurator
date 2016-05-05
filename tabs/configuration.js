@@ -257,7 +257,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // generate GPS
         var gpsProtocols = [
             'NMEA',
-            'UBLOX'
+            'UBLOX',
+            'I2C-NAV',
+            'DJI NAZA',
         ];
 
         var gpsBaudRates = [
@@ -325,12 +327,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             'SUMD',
             'SUMH',
             'XBUS_MODE_B',
-            'XBUS_MODE_B_RJ01'
+            'XBUS_MODE_B_RJ01',
+            'IBUS'
         ];
-
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            serialRXtypes.push('IBUS');
-        }
 
         var serialRX_e = $('select.serialRX');
         for (var i = 0; i < serialRXtypes.length; i++) {

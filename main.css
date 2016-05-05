@@ -302,6 +302,24 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #818181;
 }
 
+.opflowicon {
+    background-image: url(images/icons/sensor_flow_off.png);
+    background-size: 42px;
+    background-position: -5px 2px;
+    background-repeat: no-repeat;
+    height: 30px;
+    margin-top: 3px;
+    width: 100%;
+    padding-top: 40px;
+    color: #4f4f4f;
+    text-align: center;
+}
+
+.opflowicon.active {
+    background-image: url(images/icons/sensor_flow_on.png);
+    color: #818181;
+}
+
 .baroicon {
     background-image: url(images/icons/sensor_baro_off.png);
     background-size: 40px;
@@ -1451,7 +1469,7 @@ dialog {
 }
 
 /* GPS Fix styling*/
-.fix3D {
+.fix3d {
     background-color: #56ac1d;
     padding: 2px;
     padding-left: 5px;
@@ -1461,7 +1479,7 @@ dialog {
     font-size: 10px;
 }
 
-.fix2D {
+.fix2d {
     background-color: #bcbf10;
     padding: 2px;
     padding-left: 5px;
