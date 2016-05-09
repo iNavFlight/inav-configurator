@@ -271,14 +271,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         ];
 
         var gpsSbas = [
-            'Disabled',
+            'Autodetect',
             'European EGNOS',
             'North American WAAS',
             'Japanese MSAS',
             'Indian GAGAN',
-            'Autodetect'
+            'Disabled',
         ];
-
 
         var gps_protocol_e = $('select.gps_protocol');
         for (var i = 0; i < gpsProtocols.length; i++) {
@@ -306,7 +305,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             gps_baudrate_e.prop("disabled", true);
             gps_baudrate_e.parent().hide();
         }
-        
         
         var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
         for (var i = 0; i < gpsSbas.length; i++) {
