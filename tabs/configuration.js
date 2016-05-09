@@ -271,11 +271,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         ];
 
         var gpsSbas = [
-            'Auto-detect',
+            'Disabled',
             'European EGNOS',
             'North American WAAS',
             'Japanese MSAS',
-            'Indian GAGAN'
+            'Indian GAGAN',
+            'Autodetect'
         ];
 
 
