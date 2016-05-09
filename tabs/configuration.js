@@ -30,7 +30,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     function load_misc() {
         MSP.send_message(MSP_codes.MSP_MISC, false, false, load_arming_config);
     }
-    
+
     function load_arming_config() {
         var next_callback = load_loop_time;
         if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
@@ -39,7 +39,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             next_callback();
         }
     }
-    
+
     function load_loop_time() {
         var next_callback = load_3d;
         if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
@@ -57,7 +57,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             next_callback();
         }
     }
-    
+
     function load_sensor_alignment() {
         var next_callback = load_html;
         if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
@@ -87,12 +87,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         if (looptime > 0) {
             message = parseFloat((1 / looptime) * 1000 * 1000).toFixed(0);
         }
-        
+
         $('input[name="looptimehz"]').val(message);
     }
-    
+
     function process_html() {
-        
+
         var mixer_list_e = $('select.mixerList');
         for (var i = 0; i < mixerList.length; i++) {
             mixer_list_e.append('<option value="' + (i + 1) + '">' + mixerList[i].name + '</option>');
@@ -132,7 +132,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
         ];
-        
+
         if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
             features.push(
                 {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
@@ -155,16 +155,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         var radioGroups = [];
-        
+
         var features_e = $('.features');
         for (var i = 0; i < features.length; i++) {
             var row_e;
-            
+
             var feature_tip_html = '';
             if (features[i].haveTip) {
                 feature_tip_html = '<div class="helpicon cf_tip" i18n_title="feature' + features[i].name + 'Tip"></div>';
             }
-            
+
             if (features[i].mode === 'group') {
                 row_e = $('<tr><td style="width: 15px;"><input style="width: 13px;" class="feature" id="feature-'
                         + i
@@ -178,7 +178,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                         + i
                         + '">'
                         + features[i].name
-                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>' 
+                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>'
                         + feature_tip_html + '</td></tr>');
                 radioGroups.push(features[i].group);
             } else {
@@ -192,9 +192,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                         + i
                         + '">'
                         + features[i].name
-                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>' 
+                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>'
                         + feature_tip_html + '</td></tr>');
-                
+
                 var feature_e = row_e.find('input.feature');
 
                 feature_e.prop('checked', bit_check(BF_CONFIG.features, features[i].bit));
@@ -207,24 +207,24 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             });
         }
-        
+
         // translate to user-selected language
         localize();
 
         for (var i = 0; i < radioGroups.length; i++) {
             var group = radioGroups[i];
             var controls_e = $('input[name="' + group + '"].feature');
-            
-            
+
+
             controls_e.each(function() {
                 var bit = parseInt($(this).attr('value'));
                 var state = bit_check(BF_CONFIG.features, bit);
-                
+
                 $(this).prop('checked', state);
             });
         }
 
-        
+
         var alignments = [
             'CW 0°',
             'CW 90°',
@@ -235,7 +235,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             'CW 180° flip',
             'CW 270° flip'
         ];
-        
+
         var orientation_gyro_e = $('select.gyroalign');
         var orientation_acc_e = $('select.accalign');
         var orientation_mag_e = $('select.magalign');
@@ -252,8 +252,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             orientation_acc_e.val(SENSOR_ALIGNMENT.align_acc);
             orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
         }
-        
-        
+
+
         // generate GPS
         var gpsProtocols = [
             'NMEA',
@@ -289,13 +289,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         gps_protocol_e.val(MISC.gps_type);
-        
-        
+
+
         var gps_baudrate_e = $('select.gps_baudrate');
         for (var i = 0; i < gpsBaudRates.length; i++) {
             gps_baudrate_e.append('<option value="' + gpsBaudRates[i] + '">' + gpsBaudRates[i] + '</option>');
         }
-    
+
         if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
             gps_baudrate_e.change(function () {
                 SERIAL_CONFIG.gpsBaudRate = parseInt($(this).val());
@@ -305,7 +305,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             gps_baudrate_e.prop("disabled", true);
             gps_baudrate_e.parent().hide();
         }
-        
+
         var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
         for (var i = 0; i < gpsSbas.length; i++) {
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
@@ -355,30 +355,30 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill magnetometer
         $('input[name="mag_declination"]').val(MISC.mag_declination);
 
-        //fill motor disarm params and FC loop time        
+        //fill motor disarm params and FC loop time
         if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
             $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
             $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
-            $('div.disarm').show();            
+            $('div.disarm').show();
             if(bit_check(BF_CONFIG.features, 4))//MOTOR_STOP
                 $('div.disarmdelay').show();
             else
                 $('div.disarmdelay').hide();
-            
+
             // fill FC loop time
             $('input[name="looptime"]').val(FC_CONFIG.loopTime);
 
             recalculate_cycles_sec();
-            
+
             $('div.cycles').show();
         }
-        
+
         // fill throttle
         $('input[name="minthrottle"]').val(MISC.minthrottle);
         $('input[name="midthrottle"]').val(MISC.midrc);
         $('input[name="maxthrottle"]').val(MISC.maxthrottle);
         $('input[name="mincommand"]').val(MISC.mincommand);
-        
+
         // fill battery
         $('input[name="mincellvoltage"]').val(MISC.vbatmincellvoltage);
         $('input[name="maxcellvoltage"]').val(MISC.vbatmaxcellvoltage);
@@ -416,7 +416,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             if (state) {
                 BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
-                if(element.attr('name') === 'MOTOR_STOP')                    
+                if(element.attr('name') === 'MOTOR_STOP')
                     $('div.disarmdelay').show();
             } else {
                 BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
@@ -432,10 +432,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             var controls_e = $('input[name="' + group + '"]');
             var selected_bit = controls_e.filter(':checked').val();
-            
+
             controls_e.each(function() {
                 var bit = $(this).attr('value');
-                
+
                 var selected = (selected_bit == bit);
                 if (selected) {
                     BF_CONFIG.features = bit_set(BF_CONFIG.features, bit);
@@ -454,14 +454,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
             MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
-            
+
             // motor disarm
             if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
                 ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
                 ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
                 FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
             }
-            
+
             MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
             MISC.midrc = parseInt($('input[name="midthrottle"]').val());
             MISC.maxthrottle = parseInt($('input[name="maxthrottle"]').val());
@@ -492,7 +492,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             if (isFeatureEnabled('RX_SERIAL')) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRXtypes[BF_CONFIG.serialrx_type]);
             }
-            
+
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
                 if (isFeatureEnabled(featureName)) {
@@ -512,23 +512,23 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             function save_misc() {
                 MSP.send_message(MSP_codes.MSP_SET_MISC, MSP.crunch(MSP_codes.MSP_SET_MISC), false, save_3d);
             }
-            
+
             function save_3d() {
                 var next_callback = save_sensor_alignment;
                 if(semver.gte(CONFIG.apiVersion, "1.14.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_3D, MSP.crunch(MSP_codes.MSP_SET_3D), false, next_callback);
                 } else {
                    next_callback();
-                }     
+                }
             }
-            
+
             function save_sensor_alignment() {
                 var next_callback = save_acc_trim;
                 if(semver.gte(CONFIG.apiVersion, "1.15.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_SENSOR_ALIGNMENT, MSP.crunch(MSP_codes.MSP_SET_SENSOR_ALIGNMENT), false, next_callback);
                 } else {
                    next_callback();
-                }     
+                }
             }
 
             function save_acc_trim() {

@@ -68,6 +68,9 @@
     "tabSetup": {
         "message": "Setup"
     },
+    "tabCalibration": {
+        "message": "Calibration"
+    },
     "tabConfiguration": {
         "message": "Configuration"
     },
