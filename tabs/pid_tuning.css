@@ -1,3 +1,25 @@
+.rate-tpa.rate-tpa--inav input[type="number"] {
+    margin: 4px;
+    width: auto;
+    border: 1px solid silver;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.rate-tpa.rate-tpa--inav td {
+    background-color: #DEDEDE;
+    width: auto;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-pid_tuning .rate-tpa.rate-tpa--inav th:first-child {
+    border-top-left-radius: 0;
+}
+
+.tab-pid_tuning .rate-tpa.rate-tpa--inav .roll {
+    border-bottom-left-radius: 0;
+}
+
 .tab-pid_tuning .rate-tpa th {
     background-color: #828885;
     padding: 4px;
@@ -153,7 +175,7 @@
     font-weight: normal;
     padding: 2px;
     padding-left: 6px;
-    border-top-left-radius: 3px; 
+    border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
 
@@ -258,11 +280,11 @@
 }
 
 .show {
-    width:110px; 
-    float:right; 
+    width:110px;
+    float:right;
     margin-right:3px;
 }
-    
+
 .show a {
     margin-left: 10px;
     width: calc(100% - 10px);
@@ -282,7 +304,7 @@
     margin-right: 5px;
 }
 
-.tab-pid_tuning .spacer_left {    
+.tab-pid_tuning .spacer_left {
     padding-left: 15px;
     float: right;
     width: calc(100% - 20px)
@@ -327,7 +349,7 @@
     color: #7d7d7d;
     font-size: 11px;
 }
-    
+
 #content-watermark {
     position: absolute;
     bottom: 40px;
@@ -344,7 +366,7 @@
 }
 
 .tab-pid_tuning .resetbt {
-    width: 140px; 
+    width: 140px;
     float: right;
 }
 
@@ -374,13 +396,13 @@
 }
 
 .tab-pid_tuning .borderleft {
-    border-top-left-radius: 3px; 
+    border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
 
 .tab-pid_tuning .textleft {
-    width: 25%; 
-    float: left; 
+    width: 25%;
+    float: left;
     text-align: left;
 }
 

@@ -173,9 +173,17 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // Fill in data from RC_tuning object
         $('.rate-tpa input[name="roll-pitch"]').val(RC_tuning.roll_pitch_rate.toFixed(2));
-        $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate.toFixed(2));
-        $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate.toFixed(2));
-        $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
+
+        if (FC.isRatesInDps()) {
+            $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate);
+            $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate);
+            $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate);
+        } else {
+            $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate.toFixed(2));
+            $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate.toFixed(2));
+            $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
+        }
+
         $('.rate-tpa input[name="tpa"]').val(RC_tuning.dynamic_THR_PID.toFixed(2));
         $('.rate-tpa input[name="tpa-breakpoint"]').val(RC_tuning.dynamic_THR_breakpoint);
     }
@@ -234,9 +242,9 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // catch RC_tuning changes
         RC_tuning.roll_pitch_rate = parseFloat($('.rate-tpa input[name="roll-pitch"]').val());
-        RC_tuning.roll_rate = parseFloat($('.rate-tpa input[name="roll"]').val());
-        RC_tuning.pitch_rate = parseFloat($('.rate-tpa input[name="pitch"]').val());
-        RC_tuning.yaw_rate = parseFloat($('.rate-tpa input[name="yaw"]').val());
+        RC_tuning.roll_rate = parseFloat($('.rate-tpa input[name="roll"]:visible').val());
+        RC_tuning.pitch_rate = parseFloat($('.rate-tpa input[name="pitch"]:visible').val());
+        RC_tuning.yaw_rate = parseFloat($('.rate-tpa input[name="yaw"]:visible').val());
         RC_tuning.dynamic_THR_PID = parseFloat($('.rate-tpa input[name="tpa"]').val());
         RC_tuning.dynamic_THR_breakpoint = parseInt($('.rate-tpa input[name="tpa-breakpoint"]').val());
     }
@@ -313,12 +321,12 @@ TABS.pid_tuning.initialize = function (callback) {
                 { name: "LuxFloat"},
             ]
         }
-        
+
         for (var i = 0; i < pidControllerList.length; i++) {
             pidController_e.append('<option value="' + (i) + '">' + pidControllerList[i].name + '</option>');
         }
-       
-        
+
+
         var form_e = $('#pid-tuning');
 
         if (GUI.canChangePidController) {
@@ -336,8 +344,12 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rate-tpa .tpa-breakpoint').hide();
             $('.rate-tpa .roll').hide();
             $('.rate-tpa .pitch').hide();
+            $('.rate-tpa--inav').hide();
+        } else if (FC.isRatesInDps()) {
+           $('.rate-tpa--no-dps').hide();
         } else {
             $('.rate-tpa .roll-pitch').hide();
+            $('.rate-tpa--inav').hide();
         }
 
         // UI Hooks

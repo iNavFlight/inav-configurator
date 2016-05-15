@@ -37,6 +37,13 @@ var FAILSAFE_CONFIG;
 var RXFAIL_CONFIG;
 
 var FC = {
+    isRatesInDps: function () {
+        if (typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0")) {
+            return true;
+        } else {
+            return false;
+        }
+    },
     resetState: function() {
         CONFIG = {
             apiVersion:    "0.0.0",
@@ -55,7 +62,7 @@ var FC = {
             uid:           [0, 0, 0],
             accelerometerTrims: [0, 0]
         };
-        
+
         BF_CONFIG = {
             mixerConfiguration:     0,
             features:               0,
@@ -66,33 +73,33 @@ var FC = {
             currentscale:           0,
             currentoffset:          0
         };
-        
+
         LED_STRIP = [];
-        
+
         PID = {
             controller:             0
         };
-        
+
         PID_names = [];
         PIDs = new Array(10);
         for (var i = 0; i < 10; i++) {
             PIDs[i] = new Array(3);
         }
-        
+
         RC_MAP = [];
-        
+
         // defaults
         // roll, pitch, yaw, throttle, aux 1, ... aux n
         RC = {
             active_channels: 0,
             channels: new Array(32)
         };
-        
+
         RC_tuning = {
             RC_RATE:         0,
             RC_EXPO:         0,
             roll_pitch_rate: 0, // pre 1.7 api only
-            roll_rate:       0, 
+            roll_rate:       0,
             pitch_rate:      0,
             yaw_rate:        0,
             dynamic_THR_PID: 0,
@@ -101,26 +108,26 @@ var FC = {
             dynamic_THR_breakpoint: 0,
         	RC_YAW_EXPO:         0
         };
-        
+
         AUX_CONFIG = [];
         AUX_CONFIG_IDS = [];
-        
+
         MODE_RANGES = [];
         ADJUSTMENT_RANGES = [];
-        
+
         SERVO_CONFIG = [];
         SERVO_RULES = [];
-        
+
         SERIAL_CONFIG = {
             ports: [],
-            
+
             // pre 1.6 settings
             mspBaudRate: 0,
             gpsBaudRate: 0,
             gpsPassthroughBaudRate: 0,
             cliBaudRate: 0,
         };
-        
+
         SENSOR_DATA = {
             gyroscope:     [0, 0, 0],
             accelerometer: [0, 0, 0],
@@ -130,10 +137,10 @@ var FC = {
             kinematics:    [0.0, 0.0, 0.0],
             debug:         [0, 0, 0, 0]
         };
-        
+
         MOTOR_DATA = new Array(8);
         SERVO_DATA = new Array(8);
-        
+
         GPS_DATA = {
             fix:             0,
             numSat:          0,
@@ -153,23 +160,23 @@ var FC = {
             timeouts:        0,
             packetCount:     0
         };
-        
+
         ANALOG = {
             voltage:    0,
             mAhdrawn:   0,
             rssi:       0,
             amperage:   0
         };
-        
+
         ARMING_CONFIG = {
             auto_disarm_delay:      0,
             disarm_kill_switch:     0
         };
-        
+
         FC_CONFIG = {
             loopTime: 0
         };
-        
+
         MISC = {
             midrc:                  0,
             minthrottle:            0,
@@ -188,14 +195,14 @@ var FC = {
             vbatmaxcellvoltage:     0,
             vbatwarningcellvoltage: 0
         };
-        
+
         _3D = {
             deadband3d_low:         0,
             deadband3d_high:        0,
             neutral3d:              0,
             deadband3d_throttle:    0
         };
-        
+
         DATAFLASH = {
             ready: false,
             supported: false,
@@ -203,7 +210,7 @@ var FC = {
             totalSize: 0,
             usedSize: 0
         };
-        
+
         SDCARD = {
             supported: false,
             state: 0,
@@ -211,31 +218,31 @@ var FC = {
             freeSizeKB: 0,
             totalSizeKB: 0,
         };
-        
+
         BLACKBOX = {
             supported: false,
             blackboxDevice: 0,
             blackboxRateNum: 1,
             blackboxRateDenom: 1
         };
-        
+
         TRANSPONDER = {
             supported: false,
             data: []
         };
-        
+
         RC_deadband = {
             deadband:               0,
             yaw_deadband:           0,
             alt_hold_deadband:      0
         };
-        
+
         SENSOR_ALIGNMENT = {
             align_gyro:             0,
             align_acc:              0,
             align_mag:              0
         };
-        
+
         RX_CONFIG = {
             serialrx_provider:      0,
             maxcheck:               0,
@@ -245,7 +252,7 @@ var FC = {
             rx_min_usec:            0,
             rx_max_usec:            0
         };
-        
+
         FAILSAFE_CONFIG = {
             failsafe_delay:                 0,
             failsafe_off_delay:             0,
@@ -254,7 +261,7 @@ var FC = {
             failsafe_throttle_low_delay:    0,
             failsafe_procedure:             0
         };
-        
+
         RXFAIL_CONFIG = [];
     }
 };
