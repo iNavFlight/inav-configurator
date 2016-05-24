@@ -118,7 +118,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 
 #logo {
-    position: relative;
+    position: absolute;
     float: left;
     height: 80px;
     z-index: 0;
