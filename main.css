@@ -120,15 +120,15 @@ input[type="number"]::-webkit-inner-spin-button {
 #logo {
     position: relative;
     float: left;
-    height: 70px;
+    height: 80px;
     z-index: 0;
     background-image: url("images/light-wide-2.svg");
     background-repeat: no-repeat;
-    width: 340px;
+    width: 450px;
     background-position: left center;
     background-size: contain;
     margin-left: 15px;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .logo_text {
@@ -136,7 +136,7 @@ input[type="number"]::-webkit-inner-spin-button {
     height: 20px;
     width: 125px;
     left: 0px;
-    top: 60px;
+    top: 65px;
     color: #949494;
     opacity: 0.5;
 }

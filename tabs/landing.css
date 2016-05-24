@@ -41,14 +41,10 @@
 }
 
 .tab-landing .logowrapper img {
-    width: 420px;
-    margin: 5px;
+    width: 700px;
+    margin: 10px;
 }
 
-.tab-landing .logowrapper span {
-    font-size: 22px;
-    font-family: 'open_sanslight', Arial;
-}
 
 /* sponsors blocks */
 .sponsors .title {
