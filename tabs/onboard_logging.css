@@ -14,6 +14,7 @@
     color: white;
     font-weight: bold;
     /* text-shadow: 1px 0px 2px rgba(0, 0, 0, 0.9);*/
+
 }
 
 .tab-onboard_logging .properties {
@@ -118,6 +119,7 @@
 
 .tab-onboard_logging progress::-webkit-progress-value {
     background-color: #bcf;
+
 }
 
 .tab-onboard_logging dialog {
@@ -241,8 +243,8 @@
     border: 1px solid #68a7ff;
 } 
 .tab-onboard_logging.sdcard-ready .sdcard-icon {
-    background-color: #56ac1d;
-    border: 1px solid #5bbb1b;
+    background-color: #37a8db;
+    border: 1px solid #68a7ff;
 } 
 .tab-onboard_logging .sdcard-icon {
 	box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.35);
