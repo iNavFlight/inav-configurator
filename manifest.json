@@ -3,7 +3,7 @@
     "minimum_chrome_version": "38",
     "version": "1.0.0",
     "author": "Several",
-    "name": "INAVFlight - Configurator",
+    "name": "INAV - Configurator",
     "short_name": "INAV",
     "description": "Crossplatform configuration tool for INAVFlight flight control system",
 

@@ -35,7 +35,7 @@
         "message": "Device - <span style=\"color: red\">Rebooting</span>"
     },
     "deviceReady": {
-        "message": "Device - <span style=\"color: #57a929\">Ready</span>"
+        "message": "Device - <span style=\"color: #37a8db\">Ready</span>"
     },
 
     "backupFileIncompatible": {
@@ -125,26 +125,26 @@
     },
 
     "serialPortOpened": {
-        "message": "Serial port <span style=\"color: #57a929\">successfully</span> opened with ID: $1"
+        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
     },
     "serialPortClosedOk": {
-        "message": "Serial port <span style=\"color: #57a929\">successfully</span> closed"
+        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> closed"
     },
     "serialPortClosedFail": {
         "message": "<span style=\"color: red\">Failed</span> to close serial port"
     },
 
     "usbDeviceOpened": {
-        "message": "USB device <span style=\"color: #57a929\">successfully</span> opened with ID: $1"
+        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
     "usbDeviceOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open USB device!"
     },
     "usbDeviceClosed": {
-        "message": "USB device <span style=\"color: #57a929\">successfully</span> closed"
+        "message": "USB device <span style=\"color: #37a8db\">successfully</span> closed"
     },
     "usbDeviceCloseFail": {
         "message": "<span style=\"color: red\">Failed</span> to close USB device"
@@ -177,10 +177,10 @@
         "message": "Firmware Version: <strong>$1</strong>"
     },
     "apiVersionReceived": {
-        "message": "MultiWii API version <span style=\"color: #57a929\">received</span> - <strong>$1</strong>"
+        "message": "MultiWii API version <span style=\"color: #37a8db\">received</span> - <strong>$1</strong>"
     },
     "uniqueDeviceIdReceived": {
-        "message": "Unique device ID <span style=\"color: #57a929\">received</span> - <strong>0x$1</strong>"
+        "message": "Unique device ID <span style=\"color: #37a8db\">received</span> - <strong>0x$1</strong>"
     },
     "boardInfoReceived": {
         "message": "Board: <strong>$1</strong>, version: <strong>$2</strong>"
@@ -222,7 +222,7 @@
         "message": "Please use the Firmware Flasher to access DFU devices"
     },
     "dfu_erased_kilobytes": {
-        "message": "Erased $1 kB of flash <span style=\"color: #57a929\">successfully</span>"
+        "message": "Erased $1 kB of flash <span style=\"color: #37a8db\">successfully</span>"
     },
     "dfu_device_flash_info": {
         "message": "Detected device with total flash size $1 kiB"
@@ -232,21 +232,21 @@
     },
 
     "eeprom_saved_ok": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "defaultWelcomeIntro": {
-        "message": "Welcome to <strong>INAVFlight - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
+        "message": "Welcome to <strong>INAV - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
     },
     
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAVFlight (<a href=\"http://seriouslypro.com/spracingf3\" target=\"_blank\">SPRacingF3</a>, <a href=\"http://www.immersionrc.com/fpv-products/vortex-racing-quad/\" target=\"_blank\">Vortex</a>, <a href=\"https://github.com/TauLabs/TauLabs/wiki/Sparky\" target=\"_blank\">Sparky</a>, <a href=\"http://www.readymaderc.com/store/index.php?main_page=product_info&cPath=76_156&products_id=4221\" target=\"_blank\">DoDo</a>, <a href=\"https://www.openpilot.org/product/coptercontrol/\" target=\"_blank\">CC3D/EVO</a>, <a href=\"http://www.multiwiicopter.com/products/paris-air-hero-32-naze\" target=\"_blank\">Air Hero 32</a>, <a href=\"http://www.readytoflyquads.com/flight-controllers/flip-series\" target=\"_blank\">Flip32/+/Deluxe</a>, <a href=\"http://multirotormania.com/129-dragonfly32\" target=\"_blank\">DragonFly32</a>, <a href=\"http://www.goodluckbuy.com/micro-quadcopter-flight-driver-controller-9dof-9-axis-altitude-sensor-stm32f103.html\" target=\"_blank\">CJMCU Microquad</a>, Chebuzz F3, <a href=\"http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF254044\" target=\"_blank\">STM32F3Discovery</a>, <a href=\"http://www.overskyrc.com/hermit-micro-fpv-brushless-quadcopter-145mm-98g-fully-assembled-p-621.html\" target=\"_blank\">Hermit</a>, <a href=\"http://rcexplorer.se/blog/2015/05/introducing-the-naze32-tricopter-frame/\" target=\"_blank\">Naze32 Tricopter Frame</a>, <a href=\"http://www.2dogrc.com/skyline-32-naze-32-bit-flight-controller-acro-version.html\" target=\"_blank\">Skyline32</a>, <a href=\"http://abusemark.com/store/index.php?main_page=index&cPath=1\" target=\"_blank\">Naze/32/Mini/Pro</a>/<a href=\"http://www.massiverc.com/Shop/en/574-massive-acro-blackbox-flight-control-board.html\" target=\"_blank\">Blackbox</a> etc)<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/cleanflight/cleanflight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/cleanflight/cleanflight/releases\" title=\"www.github.com\" target=\"_blank\">here</a>, development builds available <a href=\"http://cleanflight.memoryleaks.org/builds/\" target=\"_blank\">here</a><br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"http://seriouslypro.com/spracingf3\" target=\"_blank\">SPRacingF3</a>, <a href=\"http://www.immersionrc.com/fpv-products/vortex-racing-quad/\" target=\"_blank\">Vortex</a>, <a href=\"https://github.com/TauLabs/TauLabs/wiki/Sparky\" target=\"_blank\">Sparky</a>, <a href=\"http://www.readymaderc.com/store/index.php?main_page=product_info&cPath=76_156&products_id=4221\" target=\"_blank\">DoDo</a>, <a href=\"https://www.openpilot.org/product/coptercontrol/\" target=\"_blank\">CC3D/EVO</a>, <a href=\"http://www.multiwiicopter.com/products/paris-air-hero-32-naze\" target=\"_blank\">Air Hero 32</a>, <a href=\"http://www.readytoflyquads.com/flight-controllers/flip-series\" target=\"_blank\">Flip32/+/Deluxe</a>, <a href=\"http://multirotormania.com/129-dragonfly32\" target=\"_blank\">DragonFly32</a>, <a href=\"http://www.goodluckbuy.com/micro-quadcopter-flight-driver-controller-9dof-9-axis-altitude-sensor-stm32f103.html\" target=\"_blank\">CJMCU Microquad</a>, Chebuzz F3, <a href=\"http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF254044\" target=\"_blank\">STM32F3Discovery</a>, <a href=\"http://www.overskyrc.com/hermit-micro-fpv-brushless-quadcopter-145mm-98g-fully-assembled-p-621.html\" target=\"_blank\">Hermit</a>, <a href=\"http://rcexplorer.se/blog/2015/05/introducing-the-naze32-tricopter-frame/\" target=\"_blank\">Naze32 Tricopter Frame</a>, <a href=\"http://www.2dogrc.com/skyline-32-naze-32-bit-flight-controller-acro-version.html\" target=\"_blank\">Skyline32</a>, <a href=\"http://abusemark.com/store/index.php?main_page=index&cPath=1\" target=\"_blank\">Naze/32/Mini/Pro</a>/<a href=\"http://www.massiverc.com/Shop/en/574-massive-acro-blackbox-flight-control-board.html\" target=\"_blank\">Blackbox</a> etc)<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/cleanflight/cleanflight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/cleanflight/cleanflight/releases\" title=\"www.github.com\" target=\"_blank\">here</a>, development builds available <a href=\"http://cleanflight.memoryleaks.org/builds/\" target=\"_blank\">here</a><br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
     },
     "defaultContributingText": {
-        "message": "If you would like to help make INAVFlight even better you can help in many ways, including:<br /><ul><li>Answering other users questions on the forums and IRC.</li><li>Contributing code to the firmware and configurator - new features, fixes, improvements</li><li>Testing <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new features/fixes</a> and providing feedback.</li><li>Helping out with <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">issues and commenting on feature requests</a>.</li><li><a href=\"https://www.paypal.me/KonstantinSharlaimov\" target=\"_blank\" title=\"Donate\">Donating</a></li></ul>"
+        "message": "If you would like to help make INAV even better you can help in many ways, including:<br /><ul><li>Answering other users questions on the forums and IRC.</li><li>Contributing code to the firmware and configurator - new features, fixes, improvements</li><li>Testing <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new features/fixes</a> and providing feedback.</li><li>Helping out with <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">issues and commenting on feature requests</a>.</li><li><a href=\"https://www.paypal.me/KonstantinSharlaimov\" target=\"_blank\" title=\"Donate\">Donating</a></li></ul>"
     },
     "defaultChangelogHead": {
         "message": "Configurator - Changelog"
@@ -258,7 +258,7 @@
         "message": "Open Source / Donation Notice"
     },
     "defaultDonateText": {
-        "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAVFlight</strong> users.<br />If you found the INAVFlight or INAVFlight Configurator useful, please consider <strong>supporting</strong> its development by donating."
+        "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAVF</strong> users.<br />If you found the INAV or INAV Configurator useful, please consider <strong>supporting</strong> its development by donating."
     },
     "defaultSponsorsHead": {
         "message": "Sponsors"
@@ -304,7 +304,7 @@
     },
     
     "initialSetupBackupAndRestoreApiVersion": {
-        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #57a929\">$2</span>.  Please backup your settings via the CLI, see Cleanflight documentation for procedure."
+        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see Cleanflight documentation for procedure."
     },
     "initialSetupButtonCalibrateAccel": {
         "message": "Calibrate Accelerometer"
@@ -334,10 +334,10 @@
         "message": "<strong>Backup</strong> your configuration in case of an accident, <strong>CLI</strong> settings are <span style=\"color: red\">not</span> included - See 'dump' cli command"
     },
     "initialSetupBackupSuccess": {
-        "message": "Backup saved <span style=\"color: #57a929\">successfully</span>"
+        "message": "Backup saved <span style=\"color: #37a8db\">successfully</span>"
     },
     "initialSetupRestoreSuccess": {
-        "message": "Configuration restored <span style=\"color: #57a929\">successfully</span>"
+        "message": "Configuration restored <span style=\"color: #37a8db\">successfully</span>"
     },
     "initialSetupButtonResetZaxis": {
         "message": "Reset Z axis, offset: 0 deg"
@@ -436,19 +436,19 @@
         "message": "Accelerometer calibration started"
     },
     "initialSetupAccelCalibEnded": {
-        "message": "Accelerometer calibration <span style=\"color: #57a929\">finished</span>"
+        "message": "Accelerometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
     "initialSetupMagCalibStarted": {
         "message": "Magnetometer calibration started"
     },
     "initialSetupMagCalibEnded": {
-        "message": "Magnetometer calibration <span style=\"color: #57a929\">finished</span>"
+        "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "featureRX_PPM": {
@@ -693,7 +693,7 @@
         "message": "Serial Receiver Provider"
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -746,7 +746,7 @@
     },
 
     "pidTuningUpgradeFirmwareToChangePidController": {
-        "message": "<span style=\"color: red\">Changing PID controller disabled - you can change it via the CLI.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, but this functionality requires requires <span style=\"color: #57a929\">$2</span>."
+        "message": "<span style=\"color: red\">Changing PID controller disabled - you can change it via the CLI.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, but this functionality requires requires <span style=\"color: #37a8db\">$2</span>."
     },
     "pidTuningName": {
         "message": "Name"
@@ -791,13 +791,13 @@
         "message": "PID Controller"
     },
     "pidTuningLoadedProfile": {
-        "message": "Loaded Profile: <strong style=\"color: #57a929\">$1</strong>"
+        "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "receiverHelp": {
@@ -855,7 +855,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "auxiliaryHelp": {
@@ -874,7 +874,7 @@
         "message": "Save"
     },
     "auxiliaryEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "adjustmentsHelp": {
@@ -1046,7 +1046,7 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "transponderNotSupported": {
@@ -1074,7 +1074,7 @@
         "message": "Transponder data is <span style=\"color: red\">invalid</span>"
     },    
     "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "servosFirmwareUpgradeRequired": {
@@ -1117,7 +1117,7 @@
         "message": "Reverse"
     },
     "servosEepromSave": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
     "gpsHead": {
@@ -1463,7 +1463,7 @@
         "message": "HEX file appears to be corrupted"
     },
     "firmwareFlasherRemoteFirmwareLoaded": {
-        "message": "<span style=\"color: #57a929\">Remote Firmware loaded, ready for flashing</span>"
+        "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
     },
     "firmwareFlasherFailedToLoadOnlineFirmware": {
         "message": "Failed to load remote firmware"
@@ -1476,7 +1476,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #57a929\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
     
     "controlAxisRoll": {

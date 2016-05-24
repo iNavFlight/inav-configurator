@@ -60,9 +60,9 @@ a.disabled {
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
-    background-color: #0a3a9d;
+    background-color: #37a8db;
     border-radius: 3px;
-    border: 1px solid #06235f;
+    border: 1px solid #3a9dbf;
     color: #fff;
     float: right;
     font-family: 'open_sansbold', Arial;
@@ -75,7 +75,7 @@ a.disabled {
 }
 
 .cf_doc_version_bt a:hover {
-    background-color: #4689c8;
+    background-color: #37a8db;
     transition: all ease 0.2s;
 }
 
@@ -500,7 +500,7 @@ input[type="number"]::-webkit-inner-spin-button {
     float: left;
     height: calc(100% - 150px);
     width: 200px;
-    border-right: 4px solid #4689c8;
+    border-right: 4px solid #37a8db;
     background-color: #2e2e2e;
     transition: all 0.2s;
 
@@ -569,14 +569,14 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 #tabs li.active a {
-    background-color: #4689c8;
+    background-color: #37a8db;
     color: #fff;
     transition: none;
 }
 
 #tabs li.active a:hover {
     cursor: default;
-    background-color: #4689c8;
+    background-color: #37a8db;
 }
 
 .tabicon {
@@ -968,7 +968,7 @@ dialog {
 
 /* Tab Title */
 .tab_title {
-    border-bottom: 1px solid #4689c8;
+    border-bottom: 1px solid #37a8db;
     font-size: 20px;
     line-height: 24px;
     height: 30px;
@@ -1017,9 +1017,9 @@ dialog {
     margin-top: 0px;
     margin-bottom: 0px;
     margin-right: 20px;
-    background-color: #0a3a9d;
+    background-color: #37a8db;
     border-radius: 3px;
-    border: 1px solid #06235f;
+    border: 1px solid #3394b5;
     color: #fff;
     float: right;
     font-family: 'open_sansbold', Arial;
@@ -1035,12 +1035,12 @@ dialog {
 }
 
 .content_toolbar .btn a:hover {
-    background-color: #4689c8;
+    background-color: #3394b5;
     transition: all ease 0.2s;
 }
 
 .content_toolbar .btn a:active {
-    background-color: #0a3a9d;
+    background-color: #37a8db;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -1166,7 +1166,7 @@ dialog {
 }
 
 .gui_note {
-    background: #ffffdd;
+    background: #ffffff;
 }
 
 .gui_warning .gui_box_titlebar {
@@ -1180,7 +1180,6 @@ dialog {
 }
 
 .gui_note .gui_box_titlebar {
-    background-color: #cccc00;
     background-image: linear-gradient(-45deg, rgba(255, 255, 255, .3) 10%, transparent 10%, transparent 20%,
         rgba(255, 255, 255, .3) 20%, rgba(255, 255, 255, .3) 30%, transparent 30%, transparent 40%,
         rgba(255, 255, 255, .3) 40%, rgba(255, 255, 255, .3) 50%, transparent 50%, transparent 60%,
@@ -1254,7 +1253,7 @@ dialog {
 }
 
 .fixed_band .save_btn a:hover {
-    background-color: #6ac435;
+    background-color: #37a8db;
     transition: all ease 0.2s;
 }
 
@@ -1272,8 +1271,8 @@ dialog {
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
-    border: 1px solid #06235f;
-    color: #06235f !important;
+    border: 1px solid #37a8db;
+    color: #37a8db !important;
     font-family: 'open_sanssemibold', Arial;
     font-size: 12px;
     line-height: 13px;
@@ -1283,8 +1282,8 @@ dialog {
 }
 
 .default_btn a:hover {
-    background-color: #4689c8;
-    color: #fff;
+    background-color: #37a8db;
+    color: #fff !important;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     transition: all ease 0.2s;
     text-decoration:none;
@@ -1292,7 +1291,7 @@ dialog {
 }
 
 .default_btn a:active {
-    background-color: #0a3a9d;
+    background-color: #37a8db;
     transition: all ease 0.0s;
     box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -1322,10 +1321,10 @@ dialog {
 }
 
 .small a:hover {
-    background-color: #6ac435;
+    background-color: #45bce5;
     color: #fff;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
-    border: 1px solid #59aa29;
+    border: 1px solid #3a9dbf;
     transition: all ease 0.2s;
 }
 
@@ -1336,16 +1335,16 @@ dialog {
 }
 
 .green a {
-    background-color: #59aa29;
+    background-color: #37a8db;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     color: #fff;
-    border: 1px solid #59aa29;
+    border: 1px solid #3a9dbf;
     transition: all ease 0.2s;
 }
 
 .green a:hover {
-    background-color: #6ac435;
-    border: 1px solid #4d9324;
+    background-color: #45bce5;
+    border: 1px solid #3a9dbf;
     text-shadow: 0px 1px rgba(0, 0, 0, 0.25);
     color: #fff;
     transition: all ease 0.2s;
@@ -1422,8 +1421,8 @@ dialog {
 }
 
 .connect_b a.connect {
-    background-color: #0a3a9d;
-    border: 1px solid #06235f;
+    background-color: #37a8db;
+    border: 1px solid #339cc1;
     background-image: url(images/icons/cf_icon_usb2_white.svg);
     background-repeat: no-repeat;
     background-size: 44px;
@@ -1432,7 +1431,7 @@ dialog {
 }
 
 .connect_b a.connect:hover {
-    background-color: #4689c8;
+    background-color: #40b8e2;
 }
 
 .connect_b a.connect.active {
@@ -1556,7 +1555,7 @@ dialog {
 
 
 .dataflash-free_global {
-    background-color: #59AA29;
+    background-color: #37a8db;
     border-radius: 4px;
 }
 
