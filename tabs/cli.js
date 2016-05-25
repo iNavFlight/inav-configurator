@@ -99,7 +99,7 @@ TABS.cli.sendSlowly = function (out_arr, i, timeout_needle) {
         bufView[out_arr[i].length] = 0x0D; // enter (\n)
 
         serial.send(bufferOut);
-    }, timeout_needle * 25);
+    }, timeout_needle * 100);
 };
 
 TABS.cli.read = function (readInfo) {
