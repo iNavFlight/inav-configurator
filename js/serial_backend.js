@@ -273,7 +273,9 @@ function onConnect() {
     port_picker.hide(); 
 
     var dataflash = $('#dataflash_wrapper_global');
-    dataflash.show();    
+    dataflash.show();
+    
+    startLiveDataRefreshTimer();    
     
 }
 
@@ -295,6 +297,9 @@ function onClosed(result) {
     
     var dataflash = $('#dataflash_wrapper_global');
     dataflash.hide();
+    
+    var battery = $('#quad-status_wrapper');
+    battery.hide();
 }
 
 function read_serial(info) {
@@ -394,7 +399,9 @@ function highByte(num) {
 
 function lowByte(num) {
     return 0x00FF & num;
-}function update_dataflash_global() {
+}
+
+function update_dataflash_global() {
         var supportsDataflash = DATAFLASH.totalSize > 0;
         if (supportsDataflash){
 
@@ -422,6 +429,88 @@ function lowByte(num) {
         }      
         
     }
+
+function startLiveDataRefreshTimer() {
+    // live data refresh
+    GUI.timeout_add('data_refresh', function () { update_live_status(); }, 100);
+}
+    
+function update_live_status() {
+    
+    var statuswrapper = $('#quad-status_wrapper');
+
+    $(".quad-status-contents").css({
+       display: 'inline-block'
+    });
+    
+    if (GUI.active_tab != 'cli') {
+        MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false);      
+        MSP.send_message(MSP_codes.MSP_STATUS, false, false);
+        MSP.send_message(MSP_codes.MSP_ANALOG, false, false);
+    }
+    
+    var active = ((Date.now() - MSP.analog_last_received_timestamp) < 300);
+
+    for (var i = 0; i < AUX_CONFIG.length; i++) {
+       if (AUX_CONFIG[i] == 'ARM') {
+               if (bit_check(CONFIG.mode, i))
+                       $(".armedicon").css({
+                               'background-image': 'url(images/icons/cf_icon_armed_active.svg)'
+                           });
+               else
+                       $(".armedicon").css({
+                               'background-image': 'url(images/icons/cf_icon_armed_grey.svg)'
+                           });
+       }
+       if (AUX_CONFIG[i] == 'FAILSAFE') {
+               if (bit_check(CONFIG.mode, i))
+                       $(".failsafeicon").css({
+                               'background-image': 'url(images/icons/cf_icon_failsafe_active.svg)'
+                           });
+               else
+                       $(".failsafeicon").css({
+                               'background-image': 'url(images/icons/cf_icon_failsafe_grey.svg)'
+                           });
+       }
+    }
+    if (ANALOG != undefined) {
+    var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;   
+    if (ANALOG.voltage == 0)
+           nbCells = 1;
+   
+       var min = MISC.vbatmincellvoltage * nbCells;
+       var max = MISC.vbatmaxcellvoltage * nbCells;
+       var warn = MISC.vbatwarningcellvoltage * nbCells;
+       
+       $(".battery-status").css({
+          width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
+          display: 'inline-block'
+       });
+   
+       if (active) {
+           $(".linkicon").css({
+               'background-image': 'url(images/icons/cf_icon_link_active.svg)'
+           });
+       } else {
+           $(".linkicon").css({
+               'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
+           });
+       } 
+       
+       if (ANALOG.voltage < warn) {
+           $(".battery-status").css('background-color', '#D42133');
+       } else  {
+           $(".battery-status").css('background-color', '#59AA29');
+       }
+       
+       $(".battery-legend").text(ANALOG.voltage + " V");
+    }
+
+    statuswrapper.show();
+    GUI.timeout_remove('data_refresh');
+    startLiveDataRefreshTimer();
+}
+
 
 function specificByte(num, pos) {
     return 0x000000FF & (num >> (8 * pos));
