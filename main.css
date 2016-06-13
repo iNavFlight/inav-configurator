@@ -1272,7 +1272,7 @@ dialog {
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid #37a8db;
-    color: #37a8db !important;
+    color: #37a8db;
     font-family: 'open_sanssemibold', Arial;
     font-size: 12px;
     line-height: 13px;
@@ -1281,6 +1281,12 @@ dialog {
     text-decoration:none;
 }
 
+.default_btn a.disabled {
+     background-color: #fff;
+     border: 1px solid #ccc;
+     color: #ccc;
+}
+ 
 .default_btn a:hover {
     background-color: #37a8db;
     color: #fff !important;
