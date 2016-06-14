@@ -1,8 +1,8 @@
-# Cleanflight Configurator
+# INAV Configurator
 
-Cleanflight Configurator is a crossplatform configuration tool for the [Cleanflight](http://cleanflight.com/) flight control system.
+INAV Configurator is a crossplatform configuration tool for the [INAV](http://cleanflight.com/) flight control system.
 
-It runs as an app within Google Chrome and allows you to configure the Cleanflight software running on any [supported Cleanflight target](https://github.com/cleanflight/cleanflight/blob/master/docs/Boards.md).
+It runs as an app within Google Chrome and allows you to configure the Cleanflight software running on any [supported INAV target](https://github.com/cleanflight/cleanflight/blob/master/docs/Boards.md).
 
 Various types of aircraft are supported by the tool and by cleanflight, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
 
