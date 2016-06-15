@@ -13,7 +13,7 @@ TABS.cli.initialize = function (callback) {
         GUI.active_tab = 'cli';
         googleAnalytics.sendAppView('CLI');
     }
-    
+
     $('#content').load("./tabs/cli.html", function () {
         // translate to user-selected language
         localize();
@@ -99,7 +99,7 @@ TABS.cli.sendSlowly = function (out_arr, i, timeout_needle) {
         bufView[out_arr[i].length] = 0x0D; // enter (\n)
 
         serial.send(bufferOut);
-    }, timeout_needle * 5);
+    }, timeout_needle * 100);
 };
 
 TABS.cli.read = function (readInfo) {
