@@ -148,7 +148,6 @@ var MSP = {
             'GPS': 1,
             'TELEMETRY_FRSKY': 2,
             'TELEMETRY_HOTT': 3,
-            'TELEMETRY_MSP': 4,
             'TELEMETRY_LTM': 4, // LTM replaced MSP
             'TELEMETRY_SMARTPORT': 5,
             'RX_SERIAL': 6,
