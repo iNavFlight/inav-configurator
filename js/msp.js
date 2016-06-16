@@ -128,7 +128,7 @@ var MSP = {
 
     ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],      // in LSB bit order
     ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c'], // in LSB bit order
-    
+
     last_received_timestamp:   null,
     analog_last_received_timestamp: null,
 
@@ -973,13 +973,6 @@ var MSP = {
             case MSP_codes.MSP_SET_ADJUSTMENT_RANGE:
                 console.log('Adjustment range saved');
                 break;
-
-            case MSP_codes.MSP_PID_CONTROLLER:
-                PID.controller = data.getUint8(0, 1);
-                break;
-            case MSP_codes.MSP_SET_PID_CONTROLLER:
-                console.log('PID controller changed');
-                break;
             case MSP_codes.MSP_SET_LOOP_TIME:
                 console.log('Looptime saved');
                 break;
@@ -1143,9 +1136,6 @@ MSP.crunch = function (code) {
             buffer.push(highByte(BF_CONFIG.currentscale));
             buffer.push(lowByte(BF_CONFIG.currentoffset));
             buffer.push(highByte(BF_CONFIG.currentoffset));
-            break;
-        case MSP_codes.MSP_SET_PID_CONTROLLER:
-            buffer.push(PID.controller);
             break;
         case MSP_codes.MSP_SET_PID:
             for (var i = 0; i < PIDs.length; i++) {

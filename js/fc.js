@@ -77,7 +77,7 @@ var FC = {
         LED_STRIP = [];
 
         PID = {
-            controller:             0
+
         };
 
         PID_names = [];

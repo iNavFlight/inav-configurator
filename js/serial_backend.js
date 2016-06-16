@@ -81,7 +81,7 @@ $(document).ready(function () {
                     // reset connect / disconnect button
                     $('div.connect_controls a.connect').removeClass('active');
                     $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connect'));
-                   
+
                     // reset active sensor indicators
                     sensor_status(0);
 
@@ -132,7 +132,7 @@ $(document).ready(function () {
             }
 
             chrome.storage.local.set({'auto_connect': GUI.auto_connect});
-            
+
 
         });
     });
@@ -215,8 +215,6 @@ function onOpen(openInfo) {
                                             GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('led_strip'), 1);
                                         }
 
-                                        GUI.canChangePidController = semver.gte(CONFIG.apiVersion, CONFIGURATOR.pidControllerChangeMinApiVersion);
-
                                         onConnect();
 
                                         $('#tabs ul.mode-connected .tab_setup a').click();
@@ -260,23 +258,23 @@ function onConnect() {
     $('div#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
     $('div#connectbutton a.connect').addClass('active');
     $('#tabs ul.mode-disconnected').hide();
-    $('#tabs ul.mode-connected').show(); 
-     
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false);      
-    
+    $('#tabs ul.mode-connected').show();
+
+    MSP.send_message(MSP_codes.MSP_STATUS, false, false);
+
     MSP.send_message(MSP_codes.MSP_DATAFLASH_SUMMARY, false, false);
-    
+
     var sensor_state = $('#sensor-status');
-    sensor_state.show(); 
-    
+    sensor_state.show();
+
     var port_picker = $('#portsinput');
-    port_picker.hide(); 
+    port_picker.hide();
 
     var dataflash = $('#dataflash_wrapper_global');
     dataflash.show();
-    
-    startLiveDataRefreshTimer();    
-    
+
+    startLiveDataRefreshTimer();
+
 }
 
 function onClosed(result) {
@@ -291,13 +289,13 @@ function onClosed(result) {
 
     var sensor_state = $('#sensor-status');
     sensor_state.hide();
-    
+
     var port_picker = $('#portsinput');
-    port_picker.show(); 
-    
+    port_picker.show();
+
     var dataflash = $('#dataflash_wrapper_global');
     dataflash.hide();
-    
+
     var battery = $('#quad-status_wrapper');
     battery.hide();
 }
@@ -407,12 +405,12 @@ function update_dataflash_global() {
 
              $(".noflash_global").css({
                  display: 'none'
-             }); 
+             });
 
              $(".dataflash-contents_global").css({
                  display: 'block'
-             }); 
-	     
+             });
+
              $(".dataflash-free_global").css({
                  width: (100-(DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
                  display: 'block'
@@ -421,34 +419,34 @@ function update_dataflash_global() {
         } else {
              $(".noflash_global").css({
                  display: 'block'
-             }); 
+             });
 
              $(".dataflash-contents_global").css({
                  display: 'none'
-             }); 
-        }      
-        
+             });
+        }
+
     }
 
 function startLiveDataRefreshTimer() {
     // live data refresh
     GUI.timeout_add('data_refresh', function () { update_live_status(); }, 100);
 }
-    
+
 function update_live_status() {
-    
+
     var statuswrapper = $('#quad-status_wrapper');
 
     $(".quad-status-contents").css({
        display: 'inline-block'
     });
-    
+
     if (GUI.active_tab != 'cli') {
-        MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false);      
+        MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false);
         MSP.send_message(MSP_codes.MSP_STATUS, false, false);
         MSP.send_message(MSP_codes.MSP_ANALOG, false, false);
     }
-    
+
     var active = ((Date.now() - MSP.analog_last_received_timestamp) < 300);
 
     for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -474,19 +472,19 @@ function update_live_status() {
        }
     }
     if (ANALOG != undefined) {
-    var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;   
+    var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
     if (ANALOG.voltage == 0)
            nbCells = 1;
-   
+
        var min = MISC.vbatmincellvoltage * nbCells;
        var max = MISC.vbatmaxcellvoltage * nbCells;
        var warn = MISC.vbatwarningcellvoltage * nbCells;
-       
+
        $(".battery-status").css({
           width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
           display: 'inline-block'
        });
-   
+
        if (active) {
            $(".linkicon").css({
                'background-image': 'url(images/icons/cf_icon_link_active.svg)'
@@ -495,14 +493,14 @@ function update_live_status() {
            $(".linkicon").css({
                'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
            });
-       } 
-       
+       }
+
        if (ANALOG.voltage < warn) {
            $(".battery-status").css('background-color', '#D42133');
        } else  {
            $(".battery-status").css('background-color', '#59AA29');
        }
-       
+
        $(".battery-legend").text(ANALOG.voltage + " V");
     }
 
@@ -534,27 +532,27 @@ function update_dataflash_global() {
             return bytes + "B";
         }
         var kilobytes = bytes / 1024;
-        
+
         if (kilobytes < 1024) {
             return Math.round(kilobytes) + "kB";
         }
-        
+
         var megabytes = kilobytes / 1024;
-        
+
         return megabytes.toFixed(1) + "MB";
     }
-  
+
     var supportsDataflash = DATAFLASH.totalSize > 0;
 
     if (supportsDataflash){
         $(".noflash_global").css({
            display: 'none'
-        }); 
+        });
 
         $(".dataflash-contents_global").css({
            display: 'block'
-        }); 
-	     
+        });
+
         $(".dataflash-free_global").css({
            width: (100-(DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
            display: 'block'
@@ -563,10 +561,10 @@ function update_dataflash_global() {
      } else {
         $(".noflash_global").css({
            display: 'block'
-        }); 
+        });
 
         $(".dataflash-contents_global").css({
            display: 'none'
-        }); 
-     }      
+        });
+     }
 }

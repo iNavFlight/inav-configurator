@@ -1,7 +1,7 @@
 'use strict';
 
 TABS.pid_tuning = {
-    controllerChanged: true
+
 };
 
 TABS.pid_tuning.initialize = function (callback) {
@@ -10,14 +10,6 @@ TABS.pid_tuning.initialize = function (callback) {
     if (GUI.active_tab != 'pid_tuning') {
         GUI.active_tab = 'pid_tuning';
         googleAnalytics.sendAppView('PID Tuning');
-    }
-
-    function get_pid_controller() {
-        if (GUI.canChangePidController) {
-            MSP.send_message(MSP_codes.MSP_PID_CONTROLLER, false, false, get_pid_names);
-        } else {
-            get_pid_names();
-        }
     }
 
     function get_pid_names() {
@@ -37,7 +29,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     // requesting MSP_STATUS manually because it contains CONFIG.profile
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_pid_controller);
+    MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_pid_names);
 
     function pid_and_rc_to_form() {
         // Fill in the data from PIDs array
@@ -289,6 +281,8 @@ TABS.pid_tuning.initialize = function (callback) {
 	  updateActivatedTab();
         });
 
+        var i;
+
         $('.pid_tuning tr').each(function(){
           for(i = 0; i < PID_names.length; i++) {
             if($(this).hasClass(PID_names[i])) {
@@ -297,48 +291,9 @@ TABS.pid_tuning.initialize = function (callback) {
           }
         });
 
-
         pid_and_rc_to_form();
 
-        var pidController_e = $('select[name="controller"]');
-
-
-        var pidControllerList;
-
-        if (semver.lt(CONFIG.apiVersion, "1.14.0")) {
-            pidControllerList = [
-                { name: "MultiWii (Old)"},
-                { name: "MultiWii (rewrite)"},
-                { name: "LuxFloat"},
-                { name: "MultiWii (2.3 - latest)"},
-                { name: "MultiWii (2.3 - hybrid)"},
-                { name: "Harakiri"}
-            ]
-        } else {
-            pidControllerList = [
-                { name: "MultiWii (2.3)"},
-                { name: "MultiWii (Rewrite)"},
-                { name: "LuxFloat"},
-            ]
-        }
-
-        for (var i = 0; i < pidControllerList.length; i++) {
-            pidController_e.append('<option value="' + (i) + '">' + pidControllerList[i].name + '</option>');
-        }
-
-
         var form_e = $('#pid-tuning');
-
-        if (GUI.canChangePidController) {
-            pidController_e.val(PID.controller);
-        } else {
-            GUI.log(chrome.i18n.getMessage('pidTuningUpgradeFirmwareToChangePidController', [CONFIG.apiVersion, CONFIGURATOR.pidControllerChangeMinApiVersion]));
-
-            pidController_e.empty();
-            pidController_e.append('<option value="">Unknown</option>');
-
-            pidController_e.prop('disabled', true);
-        }
 
         if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
             $('.rate-tpa .tpa-breakpoint').hide();
@@ -361,31 +316,12 @@ TABS.pid_tuning.initialize = function (callback) {
             });
         });
 
-        form_e.find('input').each(function (k, item) {
-            $(item).change(function () {
-                pidController_e.prop("disabled", true);
-                TABS.pid_tuning.controllerChanged = false;
-            })
-        });
-
-        pidController_e.change(function () {
-            if (PID.controller != pidController_e.val()) {
-                form_e.find('input').each(function (k, item) {
-                    $(item).prop('disabled', true);
-                    TABS.pid_tuning.controllerChanged = true;
-                });
-            }
-        });
-
-
         // update == save.
         $('a.update').click(function () {
             form_to_pid_and_rc();
 
             function send_pids() {
-                if (!TABS.pid_tuning.controllerChanged) {
-                    MSP.send_message(MSP_codes.MSP_SET_PID, MSP.crunch(MSP_codes.MSP_SET_PID), false, send_rc_tuning_changes);
-                }
+                MSP.send_message(MSP_codes.MSP_SET_PID, MSP.crunch(MSP_codes.MSP_SET_PID), false, send_rc_tuning_changes);
             }
 
             function send_rc_tuning_changes() {
@@ -398,17 +334,7 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            if (GUI.canChangePidController && TABS.pid_tuning.controllerChanged) {
-                PID.controller = pidController_e.val();
-                MSP.send_message(MSP_codes.MSP_SET_PID_CONTROLLER, MSP.crunch(MSP_codes.MSP_SET_PID_CONTROLLER), false, function () {
-                    MSP.send_message(MSP_codes.MSP_EEPROM_WRITE, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('pidTuningEepromSaved'));
-                    });
-                    TABS.pid_tuning.initialize();
-                });
-            } else {
-                send_pids();
-            }
+            send_pids();
         });
 
         // status data pulled via separate timer with static speed
