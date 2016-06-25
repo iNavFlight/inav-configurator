@@ -48,13 +48,13 @@ a.disabled {
     background-image: url(images/icons/cf_icon_info_grey.svg);
     background-size: contain;
     background-position: center;
-    transition: none;  
+    transition: none;
 }
 
 .helpicon:hover {
     opacity: 0.9;
     background-image: url(images/icons/cf_icon_info_green.svg);
-    transition: none;  
+    transition: none;
 }
 
 .cf_doc_version_bt a {
@@ -814,19 +814,6 @@ li.active .ic_transponder {
     background-image: url(images/icons/cf_icon_transponder_white.svg);
 }
 
-.ic_calibration {
-    background-image: url(images/icons/cf_icon_wizard_grey.svg);
-}
-
-.ic_calibration:hover {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
-}
-
-li.active .ic_calibration {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
-}
-
-
 /* SPARE Tab-Icons */
 .ic_failsafe {
     background-image: url(images/icons/cf_icon_failsafe_grey.svg);
@@ -884,14 +871,14 @@ li.active .ic_mission {
 }
 
 #content {
-    margin-top: 0px; 
-    padding: 0px; 
+    margin-top: 0px;
+    padding: 0px;
     height: calc(100% - 150px);
     /*  (port picker 105px, log CLOSED 25px, status bar: 20px + padding) - was: calc(100% - 171px)*/
     background-color: white;
     overflow-x: hidden;
     overflow-y: auto;
-    border: 0px solid #848484; 
+    border: 0px solid #848484;
     -webkit-transform: rotateX(0deg); /* DO NOT REMOVE! this fixes the UI freezing bug on MAC OS X */
     transition: all 0.3s;
 }
@@ -1286,7 +1273,7 @@ dialog {
      border: 1px solid #ccc;
      color: #ccc;
 }
- 
+
 .default_btn a:hover {
     background-color: #37a8db;
     color: #fff !important;
@@ -1636,7 +1623,7 @@ dialog {
     margin-left: 14px;
     height: 10px;
     width: 30px;
-    /* width: 30px; */    
+    /* width: 30px; */
 }
 
 
@@ -1685,7 +1672,7 @@ dialog {
 }
 
 .armedicon,
-.failsafeicon, 
+.failsafeicon,
 .linkicon {
     float: left;
     margin-left: 8px;
@@ -1697,7 +1684,7 @@ dialog {
     opacity: 0.8;
     background-size: contain;
     background-position: center;
-    transition: none;  
+    transition: none;
 }
 
 .armedicon {
@@ -1706,7 +1693,7 @@ dialog {
 .failsafeicon {
     background-image: url(images/icons/cf_icon_failsafe_grey.svg);
 }
- 
+
 .linkicon {
     background-image: url(images/icons/cf_icon_link_grey.svg);
 }
@@ -1833,5 +1820,5 @@ input {
     overflow-x: hidden;
     overflow-y: auto;
 }
-    
+
     }
