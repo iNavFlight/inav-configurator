@@ -66,6 +66,7 @@ var MSP_codes = {
     MSP_3D:                 124,
     MSP_RC_DEADBAND:        125,
     MSP_SENSOR_ALIGNMENT:   126,
+    MSP_STATUS_EX:          150,
 
     MSP_SET_RAW_RC:         200,
     MSP_SET_RAW_GPS:        201,
@@ -263,6 +264,20 @@ var MSP = {
                 $('span.i2c-error').text(CONFIG.i2cError);
                 $('span.cycle-time').text(CONFIG.cycleTime);
                 break;
+            case MSP_codes.MSP_STATUS_EX:
+                CONFIG.cycleTime = data.getUint16(0, 1);
+                CONFIG.i2cError = data.getUint16(2, 1);
+                CONFIG.activeSensors = data.getUint16(4, 1);
+                CONFIG.mode = data.getUint32(6, 1);
+                CONFIG.profile = data.getUint8(10);
+                CONFIG.cpuload = data.getUint16(11, 1);
+
+                sensor_status(CONFIG.activeSensors);
+                $('span.i2c-error').text(CONFIG.i2cError);
+                $('span.cycle-time').text(CONFIG.cycleTime);
+                $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+                break;
+            
             case MSP_codes.MSP_RAW_IMU:
                 // 512 for mpu6050, 256 for mma
                 // currently we are unable to differentiate between the sensor types, so we are goign with 512
