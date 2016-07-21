@@ -32,30 +32,56 @@ TABS.firmware_flasher.initialize = function (callback) {
 
 
         $('input.show_development_releases').click(function(){
-            buildFirmwareOptions();
+            buildBoardOptions();
         });
 
-        var buildFirmwareOptions = function(){
-            var releases_e = $('select[name="release"]').empty();
-            var showDevReleases = ($('input.show_development_releases').is(':checked'));
-            releases_e.append($("<option value='0'>{0}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectFirmware'))));
+        var buildBoardOptions = function(){
 
-            var releaseDescriptors = [];
-            TABS.firmware_flasher.releases.forEach(function(release){
+            var boards_e = $('select[name="board"]').empty();
+            var showDevReleases = ($('input.show_development_releases').is(':checked'));
+            boards_e.append($("<option value='0'>{0}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectBoard'))));
+
+            var versions_e = $('select[name="firmware_version"]').empty();
+            versions_e.append($("<option value='0'>{0}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersion'))));
+
+            var releases = {};
+            var sortedTargets = [];
+            var unsortedTargets = [];
+            TABS.firmware_flasher.releasesData.forEach(function(release){
                 release.assets.forEach(function(asset){
-                    var targetFromFilenameExpression = /w*_(.*)\.(.*)/;
+                    var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
                     var match = targetFromFilenameExpression.exec(asset.name);
 
-                    if (!showDevReleases && release.prerelease) {
+                    if ((!showDevReleases && release.prerelease) || !match) {
+                        return;
+                    }
+                    var target = match[2];
+                    if($.inArray(target, unsortedTargets) == -1) {
+                        unsortedTargets.push(target);
+                    }
+                });
+                sortedTargets = unsortedTargets.sort();
+            });
+            sortedTargets.forEach(function(release) {
+                releases[release] = [];
+            });
+
+            TABS.firmware_flasher.releasesData.forEach(function(release){
+
+                var versionFromTagExpression = /v?(.*)/;
+                var matchVersionFromTag = versionFromTagExpression.exec(release.tag_name);
+                var version = matchVersionFromTag[1];
+
+                release.assets.forEach(function(asset){
+                    var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
+                    var match = targetFromFilenameExpression.exec(asset.name);
+
+                    if ((!showDevReleases && release.prerelease) || !match) {
                         return;
                     }
 
-                    if (!match) {
-                        return;
-                    }
-
-                    var target = match[1].replace("_", " ");
-                    var format = match[2];
+                    var target = match[2].replace("_", " ");
+                    var format = match[3];
 
                     if (format != 'hex') {
                         return;
@@ -81,79 +107,63 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-
-                    releaseDescriptors.push(descriptor);
+                    releases[target].push(descriptor);
                 });
             });
-
-
-
-            releaseDescriptors.sort(function(o1,o2){
-                // compare versions descending
-                                // compare versions descending
-				var oo1 = o1.version.replace(/[^0-9]+/g, "");
-				var oo2 = o2.version.replace(/[^0-9]+/g, "");
-				var cmpVal = (oo2<oo1?-1:(oo2>oo1?1:0));
-
-                if (cmpVal == 0){
-                    // compare target names ascending
-                    cmpVal = (o1.target<o2.target?-1:(o1.target>o2.target?1:0));
-                }
-                return cmpVal;
-            });
-
-
-
-            var optionIndex = 1;
-            releaseDescriptors.forEach(function(descriptor){
-                var select_e =
-                        $("<option value='{0}'>{1} {2} {3} ({4})</option>".format(
-                                optionIndex++,
-                                descriptor.name,
-                                descriptor.target,
-                                descriptor.date,
-                                descriptor.status
-                        )).data('summary', descriptor);
-
-                releases_e.append(select_e);
-            });
-        };
-
-
-        var processReleases = function (releases){
-            var promises = [];
-            releases.forEach(function(release){
-                var promise = Q.defer();
-                promises.push(promise);
-                $.get(release.assets_url).
-                done(function(assets){
-                            release.assets = assets;
-                            promise.resolve(assets);
+            var selectTargets = [];
+            Object.keys(releases)
+                .sort()
+                .forEach(function(target, i) {
+                    var descriptors = releases[target];
+                    descriptors.forEach(function(descriptor){
+                        if($.inArray(target, selectTargets) == -1) {
+                            selectTargets.push(target);
+                            var select_e =
+                                    $("<option value='{0}'>{0}</option>".format(
+                                            descriptor.target
+                                    )).data('summary', descriptor);
+                            boards_e.append(select_e);
                         }
-                ).
-                fail(function(reason){
-                            promise.reject(reason);
-                        }
-                );
-            });
-
-            Q.all(promises).then(function(){
-                buildFirmwareOptions();
-            })
-        };
-
-        $.get('https://api.github.com/repos/iNavFlight/inav/releases', function (releases){
-            processReleases(releases);
+                    });
+                });
             TABS.firmware_flasher.releases = releases;
+        };
+
+        $.get('https://api.github.com/repos/iNavFlight/inav/releases', function (releasesData){
+            TABS.firmware_flasher.releasesData = releasesData;
+            buildBoardOptions();
 
             // bind events
-            $('select[name="release"]').change(function() {
+            $('select[name="board"]').change(function() {
+
+                $("a.load_remote_file").addClass('disabled');
+                var target = $(this).val();
+                
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');
                     $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherLoadFirmwareFile'));
                     $('div.git_info').slideUp();
                     $('div.release_info').slideUp();
                     $('a.flash_firmware').addClass('disabled');
+
+                    var versions_e = $('select[name="firmware_version"]').empty();
+                    if(target == 0) {
+                        versions_e.append($("<option value='0'>{0}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersion'))));
+                    } else {
+                        versions_e.append($("<option value='0'>{0} {1}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
+                    }
+                        
+                    TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
+                        var select_e =
+                                $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
+                                        descriptor.version,
+                                        descriptor.target,
+                                        descriptor.date,
+                                        descriptor.status
+                                )).data('summary', descriptor);
+
+                        versions_e.append(select_e);
+                    });
                 }
             });
 
@@ -163,7 +173,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
             $('select[name="release"]').empty().append('<option value="0">Offline</option>');
         });
-
 
         // UI Hooks
         $('a.load_file').click(function () {
@@ -221,7 +230,9 @@ TABS.firmware_flasher.initialize = function (callback) {
         /**
          * Lock / Unlock the firmware download button according to the firmware selection dropdown.
          */
-        $('select[name="release"]').change(function(evt){
+        $('select[name="firmware_version"]').change(function(evt){
+            $('div.release_info').slideUp();
+            $('a.flash_firmware').addClass('disabled');
             if (evt.target.value=="0") {
                 $("a.load_remote_file").addClass('disabled');
             }
@@ -232,7 +243,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         $('a.load_remote_file').click(function (evt) {
 
-            if ($('select[name="release"]').val() == "0") {
+            if ($('select[name="firmware_version"]').val() == "0") {
                 GUI.log("<b>No firmware selected to load</b>");
                 return;
             }
@@ -251,6 +262,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('a.flash_firmware').removeClass('disabled');
 
+                        
                         if (summary.commit) {
                             $.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
                                 var data = data,
@@ -283,6 +295,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('div.release_info .name').text(summary.name).prop('href', summary.releaseUrl);
                         $('div.release_info .date').text(summary.date);
+                        $('div.release_info .status').text(summary.status);
                         $('div.release_info .file').text(summary.file).prop('href', summary.url);
 
                         var formattedNotes = summary.notes.trim('\r').replace(/\r/g, '<br />');
@@ -301,8 +314,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 $('a.flash_firmware').addClass('disabled');
             }
 
-            var summary = $('select[name="release"] option:selected').data('summary');
-
+            var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
                 $.get(summary.url, function (data) {
                     process_hex(data, summary);
@@ -367,7 +379,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         });
 
         $(document).on('click', 'span.progressLabel a.save_firmware', function () {
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'baseflight', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
+            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
                 if (chrome.runtime.lastError) {
                     console.error(chrome.runtime.lastError.message);
                     return;
