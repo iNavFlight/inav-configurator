@@ -55,7 +55,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                     if ((!showDevReleases && release.prerelease) || !match) {
                         return;
                     }
-                    var target = match[2];
+                    var target = match[2].replace("_", " ");
                     if($.inArray(target, unsortedTargets) == -1) {
                         unsortedTargets.push(target);
                     }
@@ -98,7 +98,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                     var descriptor = {
                         "releaseUrl": release.html_url,
-                        "name"      : release.name,
+                        "name"      : semver.clean(release.name),
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
@@ -262,7 +262,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('a.flash_firmware').removeClass('disabled');
 
-                        
                         if (summary.commit) {
                             $.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
                                 var data = data,
