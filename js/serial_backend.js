@@ -73,6 +73,8 @@ $(document).ready(function () {
                     // Reset various UI elements
                     $('span.i2c-error').text(0);
                     $('span.cycle-time').text(0);
+                    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
+                        $('span.cpu-load').text('');
 
                     // unlock port select & baud
                     $('div#port-picker #port').prop('disabled', false);
@@ -260,8 +262,12 @@ function onConnect() {
     $('#tabs ul.mode-disconnected').hide();
     $('#tabs ul.mode-connected').show();
 
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false);
-
+    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
+        MSP.send_message(MSP_codes.MSP_STATUS_EX, false, false);
+    } else {
+        MSP.send_message(MSP_codes.MSP_STATUS, false, false);
+    }
+    
     MSP.send_message(MSP_codes.MSP_DATAFLASH_SUMMARY, false, false);
 
     var sensor_state = $('#sensor-status');
@@ -351,7 +357,7 @@ function sensor_status(sensors_detected) {
 
     if (have_sensor(sensors_detected, 'mag')) {
         $('.mag', e_sensor_status).addClass('on');
-		$('.magicon', e_sensor_status).addClass('active');
+        $('.magicon', e_sensor_status).addClass('active');
     } else {
         $('.mag', e_sensor_status).removeClass('on');
         $('.magicon', e_sensor_status).removeClass('active');
@@ -359,7 +365,7 @@ function sensor_status(sensors_detected) {
 
     if (have_sensor(sensors_detected, 'gps')) {
         $('.gps', e_sensor_status).addClass('on');
-		$('.gpsicon', e_sensor_status).addClass('active');
+        $('.gpsicon', e_sensor_status).addClass('active');
     } else {
         $('.gps', e_sensor_status).removeClass('on');
         $('.gpsicon', e_sensor_status).removeClass('active');
@@ -443,7 +449,10 @@ function update_live_status() {
 
     if (GUI.active_tab != 'cli') {
         MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false);
-        MSP.send_message(MSP_codes.MSP_STATUS, false, false);
+        if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
+        	MSP.send_message(MSP_codes.MSP_STATUS_EX, false, false);
+        else
+        	MSP.send_message(MSP_codes.MSP_STATUS, false, false);
         MSP.send_message(MSP_codes.MSP_ANALOG, false, false);
     }
 
@@ -508,7 +517,6 @@ function update_live_status() {
     GUI.timeout_remove('data_refresh');
     startLiveDataRefreshTimer();
 }
-
 
 function specificByte(num, pos) {
     return 0x000000FF & (num >> (8 * pos));
