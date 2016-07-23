@@ -73,8 +73,7 @@ $(document).ready(function () {
                     // Reset various UI elements
                     $('span.i2c-error').text(0);
                     $('span.cycle-time').text(0);
-                    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
-                        $('span.cpu-load').text('');
+                    $('span.cpu-load').text('');
 
                     // unlock port select & baud
                     $('div#port-picker #port').prop('disabled', false);
