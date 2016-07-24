@@ -381,6 +381,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         nrf24Protocol_e.change(function () {
             RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
+            RX_CONFIG.nrf24rx_id = 0;
         });
 
         // select current nrf24 protocol
