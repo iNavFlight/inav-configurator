@@ -279,7 +279,6 @@ function onConnect() {
     dataflash.show();
 
     startLiveDataRefreshTimer();
-
 }
 
 function onClosed(result) {
@@ -316,7 +315,7 @@ function read_serial(info) {
 function sensor_status(sensors_detected) {
     // initialize variable (if it wasn't)
     if (!sensor_status.previous_sensors_detected) {
-        sensor_status.previous_sensors_detected = 0;
+        sensor_status.previous_sensors_detected = -1; // Otherwise first iteration will not be run if sensors_detected == 0
     }
 
     // update UI (if necessary)
