@@ -853,6 +853,12 @@ var MSP = {
                 offset += 2;
                 RX_CONFIG.rx_max_usec = data.getUint16(offset, 1);
                 offset += 2;
+                if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                    RX_CONFIG.nrf24rx_protocol = data.getUint8(offset, 1);
+                    offset++;
+                    RX_CONFIG.nrf24rx_id = data.getUint32(offset, 1);
+                    offset += 4;
+                }
                 break;
 
             case MSP_codes.MSP_FAILSAFE_CONFIG:
@@ -1380,6 +1386,13 @@ MSP.crunch = function (code) {
             buffer.push(highByte(RX_CONFIG.rx_min_usec));
             buffer.push(lowByte(RX_CONFIG.rx_max_usec));
             buffer.push(highByte(RX_CONFIG.rx_max_usec));
+            if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                buffer.push(RX_CONFIG.nrf24rx_protocol);
+                buffer.push(RX_CONFIG.nrf24rx_id & 0xFF);
+                buffer.push((RX_CONFIG.nrf24rx_id >> 8) & 0xFF);
+                buffer.push((RX_CONFIG.nrf24rx_id >> 16) & 0xFF);
+                buffer.push((RX_CONFIG.nrf24rx_id >> 24) & 0xFF);
+            }
             break;
 
         case MSP_codes.MSP_SET_FAILSAFE_CONFIG:

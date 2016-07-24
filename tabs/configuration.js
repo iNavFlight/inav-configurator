@@ -41,9 +41,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
     
     function load_loop_time() {
-        var next_callback = load_3d;
+        var next_callback = load_rx_config;
         if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
             MSP.send_message(MSP_codes.MSP_LOOP_TIME, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function load_rx_config() {
+        var next_callback = load_3d;
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            MSP.send_message(MSP_codes.MSP_RX_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -142,6 +151,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
                 {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true}
+            );
+        }
+
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            features.push(
+                {bit: 22, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
+                {bit: 23, group: 'other', name: 'SOFTSPI'}
             );
         }
 
@@ -347,6 +363,30 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // code below is a temporary fix, which we will be able to remove in the future (hopefully)
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
+        var nrf24Protocoltypes = [
+            'V202 250Kbps',
+            'V202 1Mbps',
+            'Syma X',
+            'Syma X5C',
+            'Cheerson CX10',
+            'Cheerson CX10A',
+            'JJRC H8_3D',
+            'iNav Reference protocol'
+        ];
+
+        var nrf24Protocol_e = $('select.nrf24Protocol');
+        for (var i = 0; i < nrf24Protocoltypes.length; i++) {
+            nrf24Protocol_e.append('<option value="' + i + '">' + nrf24Protocoltypes[i] + '</option>');
+        }
+
+        nrf24Protocol_e.change(function () {
+            RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
+            RX_CONFIG.nrf24rx_id = 0;
+        });
+
+        // select current nrf24 protocol
+        nrf24Protocol_e.val(RX_CONFIG.nrf24rx_protocol);
+
         // fill board alignment
         $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));
         $('input[name="board_align_pitch"]').val((BF_CONFIG.board_align_pitch / 10.0).toFixed(1));
@@ -492,7 +532,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             if (isFeatureEnabled('RX_SERIAL')) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRXtypes[BF_CONFIG.serialrx_type]);
             }
-            
+
+            // track feature usage
+            if (isFeatureEnabled('RX_NRF24')) {
+                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', nrf24Protocoltypes[RX_CONFIG.nrf24rx_protocol]);
+            }
+
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
                 if (isFeatureEnabled(featureName)) {
@@ -541,7 +586,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function save_looptime_config() {
-                MSP.send_message(MSP_codes.MSP_SET_LOOP_TIME, MSP.crunch(MSP_codes.MSP_SET_LOOP_TIME), false, save_to_eeprom);
+                MSP.send_message(MSP_codes.MSP_SET_LOOP_TIME, MSP.crunch(MSP_codes.MSP_SET_LOOP_TIME), false, save_rx_config);
+            }
+
+            function save_rx_config() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_RX_CONFIG, MSP.crunch(MSP_codes.MSP_SET_RX_CONFIG), false, next_callback);
+                } else {
+                   next_callback();
+                }     
             }
 
             function save_to_eeprom() {

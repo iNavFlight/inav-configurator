@@ -253,7 +253,9 @@ var FC = {
             mincheck:               0,
             spektrum_sat_bind:      0,
             rx_min_usec:            0,
-            rx_max_usec:            0
+            rx_max_usec:            0,
+            nrf24rx_protocol:       0,
+            nrf24rx_id:             0
         };
 
         FAILSAFE_CONFIG = {

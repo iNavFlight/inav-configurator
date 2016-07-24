@@ -546,7 +546,9 @@ function configuration_restore(callback) {
                     mincheck:               1100,
                     maxcheck:               1900,
                     rx_min_usec:            885,
-                    rx_max_usec:            2115
+                    rx_max_usec:            2115,
+                    nrf24rx_protocol:       0,
+                    nrf24rx_id:             0
                 };
             }
 
