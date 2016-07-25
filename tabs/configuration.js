@@ -156,8 +156,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             features.push(
-                {bit: 22, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
-                {bit: 23, group: 'other', name: 'SOFTSPI'}
+                {bit: 26, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
+                {bit: 27, group: 'other', name: 'SOFTSPI'}
             );
         }
 
