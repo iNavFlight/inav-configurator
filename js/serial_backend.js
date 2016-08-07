@@ -376,6 +376,14 @@ function sensor_status(sensors_detected) {
         $('.sonar', e_sensor_status).removeClass('on');
         $('.sonaricon', e_sensor_status).removeClass('active');
     }
+
+    if (have_sensor(sensors_detected, 'opflow')) {
+        $('.opflow', e_sensor_status).addClass('on');
+        $('.opflowicon', e_sensor_status).addClass('active');
+    } else {
+        $('.opflow', e_sensor_status).removeClass('on');
+        $('.opflowicon', e_sensor_status).removeClass('active');
+    }
 }
 
 function have_sensor(sensors_detected, sensor_code) {
@@ -391,6 +399,8 @@ function have_sensor(sensors_detected, sensor_code) {
             return bit_check(sensors_detected, 3);
         case 'sonar':
             return bit_check(sensors_detected, 4);
+        case 'opflow':
+            return bit_check(sensors_detected, 5);
     }
     return false;
 }
