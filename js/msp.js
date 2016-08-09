@@ -854,6 +854,7 @@ var MSP = {
                 RX_CONFIG.rx_max_usec = data.getUint16(offset, 1);
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                    offset += 4; // 4 null bytes for betaflight compatibility
                     RX_CONFIG.nrf24rx_protocol = data.getUint8(offset, 1);
                     offset++;
                     RX_CONFIG.nrf24rx_id = data.getUint32(offset, 1);
@@ -1387,6 +1388,10 @@ MSP.crunch = function (code) {
             buffer.push(lowByte(RX_CONFIG.rx_max_usec));
             buffer.push(highByte(RX_CONFIG.rx_max_usec));
             if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                buffer.push(0); // 4 null bytes for betaflight compatibility
+                buffer.push(0);
+                buffer.push(0);
+                buffer.push(0);
                 buffer.push(RX_CONFIG.nrf24rx_protocol);
                 buffer.push(RX_CONFIG.nrf24rx_id & 0xFF);
                 buffer.push((RX_CONFIG.nrf24rx_id >> 8) & 0xFF);
