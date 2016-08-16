@@ -1,41 +1,41 @@
 # INAV Configurator
 
-INAV Configurator is a crossplatform configuration tool for the [INAV](http://cleanflight.com/) flight control system.
+INAV Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
-It runs as an app within Google Chrome and allows you to configure the Cleanflight software running on any [supported INAV target](https://github.com/cleanflight/cleanflight/blob/master/docs/Boards.md).
+It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
 
-Various types of aircraft are supported by the tool and by cleanflight, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
+Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
 
-[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/cleanflight-configurator/enacoimjcgeinfnnnpajinjgmkahmfgb)
+[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
 
 ## Authors
 
-Dominic Clifton/hydra - maintainer of the Cleanflight firmware and configurator. 
+Konstantin Sharlaimov/DigitalEntity - maintainer of the INAV firmware and configurator. 
 
-Cleanflight Configurator was originally a [fork](#credits) of Baseflight Configurator with support for Cleanflight instead of Baseflight.
+INAV Configurator was originally a [fork](#credits) of Cleanflight Configurator with support for INAV instead of Cleanflight.
 
-This configurator is the only configurator with support for Cleanflight specific features. It will likely require that you run the latest firmware on the flight controller.
-If you are experiencing any problems please make sure you are running the [latest firmware version](https://github.com/cleanflight/cleanflight/releases/latest).
+This configurator is the only configurator with support for INAV specific features. It will likely require that you run the latest firmware on the flight controller.
+If you are experiencing any problems please make sure you are running the [latest firmware version](https://github.com/iNavFlight/inav/releases).
 
 ## Installation
 
 ### Via chrome webstore
 
-1. Visit [Chrome web store](https://chrome.google.com/webstore/detail/cleanflight-configurator/enacoimjcgeinfnnnpajinjgmkahmfgb)
+1. Visit [Chrome web store](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
 2. Click **+ Free**
 
-Please note - the application will automatically update itself when new versions are released.  Please ensure you maintain configuration backups as described in the Cleanflight documentation.
+Please note - the application will automatically update itself when new versions are released.  Please ensure you maintain configuration backups as described in the INAV documentation.
 
 ### Alternative way
 
 1. Clone the repo to any local directory or download it as zip
 2. Start Chromium or Google Chrome and go to tools -> extension
 3. Check the "Developer mode" checkbox
-4. Click on load unpacked extension and point it to the Cleanflight Configurator directory (for example D:/cleanflight-configurator)
+4. Click on load unpacked extension and point it to the INAV Configurator directory (for example D:/inav-configurator)
 
 ## How to use
 
-You can find the Cleanflight Configurator icon in your application tab "Apps"
+You can find the INAV Configurator icon in your application tab "Apps"
 
 ## Notes
 
@@ -54,19 +54,13 @@ If you need help your please use the multiwii or rcgroups forums or visit the IR
 
 ### Issue trackers
 
-For Cleanflight configurator issues raise them here
+For INAV configurator issues raise them here
 
-https://github.com/cleanflight/cleanflight-configurator/issues
+https://github.com/iNavFlight/inav-configurator/issues
 
 For Cleanflight firmware issues raise them here
 
-https://github.com/cleanflight/cleanflight/issues
-
-### IRC Channel
-
-There is an IRC channel for Cleanflight, here: irc://irc.freenode.net/#cleanflight
-
-Support for Baseflight Configurator can also be found on IRC, here: irc://irc.freenode.net/#multiwii
+https://github.com/iNavFlight/inav/issues
 
 ## Technical details
 
@@ -78,4 +72,5 @@ We accept clean and reasonable patches, submit them!
 
 ## Credits
 
-ctn - primary author and maintainer of Baseflight Configurator from which this project was forked.
+ctn - primary author and maintainer of Baseflight Configurator.
+Hydra - author and maintainer of Cleanflight Configurator from which this project was forked.
