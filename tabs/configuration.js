@@ -352,11 +352,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         serialRX_e.change(function () {
-            BF_CONFIG.serialrx_type = parseInt($(this).val());
+            RX_CONFIG.serialrx_provider = parseInt($(this).val());
         });
 
         // select current serial RX type
-        serialRX_e.val(BF_CONFIG.serialrx_type);
+        serialRX_e.val(RX_CONFIG.serialrx_provider);
 
         // for some odd reason chrome 38+ changes scroll according to the touched select element
         // i am guessing this is a bug, since this wasn't happening on 37
@@ -530,7 +530,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             // track feature usage
             if (isFeatureEnabled('RX_SERIAL')) {
-                googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRXtypes[BF_CONFIG.serialrx_type]);
+                googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRXtypes[RX_CONFIG.serialrx_provider]);
             }
 
             // track feature usage
