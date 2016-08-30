@@ -31,137 +31,38 @@ TABS.pid_tuning.initialize = function (callback) {
     // requesting MSP_STATUS manually because it contains CONFIG.profile
     MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_pid_names);
 
+    var sectionClasses = [
+        'ROLL', // 0
+        'PITCH', // 1
+        'YAW', // 2
+        'ALT', // 3
+        'Pos', // 4
+        'PosR', // 5
+        'NavR', // 6
+        'LEVEL', // 7
+        'MAG', // 8
+        'Vario' // 9
+    ];
+
     function pid_and_rc_to_form() {
+
         // Fill in the data from PIDs array
-        var i = 0;
-        $('.pid_tuning .ROLL input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[0][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[0][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[0][i++].toFixed(0));
-                    break;
-            }
-        });
+        var i;
+        /*
+         * Iterate over registered sections/PID controllers
+         */
+        for (var sectionId = 0; sectionId < sectionClasses.length; sectionId++) {
 
-        i = 0;
-        $('.pid_tuning .PITCH input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[1][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[1][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[1][i++].toFixed(0));
-                    break;
-            }
-        });
+            i = 0;
+            /*
+             * Now, iterate over inputs inside PID constroller section
+             */
+            $('.pid_tuning .' + sectionClasses[sectionId] + ' input').each(function () {
+                $(this).val(PIDs[sectionId][i]);
+                i++;
+            });
 
-        i = 0;
-        $('.pid_tuning .YAW input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[2][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[2][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[2][i++].toFixed(0));
-                    break;
-            }
-        });
-
-        i = 0;
-        $('.pid_tuning .ALT input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[3][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[3][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[3][i++].toFixed(0));
-                    break;
-            }
-        });
-
-        i = 0;
-        $('.pid_tuning .Pos input').each(function () {
-            $(this).val(PIDs[4][i++].toFixed(2));
-        });
-
-        i = 0;
-        $('.pid_tuning .PosR input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[5][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[5][i++].toFixed(2));
-                    break;
-                case 2:
-                    $(this).val(PIDs[5][i++].toFixed(3));
-                    break;
-            }
-        });
-
-        i = 0;
-        $('.pid_tuning .NavR input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[6][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[6][i++].toFixed(2));
-                    break;
-                case 2:
-                    $(this).val(PIDs[6][i++].toFixed(3));
-                    break;
-            }
-        });
-
-        i = 0;
-        $('.pid_tuning .LEVEL input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[7][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[7][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[7][i++].toFixed(0));
-                    break;
-            }
-        });
-
-        i = 0;
-        $('.pid_tuning .MAG input').each(function () {
-            $(this).val(PIDs[8][i++].toFixed(1));
-        });
-
-        i = 0;
-        $('.pid_tuning .Vario input').each(function () {
-            switch (i) {
-                case 0:
-                    $(this).val(PIDs[9][i++].toFixed(1));
-                    break;
-                case 1:
-                    $(this).val(PIDs[9][i++].toFixed(3));
-                    break;
-                case 2:
-                    $(this).val(PIDs[9][i++].toFixed(0));
-                    break;
-            }
-        });
+        }
 
         // Fill in data from RC_tuning object
         $('.rate-tpa input[name="roll-pitch"]').val(RC_tuning.roll_pitch_rate.toFixed(2));
@@ -181,56 +82,15 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function form_to_pid_and_rc() {
-        // Catch all the changes and stuff the inside PIDs array
-        var i = 0;
-        $('table.pid_tuning tr.ROLL input').each(function () {
-            PIDs[0][i++] = parseFloat($(this).val());
-        });
 
-        i = 0;
-        $('table.pid_tuning tr.PITCH input').each(function () {
-            PIDs[1][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.YAW input').each(function () {
-            PIDs[2][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.ALT input').each(function () {
-            PIDs[3][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.Vario input').each(function () {
-            PIDs[9][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.Pos input').each(function () {
-            PIDs[4][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.PosR input').each(function () {
-            PIDs[5][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.NavR input').each(function () {
-            PIDs[6][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.LEVEL input').each(function () {
-            PIDs[7][i++] = parseFloat($(this).val());
-        });
-
-        i = 0;
-        $('table.pid_tuning tr.MAG input').each(function () {
-            PIDs[8][i++] = parseFloat($(this).val());
-        });
+        var i;
+        for (var sectionId = 0; sectionId < sectionClasses.length; sectionId++) {
+          i = 0;
+          $('table.pid_tuning tr.' + sectionClasses[sectionId] + ' input').each(function () {
+              PIDs[sectionId][i] = parseFloat($(this).val());
+              i++;
+          });
+        }
 
         // catch RC_tuning changes
         RC_tuning.roll_pitch_rate = parseFloat($('.rate-tpa input[name="roll-pitch"]').val());
