@@ -545,6 +545,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             googleAnalytics.sendEvent('Setting', 'Mixer', mixerList[BF_CONFIG.mixerConfiguration - 1].name);
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('tr').find('label').text());
+            googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
