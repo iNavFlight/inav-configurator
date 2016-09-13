@@ -1,5 +1,15 @@
 'use strict';
 
+var limitedFunctionalityTargets = [
+        "NAZE",
+        "CC3D",
+        "CJMCU",
+        "CRAZEPONYMINI",
+        "OLIMEXINO",
+        "RMDO",
+        "CC3D PPM1"
+];
+
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
     var self = this;
@@ -138,7 +148,15 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 $("a.load_remote_file").addClass('disabled');
                 var target = $(this).val();
-                
+
+                console.log(target, limitedFunctionalityTargets.indexOf(target));
+
+                if (limitedFunctionalityTargets.indexOf(target) >= 0) {
+                    $('.limited-functionality-warning').show();
+                } else {
+                    $('.limited-functionality-warning').hide();
+                }
+
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');
                     $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherLoadFirmwareFile'));
@@ -152,7 +170,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                     } else {
                         versions_e.append($("<option value='0'>{0} {1}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectFirmwareVersionFor'), target)));
                     }
-                        
+
                     TABS.firmware_flasher.releases[target].forEach(function(descriptor) {
                         var select_e =
                                 $("<option value='{0}'>{0} - {1} - {2} ({3})</option>".format(
