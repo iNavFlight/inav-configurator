@@ -309,7 +309,7 @@
         "message": "Calibrate Accelerometer"
     },
     "initialSetupCalibrateAccelText": {
-        "message": "Place board or frame on <strong>leveled</strong> surface, proceed with calibration, ensure platform is not moving during calibration period"
+        "message": "6-point calibration of accelerometer. Go to wiki for iNav and follow Sensor Calibration for more infomation"
     },
     "initialSetupButtonCalibrateMag": {
         "message": "Calibrate Magnetometer"
