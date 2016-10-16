@@ -182,7 +182,7 @@
 .tab-configuration .disarm .checkbox {
     float: left;
     padding-left: 0px;
-    margin-top: -5px;
+    /*margin-top: -5px;*/
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
     width: 100%;
@@ -454,7 +454,7 @@
 }
 
 .tab-configuration .sensoralignment {
-    width: 50%; 
+    width: 50%;
     float: left;
 }
 
@@ -500,4 +500,13 @@
     .tab-configuration .current .gui_box {
         float: left;
     }
+}
+
+#esc-protocols {
+    display: none;
+}
+
+#esc-protocols span {
+    display: inline-block;
+    width: 10em;
 }

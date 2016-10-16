@@ -148,9 +148,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             {bit: 15, group: 'rssi', name: 'RSSI_ADC'},
             {bit: 16, group: 'other', name: 'LED_STRIP'},
             {bit: 17, group: 'other', name: 'DISPLAY'},
-            {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
+            features.push(
+                {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true}
+            );
+        }
 
         if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
             features.push(
@@ -445,6 +450,104 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="currentscale"]').val(BF_CONFIG.currentscale);
         $('input[name="currentoffset"]').val(BF_CONFIG.currentoffset);
         $('input[name="multiwiicurrentoutput"]').prop('checked', MISC.multiwiicurrentoutput);
+
+        var escProtocols = {
+            0: {
+                name: "STANDARD",
+                defaultRate: 400,
+                rates: {
+                    50: "50Hz",
+                    400: "400Hz"
+                }
+            },
+            1: {
+                name: "ONESHOT125",
+                defaultRate: 1000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz"
+                }
+            },
+            2: {
+                name: "ONESHOT42",
+                defaultRate: 2000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz",
+                    8000: "8kHz"
+                }
+            },
+            3: {
+                name: "MULTISHOT",
+                defaultRate: 2000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz",
+                    8000: "8kHz"
+                }
+            },
+            4: {
+                name: "BRUSHED",
+                defaultRate: 500,
+                rates: {
+                    500: "500Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz",
+                    8000: "8kHz",
+                    16000: "16kHz",
+                    32000: "32kHz"
+                }
+            }
+        };
+
+        function buildMotorRates() {
+            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
+
+            $escRate.find('option').remove();
+
+            for (var i in protocolData.rates) {
+                if (protocolData.rates.hasOwnProperty(i)) {
+                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
+                }
+            }
+
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+
+            var $escProtocol = $('#esc-protocol');
+            var $escRate = $('#esc-rate');
+            for (var i in escProtocols) {
+                if (escProtocols.hasOwnProperty(i)) {
+                    var protocolData = escProtocols[i];
+                    $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
+                }
+            }
+
+            buildMotorRates();
+            $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+
+            $escProtocol.change(function () {
+                ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+                buildMotorRates();
+                ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
+                $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+            });
+
+            $escRate.change(function () {
+                ADVANCED_CONFIG.motorPwmRate = $(this).val();
+            });
+
+            $("#esc-protocols").show();
+        }
 
         //fill 3D
         if (semver.lt(CONFIG.apiVersion, "1.14.0")) {
