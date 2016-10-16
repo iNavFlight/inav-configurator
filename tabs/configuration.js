@@ -161,6 +161,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             );
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, '1.3.0')) {
+            features.push(
+                {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true}
+            );
+        }
+
         function isFeatureEnabled(featureName) {
             for (var i = 0; i < features.length; i++) {
                 if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
