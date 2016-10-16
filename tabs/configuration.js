@@ -68,13 +68,23 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_sensor_alignment() {
-        var next_callback = load_html;
+        var next_callback = loadAdvancedConfig;
         if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
             MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, next_callback);
         } else {
             next_callback();
         }
     }
+
+    function loadAdvancedConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSP_codes.MSP_ADVANCED_CONFIG, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
     //Update Analog/Battery Data
     function load_analog() {
         MSP.send_message(MSP_codes.MSP_ANALOG, false, false, function () {
@@ -605,9 +615,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function save_rx_config() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveAdvancedConfig;
                 if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_RX_CONFIG, MSP.crunch(MSP_codes.MSP_SET_RX_CONFIG), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function saveAdvancedConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_ADVANCED_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }
