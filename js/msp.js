@@ -373,12 +373,7 @@ var MSP = {
                 var offset = 0;
                 RC_tuning.RC_RATE = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-                    RC_tuning.roll_pitch_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                    RC_tuning.pitch_rate = 0;
-                    RC_tuning.roll_rate = 0;
-                    RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                } else if (FC.isRatesInDps()) {
+                if (FC.isRatesInDps()) {
                     RC_tuning.roll_pitch_rate = 0;
                     RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) * 10));
                     RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) * 10));
@@ -393,17 +388,12 @@ var MSP = {
                 RC_tuning.dynamic_THR_PID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.throttle_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
-                    RC_tuning.dynamic_THR_breakpoint = data.getUint16(offset, 1);
-                    offset += 2;
-                } else {
-                    RC_tuning.dynamic_THR_breakpoint = 0;
-                }
-                if (semver.gte(CONFIG.apiVersion, "1.10.0")) {
-                    RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                } else {
-                    RC_tuning.RC_YAW_EXPO = 0;
-                }
+
+                RC_tuning.dynamic_THR_breakpoint = data.getUint16(offset, 1);
+                offset += 2;
+
+                RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+
                 break;
             case MSP_codes.MSP_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
@@ -425,15 +415,11 @@ var MSP = {
                 break;
             */
             case MSP_codes.MSP_ARMING_CONFIG:
-                if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-                    ARMING_CONFIG.auto_disarm_delay = data.getUint8(0, 1);
-                    ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
-                }
+                ARMING_CONFIG.auto_disarm_delay = data.getUint8(0, 1);
+                ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
                 break;
             case MSP_codes.MSP_LOOP_TIME:
-                if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-                    FC_CONFIG.loopTime = data.getInt16(0, 1);
-                }
+                FC_CONFIG.loopTime = data.getInt16(0, 1);
                 break;
             case MSP_codes.MSP_MISC: // 22 bytes
                 var offset = 0;
@@ -522,48 +508,23 @@ var MSP = {
             case MSP_codes.MSP_SERVO_CONFIGURATIONS:
                 SERVO_CONFIG = []; // empty the array as new data is coming in
 
-                if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
-                    if (data.byteLength % 14 == 0) {
-                        for (var i = 0; i < data.byteLength; i += 14) {
-                            var arr = {
-                                'min':                      data.getInt16(i + 0, 1),
-                                'max':                      data.getInt16(i + 2, 1),
-                                'middle':                   data.getInt16(i + 4, 1),
-                                'rate':                     data.getInt8(i + 6),
-                                'angleAtMin':               data.getInt8(i + 7),
-                                'angleAtMax':               data.getInt8(i + 8),
-                                'indexOfChannelToForward':  data.getInt8(i + 9),
-                                'reversedInputSources':     data.getUint32(i + 10)
-                            };
+                if (data.byteLength % 14 == 0) {
+                    for (var i = 0; i < data.byteLength; i += 14) {
+                        var arr = {
+                            'min':                      data.getInt16(i + 0, 1),
+                            'max':                      data.getInt16(i + 2, 1),
+                            'middle':                   data.getInt16(i + 4, 1),
+                            'rate':                     data.getInt8(i + 6),
+                            'angleAtMin':               data.getInt8(i + 7),
+                            'angleAtMax':               data.getInt8(i + 8),
+                            'indexOfChannelToForward':  data.getInt8(i + 9),
+                            'reversedInputSources':     data.getUint32(i + 10)
+                        };
 
-                            SERVO_CONFIG.push(arr);
-                        }
-                    }
-                } else {
-                    if (data.byteLength % 7 == 0) {
-                        for (var i = 0; i < data.byteLength; i += 7) {
-                            var arr = {
-                                'min':                      data.getInt16(i + 0, 1),
-                                'max':                      data.getInt16(i + 2, 1),
-                                'middle':                   data.getInt16(i + 4, 1),
-                                'rate':                     data.getInt8(i + 6),
-                                'angleAtMin':               45,
-                                'angleAtMax':               45,
-                                'indexOfChannelToForward':  undefined,
-                                'reversedInputSources':     0
-                            };
-
-                            SERVO_CONFIG.push(arr);
-                        }
-                    }
-
-                    if (semver.eq(CONFIG.apiVersion, '1.10.0')) {
-                        // drop two unused servo configurations due to MSP rx buffer to small)
-                        while (SERVO_CONFIG.length > 8) {
-                            SERVO_CONFIG.pop();
-                        }
+                        SERVO_CONFIG.push(arr);
                     }
                 }
+
                 break;
             case MSP_codes.MSP_RC_DEADBAND:
                 var offset = 0;
@@ -720,45 +681,25 @@ var MSP = {
 
             case MSP_codes.MSP_CF_SERIAL_CONFIG:
 
-                if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-                    SERIAL_CONFIG.ports = [];
-                    var offset = 0;
-                    var serialPortCount = (data.byteLength - (4 * 4)) / 2;
-                    for (var i = 0; i < serialPortCount; i++) {
-                        var serialPort = {
-                            identifier: data.getUint8(offset++, 1),
-                            scenario: data.getUint8(offset++, 1)
-                        }
-                        SERIAL_CONFIG.ports.push(serialPort);
-                    }
-                    SERIAL_CONFIG.mspBaudRate = data.getUint32(offset, 1);
-                    offset+= 4;
-                    SERIAL_CONFIG.cliBaudRate = data.getUint32(offset, 1);
-                    offset+= 4;
-                    SERIAL_CONFIG.gpsBaudRate = data.getUint32(offset, 1);
-                    offset+= 4;
-                    SERIAL_CONFIG.gpsPassthroughBaudRate = data.getUint32(offset, 1);
-                    offset+= 4;
-                } else {
-                    SERIAL_CONFIG.ports = [];
-                    var offset = 0;
-                    var bytesPerPort = 1 + 2 + (1 * 4);
-                    var serialPortCount = data.byteLength / bytesPerPort;
+                SERIAL_CONFIG.ports = [];
+                var offset = 0;
+                var bytesPerPort = 1 + 2 + (1 * 4);
+                var serialPortCount = data.byteLength / bytesPerPort;
 
-                    for (var i = 0; i < serialPortCount; i++) {
-                        var serialPort = {
-                            identifier: data.getUint8(offset, 1),
-                            functions: MSP.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, 1)),
-                            msp_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 3, 1)],
-                            gps_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 4, 1)],
-                            telemetry_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 5, 1)],
-                            blackbox_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 6, 1)]
-                        }
-
-                        offset += bytesPerPort;
-                        SERIAL_CONFIG.ports.push(serialPort);
+                for (var i = 0; i < serialPortCount; i++) {
+                    var serialPort = {
+                        identifier: data.getUint8(offset, 1),
+                        functions: MSP.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, 1)),
+                        msp_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 3, 1)],
+                        gps_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 4, 1)],
+                        telemetry_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 5, 1)],
+                        blackbox_baudrate: MSP.supportedBaudRates[data.getUint8(offset + 6, 1)]
                     }
+
+                    offset += bytesPerPort;
+                    SERIAL_CONFIG.ports.push(serialPort);
                 }
+
                 break;
 
             case MSP_codes.MSP_SET_CF_SERIAL_CONFIG:
@@ -849,14 +790,14 @@ var MSP = {
                 offset++;
                 FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, 1);
                 offset += 2;
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset, 1);
-                    offset++;
-                    FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, 1);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset, 1);
-                    offset++;
-                }
+
+                FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset, 1);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, 1);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset, 1);
+                offset++;
+
                 break;
 
             case MSP_codes.MSP_RXFAIL_CONFIG:
@@ -1255,10 +1196,8 @@ MSP.crunch = function (code) {
         case MSP_codes.MSP_SET_RC_TUNING:
             buffer.push(Math.round(RC_tuning.RC_RATE * 100));
             buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
-            if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-                buffer.push(Math.round(RC_tuning.roll_pitch_rate * 100));
-                buffer.push(Math.round(RC_tuning.yaw_rate * 100));
-            } else if (FC.isRatesInDps()) {
+
+            if (FC.isRatesInDps()) {
                 buffer.push(Math.round(RC_tuning.roll_rate / 10));
                 buffer.push(Math.round(RC_tuning.pitch_rate / 10));
                 buffer.push(Math.round(RC_tuning.yaw_rate / 10));
@@ -1271,13 +1210,10 @@ MSP.crunch = function (code) {
             buffer.push(Math.round(RC_tuning.dynamic_THR_PID * 100));
             buffer.push(Math.round(RC_tuning.throttle_MID * 100));
             buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
-            if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
-                buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
-                buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
-            }
-            if (semver.gte(CONFIG.apiVersion, "1.10.0")) {
-                buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
-            }
+            buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
+            buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
+            buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
+
             break;
         // Disabled, cleanflight does not use MSP_SET_BOX.
         /*
@@ -1363,12 +1299,10 @@ MSP.crunch = function (code) {
             buffer.push(FAILSAFE_CONFIG.failsafe_off_delay);
             buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle));
             buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle));
-            if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-            }
+            buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
+            buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+            buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+            buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
             break;
 
         case MSP_codes.MSP_SET_TRANSPONDER_CONFIG:
@@ -1387,46 +1321,21 @@ MSP.crunch = function (code) {
             }
             break;
         case MSP_codes.MSP_SET_CF_SERIAL_CONFIG:
-            if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
+            for (var i = 0; i < SERIAL_CONFIG.ports.length; i++) {
+                var serialPort = SERIAL_CONFIG.ports[i];
 
-                for (var i = 0; i < SERIAL_CONFIG.ports.length; i++) {
-                    buffer.push(SERIAL_CONFIG.ports[i].scenario);
-                }
-                buffer.push(specificByte(SERIAL_CONFIG.mspBaudRate, 0));
-                buffer.push(specificByte(SERIAL_CONFIG.mspBaudRate, 1));
-                buffer.push(specificByte(SERIAL_CONFIG.mspBaudRate, 2));
-                buffer.push(specificByte(SERIAL_CONFIG.mspBaudRate, 3));
+                buffer.push(serialPort.identifier);
 
-                buffer.push(specificByte(SERIAL_CONFIG.cliBaudRate, 0));
-                buffer.push(specificByte(SERIAL_CONFIG.cliBaudRate, 1));
-                buffer.push(specificByte(SERIAL_CONFIG.cliBaudRate, 2));
-                buffer.push(specificByte(SERIAL_CONFIG.cliBaudRate, 3));
+                var functionMask = MSP.serialPortFunctionsToMask(serialPort.functions);
+                buffer.push(specificByte(functionMask, 0));
+                buffer.push(specificByte(functionMask, 1));
 
-                buffer.push(specificByte(SERIAL_CONFIG.gpsBaudRate, 0));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsBaudRate, 1));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsBaudRate, 2));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsBaudRate, 3));
-
-                buffer.push(specificByte(SERIAL_CONFIG.gpsPassthroughBaudRate, 0));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsPassthroughBaudRate, 1));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsPassthroughBaudRate, 2));
-                buffer.push(specificByte(SERIAL_CONFIG.gpsPassthroughBaudRate, 3));
-            } else {
-                for (var i = 0; i < SERIAL_CONFIG.ports.length; i++) {
-                    var serialPort = SERIAL_CONFIG.ports[i];
-
-                    buffer.push(serialPort.identifier);
-
-                    var functionMask = MSP.serialPortFunctionsToMask(serialPort.functions);
-                    buffer.push(specificByte(functionMask, 0));
-                    buffer.push(specificByte(functionMask, 1));
-
-                    buffer.push(MSP.supportedBaudRates.indexOf(serialPort.msp_baudrate));
-                    buffer.push(MSP.supportedBaudRates.indexOf(serialPort.gps_baudrate));
-                    buffer.push(MSP.supportedBaudRates.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(MSP.supportedBaudRates.indexOf(serialPort.blackbox_baudrate));
-                }
+                buffer.push(MSP.supportedBaudRates.indexOf(serialPort.msp_baudrate));
+                buffer.push(MSP.supportedBaudRates.indexOf(serialPort.gps_baudrate));
+                buffer.push(MSP.supportedBaudRates.indexOf(serialPort.telemetry_baudrate));
+                buffer.push(MSP.supportedBaudRates.indexOf(serialPort.blackbox_baudrate));
             }
+
             break;
 
         case MSP_codes.MSP_SET_3D:
@@ -1533,61 +1442,43 @@ MSP.sendServoConfigurations = function(onCompleteCallback) {
 
         var buffer = [];
 
-        if (semver.lt(CONFIG.apiVersion, "1.12.0")) {
-            // send all in one go
-            // 1.9.0 had a bug where the MSP input buffer was too small, limit to 8.
-            for (var i = 0; i < SERVO_CONFIG.length && i < 8; i++) {
-                buffer.push(lowByte(SERVO_CONFIG[i].min));
-                buffer.push(highByte(SERVO_CONFIG[i].min));
+        // send one at a time, with index
 
-                buffer.push(lowByte(SERVO_CONFIG[i].max));
-                buffer.push(highByte(SERVO_CONFIG[i].max));
+        var servoConfiguration = SERVO_CONFIG[servoIndex];
 
-                buffer.push(lowByte(SERVO_CONFIG[i].middle));
-                buffer.push(highByte(SERVO_CONFIG[i].middle));
+        buffer.push(servoIndex);
 
-                buffer.push(lowByte(SERVO_CONFIG[i].rate));
-            }
+        buffer.push(lowByte(servoConfiguration.min));
+        buffer.push(highByte(servoConfiguration.min));
 
-            nextFunction = send_channel_forwarding;
-        } else {
-            // send one at a time, with index
+        buffer.push(lowByte(servoConfiguration.max));
+        buffer.push(highByte(servoConfiguration.max));
 
-            var servoConfiguration = SERVO_CONFIG[servoIndex];
+        buffer.push(lowByte(servoConfiguration.middle));
+        buffer.push(highByte(servoConfiguration.middle));
 
-            buffer.push(servoIndex);
+        buffer.push(lowByte(servoConfiguration.rate));
 
-            buffer.push(lowByte(servoConfiguration.min));
-            buffer.push(highByte(servoConfiguration.min));
+        buffer.push(servoConfiguration.angleAtMin);
+        buffer.push(servoConfiguration.angleAtMax);
 
-            buffer.push(lowByte(servoConfiguration.max));
-            buffer.push(highByte(servoConfiguration.max));
-
-            buffer.push(lowByte(servoConfiguration.middle));
-            buffer.push(highByte(servoConfiguration.middle));
-
-            buffer.push(lowByte(servoConfiguration.rate));
-
-            buffer.push(servoConfiguration.angleAtMin);
-            buffer.push(servoConfiguration.angleAtMax);
-
-            var out = servoConfiguration.indexOfChannelToForward;
-            if (out == undefined) {
-                out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-            }
-            buffer.push(out);
-
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 0));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 1));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 2));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 3));
-
-            // prepare for next iteration
-            servoIndex++;
-            if (servoIndex == SERVO_CONFIG.length) {
-                nextFunction = onCompleteCallback;
-            }
+        var out = servoConfiguration.indexOfChannelToForward;
+        if (out == undefined) {
+            out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
         }
+        buffer.push(out);
+
+        buffer.push(specificByte(servoConfiguration.reversedInputSources, 0));
+        buffer.push(specificByte(servoConfiguration.reversedInputSources, 1));
+        buffer.push(specificByte(servoConfiguration.reversedInputSources, 2));
+        buffer.push(specificByte(servoConfiguration.reversedInputSources, 3));
+
+        // prepare for next iteration
+        servoIndex++;
+        if (servoIndex == SERVO_CONFIG.length) {
+            nextFunction = onCompleteCallback;
+        }
+
         MSP.send_message(MSP_codes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
     }
 

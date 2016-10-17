@@ -96,12 +96,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
 
     function update_ui() {
 
-        if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-
-            $(".tab-ports").removeClass("supported");
-            return;
-        }
-
         $(".tab-ports").addClass("supported");
 
         var portIdentifierToNameMapping = {

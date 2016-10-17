@@ -155,12 +155,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         var form_e = $('#pid-tuning');
 
-        if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-            $('.rate-tpa .tpa-breakpoint').hide();
-            $('.rate-tpa .roll').hide();
-            $('.rate-tpa .pitch').hide();
-            $('.rate-tpa--inav').hide();
-        } else if (FC.isRatesInDps()) {
+        if (FC.isRatesInDps()) {
            $('.rate-tpa--no-dps').hide();
         } else {
             $('.rate-tpa .roll-pitch').hide();

@@ -11,16 +11,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_config() {
-        MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_serial_config);
-    }
-
-    function load_serial_config() {
-        var next_callback = load_rc_map;
-        if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-            MSP.send_message(MSP_codes.MSP_CF_SERIAL_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_rc_map);
     }
 
     function load_rc_map() {
@@ -32,21 +23,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_arming_config() {
-        var next_callback = load_loop_time;
-        if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            MSP.send_message(MSP_codes.MSP_ARMING_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_ARMING_CONFIG, false, false, load_loop_time);
     }
 
     function load_loop_time() {
-        var next_callback = load_rx_config;
-        if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            MSP.send_message(MSP_codes.MSP_LOOP_TIME, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_LOOP_TIME, false, false, load_rx_config);
     }
 
     function load_rx_config() {
@@ -59,21 +40,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_3d() {
-        var next_callback = load_sensor_alignment;
-        if (semver.gte(CONFIG.apiVersion, "1.14.0")) {
-            MSP.send_message(MSP_codes.MSP_3D, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_3D, false, false, load_sensor_alignment);
     }
 
     function load_sensor_alignment() {
-        var next_callback = load_html;
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, load_html);
     }
     //Update Analog/Battery Data
     function load_analog() {
@@ -139,14 +110,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             {bit: 16, group: 'other', name: 'LED_STRIP'},
             {bit: 17, group: 'other', name: 'DISPLAY'},
             {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true},
-            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
+            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true},
+            {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
         ];
-
-        if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
-            features.push(
-                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
-            );
-        }
 
         if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
@@ -262,19 +228,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var orientation_acc_e = $('select.accalign');
         var orientation_mag_e = $('select.magalign');
 
-        if (semver.lt(CONFIG.apiVersion, "1.15.0")) {
-            $('.tab-configuration .sensoralignment').hide();
-        } else {
-            for (var i = 0; i < alignments.length; i++) {
-                orientation_gyro_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
-                orientation_acc_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
-                orientation_mag_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
-            }
-            orientation_gyro_e.val(SENSOR_ALIGNMENT.align_gyro);
-            orientation_acc_e.val(SENSOR_ALIGNMENT.align_acc);
-            orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
+        for (var i = 0; i < alignments.length; i++) {
+            orientation_gyro_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
+            orientation_acc_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
+            orientation_mag_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
         }
-
+        orientation_gyro_e.val(SENSOR_ALIGNMENT.align_gyro);
+        orientation_acc_e.val(SENSOR_ALIGNMENT.align_acc);
+        orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
 
         // generate GPS
         var gpsProtocols = [
@@ -318,15 +279,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             gps_baudrate_e.append('<option value="' + gpsBaudRates[i] + '">' + gpsBaudRates[i] + '</option>');
         }
 
-        if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-            gps_baudrate_e.change(function () {
-                SERIAL_CONFIG.gpsBaudRate = parseInt($(this).val());
-            });
-            gps_baudrate_e.val(SERIAL_CONFIG.gpsBaudRate);
-        } else {
-            gps_baudrate_e.prop("disabled", true);
-            gps_baudrate_e.parent().hide();
-        }
+        gps_baudrate_e.prop("disabled", true);
+        gps_baudrate_e.parent().hide();
 
         var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
         for (var i = 0; i < gpsSbas.length; i++) {
@@ -402,22 +356,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="mag_declination"]').val(MISC.mag_declination);
 
         //fill motor disarm params and FC loop time
-        if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-            $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
-            $('div.disarm').show();
-            if(bit_check(BF_CONFIG.features, 4))//MOTOR_STOP
-                $('div.disarmdelay').show();
-            else
-                $('div.disarmdelay').hide();
 
-            // fill FC loop time
-            $('input[name="looptime"]').val(FC_CONFIG.loopTime);
+        $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
+        $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
+        $('div.disarm').show();
+        if(bit_check(BF_CONFIG.features, 4))//MOTOR_STOP
+            $('div.disarmdelay').show();
+        else
+            $('div.disarmdelay').hide();
 
-            recalculate_cycles_sec();
+        // fill FC loop time
+        $('input[name="looptime"]').val(FC_CONFIG.loopTime);
 
-            $('div.cycles').show();
-        }
+        recalculate_cycles_sec();
+
+        $('div.cycles').show();
 
         // fill throttle
         $('input[name="minthrottle"]').val(MISC.minthrottle);
@@ -437,17 +390,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="multiwiicurrentoutput"]').prop('checked', MISC.multiwiicurrentoutput);
 
         //fill 3D
-        if (semver.lt(CONFIG.apiVersion, "1.14.0")) {
-            $('.tab-configuration .3d').hide();
+        $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
+        $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
+        $('input[name="3dneutral"]').val(_3D.neutral3d);
+        if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
+            $('input[name="3ddeadbandthrottle"]').val(_3D.deadband3d_throttle);
         } else {
-            $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
-            $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
-            $('input[name="3dneutral"]').val(_3D.neutral3d);
-            if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                $('input[name="3ddeadbandthrottle"]').val(_3D.deadband3d_throttle);
-            } else {
-                $('.3ddeadbandthrottle').hide();
-            }
+            $('.3ddeadbandthrottle').hide();
         }
 
         // UI hooks
@@ -502,11 +451,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
 
             // motor disarm
-            if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
-                ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
-                ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
-                FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
-            }
+            ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
+            ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
+            FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
 
             MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
             MISC.midrc = parseInt($('input[name="midthrottle"]').val());
@@ -560,40 +507,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-
-            function save_serial_config() {
-                if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-                    MSP.send_message(MSP_codes.MSP_SET_CF_SERIAL_CONFIG, MSP.crunch(MSP_codes.MSP_SET_CF_SERIAL_CONFIG), false, save_misc);
-                } else {
-                    save_misc();
-                }
-            }
-
             function save_misc() {
                 MSP.send_message(MSP_codes.MSP_SET_MISC, MSP.crunch(MSP_codes.MSP_SET_MISC), false, save_3d);
             }
 
             function save_3d() {
-                var next_callback = save_sensor_alignment;
-                if(semver.gte(CONFIG.apiVersion, "1.14.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_3D, MSP.crunch(MSP_codes.MSP_SET_3D), false, next_callback);
-                } else {
-                   next_callback();
-                }
+                MSP.send_message(MSP_codes.MSP_SET_3D, MSP.crunch(MSP_codes.MSP_SET_3D), false, save_sensor_alignment);
             }
 
             function save_sensor_alignment() {
-                var next_callback = save_acc_trim;
-                if(semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_SENSOR_ALIGNMENT, MSP.crunch(MSP_codes.MSP_SET_SENSOR_ALIGNMENT), false, next_callback);
-                } else {
-                   next_callback();
-                }
+                MSP.send_message(MSP_codes.MSP_SET_SENSOR_ALIGNMENT, MSP.crunch(MSP_codes.MSP_SET_SENSOR_ALIGNMENT), false, save_acc_trim);
             }
 
             function save_acc_trim() {
-                MSP.send_message(MSP_codes.MSP_SET_ACC_TRIM, MSP.crunch(MSP_codes.MSP_SET_ACC_TRIM), false
-                                , semver.gte(CONFIG.apiVersion, "1.8.0") ? save_arming_config : save_to_eeprom);
+                MSP.send_message(MSP_codes.MSP_SET_ACC_TRIM, MSP.crunch(MSP_codes.MSP_SET_ACC_TRIM), false, save_arming_config);
             }
 
             function save_arming_config() {
@@ -644,7 +571,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-            MSP.send_message(MSP_codes.MSP_SET_BF_CONFIG, MSP.crunch(MSP_codes.MSP_SET_BF_CONFIG), false, save_serial_config);
+            MSP.send_message(MSP_codes.MSP_SET_BF_CONFIG, MSP.crunch(MSP_codes.MSP_SET_BF_CONFIG), false, save_misc);
         });
 
         // status data pulled via separate timer with static speed
