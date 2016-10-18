@@ -1816,9 +1816,15 @@ input {
 
 @media only screen and (max-height: 700px) , only screen and (max-device-height: 700px) {
 
-.tab_container {
-    overflow-x: hidden;
-    overflow-y: auto;
+        .tab_container {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
 }
 
-    }
+select {
+    border: 1px solid silver;
+    border-radius: 3px;
+    padding: 1px;
+}

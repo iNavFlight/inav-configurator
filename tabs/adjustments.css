@@ -60,12 +60,6 @@
     background-color: #e4e4e4;
 }
 
-.tab-adjustments .adjustment select {
-    /* outline: 1px solid silver; */
-    border-radius: 3px;
-    border: 1px solid silver;    
-}
-
 .tab-adjustments .adjustment td {
     text-align: center;
 }

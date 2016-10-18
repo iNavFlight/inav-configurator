@@ -44,8 +44,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_sensor_alignment() {
-        MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, load_html);
+        MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, loadAdvancedConfig);
     }
+
+    function loadAdvancedConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSP_codes.MSP_ADVANCED_CONFIG, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
     //Update Analog/Battery Data
     function load_analog() {
         MSP.send_message(MSP_codes.MSP_ANALOG, false, false, function () {
@@ -109,10 +119,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             {bit: 15, group: 'rssi', name: 'RSSI_ADC'},
             {bit: 16, group: 'other', name: 'LED_STRIP'},
             {bit: 17, group: 'other', name: 'DISPLAY'},
-            {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
+            features.push(
+                {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true}
+            );
+        }
 
         if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
@@ -389,6 +404,99 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="currentoffset"]').val(BF_CONFIG.currentoffset);
         $('input[name="multiwiicurrentoutput"]').prop('checked', MISC.multiwiicurrentoutput);
 
+        var escProtocols = {
+            0: {
+                name: "STANDARD",
+                defaultRate: 400,
+                rates: {
+                    50: "50Hz",
+                    400: "400Hz"
+                }
+            },
+            1: {
+                name: "ONESHOT125",
+                defaultRate: 1000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz"
+                }
+            },
+            2: {
+                name: "ONESHOT42",
+                defaultRate: 2000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz",
+                    8000: "8kHz"
+                }
+            },
+            3: {
+                name: "MULTISHOT",
+                defaultRate: 2000,
+                rates: {
+                    400: "400Hz",
+                    1000: "1kHz",
+                    2000: "2kHz",
+                    4000: "4kHz",
+                    8000: "8kHz"
+                }
+            },
+            4: {
+                name: "BRUSHED",
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz",
+                    16000: "16kHz",
+                    32000: "32kHz"
+                }
+            }
+        };
+
+        function buildMotorRates() {
+            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
+
+            $escRate.find('option').remove();
+
+            for (var i in protocolData.rates) {
+                if (protocolData.rates.hasOwnProperty(i)) {
+                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
+                }
+            }
+
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+
+            var $escProtocol = $('#esc-protocol');
+            var $escRate = $('#esc-rate');
+            for (var i in escProtocols) {
+                if (escProtocols.hasOwnProperty(i)) {
+                    var protocolData = escProtocols[i];
+                    $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
+                }
+            }
+
+            buildMotorRates();
+            $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+
+            $escProtocol.change(function () {
+                ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+                buildMotorRates();
+                ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
+                $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+            });
+
+            $escRate.change(function () {
+                ADVANCED_CONFIG.motorPwmRate = $(this).val();
+            });
+
+            $("#esc-protocols").show();
+        }
+
         //fill 3D
         $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
         $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
@@ -532,9 +640,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function save_rx_config() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveAdvancedConfig;
                 if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_RX_CONFIG, MSP.crunch(MSP_codes.MSP_SET_RX_CONFIG), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function saveAdvancedConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_ADVANCED_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }

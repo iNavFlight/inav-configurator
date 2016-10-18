@@ -124,11 +124,6 @@
     padding: 10px 0px;
 }
 
-.tab-auxiliary .range .channel {
-    border: 1px solid silver;
-    border-radius: 3px;
-}
-
 .tab-auxiliary .range .marker {
     position: absolute;
     left: 50%;

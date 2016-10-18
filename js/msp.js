@@ -43,6 +43,9 @@ var MSP_codes = {
     MSP_TRANSPONDER_CONFIG:     82,
     MSP_SET_TRANSPONDER_CONFIG: 83,
 
+    MSP_ADVANCED_CONFIG: 90,
+    MSP_SET_ADVANCED_CONFIG: 91,
+
     // Multiwii MSP commands
     MSP_IDENT:              100,
     MSP_STATUS:             101,
@@ -1011,6 +1014,28 @@ var MSP = {
             case MSP_codes.MSP_SET_TRANSPONDER_CONFIG:
                 console.log("Transponder config saved");
                 break;
+
+            case MSP_codes.MSP_ADVANCED_CONFIG:
+                var offset = 0;
+                ADVANCED_CONFIG.gyroSyncDenominator = data.getUint8(offset, 1);
+                offset++;
+                ADVANCED_CONFIG.pidProcessDenom = data.getUint8(offset, 1);
+                offset++;
+                ADVANCED_CONFIG.useUnsyncedPwm = data.getUint8(offset, 1);
+                offset++;
+                ADVANCED_CONFIG.motorPwmProtocol = data.getUint8(offset, 1);
+                offset++;
+                ADVANCED_CONFIG.motorPwmRate = data.getUint16(offset, 1);
+                offset += 2;
+                ADVANCED_CONFIG.servoPwmRate = data.getUint16(offset, 1);
+                offset += 2;
+                ADVANCED_CONFIG.gyroSync = data.getUint8(offset, 1);
+                break;
+
+            case MSP_codes.MSP_SET_ADVANCED_CONFIG:
+                console.log("Advanced config saved");
+                break;
+
             case MSP_codes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1361,6 +1386,21 @@ MSP.crunch = function (code) {
             buffer.push(SENSOR_ALIGNMENT.align_gyro);
             buffer.push(SENSOR_ALIGNMENT.align_acc);
             buffer.push(SENSOR_ALIGNMENT.align_mag);
+            break;
+
+        case MSP_codes.MSP_SET_ADVANCED_CONFIG:
+            buffer.push(ADVANCED_CONFIG.gyroSyncDenominator);
+            buffer.push(ADVANCED_CONFIG.pidProcessDenom);
+            buffer.push(ADVANCED_CONFIG.useUnsyncedPwm);
+            buffer.push(ADVANCED_CONFIG.motorPwmProtocol);
+
+            buffer.push(lowByte(ADVANCED_CONFIG.motorPwmRate));
+            buffer.push(highByte(ADVANCED_CONFIG.motorPwmRate));
+
+            buffer.push(lowByte(ADVANCED_CONFIG.servoPwmRate));
+            buffer.push(highByte(ADVANCED_CONFIG.servoPwmRate));
+
+            buffer.push(ADVANCED_CONFIG.gyroSync);
             break;
 
         default:
