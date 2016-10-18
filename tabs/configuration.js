@@ -466,8 +466,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 rates: {
                     400: "400Hz",
                     1000: "1kHz",
-                    2000: "2kHz",
-                    4000: "4kHz"
+                    2000: "2kHz"
                 }
             },
             2: {
@@ -496,10 +495,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 name: "BRUSHED",
                 defaultRate: 8000,
                 rates: {
-                    500: "500Hz",
-                    1000: "1kHz",
-                    2000: "2kHz",
-                    4000: "4kHz",
                     8000: "8kHz",
                     16000: "16kHz",
                     32000: "32kHz"
