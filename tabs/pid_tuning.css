@@ -63,7 +63,6 @@
 .tab-pid_tuning .cf select {
     margin: 4px;
     width: calc(100% - 10px);
-    border: 1px solid silver;
 }
 
 .tab-pid_tuning .rate-tpa th:nth-child(2) {
