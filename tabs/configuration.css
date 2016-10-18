@@ -61,7 +61,6 @@
     height: 20px;
     margin-top: 5px;
     font-weight: bold;
-    border: 1px solid silver;
 }
 
 .tab-configuration dl.features dt {
@@ -113,7 +112,6 @@
     width: 100px;
     height: 20px;
     margin: 0 10px 5px 0;
-    border: 1px solid silver;
 }
 
 .tab-configuration .gps span {
@@ -122,13 +120,11 @@
 
 .tab-configuration .serialRX {
     width: 100%;
-    border: 1px solid silver;
     margin-bottom: 5px;
 }
 
 .tab-configuration .nrf24Protocol {
     width: 100%;
-    border: 1px solid silver;
     margin-bottom: 5px;
 }
 
@@ -182,7 +178,7 @@
 .tab-configuration .disarm .checkbox {
     float: left;
     padding-left: 0px;
-    margin-top: -5px;
+    /*margin-top: -5px;*/
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
     width: 100%;
@@ -378,8 +374,6 @@
     width: 45%;
     height: 20px;
     margin: 0 0px 2px 0;
-    border: 1px solid silver;
-    border-radius:3px;
 }
 
 
@@ -397,8 +391,6 @@
     width: 100%;
     height: 20px;
     margin: 0 0px 2px 0;
-    border: 1px solid silver;
-    border-radius:3px;
     margin-bottom: 20px;
     margin-top:3px;
 
@@ -454,7 +446,7 @@
 }
 
 .tab-configuration .sensoralignment {
-    width: 50%; 
+    width: 50%;
     float: left;
 }
 
@@ -500,4 +492,13 @@
     .tab-configuration .current .gui_box {
         float: left;
     }
+}
+
+#esc-protocols {
+    display: none;
+}
+
+#esc-protocols span {
+    display: inline-block;
+    width: 10em;
 }

@@ -122,7 +122,7 @@
 .tab-failsafe .spacer_box .helpicon {
     margin-top: 3px;
     margin-right: 0;
-    
+
 }
 
 .tab-failsafe .checkbox:last-child {
@@ -190,13 +190,12 @@
     float: right;
     margin-right: 0;
  }
-    
+
 .tab-failsafe .stage1 select {
     float: left;
     width: 95%;
     height: 22px;
     margin: 0;
-    border: 1px solid silver;
     }
 
 .tab-failsafe .modename {
@@ -212,12 +211,12 @@
 }
 
 .tab-failsafe .channelprimary {
-    float:left;   
-    width:60%;   
+    float:left;
+    width:60%;
 }
 
 .tab-failsafe .channelauxiliary {
-    float:left;   
+    float:left;
     width:60%;
     padding-top: 2px;
 }
@@ -227,13 +226,13 @@
 }
 
 .tab-failsafe .channelsetting {
-    float:left;    
-    width:25%;    
+    float:left;
+    width:25%;
 }
 
 .tab-failsafe .auxiliary {
-    float:left;    
-    width:15%;    
+    float:left;
+    width:15%;
 }
 
 .tab-failsafe .note {

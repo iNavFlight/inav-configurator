@@ -37,6 +37,7 @@ var SENSOR_ALIGNMENT;
 var RX_CONFIG;
 var FAILSAFE_CONFIG;
 var RXFAIL_CONFIG;
+var ADVANCED_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -197,6 +198,16 @@ var FC = {
             vbatmincellvoltage:     0,
             vbatmaxcellvoltage:     0,
             vbatwarningcellvoltage: 0
+        };
+
+        ADVANCED_CONFIG = {
+            gyroSyncDenominator: null,
+            pidProcessDenom: null,
+            useUnsyncedPwm: null,
+            motorPwmProtocol: null,
+            motorPwmRate: null,
+            servoPwmRate: null,
+            gyroSync: null
         };
 
         _3D = {
