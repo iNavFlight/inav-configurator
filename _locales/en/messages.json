@@ -516,6 +516,12 @@
     "featureONESHOT125Tip": {
         "message": "Disconnect flight battery and remove props before enabling."
     },
+    "featurePWM_OUTPUT_ENABLE": {
+        "message": "Enable motor output"
+    },
+    "featurePWM_OUTPUT_ENABLETip": {
+        "message": "Enabling this option is required for INAV to send signals to ESC. It is a safety precaution that prevents servos from being damaged right after flashing flight controller."
+    },
     "featureBLACKBOX": {
         "message": "Blackbox flight data recorder"
     },

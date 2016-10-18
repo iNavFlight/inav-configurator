@@ -157,6 +157,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             );
         }
 
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            features.push(
+                {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
+            );
+        } else {
+            $('.features.esc-priority').parent().hide();
+        }
+
         if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
             features.push(
                 {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
