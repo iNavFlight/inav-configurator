@@ -1702,5 +1702,11 @@
     },
     "escRefreshRate": {
         "message" : "ESC refresh rate"
+    },
+    "escProtocolHelp": {
+        "message" : "ESC has to support chosen protocol. Change only if you know that ESC supports it!"
+    },
+    "escRefreshRatelHelp": {
+        "message" : "ESC has to support refresh rate. Change only if you know that ESC supports it!"
     }
 }
