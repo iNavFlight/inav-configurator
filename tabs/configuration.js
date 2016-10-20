@@ -513,6 +513,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
+            /*
+             *  If rate from FC is not on the list, add a new entry
+             */
+            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
+                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
+            }
+
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
