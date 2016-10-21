@@ -502,6 +502,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
         };
 
+        var servoRates = {
+            50: "50Hz",
+            60: "60Hz",
+            100: "100Hz",
+            200: "200Hz",
+            400: "400Hz"
+        };
+
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
 
@@ -549,6 +557,27 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
 
             $("#esc-protocols").show();
+
+            var $servoRate = $('#servo-rate');
+
+            for (var i in servoRates) {
+                if (servoRates.hasOwnProperty(i)) {
+                    $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
+                }
+            }
+            /*
+             *  If rate from FC is not on the list, add a new entry
+             */
+            if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
+                $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
+            }
+
+            $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
+            $servoRate.change(function () {
+                ADVANCED_CONFIG.servoPwmRate = $(this).val();
+            });
+
+            $('#servo-rate-container').show();
         }
 
         //fill 3D
