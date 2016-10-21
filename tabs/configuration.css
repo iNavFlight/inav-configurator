@@ -494,7 +494,8 @@
     }
 }
 
-#esc-protocols {
+#esc-protocols,
+#servo-rate-container {
     display: none;
 }
 
@@ -503,10 +504,12 @@
     width: 10em;
 }
 
-#esc-protocols .select {
+#esc-protocols .select,
+#servo-rate-container .select {
     position: relative;
 }
 
-#esc-protocols label {
+#esc-protocols label,
+#servo-rate-container label {
     position: absolute;
     left: 10em;

@@ -1708,5 +1708,11 @@
     },
     "escRefreshRatelHelp": {
         "message" : "ESC has to support refresh rate. Change only if you know that ESC supports it!"
+    },
+    "servoRefreshRate": {
+        "message" : "Servo refresh rate"
+    },
+    "servoRefreshRatelHelp": {
+        "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
     }
 }
