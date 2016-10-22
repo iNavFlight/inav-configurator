@@ -11,7 +11,7 @@ TABS.motors.initialize = function (callback) {
     self.armed = false;
     self.feature3DSupported = false;
     self.allowTestMode = true;
-    
+
     if (GUI.active_tab != 'motors') {
         GUI.active_tab = 'motors';
         googleAnalytics.sendAppView('Motors');
@@ -20,22 +20,17 @@ TABS.motors.initialize = function (callback) {
     function get_arm_status() {
         MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_config);
     }
-    
+
     function load_config() {
         MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_3d);
     }
-    
+
     function load_3d() {
         var next_callback = get_motor_data;
-        if (semver.gte(CONFIG.apiVersion, "1.14.0")) {
-            self.feature3DSupported = true;
-            MSP.send_message(MSP_codes.MSP_3D, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-        
+        self.feature3DSupported = true;
+        MSP.send_message(MSP_codes.MSP_3D, false, false, next_callback);        
     }
-    
+
     function get_motor_data() {
         update_arm_status();
         MSP.send_message(MSP_codes.MSP_MOTOR, false, false, load_html);
@@ -172,7 +167,7 @@ TABS.motors.initialize = function (callback) {
     function update_model(val) {
         $('.mixerPreview img').attr('src', './resources/motor_order/' + mixerList[val - 1].image + '.svg');
     }
-    
+
     function process_html() {
         // translate to user-selected language
         localize();
@@ -182,12 +177,12 @@ TABS.motors.initialize = function (callback) {
         if (self.feature3DEnabled && !self.feature3DSupported) {
             self.allowTestMode = false;
         }
-        
+
         $('#motorsEnableTestMode').prop('checked', false);
         $('#motorsEnableTestMode').prop('disabled', true);
-        
+
         update_model(CONFIG.multiType);
-        
+
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();
 
@@ -269,7 +264,7 @@ TABS.motors.initialize = function (callback) {
                 drawGraph(accelHelpers, accel_data, samples_accel_i);
 
                 // Compute RMS of acceleration in displayed period of time
-                // This is particularly useful for motor balancing as it 
+                // This is particularly useful for motor balancing as it
                 // eliminates the need for external tools
                 var sum = 0.0;
                 for (var j = 0; j < accel_data.length; j++)
@@ -329,24 +324,24 @@ TABS.motors.initialize = function (callback) {
         $('div.sliders input').prop('min', MISC.mincommand);
         $('div.sliders input').prop('max', MISC.maxthrottle);
         $('div.values li:not(:last)').text(MISC.mincommand);
-        
+
         if(self.feature3DEnabled && self.feature3DSupported) {
             //Arbitrary sanity checks
             //Note: values may need to be revisited
             if(_3D.neutral3d > 1575 || _3D.neutral3d < 1425)
                 _3D.neutral3d = 1500;
-                
+
             $('div.sliders input').val(_3D.neutral3d);
         } else {
-            $('div.sliders input').val(MISC.mincommand); 
+            $('div.sliders input').val(MISC.mincommand);
         }
 
-        if(self.allowTestMode){ 
+        if(self.allowTestMode){
            // UI hooks
            var buffering_set_motor = [],
            buffer_delay = false;
            $('div.sliders input:not(.master)').on('input', function () {
-            
+
                var index = $(this).index(),
                buffer = [],
                i;
@@ -359,20 +354,20 @@ TABS.motors.initialize = function (callback) {
                buffer.push(lowByte(val));
                buffer.push(highByte(val));
                }
-             
+
                buffering_set_motor.push(buffer);
 
                if (!buffer_delay) {
                    buffer_delay = setTimeout(function () {
                        buffer = buffering_set_motor.pop();
-                    
+
                        MSP.send_message(MSP_codes.MSP_SET_MOTOR, buffer);
 
                        buffering_set_motor = [];
                        buffer_delay = false;
                    }, 10);
                }
-           });  
+           });
         }
 
         $('div.sliders input.master').on('input', function () {
@@ -400,7 +395,7 @@ TABS.motors.initialize = function (callback) {
                     $('div.sliders input').val(MISC.mincommand);
                 }
 
-                $('div.sliders input').trigger('input');             
+                $('div.sliders input').trigger('input');
             }
         });
 
@@ -418,7 +413,7 @@ TABS.motors.initialize = function (callback) {
                     motors_running = true;
                     break;
                 }
-            } 
+            }
         }
 
         if (motors_running) {
@@ -451,9 +446,9 @@ TABS.motors.initialize = function (callback) {
         }
 
         $('#motorsEnableTestMode').change();
-        
+
         // data pulling functions used inside interval timer
-        
+
         function get_status() {
             // status needed for arming flag
             MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_motor_data);
@@ -468,9 +463,9 @@ TABS.motors.initialize = function (callback) {
         }
 
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
-        
-        function update_ui() {            
-            var previousArmState = self.armed;                                   
+
+        function update_ui() {
+            var previousArmState = self.armed;
             var block_height = $('div.m-block:first').height();
 
             for (var i = 0; i < MOTOR_DATA.length; i++) {
@@ -494,21 +489,21 @@ TABS.motors.initialize = function (callback) {
                 $('.servo-' + i + ' .indicator', servos_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
             }
             //keep the following here so at least we get a visual cue of our motor setup
-            update_arm_status();                        
+            update_arm_status();
             if (!self.allowTestMode) return;
-            
+
             if (self.armed) {
                 $('#motorsEnableTestMode').prop('disabled', true);
                 $('#motorsEnableTestMode').prop('checked', false);
             } else {
                 if (self.allowTestMode) {
-                    $('#motorsEnableTestMode').prop('disabled', false);                    
+                    $('#motorsEnableTestMode').prop('disabled', false);
                 }
             }
 
             if (previousArmState != self.armed) {
                 console.log('arm state change detected');
-                $('#motorsEnableTestMode').change(); 
+                $('#motorsEnableTestMode').change();
             }
         }
 

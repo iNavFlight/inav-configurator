@@ -212,9 +212,6 @@ function onOpen(openInfo) {
                                         // continue as usually
                                         CONFIGURATOR.connectionValid = true;
                                         GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
-                                        if (semver.lt(CONFIG.apiVersion, "1.4.0")) {
-                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('led_strip'), 1);
-                                        }
 
                                         onConnect();
 
@@ -266,7 +263,7 @@ function onConnect() {
     } else {
         MSP.send_message(MSP_codes.MSP_STATUS, false, false);
     }
-    
+
     MSP.send_message(MSP_codes.MSP_DATAFLASH_SUMMARY, false, false);
 
     var sensor_state = $('#sensor-status');

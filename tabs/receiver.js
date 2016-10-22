@@ -28,14 +28,9 @@ TABS.receiver.initialize = function (callback) {
     function load_config() {
         MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_rc_configs);
     }
-    
+
     function load_rc_configs() {
-        var next_callback = load_html;
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            MSP.send_message(MSP_codes.MSP_RC_DEADBAND, false, false, next_callback);
-        } else {
-            next_callback();
-        }
+        MSP.send_message(MSP_codes.MSP_RC_DEADBAND, false, false, load_html);
     }
 
     function load_html() {
@@ -56,10 +51,6 @@ TABS.receiver.initialize = function (callback) {
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
 		    $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
 
-		    if (semver.lt(CONFIG.apiVersion, "1.10.0")) {
-            $('.tunings .yaw_rate input[name="yaw_expo"]').hide();
-        }
-
         chrome.storage.local.get('rx_refresh_rate', function (result) {
             if (result.rx_refresh_rate) {
                 $('select[name="rx_refresh_rate"]').val(result.rx_refresh_rate).change();
@@ -68,12 +59,8 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
-        if (semver.lt(CONFIG.apiVersion, "1.15.0")) {
-            $('.deadband').hide();
-        } else {
-            $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
-            $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
-        }
+        $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
+        $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
 
         // generate bars
         var bar_names = [
@@ -308,11 +295,9 @@ TABS.receiver.initialize = function (callback) {
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
-            if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-               RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
-               RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
-            }
-   
+            RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
+            RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
+
             // catch rc map
             var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
             var strBuffer = $('input[name="rcmap"]').val().split('');
@@ -331,14 +316,9 @@ TABS.receiver.initialize = function (callback) {
             function save_misc() {
                 MSP.send_message(MSP_codes.MSP_SET_MISC, MSP.crunch(MSP_codes.MSP_SET_MISC), false, save_rc_configs);
             }
-            
+
             function save_rc_configs() {
-                var next_callback = save_to_eeprom;
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_RC_DEADBAND, MSP.crunch(MSP_codes.MSP_SET_RC_DEADBAND), false, next_callback);
-                } else {
-                   next_callback();
-                }
+                MSP.send_message(MSP_codes.MSP_SET_RC_DEADBAND, MSP.crunch(MSP_codes.MSP_SET_RC_DEADBAND), false, save_to_eeprom);
             }
 
             function save_to_eeprom() {
