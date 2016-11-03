@@ -77,9 +77,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function loadAdvancedConfig() {
-        var next_callback = load_html;
+        var next_callback = loadINAVPidConfig;
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSP_codes.MSP_ADVANCED_CONFIG, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function loadINAVPidConfig() {
+        var next_callback = load_html;
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -520,6 +529,90 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#servo-rate-container').show();
         }
 
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+
+            var $gyroLpf = $("#gyro-lpf"),
+                $gyroSync = $("#gyro-sync-checkbox"),
+                $gyroSyncDenominator = $("#gyro-sync-denominator"),
+                $looptime = $("#looptime");
+
+            var gyroLpfValues = [
+                {
+                    tick: 125,
+                    defaultDenominator: 16,
+                    label: "256Hz"
+                }, {
+                    tick: 1000,
+                    defaultDenominator: 2,
+                    label: "188Hz"
+                }, {
+                    tick: 1000,
+                    defaultDenominator: 2,
+                    label: "98Hz"
+                }, {
+                    tick: 1000,
+                    defaultDenominator: 2,
+                    label: "42Hz"
+                }, {
+                    tick: 1000,
+                    defaultDenominator: 2,
+                    label: "20Hz"
+                }, {
+                    tick: 1000,
+                    defaultDenominator: 2,
+                    label: "10Hz"
+                }
+            ];
+
+            function computeLooptime() {
+                if ($gyroSync.is(":checked")) {
+                    $looptime.val(gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick * $gyroSyncDenominator.val());
+                } else {
+                    $looptime.val(FC_CONFIG.loopTime);
+                }
+                recalculate_cycles_sec();
+            }
+
+            for (var i in gyroLpfValues) {
+                if (gyroLpfValues.hasOwnProperty(i)) {
+                    $gyroLpf.append('<option value="' + i + '">' + gyroLpfValues[i].label + '</option>');
+                }
+            }
+
+            $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
+            $gyroSyncDenominator.val(ADVANCED_CONFIG.gyroSyncDenominator);
+            $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
+
+            $gyroLpf.change(function () {
+                INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
+                computeLooptime();
+            });
+
+            $gyroSyncDenominator.change(function () {
+                ADVANCED_CONFIG.gyroSyncDenominator = $gyroSyncDenominator.val();
+                computeLooptime();
+            });
+
+            $gyroSync.change(function () {
+                if ($(this).is(":checked")) {
+                    ADVANCED_CONFIG.gyroSync = 1;
+                    $looptime.addClass("disabled").attr("readonly", true);
+                    $gyroSyncDenominator.removeClass("disabled").attr("readonly", null);
+                } else {
+                    ADVANCED_CONFIG.gyroSync = 0;
+                    $looptime.removeClass("disabled").attr("readonly", null);
+                    $gyroSyncDenominator.addClass("disabled").attr("readonly", true);
+                }
+                computeLooptime();
+            });
+
+            $gyroSync.change();
+
+            $(".requires-v1_4").show();
+        } else {
+            $(".requires-v1_4").hide();
+        }
+
         //fill 3D
         if (semver.lt(CONFIG.apiVersion, "1.14.0")) {
             $('.tab-configuration .3d').hide();
@@ -698,9 +791,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function saveAdvancedConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveINAVPidConfig;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_ADVANCED_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function saveINAVPidConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
                 }

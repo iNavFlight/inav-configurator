@@ -8,6 +8,9 @@ var MSP_codes = {
     MSP_BOARD_INFO:             4,
     MSP_BUILD_INFO:             5,
 
+    MSP_INAV_PID:               6,
+    MSP_SET_INAV_PID:           7,
+
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
     MSP_SET_CHANNEL_FORWARDING: 33,
@@ -1095,6 +1098,20 @@ var MSP = {
                 console.log("Advanced config saved");
                 break;
 
+            case MSP_codes.MSP_INAV_PID:
+                INAV_PID_CONFIG.asynchronousMode = data.getUint8(0);
+                INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1);
+                INAV_PID_CONFIG.attitudeTaskFrequency = data.getUint16(3);
+                INAV_PID_CONFIG.magHoldRateLimit = data.getUint8(5);
+                INAV_PID_CONFIG.magHoldErrorLpfFrequency = data.getUint8(6);
+                INAV_PID_CONFIG.yawJumpPreventionLimit = data.getUint16(7);
+                INAV_PID_CONFIG.gyroscopeLpf = data.getUint8(9);
+                break;
+
+            case MSP_codes.MSP_SET_INAV_PID:
+                console.log("MSP_INAV_PID saved");
+                break;
+
             case MSP_codes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1492,6 +1509,30 @@ MSP.crunch = function (code) {
             buffer.push(highByte(ADVANCED_CONFIG.servoPwmRate));
 
             buffer.push(ADVANCED_CONFIG.gyroSync);
+            break;
+
+        case MSP_codes.MSP_SET_INAV_PID:
+            buffer.push(INAV_PID_CONFIG.asynchronousMode);
+
+            buffer.push(lowByte(INAV_PID_CONFIG.accelerometerTaskFrequency));
+            buffer.push(highByte(INAV_PID_CONFIG.accelerometerTaskFrequency));
+
+            buffer.push(lowByte(INAV_PID_CONFIG.attitudeTaskFrequency));
+            buffer.push(highByte(INAV_PID_CONFIG.attitudeTaskFrequency));
+
+            buffer.push(INAV_PID_CONFIG.magHoldRateLimit);
+            buffer.push(INAV_PID_CONFIG.magHoldErrorLpfFrequency);
+
+            buffer.push(lowByte(INAV_PID_CONFIG.yawJumpPreventionLimit));
+            buffer.push(highByte(INAV_PID_CONFIG.yawJumpPreventionLimit));
+
+            buffer.push(INAV_PID_CONFIG.gyroscopeLpf);
+
+            buffer.push(0); //reserved
+            buffer.push(0); //reserved
+            buffer.push(0); //reserved
+            buffer.push(0); //reserved
+            buffer.push(0); //reserved
             break;
 
         default:

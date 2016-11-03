@@ -38,6 +38,7 @@ var RX_CONFIG;
 var FAILSAFE_CONFIG;
 var RXFAIL_CONFIG;
 var ADVANCED_CONFIG;
+var INAV_PID_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -209,6 +210,16 @@ var FC = {
             servoPwmRate: null,
             gyroSync: null
         };
+
+        INAV_PID_CONFIG = {
+            asynchronousMode: null,
+            accelerometerTaskFrequency: null,
+            attitiudeTaskFrequency: null,
+            magHoldRateLimit: null,
+            magHoldErrorLpfFrequency: null,
+            yawJumpPreventionLimit: null,
+            gyroscopeLpf: null
+        }
 
         _3D = {
             deadband3d_low:         0,
