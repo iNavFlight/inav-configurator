@@ -129,75 +129,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mixer_list_e.val(BF_CONFIG.mixerConfiguration).change();
 
         // generate features
-        var features = [
-            {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
-            {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL'},
-            {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
-            {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
-            {bit: 5, group: 'other', name: 'SERVO_TILT'},
-            {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
-            {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'},
-            {bit: 9, group: 'other', name: 'SONAR'},
-            {bit: 10, group: 'other', name: 'TELEMETRY'},
-            {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
-            {bit: 12, group: 'other', name: '3D'},
-            {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM'},
-            {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP'},
-            {bit: 15, group: 'rssi', name: 'RSSI_ADC'},
-            {bit: 16, group: 'other', name: 'LED_STRIP'},
-            {bit: 17, group: 'other', name: 'DISPLAY'},
-            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
-        ];
-
-        if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
-            features.push(
-                {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true}
-            );
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            features.push(
-                {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
-            );
-        } else {
-            $('.features.esc-priority').parent().hide();
-        }
-
-        if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
-            features.push(
-                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
-            );
-        }
-
-        if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
-            features.push(
-                {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true}
-            );
-        }
-
-        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            features.push(
-                {bit: 25, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
-                {bit: 26, group: 'other', name: 'SOFTSPI'}
-            );
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, '1.3.0')) {
-            features.push(
-                {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true}
-            );
-        }
-
-        function isFeatureEnabled(featureName) {
-            for (var i = 0; i < features.length; i++) {
-                if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        var features = FC.getFeatures();
 
         var radioGroups = [];
 
@@ -687,16 +619,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             // track feature usage
-            if (isFeatureEnabled('RX_SERIAL')) {
+            if (FC.isFeatureEnabled('RX_SERIAL', features)) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRXtypes[RX_CONFIG.serialrx_provider]);
             }
 
             // track feature usage
-            if (isFeatureEnabled('RX_NRF24')) {
+            if (FC.isFeatureEnabled('RX_NRF24', features)) {
                 googleAnalytics.sendEvent('Setting', 'nrf24Protocol', nrf24Protocoltypes[RX_CONFIG.nrf24rx_protocol]);
             }
 
-            if (isFeatureEnabled('GPS')) {
+            if (FC.isFeatureEnabled('GPS', features)) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
@@ -707,7 +639,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
-                if (isFeatureEnabled(featureName)) {
+                if (FC.isFeatureEnabled(featureName, features)) {
                     googleAnalytics.sendEvent('Setting', 'Feature', featureName);
                 }
             }
