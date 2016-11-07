@@ -157,7 +157,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             );
         }
 
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             features.push(
                 {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
             );
