@@ -218,7 +218,8 @@ var FC = {
             magHoldRateLimit: null,
             magHoldErrorLpfFrequency: null,
             yawJumpPreventionLimit: null,
-            gyroscopeLpf: null
+            gyroscopeLpf: null,
+            accSoftLpfHz: null
         }
 
         _3D = {

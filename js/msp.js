@@ -1106,6 +1106,7 @@ var MSP = {
                 INAV_PID_CONFIG.magHoldErrorLpfFrequency = data.getUint8(6);
                 INAV_PID_CONFIG.yawJumpPreventionLimit = data.getUint16(7);
                 INAV_PID_CONFIG.gyroscopeLpf = data.getUint8(9);
+                INAV_PID_CONFIG.accSoftLpfHz = data.getUint8(10);
                 break;
 
             case MSP_codes.MSP_SET_INAV_PID:
@@ -1527,8 +1528,8 @@ MSP.crunch = function (code) {
             buffer.push(highByte(INAV_PID_CONFIG.yawJumpPreventionLimit));
 
             buffer.push(INAV_PID_CONFIG.gyroscopeLpf);
+            buffer.push(INAV_PID_CONFIG.accSoftLpfHz);
 
-            buffer.push(0); //reserved
             buffer.push(0); //reserved
             buffer.push(0); //reserved
             buffer.push(0); //reserved
