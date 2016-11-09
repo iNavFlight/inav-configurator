@@ -108,17 +108,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     MSP.send_message(MSP_codes.MSP_IDENT, false, false, load_config);
 
-    function recalculate_cycles_sec() {
-        var looptime = $('input[name="looptime"]').val();
-
-        var message = 'Max';
-        if (looptime > 0) {
-            message = parseFloat((1 / looptime) * 1000 * 1000).toFixed(0);
-        }
-
-        $('input[name="looptimehz"]').val(message);
-    }
-
     function process_html() {
 
         var mixer_list_e = $('select.mixerList');
@@ -375,12 +364,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             else
                 $('div.disarmdelay').hide();
 
-            // fill FC loop time
-            $('input[name="looptime"]').val(FC_CONFIG.loopTime);
-
-            recalculate_cycles_sec();
-
-            $('div.cycles').show();
         }
 
         // fill throttle
@@ -529,49 +512,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#servo-rate-container').show();
         }
 
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+        var gyroLpfValues = FC.getGyroLpfValues();
+        var looptimes = FC.getLooptimes();
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
 
             var $gyroLpf = $("#gyro-lpf"),
                 $gyroSync = $("#gyro-sync-checkbox"),
-                $gyroSyncDenominator = $("#gyro-sync-denominator"),
                 $looptime = $("#looptime");
-
-            var gyroLpfValues = [
-                {
-                    tick: 125,
-                    defaultDenominator: 16,
-                    label: "256Hz"
-                }, {
-                    tick: 1000,
-                    defaultDenominator: 2,
-                    label: "188Hz"
-                }, {
-                    tick: 1000,
-                    defaultDenominator: 2,
-                    label: "98Hz"
-                }, {
-                    tick: 1000,
-                    defaultDenominator: 2,
-                    label: "42Hz"
-                }, {
-                    tick: 1000,
-                    defaultDenominator: 2,
-                    label: "20Hz"
-                }, {
-                    tick: 1000,
-                    defaultDenominator: 2,
-                    label: "10Hz"
-                }
-            ];
-
-            function computeLooptime() {
-                if ($gyroSync.is(":checked")) {
-                    $looptime.val(gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick * $gyroSyncDenominator.val());
-                } else {
-                    $looptime.val(FC_CONFIG.loopTime);
-                }
-                recalculate_cycles_sec();
-            }
 
             for (var i in gyroLpfValues) {
                 if (gyroLpfValues.hasOwnProperty(i)) {
@@ -580,36 +528,61 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
-            $gyroSyncDenominator.val(ADVANCED_CONFIG.gyroSyncDenominator);
             $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
 
             $gyroLpf.change(function () {
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
-                computeLooptime();
+
+                $looptime.find("*").remove();
+                var looptimeOptions = looptimes[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
+                for (var i in looptimeOptions.looptimes) {
+                    if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                        $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                    }
+                }
+                $looptime.val(looptimeOptions.defaultLooptime);
+                $looptime.change();
             });
 
-            $gyroSyncDenominator.change(function () {
-                ADVANCED_CONFIG.gyroSyncDenominator = $gyroSyncDenominator.val();
-                computeLooptime();
+            $gyroLpf.change()
+            $looptime.val(FC_CONFIG.loopTime);
+
+            $looptime.change(function () {
+                if (INAV_PID_CONFIG.asynchronousMode == 0) {
+                    //All task running together
+                    FC_CONFIG.loopTime = $(this).val();
+                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+                } else {
+
+                }
             });
+
+            $looptime.change();
 
             $gyroSync.change(function () {
                 if ($(this).is(":checked")) {
                     ADVANCED_CONFIG.gyroSync = 1;
-                    $looptime.addClass("disabled").attr("readonly", true);
-                    $gyroSyncDenominator.removeClass("disabled").attr("readonly", null);
                 } else {
                     ADVANCED_CONFIG.gyroSync = 0;
-                    $looptime.removeClass("disabled").attr("readonly", null);
-                    $gyroSyncDenominator.addClass("disabled").attr("readonly", true);
                 }
-                computeLooptime();
             });
 
             $gyroSync.change();
 
             $(".requires-v1_4").show();
         } else {
+
+            var looptimeOptions = looptimes[125];
+            for (var i in looptimeOptions.looptimes) {
+                if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                    $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                }
+            }
+            $looptime.val(FC_CONFIG.loopTime);
+            $looptime.change(function () {
+                FC_CONFIG.loopTime = $(this).val();
+            });
+
             $(".requires-v1_4").hide();
         }
 
@@ -626,11 +599,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $('.3ddeadbandthrottle').hide();
             }
         }
-
-        // UI hooks
-        $('input[name="looptime"]').change(function() {
-            recalculate_cycles_sec();
-        });
 
         $('input[type="checkbox"].feature', features_e).change(function () {
             var element = $(this),
@@ -682,7 +650,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
                 ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
                 ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
-                FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
             }
 
             MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
