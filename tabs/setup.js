@@ -34,6 +34,10 @@ TABS.setup.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        if (semver.gte(CONFIG.flightControllerVersion, '1.4.0') && !FC.isMotorOutputEnabled()) {
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
+        }
+
         if (semver.lt(CONFIG.apiVersion, CONFIGURATOR.backupRestoreMinApiVersionAccepted)) {
             $('#content .backup').addClass('disabled');
             $('#content .restore').addClass('disabled');
@@ -271,7 +275,7 @@ TABS.setup.initialize3D = function (compatibility) {
         modelWrapper.add(model);
         scene.add(modelWrapper);
     });
-    
+
     // stationary camera
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
 

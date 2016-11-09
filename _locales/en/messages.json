@@ -1720,5 +1720,8 @@
     },
     "servoRefreshRatelHelp": {
         "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
+    },
+    "logPwmOutputDisabled": {
+        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Configuration</u> tab to enable!"
     }
 }
