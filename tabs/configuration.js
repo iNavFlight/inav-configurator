@@ -514,12 +514,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var gyroLpfValues = FC.getGyroLpfValues();
         var looptimes = FC.getLooptimes();
+        var $looptime = $("#looptime");
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
 
             var $gyroLpf = $("#gyro-lpf"),
-                $gyroSync = $("#gyro-sync-checkbox"),
-                $looptime = $("#looptime");
+                $gyroSync = $("#gyro-sync-checkbox");
 
             for (var i in gyroLpfValues) {
                 if (gyroLpfValues.hasOwnProperty(i)) {
@@ -553,7 +553,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                     FC_CONFIG.loopTime = $(this).val();
                     ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
                 } else {
-
+                    //FIXME this is temporaty fix that gives the same functionality to ASYNC_MODE=GYRO and ALL
+                    FC_CONFIG.loopTime = $(this).val();
+                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
                 }
             });
 
@@ -571,7 +573,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             $(".requires-v1_4").show();
         } else {
-
             var looptimeOptions = looptimes[125];
             for (var i in looptimeOptions.looptimes) {
                 if (looptimeOptions.looptimes.hasOwnProperty(i)) {
