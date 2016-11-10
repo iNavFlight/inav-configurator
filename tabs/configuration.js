@@ -77,9 +77,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function loadAdvancedConfig() {
-        var next_callback = load_html;
+        var next_callback = loadINAVPidConfig;
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSP_codes.MSP_ADVANCED_CONFIG, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function loadINAVPidConfig() {
+        var next_callback = load_html;
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -98,17 +107,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     MSP.send_message(MSP_codes.MSP_IDENT, false, false, load_config);
-
-    function recalculate_cycles_sec() {
-        var looptime = $('input[name="looptime"]').val();
-
-        var message = 'Max';
-        if (looptime > 0) {
-            message = parseFloat((1 / looptime) * 1000 * 1000).toFixed(0);
-        }
-
-        $('input[name="looptimehz"]').val(message);
-    }
 
     function process_html() {
 
@@ -366,12 +364,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             else
                 $('div.disarmdelay').hide();
 
-            // fill FC loop time
-            $('input[name="looptime"]').val(FC_CONFIG.loopTime);
-
-            recalculate_cycles_sec();
-
-            $('div.cycles').show();
         }
 
         // fill throttle
@@ -520,6 +512,81 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#servo-rate-container').show();
         }
 
+        var gyroLpfValues = FC.getGyroLpfValues();
+        var looptimes = FC.getLooptimes();
+        var $looptime = $("#looptime");
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+
+            var $gyroLpf = $("#gyro-lpf"),
+                $gyroSync = $("#gyro-sync-checkbox");
+
+            for (var i in gyroLpfValues) {
+                if (gyroLpfValues.hasOwnProperty(i)) {
+                    $gyroLpf.append('<option value="' + i + '">' + gyroLpfValues[i].label + '</option>');
+                }
+            }
+
+            $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
+            $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
+
+            $gyroLpf.change(function () {
+                INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
+
+                $looptime.find("*").remove();
+                var looptimeOptions = looptimes[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
+                for (var i in looptimeOptions.looptimes) {
+                    if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                        $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                    }
+                }
+                $looptime.val(looptimeOptions.defaultLooptime);
+                $looptime.change();
+            });
+
+            $gyroLpf.change()
+            $looptime.val(FC_CONFIG.loopTime);
+
+            $looptime.change(function () {
+                if (INAV_PID_CONFIG.asynchronousMode == 0) {
+                    //All task running together
+                    FC_CONFIG.loopTime = $(this).val();
+                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+                } else {
+                    //FIXME this is temporaty fix that gives the same functionality to ASYNC_MODE=GYRO and ALL
+                    FC_CONFIG.loopTime = $(this).val();
+                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+                }
+            });
+
+            $looptime.change();
+
+            $gyroSync.change(function () {
+                if ($(this).is(":checked")) {
+                    ADVANCED_CONFIG.gyroSync = 1;
+                } else {
+                    ADVANCED_CONFIG.gyroSync = 0;
+                }
+            });
+
+            $gyroSync.change();
+
+            $(".requires-v1_4").show();
+        } else {
+            var looptimeOptions = looptimes[125];
+            for (var i in looptimeOptions.looptimes) {
+                if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                    $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                }
+            }
+            $looptime.val(FC_CONFIG.loopTime);
+            $looptime.change(function () {
+                FC_CONFIG.loopTime = $(this).val();
+            });
+
+            $(".requires-v1_4").hide();
+        }
+
         //fill 3D
         if (semver.lt(CONFIG.apiVersion, "1.14.0")) {
             $('.tab-configuration .3d').hide();
@@ -533,11 +600,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $('.3ddeadbandthrottle').hide();
             }
         }
-
-        // UI hooks
-        $('input[name="looptime"]').change(function() {
-            recalculate_cycles_sec();
-        });
 
         $('input[type="checkbox"].feature', features_e).change(function () {
             var element = $(this),
@@ -589,7 +651,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
                 ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
                 ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
-                FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
             }
 
             MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
@@ -698,9 +759,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function saveAdvancedConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveINAVPidConfig;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_ADVANCED_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function saveINAVPidConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
                 }

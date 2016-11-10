@@ -1723,5 +1723,14 @@
     },
     "logPwmOutputDisabled": {
         "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Configuration</u> tab to enable!"
+    },
+    "configurationGyroSyncTitle": {
+        "message" : "Synchronize looptime with gyroscope"
+    },
+    "configurationGyroLpfTitle": {
+        "message" : "Gyroscope LPF cutoff frequency"
+    },
+    "configurationGyroSyncDenominator": {
+        "message" : "Gyroscope denominator"
     }
 }

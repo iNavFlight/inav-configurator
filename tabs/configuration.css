@@ -81,7 +81,7 @@
 }
 
 .tab-configuration .number input {
-    width: 50px;
+    width: 57px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -94,8 +94,8 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 43px;
-    padding: 0px 5px;
+    width: 50px;
+    /*padding: 0px 5px;*/
     background-color: #ececec;
 }
 
@@ -205,7 +205,8 @@
 }
 
 .tab-configuration .number,
-.tab-configuration .select
+.tab-configuration .select,
+hr
  {
     margin-bottom: 5px;
     clear: left;
@@ -505,11 +506,15 @@
 }
 
 #esc-protocols .select,
-#servo-rate-container .select {
+#servo-rate-container .select,
+.system .select,
+.system .checkbox,
+.system .number {
     position: relative;
 }
 
 #esc-protocols label,
-#servo-rate-container label {
+#servo-rate-container label,
+.system label {
     position: absolute;
     left: 10em;

@@ -192,19 +192,26 @@
                     <div class="spacer_box_title" i18n="configurationSystem"></div>
                 </div>
                 <div class="spacer_box">
-                    <div class="note">
-                        <div class="note_spacer">
-                            <p i18n="configurationLoopTimeHelp"></p>
+
+                    <div class="checkbox requires-v1_4">
+                        <div class="numberspacer">
+                            <input type="checkbox" id="gyro-sync-checkbox" class="toggle" />
                         </div>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="looptime" step="100" min="0" max="9000" /> <span
-                            i18n="configurationLoopTime"></span>
+                        <label> <span i18n="configurationGyroSyncTitle"></span>
                         </label>
                     </div>
-                    <div class="number">
-                        <label> <input type="text" name="looptimehz" readonly class="disabled" /> <span
-                            i18n="configurationCalculatedCyclesSec"></span>
+
+                    <hr class="requires-v1_4" />
+
+                    <div class="select requires-v1_4">
+                        <select id="gyro-lpf"></select>
+                        <label for="gyro-lpf"> <span i18n="configurationGyroLpfTitle"></span></label>
+                    </div>
+
+                    <div class="select">
+                        <select id="looptime"></select>
+                        <label for="looptime"> <span
+                            i18n="configurationLoopTime"></span>
                         </label>
                     </div>
                 </div>

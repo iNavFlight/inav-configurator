@@ -38,6 +38,7 @@ var RX_CONFIG;
 var FAILSAFE_CONFIG;
 var RXFAIL_CONFIG;
 var ADVANCED_CONFIG;
+var INAV_PID_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -210,6 +211,17 @@ var FC = {
             gyroSync: null
         };
 
+        INAV_PID_CONFIG = {
+            asynchronousMode: null,
+            accelerometerTaskFrequency: null,
+            attitudeTaskFrequency: null,
+            magHoldRateLimit: null,
+            magHoldErrorLpfFrequency: null,
+            yawJumpPreventionLimit: null,
+            gyroscopeLpf: null,
+            accSoftLpfHz: null
+        }
+
         _3D = {
             deadband3d_low:         0,
             deadband3d_high:        0,
@@ -353,5 +365,59 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    }
+    },
+    getLooptimes: function () {
+        return {
+               125: {
+                   defaultLooptime: 2000,
+                   looptimes: {
+                       4000: "250Hz",
+                       3000: "334Hz",
+                       2000: "500Hz",
+                       1500: "667Hz",
+                       1000: "1kHz",
+                       500: "2kHz",
+                       250: "4kHz",
+                       125: "8kHz"
+                   }
+               },
+               1000: {
+                   defaultLooptime: 2000,
+                   looptimes: {
+                       4000: "250Hz",
+                       2000: "500Hz",
+                       1000: "1kHz"
+                   }
+               }
+       };
+   },
+   getGyroLpfValues: function () {
+       return [
+           {
+               tick: 125,
+               defaultDenominator: 16,
+               label: "256Hz"
+           }, {
+               tick: 1000,
+               defaultDenominator: 2,
+               label: "188Hz"
+           }, {
+               tick: 1000,
+               defaultDenominator: 2,
+               label: "98Hz"
+           }, {
+               tick: 1000,
+               defaultDenominator: 2,
+               label: "42Hz"
+           }, {
+               tick: 1000,
+               defaultDenominator: 2,
+               label: "20Hz"
+           }, {
+               tick: 1000,
+               defaultDenominator: 2,
+               label: "10Hz"
+           }
+       ];
+   }
 };
