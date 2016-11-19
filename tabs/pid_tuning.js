@@ -25,13 +25,23 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function loadINAVPidConfig() {
-        var next_callback = load_html;
+        var next_callback = loadPidAdvanced;
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
     }
+
+    function loadPidAdvanced() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSP_codes.MSP_PID_ADVANCED, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
 
     function load_html() {
         $('#content').load("./tabs/pid_tuning.html", process_html);
@@ -173,13 +183,25 @@ TABS.pid_tuning.initialize = function (callback) {
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
 
-            var $magHoldYawRate = $("#magHoldYawRate");
+            var $magHoldYawRate         = $("#magHoldYawRate"),
+                $yawJumpPreventionLimit = $('#yawJumpPreventionLimit'),
+                $yawPLimit              = $('#yawPLimit');
 
             $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
+            $yawJumpPreventionLimit.val(INAV_PID_CONFIG.yawJumpPreventionLimit);
+            $yawPLimit.val(PID_ADVANCED.yawPLimit);
 
             $magHoldYawRate.change(function () {
                 INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
             });
+
+            $yawJumpPreventionLimit.change(function () {
+                INAV_PID_CONFIG.yawJumpPreventionLimit = parseInt($yawJumpPreventionLimit.val(), 10);
+            });
+
+            $yawPLimit.change(function () {
+                PID_ADVANCED.yawPLimit = parseInt($yawPLimit.val(), 10);
+            })
 
             $('.requires-v1_4').show();
         } else {
@@ -207,9 +229,18 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveINAVPidConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = savePidAdvanced;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function savePidAdvanced() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_PID_ADVANCED, MSP.crunch(MSP_codes.MSP_SET_PID_ADVANCED), false, next_callback);
                 } else {
                    next_callback();
                 }

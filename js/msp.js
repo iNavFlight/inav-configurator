@@ -46,8 +46,12 @@ var MSP_codes = {
     MSP_TRANSPONDER_CONFIG:     82,
     MSP_SET_TRANSPONDER_CONFIG: 83,
 
-    MSP_ADVANCED_CONFIG: 90,
-    MSP_SET_ADVANCED_CONFIG: 91,
+    MSP_ADVANCED_CONFIG:        90,
+    MSP_SET_ADVANCED_CONFIG:    91,
+    MSP_FILTER_CONFIG:          92,
+    MSP_SET_FILTER_CONFIG:      93,
+    MSP_PID_ADVANCED:           94,
+    MSP_SET_PID_ADVANCED:       95,
 
     // Multiwii MSP commands
     MSP_IDENT:              100,
@@ -1098,6 +1102,18 @@ var MSP = {
                 console.log("Advanced config saved");
                 break;
 
+            case MSP_codes.MSP_PID_ADVANCED:
+                PID_ADVANCED.rollPitchItermIgnoreRate           = data.getUint16(0, true);
+                PID_ADVANCED.yawItermIgnoreRate                 = data.getUint16(2, true);
+                PID_ADVANCED.yawPLimit                          = data.getUint16(4, true);
+                PID_ADVANCED.axisAccelerationLimitRollPitch     = data.getUint16(13, true);
+                PID_ADVANCED.axisAccelerationLimitYaw           = data.getUint16(15, true);
+                break;
+
+            case MSP_codes.MSP_SET_PID_ADVANCED:
+                console.log("PID advanced saved");
+                break;
+
             case MSP_codes.MSP_INAV_PID:
                 INAV_PID_CONFIG.asynchronousMode = data.getUint8(0);
                 INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1, true);
@@ -1534,6 +1550,31 @@ MSP.crunch = function (code) {
             buffer.push(0); //reserved
             buffer.push(0); //reserved
             buffer.push(0); //reserved
+            break;
+
+        case MSP_codes.MSP_SET_PID_ADVANCED:
+            buffer.push(lowByte(PID_ADVANCED.rollPitchItermIgnoreRate));
+            buffer.push(highByte(PID_ADVANCED.rollPitchItermIgnoreRate));
+
+            buffer.push(lowByte(PID_ADVANCED.yawItermIgnoreRate));
+            buffer.push(highByte(PID_ADVANCED.yawItermIgnoreRate));
+
+            buffer.push(lowByte(PID_ADVANCED.yawPLimit));
+            buffer.push(highByte(PID_ADVANCED.yawPLimit));
+
+            buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
+            buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
+            buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
+            buffer.push(0); //BF: currentProfile->pidProfile.dtermSetpointWeight
+            buffer.push(0); // reserved
+            buffer.push(0); // reserved
+            buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
+
+            buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitRollPitch));
+            buffer.push(highByte(PID_ADVANCED.axisAccelerationLimitRollPitch));
+
+            buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitYaw));
+            buffer.push(highByte(PID_ADVANCED.axisAccelerationLimitYaw));
             break;
 
         default:

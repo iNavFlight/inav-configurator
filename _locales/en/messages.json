@@ -1738,5 +1738,17 @@
     },
     "configurationGyroSyncDenominator": {
         "message" : "Gyroscope denominator"
+    },
+    "yawJumpPreventionLimit": {
+        "message": "Yaw jump prevention"
+    },
+    "yawJumpPreventionLimitHelp": {
+        "message": "Prevent yaw jumps during yaw stops and rapid YAW input. To disable set to 500. Adjust this if your aircraft 'skids out'. Higher values increases YAW authority but can cause roll/pitch instability in case of underpowered UAVs. Lower values makes yaw adjustments more gentle but can cause UAV unable to keep heading"
+    },
+    "yawPLimit": {
+        "message": "Yaw P limit"
+    },
+    "yawPLimitHelp": {
+        "message": "Limiter for yaw P term. Increasing it improves yaw authority but can cause instability on ROLL and PITCH."
     }
 }
