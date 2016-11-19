@@ -378,3 +378,8 @@
 .tab-pid_tuning .topspacer {
     margin-top:15px;
 }
+
+.rate-tpa .helpicon {
+    top: 10px;
+    position: relative;
+}

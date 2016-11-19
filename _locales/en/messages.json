@@ -793,6 +793,12 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "magHoldYawRate": {
+        "message": "MagHold rate"
+    },
+    "pidTuningMagHoldYawRateHelp": {
+        "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
+    },
     "pidTuningTPA": {
         "message": "TPA"
     },

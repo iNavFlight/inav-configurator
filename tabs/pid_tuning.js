@@ -21,7 +21,16 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function get_rc_tuning_data() {
-        MSP.send_message(MSP_codes.MSP_RC_TUNING, false, false, load_html);
+        MSP.send_message(MSP_codes.MSP_RC_TUNING, false, false, loadINAVPidConfig);
+    }
+
+    function loadINAVPidConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
+        } else {
+            next_callback();
+        }
     }
 
     function load_html() {
@@ -137,8 +146,8 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         $('#resetPIDs').on('click', function(){
-          MSP.send_message(MSP_codes.MSP_SET_RESET_CURR_PID, false, false, false);
-	  updateActivatedTab();
+            MSP.send_message(MSP_codes.MSP_SET_RESET_CURR_PID, false, false, false);
+	        updateActivatedTab();
         });
 
         var i;
@@ -155,18 +164,27 @@ TABS.pid_tuning.initialize = function (callback) {
 
         var form_e = $('#pid-tuning');
 
-        if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-            $('.rate-tpa .tpa-breakpoint').hide();
-            $('.rate-tpa .roll').hide();
-            $('.rate-tpa .pitch').hide();
-            $('.rate-tpa--inav').hide();
-        } else if (FC.isRatesInDps()) {
+        if (FC.isRatesInDps()) {
            $('.rate-tpa--no-dps').hide();
         } else {
             $('.rate-tpa .roll-pitch').hide();
             $('.rate-tpa--inav').hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+
+            var $magHoldYawRate = $("#magHoldYawRate");
+
+            $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
+
+            $magHoldYawRate.change(function () {
+                INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
+            });
+
+            $('.requires-v1_4').show();
+        } else {
+            $('.requires-v1_4').hide();
+        }
         // UI Hooks
 
         $('a.refresh').click(function () {
@@ -185,7 +203,16 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function send_rc_tuning_changes() {
-                MSP.send_message(MSP_codes.MSP_SET_RC_TUNING, MSP.crunch(MSP_codes.MSP_SET_RC_TUNING), false, save_to_eeprom);
+                MSP.send_message(MSP_codes.MSP_SET_RC_TUNING, MSP.crunch(MSP_codes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
+            }
+
+            function saveINAVPidConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
+                } else {
+                   next_callback();
+                }
             }
 
             function save_to_eeprom() {
