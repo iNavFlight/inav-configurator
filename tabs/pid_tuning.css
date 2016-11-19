@@ -1,23 +1,23 @@
-.rate-tpa.rate-tpa--inav input[type="number"] {
+/*.rate-tpa.rate-tpa--inav input[type="number"],*/
+.rate-tpa_input {
     margin: 4px;
     width: auto;
     border: 1px solid silver;
     border-radius: 3px;
     display: inline-block;
+    line-height: 20px;
+    text-align: right;
 }
 
-.rate-tpa.rate-tpa--inav td {
+.rate-tpa.rate-tpa--inav td,
+.rate-tpa.rate-tpa--filtering td {
     background-color: #DEDEDE;
     width: auto;
     border-bottom: 1px solid #ccc;
 }
 
-.tab-pid_tuning .rate-tpa.rate-tpa--inav th:first-child {
-    border-top-left-radius: 0;
-}
-
-.tab-pid_tuning .rate-tpa.rate-tpa--inav .roll {
-    border-bottom-left-radius: 0;
+.tab-pid_tuning .rate-tpa.rate-tpa--filtering th {
+    width: 18em;
 }
 
 .tab-pid_tuning .rate-tpa th {
@@ -66,16 +66,12 @@
     width: calc(100% - 10px);
 }
 
-.tab-pid_tuning .rate-tpa th:nth-child(2) {
-    border-top-left-radius: 3px;
+.tab-pid_tuning .rate-tpa tr:first-child th {
+    border-top-left-radius: 5px;
 }
 
-.tab-pid_tuning .rate-tpa th:first-child {
-    border-top-left-radius: 3px;
-}
-
-.tab-pid_tuning .rate-tpa th:last-child {
-    border-top-right-radius: 3px;
+.tab-pid_tuning .rate-tpa tr:first-child td {
+    border-top-right-radius: 5px;
 }
 
 .tab-pid_tuning .rate-tpa {
@@ -145,7 +141,7 @@
     padding-left: 0px;
 }
 
-.tab-pid_tuning table input {
+.pid-section input {
     display: block;
     width: calc(100% - 0px);
     height: 20px;
@@ -355,10 +351,6 @@
 
 .tab-pid_tuning .tpa-breakpoint {
     border-top-left-radius: 0px;
-}
-
-.tab-pid_tuning .roll {
-    border-bottom-left-radius: 3px;
 }
 
 .tab-pid_tuning .pidTuningLevel {

@@ -1102,6 +1102,24 @@ var MSP = {
                 console.log("Advanced config saved");
                 break;
 
+            case MSP_codes.MSP_FILTER_CONFIG:
+                FILTER_CONFIG.gyroSoftLpfHz     = data.getUint8(0, true);
+                FILTER_CONFIG.dtermLpfHz        = data.getUint16(1, true);
+                FILTER_CONFIG.yawLpfHz          = data.getUint16(3, true);
+                /*
+                sbufWriteU16(dst, 1); //masterConfig.gyro_soft_notch_hz_1
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_1
+                sbufWriteU16(dst, 1); //BF: currentProfile->pidProfile.dterm_notch_hz
+                sbufWriteU16(dst, 1); //currentProfile->pidProfile.dterm_notch_cutoff
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_hz_2
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_2
+                */
+                break;
+
+            case MSP_codes.MSP_SET_FILTER_CONFIG:
+                console.log("Filter config saved");
+                break;
+
             case MSP_codes.MSP_PID_ADVANCED:
                 PID_ADVANCED.rollPitchItermIgnoreRate           = data.getUint16(0, true);
                 PID_ADVANCED.yawItermIgnoreRate                 = data.getUint16(2, true);
@@ -1550,6 +1568,34 @@ MSP.crunch = function (code) {
             buffer.push(0); //reserved
             buffer.push(0); //reserved
             buffer.push(0); //reserved
+            break;
+
+        case MSP_codes.MSP_SET_FILTER_CONFIG:
+            buffer.push(FILTER_CONFIG.gyroSoftLpfHz);
+
+            buffer.push(lowByte(FILTER_CONFIG.dtermLpfHz));
+            buffer.push(highByte(FILTER_CONFIG.dtermLpfHz));
+
+            buffer.push(lowByte(FILTER_CONFIG.yawLpfHz));
+            buffer.push(highByte(FILTER_CONFIG.yawLpfHz));
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
             break;
 
         case MSP_codes.MSP_SET_PID_ADVANCED:

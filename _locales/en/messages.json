@@ -1750,5 +1750,32 @@
     },
     "yawPLimitHelp": {
         "message": "Limiter for yaw P term. Increasing it improves yaw authority but can cause instability on ROLL and PITCH."
+    },
+    "tabFiltering": {
+        "message": "Filtering"
+    },
+    "gyroLpfCutoffFrequency": {
+        "message": "Gyro LPF cutoff frequency"
+    },
+    "gyroLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the gyro signal. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value. Too high value can cause motor and ESC overheating."
+    },
+    "accLpfCutoffFrequency": {
+        "message": "Accelerometer LPF cutoff frequency"
+    },
+    "accLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the accelerometer measurements. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value."
+    },
+    "dtermLpfCutoffFrequency": {
+        "message": "D-term LPF cutoff frequency"
+    },
+    "dtermLpfCutoffFrequencyHelp": {
+        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
+    },
+    "yawLpfCutoffFrequency": {
+        "message": "Yaw LPF cutoff frequency"
+    },
+    "yawLpfCutoffFrequencyHelp": {
+        "message": "Yaw P-term LPF cutoff frequency"
     }
 }
