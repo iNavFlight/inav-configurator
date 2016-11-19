@@ -1100,11 +1100,11 @@ var MSP = {
 
             case MSP_codes.MSP_INAV_PID:
                 INAV_PID_CONFIG.asynchronousMode = data.getUint8(0);
-                INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1);
-                INAV_PID_CONFIG.attitudeTaskFrequency = data.getUint16(3);
+                INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1, true);
+                INAV_PID_CONFIG.attitudeTaskFrequency = data.getUint16(3, true);
                 INAV_PID_CONFIG.magHoldRateLimit = data.getUint8(5);
                 INAV_PID_CONFIG.magHoldErrorLpfFrequency = data.getUint8(6);
-                INAV_PID_CONFIG.yawJumpPreventionLimit = data.getUint16(7);
+                INAV_PID_CONFIG.yawJumpPreventionLimit = data.getUint16(7, true);
                 INAV_PID_CONFIG.gyroscopeLpf = data.getUint8(9);
                 INAV_PID_CONFIG.accSoftLpfHz = data.getUint8(10);
                 break;
