@@ -75,10 +75,13 @@
         "message": "Ports"
     },
     "tabPidTuning": {
-        "message": "PID Tuning"
+        "message": "PID tuning"
     },
     "tabReceiver": {
         "message": "Receiver"
+    },
+    "tabMisc": {
+        "message": "Miscelanous"
     },
     "tabModeSelection": {
         "message": "Mode Selection"
@@ -1738,5 +1741,74 @@
     },
     "configurationGyroSyncDenominator": {
         "message" : "Gyroscope denominator"
+    },
+    "yawJumpPreventionLimit": {
+        "message": "Yaw jump prevention"
+    },
+    "yawJumpPreventionLimitHelp": {
+        "message": "Prevent yaw jumps during yaw stops and rapid YAW input. To disable set to 500. Adjust this if your aircraft 'skids out'. Higher values increases YAW authority but can cause roll/pitch instability in case of underpowered UAVs. Lower values makes yaw adjustments more gentle but can cause UAV unable to keep heading"
+    },
+    "yawPLimit": {
+        "message": "Yaw P limit"
+    },
+    "yawPLimitHelp": {
+        "message": "Limiter for yaw P term. Increasing it improves yaw authority but can cause instability on ROLL and PITCH."
+    },
+    "tabFiltering": {
+        "message": "Filtering"
+    },
+    "gyroLpfCutoffFrequency": {
+        "message": "Gyro LPF cutoff frequency"
+    },
+    "gyroLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the gyro signal. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value. Too high value can cause motor and ESC overheating."
+    },
+    "accLpfCutoffFrequency": {
+        "message": "Accelerometer LPF cutoff frequency"
+    },
+    "accLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the accelerometer measurements. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value."
+    },
+    "dtermLpfCutoffFrequency": {
+        "message": "D-term LPF cutoff frequency"
+    },
+    "dtermLpfCutoffFrequencyHelp": {
+        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
+    },
+    "yawLpfCutoffFrequency": {
+        "message": "Yaw LPF cutoff frequency"
+    },
+    "yawLpfCutoffFrequencyHelp": {
+        "message": "Yaw P-term LPF cutoff frequency"
+    },
+    "rollPitchItermIgnoreRate": {
+        "message": "Roll/Pitch I-term ignore rate"
+    },
+    "rollPitchItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "yawItermIgnoreRate": {
+        "message": "Yaw I-term ignore rate"
+    },
+    "yawItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "axisAccelerationLimitRollPitch": {
+        "message": "Roll/Pitch acceleration limit"
+    },
+    "axisAccelerationLimitRollPitchHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "axisAccelerationLimitYaw": {
+        "message": "Yaw acceleration limit"
+    },
+    "axisAccelerationLimitYawHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "pidTuningTPAHelp": {
+        "message": "Throttle PID Attenuation factor. PID gains will be reduced lineary starting from 0 at TPA Breakpoint (Throttle) to TPA factor at max throttle"
+    },
+    "pidTuningTPABreakPointHelp": {
+        "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
     }
 }

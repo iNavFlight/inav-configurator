@@ -46,8 +46,12 @@ var MSP_codes = {
     MSP_TRANSPONDER_CONFIG:     82,
     MSP_SET_TRANSPONDER_CONFIG: 83,
 
-    MSP_ADVANCED_CONFIG: 90,
-    MSP_SET_ADVANCED_CONFIG: 91,
+    MSP_ADVANCED_CONFIG:        90,
+    MSP_SET_ADVANCED_CONFIG:    91,
+    MSP_FILTER_CONFIG:          92,
+    MSP_SET_FILTER_CONFIG:      93,
+    MSP_PID_ADVANCED:           94,
+    MSP_SET_PID_ADVANCED:       95,
 
     // Multiwii MSP commands
     MSP_IDENT:              100,
@@ -396,7 +400,7 @@ var MSP = {
                     RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 }
 
-                RC_tuning.dynamic_THR_PID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.throttle_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
@@ -1098,6 +1102,36 @@ var MSP = {
                 console.log("Advanced config saved");
                 break;
 
+            case MSP_codes.MSP_FILTER_CONFIG:
+                FILTER_CONFIG.gyroSoftLpfHz     = data.getUint8(0, true);
+                FILTER_CONFIG.dtermLpfHz        = data.getUint16(1, true);
+                FILTER_CONFIG.yawLpfHz          = data.getUint16(3, true);
+                /*
+                sbufWriteU16(dst, 1); //masterConfig.gyro_soft_notch_hz_1
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_1
+                sbufWriteU16(dst, 1); //BF: currentProfile->pidProfile.dterm_notch_hz
+                sbufWriteU16(dst, 1); //currentProfile->pidProfile.dterm_notch_cutoff
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_hz_2
+                sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_2
+                */
+                break;
+
+            case MSP_codes.MSP_SET_FILTER_CONFIG:
+                console.log("Filter config saved");
+                break;
+
+            case MSP_codes.MSP_PID_ADVANCED:
+                PID_ADVANCED.rollPitchItermIgnoreRate           = data.getUint16(0, true);
+                PID_ADVANCED.yawItermIgnoreRate                 = data.getUint16(2, true);
+                PID_ADVANCED.yawPLimit                          = data.getUint16(4, true);
+                PID_ADVANCED.axisAccelerationLimitRollPitch     = data.getUint16(13, true);
+                PID_ADVANCED.axisAccelerationLimitYaw           = data.getUint16(15, true);
+                break;
+
+            case MSP_codes.MSP_SET_PID_ADVANCED:
+                console.log("PID advanced saved");
+                break;
+
             case MSP_codes.MSP_INAV_PID:
                 INAV_PID_CONFIG.asynchronousMode = data.getUint8(0);
                 INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1, true);
@@ -1311,7 +1345,7 @@ MSP.crunch = function (code) {
                 buffer.push(Math.round(RC_tuning.yaw_rate * 100));
             }
 
-            buffer.push(Math.round(RC_tuning.dynamic_THR_PID * 100));
+            buffer.push(RC_tuning.dynamic_THR_PID);
             buffer.push(Math.round(RC_tuning.throttle_MID * 100));
             buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
             if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
@@ -1534,6 +1568,59 @@ MSP.crunch = function (code) {
             buffer.push(0); //reserved
             buffer.push(0); //reserved
             buffer.push(0); //reserved
+            break;
+
+        case MSP_codes.MSP_SET_FILTER_CONFIG:
+            buffer.push(FILTER_CONFIG.gyroSoftLpfHz);
+
+            buffer.push(lowByte(FILTER_CONFIG.dtermLpfHz));
+            buffer.push(highByte(FILTER_CONFIG.dtermLpfHz));
+
+            buffer.push(lowByte(FILTER_CONFIG.yawLpfHz));
+            buffer.push(highByte(FILTER_CONFIG.yawLpfHz));
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+
+            buffer.push(0);
+            buffer.push(0);
+            break;
+
+        case MSP_codes.MSP_SET_PID_ADVANCED:
+            buffer.push(lowByte(PID_ADVANCED.rollPitchItermIgnoreRate));
+            buffer.push(highByte(PID_ADVANCED.rollPitchItermIgnoreRate));
+
+            buffer.push(lowByte(PID_ADVANCED.yawItermIgnoreRate));
+            buffer.push(highByte(PID_ADVANCED.yawItermIgnoreRate));
+
+            buffer.push(lowByte(PID_ADVANCED.yawPLimit));
+            buffer.push(highByte(PID_ADVANCED.yawPLimit));
+
+            buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
+            buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
+            buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
+            buffer.push(0); //BF: currentProfile->pidProfile.dtermSetpointWeight
+            buffer.push(0); // reserved
+            buffer.push(0); // reserved
+            buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
+
+            buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitRollPitch));
+            buffer.push(highByte(PID_ADVANCED.axisAccelerationLimitRollPitch));
+
+            buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitYaw));
+            buffer.push(highByte(PID_ADVANCED.axisAccelerationLimitYaw));
             break;
 
         default:

@@ -25,13 +25,32 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function loadINAVPidConfig() {
-        var next_callback = load_html;
+        var next_callback = loadPidAdvanced;
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
     }
+
+    function loadPidAdvanced() {
+        var next_callback = loadFilterConfig;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSP_codes.MSP_PID_ADVANCED, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function loadFilterConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSP_codes.MSP_FILTER_CONFIG, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
 
     function load_html() {
         $('#content').load("./tabs/pid_tuning.html", process_html);
@@ -86,8 +105,8 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
         }
 
-        $('.rate-tpa input[name="tpa"]').val(RC_tuning.dynamic_THR_PID.toFixed(2));
-        $('.rate-tpa input[name="tpa-breakpoint"]').val(RC_tuning.dynamic_THR_breakpoint);
+        $('#tpa').val(RC_tuning.dynamic_THR_PID);
+        $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
     }
 
     function form_to_pid_and_rc() {
@@ -106,8 +125,8 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.roll_rate = parseFloat($('.rate-tpa input[name="roll"]:visible').val());
         RC_tuning.pitch_rate = parseFloat($('.rate-tpa input[name="pitch"]:visible').val());
         RC_tuning.yaw_rate = parseFloat($('.rate-tpa input[name="yaw"]:visible').val());
-        RC_tuning.dynamic_THR_PID = parseFloat($('.rate-tpa input[name="tpa"]').val());
-        RC_tuning.dynamic_THR_breakpoint = parseInt($('.rate-tpa input[name="tpa-breakpoint"]').val());
+        RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
+        RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
     }
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
@@ -172,13 +191,72 @@ TABS.pid_tuning.initialize = function (callback) {
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-
-            var $magHoldYawRate = $("#magHoldYawRate");
+            var $magHoldYawRate                 = $("#magHoldYawRate"),
+                $yawJumpPreventionLimit         = $('#yawJumpPreventionLimit'),
+                $yawPLimit                      = $('#yawPLimit'),
+                $gyroSoftLpfHz                  = $('#gyroSoftLpfHz'),
+                $accSoftLpfHz                   = $('#accSoftLpfHz'),
+                $dtermLpfHz                     = $('#dtermLpfHz'),
+                $yawLpfHz                       = $('#yawLpfHz'),
+                $rollPitchItermIgnoreRate       = $('#rollPitchItermIgnoreRate'),
+                $yawItermIgnoreRate             = $('#yawItermIgnoreRate'),
+                $axisAccelerationLimitRollPitch = $('#axisAccelerationLimitRollPitch'),
+                $axisAccelerationLimitYaw       = $('#axisAccelerationLimitYaw');
 
             $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
+            $yawJumpPreventionLimit.val(INAV_PID_CONFIG.yawJumpPreventionLimit);
+            $yawPLimit.val(PID_ADVANCED.yawPLimit);
+            $gyroSoftLpfHz.val(FILTER_CONFIG.gyroSoftLpfHz);
+            $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
+            $dtermLpfHz.val(FILTER_CONFIG.dtermLpfHz);
+            $yawLpfHz.val(FILTER_CONFIG.yawLpfHz),
+            $rollPitchItermIgnoreRate.val(PID_ADVANCED.rollPitchItermIgnoreRate);
+            $yawItermIgnoreRate.val(PID_ADVANCED.yawItermIgnoreRate);
+            $axisAccelerationLimitRollPitch.val(PID_ADVANCED.axisAccelerationLimitRollPitch * 10);
+            $axisAccelerationLimitYaw.val(PID_ADVANCED.axisAccelerationLimitYaw * 10)
 
             $magHoldYawRate.change(function () {
                 INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
+            });
+
+            $yawJumpPreventionLimit.change(function () {
+                INAV_PID_CONFIG.yawJumpPreventionLimit = parseInt($yawJumpPreventionLimit.val(), 10);
+            });
+
+            $yawPLimit.change(function () {
+                PID_ADVANCED.yawPLimit = parseInt($yawPLimit.val(), 10);
+            });
+
+            $gyroSoftLpfHz.change(function () {
+                FILTER_CONFIG.gyroSoftLpfHz = parseInt($gyroSoftLpfHz.val(), 10);
+            });
+
+            $accSoftLpfHz.change(function () {
+                INAV_PID_CONFIG.accSoftLpfHz = parseInt($accSoftLpfHz.val(), 10);
+            });
+
+            $dtermLpfHz.change(function () {
+                FILTER_CONFIG.dtermLpfHz = parseInt($dtermLpfHz.val(), 10);
+            });
+
+            $yawLpfHz.change(function () {
+                FILTER_CONFIG.yawLpfHz = parseInt($yawLpfHz.val(), 10);
+            });
+
+            $rollPitchItermIgnoreRate.change(function () {
+                PID_ADVANCED.rollPitchItermIgnoreRate = parseInt($rollPitchItermIgnoreRate.val(), 10);
+            });
+
+            $yawItermIgnoreRate.change(function () {
+                PID_ADVANCED.yawItermIgnoreRate = parseInt($yawItermIgnoreRate.val(), 10);
+            });
+
+            $axisAccelerationLimitRollPitch.change(function () {
+                PID_ADVANCED.axisAccelerationLimitRollPitch = Math.round(parseInt($axisAccelerationLimitRollPitch.val(), 10) / 10);
+            });
+
+            $axisAccelerationLimitYaw.change(function () {
+                PID_ADVANCED.axisAccelerationLimitYaw = Math.round(parseInt($axisAccelerationLimitYaw.val(), 10) / 10);
             });
 
             $('.requires-v1_4').show();
@@ -207,9 +285,27 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveINAVPidConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = savePidAdvanced;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
                    MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function savePidAdvanced() {
+                var next_callback = saveFilterConfig;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_PID_ADVANCED, MSP.crunch(MSP_codes.MSP_SET_PID_ADVANCED), false, next_callback);
+                } else {
+                   next_callback();
+                }
+            }
+
+            function saveFilterConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+                   MSP.send_message(MSP_codes.MSP_SET_FILTER_CONFIG, MSP.crunch(MSP_codes.MSP_SET_FILTER_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }

@@ -39,6 +39,8 @@ var FAILSAFE_CONFIG;
 var RXFAIL_CONFIG;
 var ADVANCED_CONFIG;
 var INAV_PID_CONFIG;
+var PID_ADVANCED;
+var FILTER_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -210,6 +212,20 @@ var FC = {
             servoPwmRate: null,
             gyroSync: null
         };
+
+        FILTER_CONFIG = {
+            gyroSoftLpfHz: null,
+            dtermLpfHz: null,
+            yawLpfHz: null
+        }
+
+        PID_ADVANCED = {
+            rollPitchItermIgnoreRate: null,
+            yawItermIgnoreRate: null,
+            yawPLimit: null,
+            axisAccelerationLimitRollPitch: null,
+            axisAccelerationLimitYaw: null
+        }
 
         INAV_PID_CONFIG = {
             asynchronousMode: null,
