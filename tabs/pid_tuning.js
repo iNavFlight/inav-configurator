@@ -191,15 +191,17 @@ TABS.pid_tuning.initialize = function (callback) {
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            var $magHoldYawRate             = $("#magHoldYawRate"),
-                $yawJumpPreventionLimit     = $('#yawJumpPreventionLimit'),
-                $yawPLimit                  = $('#yawPLimit'),
-                $gyroSoftLpfHz              = $('#gyroSoftLpfHz'),
-                $accSoftLpfHz               = $('#accSoftLpfHz'),
-                $dtermLpfHz                 = $('#dtermLpfHz'),
-                $yawLpfHz                   = $('#yawLpfHz'),
-                $rollPitchItermIgnoreRate   = $('#rollPitchItermIgnoreRate'),
-                $yawItermIgnoreRate         = $('#yawItermIgnoreRate');
+            var $magHoldYawRate                 = $("#magHoldYawRate"),
+                $yawJumpPreventionLimit         = $('#yawJumpPreventionLimit'),
+                $yawPLimit                      = $('#yawPLimit'),
+                $gyroSoftLpfHz                  = $('#gyroSoftLpfHz'),
+                $accSoftLpfHz                   = $('#accSoftLpfHz'),
+                $dtermLpfHz                     = $('#dtermLpfHz'),
+                $yawLpfHz                       = $('#yawLpfHz'),
+                $rollPitchItermIgnoreRate       = $('#rollPitchItermIgnoreRate'),
+                $yawItermIgnoreRate             = $('#yawItermIgnoreRate'),
+                $axisAccelerationLimitRollPitch = $('#axisAccelerationLimitRollPitch'),
+                $axisAccelerationLimitYaw       = $('#axisAccelerationLimitYaw');
 
             $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
             $yawJumpPreventionLimit.val(INAV_PID_CONFIG.yawJumpPreventionLimit);
@@ -210,6 +212,8 @@ TABS.pid_tuning.initialize = function (callback) {
             $yawLpfHz.val(FILTER_CONFIG.yawLpfHz),
             $rollPitchItermIgnoreRate.val(PID_ADVANCED.rollPitchItermIgnoreRate);
             $yawItermIgnoreRate.val(PID_ADVANCED.yawItermIgnoreRate);
+            $axisAccelerationLimitRollPitch.val(PID_ADVANCED.axisAccelerationLimitRollPitch * 10);
+            $axisAccelerationLimitYaw.val(PID_ADVANCED.axisAccelerationLimitYaw * 10)
 
             $magHoldYawRate.change(function () {
                 INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
@@ -245,6 +249,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
             $yawItermIgnoreRate.change(function () {
                 PID_ADVANCED.yawItermIgnoreRate = parseInt($yawItermIgnoreRate.val(), 10);
+            });
+
+            $axisAccelerationLimitRollPitch.change(function () {
+                PID_ADVANCED.axisAccelerationLimitRollPitch = Math.round(parseInt($axisAccelerationLimitRollPitch.val(), 10) / 10);
+            });
+
+            $axisAccelerationLimitYaw.change(function () {
+                PID_ADVANCED.axisAccelerationLimitYaw = Math.round(parseInt($axisAccelerationLimitYaw.val(), 10) / 10);
             });
 
             $('.requires-v1_4').show();

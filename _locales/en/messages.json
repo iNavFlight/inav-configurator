@@ -1789,5 +1789,17 @@
     },
     "yawItermIgnoreRateHelp": {
         "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "axisAccelerationLimitRollPitch": {
+        "message": "Roll/Pitch acceleration limit"
+    },
+    "axisAccelerationLimitRollPitchHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "axisAccelerationLimitYaw": {
+        "message": "Yaw acceleration limit"
+    },
+    "axisAccelerationLimitYawHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
     }
 }
