@@ -191,13 +191,15 @@ TABS.pid_tuning.initialize = function (callback) {
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            var $magHoldYawRate         = $("#magHoldYawRate"),
-                $yawJumpPreventionLimit = $('#yawJumpPreventionLimit'),
-                $yawPLimit              = $('#yawPLimit'),
-                $gyroSoftLpfHz          = $('#gyroSoftLpfHz'),
-                $accSoftLpfHz           = $('#accSoftLpfHz'),
-                $dtermLpfHz             = $('#dtermLpfHz'),
-                $yawLpfHz               = $('#yawLpfHz');
+            var $magHoldYawRate             = $("#magHoldYawRate"),
+                $yawJumpPreventionLimit     = $('#yawJumpPreventionLimit'),
+                $yawPLimit                  = $('#yawPLimit'),
+                $gyroSoftLpfHz              = $('#gyroSoftLpfHz'),
+                $accSoftLpfHz               = $('#accSoftLpfHz'),
+                $dtermLpfHz                 = $('#dtermLpfHz'),
+                $yawLpfHz                   = $('#yawLpfHz'),
+                $rollPitchItermIgnoreRate   = $('#rollPitchItermIgnoreRate'),
+                $yawItermIgnoreRate         = $('#yawItermIgnoreRate');
 
             $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
             $yawJumpPreventionLimit.val(INAV_PID_CONFIG.yawJumpPreventionLimit);
@@ -205,7 +207,9 @@ TABS.pid_tuning.initialize = function (callback) {
             $gyroSoftLpfHz.val(FILTER_CONFIG.gyroSoftLpfHz);
             $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
             $dtermLpfHz.val(FILTER_CONFIG.dtermLpfHz);
-            $yawLpfHz.val(FILTER_CONFIG.yawLpfHz);
+            $yawLpfHz.val(FILTER_CONFIG.yawLpfHz),
+            $rollPitchItermIgnoreRate.val(PID_ADVANCED.rollPitchItermIgnoreRate);
+            $yawItermIgnoreRate.val(PID_ADVANCED.yawItermIgnoreRate);
 
             $magHoldYawRate.change(function () {
                 INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
@@ -233,6 +237,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
             $yawLpfHz.change(function () {
                 FILTER_CONFIG.yawLpfHz = parseInt($yawLpfHz.val(), 10);
+            });
+
+            $rollPitchItermIgnoreRate.change(function () {
+                PID_ADVANCED.rollPitchItermIgnoreRate = parseInt($rollPitchItermIgnoreRate.val(), 10);
+            });
+
+            $yawItermIgnoreRate.change(function () {
+                PID_ADVANCED.yawItermIgnoreRate = parseInt($yawItermIgnoreRate.val(), 10);
             });
 
             $('.requires-v1_4').show();

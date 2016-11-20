@@ -1777,5 +1777,17 @@
     },
     "yawLpfCutoffFrequencyHelp": {
         "message": "Yaw P-term LPF cutoff frequency"
+    },
+    "rollPitchItermIgnoreRate": {
+        "message": "Roll/Pitch I-term ignore rate"
+    },
+    "rollPitchItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "yawItermIgnoreRate": {
+        "message": "Yaw I-term ignore rate"
+    },
+    "yawItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
     }
 }
