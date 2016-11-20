@@ -105,8 +105,8 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
         }
 
-        $('.rate-tpa input[name="tpa"]').val(RC_tuning.dynamic_THR_PID.toFixed(2));
-        $('.rate-tpa input[name="tpa-breakpoint"]').val(RC_tuning.dynamic_THR_breakpoint);
+        $('#tpa').val(RC_tuning.dynamic_THR_PID);
+        $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
     }
 
     function form_to_pid_and_rc() {
@@ -125,8 +125,8 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.roll_rate = parseFloat($('.rate-tpa input[name="roll"]:visible').val());
         RC_tuning.pitch_rate = parseFloat($('.rate-tpa input[name="pitch"]:visible').val());
         RC_tuning.yaw_rate = parseFloat($('.rate-tpa input[name="yaw"]:visible').val());
-        RC_tuning.dynamic_THR_PID = parseFloat($('.rate-tpa input[name="tpa"]').val());
-        RC_tuning.dynamic_THR_breakpoint = parseInt($('.rate-tpa input[name="tpa-breakpoint"]').val());
+        RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
+        RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
     }
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();

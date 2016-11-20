@@ -1,7 +1,7 @@
 /*.rate-tpa.rate-tpa--inav input[type="number"],*/
 .rate-tpa_input {
     margin: 4px;
-    width: auto;
+    width: 5em;
     border: 1px solid silver;
     border-radius: 3px;
     display: inline-block;
@@ -10,13 +10,15 @@
 }
 
 .rate-tpa.rate-tpa--inav td,
-.rate-tpa.rate-tpa--filtering td {
+.rate-tpa.rate-tpa--filtering td,
+.rate-tpa.rate-tpa--misc td {
     background-color: #DEDEDE;
     width: auto;
     border-bottom: 1px solid #ccc;
 }
 
-.tab-pid_tuning .rate-tpa.rate-tpa--filtering th {
+.tab-pid_tuning .rate-tpa.rate-tpa--filtering th,
+.tab-pid_tuning .rate-tpa.rate-tpa--misc th {
     width: 18em;
 }
 

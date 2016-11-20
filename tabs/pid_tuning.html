@@ -175,60 +175,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <table class="rate-tpa rate-tpa--inav requires-v1_4">
-                        <tbody>
-                            <tr>
-                                <th i18n="yawJumpPreventionLimit"></th>
-                                <td >
-                                    <input type="number" id="yawJumpPreventionLimit" class="rate-tpa_input" step="10" min="80" max="500" />
-                                    <div class="helpicon cf_tip" i18n_title="yawJumpPreventionLimitHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th i18n="yawPLimit"></th>
-                                <td >
-                                    <input type="number" id="yawPLimit" class="rate-tpa_input" step="10" min="100" max="500" />
-                                    <div class="helpicon cf_tip" i18n_title="yawPLimitHelp"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="rate-tpa rate-tpa--inav requires-v1_4">
-                        <tbody>
-                            <tr>
-                                <th i18n="rollPitchItermIgnoreRate"></th>
-                                <td >
-                                    <input type="number" id="rollPitchItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
-                                    <div class="helpicon cf_tip" i18n_title="rollPitchItermIgnoreRateHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th i18n="yawItermIgnoreRate"></th>
-                                <td >
-                                    <input type="number" id="yawItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
-                                    <div class="helpicon cf_tip" i18n_title="yawItermIgnoreRateHelp"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="rate-tpa rate-tpa--inav requires-v1_4">
-                        <tbody>
-                            <tr>
-                                <th i18n="axisAccelerationLimitRollPitch"></th>
-                                <td >
-                                    <input type="number" id="axisAccelerationLimitRollPitch" class="rate-tpa_input" step="10" min="0" max="655350" />
-                                    <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitRollPitchHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th i18n="axisAccelerationLimitYaw"></th>
-                                <td >
-                                    <input type="number" id="axisAccelerationLimitYaw" class="rate-tpa_input" step="10" min="0" max="655350" />
-                                    <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitYawHelp"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                     <table class="rate-tpa rate-tpa--no-dps cf">
                         <thead>
                             <tr>
@@ -246,22 +192,6 @@
                                     name="roll" step="0.01" min="0" max="1.00" /></td>
                                 <td class="pitch"><input type="number" name="pitch" step="0.01" min="0" max="1.00" /></td>
                                 <td><input type="number" name="yaw" step="0.01" min="0" max="2.55" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="rate-tpa cf">
-                        <thead>
-                            <tr>
-                                <th i18n="pidTuningTPA"></th>
-                                <th class="tpa-breakpoint" i18n="pidTuningTPABreakPoint"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="leftzero"><input class="rate-tpa_input" type="number" name="tpa" step="0.01" min="0"
-                                    max="1.00" /></td>
-                                <td class="tpa-breakpoint"><input class="rate-tpa_input" type="number" name="tpa-breakpoint" step="10"
-                                    min="1000" max="2000" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -287,6 +217,13 @@
                             <div class="helpicon cf_tip" i18n_title="accLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="cf_column half requires-v1_4">
+            <table class="spacer_left rate-tpa rate-tpa--filtering">
+                <tbody>
                     <tr>
                         <th i18n="dtermLpfCutoffFrequency"></th>
                         <td>
@@ -299,6 +236,78 @@
                         <td>
                             <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
                             <div class="helpicon cf_tip" i18n_title="yawLpfCutoffFrequencyHelp"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="clear-both requires-v1_4"></div>
+        <div class="tab_title requires-v1_4" i18n="tabMisc" style="margin-top: 1em;"></div>
+        <div class="cf_column half requires-v1_4">
+            <table class="rate-tpa rate-tpa--misc">
+                <tr>
+                    <th i18n="yawJumpPreventionLimit"></th>
+                    <td >
+                        <input type="number" id="yawJumpPreventionLimit" class="rate-tpa_input" step="10" min="80" max="500" />
+                        <div class="helpicon cf_tip" i18n_title="yawJumpPreventionLimitHelp"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th i18n="yawPLimit"></th>
+                    <td >
+                        <input type="number" id="yawPLimit" class="rate-tpa_input" step="10" min="100" max="500" />
+                        <div class="helpicon cf_tip" i18n_title="yawPLimitHelp"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th i18n="rollPitchItermIgnoreRate"></th>
+                    <td >
+                        <input type="number" id="rollPitchItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
+                        <div class="helpicon cf_tip" i18n_title="rollPitchItermIgnoreRateHelp"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th i18n="yawItermIgnoreRate"></th>
+                    <td >
+                        <input type="number" id="yawItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
+                        <div class="helpicon cf_tip" i18n_title="yawItermIgnoreRateHelp"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="cf_column half requires-v1_4">
+            <table class="spacer_left rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr>
+                        <th i18n="axisAccelerationLimitRollPitch"></th>
+                        <td >
+                            <input type="number" id="axisAccelerationLimitRollPitch" class="rate-tpa_input" step="10" min="0" max="655350" />
+                            dps^2
+                            <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitRollPitchHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th i18n="axisAccelerationLimitYaw"></th>
+                        <td >
+                            <input type="number" id="axisAccelerationLimitYaw" class="rate-tpa_input" step="10" min="0" max="655350" />
+                            dps^2
+                            <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitYawHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th i18n="pidTuningTPA"></th>
+                        <td >
+                            <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
+                            %
+                            <div class="helpicon cf_tip" i18n_title="pidTuningTPAHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th i18n="pidTuningTPABreakPoint"></th>
+                        <td >
+                            <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000" max="2000" />
+                            <div class="helpicon cf_tip" i18n_title="pidTuningTPABreakPointHelp"></div>
                         </td>
                     </tr>
                 </tbody>

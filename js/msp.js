@@ -400,7 +400,7 @@ var MSP = {
                     RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 }
 
-                RC_tuning.dynamic_THR_PID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.throttle_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
@@ -1345,7 +1345,7 @@ MSP.crunch = function (code) {
                 buffer.push(Math.round(RC_tuning.yaw_rate * 100));
             }
 
-            buffer.push(Math.round(RC_tuning.dynamic_THR_PID * 100));
+            buffer.push(RC_tuning.dynamic_THR_PID);
             buffer.push(Math.round(RC_tuning.throttle_MID * 100));
             buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
             if (semver.gte(CONFIG.apiVersion, "1.7.0")) {

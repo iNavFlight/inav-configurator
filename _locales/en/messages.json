@@ -75,10 +75,13 @@
         "message": "Ports"
     },
     "tabPidTuning": {
-        "message": "PID Tuning"
+        "message": "PID tuning"
     },
     "tabReceiver": {
         "message": "Receiver"
+    },
+    "tabMisc": {
+        "message": "Miscelanous"
     },
     "tabModeSelection": {
         "message": "Mode Selection"
@@ -1801,5 +1804,11 @@
     },
     "axisAccelerationLimitYawHelp": {
         "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "pidTuningTPAHelp": {
+        "message": "Throttle PID Attenuation factor. PID gains will be reduced lineary starting from 0 at TPA Breakpoint (Throttle) to TPA factor at max throttle"
+    },
+    "pidTuningTPABreakPointHelp": {
+        "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
     }
 }
