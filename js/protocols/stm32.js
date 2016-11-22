@@ -241,7 +241,7 @@ STM32_protocol.prototype.send = function (Array, bytes_to_read, callback) {
 // result = true/false
 STM32_protocol.prototype.verify_response = function (val, data) {
     var self = this;
-    
+
     if (val != data[0]) {
         var message = 'STM32 Communication failed, wrong response, expected: ' + val + ' (0x' + val.toString(16) + ') received: ' + data[0] + ' (0x' + data[0].toString(16) + ')';
         console.error(message);
@@ -271,6 +271,8 @@ STM32_protocol.prototype.verify_chip_signature = function (signature) {
             break;
         case 0x414: // not tested
             console.log('Chip recognized as F1 High-density');
+            this.available_flash_size =  0x40000;
+            this.page_size = 2048;
             break;
         case 0x418: // not tested
             console.log('Chip recognized as F1 Connectivity line');
@@ -432,14 +434,14 @@ STM32_protocol.prototype.upload_procedure = function (step) {
 
             if (self.useExtendedErase) {
                 if (self.options.erase_chip) {
-            
+
                     var message = 'Executing global chip erase (via extended erase)';
                     console.log(message);
                     $('span.progressLabel').text(message + ' ...');
-    
+
                     self.send([self.command.extended_erase, 0xBB], 1, function (reply) {
                         if (self.verify_response(self.status.ACK, reply)) {
-                            self.send( [0xFF, 0xFF, 0x00], 1, function (reply) { 
+                            self.send( [0xFF, 0xFF, 0x00], 1, function (reply) {
                                 if (self.verify_response(self.status.ACK, reply)) {
                                     console.log('Executing global chip extended erase: done');
                                     self.upload_procedure(5);
@@ -447,15 +449,15 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                             });
                         }
                     });
-                    
+
                 } else {
-                    var message = 'Executing local erase (via extended erase)'; 
+                    var message = 'Executing local erase (via extended erase)';
                     console.log(message);
                     $('span.progressLabel').text(message + ' ...');
 
                     self.send([self.command.extended_erase, 0xBB], 1, function (reply) {
                         if (self.verify_response(self.status.ACK, reply)) {
-                        
+
                             // For reference: https://code.google.com/p/stm32flash/source/browse/stm32.c#723
 
                             var max_address = self.hex.data[self.hex.data.length - 1].address + self.hex.data[self.hex.data.length - 1].bytes - 0x8000000,
@@ -472,18 +474,18 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                             buff.push(pg_byte);
                             checksum ^= pg_byte;
 
-                            
+
                             for (var i = 0; i < erase_pages_n; i++) {
-                                pg_byte = i >> 8; 
+                                pg_byte = i >> 8;
                                 buff.push(pg_byte);
                                 checksum ^= pg_byte;
-                                pg_byte = i & 0xFF; 
+                                pg_byte = i & 0xFF;
                                 buff.push(pg_byte);
                                 checksum ^= pg_byte;
                             }
 
                             buff.push(checksum);
-                            console.log('Erasing. pages: 0x00 - 0x' + erase_pages_n.toString(16) + ', checksum: 0x' + checksum.toString(16)); 
+                            console.log('Erasing. pages: 0x00 - 0x' + erase_pages_n.toString(16) + ', checksum: 0x' + checksum.toString(16));
 
                             self.send(buff, 1, function (reply) {
                                 if (self.verify_response(self.status.ACK, reply)) {
@@ -494,8 +496,8 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                             });
                         }
                     });
-                    
-                
+
+
                 }
                 break;
             }
@@ -517,7 +519,7 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                     }
                 });
             } else {
-                var message = 'Executing local erase'; 
+                var message = 'Executing local erase';
                 console.log(message);
                 $('span.progressLabel').text(message + ' ...');
 
