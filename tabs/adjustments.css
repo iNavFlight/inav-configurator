@@ -4,23 +4,23 @@
 
 .tab-adjustments .range .marker, .tab-adjustments .channel-slider .noUi-connect {
     background: #37a8db;
-    box-shadow: inset 0 0px 2px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .noUi-target {
     border-radius: 4px;
     border: 1px solid #D3D3D3;
-    box-shadow: inset 0 0px 2px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .noUi-background {
-    box-shadow: inset 0 0px 2px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.6);
     background: #D2D2D2;
 }
 
 .tab-adjustments .adjustments {
     width: 100%;
-    border-spacing: 0px;
+    border-spacing: 0;
 }
 
 .tab-adjustments td {
@@ -29,11 +29,11 @@
 }
 
 .tab-adjustments .range:first-child {
-    border-top: 0px;
+    border-top: 0;
 }
 
 .tab-adjustments .range:last-child {
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 
 .tab-adjustments .adjustments thead td {
@@ -75,16 +75,16 @@
 
 .tab-adjustments .adjustment .channelInfo {
     width: 5%;
-    padding: 0px 10px;
+    padding: 0 10px;
 }
 
 .tab-adjustments .adjustment .channelInfo .limits {
-    padding: 5px 0px;
+    padding: 5px 0;
 }
 
 .tab-adjustments .adjustment .range {
     width: 65%;
-    padding: 0px 20px;
+    padding: 0 20px;
 }
 
 .tab-adjustments .adjustment .range .channel-slider {

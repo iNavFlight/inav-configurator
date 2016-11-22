@@ -23,13 +23,11 @@
 }
 
 .tab-auxiliary .mode.off .info {
-    background: #cb4747;
     background: #828885;
     color: white;
 }
 
 .tab-auxiliary .mode.off:nth-child(odd) .info {
-    background: #cb4747;
     background: #828885;
 }
 
@@ -39,7 +37,7 @@
 
 .tab-auxiliary .modes {
     width: 100%;
-    border-spacing: 0px;
+    border-spacing: 0;
 }
 
 .tab-auxiliary .mode {
@@ -50,7 +48,7 @@
 
 .tab-auxiliary .mode .name {
     min-height: 50px;
-    padding: 13px 0px;
+    padding: 13px 0;
 }
 
 .tab-auxiliary .mode .info {
@@ -81,7 +79,7 @@
 
 .tab-auxiliary .ranges {
     margin: 10px;
-    padding-right: 0px;
+    padding-right: 0;
     border-bottom: 5px solid white;
 }
 
@@ -89,7 +87,7 @@
     position: relative;
     height: 70px;
     padding-top: 15px;
-    padding-left: 0px;
+    padding-left: 0;
     border-top: 1px solid #fff;
     border-bottom: 1px solid #cccccc;
     background-color: #ececec;
@@ -97,17 +95,17 @@
 }
 
 .tab-auxiliary .range:first-child {
-    border-top: 0px;
+    border-top: 0;
 }
 
 .tab-auxiliary .range:last-child {
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 
 .tab-auxiliary .range>.buttons {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
 }
 
 .tab-auxiliary .range>.buttons .a {
@@ -121,7 +119,7 @@
 }
 
 .tab-auxiliary .mode .range .channelInfo .limits {
-    padding: 10px 0px;
+    padding: 10px 0;
 }
 
 .tab-auxiliary .range .marker {
@@ -178,9 +176,7 @@
     float: right;
     margin-right: 5px;
     margin-top: -9px;
-    background-image: url('../images/icons/close1.svg');
-    background-repeat: no-repeat;
-    background-position: center 100%;
+    background: url('../images/icons/close1.svg') no-repeat center 100%;
     display: block;
 }
 
@@ -190,7 +186,7 @@
 }
 
 .tab-auxiliary .fixed_band {
-    bottom: 0px;
+    bottom: 0;
 }
 
 .tab-auxiliary .save_btn a {
@@ -204,9 +200,8 @@
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-auxiliary .fixed_band {
-        margin: 0px;
         width: calc(100% - -30px);
-        margin-left: -15px;
+        margin: 0 0 0 -15px;
     }
     .tab-auxiliary .fixed_band .save_btn a {
         margin-right: 15px;

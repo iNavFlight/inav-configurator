@@ -92,31 +92,23 @@
 }
 
 .tab-failsafe .pro1 {
-    background-image: url(../images/icons/cf_failsafe_procedure1.svg);
-    background-position: top right 10px;
     background-size: 200px;
-    background-repeat: no-repeat;
+    background: url(../images/icons/cf_failsafe_procedure1.svg) no-repeat top right 10px;
 }
 
 .tab-failsafe .pro2 {
-    background-image: url(../images/icons/cf_failsafe_procedure2.svg);
-    background-position: top right 10px;
     background-size: 200px;
-    background-repeat: no-repeat;
+    background: url(../images/icons/cf_failsafe_procedure2.svg) no-repeat top right 10px;
 }
 
 .tab-failsafe .pro3 {
-    background-image: url(../images/icons/cf_failsafe_procedure3.svg);
-    background-position: top right 10px;
     background-size: 200px;
-    background-repeat: no-repeat;
+    background: url(../images/icons/cf_failsafe_procedure3.svg) no-repeat top right 10px;
 }
 
 .tab-failsafe .pro4 {
-    background-image: url(../images/icons/cf_failsafe_procedure4.svg);
-    background-position: top right 10px;
     background-size: 200px;
-    background-repeat: no-repeat;
+    background: url(../images/icons/cf_failsafe_procedure4.svg) no-repeat top right 10px;
 }
 
 .tab-failsafe .spacer_box .helpicon {

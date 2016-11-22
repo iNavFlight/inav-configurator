@@ -5,13 +5,11 @@
 }
 
 .tab-configuration table, .tab-configuration table th, .tab-configuration table td {
-    padding: 0px;
-    padding-left: 0px;
+    padding: 0;
     text-align: left;
 }
 
 .tab-configuration table th {
-    padding-left: 3px;
     padding: 3px;
     border-bottom: 1px solid #ddd;
 }
@@ -100,7 +98,7 @@
 }
 
 .tab-configuration .number span {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .tab-configuration .gps .line {
@@ -129,7 +127,7 @@
 }
 
 .tab-configuration .current .checkbox {
-    margin-top: 0px;
+    margin-top: 0;
     float: left;
 }
 
@@ -139,7 +137,7 @@
 }
 
 .tab-configuration .current .checkbox div input {
-    margin: 0px;
+    margin: 0;
     float: left;
 }
 
@@ -149,17 +147,17 @@
 }
 
 .tab-configuration .disarm .checkbox div {
-    margin-bottom: 0px;
-    margin-top: 0px;
+    margin-bottom: 0;
+    margin-top: 0;
 }
 
 .tab-configuration .disarm .checkbox div input {
-    margin: 0px;
+    margin: 0;
     float: left;
 }
 
 .tab-configuration .disarm .checkbox span {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .tab-configuration .freelabel {
@@ -172,13 +170,12 @@
 }
 
 .tab-configuration span {
-    margin: 0px;
+    margin: 0;
 }
 
 .tab-configuration .disarm .checkbox {
     float: left;
-    padding-left: 0px;
-    /*margin-top: -5px;*/
+    padding-left: 0;
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
     width: 100%;
@@ -219,12 +216,12 @@ hr
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child {
     border-bottom: none;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-configuration .gui_box_titlebar {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .tab-configuration .numberspacer {
@@ -244,8 +241,8 @@ hr
 
 .tab-configuration .rssi td {
     border-bottom: none;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
@@ -302,9 +299,9 @@ hr
 }
 
 .tab-configuration .other tr:last-child td {
-    border-bottom: 0px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-configuration .mixerPreview {
@@ -323,19 +320,18 @@ hr
 }
 
 .tab-configuration .rxMode tr:last-child td {
-    border-bottom: 0px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-configuration .gui_box {
-    font-style: bold;
-    font-family: 'open_sanssemibold', Arial;
+    font-family: 'open_sanssemibold', Arial,serif;
 }
 
 .tab-configuration .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial,serif;
     line-height: 19px;
     color: #4F4F4F;
     font-size: 11px;
@@ -350,51 +346,40 @@ hr
 }
 
 .tab-configuration .pitch {
-    background-image: url(../images/icons/cf_icon_pitch.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_pitch.svg) no-repeat center;
 }
 
 .tab-configuration .yaw {
-    background-image: url(../images/icons/cf_icon_yaw.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_yaw.svg) no-repeat center;
 }
 
 .tab-configuration .roll {
-    background-image: url(../images/icons/cf_icon_roll.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_roll.svg) no-repeat center;
 }
 
 .tab-configuration .board select {
-    /*float: left;*/
     width: 45%;
     height: 20px;
-    margin: 0 0px 2px 0;
+    margin: 0 0 2px 0;
 }
-
 
 #mixercontent .mixerheadline {
     font-size: 13px;
     width: 100%;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     float: left;
     margin-bottom: 7px;
-    font-family: 'open_sanssemibold', Arial;
+    font-family: 'open_sanssemibold', Arial,serif;
 }
 
 #mixercontent select {
     float: left;
     width: 100%;
     height: 20px;
-    margin: 0 0px 2px 0;
-    margin-bottom: 20px;
-    margin-top:3px;
-
+    margin: 3px 0 20px 0;
 }
 
 #mixercontent input {
@@ -434,8 +419,8 @@ hr
 }
 
 #mixercontent .number:last-child {
-    padding-top: 0px;
-    margin-bottom: 0px;
+    padding-top: 0;
+    margin-bottom: 0;
 }
 
 #mixercontent .mixercanvas {
@@ -518,3 +503,4 @@ hr
 .system label {
     position: absolute;
     left: 10em;
+}

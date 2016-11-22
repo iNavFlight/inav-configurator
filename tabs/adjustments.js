@@ -1,3 +1,4 @@
+/*global $*/
 'use strict';
 
 TABS.adjustments = {};
@@ -27,7 +28,7 @@ TABS.adjustments.initialize = function (callback) {
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
 
-        var template = $('#tab-adjustments-templates .adjustments .adjustment');
+        var template = $('#tab-adjustments-templates').find('.adjustments .adjustment');
         var newAdjustment = template.clone();
         
         $(newAdjustment).attr('id', 'adjustment-' + adjustmentIndex);

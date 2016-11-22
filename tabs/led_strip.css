@@ -150,7 +150,7 @@
     text-align: center;
     font-size: 12px;
     text-shadow: 1px 1px rgba(0,0,0,.4);
-    padding-top: 0px;
+    padding-top: 0;
     display: block;
     /* font-family: monospace; */
     margin-left: -1px;
@@ -314,7 +314,7 @@
 }
 
 .tab-led-strip .indicators .up {
-    top: 0px;
+    top: 0;
     left: 2px;
 }
 

@@ -21,7 +21,7 @@
     top: 10px;
     left: 10px;
     width: 120px;
-    margin: 0px 0px 0px 0px;
+    margin: 0;
     font-weight: normal;
     color: #616161;
 }
@@ -67,9 +67,8 @@
     height: 100%;
     top: 0;
     left: 0;
-    background-image: url(../images/paper.jpg);
     background-size: 100%;
-    background-position: center;
+    background: url(../images/paper.jpg) center;
     border-radius: 5px;
 }
 
@@ -188,7 +187,7 @@
 }
 
 .instrumentsbox {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
@@ -212,17 +211,17 @@
     
     width: 100%;
     position: relative;
-    margin-bottom: 0px;
-    margin-top: 0px;
+    margin-bottom: 0;
+    margin-top: 0;
     float: left;
     
-    padding: 5px 0px 5px 0px;
+    padding: 5px 0 5px 0;
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid #39a9dc;
     color: #39a9dc;
-    font-family: 'open_sanssemibold', Arial;
+    font-family: 'open_sanssemibold', Arial,serif;
     font-size: 12px;
     line-height: 13px;
     transition: all ease 0.2s;
@@ -235,17 +234,17 @@
     
     width: 100%;
     position: relative;
-    margin-bottom: 0px;
-    margin-top: 0px;
+    margin-bottom: 0;
+    margin-top: 0;
     float: left;
     
-    padding: 5px 0px 5px 0px;
+    padding: 5px 0 5px 0;
     text-align: center;
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid #39a9dc;
     color: #39a9dc;
-    font-family: 'open_sanssemibold', Arial;
+    font-family: 'open_sanssemibold', Arial,serif;
     font-size: 12px;
     line-height: 13px;
     transition: all ease 0.2s;
