@@ -1,0 +1,7 @@
+{
+  "name": "INAV Configurator",
+  "description": "",
+  "version": "1.4.1",
+  "main": "main.html",
+  "default_locale": "en"
+}
