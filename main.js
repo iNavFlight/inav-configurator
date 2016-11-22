@@ -1,3 +1,4 @@
+/*global $, chrome*/
 'use strict';
 
 // Google Analytics
@@ -162,6 +163,9 @@ $(document).ready(function () {
                         break;
                     case 'motors':
                         TABS.motors.initialize(content_ready);
+                        break;
+                    case 'osd':
+                        TABS.osd.initialize(content_ready);
                         break;
                     case 'sensors':
                         TABS.sensors.initialize(content_ready);

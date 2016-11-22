@@ -45,6 +45,7 @@ var MSP_codes = {
     MSP_SET_BLACKBOX_CONFIG:    81,
     MSP_TRANSPONDER_CONFIG:     82,
     MSP_SET_TRANSPONDER_CONFIG: 83,
+    MSP_OSD_CONFIG:             84,
 
     MSP_ADVANCED_CONFIG:        90,
     MSP_SET_ADVANCED_CONFIG:    91,
@@ -1180,6 +1181,8 @@ var MSP = {
             case MSP_codes.MSP_SET_FAILSAFE_CONFIG:
                 console.log('Failsafe config saved');
                 break;
+            case MSP_codes.MSP_OSD_CONFIG:
+                break;
             default:
                 console.log('Unknown code detected: ' + code);
         } else {
@@ -1281,6 +1284,14 @@ var MSP = {
             });
         }
         return true;
+    },
+    promise: function(code, data) {
+        var self = this;
+        return new Promise(function(resolve) {
+            self.send_message(code, data, false, function(data) {
+                resolve(data);
+            });
+        });
     },
     callbacks_cleanup: function () {
         for (var i = 0; i < this.callbacks.length; i++) {

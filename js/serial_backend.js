@@ -217,8 +217,10 @@ function onOpen(openInfo) {
                                         // continue as usually
                                         CONFIGURATOR.connectionValid = true;
                                         GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
-                                        if (semver.lt(CONFIG.apiVersion, "1.4.0")) {
-                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('led_strip'), 1);
+                                        //TODO here we can remove led_strip tab from NAZE and CC3D at least!
+                                        //FIXME add real version here
+                                        if (false && semver.lt(CONFIG.flightControllerVersion, "1.4.0")) {
+                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('osd'), 1);
                                         }
 
                                         onConnect();
