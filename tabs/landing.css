@@ -167,6 +167,7 @@
     position: fixed;
     right: -245px;
     top: 0;
+    background: white;
 }
 
 #changelog .wrapper {
@@ -199,11 +200,6 @@
 #changelog .title {
     margin: 20px 0;
     font-size: 16px;
-}
-
-#changelog {
-    right: 0;
-    background: white;
 }
 
 #changelog .wrapper {
