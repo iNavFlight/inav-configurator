@@ -5,7 +5,7 @@
 
 .tab-help .gui_box {
     min-height: 500px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .tab-help ul {
@@ -16,9 +16,7 @@
     border-top: 1px dotted silver;
     padding-top: 5px;
     padding-bottom: 5px;
-    background-image: url(../images/arrow.svg);
-    background-repeat: no-repeat;
-    background-position: 0px 8px;
+    background: url(../images/arrow.svg) no-repeat 0 8px;
     background-size: 12px;
 }
 

@@ -49,7 +49,7 @@
 
 .tab-logging .fixed_band {
     width: 100%;
-    bottom: 0px;
+    bottom: 0;
 }
 
 .tab-logging .save_btn .back {
