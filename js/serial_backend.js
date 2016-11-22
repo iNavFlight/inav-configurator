@@ -2,8 +2,12 @@
 
 $(document).ready(function () {
 
+    var $port = $('#port'),
+        $baud = $('#baud'),
+        $portOverride = $('#port-override');
+
     GUI.updateManualPortVisibility = function(){
-        var selected_port = $('div#port-picker #port option:selected');
+        var selected_port = $port.find('option:selected');
         if (selected_port.data().isManual) {
             $('#port-override-option').show();
         }
@@ -11,24 +15,24 @@ $(document).ready(function () {
             $('#port-override-option').hide();
         }
         if (selected_port.data().isDFU) {
-            $('select#baud').hide();
+            $baud.hide();
         }
         else {
-            $('select#baud').show();
+            $baud.show();
         }
     };
 
     GUI.updateManualPortVisibility();
 
-    $('#port-override').change(function () {
-        chrome.storage.local.set({'portOverride': $('#port-override').val()});
+    $portOverride.change(function () {
+        chrome.storage.local.set({'portOverride': $portOverride.val()});
     });
 
     chrome.storage.local.get('portOverride', function (data) {
-        $('#port-override').val(data.portOverride);
+        $portOverride.val(data.portOverride);
     });
 
-    $('div#port-picker #port').change(function (target) {
+    $port.change(function (target) {
         GUI.updateManualPortVisibility();
     });
 
@@ -36,10 +40,10 @@ $(document).ready(function () {
         if (GUI.connect_lock != true) { // GUI control overrides the user control
 
             var clicks = $(this).data('clicks');
-            var selected_baud = parseInt($('div#port-picker #baud').val());
-            var selected_port = $('div#port-picker #port option:selected').data().isManual ?
-                    $('#port-override').val() :
-                    String($('div#port-picker #port').val());
+            var selected_baud = parseInt($baud.val());
+            var selected_port = $port.find('option:selected').data().isManual ?
+                    $portOverride.val() :
+                    String($port.val());
             if (selected_port === 'DFU') {
                 GUI.log(chrome.i18n.getMessage('dfu_connect_message'));
             }
@@ -49,9 +53,8 @@ $(document).ready(function () {
                     GUI.connecting_to = selected_port;
 
                     // lock port select & baud while we are connecting / connected
-                    $('div#port-picker #port, div#port-picker #baud, div#port-picker #delay').prop('disabled', true);
+                    $('#port, #baud, #delay').prop('disabled', true);
                     $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connecting'));
-
 
                     serial.connect(selected_port, {bitrate: selected_baud}, onOpen);
                 } else {
@@ -76,8 +79,10 @@ $(document).ready(function () {
                     $('span.cpu-load').text('');
 
                     // unlock port select & baud
-                    $('div#port-picker #port').prop('disabled', false);
-                    if (!GUI.auto_connect) $('div#port-picker #baud').prop('disabled', false);
+                    $port.prop('disabled', false);
+                    if (!GUI.auto_connect) {
+                        $baud.prop('disabled', false);
+                    }
 
                     // reset connect / disconnect button
                     $('div.connect_controls a.connect').removeClass('active');
@@ -108,7 +113,7 @@ $(document).ready(function () {
             $('input.auto_connect').prop('checked', true);
             $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectEnabled'));
 
-            $('select#baud').val(115200).prop('disabled', true);
+            $baud.val(115200).prop('disabled', true);
         } else {
             // disabled by user
             GUI.auto_connect = false;
@@ -125,7 +130,7 @@ $(document).ready(function () {
             if (GUI.auto_connect) {
                 $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectEnabled'));
 
-                $('select#baud').val(115200).prop('disabled', true);
+                $baud.val(115200).prop('disabled', true);
             } else {
                 $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectDisabled'));
 
@@ -247,7 +252,7 @@ function onOpen(openInfo) {
         $('div#connectbutton a.connect').removeClass('active');
 
         // unlock port select & baud
-        $('div#port-picker #port, div#port-picker #baud, div#port-picker #delay').prop('disabled', false);
+        $('#port, #baud, #delay').prop('disabled', false);
 
         // reset data
         $('div#connectbutton a.connect').data("clicks", false);
@@ -266,17 +271,12 @@ function onConnect() {
     } else {
         MSP.send_message(MSP_codes.MSP_STATUS, false, false);
     }
-    
+
     MSP.send_message(MSP_codes.MSP_DATAFLASH_SUMMARY, false, false);
 
-    var sensor_state = $('#sensor-status');
-    sensor_state.show();
-
-    var port_picker = $('#portsinput');
-    port_picker.hide();
-
-    var dataflash = $('#dataflash_wrapper_global');
-    dataflash.show();
+    $('#sensor-status').show();
+    $('#portsinput').hide();
+    $('#dataflash_wrapper_global').show();
 
     startLiveDataRefreshTimer();
 }
@@ -291,17 +291,10 @@ function onClosed(result) {
     $('#tabs ul.mode-connected').hide();
     $('#tabs ul.mode-disconnected').show();
 
-    var sensor_state = $('#sensor-status');
-    sensor_state.hide();
-
-    var port_picker = $('#portsinput');
-    port_picker.show();
-
-    var dataflash = $('#dataflash_wrapper_global');
-    dataflash.hide();
-
-    var battery = $('#quad-status_wrapper');
-    battery.hide();
+    $('#sensor-status').hide();
+    $('#portsinput').show();
+    $('#dataflash_wrapper_global').hide();
+    $('#quad-status_wrapper').hide();
 }
 
 function read_serial(info) {
@@ -326,7 +319,7 @@ function sensor_status(sensors_detected) {
     // set current value
     sensor_status.previous_sensors_detected = sensors_detected;
 
-    var e_sensor_status = $('div#sensor-status');
+    var e_sensor_status = $('#sensor-status');
 
     if (have_sensor(sensors_detected, 'acc')) {
         $('.accel', e_sensor_status).addClass('on');
