@@ -859,6 +859,14 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_OSD_CONFIG:
                 break;
+            case MSPCodes.MSP_SET_OSD_CONFIG:
+                console.log('OSD config set');
+                break;
+            case MSPCodes.MSP_OSD_CHAR_READ:
+                break;
+            case MSPCodes.MSP_OSD_CHAR_WRITE:
+                console.log('OSD char uploaded');
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {

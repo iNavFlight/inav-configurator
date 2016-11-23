@@ -45,7 +45,9 @@ var MSPCodes = {
     MSP_TRANSPONDER_CONFIG:     82,
     MSP_SET_TRANSPONDER_CONFIG: 83,
     MSP_OSD_CONFIG:             84,
-
+    MSP_SET_OSD_CONFIG:         85,
+    MSP_OSD_CHAR_READ:          86,
+    MSP_OSD_CHAR_WRITE:         87,
     MSP_ADVANCED_CONFIG:        90,
     MSP_SET_ADVANCED_CONFIG:    91,
     MSP_FILTER_CONFIG:          92,
