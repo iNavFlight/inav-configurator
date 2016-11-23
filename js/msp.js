@@ -87,7 +87,7 @@ var MSP = {
                 case 6:
                     if (this.message_checksum == data[i]) {
                         // message received, process
-                        mspHelper.processData(this.code, this.message_buffer, this.message_length_expected);
+                        mspHelper.processData(this);
                     } else {
                         console.log('code: ' + this.code + ' - crc failed');
 
@@ -109,12 +109,13 @@ var MSP = {
 
     send_message: function (code, data, callback_sent, callback_msp) {
         var bufferOut,
-            bufView;
+            bufView,
+            i;
 
         // always reserve 6 bytes for protocol overhead !
         if (data) {
             var size = data.length + 6,
-                checksum = 0;
+                checksum;
 
             bufferOut = new ArrayBuffer(size);
             bufView = new Uint8Array(bufferOut);
@@ -127,7 +128,7 @@ var MSP = {
 
             checksum = bufView[3] ^ bufView[4];
 
-            for (var i = 0; i < data.length; i++) {
+            for (i = 0; i < data.length; i++) {
                 bufView[i + 5] = data[i];
 
                 checksum ^= bufView[i + 5];
@@ -152,7 +153,7 @@ var MSP = {
         var obj = {'code': code, 'requestBuffer': bufferOut, 'callback': (callback_msp) ? callback_msp : false, 'timer': false};
 
         var requestExists = false;
-        for (var i = 0; i < MSP.callbacks.length; i++) {
+        for (i = 0; i < MSP.callbacks.length; i++) {
             if (i < MSP.callbacks.length) {
                 if (MSP.callbacks[i].code == code) {
                     // request already exist, we will just attach

@@ -189,7 +189,7 @@ FONT.upload = function ($progress) {
 };
 
 FONT.preview = function ($el) {
-    $el.empty()
+    $el.empty();
     for (var i = 0; i < SYM.LOGO; i++) {
         var url = FONT.data.character_image_urls[i];
         $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img>');

@@ -350,7 +350,7 @@ $(document).ready(function () {
 
     });
 
-    var profile_e = $('select[name="profilechange"]');
+    var profile_e = $('#profilechange');
 
     profile_e.change(function () {
         var profile = parseInt($(this).val());

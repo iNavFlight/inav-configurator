@@ -345,5 +345,15 @@ GUI_control.prototype.content_ready = function (callback) {
     if (callback) callback();
 };
 
+GUI_control.prototype.updateStatusBar = function() {
+    $('span.i2c-error').text(CONFIG.i2cError);
+    $('span.cycle-time').text(CONFIG.cycleTime);
+    $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+};
+
+GUI_control.prototype.updateProfileChange = function() {
+    $('#profilechange').val(CONFIG.profile);
+};
+
 // initialize object into GUI variable
 var GUI = new GUI_control();

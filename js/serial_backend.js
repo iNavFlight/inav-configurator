@@ -1,3 +1,4 @@
+/*global chrome, chrome.i18n*/
 'use strict';
 
 $(document).ready(function () {
@@ -307,6 +308,7 @@ function read_serial(info) {
     }
 }
 
+//FIXME move it into GUI
 function sensor_status(sensors_detected) {
     // initialize variable (if it wasn't)
     if (!sensor_status.previous_sensors_detected) {
