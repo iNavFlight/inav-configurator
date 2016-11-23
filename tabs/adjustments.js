@@ -7,44 +7,44 @@ TABS.adjustments.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
     googleAnalytics.sendAppView('Adjustments');
-    
+
     function get_adjustment_ranges() {
-        MSP.send_message(MSP_codes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
+        MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
     }
 
     function get_box_ids() {
-        MSP.send_message(MSP_codes.MSP_BOXIDS, false, false, get_rc_data);
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
     }
 
     function get_rc_data() {
-        MSP.send_message(MSP_codes.MSP_RC, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
     }
 
     function load_html() {
         $('#content').load("./tabs/adjustments.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
+    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
 
         var template = $('#tab-adjustments-templates').find('.adjustments .adjustment');
         var newAdjustment = template.clone();
-        
+
         $(newAdjustment).attr('id', 'adjustment-' + adjustmentIndex);
         $(newAdjustment).data('index', adjustmentIndex);
 
         //
         // update selected slot
         //
-        
+
         var channelList = $(newAdjustment).find('.adjustmentSlot .slot');
         channelList.val(adjustmentRange.slotIndex);
 
         //
         // populate source channel select box
         //
-        
+
         var channelList = $(newAdjustment).find('.channelInfo .channel');
         var channelOptionTemplate = $(channelList).find('option');
         channelOptionTemplate.remove();
@@ -59,13 +59,13 @@ TABS.adjustments.initialize = function (callback) {
         //
         // update selected function
         //
-        
+
         var functionList = $(newAdjustment).find('.functionSelection .function');
-        
-        // update list of selected functions        
+
+        // update list of selected functions
         var functionListOptions = $(functionList).find('option');
         var availableFunctionCount = 13;
-        
+
         if (semver.gte(CONFIG.flightControllerVersion, '1.8.0')) {
             availableFunctionCount += 2; // pitch and roll rate
             if (semver.gte(CONFIG.flightControllerVersion, '1.9.0')) {
@@ -75,18 +75,18 @@ TABS.adjustments.initialize = function (callback) {
                 }
             }
         }
-        
+
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
         functionList.empty().append(functionListOptions);
-        
+
         functionList.val(adjustmentRange.adjustmentFunction);
-        
-        
+
+
 
         //
         // populate function channel select box
         //
-        
+
         var channelList = $(newAdjustment).find('.functionSwitchChannel .channel');
         var channelOptionTemplate = $(channelList).find('option');
         channelOptionTemplate.remove();
@@ -101,12 +101,12 @@ TABS.adjustments.initialize = function (callback) {
         //
         // configure range
         //
-        
+
         var channel_range = {
                 'min': [  900 ],
                 'max': [ 2100 ]
             };
-        
+
         var defaultRangeValues = [1300, 1700];
         var rangeValues = defaultRangeValues;
         if (adjustmentRange.range != undefined) {
@@ -137,16 +137,16 @@ TABS.adjustments.initialize = function (callback) {
             density: 4,
             stepped: true
         });
-        
+
         //
         // add the enable/disable behavior
         //
-        
+
         var enableElement = $(newAdjustment).find('.enable');
         $(enableElement).data('adjustmentElement', newAdjustment);
         $(enableElement).change(function() {
             var adjustmentElement = $(this).data('adjustmentElement');
-            if ($(this).prop("checked")) { 
+            if ($(this).prop("checked")) {
                 $(adjustmentElement).find(':input').prop("disabled", false);
                 $(adjustmentElement).find('.channel-slider').removeAttr("disabled");
                 var rangeElement = $(adjustmentElement).find('.range .channel-slider');
@@ -163,10 +163,10 @@ TABS.adjustments.initialize = function (callback) {
             // keep this element enabled
             $(this).prop("disabled", false);
         });
-        
-        var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end); 
+
+        var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end);
         $(enableElement).prop("checked", isEnabled).change();
-        
+
         return newAdjustment;
     }
 
@@ -174,12 +174,12 @@ TABS.adjustments.initialize = function (callback) {
 
         var auxChannelCount = RC.active_channels - 4;
 
-        var modeTableBodyElement = $('.tab-adjustments .adjustments tbody') 
+        var modeTableBodyElement = $('.tab-adjustments .adjustments tbody')
         for (var adjustmentIndex = 0; adjustmentIndex < ADJUSTMENT_RANGES.length; adjustmentIndex++) {
             var newAdjustment = addAdjustment(adjustmentIndex, ADJUSTMENT_RANGES[adjustmentIndex], auxChannelCount);
             modeTableBodyElement.append(newAdjustment);
         }
-        
+
         // translate to user-selected language
         localize();
 
@@ -188,9 +188,9 @@ TABS.adjustments.initialize = function (callback) {
 
             // update internal data structures based on current UI elements
             var requiredAdjustmentRangeCount = ADJUSTMENT_RANGES.length;
-            
+
             ADJUSTMENT_RANGES = [];
-            
+
             var defaultAdjustmentRange = {
                 slotIndex: 0,
                 auxChannelIndex: 0,
@@ -204,7 +204,7 @@ TABS.adjustments.initialize = function (callback) {
 
             $('.tab-adjustments .adjustments .adjustment').each(function () {
                 var adjustmentElement = $(this);
-                
+
                 if ($(adjustmentElement).find('.enable').prop("checked")) {
                     var rangeValues = $(this).find('.range .channel-slider').val();
                     var adjustmentRange = {
@@ -222,18 +222,18 @@ TABS.adjustments.initialize = function (callback) {
                     ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
                 }
             });
-            
+
             for (var adjustmentRangeIndex = ADJUSTMENT_RANGES.length; adjustmentRangeIndex < requiredAdjustmentRangeCount; adjustmentRangeIndex++) {
                 ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
             }
-            
+
             //
             // send data to FC
             //
-            MSP.sendAdjustmentRanges(save_to_eeprom);
-            
+            mspHelper.sendAdjustmentRanges(save_to_eeprom);
+
             function save_to_eeprom() {
-                MSP.send_message(MSP_codes.MSP_EEPROM_WRITE, false, false, function () {
+                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('adjustmentsEepromSaved'));
                 });
             }
@@ -247,20 +247,20 @@ TABS.adjustments.initialize = function (callback) {
                 channelPosition = 2100;
             }
             var percentage = (channelPosition - 900) / (2100-900) * 100;
-            
+
             $('.adjustments .adjustment').each( function () {
                 var auxChannelCandidateIndex = $(this).find('.channel').val();
                 if (auxChannelCandidateIndex != auxChannelIndex) {
                     return;
                 }
-                
+
                 $(this).find('.range .marker').css('left', percentage + '%');
             });
         }
 
         // data pulling functions used inside interval timer
         function get_rc_data() {
-            MSP.send_message(MSP_codes.MSP_RC, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
         function update_ui() {
@@ -268,7 +268,7 @@ TABS.adjustments.initialize = function (callback) {
 
             for (var auxChannelIndex = 0; auxChannelIndex < auxChannelCount; auxChannelIndex++) {
                 update_marker(auxChannelIndex, RC.channels[auxChannelIndex + 4]);
-            }           
+            }
         }
 
         // update ui instantly on first load
@@ -279,7 +279,7 @@ TABS.adjustments.initialize = function (callback) {
 
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function () {
-            MSP.send_message(MSP_codes.MSP_STATUS);
+            MSP.send_message(MSPCodes.MSP_STATUS);
         }, 250, true);
 
         GUI.content_ready(callback);

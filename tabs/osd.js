@@ -22,11 +22,7 @@ SYM.METRE = 0xC;
 SYM.FEET = 0xF;
 SYM.GPS_SAT = 0x1F;
 
-
 var FONT = FONT || {};
-
-//FIXME This is hack!
-var MSPCodes = MSP_codes;
 
 FONT.initData = function () {
     if (FONT.data) {
