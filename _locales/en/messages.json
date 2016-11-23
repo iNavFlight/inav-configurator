@@ -1810,5 +1810,8 @@
     },
     "pidTuningTPABreakPointHelp": {
         "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
+    },
+    "tabOSD": {
+        "message": "OSD"
     }
 }
