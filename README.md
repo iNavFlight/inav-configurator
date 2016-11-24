@@ -10,7 +10,7 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 ## Authors
 
-Konstantin Sharlaimov/DigitalEntity - maintainer of the INAV firmware and configurator. 
+Konstantin Sharlaimov/DigitalEntity - maintainer of the INAV firmware and configurator.
 
 INAV Configurator was originally a [fork](#credits) of Cleanflight Configurator with support for INAV instead of Cleanflight.
 
@@ -64,7 +64,12 @@ https://github.com/iNavFlight/inav/issues
 
 ## Technical details
 
-The configurator is based on chrome.serial API running on Google Chrome/Chromium core.
+This branch uses NW.js to pack Crome app into single package with node.js and chromium
+
+```
+npm install nwjs-builder -g
+nwb nwbuild -p win64 --production
+```
 
 ## Developers
 
