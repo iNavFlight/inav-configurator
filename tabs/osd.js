@@ -65,19 +65,22 @@ FONT.constants = {
  * Each line is composed of 8 asci 1 or 0, representing 1 bit each for a total of 1 byte per line
  */
 FONT.parseMCMFontFile = function (data) {
-    var data = data.split("\n");
+    data = data.split("\n");
     // clear local data
     FONT.data.characters.length = 0;
     FONT.data.characters_bytes.length = 0;
     FONT.data.character_image_urls.length = 0;
+
     // make sure the font file is valid
     if (data.shift().trim() != 'MAX7456') {
         var msg = 'that font file doesnt have the MAX7456 header, giving up';
         console.debug(msg);
         Promise.reject(msg);
     }
+
     var character_bits = [];
     var character_bytes = [];
+
     // hexstring is for debugging
     FONT.data.hexstring = [];
     var pushChar = function () {
@@ -88,39 +91,51 @@ FONT.parseMCMFontFile = function (data) {
         character_bits = [];
         character_bytes = [];
     };
+
     for (var i = 0; i < data.length; i++) {
+
         var line = data[i];
         // hexstring is for debugging
         FONT.data.hexstring.push('0x' + parseInt(line, 2).toString(16));
+
         // every 64 bytes (line) is a char, we're counting chars though, which are 2 bits
         if (character_bits.length == FONT.constants.SIZES.MAX_NVM_FONT_CHAR_FIELD_SIZE * (8 / 2)) {
             pushChar()
         }
+
         for (var y = 0; y < 8; y = y + 2) {
             var v = parseInt(line.slice(y, y + 2), 2);
             character_bits.push(v);
         }
         character_bytes.push(parseInt(line, 2));
+
     }
+
     // push the last char
     pushChar();
+
     return FONT.data.characters;
 };
 
 
+//noinspection JSUnusedLocalSymbols
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
+        //noinspection JSUnresolvedVariable
         chrome.fileSystem.chooseEntry({type: 'openFile', accepts: [
             {extensions: ['mcm']}
         ]}, function (fileEntry) {
             FONT.data.loaded_font_file = fileEntry.name;
+            //noinspection JSUnresolvedVariable
             if (chrome.runtime.lastError) {
+                //noinspection JSUnresolvedVariable
                 console.error(chrome.runtime.lastError.message);
                 return;
             }
             fileEntry.file(function (file) {
                 var reader = new FileReader();
                 reader.onloadend = function (e) {
+                    //noinspection JSUnresolvedVariable
                     if (e.total != 0 && e.total == e.loaded) {
                         FONT.parseMCMFontFile(e.target.result);
                         resolve();
@@ -210,7 +225,6 @@ OSD.initData = function () {
         alarms: [],
         display_items: [],
         last_positions: {},
-        preview_logo: false,
         preview: []
     };
 };
@@ -406,6 +420,7 @@ OSD.updateDisplaySize = function () {
 };
 
 
+//noinspection JSUnusedLocalSymbols
 OSD.msp = {
     /**
      * Note, unsigned 16 bit int for position ispacked:
@@ -428,12 +443,11 @@ OSD.msp = {
         },
         pack: {
             position: function (display_item) {
-                var isVisible = display_item.isVisible;
-                var position = display_item.position;
-                    return (isVisible ? 0x0800 : 0) | (((position / FONT.constants.SIZES.LINE) & 0x001F) << 5) | (position % FONT.constants.SIZES.LINE);
+                return (display_item.isVisible ? 0x0800 : 0) | (((display_item.position / FONT.constants.SIZES.LINE) & 0x001F) << 5) | (display_item.position % FONT.constants.SIZES.LINE);
             }
         }
     },
+
     encodeOther: function () {
         var result = [-1, OSD.data.video_system];
         result.push8(OSD.data.unit_mode);
@@ -444,13 +458,17 @@ OSD.msp = {
         result.push16(OSD.data.alarms.alt.value);
         return result;
     },
+
     encode: function (display_item) {
         var buffer = [];
         buffer.push8(display_item.index);
         buffer.push16(this.helpers.pack.position(display_item));
         return buffer;
     },
-    // Currently only parses MSP_MAX_OSD responses, add a switch on payload.code if more codes are handled
+
+    /*
+     * Currently only parses MSP_MAX_OSD responses, add a switch on payload.code if more codes are handled
+     */
     decode: function (payload) {
         var view = payload.data;
         var d = OSD.data;
@@ -493,38 +511,48 @@ OSD.GUI.preview = {
         }
         $('.field-' + $(this).data('field').index).addClass('mouseover')
     },
+
     onMouseLeave: function () {
         if (!$(this).data('field')) {
             return;
         }
         $('.field-' + $(this).data('field').index).removeClass('mouseover')
     },
+
     onDragStart: function (e) {
         var ev = e.originalEvent;
+        //noinspection JSUnresolvedVariable
         ev.dataTransfer.setData("text/plain", $(ev.target).data('field').index);
+        //noinspection JSUnresolvedVariable
         ev.dataTransfer.setDragImage($(this).data('field').preview_img, 6, 9);
     },
     onDragOver: function (e) {
         var ev = e.originalEvent;
         ev.preventDefault();
+        //noinspection JSUnresolvedVariable
         ev.dataTransfer.dropEffect = "move";
         $(this).css({
             background: 'rgba(0,0,0,.5)'
         });
     },
+
     onDragLeave: function (e) {
         // brute force unstyling on drag leave
         $(this).removeAttr('style');
     },
+
     onDrop: function (e) {
         var ev = e.originalEvent;
         var position = $(this).removeAttr('style').data('position');
-        var field_id = parseInt(ev.dataTransfer.getData('text'))
+        //noinspection JSUnresolvedVariable
+        var field_id = parseInt(ev.dataTransfer.getData('text'));
         var display_item = OSD.data.display_items[field_id];
         var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + display_item.preview.length);
+
         if (overflows_line < 0) {
             position += overflows_line;
         }
+
         $('input.' + field_id + '.position').val(position).change();
     }
 };
@@ -532,7 +560,6 @@ OSD.GUI.preview = {
 
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
-    var self = this;
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -555,41 +582,38 @@ TABS.osd.initialize = function (callback) {
 
         // 2 way binding... sorta
         function updateOsdView() {
+
             // ask for the OSD config data
             MSP.promise(MSPCodes.MSP_OSD_CONFIG)
                 .then(function (info) {
 
+                    var i,
+                        type;
+
                     OSD.chooseFields();
-                    if (!info.length) {
+                    if (info.length <= 1) {
                         $('.unsupported').fadeIn();
                         return;
                     }
+
                     $('.supported').fadeIn();
                     OSD.msp.decode(info);
 
-                    // show Betaflight logo in preview
-                    var $previewLogo = $('.preview-logo').empty();
-                    $previewLogo.append(
-                        $('<label for="preview-logo">Logo: </label><input type="checkbox" name="preview-logo" class="togglesmall"></input>')
-                            .attr('checked', OSD.data.preview_logo)
-                            .change(function (e) {
-                                OSD.data.preview_logo = $(this).attr('checked') == undefined;
-                                updateOsdView();
-                            })
-                    );
-
                     // video mode
                     var $videoTypes = $('.video-types').empty();
-                    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
-                        var type = OSD.constants.VIDEO_TYPES[i];
-                        var $checkbox = $('<label/>').append($('<input name="video_system" type="radio"/>' + type + '</label>')
-                                .prop('checked', i === OSD.data.video_system)
-                                .data('type', type)
-                                .data('type', i)
+                    for (i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+
+                        $videoTypes.append(
+                            $('<label/>')
+                                .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                                    .prop('checked', i === OSD.data.video_system)
+                                    .data('type', i)
+                            )
                         );
-                        $videoTypes.append($checkbox);
+
                     }
-                    $videoTypes.find(':radio').click(function (e) {
+
+                    $videoTypes.find(':radio').click(function () {
                         OSD.data.video_system = $(this).data('type');
                         MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                             .then(function () {
@@ -600,12 +624,13 @@ TABS.osd.initialize = function (callback) {
                     // units
                     $('.units-container').show();
                     var $unitMode = $('.units').empty();
-                    for (var i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
-                        var type = OSD.constants.UNIT_TYPES[i];
-                        var $checkbox = $('<label/>').append($('<input name="unit_mode" type="radio"/>' + type + '</label>')
-                                .prop('checked', i === OSD.data.unit_mode)
-                                .data('type', type)
-                                .data('type', i)
+                    for (i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
+                        var $checkbox = $('<label/>')
+                            .append(
+                                $('<input name="unit_mode" type="radio"/>' + OSD.constants.UNIT_TYPES[i] + '</label>'
+                            )
+                            .prop('checked', i === OSD.data.unit_mode)
+                            .data('type', i)
                         );
                         $unitMode.append($checkbox);
                     }
@@ -616,6 +641,7 @@ TABS.osd.initialize = function (callback) {
                                 updateOsdView();
                             });
                     });
+
                     // alarms
                     $('.alarms-container').show();
                     var $alarms = $('.alarms').empty();
@@ -636,10 +662,8 @@ TABS.osd.initialize = function (callback) {
 
                     // display fields on/off and position
                     var $displayFields = $('.display-fields').empty();
-                    for (let field of
-                    OSD.data.display_items
-                    )
-                    {
+                    for (let field of OSD.data.display_items) {
+
                         // versioning related, if the field doesn't exist at the current flight controller version, just skip it
                         if (!field.name) {
                             continue;
@@ -651,21 +675,24 @@ TABS.osd.initialize = function (callback) {
                             $('<input type="checkbox" name="' + field.name + '" class="togglesmall"></input>')
                                 .data('field', field)
                                 .attr('checked', field.isVisible)
-                                .change(function (e) {
+                                .change(function () {
                                     var field = $(this).data('field');
                                     var $position = $(this).parent().find('.position.' + field.name);
                                     field.isVisible = !field.isVisible;
+
                                     if (field.isVisible) {
                                         $position.show();
                                     } else {
                                         $position.hide();
                                     }
+
                                     MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(field))
                                         .then(function () {
                                             updateOsdView();
                                         });
                                 })
                         );
+
                         $field.append('<label for="' + field.name + '" class="char-label">' + inflection.titleize(field.name) + '</label>');
                         if (field.positionable && field.isVisible) {
                             $field.append(
@@ -685,38 +712,24 @@ TABS.osd.initialize = function (callback) {
                         $displayFields.append($field);
                     }
                     GUI.switchery();
+
                     // buffer the preview
                     OSD.data.preview = [];
                     OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-                    for (let field of
-                    OSD.data.display_items
-                    )
-                    {
+                    for (let field of OSD.data.display_items) {
                         // reset fields that somehow end up off the screen
                         if (field.position > OSD.data.display_size.total) {
                             field.position = 0;
                         }
                     }
+
                     // clear the buffer
-                    for (var i = 0; i < OSD.data.display_size.total; i++) {
+                    for (i = 0; i < OSD.data.display_size.total; i++) {
                         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
                     }
-                    // logo first, so it gets overwritten by subsequent elements
-                    if (OSD.data.preview_logo) {
-                        var x = 160;
-                        for (var i = 1; i < 5; i++) {
-                            for (var j = 3; j < 27; j++)
-                                OSD.data.preview[i * 30 + j] = [
-                                    {name: 'LOGO', positionable: false},
-                                    x++
-                                ];
-                        }
-                    }
+
                     // draw all the displayed items and the drag and drop preview images
-                    for (let field of
-                    OSD.data.display_items
-                    )
-                    {
+                    for (let field of OSD.data.display_items) {
                         if (!field.preview || !field.isVisible) {
                             continue;
                         }
@@ -726,7 +739,7 @@ TABS.osd.initialize = function (callback) {
                         var canvas = document.createElement('canvas');
                         var ctx = canvas.getContext("2d");
                         // fill the screen buffer
-                        for (var i = 0; i < field.preview.length; i++) {
+                        for (i = 0; i < field.preview.length; i++) {
                             var charCode = field.preview.charCodeAt(i);
                             OSD.data.preview[j++] = [field, charCode];
                             // draw the preview
@@ -737,23 +750,26 @@ TABS.osd.initialize = function (callback) {
                         field.preview_img.src = canvas.toDataURL('image/png');
                     }
                     var centerishPosition = 194;
+
                     // artificial horizon
                     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-                        for (var i = 0; i < 9; i++) {
+                        for (i = 0; i < 9; i++) {
                             OSD.data.preview[centerishPosition - 4 + i] = SYM.AH_BAR9_0 + 4;
                         }
                     }
+
                     // crosshairs
                     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
                         OSD.data.preview[centerishPosition - 1] = SYM.AH_CENTER_LINE;
                         OSD.data.preview[centerishPosition + 1] = SYM.AH_CENTER_LINE_RIGHT;
                         OSD.data.preview[centerishPosition] = SYM.AH_CENTER;
                     }
+
                     // sidebars
                     if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
                         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
                         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-                        for (var i = -hudheight; i <= hudheight; i++) {
+                        for (i = -hudheight; i <= hudheight; i++) {
                             OSD.data.preview[centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE)] = SYM.AH_DECORATION;
                             OSD.data.preview[centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE)] = SYM.AH_DECORATION;
                         }
@@ -761,14 +777,15 @@ TABS.osd.initialize = function (callback) {
                         OSD.data.preview[centerishPosition - hudwidth + 1] = SYM.AH_LEFT;
                         OSD.data.preview[centerishPosition + hudwidth - 1] = SYM.AH_RIGHT;
                     }
+
                     // render
                     var $preview = $('.display-layout .preview').empty();
                     var $row = $('<div class="row"/>');
-                    for (var i = 0; i < OSD.data.display_size.total;) {
+                    for (i = 0; i < OSD.data.display_size.total;) {
                         var charCode = OSD.data.preview[i];
                         if (typeof charCode === 'object') {
                             var field = OSD.data.preview[i][0];
-                            var charCode = OSD.data.preview[i][1];
+                            charCode = OSD.data.preview[i][1];
                         }
                         var $img = $('<div class="char"><img src=' + FONT.draw(charCode) + '></img></div>')
                             .on('mouseenter', OSD.GUI.preview.onMouseEnter)
@@ -785,8 +802,7 @@ TABS.osd.initialize = function (callback) {
                                 .prop('draggable', true)
                                 .on('dragstart', OSD.GUI.preview.onDragStart);
                         }
-                        else {
-                        }
+
                         $row.append($img);
                         if (++i % OSD.data.display_size.x == 0) {
                             $preview.append($row);
@@ -794,7 +810,7 @@ TABS.osd.initialize = function (callback) {
                         }
                     }
                 });
-        };
+        }
 
         $('a.save').click(function () {
             var self = this;
@@ -851,18 +867,23 @@ TABS.osd.initialize = function (callback) {
         });
 
         $(document).on('click', 'span.progressLabel a.save_font', function () {
+            //noinspection JSUnresolvedVariable
             chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'baseflight', accepts: [
                 {extensions: ['mcm']}
             ]}, function (fileEntry) {
+                //noinspection JSUnresolvedVariable
                 if (chrome.runtime.lastError) {
+                    //noinspection JSUnresolvedVariable
                     console.error(chrome.runtime.lastError.message);
                     return;
                 }
 
+                //noinspection JSUnresolvedVariable
                 chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
                     console.log('Saving firmware to: ' + path);
 
                     // check if file is writable
+                    //noinspection JSUnresolvedVariable
                     chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
                         if (isWritable) {
                             var blob = new Blob([intel_hex], {type: 'text/plain'});

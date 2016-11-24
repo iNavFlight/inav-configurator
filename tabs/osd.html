@@ -7,7 +7,7 @@
             <a id="button-documentation" href="" target="_blank"></a>
         </div>
         <div class="unsupported hide">
-            <p class="note">Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated BetaFlight OSD.</p>
+            <p class="note">Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD.</p>
             <p class="note">Note that some flight controllers have an onboard <a href="https://www.youtube.com/watch?v=ikKH_6SQ-Tk" target="_blank">MinimOSD</a> that can be flashed and configured with <a href="https://github.com/ShikOfTheRa/scarab-osd/releases/latest" target="_blank">scarab-osd</a>, however the MinimOSD cannot be configured through this interface.</p>
         </div>
         <div class="supported hide">
@@ -16,7 +16,7 @@
                     <div class="gui_box grey">
                         <div
                             class="gui_box_titlebar"
-                            style="margin-bottom: 0px;">
+                            style="margin-bottom: 0">
                             <div class="spacer_box_title">
                                 Elements
                             </div>
@@ -31,7 +31,7 @@
                 <div class="gui_box grey preview" style="float: left;">
                     <div class="gui_box_titlebar image">
                         <div class="spacer_box_title">
-                          Preview <span>(drag to change position)</span><span class="preview-logo cf_tip" title="Show or hide the logo in the preview window. This will not change any settings on the flight controller."></span>
+                          Preview <span>(drag to change position)</span>
                         </div>
                     </div>
                     <div class="display-layout">
@@ -108,20 +108,21 @@
                         <div class="progressLabel" style="margin-top: -21px; width: 95%; text-align: center; color: white; position: absolute;"></div>
                     </div>
                 </div>
-                <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0px;
-                    ">
+                <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0;">
                     <a class="flash_font active">Upload Font</a>
                 </div>
             </div>
             <div class="clear-both"></div>
-            <div class="content_toolbar supported hide" style="left:0;">
-                <div class="btn">
-                    <a class="active save" href="#" >Save</a>
-                </div>
-                <div class="btn">
-                    <a class="fonts" id="fontmanager" href="#" >Font Manager</a>
-                </div>
-            </div>
+
+        </div>
+
+    </div>
+    <div class="content_toolbar supported hide" style="left:0;">
+        <div class="btn">
+            <a class="active save" href="#" >Save</a>
+        </div>
+        <div class="btn">
+            <a class="fonts" id="fontmanager" href="#" >Font Manager</a>
         </div>
     </div>
 </div>
