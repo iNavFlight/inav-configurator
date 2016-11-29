@@ -2,3 +2,5 @@
 nbproject/
 node_modules/
 .idea/
+npm-debug.log
+inav-configurator.iml
