@@ -354,24 +354,31 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#servo-rate-container').show();
         }
 
-        var gyroLpfValues = FC.getGyroLpfValues(),
-            looptimes = FC.getLooptimes(),
-            $looptime = $("#looptime"),
-            asyncModes = FC.getAsyncModes(),
-            gyroFrequencies = FC.getGyroFrequencies();
+        var $looptime = $("#looptime");
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+
+            //TODO move this up and use in more places
+            var fillSelect = function ($element, values) {
+                for (i in values) {
+                    if (values.hasOwnProperty(i)) {
+                        $element.append('<option value="' + i + '">' + values[i] + '</option>');
+                    }
+                }
+            };
 
             $(".requires-v1_4").show();
 
             var $gyroLpf = $("#gyro-lpf"),
                 $gyroSync = $("#gyro-sync-checkbox"),
                 $asyncMode = $('#async-mode'),
-                $gyroFrequency = $('#gyro-frequency');
+                $gyroFrequency = $('#gyro-frequency'),
+                $accelerometerFrequency = $('#accelerometer-frequency'),
+                $attitudeFrequency = $('#attitude-frequency');
 
-            for (i in gyroLpfValues) {
-                if (gyroLpfValues.hasOwnProperty(i)) {
-                    $gyroLpf.append('<option value="' + i + '">' + gyroLpfValues[i].label + '</option>');
+            for (i in FC.getGyroLpfValues()) {
+                if (FC.getGyroLpfValues().hasOwnProperty(i)) {
+                    $gyroLpf.append('<option value="' + i + '">' + FC.getGyroLpfValues()[i].label + '</option>');
                 }
             }
 
@@ -384,26 +391,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
 
-                $looptime.find("*").remove();
-                looptimeOptions = looptimes[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
-                for (i in looptimeOptions.looptimes) {
-                    if (looptimeOptions.looptimes.hasOwnProperty(i)) {
-                        $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                function fillSelect($element, values) {
+                    $element.find("*").remove();
+                    looptimeOptions = values[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick];
+                    for (i in looptimeOptions.looptimes) {
+                        if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                            $element.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                        }
                     }
+                    $element.val(looptimeOptions.defaultLooptime);
+                    $element.change();
                 }
-                $looptime.val(looptimeOptions.defaultLooptime);
-                $looptime.change();
 
-                $gyroFrequency.find("*").remove();
-                looptimeOptions = gyroFrequencies[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
-                for (i in looptimeOptions.looptimes) {
-                    if (looptimeOptions.looptimes.hasOwnProperty(i)) {
-                        $gyroFrequency.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
-                    }
-                }
-                $gyroFrequency.val(looptimeOptions.defaultLooptime);
-                $gyroFrequency.change();
-
+                fillSelect($looptime, FC.getLooptimes());
+                fillSelect($gyroFrequency, FC.getGyroFrequencies());
             });
 
             $gyroLpf.change();
@@ -414,14 +415,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
                 if (INAV_PID_CONFIG.asynchronousMode == 0) {
                     //All task running together
-                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
                 }
             });
             $looptime.change();
 
-            $gyroFrequency.val(ADVANCED_CONFIG.gyroSyncDenominator * gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+            $gyroFrequency.val(ADVANCED_CONFIG.gyroSyncDenominator * FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
             $gyroFrequency.change(function () {
-                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor($gyroFrequency.val() / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor($gyroFrequency.val() / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
             });
 
             $gyroSync.change(function () {
@@ -437,12 +438,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             /*
              * Async mode select
              */
-            for (i in asyncModes) {
-                if (asyncModes.hasOwnProperty(i)) {
-                    $asyncMode.append('<option value="' + i + '">' + asyncModes[i] + '</option>');
-                }
-            }
-
+            fillSelect($asyncMode, FC.getAsyncModes());
             $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
             $asyncMode.change(function () {
                 INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
@@ -450,17 +446,38 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 if (INAV_PID_CONFIG.asynchronousMode == 0) {
                     $('#gyro-sync-wrapper').show();
                     $('#gyro-frequency-wrapper').hide();
+                    $('#accelerometer-frequency-wrapper').hide();
+                    $('#attitude-frequency-wrapper').hide();
+                } else if (INAV_PID_CONFIG.asynchronousMode == 1) {
+                    $('#gyro-sync-wrapper').hide();
+                    $('#gyro-frequency-wrapper').show();
+                    $('#accelerometer-frequency-wrapper').hide();
+                    $('#attitude-frequency-wrapper').hide();
+                    ADVANCED_CONFIG.gyroSync = 1;
                 } else {
                     $('#gyro-sync-wrapper').hide();
                     $('#gyro-frequency-wrapper').show();
+                    $('#accelerometer-frequency-wrapper').show();
+                    $('#attitude-frequency-wrapper').show();
                     ADVANCED_CONFIG.gyroSync = 1;
                 }
             });
             $asyncMode.change();
 
+            fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies());
+            $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
+            $accelerometerFrequency.change(function () {
+                INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
+            });
+
+            fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies());
+            $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
+            $attitudeFrequency.change(function () {
+                INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
+            });
 
         } else {
-            var looptimeOptions = looptimes[125];
+            var looptimeOptions = FC.getLooptimes()[125];
             for (i in looptimeOptions.looptimes) {
                 if (looptimeOptions.looptimes.hasOwnProperty(i)) {
                     $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
@@ -641,6 +658,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function reboot() {
+                //noinspection JSUnresolvedVariable
                 GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
 
                 GUI.tab_switch_cleanup(function() {
@@ -649,6 +667,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function reinitialize() {
+                //noinspection JSUnresolvedVariable
                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
 
                 if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect

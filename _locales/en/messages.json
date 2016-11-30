@@ -1815,6 +1815,12 @@
         "message": "Asynchronous mode"
     },
     "configurationGyroFrequencyTitle": {
-        "message": "Gyroscope frequency"
+        "message": "Gyroscope task frequency"
+    },
+    "configurationAccelerometerFrequencyTitle": {
+        "message": "Accelerometer task frequency"
+    },
+    "configurationAttitudeFrequencyTitle": {
+        "message": "Attitude task frequency"
     }
 }

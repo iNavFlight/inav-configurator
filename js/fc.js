@@ -44,11 +44,7 @@ var FILTER_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
-        if (typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0")) {
-            return true;
-        } else {
-            return false;
-        }
+        return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
     resetState: function () {
         CONFIG = {
@@ -217,7 +213,7 @@ var FC = {
             gyroSoftLpfHz: null,
             dtermLpfHz: null,
             yawLpfHz: null
-        }
+        };
 
         PID_ADVANCED = {
             rollPitchItermIgnoreRate: null,
@@ -225,7 +221,7 @@ var FC = {
             yawPLimit: null,
             axisAccelerationLimitRollPitch: null,
             axisAccelerationLimitYaw: null
-        }
+        };
 
         INAV_PID_CONFIG = {
             asynchronousMode: null,
@@ -236,7 +232,7 @@ var FC = {
             yawJumpPreventionLimit: null,
             gyroscopeLpf: null,
             accSoftLpfHz: null
-        }
+        };
 
         _3D = {
             deadband3d_low: 0,
@@ -596,5 +592,25 @@ var FC = {
             'Gyro',
             'All'
         ]
+    },
+    getAccelerometerTaskFrequencies: function () {
+        return {
+            100: '100Hz',
+            200: '200Hz',
+            250: '250Hz',
+            500: '500Hz',
+            750: '750Hz',
+            1000: '1kHz'
+        }
+    },
+    getAttitudeTaskFrequencies: function () {
+        return {
+            100: '100Hz',
+            200: '200Hz',
+            250: '250Hz',
+            500: '500Hz',
+            750: '750Hz',
+            1000: '1kHz'
+        }
     }
 };
