@@ -407,6 +407,31 @@ var FC = {
             }
         };
     },
+    getGyroFrequencies: function () {
+        return {
+            125: {
+                defaultLooptime: 1000,
+                looptimes: {
+                    4000: "250Hz",
+                    3000: "334Hz",
+                    2000: "500Hz",
+                    1500: "667Hz",
+                    1000: "1kHz",
+                    500: "2kHz",
+                    250: "4kHz",
+                    125: "8kHz"
+                }
+            },
+            1000: {
+                defaultLooptime: 1000,
+                looptimes: {
+                    4000: "250Hz",
+                    2000: "500Hz",
+                    1000: "1kHz"
+                }
+            }
+        };
+    },
     getGyroLpfValues: function () {
         return [
             {
@@ -564,6 +589,12 @@ var FC = {
             200: "200Hz",
             400: "400Hz"
         };
+    },
+    getAsyncModes: function () {
+        return [
+            'Disabled',
+            'Gyro',
+            'All'
+        ]
     }
-
 };

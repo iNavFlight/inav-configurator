@@ -354,14 +354,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#servo-rate-container').show();
         }
 
-        var gyroLpfValues = FC.getGyroLpfValues();
-        var looptimes = FC.getLooptimes();
-        var $looptime = $("#looptime");
+        var gyroLpfValues = FC.getGyroLpfValues(),
+            looptimes = FC.getLooptimes(),
+            $looptime = $("#looptime"),
+            asyncModes = FC.getAsyncModes(),
+            gyroFrequencies = FC.getGyroFrequencies();
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
 
+            $(".requires-v1_4").show();
+
             var $gyroLpf = $("#gyro-lpf"),
-                $gyroSync = $("#gyro-sync-checkbox");
+                $gyroSync = $("#gyro-sync-checkbox"),
+                $asyncMode = $('#async-mode'),
+                $gyroFrequency = $('#gyro-frequency');
 
             for (i in gyroLpfValues) {
                 if (gyroLpfValues.hasOwnProperty(i)) {
@@ -373,35 +379,50 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
 
             $gyroLpf.change(function () {
+                var i,
+                    looptimeOptions;
+
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
 
                 $looptime.find("*").remove();
-                var looptimeOptions = looptimes[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
-                for (var i in looptimeOptions.looptimes) {
+                looptimeOptions = looptimes[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
+                for (i in looptimeOptions.looptimes) {
                     if (looptimeOptions.looptimes.hasOwnProperty(i)) {
                         $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
                     }
                 }
                 $looptime.val(looptimeOptions.defaultLooptime);
                 $looptime.change();
+
+                $gyroFrequency.find("*").remove();
+                looptimeOptions = gyroFrequencies[gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick];
+                for (i in looptimeOptions.looptimes) {
+                    if (looptimeOptions.looptimes.hasOwnProperty(i)) {
+                        $gyroFrequency.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
+                    }
+                }
+                $gyroFrequency.val(looptimeOptions.defaultLooptime);
+                $gyroFrequency.change();
+
             });
 
             $gyroLpf.change();
-            $looptime.val(FC_CONFIG.loopTime);
 
+            $looptime.val(FC_CONFIG.loopTime);
             $looptime.change(function () {
+                FC_CONFIG.loopTime = $(this).val();
+
                 if (INAV_PID_CONFIG.asynchronousMode == 0) {
                     //All task running together
-                    FC_CONFIG.loopTime = $(this).val();
-                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
-                } else {
-                    //FIXME this is temporaty fix that gives the same functionality to ASYNC_MODE=GYRO and ALL
-                    FC_CONFIG.loopTime = $(this).val();
                     ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
                 }
             });
-
             $looptime.change();
+
+            $gyroFrequency.val(ADVANCED_CONFIG.gyroSyncDenominator * gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+            $gyroFrequency.change(function () {
+                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor($gyroFrequency.val() / gyroLpfValues[INAV_PID_CONFIG.gyroscopeLpf].tick);
+            });
 
             $gyroSync.change(function () {
                 if ($(this).is(":checked")) {
@@ -413,7 +434,31 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             $gyroSync.change();
 
-            $(".requires-v1_4").show();
+            /*
+             * Async mode select
+             */
+            for (i in asyncModes) {
+                if (asyncModes.hasOwnProperty(i)) {
+                    $asyncMode.append('<option value="' + i + '">' + asyncModes[i] + '</option>');
+                }
+            }
+
+            $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
+            $asyncMode.change(function () {
+                INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
+
+                if (INAV_PID_CONFIG.asynchronousMode == 0) {
+                    $('#gyro-sync-wrapper').show();
+                    $('#gyro-frequency-wrapper').hide();
+                } else {
+                    $('#gyro-sync-wrapper').hide();
+                    $('#gyro-frequency-wrapper').show();
+                    ADVANCED_CONFIG.gyroSync = 1;
+                }
+            });
+            $asyncMode.change();
+
+
         } else {
             var looptimeOptions = looptimes[125];
             for (i in looptimeOptions.looptimes) {

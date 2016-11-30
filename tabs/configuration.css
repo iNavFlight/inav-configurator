@@ -203,6 +203,7 @@
 
 .tab-configuration .number,
 .tab-configuration .select,
+.tab-configuration .checkbox,
 hr
  {
     margin-bottom: 5px;
@@ -214,7 +215,8 @@ hr
 }
 
 .tab-configuration .number:last-child,
-.tab-configuration .select:last-child {
+.tab-configuration .select:last-child,
+.tab-configuration .checkbox:last-child{
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
