@@ -243,7 +243,6 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .gyroicon.active {
     background-image: url(images/icons/sensor_gyro_on.png);
-    color: #61d514;
     color: #818181;
 }
 
@@ -262,8 +261,12 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .accicon.active {
     background-image: url(images/icons/sensor_acc_on.png);
-    color: #61d514;
     color: #818181;
+}
+
+.accicon.error {
+    background-image: url(images/icons/sensor_acc_error.png);
+    color: #d40000;
 }
 
 .magicon {
@@ -282,6 +285,10 @@ input[type="number"]::-webkit-inner-spin-button {
 .magicon.active {
     background-image: url(images/icons/sensor_mag_on.png);
     color: #818181;
+}
+.magicon.error {
+    background-image: url(images/icons/sensor_mag_error.png);
+    color: #d40000;
 }
 
 .gpsicon {
@@ -302,6 +309,11 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #818181;
 }
 
+.gpsicon.error {
+    background-image: url(images/icons/sensor_sat_error.png);
+    color: #d40000;
+}
+
 .opflowicon {
     background-image: url(images/icons/sensor_flow_off.png);
     background-size: 42px;
@@ -318,6 +330,11 @@ input[type="number"]::-webkit-inner-spin-button {
 .opflowicon.active {
     background-image: url(images/icons/sensor_flow_on.png);
     color: #818181;
+}
+
+.opflowicon.error {
+    background-image: url(images/icons/sensor_flow_error.png);
+    color: #d40000;
 }
 
 .baroicon {
@@ -338,6 +355,11 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #818181;
 }
 
+.baroicon.error {
+    background-image: url(images/icons/sensor_baro_error.png);
+    color: #d40000;
+}
+
 .sonaricon {
     background-image: url(images/icons/sensor_sonar_off.png);
     background-size: 41px;
@@ -356,6 +378,11 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #818181;
 }
 
+.sonaricon.error {
+    background-image: url(images/icons/sensor_sonar_error.png);
+    color: #d40000;
+}
+
 .airspeedicon {
     background-image: url(images/icons/sensor_airspeed_off.png);
     background-size: 41px;
@@ -372,6 +399,11 @@ input[type="number"]::-webkit-inner-spin-button {
 .airspeedicon.active {
     background-image: url(images/icons/sensor_airspeed_on.png);
     color: #818181;
+}
+
+.airspeedicon.error {
+    background-image: url(images/icons/sensor_airspeed_error.png);
+    color: #d40000;
 }
 
 #sensor-status li:last-child {
