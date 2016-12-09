@@ -356,6 +356,24 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #818181;
 }
 
+.airspeedicon {
+    background-image: url(images/icons/sensor_airspeed_off.png);
+    background-size: 41px;
+    background-position: -4px 1px;
+    background-repeat: no-repeat;
+    height: 30px;
+    margin-top: 3px;
+    width: 100%;
+    padding-top: 40px;
+    color: #4f4f4f;
+    text-align: center;
+}
+
+.airspeedicon.active {
+    background-image: url(images/icons/sensor_airspeed_on.png);
+    color: #818181;
+}
+
 #sensor-status li:last-child {
     border-right: 0px solid #c0c0c0;
     border-top-right-radius: 5px;
