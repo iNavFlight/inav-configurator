@@ -41,8 +41,8 @@
 
                     <div id="esc-protocols">
                         <div class="select">
-                            <select name="esc-protocol" id="esc-protocol"></select>
-                            <label for="esc-protocol"> <span class="freelabel"
+                            <select name="esc-protocol" id="esc-protocol" style="width:auto;"></select>
+                            <label for="esc-protocol" style="margin-left:35px;"> <span class="freelabel"
                                 i18n="escProtocol"></span></label>
                                 <div class="helpicon cf_tip" i18n_title="escProtocolHelp"></div>
                         </div>
@@ -74,7 +74,7 @@
 
                     <div class="disarm">
                         <div class="checkbox">
-                            <div style="float: left; height: 20px; margin-right: 15px; margin-left: 3px;">
+                            <div style="float: left; height: 20px; margin-right: 22px; margin-left: 3px;">
                                 <input type="checkbox" name="disarmkillswitch" class="toggle" />
                             </div>
                             <label for="disarmkillswitch"> <span class="freelabel"
@@ -248,7 +248,7 @@
                             <p i18n="configurationSerialRXHelp"></p>
                         </div>
                     </div>
-                    <select class="serialRX" size="8">
+                    <select class="serialRX" size="4">
                         <!-- list generated here -->
                     </select>
                 </div>
@@ -258,7 +258,7 @@
                     <div class="spacer_box_title" i18n="configurationNrf24Protocol"></div>
                 </div>
                 <div class="spacer_box">
-                    <select class="nrf24Protocol" size="8">
+                    <select class="nrf24Protocol" size="4">
                         <!-- list generated here -->
                     </select>
                 </div>
@@ -352,7 +352,27 @@
         </div>
         <div class="clear-both"></div>
         <div class="leftWrapper gps">
-            <div class="gui_box grey">
+        <div class="gui_box grey rssi">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" i18n="configurationRSSI"></div>
+                        <div class="helpicon cf_tip" i18n_title="configurationRSSIHelp"></div>
+                    </div>
+                <div class="spacer_box">
+                    <table cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th i18n="configurationFeatureEnabled"></th>
+                                <th i18n="configurationFeatureDescription"></th>
+                                <th i18n="configurationFeatureName"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="features rssi">
+                            <!-- table generated here -->
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+                    <div class="gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" i18n="configurationGPS"></div>
                 </div>
@@ -399,52 +419,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="rightWrapper other">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationFeatures"></div>
-                </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features other" id="noline">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="leftWrapper rssi">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationRSSI"></div>
-                        <div class="helpicon cf_tip" i18n_title="configurationRSSIHelp"></div>
-                    </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features rssi">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="rightWrapper 3d">
-            <div class="gui_box grey">
+
+                    <div class="gui_box grey 3d">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" i18n="configuration3d"></div>
                 </div>
@@ -472,6 +448,29 @@
                 </div>
             </div>
         </div>
+        <div class="rightWrapper other">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" i18n="configurationFeatures"></div>
+                </div>
+                <div class="spacer_box">
+                    <table cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th i18n="configurationFeatureEnabled"></th>
+                                <th i18n="configurationFeatureDescription"></th>
+                                <th i18n="configurationFeatureName"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="features other" id="noline">
+                            <!-- table generated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+            
+
         <div class="clear-both"></div>
     </div>
     <div class="content_toolbar">
