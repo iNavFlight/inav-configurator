@@ -41,6 +41,7 @@ var ADVANCED_CONFIG;
 var INAV_PID_CONFIG;
 var PID_ADVANCED;
 var FILTER_CONFIG;
+var SENSOR_STATUS;
 
 var FC = {
     isRatesInDps: function () {
@@ -51,6 +52,18 @@ var FC = {
         }
     },
     resetState: function() {
+        SENSOR_STATUS = {
+            isHardwareHealthy:  0,
+            gyroHwStatus:       0,
+            accHwStatus:        0,
+            magHwStatus:        0,
+            baroHwStatus:       0,
+            gpsHwStatus:        0,
+            rangeHwStatus:      0,
+            speedHwStatus:      0,
+            flowHwStatus:       0,
+        };
+
         CONFIG = {
             apiVersion:    "0.0.0",
             flightControllerIdentifier: '',
