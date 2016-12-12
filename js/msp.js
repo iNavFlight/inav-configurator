@@ -80,6 +80,7 @@ var MSP_codes = {
     MSP_SENSOR_ALIGNMENT:   126,
     MSP_LED_STRIP_MODECOLOR:127,
     MSP_STATUS_EX:          150,
+    MSP_SENSOR_STATUS:      151,
 
     MSP_SET_RAW_RC:         200,
     MSP_SET_RAW_GPS:        201,
@@ -269,6 +270,7 @@ var MSP = {
                 CONFIG.msp_version = data.getUint8(2);
                 CONFIG.capability = data.getUint32(3, 1);
                 break;
+
             case MSP_codes.MSP_STATUS:
                 CONFIG.cycleTime = data.getUint16(0, 1);
                 CONFIG.i2cError = data.getUint16(2, 1);
@@ -277,10 +279,15 @@ var MSP = {
                 CONFIG.profile = data.getUint8(10);
                 $('select[name="profilechange"]').val(CONFIG.profile);
 
-                sensor_status(CONFIG.activeSensors);
+                // Only update sensors via MSP_STATUS if earlier than 1.5
+                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
+                    sensor_status(CONFIG.activeSensors);
+                }
+
                 $('span.i2c-error').text(CONFIG.i2cError);
                 $('span.cycle-time').text(CONFIG.cycleTime);
                 break;
+
             case MSP_codes.MSP_STATUS_EX:
                 CONFIG.cycleTime = data.getUint16(0, 1);
                 CONFIG.i2cError = data.getUint16(2, 1);
@@ -289,10 +296,27 @@ var MSP = {
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, 1);
 
-                sensor_status(CONFIG.activeSensors);
+                // Only update sensors via MSP_STATUS if earlier than 1.5
+                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
+                    sensor_status(CONFIG.activeSensors);
+                }
+
                 $('span.i2c-error').text(CONFIG.i2cError);
                 $('span.cycle-time').text(CONFIG.cycleTime);
                 $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+                break;
+
+            case MSP_codes.MSP_SENSOR_STATUS:
+                SENSOR_STATUS.isHardwareHealthy = data.getUint8(0);
+                SENSOR_STATUS.gyroHwStatus      = data.getUint8(1);
+                SENSOR_STATUS.accHwStatus       = data.getUint8(2);
+                SENSOR_STATUS.magHwStatus       = data.getUint8(3);
+                SENSOR_STATUS.baroHwStatus      = data.getUint8(4);
+                SENSOR_STATUS.gpsHwStatus       = data.getUint8(5);
+                SENSOR_STATUS.rangeHwStatus     = data.getUint8(6);
+                SENSOR_STATUS.speedHwStatus     = data.getUint8(7);
+                SENSOR_STATUS.flowHwStatus      = data.getUint8(8);
+                sensor_status_ex(SENSOR_STATUS);
                 break;
 
             case MSP_codes.MSP_RAW_IMU:
