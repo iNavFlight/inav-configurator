@@ -21,11 +21,11 @@
 
 .tab-configuration table tr td:first-child {
     text-align: left;
-    width: 62px;
+    width: 55px;
 }
 
 .tab-configuration table td {
-    padding: 5px 3px;
+    padding: 5px 0;
 }
 
 .tab-configuration table thead tr:first-child {
@@ -92,12 +92,13 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 57px;
+    width: 50px;
+    /*padding: 0px 5px;*/
     background-color: #ececec;
 }
 
 .tab-configuration .number span {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .tab-configuration .gps .line {
@@ -132,7 +133,7 @@
 
 .tab-configuration .current .checkbox div {
     float: left;
-    width: 74px;
+    width: 66px;
 }
 
 .tab-configuration .current .checkbox div input {
@@ -160,7 +161,7 @@
 }
 
 .tab-configuration .freelabel {
-    margin-left: 0px;
+    margin-left: 10px;
     position: relative;
 }
 
@@ -202,6 +203,7 @@
 
 .tab-configuration .number,
 .tab-configuration .select,
+.tab-configuration .checkbox,
 hr
  {
     margin-bottom: 5px;
@@ -213,7 +215,8 @@ hr
 }
 
 .tab-configuration .number:last-child,
-.tab-configuration .select:last-child {
+.tab-configuration .select:last-child,
+.tab-configuration .checkbox:last-child{
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
@@ -225,6 +228,7 @@ hr
 
 .tab-configuration .numberspacer {
     float: left;
+    width: 65px;
     height: 21px;
 }
 
@@ -244,7 +248,7 @@ hr
 }
 
 .tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
-    min-height: 139px;
+    min-height: 145px;
     float: left;
 }
 
@@ -259,6 +263,7 @@ hr
 }
 
 .tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
+    min-height: 355px;
     float: left;
     margin-bottom: 10px;
 }
@@ -268,15 +273,11 @@ hr
 }
 
 .tab-configuration .rxprovider {
-    /*min-height: 214px;*/
+    min-height: 214px;
 }
 
 .tab-configuration .nrf24provider {
-    /*min-height: 140px;*/
-}
-
-.tab-configuration .current .gui_box {
-    min-height: 247px;
+    min-height: 140px;
 }
 
 .tab-configuration .current td:nth-child(2) {
@@ -306,7 +307,7 @@ hr
 }
 
 .tab-configuration .mixerPreview {
-    max-width: 379px;
+    max-width: 230px;
     background-color: #eeeeee;
     text-align: center;
     float: left;
@@ -461,6 +462,7 @@ hr
         margin: 0 0 10px 15px;
     }
     .tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
+        min-height: 145px;
         float: left;
     }
     .tab-configuration .mixer .gui_box, .tab-configuration .motorstop .gui_box {
@@ -472,6 +474,7 @@ hr
         float: left;
     }
     .tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
+        min-height: 355px;
         float: left;
     }
     .tab-configuration .current .gui_box {
@@ -491,46 +494,24 @@ hr
 
 #esc-protocols .select,
 #servo-rate-container .select,
+.motorstop .select,
+.motorstop .checkbox,
+.motorstop .number,
 .system .select,
 .system .checkbox,
 .system .number {
     position: relative;
 }
 
-#servo-rate-container select {
-    width: 62px;
-}
-
-#esc-protocols select {
-    width: 62px;
-}
-
 #esc-protocols label,
 #servo-rate-container label,
+.motorstop label,
 .system label {
     position: absolute;
-    left: 73px;
+    left: 10em;
 }
 
-#esc-protocol label {
-    margin-left: 25px;
-}
-
-
-.tab-configuration .number:nth-child(3) {
-    border-bottom: none;
-    padding-bottom: 0px;
-}
-
-
-.tab-configuration .helpicon {
-    margin-right: 0px;
-}
-
-.tab-configuration .gui_box_titlebar .helpicon {
-    margin-right: 7px;
-}
-
-.tab-configuration td .helpicon {
-    margin-right: -2px;
+.esc-priority label,
+.features.esc label{
+    position: inherit;
 }
