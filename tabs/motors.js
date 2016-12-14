@@ -456,6 +456,15 @@ TABS.motors.initialize = function (callback) {
         
         function get_status() {
             // status needed for arming flag
+            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_sensor_status);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
+            }
+        }
+        
+        function get_sensor_status() {
             MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
         }
 

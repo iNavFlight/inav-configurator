@@ -69,6 +69,19 @@ var mspHelper = (function (gui) {
                 gui.updateStatusBar();
                 break;
 
+            case MSPCodes.MSP_SENSOR_STATUS:
+                SENSOR_STATUS.isHardwareHealthy = data.getUint8(0);
+                SENSOR_STATUS.gyroHwStatus      = data.getUint8(1);
+                SENSOR_STATUS.accHwStatus       = data.getUint8(2);
+                SENSOR_STATUS.magHwStatus       = data.getUint8(3);
+                SENSOR_STATUS.baroHwStatus      = data.getUint8(4);
+                SENSOR_STATUS.gpsHwStatus       = data.getUint8(5);
+                SENSOR_STATUS.rangeHwStatus     = data.getUint8(6);
+                SENSOR_STATUS.speedHwStatus     = data.getUint8(7);
+                SENSOR_STATUS.flowHwStatus      = data.getUint8(8);
+                sensor_status_ex(SENSOR_STATUS);
+                break;
+
             case MSPCodes.MSP_RAW_IMU:
                 // 512 for mpu6050, 256 for mma
                 // currently we are unable to differentiate between the sensor types, so we are goign with 512

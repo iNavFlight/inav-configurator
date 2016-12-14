@@ -622,10 +622,16 @@
         "message": "Magnetometer Declination [deg]"
     },
     "configurationAutoDisarmDelay": {
-        "message": "Disarm motors after set delay(Seconds) (Requires MOTOR_STOP feature)"
+        "message": "Disarm delay [Seconds]"
+    },
+    "configurationAutoDisarmDelayHelp": {
+        "message": "Requires MOTOR_STOP feature"
     },
     "configurationDisarmKillSwitch": {
-        "message": "Disarm motors regardless of throttle value (When arming via AUX channel)"
+        "message": "Disarm regardless of throttle value"
+    },
+    "configurationDisarmKillSwitchHelp": {
+        "message": "When arming via AUX channel"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -692,9 +698,6 @@
     },
     "configurationCalculatedCyclesSec": {
         "message": "Cycles/Sec (Hz)"
-    },
-    "configurationLoopTimeHelp": {
-        "message": "<strong>Note:</strong> Changing this may require PID re-tuning."
     },
     "configurationGPS": {
         "message": "GPS"
@@ -1810,6 +1813,36 @@
     },
     "pidTuningTPABreakPointHelp": {
         "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
+    },
+    "configurationAsyncMode": {
+        "message": "Asynchronous mode"
+    },
+    "configurationGyroFrequencyTitle": {
+        "message": "Gyroscope task frequency"
+    },
+    "configurationAccelerometerFrequencyTitle": {
+        "message": "Accelerometer task frequency"
+    },
+    "configurationAttitudeFrequencyTitle": {
+        "message": "Attitude task frequency"
+    },
+    "configurationGyroLpfHelp": {
+        "message": "Hardware based cutoff frequency for gyroscope. In general, bigger value is better but makes UAV more sensitive to vibrations"
+    },
+    "configurationAsyncModeHelp": {
+        "message": "See Firmware \"Looptime\" documentation for details"
+    },
+    "configurationGyroFrequencyHelp": {
+        "message": "In general, higher value is better but makes UAV more sensitive to vibrations. Should be kept above 'Flight Controller Loop Time' frequency. Maximal practical value is hardware dependant. If set too high, board might not run properly. Observe CPU usage."
+    },
+    "configurationAccelerometerFrequencyHelp": {
+        "message": "For Acro purposes, this value can be lowered from default"
+    },
+    "configurationAttitudeFrequencyHelp": {
+        "message": "For Acro purposes, this value can be lowered from default"
+    },
+    "configurationLoopTimeHelp": {
+        "message": "In general, higher value is better. With asynchronous gyroscope, should be kept below gyro update frequency. Maximal practical value is hardware dependant. If set too high, board might not run properly. Observe CPU usage."
     },
     "tabOSD": {
         "message": "OSD"

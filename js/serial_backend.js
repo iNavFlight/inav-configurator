@@ -308,79 +308,72 @@ function read_serial(info) {
     }
 }
 
-//FIXME move it into GUI
-function sensor_status(sensors_detected) {
-    // initialize variable (if it wasn't)
-    if (!sensor_status.previous_sensors_detected) {
-        sensor_status.previous_sensors_detected = -1; // Otherwise first iteration will not be run if sensors_detected == 0
-    }
+function sensor_status_ex(hw_status)
+{
+    var statusHash = sensor_status_hash(hw_status);
 
-    // update UI (if necessary)
-    if (sensor_status.previous_sensors_detected == sensors_detected) {
+    if (sensor_status_ex.previousHash == statusHash) {
         return;
     }
 
-    // set current value
-    sensor_status.previous_sensors_detected = sensors_detected;
+    sensor_status_ex.previousHash = statusHash;
 
+    sensor_status_update_icon('.gyro',      '.gyroicon',        hw_status.gyroHwStatus);
+    sensor_status_update_icon('.accel',     '.accicon',         hw_status.accHwStatus);
+    sensor_status_update_icon('.mag',       '.magicon',         hw_status.magHwStatus);
+    sensor_status_update_icon('.baro',      '.baroicon',        hw_status.baroHwStatus);
+    sensor_status_update_icon('.gps',       '.gpsicon',         hw_status.gpsHwStatus);
+    sensor_status_update_icon('.sonar',     '.sonaricon',       hw_status.rangeHwStatus);
+    sensor_status_update_icon('.airspeed',  '.airspeedicon',    hw_status.speedHwStatus);
+    sensor_status_update_icon('.opflow',    '.opflowicon',      hw_status.flowHwStatus);
+}
+
+function sensor_status_update_icon(sensId, sensIconId, status)
+{
     var e_sensor_status = $('#sensor-status');
 
-    if (have_sensor(sensors_detected, 'acc')) {
-        $('.accel', e_sensor_status).addClass('on');
-        $('.accicon', e_sensor_status).addClass('active');
-
-    } else {
-        $('.accel', e_sensor_status).removeClass('on');
-        $('.accicon', e_sensor_status).removeClass('active');
+    if (status == 0) {
+        $(sensId, e_sensor_status).removeClass('on');
+        $(sensIconId, e_sensor_status).removeClass('active');
+        $(sensIconId, e_sensor_status).removeClass('error');
     }
-
-    if (have_sensor(sensors_detected, 'gyro')) {
-        $('.gyro', e_sensor_status).addClass('on');
-        $('.gyroicon', e_sensor_status).addClass('active');
-    } else {
-        $('.gyro', e_sensor_status).removeClass('on');
-        $('.gyroicon', e_sensor_status).removeClass('active');
+    else if (status == 1) {
+        $(sensId, e_sensor_status).addClass('on');
+        $(sensIconId, e_sensor_status).addClass('active');
+        $(sensIconId, e_sensor_status).removeClass('error');
     }
-
-    if (have_sensor(sensors_detected, 'baro')) {
-        $('.baro', e_sensor_status).addClass('on');
-        $('.baroicon', e_sensor_status).addClass('active');
-    } else {
-        $('.baro', e_sensor_status).removeClass('on');
-        $('.baroicon', e_sensor_status).removeClass('active');
+    else {
+        $(sensId, e_sensor_status).removeClass('on');
+        $(sensIconId, e_sensor_status).removeClass('active');
+        $(sensIconId, e_sensor_status).addClass('error');
     }
+}
 
-    if (have_sensor(sensors_detected, 'mag')) {
-        $('.mag', e_sensor_status).addClass('on');
-        $('.magicon', e_sensor_status).addClass('active');
-    } else {
-        $('.mag', e_sensor_status).removeClass('on');
-        $('.magicon', e_sensor_status).removeClass('active');
-    }
+function sensor_status_hash(hw_status)
+{
+    return "S" +
+           hw_status.isHardwareHealthy +
+           hw_status.gyroHwStatus +
+           hw_status.accHwStatus +
+           hw_status.magHwStatus +
+           hw_status.baroHwStatus +
+           hw_status.gpsHwStatus +
+           hw_status.rangeHwStatus +
+           hw_status.speedHwStatus +
+           hw_status.flowHwStatus;
+}
 
-    if (have_sensor(sensors_detected, 'gps')) {
-        $('.gps', e_sensor_status).addClass('on');
-        $('.gpsicon', e_sensor_status).addClass('active');
-    } else {
-        $('.gps', e_sensor_status).removeClass('on');
-        $('.gpsicon', e_sensor_status).removeClass('active');
-    }
-
-    if (have_sensor(sensors_detected, 'sonar')) {
-        $('.sonar', e_sensor_status).addClass('on');
-        $('.sonaricon', e_sensor_status).addClass('active');
-    } else {
-        $('.sonar', e_sensor_status).removeClass('on');
-        $('.sonaricon', e_sensor_status).removeClass('active');
-    }
-
-    if (have_sensor(sensors_detected, 'opflow')) {
-        $('.opflow', e_sensor_status).addClass('on');
-        $('.opflowicon', e_sensor_status).addClass('active');
-    } else {
-        $('.opflow', e_sensor_status).removeClass('on');
-        $('.opflowicon', e_sensor_status).removeClass('active');
-    }
+function sensor_status(sensors_detected) {
+    SENSOR_STATUS.isHardwareHealthy = 1;
+    SENSOR_STATUS.gyroHwStatus      = have_sensor(sensors_detected, 'gyro') ? 1 : 0;
+    SENSOR_STATUS.accHwStatus       = have_sensor(sensors_detected, 'acc') ? 1 : 0;
+    SENSOR_STATUS.magHwStatus       = have_sensor(sensors_detected, 'mag') ? 1 : 0;
+    SENSOR_STATUS.baroHwStatus      = have_sensor(sensors_detected, 'baro') ? 1 : 0;
+    SENSOR_STATUS.gpsHwStatus       = have_sensor(sensors_detected, 'gps') ? 1 : 0;
+    SENSOR_STATUS.rangeHwStatus     = have_sensor(sensors_detected, 'sonar') ? 1 : 0;
+    SENSOR_STATUS.speedHwStatus     = have_sensor(sensors_detected, 'airspeed') ? 1 : 0;
+    SENSOR_STATUS.flowHwStatus      = have_sensor(sensors_detected, 'opflow') ? 1 : 0;
+    sensor_status_ex(SENSOR_STATUS);
 }
 
 function have_sensor(sensors_detected, sensor_code) {
@@ -398,6 +391,8 @@ function have_sensor(sensors_detected, sensor_code) {
             return bit_check(sensors_detected, 4);
         case 'opflow':
             return bit_check(sensors_detected, 5);
+        case 'airspeed':
+            return bit_check(sensors_detected, 6);
     }
     return false;
 }

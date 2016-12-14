@@ -82,6 +82,7 @@ var MSPCodes = {
     MSP_SENSOR_ALIGNMENT:   126,
     MSP_LED_STRIP_MODECOLOR:127,
     MSP_STATUS_EX:          150,
+    MSP_SENSOR_STATUS:      151,
 
     MSP_SET_RAW_RC:         200,
     MSP_SET_RAW_GPS:        201,

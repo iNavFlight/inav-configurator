@@ -25,7 +25,7 @@
 }
 
 .tab-configuration table td {
-    padding: 5px 3px;
+    padding: 5px 0;
 }
 
 .tab-configuration table thead tr:first-child {
@@ -203,6 +203,7 @@
 
 .tab-configuration .number,
 .tab-configuration .select,
+.tab-configuration .checkbox,
 hr
  {
     margin-bottom: 5px;
@@ -214,7 +215,8 @@ hr
 }
 
 .tab-configuration .number:last-child,
-.tab-configuration .select:last-child {
+.tab-configuration .select:last-child,
+.tab-configuration .checkbox:last-child{
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
@@ -492,6 +494,9 @@ hr
 
 #esc-protocols .select,
 #servo-rate-container .select,
+.motorstop .select,
+.motorstop .checkbox,
+.motorstop .number,
 .system .select,
 .system .checkbox,
 .system .number {
@@ -500,7 +505,13 @@ hr
 
 #esc-protocols label,
 #servo-rate-container label,
+.motorstop label,
 .system label {
     position: absolute;
     left: 10em;
+}
+
+.esc-priority label,
+.features.esc label{
+    position: inherit;
 }

@@ -67,9 +67,9 @@
     height: 100%;
     top: 0;
     left: 0;
-    background-size: 100%;
     background: url(../images/paper.jpg) center;
     border-radius: 5px;
+    background-size: contain;
 }
 
 #canvas {
