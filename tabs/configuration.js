@@ -356,17 +356,29 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var $looptime = $("#looptime");
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+        //TODO move this up and use in more places
+        var fillSelect = function ($element, values, currentValue, unit) {
+            if (unit == null) {
+                unit = '';
+            }
 
-            //TODO move this up and use in more places
-            var fillSelect = function ($element, values) {
-                for (i in values) {
-                    if (values.hasOwnProperty(i)) {
-                        $element.append('<option value="' + i + '">' + values[i] + '</option>');
-                    }
+            $element.find("*").remove();
+
+            for (i in values) {
+                if (values.hasOwnProperty(i)) {
+                    $element.append('<option value="' + i + '">' + values[i] + '</option>');
                 }
-            };
+            }
 
+            /*
+             *  If current Value is not on the list, add a new entry
+             */
+            if (currentValue != null && $element.find('[value="' + currentValue + '"]').length == 0) {
+                $element.append('<option value="' + currentValue + '">' + currentValue + unit + '</option>');
+            }
+        };
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             $(".requires-v1_4").show();
 
             var $gyroLpf = $("#gyro-lpf"),
@@ -376,9 +388,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $accelerometerFrequency = $('#accelerometer-frequency'),
                 $attitudeFrequency = $('#attitude-frequency');
 
-            for (i in FC.getGyroLpfValues()) {
-                if (FC.getGyroLpfValues().hasOwnProperty(i)) {
-                    $gyroLpf.append('<option value="' + i + '">' + FC.getGyroLpfValues()[i].label + '</option>');
+            var values = FC.getGyroLpfValues();
+
+            for (i in values) {
+                if (values.hasOwnProperty(i)) {
+                    //noinspection JSUnfilteredForInLoop
+                    $gyroLpf.append('<option value="' + i + '">' + values[i].label + '</option>');
                 }
             }
 
@@ -386,25 +401,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
 
             $gyroLpf.change(function () {
-                var i,
-                    looptimeOptions;
-
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
 
-                function fillSelect($element, values) {
-                    $element.find("*").remove();
-                    looptimeOptions = values[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick];
-                    for (i in looptimeOptions.looptimes) {
-                        if (looptimeOptions.looptimes.hasOwnProperty(i)) {
-                            $element.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
-                        }
-                    }
-                    $element.val(looptimeOptions.defaultLooptime);
-                    $element.change();
-                }
+                fillSelect(
+                    $looptime,
+                    FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
+                    FC_CONFIG.loopTime,
+                    'Hz'
+                );
+                $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
+                $looptime.change();
 
-                fillSelect($looptime, FC.getLooptimes());
-                fillSelect($gyroFrequency, FC.getGyroFrequencies());
+                fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
+                $gyroFrequency.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
+                $gyroFrequency.change();
             });
 
             $gyroLpf.change();
@@ -464,25 +474,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
             $asyncMode.change();
 
-            fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies());
+            fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
             $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
             $accelerometerFrequency.change(function () {
                 INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
             });
 
-            fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies());
+            fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
             $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
             $attitudeFrequency.change(function () {
                 INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
             });
 
         } else {
-            var looptimeOptions = FC.getLooptimes()[125];
-            for (i in looptimeOptions.looptimes) {
-                if (looptimeOptions.looptimes.hasOwnProperty(i)) {
-                    $looptime.append('<option value="' + i + '">' + looptimeOptions.looptimes[i] + '</option>');
-                }
-            }
+            fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
+
             $looptime.val(FC_CONFIG.loopTime);
             $looptime.change(function () {
                 FC_CONFIG.loopTime = $(this).val();
