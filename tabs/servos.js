@@ -190,6 +190,10 @@ TABS.servos.initialize = function (callback) {
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function () {
             MSP.send_message(MSP_codes.MSP_STATUS);
+
+            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                MSP.send_message(MSP_codes.MSP_SENSOR_STATUS);
+            }
         }, 250, true);
 
         GUI.content_ready(callback);
