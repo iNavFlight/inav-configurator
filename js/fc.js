@@ -625,5 +625,8 @@ var FC = {
             750: '750Hz',
             1000: '1kHz'
         }
+    },
+    getOsdDisabledFields: function () {
+        return ['CRAFT_NAME', 'VTX_CHANNEL']
     }
 };

@@ -394,9 +394,9 @@ OSD.chooseFields = function () {
         F.ONTIME,
         F.FLYTIME,
         F.FLYMODE,
-//        F.CRAFT_NAME,
+        F.CRAFT_NAME,
         F.THROTTLE_POSITION,
-//        F.VTX_CHANNEL,
+        F.VTX_CHANNEL,
         F.CURRENT_DRAW,
         F.MAH_DRAWN,
         F.GPS_SPEED,
@@ -671,6 +671,9 @@ TABS.osd.initialize = function (callback) {
 
                         var checked = field.isVisible ? 'checked' : '';
                         var $field = $('<div class="display-field field-' + field.index + '"/>');
+                        if (FC.getOsdDisabledFields().indexOf(field.name) != -1) {
+                            $field.hide();
+                        }
                         $field.append(
                             $('<input type="checkbox" name="' + field.name + '" class="togglesmall"></input>')
                                 .data('field', field)
