@@ -1843,5 +1843,8 @@
     },
     "configurationLoopTimeHelp": {
         "message": "In general, higher value is better. With asynchronous gyroscope, should be kept below gyro update frequency. Maximal practical value is hardware dependant. If set too high, board might not run properly. Observe CPU usage."
+    },
+    "tabOSD": {
+        "message": "OSD"
     }
 }

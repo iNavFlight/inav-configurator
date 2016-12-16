@@ -13,21 +13,21 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function get_pid_names() {
-        MSP.send_message(MSP_codes.MSP_PIDNAMES, false, false, get_pid_data);
+        MSP.send_message(MSPCodes.MSP_PIDNAMES, false, false, get_pid_data);
     }
 
     function get_pid_data() {
-        MSP.send_message(MSP_codes.MSP_PID, false, false, get_rc_tuning_data);
+        MSP.send_message(MSPCodes.MSP_PID, false, false, get_rc_tuning_data);
     }
 
     function get_rc_tuning_data() {
-        MSP.send_message(MSP_codes.MSP_RC_TUNING, false, false, loadINAVPidConfig);
+        MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, loadINAVPidConfig);
     }
 
     function loadINAVPidConfig() {
         var next_callback = loadPidAdvanced;
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -36,7 +36,7 @@ TABS.pid_tuning.initialize = function (callback) {
     function loadPidAdvanced() {
         var next_callback = loadFilterConfig;
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSP_codes.MSP_PID_ADVANCED, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -45,7 +45,7 @@ TABS.pid_tuning.initialize = function (callback) {
     function loadFilterConfig() {
         var next_callback = load_html;
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSP_codes.MSP_FILTER_CONFIG, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -57,7 +57,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     // requesting MSP_STATUS manually because it contains CONFIG.profile
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_pid_names);
+    MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_pid_names);
 
     var sectionClasses = [
         'ROLL', // 0
@@ -165,7 +165,7 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         $('#resetPIDs').on('click', function(){
-            MSP.send_message(MSP_codes.MSP_SET_RESET_CURR_PID, false, false, false);
+            MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
 	        updateActivatedTab();
         });
 
@@ -277,17 +277,17 @@ TABS.pid_tuning.initialize = function (callback) {
             form_to_pid_and_rc();
 
             function send_pids() {
-                MSP.send_message(MSP_codes.MSP_SET_PID, MSP.crunch(MSP_codes.MSP_SET_PID), false, send_rc_tuning_changes);
+                MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, send_rc_tuning_changes);
             }
 
             function send_rc_tuning_changes() {
-                MSP.send_message(MSP_codes.MSP_SET_RC_TUNING, MSP.crunch(MSP_codes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
+                MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
             }
 
             function saveINAVPidConfig() {
                 var next_callback = savePidAdvanced;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
                 }
@@ -296,7 +296,7 @@ TABS.pid_tuning.initialize = function (callback) {
             function savePidAdvanced() {
                 var next_callback = saveFilterConfig;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_PID_ADVANCED, MSP.crunch(MSP_codes.MSP_SET_PID_ADVANCED), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, next_callback);
                 } else {
                    next_callback();
                 }
@@ -305,14 +305,14 @@ TABS.pid_tuning.initialize = function (callback) {
             function saveFilterConfig() {
                 var next_callback = save_to_eeprom;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_FILTER_CONFIG, MSP.crunch(MSP_codes.MSP_SET_FILTER_CONFIG), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }
             }
 
             function save_to_eeprom() {
-                MSP.send_message(MSP_codes.MSP_EEPROM_WRITE, false, false, function () {
+                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('pidTuningEepromSaved'));
                 });
             }
@@ -322,7 +322,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSP_codes.MSP_STATUS);
+            MSP.send_message(MSPCodes.MSP_STATUS);
         }, 250, true);
 
         GUI.content_ready(callback);

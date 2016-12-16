@@ -12,22 +12,22 @@ TABS.modes.initialize = function (callback) {
     }
 
     function get_box_data() {
-        MSP.send_message(MSP_codes.MSP_BOX, false, false, get_box_ids);
+        MSP.send_message(MSPCodes.MSP_BOX, false, false, get_box_ids);
     }
 
     function get_box_ids() {
-        MSP.send_message(MSP_codes.MSP_BOXIDS, false, false, get_rc_data);
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
     }
 
     function get_rc_data() {
-        MSP.send_message(MSP_codes.MSP_RC, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
     }
 
     function load_html() {
         $('#content').load("./tabs/modes.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_BOXNAMES, false, false, get_box_data);
+    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_box_data);
 
     function process_html() {
         // generate heads according to RC count
@@ -87,12 +87,12 @@ TABS.modes.initialize = function (callback) {
             });
 
             function save_to_eeprom() {
-                MSP.send_message(MSP_codes.MSP_EEPROM_WRITE, false, false, function () {
+                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('auxiliaryEepromSaved'));
                 });
             }
 
-            MSP.send_message(MSP_codes.MSP_SET_BOX, MSP.crunch(MSP_codes.MSP_SET_BOX), false, save_to_eeprom);
+            MSP.send_message(MSPCodes.MSP_SET_BOX, mspHelper.crunch(MSPCodes.MSP_SET_BOX), false, save_to_eeprom);
         });
 
         // val = channel value
@@ -116,7 +116,7 @@ TABS.modes.initialize = function (callback) {
 
         // data pulling functions used inside interval timer
         function get_rc_data() {
-            MSP.send_message(MSP_codes.MSP_RC, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
         function update_ui() {
@@ -146,10 +146,10 @@ TABS.modes.initialize = function (callback) {
 
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSP_codes.MSP_STATUS);
+            MSP.send_message(MSPCodes.MSP_STATUS);
             
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSP_codes.MSP_SENSOR_STATUS);
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
         }, 250, true);
 

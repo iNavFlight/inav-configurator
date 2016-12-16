@@ -10,42 +10,42 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_config() {
-        MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_misc);
+        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_misc);
     }
 
     function load_misc() {
-        MSP.send_message(MSP_codes.MSP_MISC, false, false, load_arming_config);
+        MSP.send_message(MSPCodes.MSP_MISC, false, false, load_arming_config);
     }
 
     function load_arming_config() {
-        MSP.send_message(MSP_codes.MSP_ARMING_CONFIG, false, false, load_loop_time);
+        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, load_loop_time);
     }
 
     function load_loop_time() {
-        MSP.send_message(MSP_codes.MSP_LOOP_TIME, false, false, load_rx_config);
+        MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, load_rx_config);
     }
 
     function load_rx_config() {
         var next_callback = load_3d;
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            MSP.send_message(MSP_codes.MSP_RX_CONFIG, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
     }
 
     function load_3d() {
-        MSP.send_message(MSP_codes.MSP_3D, false, false, load_sensor_alignment);
+        MSP.send_message(MSPCodes.MSP_3D, false, false, load_sensor_alignment);
     }
 
     function load_sensor_alignment() {
-        MSP.send_message(MSP_codes.MSP_SENSOR_ALIGNMENT, false, false, loadAdvancedConfig);
+        MSP.send_message(MSPCodes.MSP_SENSOR_ALIGNMENT, false, false, loadAdvancedConfig);
     }
 
     function loadAdvancedConfig() {
         var next_callback = loadINAVPidConfig;
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSP_codes.MSP_ADVANCED_CONFIG, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -54,7 +54,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     function loadINAVPidConfig() {
         var next_callback = load_html;
         if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSP_codes.MSP_INAV_PID, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -62,7 +62,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     //Update Analog/Battery Data
     function load_analog() {
-        MSP.send_message(MSP_codes.MSP_ANALOG, false, false, function () {
+        MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
 	    $('input[name="batteryvoltage"]').val([ANALOG.voltage.toFixed(1)]);
 	    $('input[name="batterycurrent"]').val([ANALOG.amperage.toFixed(2)]);
             });
@@ -72,7 +72,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').load("./tabs/configuration.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_IDENT, false, false, load_config);
+    MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_config);
 
     function process_html() {
 
@@ -609,33 +609,33 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function save_misc() {
-                MSP.send_message(MSP_codes.MSP_SET_MISC, MSP.crunch(MSP_codes.MSP_SET_MISC), false, save_3d);
+                MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, save_3d);
             }
 
             function save_3d() {
-               MSP.send_message(MSP_codes.MSP_SET_3D, MSP.crunch(MSP_codes.MSP_SET_3D), false, save_sensor_alignment);
+               MSP.send_message(MSPCodes.MSP_SET_3D, mspHelper.crunch(MSPCodes.MSP_SET_3D), false, save_sensor_alignment);
             }
 
             function save_sensor_alignment() {
-               MSP.send_message(MSP_codes.MSP_SET_SENSOR_ALIGNMENT, MSP.crunch(MSP_codes.MSP_SET_SENSOR_ALIGNMENT), false, save_acc_trim);
+               MSP.send_message(MSPCodes.MSP_SET_SENSOR_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_ALIGNMENT), false, save_acc_trim);
             }
 
             function save_acc_trim() {
-                MSP.send_message(MSP_codes.MSP_SET_ACC_TRIM, MSP.crunch(MSP_codes.MSP_SET_ACC_TRIM), false, save_arming_config);
+                MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, save_arming_config);
             }
 
             function save_arming_config() {
-                MSP.send_message(MSP_codes.MSP_SET_ARMING_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ARMING_CONFIG), false, save_looptime_config);
+                MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, save_looptime_config);
             }
 
             function save_looptime_config() {
-                MSP.send_message(MSP_codes.MSP_SET_LOOP_TIME, MSP.crunch(MSP_codes.MSP_SET_LOOP_TIME), false, save_rx_config);
+                MSP.send_message(MSPCodes.MSP_SET_LOOP_TIME, mspHelper.crunch(MSPCodes.MSP_SET_LOOP_TIME), false, save_rx_config);
             }
 
             function save_rx_config() {
                 var next_callback = saveAdvancedConfig;
                 if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_RX_CONFIG, MSP.crunch(MSP_codes.MSP_SET_RX_CONFIG), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }
@@ -644,7 +644,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             function saveAdvancedConfig() {
                 var next_callback = saveINAVPidConfig;
                 if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_ADVANCED_CONFIG, MSP.crunch(MSP_codes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
                 } else {
                    next_callback();
                 }
@@ -653,14 +653,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             function saveINAVPidConfig() {
                 var next_callback = save_to_eeprom;
                 if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_INAV_PID, MSP.crunch(MSP_codes.MSP_SET_INAV_PID), false, next_callback);
+                   MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
                 }
             }
 
             function save_to_eeprom() {
-                MSP.send_message(MSP_codes.MSP_EEPROM_WRITE, false, false, reboot);
+                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, reboot);
             }
 
             function reboot() {
@@ -668,7 +668,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
 
                 GUI.tab_switch_cleanup(function() {
-                    MSP.send_message(MSP_codes.MSP_SET_REBOOT, false, false, reinitialize);
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
                 });
             }
 
@@ -684,7 +684,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 } else {
 
                     GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
-                        MSP.send_message(MSP_codes.MSP_IDENT, false, false, function () {
+                        MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
                             //noinspection JSUnresolvedVariable
                             GUI.log(chrome.i18n.getMessage('deviceReady'));
                             //noinspection JSValidateTypes
@@ -694,15 +694,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-            MSP.send_message(MSP_codes.MSP_SET_BF_CONFIG, MSP.crunch(MSP_codes.MSP_SET_BF_CONFIG), false, save_misc);
+            MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, save_misc);
         });
 
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSP_codes.MSP_STATUS);
+            MSP.send_message(MSPCodes.MSP_STATUS);
             
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSP_codes.MSP_SENSOR_STATUS);
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
         }, 250, true);
         GUI.interval_add('config_load_analog', load_analog, 250, true); // 4 fps

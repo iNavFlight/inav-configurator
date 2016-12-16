@@ -1,3 +1,4 @@
+/*global $*/
 'use strict';
 
 var TABS = {}; // filled by individual tab js file
@@ -35,7 +36,8 @@ var GUI_control = function () {
         'receiver',
         'sensors',
         'servos',
-        'setup'
+        'setup',
+        'osd'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -239,6 +241,44 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
     }
 };
 
+GUI_control.prototype.switchery = function() {
+    $('.togglesmall').each(function(index, elem) {
+        var switchery = new Switchery(elem, {
+            size: 'small',
+            color: '#ffbb00',
+            secondaryColor: '#c4c4c4'
+        });
+        $(elem).on("change", function (evt) {
+            switchery.setPosition();
+        });
+        $(elem).removeClass('togglesmall');
+    });
+
+    $('.toggle').each(function(index, elem) {
+        var switchery = new Switchery(elem, {
+            color: '#ffbb00',
+            secondaryColor: '#c4c4c4'
+        });
+        $(elem).on("change", function (evt) {
+            switchery.setPosition();
+        });
+        $(elem).removeClass('toggle');
+    });
+
+    $('.togglemedium').each(function(index, elem) {
+        var switchery = new Switchery(elem, {
+            className: 'switcherymid',
+            color: '#ffbb00',
+            secondaryColor: '#c4c4c4'
+        });
+        $(elem).on("change", function (evt) {
+            switchery.setPosition();
+        });
+        $(elem).removeClass('togglemedium');
+    });
+};
+
+
 GUI_control.prototype.content_ready = function (callback) {
 
     $('.togglesmall').each(function(index, elem) {
@@ -303,7 +343,17 @@ GUI_control.prototype.content_ready = function (callback) {
     });
 
     if (callback) callback();
-}
+};
+
+GUI_control.prototype.updateStatusBar = function() {
+    $('span.i2c-error').text(CONFIG.i2cError);
+    $('span.cycle-time').text(CONFIG.cycleTime);
+    $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+};
+
+GUI_control.prototype.updateProfileChange = function() {
+    $('#profilechange').val(CONFIG.profile);
+};
 
 // initialize object into GUI variable
 var GUI = new GUI_control();

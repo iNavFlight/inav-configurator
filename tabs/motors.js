@@ -18,18 +18,18 @@ TABS.motors.initialize = function (callback) {
     }
 
     function get_arm_status() {
-        MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_config);
+        MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_config);
     }
     
     function load_config() {
-        MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_3d);
+        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_3d);
     }
     
     function load_3d() {
         var next_callback = get_motor_data;
         if (semver.gte(CONFIG.apiVersion, "1.14.0")) {
             self.feature3DSupported = true;
-            MSP.send_message(MSP_codes.MSP_3D, false, false, next_callback);
+            MSP.send_message(MSPCodes.MSP_3D, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -38,14 +38,14 @@ TABS.motors.initialize = function (callback) {
     
     function get_motor_data() {
         update_arm_status();
-        MSP.send_message(MSP_codes.MSP_MOTOR, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_MOTOR, false, false, load_html);
     }
 
     function load_html() {
         $('#content').load("./tabs/motors.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_MISC, false, false, get_arm_status);
+    MSP.send_message(MSPCodes.MSP_MISC, false, false, get_arm_status);
 
     function update_arm_status() {
         self.armed = bit_check(CONFIG.mode, 0);
@@ -246,7 +246,7 @@ TABS.motors.initialize = function (callback) {
             GUI.interval_kill_all(['motor_and_status_pull']);
 
             GUI.interval_add('IMU_pull', function imu_data_pull() {
-                MSP.send_message(MSP_codes.MSP_RAW_IMU, false, false, update_accel_graph);
+                MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
             }, rate, true);
 
             function update_accel_graph() {
@@ -366,7 +366,7 @@ TABS.motors.initialize = function (callback) {
                    buffer_delay = setTimeout(function () {
                        buffer = buffering_set_motor.pop();
                     
-                       MSP.send_message(MSP_codes.MSP_SET_MOTOR, buffer);
+                       MSP.send_message(MSPCodes.MSP_SET_MOTOR, buffer);
 
                        buffering_set_motor = [];
                        buffer_delay = false;
@@ -457,23 +457,23 @@ TABS.motors.initialize = function (callback) {
         function get_status() {
             // status needed for arming flag
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_sensor_status);
+                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_sensor_status);
             }
             else {
-                MSP.send_message(MSP_codes.MSP_STATUS, false, false, get_motor_data);
+                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
             }
         }
         
         function get_sensor_status() {
-            MSP.send_message(MSP_codes.MSP_SENSOR_STATUS, false, false, get_motor_data);
+            MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
         }
 
         function get_motor_data() {
-            MSP.send_message(MSP_codes.MSP_MOTOR, false, false, get_servo_data);
+            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, get_servo_data);
         }
 
         function get_servo_data() {
-            MSP.send_message(MSP_codes.MSP_SERVO, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;

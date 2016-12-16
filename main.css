@@ -1878,3 +1878,12 @@ select {
     border-radius: 3px;
     padding: 1px;
 }
+
+.ic_osd {
+    background-image: url(images/icons/icon_osd.svg);
+    background-position-y: 4px;
+}
+
+.ic_osd:hover, li.active .ic_osd {
+    background-image: url(images/icons/icon_osd_white.svg);
+}

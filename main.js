@@ -1,3 +1,4 @@
+/*global $, chrome*/
 'use strict';
 
 // Google Analytics
@@ -162,6 +163,9 @@ $(document).ready(function () {
                         break;
                     case 'motors':
                         TABS.motors.initialize(content_ready);
+                        break;
+                    case 'osd':
+                        TABS.osd.initialize(content_ready);
                         break;
                     case 'sensors':
                         TABS.sensors.initialize(content_ready);
@@ -346,11 +350,11 @@ $(document).ready(function () {
 
     });
 
-    var profile_e = $('select[name="profilechange"]');
+    var profile_e = $('#profilechange');
 
     profile_e.change(function () {
         var profile = parseInt($(this).val());
-        MSP.send_message(MSP_codes.MSP_SELECT_SETTING, [profile], false, function () {
+        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
             GUI.log(chrome.i18n.getMessage('pidTuningLoadedProfile', [profile + 1]));
             updateActivatedTab();
         });

@@ -1,6 +1,7 @@
 .DS_store
 nbproject/
 node_modules/
+npm-debug.log
 .idea/
 npm-debug.log
 inav-configurator.iml

@@ -13,7 +13,7 @@ TABS.gps.initialize = function (callback) {
         $('#content').load("./tabs/gps.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_html);
+    MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_html);
     
     function set_online(){
         $('#connect').hide();
@@ -32,15 +32,15 @@ TABS.gps.initialize = function (callback) {
         localize();
 
         function get_raw_gps_data() {
-            MSP.send_message(MSP_codes.MSP_RAW_GPS, false, false, get_comp_gps_data);
+            MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
         }
 
         function get_comp_gps_data() {
-            MSP.send_message(MSP_codes.MSP_COMP_GPS, false, false, get_gpsstatistics_data);
+            MSP.send_message(MSPCodes.MSP_COMP_GPS, false, false, get_gpsstatistics_data);
         }
 
         function get_gpsstatistics_data() {
-            MSP.send_message(MSP_codes.MSP_GPSSTATISTICS, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP_GPSSTATISTICS, false, false, update_ui);
         }
 
         function update_ui() {
@@ -113,10 +113,10 @@ TABS.gps.initialize = function (callback) {
 
         // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSP_codes.MSP_STATUS);
+            MSP.send_message(MSPCodes.MSP_STATUS);
             
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSP_codes.MSP_SENSOR_STATUS);
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
         }, 250, true);
 
