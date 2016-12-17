@@ -508,6 +508,39 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
 
+            var $sensorAcc = $('#sensor-acc'),
+                $sensorMag = $('#sensor-mag'),
+                $sensorBaro = $('#sensor-baro'),
+                $sensorPitot = $('#sensor-pitot');
+
+            $sensorAcc.prop("checked", !!SENSOR_CONFIG.accelerometer);
+            $sensorAcc.change(function () {
+                if ($(this).is(":checked")) {
+                    SENSOR_CONFIG.accelerometer = 1;
+                } else {
+                    SENSOR_CONFIG.accelerometer = 0;
+                }
+            });
+
+
+            fillSelect($sensorMag, FC.getMagnetometerNames());
+            $sensorMag.val(SENSOR_CONFIG.magnetometer);
+            $sensorMag.change(function () {
+                SENSOR_CONFIG.magnetometer = $sensorMag.val();
+            });
+
+            fillSelect($sensorBaro, FC.getBarometerNames());
+            $sensorBaro.val(SENSOR_CONFIG.barometer);
+            $sensorBaro.change(function () {
+                SENSOR_CONFIG.barometer = $sensorBaro.val();
+            });
+
+            fillSelect($sensorPitot, FC.getPitotNames());
+            $sensorPitot.val(SENSOR_CONFIG.pitot);
+            $sensorPitot.change(function () {
+                SENSOR_CONFIG.pitot = $sensorPitot.val();
+            });
+
             $(".requires-v1_5").show();
         } else {
             $(".requires-v1_5").hide();
@@ -666,11 +699,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function saveINAVPidConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveSensorConfig;
                 if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
                    MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
+                }
+            }
+
+            function saveSensorConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                    MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, next_callback);
+                } else {
+                    next_callback();
                 }
             }
 

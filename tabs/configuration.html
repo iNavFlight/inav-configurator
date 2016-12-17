@@ -9,8 +9,8 @@
                 <p data-i18n="configurationFeaturesHelp"></p>
             </div>
         </div>
-        <div class="leftWrapper mixer">
-            <div class="gui_box grey">
+        <div class="leftWrapper">
+            <div class="mixer gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationMixer"></div>
                 </div>
@@ -25,9 +25,100 @@
                     </div>
                 </div>
             </div>
+            <div class="config-section sensors gui_box grey requires-v1_5">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationSensors"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="sensor-acc" class="toggle" />
+                        <label for="sensor-acc">
+                            <span data-i18n="sensorAccelerometer"></span>
+                        </label>
+                    </div>
+
+                    <!--<div class="select">-->
+                        <!--<select id="sensor-acc"></select>-->
+                        <!--<label for="sensor-acc"> <span data-i18n="sensorAccelerometer"></span></label>-->
+                    <!--</div>-->
+
+                    <div class="select">
+                        <select id="sensor-mag"></select>
+                        <label for="sensor-mag"> <span data-i18n="sensorMagnetometer"></span></label>
+                    </div>
+
+                    <div class="select">
+                        <select id="sensor-baro"></select>
+                        <label for="sensor-baro"> <span data-i18n="sensorBarometer"></span></label>
+                    </div>
+
+                    <div class="select">
+                        <select id="sensor-pitot"></select>
+                        <label for="sensor-pitot"> <span data-i18n="sensorPitot"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="board gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationBoardAlignment"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="configHelp2"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="board_align_content">
+                        <div class="number">
+                            <label> <input type="number" name="board_align_roll" step="0.1" min="-180" max="360" /> <span
+                                    data-i18n="configurationBoardAlignmentRoll"></span>
+                            </label>
+                            <div class="alignicon roll"></div>
+                        </div>
+                        <div class="number">
+                            <label> <input type="number" name="board_align_pitch" step="0.1" min="-180" max="360" />
+                                <span data-i18n="configurationBoardAlignmentPitch"></span>
+                            </label>
+                            <div class="alignicon pitch"></div>
+                        </div>
+                        <div class="number">
+                            <label> <input type="number" name="board_align_yaw" step="0.1" min="-180" max="360" /> <span
+                                    data-i18n="configurationBoardAlignmentYaw"></span>
+                            </label>
+                            <div class="alignicon yaw"></div>
+                        </div>
+                    </div>
+                    <div class="sensoralignment">
+                        <div class="select">
+                            <label>
+                                <span data-i18n="configurationSensorAlignmentGyro"></span>
+                                <select class="gyroalign">
+                                    <option value="0">Default</option>
+                                    <!-- list generated here -->
+                                </select>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <label>
+                                <span data-i18n="configurationSensorAlignmentAcc"></span>
+                                <select class="accalign">
+                                    <option value="0">Default</option>
+                                    <!-- list generated here -->
+                                </select>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <label>
+                                <span data-i18n="configurationSensorAlignmentMag"></span>
+                                <select class="magalign">
+                                    <option value="0">Default</option>
+                                    <!-- list generated here -->
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="rightWrapper motorstop">
-            <div class="gui_box grey">
+        <div class="rightWrapper">
+            <div class="motorstop gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationEscFeatures"></div>
                 </div>
@@ -118,69 +209,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="clear-both"></div>
-        <div class="leftWrapper board">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationBoardAlignment"></div>
-                    <div class="helpicon cf_tip" data-i18n_title="configHelp2"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="board_align_content">
-                        <div class="number">
-                            <label> <input type="number" name="board_align_roll" step="0.1" min="-180" max="360" /> <span
-                                data-i18n="configurationBoardAlignmentRoll"></span>
-                            </label>
-                            <div class="alignicon roll"></div>
-                        </div>
-                        <div class="number">
-                            <label> <input type="number" name="board_align_pitch" step="0.1" min="-180" max="360" />
-                            <span data-i18n="configurationBoardAlignmentPitch"></span>
-                            </label>
-                            <div class="alignicon pitch"></div>
-                        </div>
-                        <div class="number">
-                            <label> <input type="number" name="board_align_yaw" step="0.1" min="-180" max="360" /> <span
-                                data-i18n="configurationBoardAlignmentYaw"></span>
-                            </label>
-                            <div class="alignicon yaw"></div>
-                        </div>
-                    </div>
-                    <div class="sensoralignment">
-                        <div class="select">
-                            <label>
-                                <span data-i18n="configurationSensorAlignmentGyro"></span>
-                                <select class="gyroalign">
-                                    <option value="0">Default</option>
-                                    <!-- list generated here -->
-                                </select>
-                            </label>
-                        </div>
-                        <div class="select">
-                            <label>
-                                <span data-i18n="configurationSensorAlignmentAcc"></span>
-                                <select class="accalign">
-                                    <option value="0">Default</option>
-                                    <!-- list generated here -->
-                                </select>
-                            </label>
-                        </div>
-                        <div class="select">
-                            <label>
-                                <span data-i18n="configurationSensorAlignmentMag"></span>
-                                <select class="magalign">
-                                    <option value="0">Default</option>
-                                    <!-- list generated here -->
-                                </select>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="rightWrapper system">
-            <div class="gui_box grey">
+            <div class="system gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationSystem"></div>
                 </div>
