@@ -42,22 +42,32 @@ var INAV_PID_CONFIG;
 var PID_ADVANCED;
 var FILTER_CONFIG;
 var SENSOR_STATUS;
+var SENSOR_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
-    resetState: function() {
+    resetState: function () {
         SENSOR_STATUS = {
-            isHardwareHealthy:  0,
-            gyroHwStatus:       0,
-            accHwStatus:        0,
-            magHwStatus:        0,
-            baroHwStatus:       0,
-            gpsHwStatus:        0,
-            rangeHwStatus:      0,
-            speedHwStatus:      0,
-            flowHwStatus:       0
+            isHardwareHealthy: 0,
+            gyroHwStatus: 0,
+            accHwStatus: 0,
+            magHwStatus: 0,
+            baroHwStatus: 0,
+            gpsHwStatus: 0,
+            rangeHwStatus: 0,
+            speedHwStatus: 0,
+            flowHwStatus: 0
+        };
+
+        SENSOR_CONFIG = {
+            accelerometer: 0,
+            barometer: 0,
+            magnetometer: 0,
+            pitot: 0,
+            rangefinder: 0,
+            opflow: 0
         };
 
         CONFIG = {
@@ -628,5 +638,20 @@ var FC = {
     },
     getOsdDisabledFields: function () {
         return ['CRAFT_NAME', 'VTX_CHANNEL']
+    },
+    getAccelerometerNames: function () {
+        return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
+    },
+    getMagnetometerNames: function () {
+        return ["NONE", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
+    },
+    getBarometerNames: function () {
+        return ["NONE", "BMP085", "MS5611", "BMP280", "FAKE"];
+    },
+    getPitotNames: function () {
+        return ["NONE", "MS4525", "FAKE"];
+    },
+    getRangefinderNames: function () {
+        return ["NONE", "HCSR04", "SRF10"];
     }
 };

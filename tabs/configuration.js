@@ -52,9 +52,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function loadINAVPidConfig() {
-        var next_callback = load_html;
+        var next_callback = loadSensorConfig;
         if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function loadSensorConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -497,6 +506,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_4").hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+
+            $(".requires-v1_5").show();
+        } else {
+            $(".requires-v1_5").hide();
+        }
 
         $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
         $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);

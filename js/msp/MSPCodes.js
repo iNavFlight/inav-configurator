@@ -54,6 +54,8 @@ var MSPCodes = {
     MSP_SET_FILTER_CONFIG:      93,
     MSP_PID_ADVANCED:           94,
     MSP_SET_PID_ADVANCED:       95,
+    MSP_SENSOR_CONFIG:          96,
+    MSP_SET_SENSOR_CONFIG:      97,
 
     // Multiwii MSP commands
     MSP_IDENT:              100,
