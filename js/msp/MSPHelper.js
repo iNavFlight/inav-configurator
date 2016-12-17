@@ -55,7 +55,15 @@ var mspHelper = (function (gui) {
                 CONFIG.profile = data.getUint8(10);
                 gui.updateProfileChange();
                 gui.updateStatusBar();
-                sensor_status(CONFIG.activeSensors);
+
+                /*
+                 * Update sensor status only for older firmwares
+                 * Newer firmwares use MSP_STATUS_EX instead
+                 */
+                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
+                    sensor_status(CONFIG.activeSensors);
+                }
+
                 break;
             case MSPCodes.MSP_STATUS_EX:
                 CONFIG.cycleTime = data.getUint16(0, 1);
@@ -65,7 +73,9 @@ var mspHelper = (function (gui) {
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, 1);
 
-                sensor_status(CONFIG.activeSensors);
+                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
+                    sensor_status(CONFIG.activeSensors);
+                }
                 gui.updateStatusBar();
                 break;
 
@@ -79,7 +89,9 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus     = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus     = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus      = data.getUint8(8);
-                sensor_status_ex(SENSOR_STATUS);
+                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                    sensor_status_ex(SENSOR_STATUS);
+                }
                 break;
 
             case MSPCodes.MSP_RAW_IMU:

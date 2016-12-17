@@ -308,6 +308,10 @@ function read_serial(info) {
     }
 }
 
+/**
+ * Sensor handler used in INAV >= 1.5
+ * @param hw_status
+ */
 function sensor_status_ex(hw_status)
 {
     var statusHash = sensor_status_hash(hw_status);
@@ -363,6 +367,11 @@ function sensor_status_hash(hw_status)
            hw_status.flowHwStatus;
 }
 
+/**
+ * Legacy sensor handler used in INAV < 1.5 versions
+ * @param sensors_detected
+ * @deprecated
+ */
 function sensor_status(sensors_detected) {
     SENSOR_STATUS.isHardwareHealthy = 1;
     SENSOR_STATUS.gyroHwStatus      = have_sensor(sensors_detected, 'gyro') ? 1 : 0;
