@@ -513,13 +513,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $sensorBaro = $('#sensor-baro'),
                 $sensorPitot = $('#sensor-pitot');
 
-            $sensorAcc.prop("checked", !!SENSOR_CONFIG.accelerometer);
+            fillSelect($sensorAcc, FC.getAccelerometerNames());
+            $sensorAcc.val(SENSOR_CONFIG.accelerometer);
             $sensorAcc.change(function () {
-                if ($(this).is(":checked")) {
-                    SENSOR_CONFIG.accelerometer = 1;
-                } else {
-                    SENSOR_CONFIG.accelerometer = 0;
-                }
+                SENSOR_CONFIG.accelerometer = $sensorAcc.val();
             });
 
 

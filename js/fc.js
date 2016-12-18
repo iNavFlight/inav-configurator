@@ -643,15 +643,15 @@ var FC = {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
     },
     getMagnetometerNames: function () {
-        return ["NONE", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
+        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
     },
     getBarometerNames: function () {
-        return ["NONE", "BMP085", "MS5611", "BMP280", "FAKE"];
+        return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
     },
     getPitotNames: function () {
-        return ["NONE", "MS4525", "FAKE"];
+        return ["NONE", "AUTO", "MS4525", "FAKE"];
     },
     getRangefinderNames: function () {
-        return ["NONE", "HCSR04", "SRF10"];
+        return ["NONE", "AUTO", "HCSR04", "SRF10"];
     }
 };
