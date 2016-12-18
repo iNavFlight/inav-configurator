@@ -52,9 +52,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function loadINAVPidConfig() {
-        var next_callback = load_html;
+        var next_callback = loadSensorConfig;
         if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
+        } else {
+            next_callback();
+        }
+    }
+
+    function loadSensorConfig() {
+        var next_callback = load_html;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, next_callback);
         } else {
             next_callback();
         }
@@ -497,6 +506,42 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_4").hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+
+            var $sensorAcc = $('#sensor-acc'),
+                $sensorMag = $('#sensor-mag'),
+                $sensorBaro = $('#sensor-baro'),
+                $sensorPitot = $('#sensor-pitot');
+
+            fillSelect($sensorAcc, FC.getAccelerometerNames());
+            $sensorAcc.val(SENSOR_CONFIG.accelerometer);
+            $sensorAcc.change(function () {
+                SENSOR_CONFIG.accelerometer = $sensorAcc.val();
+            });
+
+
+            fillSelect($sensorMag, FC.getMagnetometerNames());
+            $sensorMag.val(SENSOR_CONFIG.magnetometer);
+            $sensorMag.change(function () {
+                SENSOR_CONFIG.magnetometer = $sensorMag.val();
+            });
+
+            fillSelect($sensorBaro, FC.getBarometerNames());
+            $sensorBaro.val(SENSOR_CONFIG.barometer);
+            $sensorBaro.change(function () {
+                SENSOR_CONFIG.barometer = $sensorBaro.val();
+            });
+
+            fillSelect($sensorPitot, FC.getPitotNames());
+            $sensorPitot.val(SENSOR_CONFIG.pitot);
+            $sensorPitot.change(function () {
+                SENSOR_CONFIG.pitot = $sensorPitot.val();
+            });
+
+            $(".requires-v1_5").show();
+        } else {
+            $(".requires-v1_5").hide();
+        }
 
         $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
         $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
@@ -651,11 +696,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function saveINAVPidConfig() {
-                var next_callback = save_to_eeprom;
+                var next_callback = saveSensorConfig;
                 if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
                    MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, next_callback);
                 } else {
                    next_callback();
+                }
+            }
+
+            function saveSensorConfig() {
+                var next_callback = save_to_eeprom;
+                if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                    MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, next_callback);
+                } else {
+                    next_callback();
                 }
             }
 

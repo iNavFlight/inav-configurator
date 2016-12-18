@@ -1846,5 +1846,20 @@
     },
     "tabOSD": {
         "message": "OSD"
+    },
+    "configurationSensors": {
+        "message": "Sensors"
+    },
+    "sensorAccelerometer": {
+        "message": "Accelerometer"
+    },
+    "sensorMagnetometer": {
+        "message": "Magnetometer"
+    },
+    "sensorBarometer": {
+        "message": "Barometer"
+    },
+    "sensorPitot": {
+        "message": "Pitot tube"
     }
 }

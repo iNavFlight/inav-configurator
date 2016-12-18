@@ -497,6 +497,9 @@ hr
 .motorstop .select,
 .motorstop .checkbox,
 .motorstop .number,
+.config-section .select,
+.config-section .checkbox,
+.config-section .number,
 .system .select,
 .system .checkbox,
 .system .number {
@@ -506,6 +509,7 @@ hr
 #esc-protocols label,
 #servo-rate-container label,
 .motorstop label,
+.config-section label,
 .system label {
     position: absolute;
     left: 10em;
@@ -514,4 +518,8 @@ hr
 .esc-priority label,
 .features.esc label{
     position: inherit;
+}
+
+.sensors select {
+    width: 8em;
 }

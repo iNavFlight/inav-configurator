@@ -834,6 +834,19 @@ var mspHelper = (function (gui) {
                 console.log("PID advanced saved");
                 break;
 
+            case MSPCodes.MSP_SENSOR_CONFIG:
+                SENSOR_CONFIG.accelerometer = data.getUint8(0, true);
+                SENSOR_CONFIG.barometer = data.getUint8(1, true);
+                SENSOR_CONFIG.magnetometer = data.getUint8(2, true);
+                SENSOR_CONFIG.pitot = data.getUint8(3, true);
+                SENSOR_CONFIG.rangefinder = data.getUint8(4, true);
+                SENSOR_CONFIG.opflow = data.getUint8(5, true);
+                break;
+
+            case MSPCodes.MSP_SET_SENSOR_CONFIG:
+                console.log("Sensor config saved");
+                break;
+
             case MSPCodes.MSP_INAV_PID:
                 INAV_PID_CONFIG.asynchronousMode = data.getUint8(0);
                 INAV_PID_CONFIG.accelerometerTaskFrequency = data.getUint16(1, true);
@@ -1206,6 +1219,15 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitYaw));
                 buffer.push(highByte(PID_ADVANCED.axisAccelerationLimitYaw));
+                break;
+
+            case MSPCodes.MSP_SET_SENSOR_CONFIG:
+                buffer.push(SENSOR_CONFIG.accelerometer);
+                buffer.push(SENSOR_CONFIG.barometer);
+                buffer.push(SENSOR_CONFIG.magnetometer);
+                buffer.push(SENSOR_CONFIG.pitot);
+                buffer.push(SENSOR_CONFIG.rangefinder);
+                buffer.push(SENSOR_CONFIG.opflow);
                 break;
 
             default:
