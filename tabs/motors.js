@@ -11,7 +11,9 @@ TABS.motors.initialize = function (callback) {
     self.armed = false;
     self.feature3DSupported = false;
     self.allowTestMode = true;
-    
+
+    var $motorsEnableTestMode = $('#motorsEnableTestMode');
+
     if (GUI.active_tab != 'motors') {
         GUI.active_tab = 'motors';
         googleAnalytics.sendAppView('Motors');
@@ -26,14 +28,7 @@ TABS.motors.initialize = function (callback) {
     }
     
     function load_3d() {
-        var next_callback = get_motor_data;
-        if (semver.gte(CONFIG.apiVersion, "1.14.0")) {
-            self.feature3DSupported = true;
-            MSP.send_message(MSPCodes.MSP_3D, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-        
+        MSP.send_message(MSPCodes.MSP_3D, false, false, get_motor_data);
     }
     
     function get_motor_data() {
@@ -60,7 +55,7 @@ TABS.motors.initialize = function (callback) {
     function initDataArray(length) {
         var data = new Array(length);
         for (var i = 0; i < length; i++) {
-            data[i] = new Array();
+            data[i] = [];
             data[i].min = -1;
             data[i].max = 1;
         }
@@ -165,7 +160,7 @@ TABS.motors.initialize = function (callback) {
 
         var group = svg.select("g.data");
         var lines = group.selectAll("path").data(data, function (d, i) {return i;});
-        var newLines = lines.enter().append("path").attr("class", "line");
+        lines.enter().append("path").attr("class", "line");
         lines.attr('d', graphHelpers.line);
     }
 
@@ -182,9 +177,9 @@ TABS.motors.initialize = function (callback) {
         if (self.feature3DEnabled && !self.feature3DSupported) {
             self.allowTestMode = false;
         }
-        
-        $('#motorsEnableTestMode').prop('checked', false);
-        $('#motorsEnableTestMode').prop('disabled', true);
+
+        $motorsEnableTestMode.prop('checked', false);
+        $motorsEnableTestMode.prop('disabled', true);
         
         update_model(CONFIG.multiType);
         
@@ -383,7 +378,7 @@ TABS.motors.initialize = function (callback) {
             $('div.sliders input:not(:last):first').trigger('input');
         });
 
-        $('#motorsEnableTestMode').change(function () {
+        $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
                 $('div.sliders input').slice(0, number_of_valid_outputs).prop('disabled', false);
 
@@ -423,7 +418,7 @@ TABS.motors.initialize = function (callback) {
 
         if (motors_running) {
             if (!self.armed && self.allowTestMode) {
-                $('#motorsEnableTestMode').prop('checked', true);
+                $motorsEnableTestMode.prop('checked', true);
             }
             // motors are running adjust sliders to current values
 
@@ -450,29 +445,30 @@ TABS.motors.initialize = function (callback) {
             }
         }
 
-        $('#motorsEnableTestMode').change();
+        $motorsEnableTestMode.change();
         
         // data pulling functions used inside interval timer
         
-        function get_status() {
-            // status needed for arming flag
+        function periodicUpdateHandler() {
+
+            MSP.send_message(MSPCodes.MSP_STATUS);
+
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_sensor_status);
-            }
-            else {
-                MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
+                getPeriodicSensorStatus();
+            } else {
+                getPeriodicMotorOutput();
             }
         }
         
-        function get_sensor_status() {
-            MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_motor_data);
+        function getPeriodicSensorStatus() {
+            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, getPeriodicMotorOutput);
         }
 
-        function get_motor_data() {
-            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, get_servo_data);
+        function getPeriodicMotorOutput() {
+            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
         }
 
-        function get_servo_data() {
+        function getPeriodicServoOutput() {
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
@@ -507,22 +503,22 @@ TABS.motors.initialize = function (callback) {
             if (!self.allowTestMode) return;
             
             if (self.armed) {
-                $('#motorsEnableTestMode').prop('disabled', true);
-                $('#motorsEnableTestMode').prop('checked', false);
+                $motorsEnableTestMode.prop('disabled', true);
+                $motorsEnableTestMode.prop('checked', false);
             } else {
                 if (self.allowTestMode) {
-                    $('#motorsEnableTestMode').prop('disabled', false);                    
+                    $motorsEnableTestMode.prop('disabled', false);
                 }
             }
 
             if (previousArmState != self.armed) {
                 console.log('arm state change detected');
-                $('#motorsEnableTestMode').change(); 
+                $motorsEnableTestMode.change();
             }
         }
 
         // enable Status and Motor data pulling
-        GUI.interval_add('motor_and_status_pull', get_status, 50, true);
+        GUI.interval_add('motor_and_status_pull', periodicUpdateHandler, 75, true);
 
         GUI.content_ready(callback);
     }
