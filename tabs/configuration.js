@@ -196,7 +196,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var gpsProtocols = FC.getGpsProtocols();
         var gpsSbas = FC.getGpsSbasProviders();
 
-        var gps_protocol_e = $('select.gps_protocol');
+        var gps_protocol_e = $('#gps_protocol');
         for (i = 0; i < gpsProtocols.length; i++) {
             gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
         }
@@ -207,7 +207,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         gps_protocol_e.val(MISC.gps_type);
 
-        var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
+        var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (i = 0; i < gpsSbas.length; i++) {
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
         }
@@ -240,12 +240,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        var nrf24ProtocolTypes = FC.getNrf24ProtocolTypes();
-
         var nrf24Protocol_e = $('#nrf24-protocol');
-        for (i = 0; i < nrf24ProtocolTypes.length; i++) {
-            nrf24Protocol_e.append('<option value="' + i + '">' + nrf24ProtocolTypes[i] + '</option>');
-        }
+        GUI.fillSelect(nrf24Protocol_e, FC.getNrf24ProtocolTypes());
 
         nrf24Protocol_e.change(function () {
             RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
@@ -261,7 +257,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
         // fill magnetometer
-        $('input[name="mag_declination"]').val(MISC.mag_declination);
+        $('#mag_declination').val(MISC.mag_declination);
 
         //fill motor disarm params and FC loop time
         $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
@@ -365,28 +361,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var $looptime = $("#looptime");
 
-        //TODO move this up and use in more places
-        var fillSelect = function ($element, values, currentValue, unit) {
-            if (unit == null) {
-                unit = '';
-            }
-
-            $element.find("*").remove();
-
-            for (i in values) {
-                if (values.hasOwnProperty(i)) {
-                    $element.append('<option value="' + i + '">' + values[i] + '</option>');
-                }
-            }
-
-            /*
-             *  If current Value is not on the list, add a new entry
-             */
-            if (currentValue != null && $element.find('[value="' + currentValue + '"]').length == 0) {
-                $element.append('<option value="' + currentValue + '">' + currentValue + unit + '</option>');
-            }
-        };
-
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             $(".requires-v1_4").show();
 
@@ -412,7 +386,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $gyroLpf.change(function () {
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
 
-                fillSelect(
+                GUI.fillSelect(
                     $looptime,
                     FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
                     FC_CONFIG.loopTime,
@@ -421,7 +395,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
                 $looptime.change();
 
-                fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
+                GUI.fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
                 $gyroFrequency.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
                 $gyroFrequency.change();
             });
@@ -457,7 +431,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             /*
              * Async mode select
              */
-            fillSelect($asyncMode, FC.getAsyncModes());
+            GUI.fillSelect($asyncMode, FC.getAsyncModes());
             $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
             $asyncMode.change(function () {
                 INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
@@ -483,20 +457,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
             $asyncMode.change();
 
-            fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
+            GUI.fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
             $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
             $accelerometerFrequency.change(function () {
                 INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
             });
 
-            fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
+            GUI.fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
             $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
             $attitudeFrequency.change(function () {
                 INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
             });
 
         } else {
-            fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
+            GUI.fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
 
             $looptime.val(FC_CONFIG.loopTime);
             $looptime.change(function () {
@@ -513,26 +487,26 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $sensorBaro = $('#sensor-baro'),
                 $sensorPitot = $('#sensor-pitot');
 
-            fillSelect($sensorAcc, FC.getAccelerometerNames());
+            GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
             $sensorAcc.val(SENSOR_CONFIG.accelerometer);
             $sensorAcc.change(function () {
                 SENSOR_CONFIG.accelerometer = $sensorAcc.val();
             });
 
 
-            fillSelect($sensorMag, FC.getMagnetometerNames());
+            GUI.fillSelect($sensorMag, FC.getMagnetometerNames());
             $sensorMag.val(SENSOR_CONFIG.magnetometer);
             $sensorMag.change(function () {
                 SENSOR_CONFIG.magnetometer = $sensorMag.val();
             });
 
-            fillSelect($sensorBaro, FC.getBarometerNames());
+            GUI.fillSelect($sensorBaro, FC.getBarometerNames());
             $sensorBaro.val(SENSOR_CONFIG.barometer);
             $sensorBaro.change(function () {
                 SENSOR_CONFIG.barometer = $sensorBaro.val();
             });
 
-            fillSelect($sensorPitot, FC.getPitotNames());
+            GUI.fillSelect($sensorPitot, FC.getPitotNames());
             $sensorPitot.val(SENSOR_CONFIG.pitot);
             $sensorPitot.change(function () {
                 SENSOR_CONFIG.pitot = $sensorPitot.val();
@@ -596,7 +570,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
             BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
-            MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
+            MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
             ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
@@ -634,7 +608,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             // track feature usage
             if (FC.isFeatureEnabled('RX_NRF24', features)) {
-                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', nrf24ProtocolTypes[RX_CONFIG.nrf24rx_protocol]);
+                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getNrf24ProtocolTypes()[RX_CONFIG.nrf24rx_protocol]);
             }
 
             if (FC.isFeatureEnabled('GPS', features)) {

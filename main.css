@@ -1887,3 +1887,7 @@ select {
 .ic_osd:hover, li.active .ic_osd {
     background-image: url(images/icons/icon_osd_white.svg);
 }
+
+.full-width {
+    width: 100%;
+}

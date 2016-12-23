@@ -355,5 +355,26 @@ GUI_control.prototype.updateProfileChange = function() {
     $('#profilechange').val(CONFIG.profile);
 };
 
+GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {
+    if (unit == null) {
+        unit = '';
+    }
+
+    $element.find("*").remove();
+
+    for (var i in values) {
+        if (values.hasOwnProperty(i)) {
+            $element.append('<option value="' + i + '">' + values[i] + '</option>');
+        }
+    }
+
+    /*
+     *  If current Value is not on the list, add a new entry
+     */
+    if (currentValue != null && $element.find('[value="' + currentValue + '"]').length == 0) {
+        $element.append('<option value="' + currentValue + '">' + currentValue + unit + '</option>');
+    }
+};
+
 // initialize object into GUI variable
 var GUI = new GUI_control();

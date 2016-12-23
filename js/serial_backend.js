@@ -29,7 +29,7 @@ $(document).ready(function () {
                 if ($tabElement != null) {
                     setTimeout(function () {
                         $tabElement.click();
-                    }, 250);
+                    }, 500);
                 }
 
             }, 5000);

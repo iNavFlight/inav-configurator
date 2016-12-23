@@ -134,19 +134,19 @@
                             <p data-i18n="configurationSerialRXHelp"></p>
                         </div>
                     </div>
-                    <select id="serial-rx-protocol" class="serialRX" size="1">
+                    <select id="serial-rx-protocol" class="full-width" size="1">
                         <!-- list generated here -->
                     </select>
                 </div>
                 <div class="spacer_box">
                     <h3 data-i18n="configurationNrf24Protocol"></h3>
-                    <select id="nrf24-protocol" class="nrf24Protocol" size="1">
+                    <select id="nrf24-protocol" class="full-width" size="1">
                         <!-- list generated here -->
                     </select>
                 </div>
             </div>
 
-            <div class="gui_box grey gps">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationGPS"></div>
                 </div>
@@ -157,31 +157,29 @@
                         </div>
                     </div>
                     <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
                         <tbody class="features gps">
                         <!-- table generated here -->
                         </tbody>
                     </table>
-                    <div class="line">
-                        <select class="gps_protocol">
+                    <div class="select">
+                        <select id="gps_protocol" class="gps_protocol">
                             <!-- list generated here -->
                         </select>
-                        <span data-i18n="configurationGPSProtocol"></span>
+                        <label for="gps_protocol">
+                            <span data-i18n="configurationGPSProtocol"></span>
+                        </label>
                     </div>
-                    <div class="line">
-                        <select class="gps_ubx_sbas">
+                    <div class="select">
+                        <select id="gps_ubx_sbas" class="gps_ubx_sbas">
                             <!-- list generated here -->
                         </select>
-                        <span data-i18n="configurationGPSubxSbas"></span>
+                        <label for="gps_ubx_sbas">
+                            <span data-i18n="configurationGPSubxSbas"></span>
+                        </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="mag_declination" step="0.1" min="-180" max="180" />
+                        <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
+                        <label for="mag_declination">
                             <span data-i18n="configurationMagDeclination"></span>
                         </label>
                     </div>
@@ -225,7 +223,7 @@
         <!--Right column begins here-->
 
         <div class="rightWrapper">
-            <div class="motorstop gui_box grey">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationEscFeatures"></div>
                 </div>
@@ -316,7 +314,7 @@
                     </div>
                 </div>
             </div>
-            <div class="system gui_box grey">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationSystem"></div>
                 </div>
