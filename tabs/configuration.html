@@ -287,26 +287,26 @@
 
                     <!--   -->
                     <div class="number">
-                        <input type="number" name="minthrottle" min="0" max="2000" />
-                        <label>
+                        <input type="number" id="minthrottle" name="minthrottle" min="0" max="2000" />
+                        <label for="minthrottle">
                             <span data-i18n="configurationThrottleMinimum"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <input type="number" name="midthrottle" min="0" max="2000" />
-                        <label>
+                        <input type="number" id="midthrottle" name="midthrottle" min="0" max="2000" />
+                        <label for="midthrottle">
                             <span data-i18n="configurationThrottleMid"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <input type="number" name="maxthrottle" min="0" max="2000" />
-                        <label>
+                        <input type="number" id="maxthrottle" name="maxthrottle" min="0" max="2000" />
+                        <label for="maxthrottle">
                             <span data-i18n="configurationThrottleMaximum"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <input type="number" name="mincommand" min="0" max="2000" />
-                        <label>
+                        <input type="number" id="mincommand" name="mincommand" min="0" max="2000" />
+                        <label for="mincommand">
                             <span data-i18n="configurationThrottleMinimumCommand"></span>
                         </label>
                     </div>
@@ -371,87 +371,78 @@
                 </div>
             </div>
 
-            <div class="gui_box grey voltage">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationBatteryVoltage"></div>
                 </div>
                 <div class="spacer_box">
                     <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
                         <tbody class="features batteryVoltage">
                         <!-- table generated here -->
                         </tbody>
                     </table>
                     <div class="number">
-                        <label> <input type="number" name="mincellvoltage" step="0.1" min="1" max="5" /> <span
-                                data-i18n="configurationBatteryMinimum"></span>
+                        <input type="number" id="mincellvoltage" name="mincellvoltage" step="0.1" min="1" max="5" />
+                        <label for="mincellvoltage"><span data-i18n="configurationBatteryMinimum"></span></label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="maxcellvoltage" name="maxcellvoltage" step="0.1" min="1" max="5" />
+                        <label for="maxcellvoltage">
+                            <span data-i18n="configurationBatteryMaximum"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="maxcellvoltage" step="0.1" min="1" max="5" /> <span
-                                data-i18n="configurationBatteryMaximum"></span>
+                        <input type="number" id="warningcellvoltage" name="warningcellvoltage" step="0.1" min="1" max="5" />
+                        <label for="warningcellvoltage">
+                            <span data-i18n="configurationBatteryWarning"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="warningcellvoltage" step="0.1" min="1" max="5" /> <span
-                                data-i18n="configurationBatteryWarning"></span>
+                        <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="255" />
+                        <label for="voltagescale">
+                            <span data-i18n="configurationBatteryScale"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="voltagescale" step="1" min="10" max="255" /> <span
-                                data-i18n="configurationBatteryScale"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="text" name="batteryvoltage" readonly class="disabled" /> <span
-                                data-i18n="configurationBatteryVoltage"></span>
+                        <input type="text" id="batteryvoltage" name="batteryvoltage" readonly class="disabled" />
+                        <label for="batteryvoltage">
+                            <span data-i18n="configurationBatteryVoltage"></span>
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="gui_box grey current">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationCurrent"></div>
                 </div>
                 <div class="spacer_box">
                     <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
                         <tbody class="features batteryCurrent">
                         <!-- table generated here -->
                         </tbody>
                     </table>
                     <div class="number">
-                        <label> <input type="number" name="currentscale" step="1" min="-1000" max="1000" /> <span
-                                data-i18n="configurationCurrentScale"></span>
+                        <input type="number" id="currentscale" name="currentscale" step="1" min="-1000" max="1000" />
+                        <label for="currentscale">
+                            <span data-i18n="configurationCurrentScale"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="currentoffset" step="1" min="0" max="3300" /> <span
-                                data-i18n="configurationCurrentOffset"></span>
+                        <input type="number" id="currentoffset" name="currentoffset" step="1" min="0" max="3300" />
+                        <label for="currentoffset">
+                            <span data-i18n="configurationCurrentOffset"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="text" name="batterycurrent" readonly class="disabled" /> <span
-                                data-i18n="configurationBatteryCurrent"></span>
+                        <input type="text" id="batterycurrent" name="batterycurrent" readonly class="disabled" />
+                        <label for="batterycurrent">
+                            <span data-i18n="configurationBatteryCurrent"></span>
                         </label>
                     </div>
                     <div class="checkbox">
-                        <div class="numberspacer">
-                            <input type="checkbox" name="multiwiicurrentoutput" class="toggle" />
-                        </div>
-                        <label> <span data-i18n="configurationBatteryMultiwiiCurrent"></span>
+                        <input type="checkbox" id="multiwiicurrentoutput" name="multiwiicurrentoutput" class="toggle" />
+                        <label for="multiwiicurrentoutput">
+                            <span data-i18n="configurationBatteryMultiwiiCurrent"></span>
                         </label>
                     </div>
                 </div>

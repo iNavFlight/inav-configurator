@@ -126,21 +126,6 @@
     margin-bottom: 5px;
 }
 
-.tab-configuration .current .checkbox {
-    margin-top: 0;
-    float: left;
-}
-
-.tab-configuration .current .checkbox div {
-    float: left;
-    width: 66px;
-}
-
-.tab-configuration .current .checkbox div input {
-    margin: 0;
-    float: left;
-}
-
 .tab-configuration .disarm .checkbox {
     margin-top: 2px;
     margin-right: 5px;
@@ -275,24 +260,12 @@ hr
     margin-bottom: 10px;
 }
 
-.tab-configuration .current .gui_box {
-    float: left;
-}
-
 .tab-configuration .rxprovider {
     min-height: 214px;
 }
 
 .tab-configuration .nrf24provider {
     min-height: 140px;
-}
-
-.tab-configuration .current td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .voltage td:nth-child(2) {
-    width: 30px;
 }
 
 .tab-configuration .rssi td:nth-child(2) {
@@ -484,9 +457,6 @@ hr
         min-height: 355px;
         float: left;
     }
-    .tab-configuration .current .gui_box {
-        float: left;
-    }
 }
 
 #esc-protocols,
@@ -524,6 +494,10 @@ hr
 
 .esc-priority label,
 .features.esc label{
+    position: inherit;
+}
+
+.config-section .features label {
     position: inherit;
 }
 

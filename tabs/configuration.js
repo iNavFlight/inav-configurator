@@ -274,21 +274,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         // fill throttle
-        $('input[name="minthrottle"]').val(MISC.minthrottle);
-        $('input[name="midthrottle"]').val(MISC.midrc);
-        $('input[name="maxthrottle"]').val(MISC.maxthrottle);
-        $('input[name="mincommand"]').val(MISC.mincommand);
+        $('#minthrottle').val(MISC.minthrottle);
+        $('#midthrottle').val(MISC.midrc);
+        $('#maxthrottle').val(MISC.maxthrottle);
+        $('#mincommand').val(MISC.mincommand);
 
         // fill battery
-        $('input[name="mincellvoltage"]').val(MISC.vbatmincellvoltage);
-        $('input[name="maxcellvoltage"]').val(MISC.vbatmaxcellvoltage);
-        $('input[name="warningcellvoltage"]').val(MISC.vbatwarningcellvoltage);
-        $('input[name="voltagescale"]').val(MISC.vbatscale);
+        $('#mincellvoltage').val(MISC.vbatmincellvoltage);
+        $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
+        $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
+        $('#voltagescale').val(MISC.vbatscale);
 
         // fill current
-        $('input[name="currentscale"]').val(BF_CONFIG.currentscale);
-        $('input[name="currentoffset"]').val(BF_CONFIG.currentoffset);
-        $('input[name="multiwiicurrentoutput"]').prop('checked', MISC.multiwiicurrentoutput);
+        $('#currentscale').val(BF_CONFIG.currentscale);
+        $('#currentoffset').val(BF_CONFIG.currentoffset);
+        $('#multiwiicurrentoutput').prop('checked', MISC.multiwiicurrentoutput);
 
         var escProtocols = FC.getEscProtocols();
         var servoRates = FC.getServoRates();
@@ -601,19 +601,19 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
             ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
 
-            MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
-            MISC.midrc = parseInt($('input[name="midthrottle"]').val());
-            MISC.maxthrottle = parseInt($('input[name="maxthrottle"]').val());
-            MISC.mincommand = parseInt($('input[name="mincommand"]').val());
+            MISC.minthrottle = parseInt($('#minthrottle').val());
+            MISC.midrc = parseInt($('#midthrottle').val());
+            MISC.maxthrottle = parseInt($('#maxthrottle').val());
+            MISC.mincommand = parseInt($('#mincommand').val());
 
-            MISC.vbatmincellvoltage = parseFloat($('input[name="mincellvoltage"]').val());
-            MISC.vbatmaxcellvoltage = parseFloat($('input[name="maxcellvoltage"]').val());
-            MISC.vbatwarningcellvoltage = parseFloat($('input[name="warningcellvoltage"]').val());
-            MISC.vbatscale = parseInt($('input[name="voltagescale"]').val());
+            MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
+            MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
+            MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
+            MISC.vbatscale = parseInt($('#voltagescale').val());
 
-            BF_CONFIG.currentscale = parseInt($('input[name="currentscale"]').val());
-            BF_CONFIG.currentoffset = parseInt($('input[name="currentoffset"]').val());
-            MISC.multiwiicurrentoutput = ~~$('input[name="multiwiicurrentoutput"]').is(':checked'); // ~~ boolean to decimal conversion
+            BF_CONFIG.currentscale = parseInt($('#currentscale').val());
+            BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
+            MISC.multiwiicurrentoutput = ~~$('#multiwiicurrentoutput').is(':checked'); // ~~ boolean to decimal conversion
 
             _3D.deadband3d_low = parseInt($('input[name="3ddeadbandlow"]').val());
             _3D.deadband3d_high = parseInt($('input[name="3ddeadbandhigh"]').val());
