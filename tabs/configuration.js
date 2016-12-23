@@ -72,9 +72,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     //Update Analog/Battery Data
     function load_analog() {
         MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-	    $('input[name="batteryvoltage"]').val([ANALOG.voltage.toFixed(1)]);
-	    $('input[name="batterycurrent"]').val([ANALOG.amperage.toFixed(2)]);
-            });
+	        $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+	        $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+        });
     }
 
     function load_html() {
@@ -114,7 +114,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             var feature_tip_html = '';
             if (features[i].haveTip) {
-                feature_tip_html = '<div class="helpicon cf_tip" i18n_title="feature' + features[i].name + 'Tip"></div>';
+                feature_tip_html = '<div class="helpicon cf_tip" data-i18n_title="feature' + features[i].name + 'Tip"></div>';
             }
 
             if (features[i].mode === 'group') {
@@ -543,13 +543,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_5").hide();
         }
 
-        $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
-        $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
-        $('input[name="3dneutral"]').val(_3D.neutral3d);
+        $('#3ddeadbandlow').val(_3D.deadband3d_low);
+        $('#3ddeadbandhigh').val(_3D.deadband3d_high);
+        $('#3dneutral').val(_3D.neutral3d);
         if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-            $('input[name="3ddeadbandthrottle"]').val(_3D.deadband3d_throttle);
+            $('#3ddeadbandthrottle').val(_3D.deadband3d_throttle);
         } else {
-            $('.3ddeadbandthrottle').hide();
+            $('#deadband-3d-throttle-container').remove();
         }
 
         $('input[type="checkbox"].feature', features_e).change(function () {
@@ -615,11 +615,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
             MISC.multiwiicurrentoutput = ~~$('#multiwiicurrentoutput').is(':checked'); // ~~ boolean to decimal conversion
 
-            _3D.deadband3d_low = parseInt($('input[name="3ddeadbandlow"]').val());
-            _3D.deadband3d_high = parseInt($('input[name="3ddeadbandhigh"]').val());
-            _3D.neutral3d = parseInt($('input[name="3dneutral"]').val());
+            _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
+            _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
+            _3D.neutral3d = parseInt($('#3dneutral').val());
             if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                _3D.deadband3d_throttle = ($('input[name="3ddeadbandthrottle"]').val());
+                _3D.deadband3d_throttle = ($('#3ddeadbandthrottle').val());
             }
 
 
@@ -729,23 +729,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             function reinitialize() {
                 //noinspection JSUnresolvedVariable
                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-
-                if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
-                    $('a.connect').click();
-                    GUI.timeout_add('start_connection',function start_connection() {
-                        $('a.connect').click();
-                    },2500);
-                } else {
-
-                    GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
-                        MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
-                            //noinspection JSUnresolvedVariable
-                            GUI.log(chrome.i18n.getMessage('deviceReady'));
-                            //noinspection JSValidateTypes
-                            TABS.configuration.initialize(false, $('#content').scrollTop());
-                        });
-                    },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
-                }
+                GUI.handleReconnect($('.tab_configuration a'));
             }
 
             MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, save_misc);
