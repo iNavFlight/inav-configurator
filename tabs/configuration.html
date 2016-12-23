@@ -127,30 +127,20 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <div class="gui_box grey rxprovider">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationSerialRX"></div>
-                </div>
                 <div class="spacer_box">
+                    <h3 data-i18n="configurationSerialRX"></h3>
                     <div class="note">
                         <div class="note_spacer">
                             <p data-i18n="configurationSerialRXHelp"></p>
                         </div>
                     </div>
-                    <select class="serialRX" size="4">
+                    <select id="serial-rx-protocol" class="serialRX" size="1">
                         <!-- list generated here -->
                     </select>
                 </div>
-            </div>
-
-            <div class="gui_box grey nrf24provider">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationNrf24Protocol"></div>
-                </div>
                 <div class="spacer_box">
-                    <select class="nrf24Protocol" size="4">
+                    <h3 data-i18n="configurationNrf24Protocol"></h3>
+                    <select id="nrf24-protocol" class="nrf24Protocol" size="1">
                         <!-- list generated here -->
                     </select>
                 </div>
@@ -227,6 +217,9 @@
             </div>
 
         </div>
+
+        <!--Right column begins here-->
+
         <div class="rightWrapper">
             <div class="motorstop gui_box grey">
                 <div class="gui_box_titlebar">
@@ -478,27 +471,6 @@
                         </tr>
                         </thead>
                         <tbody class="features other" id="noline">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="gui_box grey rssi">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationRSSI"></div>
-                    <div class="helpicon cf_tip" data-i18n_title="configurationRSSIHelp"></div>
-                </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
-                        <tbody class="features rssi">
                         <!-- table generated here -->
                         </tbody>
                     </table>

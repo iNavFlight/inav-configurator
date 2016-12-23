@@ -222,7 +222,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // generate serial RX
         var serialRxTypes = FC.getSerialRxTypes();
 
-        var serialRX_e = $('select.serialRX');
+        var serialRX_e = $('#serial-rx-protocol');
         for (i = 0; i < serialRxTypes.length; i++) {
             serialRX_e.append('<option value="' + i + '">' + serialRxTypes[i] + '</option>');
         }
@@ -242,7 +242,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var nrf24ProtocolTypes = FC.getNrf24ProtocolTypes();
 
-        var nrf24Protocol_e = $('select.nrf24Protocol');
+        var nrf24Protocol_e = $('#nrf24-protocol');
         for (i = 0; i < nrf24ProtocolTypes.length; i++) {
             nrf24Protocol_e.append('<option value="' + i + '">' + nrf24ProtocolTypes[i] + '</option>');
         }

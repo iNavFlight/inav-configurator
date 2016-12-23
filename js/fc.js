@@ -344,7 +344,7 @@ var FC = {
             {bit: 12, group: 'other', name: '3D'},
             {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM'},
             {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP'},
-            {bit: 15, group: 'rssi', name: 'RSSI_ADC'},
+            {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP'},
             {bit: 17, group: 'other', name: 'DISPLAY'},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
