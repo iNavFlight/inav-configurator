@@ -12,7 +12,7 @@ TABS.motors.initialize = function (callback) {
     self.feature3DSupported = false;
     self.allowTestMode = true;
 
-    var $motorsEnableTestMode = $('#motorsEnableTestMode');
+    var $motorsEnableTestMode;
 
     if (GUI.active_tab != 'motors') {
         GUI.active_tab = 'motors';
@@ -169,7 +169,8 @@ TABS.motors.initialize = function (callback) {
     }
     
     function process_html() {
-        // translate to user-selected language
+        $motorsEnableTestMode = $('#motorsEnableTestMode');
+
         localize();
 
         self.feature3DEnabled = bit_check(BF_CONFIG.features, 12);
@@ -377,7 +378,7 @@ TABS.motors.initialize = function (callback) {
             $('div.values li:not(:last)').slice(0, number_of_valid_outputs).text(val);
             $('div.sliders input:not(:last):first').trigger('input');
         });
-
+        console.log($motorsEnableTestMode);
         $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
                 $('div.sliders input').slice(0, number_of_valid_outputs).prop('disabled', false);
