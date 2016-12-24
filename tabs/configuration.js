@@ -134,18 +134,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                         + feature_tip_html + '</td></tr>');
                 radioGroups.push(features[i].group);
             } else {
-                row_e = $('<tr><td><input class="feature toggle"'
-                        + i
-                        + '" name="'
-                        + features[i].name
-                        + '" title="'
-                        + features[i].name
-                        + '" type="checkbox"/></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span data-i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
+
+                row_e = $('<div class="checkbox">'
+                    + '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '">'
+                    + '<label>'
+                    + '<span data-i18n="feature' + features[i].name + '"></span>'
+                    + '</label>'
+                    + feature_tip_html
+                    + '</div>');
 
                 var feature_e = row_e.find('input.feature');
 
@@ -155,7 +151,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             features_e.each(function () {
                 if ($(this).hasClass(features[i].group)) {
-                    $(this).append(row_e);
+                    $(this).after(row_e);
                 }
             });
         }
@@ -526,7 +522,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#deadband-3d-throttle-container').remove();
         }
 
-        $('input[type="checkbox"].feature', features_e).change(function () {
+        $('input[type="checkbox"].feature').change(function () {
+
+            console.log('we have change');
             var element = $(this),
                 index = element.data('bit'),
                 state = element.is(':checked');

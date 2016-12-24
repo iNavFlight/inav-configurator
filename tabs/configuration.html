@@ -114,18 +114,8 @@
                     <div class="spacer_box_title" data-i18n="configurationReceiver"></div>
                 </div>
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
-                        <tbody class="features rxMode">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
+                    <div class="features rxMode"></div>
+                    <!--feature list goes here-->
                 </div>
                 <div class="spacer_box">
                     <h3 data-i18n="configurationSerialRX"></h3>
@@ -156,11 +146,10 @@
                             <p data-i18n="configurationGPSHelp"></p>
                         </div>
                     </div>
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features gps">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
+
+                    <div class="features gps"></div>
+                    <!--feature list generated content-->
+
                     <div class="select">
                         <select id="gps_protocol" class="gps_protocol">
                             <!-- list generated here -->
@@ -228,13 +217,8 @@
                     <div class="spacer_box_title" data-i18n="configurationEscFeatures"></div>
                 </div>
                 <div class="spacer_box">
-
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features esc-priority">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-
+                    <div class="features esc-priority"></div>
+                    <!--list of generated features goes here-->
                     <div id="esc-protocols">
                         <div class="select">
                             <select name="esc-protocol" id="esc-protocol"></select>
@@ -264,12 +248,8 @@
                         <div class="clear-both"></div>
                     </div>
 
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features esc">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                    <!--   -->
+                    <div class="features esc"></div>
+                    <!--list of generated features goes here-->
 
                     <div class="checkbox">
                             <input type="checkbox" id="disarmkillswitch" name="disarmkillswitch" class="toggle" />
@@ -280,8 +260,8 @@
                     </div>
 
                     <div class="number disarmdelay" style="display: none; margin-bottom: 5px;">
-                        <input type="number" name="autodisarmdelay" min="0" max="60" />
-                        <label>
+                        <input type="number" id="autodisarmdelay" name="autodisarmdelay" min="0" max="60" />
+                        <label for="autodisarmdelay">
                             <span data-i18n="configurationAutoDisarmDelay"></span>
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationAutoDisarmDelayHelp"></div>
@@ -378,11 +358,9 @@
                     <div class="spacer_box_title" data-i18n="configurationBatteryVoltage"></div>
                 </div>
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features batteryVoltage">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
+                    <div class="features batteryVoltage"></div>
+                    <!--list of generated features goes here-->
+
                     <div class="number">
                         <input type="number" id="mincellvoltage" name="mincellvoltage" step="0.1" min="1" max="5" />
                         <label for="mincellvoltage"><span data-i18n="configurationBatteryMinimum"></span></label>
@@ -418,11 +396,9 @@
                     <div class="spacer_box_title" data-i18n="configurationCurrent"></div>
                 </div>
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features batteryCurrent">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
+                    <div class="features batteryCurrent"></div>
+                    <!--list of generated features goes here-->
+
                     <div class="number">
                         <input type="number" id="currentscale" name="currentscale" step="1" min="-1000" max="1000" />
                         <label for="currentscale">
@@ -450,23 +426,14 @@
                 </div>
             </div>
 
-            <div class="gui_box grey other">
+            <div class="config-section gui_box grey other">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationFeatures"></div>
                 </div>
+
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                        <tr>
-                            <th data-i18n="configurationFeatureEnabled"></th>
-                            <th data-i18n="configurationFeatureDescription"></th>
-                            <th data-i18n="configurationFeatureName"></th>
-                        </tr>
-                        </thead>
-                        <tbody class="features other" id="noline">
-                        <!-- table generated here -->
-                        </tbody>
-                    </table>
+                    <div class="features other"></div>
+                    <!--feature list generated content-->
                 </div>
             </div>
 

@@ -388,7 +388,7 @@ var FC = {
                 {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true}
             );
         }
-        return features;
+        return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
         for (var i = 0; i < features.length; i++) {
