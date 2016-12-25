@@ -646,6 +646,19 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('tr').find('label').text());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
+            /*
+             * send gyro LPF and async_mode tracking
+             */
+            if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
+                googleAnalytics.sendEvent('Setting', 'AsyncMode', FC.getAsyncModes()[INAV_PID_CONFIG.asynchronousMode]);
+
+                googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
+                googleAnalytics.sendEvent('Board', 'Magnetometer', FC.getMagnetometerNames()[SENSOR_CONFIG.magnetometer]);
+                googleAnalytics.sendEvent('Board', 'Barometer', FC.getBarometerNames()[SENSOR_CONFIG.barometer]);
+                googleAnalytics.sendEvent('Board', 'Pitot', FC.getPitotNames()[SENSOR_CONFIG.pitot]);
+            }
+
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
                 if (FC.isFeatureEnabled(featureName, features)) {
