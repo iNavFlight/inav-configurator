@@ -127,26 +127,26 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             if (features[i].mode === 'group') {
-                row_e = $('<tr><td style="width: 15px;"><input style="width: 13px;" class="feature" id="feature-'
-                        + i
-                        + '" value="'
-                        + features[i].bit
-                        + '" title="'
-                        + features[i].name
-                        + '" type="radio" name="'
-                        + features[i].group
-                        + '" /></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span data-i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
+
+                row_e = $('<div class="radio">'
+                    + '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"'
+                    + ' value="' + features[i].bit + '"'
+                    + ' id="feature-' + features[i].bit + '" '
+                    + '>'
+                    + '<label for="feature-' + features[i].bit + '">'
+                    + '<span data-i18n="feature' + features[i].name + '"></span>'
+                    + '</label>'
+                    + feature_tip_html
+                    + '</div>');
+
                 radioGroups.push(features[i].group);
             } else {
 
                 row_e = $('<div class="checkbox">'
-                    + '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '">'
-                    + '<label>'
+                    + '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"'
+                    + ' id="feature-' + features[i].bit + '" '
+                    + '>'
+                    + '<label for="feature-' + features[i].bit + '">'
                     + '<span data-i18n="feature' + features[i].name + '"></span>'
                     + '</label>'
                     + feature_tip_html
@@ -549,7 +549,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         // UI hooks
-        $('input[type="radio"].feature', features_e).change(function () {
+        $('input[type="radio"].feature').change(function () {
             var element = $(this),
                 group = element.attr('name');
 

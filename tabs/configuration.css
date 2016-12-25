@@ -34,7 +34,7 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 50px;
+    width: 57px;
     background-color: #ececec;
 }
 
@@ -64,6 +64,7 @@
 
 .tab-configuration .number,
 .tab-configuration .select,
+.tab-configuration .radio,
 .tab-configuration .checkbox,
 hr {
     margin-bottom: 5px;
@@ -76,6 +77,7 @@ hr {
 
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
+.tab-configuration .radio:last-child,
 .tab-configuration .checkbox:last-child {
     border-bottom: none;
     padding-bottom: 0;
@@ -126,7 +128,7 @@ hr {
     font-family: 'open_sansregular', Arial, serif;
     line-height: 19px;
     color: #4F4F4F;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .tab-configuration .alignicon {
@@ -196,14 +198,29 @@ hr {
 
 .config-section .select,
 .config-section .checkbox,
+.config-section .radio,
 .config-section .number {
     position: relative;
     height: 22px;
 }
 
+.config-section .checkbox label,
+.config-section .radio label {
+    cursor: pointer;
+}
+
 .config-section label {
     position: absolute;
-    left: 10em;
+    left: 9em;
+}
+
+.config-section .radio label {
+    left: 2em;
+}
+
+.config-section .radio input {
+    margin-top: 3px;
+    margin-left: 5px;
 }
 
 .esc-priority label,
@@ -212,11 +229,7 @@ hr {
 }
 
 .config-section select {
-    width: 8em;
-}
-
-.tab-configuration .gps_ubx_sbas {
-    width: 8em;
+    width: 7em;
 }
 
 .config-section .helpicon {
