@@ -1861,5 +1861,8 @@
     },
     "sensorPitot": {
         "message": "Pitot tube"
+    },
+    "manualEnablingTemplate": {
+        "message": "To enable via CLI use <strong>feature {name}</strong> command"
     }
 }

@@ -110,11 +110,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var features_e = $('.features');
         for (i = 0; i < features.length; i++) {
-            var row_e;
+            var row_e,
+                tips = [],
+                feature_tip_html = '';
 
-            var feature_tip_html = '';
+            if (features[i].showNameInTip) {
+                tips.push(chrome.i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
+            }
+
             if (features[i].haveTip) {
-                feature_tip_html = '<div class="helpicon cf_tip" data-i18n_title="feature' + features[i].name + 'Tip"></div>';
+                tips.push(chrome.i18n.getMessage("feature" + features[i].name + "Tip"));
+            }
+
+            if (tips.length > 0) {
+                feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
             if (features[i].mode === 'group') {
@@ -524,7 +533,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $('input[type="checkbox"].feature').change(function () {
 
-            console.log('we have change');
             var element = $(this),
                 index = element.data('bit'),
                 state = element.is(':checked');
