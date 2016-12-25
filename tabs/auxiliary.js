@@ -85,7 +85,7 @@ TABS.auxiliary.initialize = function (callback) {
             connect: true,
             range: channel_range,
             format: wNumb({
-                decimals: 0,
+                decimals: 0
             })
         });
 
@@ -223,7 +223,9 @@ TABS.auxiliary.initialize = function (callback) {
              */
             uniqueModes = $.unique(uniqueModes);
             for (var mode in uniqueModes) {
-                googleAnalytics.sendEvent('Setting', 'AuxModes', uniqueModes[mode]);
+                if (uniqueModes.hasOwnProperty(mode)) {
+                    googleAnalytics.sendEvent('Setting', 'AuxModes', uniqueModes[mode]);
+                }
             }
 
             function save_to_eeprom() {
@@ -234,15 +236,14 @@ TABS.auxiliary.initialize = function (callback) {
         });
 
 
-        function box_highlight(auxChannelIndex, channelPosition) {
+        function update_marker(auxChannelIndex, channelPosition) {
+
             if (channelPosition < 900) {
                 channelPosition = 900;
             } else if (channelPosition > 2100) {
                 channelPosition = 2100;
             }
-        }
 
-        function update_marker(auxChannelIndex, channelPosition) {
             var percentage = (channelPosition - 900) / (2100-900) * 100;
 
             $('.modes .ranges .range').each( function () {
@@ -279,7 +280,6 @@ TABS.auxiliary.initialize = function (callback) {
             var auxChannelCount = RC.active_channels - 4;
 
             for (var i = 0; i < (auxChannelCount); i++) {
-                box_highlight(i, RC.channels[i + 4]);
                 update_marker(i, RC.channels[i + 4]);
             }
         }
