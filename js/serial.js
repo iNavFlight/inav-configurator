@@ -1,5 +1,7 @@
 'use strict';
 
+/*global chrome*/
+
 var serial = {
     connectionId:    false,
     openRequested:   false,
@@ -291,4 +293,5 @@ var serial = {
         this.outputBuffer = [];
         this.transmitting = false;
     }
+
 };

@@ -547,13 +547,16 @@
         "message": "Remember to set the NRF24 protocol after enabling."
     },
     "featureSOFTSPI": {
-        "message": "Enable CPU based SPI"
+        "message": "CPU based SPI"
     },
     "featurePWM_SERVO_DRIVER": {
-        "message": "Enable external PWM servo driver"
+        "message": "External PWM servo driver"
     },
     "featurePWM_SERVO_DRIVERTip": {
         "message": "Use external PCA9685 PMW driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
+    },
+    "featureRSSI_ADCTip": {
+        "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
     },
     "configurationFeatureEnabled": {
         "message": "Enabled"
@@ -575,9 +578,6 @@
     },
     "configurationRSSI": {
         "message": "RSSI (Signal Strength)"
-    },
-    "configurationRSSIHelp": {
-        "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
     },
     "configurationEscFeatures": {
         "message": "ESC/Motor Features"
@@ -1861,5 +1861,8 @@
     },
     "sensorPitot": {
         "message": "Pitot tube"
+    },
+    "manualEnablingTemplate": {
+        "message": "To enable via CLI use <strong>feature {name}</strong> command"
     }
 }

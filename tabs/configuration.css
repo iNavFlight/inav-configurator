@@ -1,46 +1,5 @@
-.tab-configuration table {
-    margin-bottom: 10px;
-    width: 100%;
-    float: left;
-}
-
-.tab-configuration table, .tab-configuration table th, .tab-configuration table td {
-    padding: 0;
-    text-align: left;
-}
-
-.tab-configuration table th {
-    padding: 3px;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-configuration table td {
-    padding-left: 5px;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-configuration table tr td:first-child {
-    text-align: left;
-    width: 55px;
-}
-
-.tab-configuration table td {
-    padding: 5px 0;
-}
-
-.tab-configuration table thead tr:first-child {
-    background-color: #ececec;
-}
-
 .tab-configuration {
     position: relative;
-}
-
-.tab-configuration .groupTitle {
-    padding: 0 0 5px 0;
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    border-bottom: 1px solid #dddddd;
 }
 
 .tab-configuration .leftWrapper {
@@ -61,23 +20,6 @@
     font-weight: bold;
 }
 
-.tab-configuration dl.features dt {
-    float: left;
-    width: 10px;
-    height: 18px;
-    line-height: 18px;
-}
-
-.tab-configuration dl.features dt input {
-    margin-top: 2px;
-}
-
-.tab-configuration dl.features dd {
-    margin: 0 0 0 20px;
-    height: 18px;
-    line-height: 18px;
-}
-
 .tab-configuration .number input {
     width: 57px;
     padding-left: 3px;
@@ -92,93 +34,12 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 50px;
-    /*padding: 0px 5px;*/
+    width: 57px;
     background-color: #ececec;
-}
-
-.tab-configuration .number span {
-    margin-left: 0;
-}
-
-.tab-configuration .gps .line {
-    clear: left;
-}
-
-.tab-configuration .gps select {
-    float: left;
-    width: 100px;
-    height: 20px;
-    margin: 0 10px 5px 0;
-}
-
-.tab-configuration .gps span {
-    line-height: 20px;
-}
-
-.tab-configuration .serialRX {
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.tab-configuration .nrf24Protocol {
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.tab-configuration .current .checkbox {
-    margin-top: 0;
-    float: left;
-}
-
-.tab-configuration .current .checkbox div {
-    float: left;
-    width: 66px;
-}
-
-.tab-configuration .current .checkbox div input {
-    margin: 0;
-    float: left;
-}
-
-.tab-configuration .disarm .checkbox {
-    margin-top: 2px;
-    margin-right: 5px;
-}
-
-.tab-configuration .disarm .checkbox div {
-    margin-bottom: 0;
-    margin-top: 0;
-}
-
-.tab-configuration .disarm .checkbox div input {
-    margin: 0;
-    float: left;
-}
-
-.tab-configuration .disarm .checkbox span {
-    margin-left: 0;
-}
-
-.tab-configuration .freelabel {
-    margin-left: 10px;
-    position: relative;
 }
 
 .tab-configuration input {
     float: left;
-}
-
-.tab-configuration span {
-    margin: 0;
-}
-
-.tab-configuration .disarm .checkbox {
-    float: left;
-    padding-left: 0;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
-    width: 100%;
 }
 
 .tab-configuration .spacer_box {
@@ -203,9 +64,9 @@
 
 .tab-configuration .number,
 .tab-configuration .select,
+.tab-configuration .radio,
 .tab-configuration .checkbox,
-hr
- {
+hr {
     margin-bottom: 5px;
     clear: left;
     padding-bottom: 5px;
@@ -216,7 +77,8 @@ hr
 
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
-.tab-configuration .checkbox:last-child{
+.tab-configuration .radio:last-child,
+.tab-configuration .checkbox:last-child {
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
@@ -224,12 +86,6 @@ hr
 
 .tab-configuration .gui_box_titlebar {
     margin-bottom: 0;
-}
-
-.tab-configuration .numberspacer {
-    float: left;
-    width: 65px;
-    height: 21px;
 }
 
 .tab-configuration thead {
@@ -241,69 +97,11 @@ hr
     float: left;
 }
 
-.tab-configuration .rssi td {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 0;
-}
-
-.tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
-    min-height: 145px;
-    float: left;
-}
-
-.tab-configuration .mixer .gui_box, .tab-configuration .motorstop .gui_box {
-    min-height: 290px;
-    float: left;
-}
-
-.tab-configuration .board .gui_box, .tab-configuration .acc .gui_box {
-    min-height: 137px;
-    float: left;
-}
-
-.tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
-    min-height: 355px;
-    float: left;
-    margin-bottom: 10px;
-}
-
-.tab-configuration .current .gui_box {
-    float: left;
-}
-
-.tab-configuration .rxprovider {
-    min-height: 214px;
-}
-
-.tab-configuration .nrf24provider {
-    min-height: 140px;
-}
-
-.tab-configuration .current td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .voltage td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .rssi td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .rxFailsafe td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .gps td:nth-child(2) {
-    width: 38px;
-}
-
-.tab-configuration .other tr:last-child td {
-    border-bottom: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
+.tab-configuration .gui_box h3 {
+    text-decoration: underline;
+    font-size: 1.07em;
+    color: #333;
+    margin-left: 2px;
 }
 
 .tab-configuration .mixerPreview {
@@ -321,22 +119,16 @@ hr
     padding: 5%;
 }
 
-.tab-configuration .rxMode tr:last-child td {
-    border-bottom: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
-}
-
 .tab-configuration .gui_box {
-    font-family: 'open_sanssemibold', Arial,serif;
+    font-family: 'open_sanssemibold', Arial, serif;
 }
 
 .tab-configuration .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial,serif;
+    font-family: 'open_sansregular', Arial, serif;
     line-height: 19px;
     color: #4F4F4F;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .tab-configuration .alignicon {
@@ -368,71 +160,6 @@ hr
     margin: 0 0 2px 0;
 }
 
-#mixercontent .mixerheadline {
-    font-size: 13px;
-    width: 100%;
-    padding-bottom: 0;
-    float: left;
-    margin-bottom: 7px;
-    font-family: 'open_sanssemibold', Arial,serif;
-}
-
-#mixercontent select {
-    float: left;
-    width: 100%;
-    height: 20px;
-    margin: 3px 0 20px 0;
-}
-
-#mixercontent input {
-    width: 50px;
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    margin-right: 11px;
-    font-size: 12px;
-    font-weight: normal;
-
-}
-
-#mixercontent .mixerletter {
-    width: 23px;
-    height: 23px;
-    background-color: #d0d0d0;
-    line-height: 23px;
-    text-align: center;
-    border-radius: 100px;
-    margin-right: 10px;
-    font-size: 12px;
-    font-weight: bold;
-    float: left;
-}
-
-#mixercontent .number {
-    margin-bottom: 5px;
-    clear: left;
-    padding-top: 5px;
-    border-top: 1px solid #ddd;
-    width: 100%;
-    float: left;
-}
-
-#mixercontent .number:last-child {
-    padding-top: 0;
-    margin-bottom: 0;
-}
-
-#mixercontent .mixercanvas {
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    border: 1px solid #e4e4e4;
-    height: 340px;
-    margin-top: 3px;
-}
-
 .tab-configuration .sensoralignment {
     width: 50%;
     float: left;
@@ -448,37 +175,19 @@ hr
     float: left;
 }
 
-
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-configuration .gui_box span {
         line-height: 17px;
     }
+
     .tab-configuration .leftWrapper {
         width: calc(50% - 15px);
     }
+
     .tab-configuration .rightWrapper {
         float: left;
         width: calc(50% - 0px);
         margin: 0 0 10px 15px;
-    }
-    .tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
-        min-height: 145px;
-        float: left;
-    }
-    .tab-configuration .mixer .gui_box, .tab-configuration .motorstop .gui_box {
-        min-height: 290px;
-        float: left;
-    }
-    .tab-configuration .board .gui_box, .tab-configuration .acc .gui_box {
-        min-height: 137px;
-        float: left;
-    }
-    .tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
-        min-height: 355px;
-        float: left;
-    }
-    .tab-configuration .current .gui_box {
-        float: left;
     }
 }
 
@@ -487,39 +196,42 @@ hr
     display: none;
 }
 
-#esc-protocols span {
-    display: inline-block;
-    width: 10em;
-}
-
-#esc-protocols .select,
-#servo-rate-container .select,
-.motorstop .select,
-.motorstop .checkbox,
-.motorstop .number,
 .config-section .select,
 .config-section .checkbox,
-.config-section .number,
-.system .select,
-.system .checkbox,
-.system .number {
+.config-section .radio,
+.config-section .number {
     position: relative;
+    height: 22px;
 }
 
-#esc-protocols label,
-#servo-rate-container label,
-.motorstop label,
-.config-section label,
-.system label {
+.config-section .checkbox label,
+.config-section .radio label {
+    cursor: pointer;
+}
+
+.config-section label {
     position: absolute;
-    left: 10em;
+    left: 9em;
+}
+
+.config-section .radio label {
+    left: 2em;
+}
+
+.config-section .radio input {
+    margin-top: 3px;
+    margin-left: 5px;
 }
 
 .esc-priority label,
-.features.esc label{
+.features.esc label {
     position: inherit;
 }
 
-.sensors select {
-    width: 8em;
+.config-section select {
+    width: 7em;
+}
+
+.config-section .helpicon {
+    margin-top: 3px;
 }

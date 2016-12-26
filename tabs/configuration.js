@@ -72,9 +72,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     //Update Analog/Battery Data
     function load_analog() {
         MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-	    $('input[name="batteryvoltage"]').val([ANALOG.voltage.toFixed(1)]);
-	    $('input[name="batterycurrent"]').val([ANALOG.amperage.toFixed(2)]);
-            });
+	        $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+	        $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+        });
     }
 
     function load_html() {
@@ -110,42 +110,47 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var features_e = $('.features');
         for (i = 0; i < features.length; i++) {
-            var row_e;
+            var row_e,
+                tips = [],
+                feature_tip_html = '';
 
-            var feature_tip_html = '';
+            if (features[i].showNameInTip) {
+                tips.push(chrome.i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
+            }
+
             if (features[i].haveTip) {
-                feature_tip_html = '<div class="helpicon cf_tip" i18n_title="feature' + features[i].name + 'Tip"></div>';
+                tips.push(chrome.i18n.getMessage("feature" + features[i].name + "Tip"));
+            }
+
+            if (tips.length > 0) {
+                feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
             if (features[i].mode === 'group') {
-                row_e = $('<tr><td style="width: 15px;"><input style="width: 13px;" class="feature" id="feature-'
-                        + i
-                        + '" value="'
-                        + features[i].bit
-                        + '" title="'
-                        + features[i].name
-                        + '" type="radio" name="'
-                        + features[i].group
-                        + '" /></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span data-i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
+
+                row_e = $('<div class="radio">'
+                    + '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"'
+                    + ' value="' + features[i].bit + '"'
+                    + ' id="feature-' + features[i].bit + '" '
+                    + '>'
+                    + '<label for="feature-' + features[i].bit + '">'
+                    + '<span data-i18n="feature' + features[i].name + '"></span>'
+                    + '</label>'
+                    + feature_tip_html
+                    + '</div>');
+
                 radioGroups.push(features[i].group);
             } else {
-                row_e = $('<tr><td><input class="feature toggle"'
-                        + i
-                        + '" name="'
-                        + features[i].name
-                        + '" title="'
-                        + features[i].name
-                        + '" type="checkbox"/></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span data-i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
+
+                row_e = $('<div class="checkbox">'
+                    + '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"'
+                    + ' id="feature-' + features[i].bit + '" '
+                    + '>'
+                    + '<label for="feature-' + features[i].bit + '">'
+                    + '<span data-i18n="feature' + features[i].name + '"></span>'
+                    + '</label>'
+                    + feature_tip_html
+                    + '</div>');
 
                 var feature_e = row_e.find('input.feature');
 
@@ -155,7 +160,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             features_e.each(function () {
                 if ($(this).hasClass(features[i].group)) {
-                    $(this).append(row_e);
+                    $(this).after(row_e);
                 }
             });
         }
@@ -196,7 +201,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var gpsProtocols = FC.getGpsProtocols();
         var gpsSbas = FC.getGpsSbasProviders();
 
-        var gps_protocol_e = $('select.gps_protocol');
+        var gps_protocol_e = $('#gps_protocol');
         for (i = 0; i < gpsProtocols.length; i++) {
             gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
         }
@@ -207,7 +212,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         gps_protocol_e.val(MISC.gps_type);
 
-        var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
+        var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (i = 0; i < gpsSbas.length; i++) {
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
         }
@@ -222,7 +227,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // generate serial RX
         var serialRxTypes = FC.getSerialRxTypes();
 
-        var serialRX_e = $('select.serialRX');
+        var serialRX_e = $('#serial-rx-protocol');
         for (i = 0; i < serialRxTypes.length; i++) {
             serialRX_e.append('<option value="' + i + '">' + serialRxTypes[i] + '</option>');
         }
@@ -240,12 +245,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        var nrf24ProtocolTypes = FC.getNrf24ProtocolTypes();
-
-        var nrf24Protocol_e = $('select.nrf24Protocol');
-        for (i = 0; i < nrf24ProtocolTypes.length; i++) {
-            nrf24Protocol_e.append('<option value="' + i + '">' + nrf24ProtocolTypes[i] + '</option>');
-        }
+        var nrf24Protocol_e = $('#nrf24-protocol');
+        GUI.fillSelect(nrf24Protocol_e, FC.getNrf24ProtocolTypes());
 
         nrf24Protocol_e.change(function () {
             RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
@@ -261,7 +262,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
         // fill magnetometer
-        $('input[name="mag_declination"]').val(MISC.mag_declination);
+        $('#mag_declination').val(MISC.mag_declination);
 
         //fill motor disarm params and FC loop time
         $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
@@ -274,21 +275,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         // fill throttle
-        $('input[name="minthrottle"]').val(MISC.minthrottle);
-        $('input[name="midthrottle"]').val(MISC.midrc);
-        $('input[name="maxthrottle"]').val(MISC.maxthrottle);
-        $('input[name="mincommand"]').val(MISC.mincommand);
+        $('#minthrottle').val(MISC.minthrottle);
+        $('#midthrottle').val(MISC.midrc);
+        $('#maxthrottle').val(MISC.maxthrottle);
+        $('#mincommand').val(MISC.mincommand);
 
         // fill battery
-        $('input[name="mincellvoltage"]').val(MISC.vbatmincellvoltage);
-        $('input[name="maxcellvoltage"]').val(MISC.vbatmaxcellvoltage);
-        $('input[name="warningcellvoltage"]').val(MISC.vbatwarningcellvoltage);
-        $('input[name="voltagescale"]').val(MISC.vbatscale);
+        $('#mincellvoltage').val(MISC.vbatmincellvoltage);
+        $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
+        $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
+        $('#voltagescale').val(MISC.vbatscale);
 
         // fill current
-        $('input[name="currentscale"]').val(BF_CONFIG.currentscale);
-        $('input[name="currentoffset"]').val(BF_CONFIG.currentoffset);
-        $('input[name="multiwiicurrentoutput"]').prop('checked', MISC.multiwiicurrentoutput);
+        $('#currentscale').val(BF_CONFIG.currentscale);
+        $('#currentoffset').val(BF_CONFIG.currentoffset);
+        $('#multiwiicurrentoutput').prop('checked', MISC.multiwiicurrentoutput);
 
         var escProtocols = FC.getEscProtocols();
         var servoRates = FC.getServoRates();
@@ -365,28 +366,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var $looptime = $("#looptime");
 
-        //TODO move this up and use in more places
-        var fillSelect = function ($element, values, currentValue, unit) {
-            if (unit == null) {
-                unit = '';
-            }
-
-            $element.find("*").remove();
-
-            for (i in values) {
-                if (values.hasOwnProperty(i)) {
-                    $element.append('<option value="' + i + '">' + values[i] + '</option>');
-                }
-            }
-
-            /*
-             *  If current Value is not on the list, add a new entry
-             */
-            if (currentValue != null && $element.find('[value="' + currentValue + '"]').length == 0) {
-                $element.append('<option value="' + currentValue + '">' + currentValue + unit + '</option>');
-            }
-        };
-
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             $(".requires-v1_4").show();
 
@@ -412,7 +391,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $gyroLpf.change(function () {
                 INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
 
-                fillSelect(
+                GUI.fillSelect(
                     $looptime,
                     FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
                     FC_CONFIG.loopTime,
@@ -421,7 +400,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
                 $looptime.change();
 
-                fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
+                GUI.fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
                 $gyroFrequency.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
                 $gyroFrequency.change();
             });
@@ -457,7 +436,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             /*
              * Async mode select
              */
-            fillSelect($asyncMode, FC.getAsyncModes());
+            GUI.fillSelect($asyncMode, FC.getAsyncModes());
             $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
             $asyncMode.change(function () {
                 INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
@@ -483,20 +462,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
             $asyncMode.change();
 
-            fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
+            GUI.fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
             $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
             $accelerometerFrequency.change(function () {
                 INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
             });
 
-            fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
+            GUI.fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
             $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
             $attitudeFrequency.change(function () {
                 INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
             });
 
         } else {
-            fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
+            GUI.fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
 
             $looptime.val(FC_CONFIG.loopTime);
             $looptime.change(function () {
@@ -513,26 +492,26 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $sensorBaro = $('#sensor-baro'),
                 $sensorPitot = $('#sensor-pitot');
 
-            fillSelect($sensorAcc, FC.getAccelerometerNames());
+            GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
             $sensorAcc.val(SENSOR_CONFIG.accelerometer);
             $sensorAcc.change(function () {
                 SENSOR_CONFIG.accelerometer = $sensorAcc.val();
             });
 
 
-            fillSelect($sensorMag, FC.getMagnetometerNames());
+            GUI.fillSelect($sensorMag, FC.getMagnetometerNames());
             $sensorMag.val(SENSOR_CONFIG.magnetometer);
             $sensorMag.change(function () {
                 SENSOR_CONFIG.magnetometer = $sensorMag.val();
             });
 
-            fillSelect($sensorBaro, FC.getBarometerNames());
+            GUI.fillSelect($sensorBaro, FC.getBarometerNames());
             $sensorBaro.val(SENSOR_CONFIG.barometer);
             $sensorBaro.change(function () {
                 SENSOR_CONFIG.barometer = $sensorBaro.val();
             });
 
-            fillSelect($sensorPitot, FC.getPitotNames());
+            GUI.fillSelect($sensorPitot, FC.getPitotNames());
             $sensorPitot.val(SENSOR_CONFIG.pitot);
             $sensorPitot.change(function () {
                 SENSOR_CONFIG.pitot = $sensorPitot.val();
@@ -543,16 +522,17 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_5").hide();
         }
 
-        $('input[name="3ddeadbandlow"]').val(_3D.deadband3d_low);
-        $('input[name="3ddeadbandhigh"]').val(_3D.deadband3d_high);
-        $('input[name="3dneutral"]').val(_3D.neutral3d);
+        $('#3ddeadbandlow').val(_3D.deadband3d_low);
+        $('#3ddeadbandhigh').val(_3D.deadband3d_high);
+        $('#3dneutral').val(_3D.neutral3d);
         if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-            $('input[name="3ddeadbandthrottle"]').val(_3D.deadband3d_throttle);
+            $('#3ddeadbandthrottle').val(_3D.deadband3d_throttle);
         } else {
-            $('.3ddeadbandthrottle').hide();
+            $('#deadband-3d-throttle-container').remove();
         }
 
-        $('input[type="checkbox"].feature', features_e).change(function () {
+        $('input[type="checkbox"].feature').change(function () {
+
             var element = $(this),
                 index = element.data('bit'),
                 state = element.is(':checked');
@@ -569,7 +549,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         // UI hooks
-        $('input[type="radio"].feature', features_e).change(function () {
+        $('input[type="radio"].feature').change(function () {
             var element = $(this),
                 group = element.attr('name');
 
@@ -596,30 +576,30 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
             BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
-            MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
+            MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
             ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
 
-            MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
-            MISC.midrc = parseInt($('input[name="midthrottle"]').val());
-            MISC.maxthrottle = parseInt($('input[name="maxthrottle"]').val());
-            MISC.mincommand = parseInt($('input[name="mincommand"]').val());
+            MISC.minthrottle = parseInt($('#minthrottle').val());
+            MISC.midrc = parseInt($('#midthrottle').val());
+            MISC.maxthrottle = parseInt($('#maxthrottle').val());
+            MISC.mincommand = parseInt($('#mincommand').val());
 
-            MISC.vbatmincellvoltage = parseFloat($('input[name="mincellvoltage"]').val());
-            MISC.vbatmaxcellvoltage = parseFloat($('input[name="maxcellvoltage"]').val());
-            MISC.vbatwarningcellvoltage = parseFloat($('input[name="warningcellvoltage"]').val());
-            MISC.vbatscale = parseInt($('input[name="voltagescale"]').val());
+            MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
+            MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
+            MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
+            MISC.vbatscale = parseInt($('#voltagescale').val());
 
-            BF_CONFIG.currentscale = parseInt($('input[name="currentscale"]').val());
-            BF_CONFIG.currentoffset = parseInt($('input[name="currentoffset"]').val());
-            MISC.multiwiicurrentoutput = ~~$('input[name="multiwiicurrentoutput"]').is(':checked'); // ~~ boolean to decimal conversion
+            BF_CONFIG.currentscale = parseInt($('#currentscale').val());
+            BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
+            MISC.multiwiicurrentoutput = ~~$('#multiwiicurrentoutput').is(':checked'); // ~~ boolean to decimal conversion
 
-            _3D.deadband3d_low = parseInt($('input[name="3ddeadbandlow"]').val());
-            _3D.deadband3d_high = parseInt($('input[name="3ddeadbandhigh"]').val());
-            _3D.neutral3d = parseInt($('input[name="3dneutral"]').val());
+            _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
+            _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
+            _3D.neutral3d = parseInt($('#3dneutral').val());
             if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                _3D.deadband3d_throttle = ($('input[name="3ddeadbandthrottle"]').val());
+                _3D.deadband3d_throttle = ($('#3ddeadbandthrottle').val());
             }
 
 
@@ -634,7 +614,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             // track feature usage
             if (FC.isFeatureEnabled('RX_NRF24', features)) {
-                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', nrf24ProtocolTypes[RX_CONFIG.nrf24rx_protocol]);
+                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getNrf24ProtocolTypes()[RX_CONFIG.nrf24rx_protocol]);
             }
 
             if (FC.isFeatureEnabled('GPS', features)) {
@@ -742,23 +722,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             function reinitialize() {
                 //noinspection JSUnresolvedVariable
                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-
-                if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
-                    $('a.connect').click();
-                    GUI.timeout_add('start_connection',function start_connection() {
-                        $('a.connect').click();
-                    },2500);
-                } else {
-
-                    GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
-                        MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
-                            //noinspection JSUnresolvedVariable
-                            GUI.log(chrome.i18n.getMessage('deviceReady'));
-                            //noinspection JSValidateTypes
-                            TABS.configuration.initialize(false, $('#content').scrollTop());
-                        });
-                    },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
-                }
+                GUI.handleReconnect($('.tab_configuration a'));
             }
 
             MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, save_misc);

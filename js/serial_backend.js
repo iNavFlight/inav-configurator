@@ -7,6 +7,45 @@ $(document).ready(function () {
         $baud = $('#baud'),
         $portOverride = $('#port-override');
 
+    GUI.handleReconnect = function ($tabElement) {
+        if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
+
+            /*
+             Disconnect
+             */
+            setTimeout(function () {
+                $('a.connect').click();
+            }, 100);
+
+            /*
+             Connect again
+             */
+            setTimeout(function start_connection() {
+                $('a.connect').click();
+
+                /*
+                 Open configuration tab
+                 */
+                if ($tabElement != null) {
+                    setTimeout(function () {
+                        $tabElement.click();
+                    }, 500);
+                }
+
+            }, 5000);
+        } else {
+
+            GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
+                MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
+                    //noinspection JSUnresolvedVariable
+                    GUI.log(chrome.i18n.getMessage('deviceReady'));
+                    //noinspection JSValidateTypes
+                    TABS.configuration.initialize(false, $('#content').scrollTop());
+                });
+            },1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
+        }
+    };
+
     GUI.updateManualPortVisibility = function(){
         var selected_port = $port.find('option:selected');
         if (selected_port.data().isManual) {
@@ -147,9 +186,6 @@ $(document).ready(function () {
     PortHandler.initialize();
     PortUsage.initialize();
 });
-
-
-
 
 function onOpen(openInfo) {
     if (openInfo) {
