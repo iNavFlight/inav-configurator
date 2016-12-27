@@ -85,7 +85,8 @@ var FC = {
             mode: 0,
             profile: 0,
             uid: [0, 0, 0],
-            accelerometerTrims: [0, 0]
+            accelerometerTrims: [0, 0],
+            armingFlags: 0
         };
 
         BF_CONFIG = {
@@ -648,5 +649,45 @@ var FC = {
     },
     getRangefinderNames: function () {
         return ["NONE", "AUTO", "HCSR04", "SRF10"];
+    },
+    getArmingFlags: function () {
+        return {
+            0: "OK_TO_ARM",
+            1: "PREVENT_ARMING",
+            2: "ARMED",
+            3: "WAS_EVER_ARMED",
+            8: "BLOCKED_UAV_NOT_LEVEL",
+            9: "BLOCKED_SENSORS_CALIBRATING",
+            10: "BLOCKED_SYSTEM_OVERLOADED",
+            11: "BLOCKED_NAVIGATION_SAFETY",
+            12: "BLOCKED_COMPASS_NOT_CALIBRATED",
+            13: "BLOCKED_ACCELEROMETER_NOT_CALIBRATED",
+            14: null,
+            15: "BLOCKED_HARDWARE_FAILURE"
+        }
+    },
+    getArmingBlockingFlags: function() {
+        var allFlags = this.getArmingFlags(),
+            retVal = {};
+
+        for (var i in allFlags) {
+            if (allFlags.hasOwnProperty(i) && parseInt(i, 10) >= 8 && allFlags[i] !== null) {
+                retVal[i] = allFlags[i];
+            }
+        }
+
+        return retVal;
+    },
+    processArmingFlags: function (flag) {
+        var retVal = [],
+            flagNames = this.getArmingFlags();
+
+        for (var bit in flagNames) {
+            if (flagNames.hasOwnProperty(bit) && bit_check(flag, bit)) {
+                retVal.push(flagNames[bit]);
+            }
+        }
+
+        return retVal;
     }
 };

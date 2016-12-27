@@ -1864,5 +1864,29 @@
     },
     "manualEnablingTemplate": {
         "message": "To enable via CLI use <strong>feature {name}</strong> command"
+    },
+    "armingFailureReasonTitle": {
+        "message": "Arming status"
+    },
+    "BLOCKED_UAV_NOT_LEVEL": {
+        "message": "UAV level"
+    },
+    "BLOCKED_SENSORS_CALIBRATING": {
+        "message": "Boot calibration"
+    },
+    "BLOCKED_SYSTEM_OVERLOADED": {
+        "message": "CPU load"
+    },
+    "BLOCKED_NAVIGATION_SAFETY": {
+        "message": "Navigation safety"
+    },
+    "BLOCKED_COMPASS_NOT_CALIBRATED": {
+        "message": "Compass calibrated"
+    },
+    "BLOCKED_ACCELEROMETER_NOT_CALIBRATED": {
+        "message": "Accelerometer calibrated"
+    },
+    "BLOCKED_HARDWARE_FAILURE": {
+        "message": "Hardware healthy"
     }
 }

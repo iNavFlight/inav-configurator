@@ -250,3 +250,14 @@
     transition: all ease 0.2s;
     text-decoration:none;
 }
+
+.armin-status-element {
+    margin: 4px 0;
+    font-weight: bold;
+    color: #37a8db;
+    font-size: 1.1em;
+}
+
+.armin-status-failed {
+    color: red;
+}
