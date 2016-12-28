@@ -64,16 +64,10 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 13;
+        var availableFunctionCount = 15;
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.8.0')) {
-            availableFunctionCount += 2; // pitch and roll rate
-            if (semver.gte(CONFIG.flightControllerVersion, '1.9.0')) {
-                availableFunctionCount += 6; // pitch p,i,d and roll p,i,d
-                if(semver.gte(CONFIG.apiVersion, "1.15.0")){
-                   availableFunctionCount += 18;
-                }
-            }
+        if (semver.gte(CONFIG.flightControllerVersion, '1.4.0')) {
+           availableFunctionCount = 21;
         }
 
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
