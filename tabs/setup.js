@@ -211,6 +211,25 @@ TABS.setup.initialize = function (callback) {
         GUI.interval_add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
         GUI.interval_add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
 
+        function updateArminFailure() {
+            var flagNames = FC.getArmingFlags();
+            for (var bit in flagNames) {
+                if (flagNames.hasOwnProperty(bit)) {
+                    if (bit_check(CONFIG.armingFlags & 0xff00, bit)) {
+                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckFail'));
+                    }
+                    else {
+                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckPass'));
+                    }
+                }
+            }
+        }
+
+        /*
+         * 1fps update rate will be fully enough
+         */
+        GUI.interval_add('updateArminFailure', updateArminFailure, 500, true);
+
         GUI.content_ready(callback);
     }
 };

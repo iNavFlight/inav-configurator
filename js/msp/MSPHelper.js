@@ -58,7 +58,7 @@ var mspHelper = (function (gui) {
 
                 /*
                  * Update sensor status only for older firmwares
-                 * Newer firmwares use MSP_STATUS_EX instead
+                 * Newer firmwares use MSP_SENSOR_STATUS instead
                  */
                 if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
                     sensor_status(CONFIG.activeSensors);
@@ -72,6 +72,10 @@ var mspHelper = (function (gui) {
                 CONFIG.mode = data.getUint32(6, 1);
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, 1);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                    CONFIG.armingFlags = data.getUint16(13, 2);
+                }
 
                 if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
                     sensor_status(CONFIG.activeSensors);
