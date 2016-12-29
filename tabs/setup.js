@@ -211,27 +211,18 @@ TABS.setup.initialize = function (callback) {
         GUI.interval_add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
         GUI.interval_add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
 
-        var $armingFailuresList = $('#armingFailuresList');
-
-        var reasons = FC.getArmingBlockingFlags();
-
-        for (var i in reasons) {
-            if (reasons.hasOwnProperty(i)) {
-                $armingFailuresList.append("<li id='reason-" + reasons[i] + "' class='armin-status-element'>" + chrome.i18n.getMessage(reasons[i]) + "</li>");
-            }
-        }
-
         function updateArminFailure() {
-            var armingReasons = FC.processArmingFlags(CONFIG.armingFlags & 0xff00);
-
-            $armingFailuresList.find('*').removeClass("armin-status-failed");
-
-            for (var reason in armingReasons) {
-                if (armingReasons.hasOwnProperty(reason)) {
-                    $('#reason-' + armingReasons[reason]).addClass("armin-status-failed");
+            var flagNames = FC.getArmingFlags();
+            for (var bit in flagNames) {
+                if (flagNames.hasOwnProperty(bit)) {
+                    if (bit_check(CONFIG.armingFlags & 0xff00, bit)) {
+                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckFail'));
+                    }
+                    else {
+                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckPass'));
+                    }
                 }
             }
-
         }
 
         /*

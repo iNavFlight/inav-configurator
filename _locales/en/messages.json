@@ -1866,19 +1866,19 @@
         "message": "To enable via CLI use <strong>feature {name}</strong> command"
     },
     "armingFailureReasonTitle": {
-        "message": "Arming status"
+        "message": "Pre-arming checks"
     },
     "BLOCKED_UAV_NOT_LEVEL": {
-        "message": "UAV level"
+        "message": "UAV is levelled"
     },
     "BLOCKED_SENSORS_CALIBRATING": {
-        "message": "Boot calibration"
+        "message": "Run-time calibration"
     },
     "BLOCKED_SYSTEM_OVERLOADED": {
         "message": "CPU load"
     },
     "BLOCKED_NAVIGATION_SAFETY": {
-        "message": "Navigation safety"
+        "message": "Navigation is safe"
     },
     "BLOCKED_COMPASS_NOT_CALIBRATED": {
         "message": "Compass calibrated"
@@ -1887,6 +1887,12 @@
         "message": "Accelerometer calibrated"
     },
     "BLOCKED_HARDWARE_FAILURE": {
-        "message": "Hardware healthy"
+        "message": "Hardware health"
+    },
+    "armingCheckPass": {
+        "message": "<span class=\"arming-state-pass\">PASS</span>"
+    },
+    "armingCheckFail": {
+        "message": "<span class=\"arming-state-fail\">FAIL</span>"
     }
 }

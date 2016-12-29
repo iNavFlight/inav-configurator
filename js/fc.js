@@ -678,16 +678,4 @@ var FC = {
 
         return retVal;
     },
-    processArmingFlags: function (flag) {
-        var retVal = [],
-            flagNames = this.getArmingFlags();
-
-        for (var bit in flagNames) {
-            if (flagNames.hasOwnProperty(bit) && bit_check(flag, bit)) {
-                retVal.push(flagNames[bit]);
-            }
-        }
-
-        return retVal;
-    }
 };

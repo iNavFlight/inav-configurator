@@ -251,11 +251,21 @@
     text-decoration:none;
 }
 
+.arming-state-pass {
+    font-weight: bold;
+    color: green;
+}
+
+.arming-state-fail {
+    font-weight: bold;
+    color: red;
+}
+
 .armin-status-element {
-    margin: 4px 0;
+    margin: 2px 0;
     font-weight: bold;
     color: #37a8db;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 .armin-status-failed {
