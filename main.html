@@ -99,22 +99,24 @@
                     <div class="version"></div>
                 </div>
             </div>
-            <a id="options" href="#" i18n_title="options_title"></a>
+            <a id="options" href="#" data-i18n_title="options_title"></a>
             <div id="port-picker">
                 <div class="connect_controls" id="connectbutton">
                     <div class="connect_b">
                         <a class="connect" href="#"></a>
                     </div>
-                    <a class="connect_state" i18n="connect"></a>
+                    <a class="connect_state" data-i18n="connect"></a>
                 </div>
                 <div id="portsinput">
                     <div class="dropdown dropdown-dark">
+                        <!--suppress HtmlFormInputWithoutLabel -->
                         <select class="dropdown-select" id="port" title="Port">
                             <option value="manual">Manual</option>
                             <!-- port list gets generated here -->
                         </select>
                     </div>
                     <div class="dropdown dropdown-dark">
+                        <!--suppress HtmlFormInputWithoutLabel -->
                         <select class="dropdown-select" id="baud" title="Baud Rate">
                             <option value="115200" selected="selected">115200</option>
                             <option value="57600">57600</option>
@@ -134,7 +136,7 @@
                     </div>
                     <div>
                         <label><input class="auto_connect togglesmall" type="checkbox" /><span
-                            class="auto_connect" i18n="autoConnect"></span></label>
+                            class="auto_connect" data-i18n="autoConnect"></span></label>
                     </div>
                 </div>
             </div>
@@ -149,11 +151,12 @@
                     <div id="profile_change">
                         <div class="dropdown dropdown-dark">
                            <form name="profile-change" id="profile-change">
-                            <select class="dropdown-select" id="profilechange">
-                            <option value="0">Profile 1</option>
-                            <option value="1">Profile 2</option>
-                            <option value="2">Profile 3</option>
-                            </select>
+                                <!--suppress HtmlFormInputWithoutLabel -->
+                                <select class="dropdown-select" id="profilechange">
+                                    <option value="0">Profile 1</option>
+                                    <option value="1">Profile 2</option>
+                                    <option value="2">Profile 3</option>
+                                </select>
                            </form>
                         </div>
                     </div>
@@ -194,9 +197,9 @@
                     </div>
                     <div class="battery-legend">Battery voltage</div>
                     <div class="bottomStatusIcons">
-                        <div class="armedicon cf_tip" i18n_title="mainHelpArmed"></div>
-                        <div class="failsafeicon cf_tip" i18n_title="mainHelpFailsafe"></div>
-                        <div class="linkicon cf_tip" i18n_title="mainHelpLink"></div>
+                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
+                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
             </div>
@@ -212,29 +215,29 @@
         <div class="tab_container">
             <div id="tabs">
                 <ul class="mode-disconnected">
-                    <li class="tab_landing"><a href="#" i18n="tabLanding" class="tabicon ic_welcome" title="Welcome"></a></li>
-                    <li class="tab_help"><a href="#" i18n="tabHelp" class="tabicon ic_help" title="Documentation &amp; Support"></a></li>
-                    <li class="tab_firmware_flasher"><a href="#" i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a></li>
+                    <li class="tab_landing"><a href="#" data-i18n="tabLanding" class="tabicon ic_welcome" title="Welcome"></a></li>
+                    <li class="tab_help"><a href="#" data-i18n="tabHelp" class="tabicon ic_help" title="Documentation &amp; Support"></a></li>
+                    <li class="tab_firmware_flasher"><a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a></li>
                 </ul>
                 <ul class="mode-connected">
-                    <li class="tab_setup"><a href="#" i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
-                    <li class="tab_ports"><a href="#" i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a></li>
-                    <li class="tab_configuration"><a href="#" i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a></li>
-                    <li class="tab_failsafe"><a href="#" i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a></li>
-                    <li class="tab_pid_tuning"><a href="#" i18n="tabPidTuning" class="tabicon ic_pid" title="PID Tuning"></a></li>
-                    <li class="tab_receiver"><a href="#" i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a></li>
-                    <li class="tab_auxiliary"><a href="#" i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a></li>
-                    <li class="tab_adjustments"><a href="#" i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a></li>
-                    <li class="tab_servos"><a href="#" i18n="tabServos" class="tabicon ic_servo" title="Servos"></a></li>
-                    <li class="tab_gps"><a href="#" i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a></li>
-                    <li class="tab_motors"><a href="#" i18n="tabMotorTesting" class="tabicon ic_motor" title="Motors"></a></li>
-                    <li class="tab_osd"><a href="#" i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a></li>
-                    <li class="tab_transponder"><a href="#" i18n="tabTransponder" class="tabicon ic_transponder" title="Transponder"></a></li>
-                    <li class="tab_led_strip"><a href="#" i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a></li>
-                    <li class="tab_sensors"><a href="#" i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a></li>
-                    <li class="tab_logging"><a href="#" i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a></li>
-                    <li class="tab_onboard_logging"><a href="#" i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a></li>
-                    <li class="tab_cli"><a href="#" i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
+                    <li class="tab_setup"><a href="#" data-i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
+                    <li class="tab_ports"><a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a></li>
+                    <li class="tab_configuration"><a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a></li>
+                    <li class="tab_failsafe"><a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a></li>
+                    <li class="tab_pid_tuning"><a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" title="PID Tuning"></a></li>
+                    <li class="tab_receiver"><a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a></li>
+                    <li class="tab_auxiliary"><a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a></li>
+                    <li class="tab_adjustments"><a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a></li>
+                    <li class="tab_servos"><a href="#" data-i18n="tabServos" class="tabicon ic_servo" title="Servos"></a></li>
+                    <li class="tab_gps"><a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a></li>
+                    <li class="tab_motors"><a href="#" data-i18n="tabMotorTesting" class="tabicon ic_motor" title="Motors"></a></li>
+                    <li class="tab_osd"><a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a></li>
+                    <li class="tab_transponder"><a href="#" data-i18n="tabTransponder" class="tabicon ic_transponder" title="Transponder"></a></li>
+                    <li class="tab_led_strip"><a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a></li>
+                    <li class="tab_sensors"><a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a></li>
+                    <li class="tab_logging"><a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a></li>
+                    <li class="tab_onboard_logging"><a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a></li>
+                    <li class="tab_cli"><a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
                     <!-- spare icons
                     <li class=""><a href="#"class="tabicon ic_mission">Mission (spare icon)</a></li>
                     <li class=""><a href="#"class="tabicon ic_advanced">Advanced (spare icon)</a></li>
@@ -247,17 +250,17 @@
         <div id="content"></div>
         <div id="status-bar">
             <div>
-                <span i18n="statusbar_port_utilization"></span> <span class="port_usage_down">D: 0%</span> <span
+                <span data-i18n="statusbar_port_utilization"></span> <span class="port_usage_down">D: 0%</span> <span
                     class="port_usage_up">U: 0%</span>
             </div>
             <div>
-                <span i18n="statusbar_packet_error"></span> <span class="packet-error">0</span>
+                <span data-i18n="statusbar_packet_error"></span> <span class="packet-error">0</span>
             </div>
             <div>
-                <span i18n="statusbar_i2c_error"></span> <span class="i2c-error">0</span>
+                <span data-i18n="statusbar_i2c_error"></span> <span class="i2c-error">0</span>
             </div>
             <div>
-                <span i18n="statusbar_cycle_time"></span> <span class="cycle-time">0</span>
+                <span data-i18n="statusbar_cycle_time"></span> <span class="cycle-time">0</span>
             </div>
             <div>
                 <span class="cpu-load"> </span>
