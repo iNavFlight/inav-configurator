@@ -1,7 +1,8 @@
+<!--suppress ALL -->
 <div id="content-watermark"></div>
 <div class="tab-pid_tuning toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title" i18n="tabPidTuning"></div>
+        <div class="tab_title" data-i18n="tabPidTuning"></div>
         <div class="cf_doc_version_bt">
             <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
         </div>
@@ -21,16 +22,16 @@
                 <div class="gui_box grey">
                     <table class="pid_titlebar">
                         <tr>
-                            <th class="name" i18n="pidTuningName"></th>
-                            <th class="proportional" i18n="pidTuningProportional"></th>
-                            <th class="integral" i18n="pidTuningIntegral"></th>
-                            <th class="derivative" i18n="pidTuningDerivative"></th>
+                            <th class="name" data-i18n="pidTuningName"></th>
+                            <th class="proportional" data-i18n="pidTuningProportional"></th>
+                            <th class="integral" data-i18n="pidTuningIntegral"></th>
+                            <th class="derivative" data-i18n="pidTuningDerivative"></th>
                         </tr>
                     </table>
                     <table id="pid_main" class="pid_tuning">
                         <tr>
                             <th colspan="4">
-                                <div class="pid_mode" i18n="pidTuningBasic"></div>
+                                <div class="pid_mode" data-i18n="pidTuningBasic"></div>
                             </th>
                         </tr>
                         <tr class="ROLL">
@@ -58,7 +59,7 @@
                     <table id="pid_baro" class="pid_tuning">
                         <tr>
                             <th colspan="4">
-                                <div class="pid_mode" i18n="pidTuningAltitude"></div>
+                                <div class="pid_mode" data-i18n="pidTuningAltitude"></div>
                             </th>
                         </tr>
                         <tr class="ALT">
@@ -79,7 +80,7 @@
                     <table id="pid_mag" class="pid_tuning">
                         <tr>
                             <th colspan="4">
-                                <div class="pid_mode" i18n="pidTuningMag"></div>
+                                <div class="pid_mode" data-i18n="pidTuningMag"></div>
                             </th>
                         </tr>
                         <tr class="MAG">
@@ -93,7 +94,7 @@
                     <table id="pid_gps" class="pid_tuning">
                         <tr>
                             <th colspan="4">
-                                <div class="pid_mode" i18n="pidTuningGps"></div>
+                                <div class="pid_mode" data-i18n="pidTuningGps"></div>
                             </th>
                         </tr>
                         <tr class="Pos">
@@ -125,12 +126,12 @@
                             <th colspan="4">
                                 <div class="pid_mode borderleft">
                                     <div class="textleft">
-                                        <div class="pidTuningLevel" i18n="pidTuningLevel"></div>
-                                        <div class="helpicon cf_tip" i18n_title="pidTuningLevelHelp"></div>
+                                        <div class="pidTuningLevel" data-i18n="pidTuningLevel"></div>
+                                        <div class="helpicon cf_tip" data-i18n_title="pidTuningLevelHelp"></div>
                                     </div>
-                                    <div class="pids" i18n="pidTuningLevelP"></div>
-                                    <div class="pids" i18n="pidTuningLevelI"></div>
-                                    <div class="pids" i18n="pidTuningLevelD"></div>
+                                    <div class="pids" data-i18n="pidTuningLevelP"></div>
+                                    <div class="pids" data-i18n="pidTuningLevelI"></div>
+                                    <div class="pids" data-i18n="pidTuningLevelD"></div>
                                 </div>
                             </th>
                         </tr>
@@ -149,28 +150,28 @@
                     <table class="rate-tpa rate-tpa--inav">
                         <tbody>
                             <tr>
-                                <th class="roll" i18n="pidTuningRollRate"></th>
+                                <th class="roll" data-i18n="pidTuningRollRate"></th>
                                 <td class="roll">
                                     <input type="number" name="roll" class="rate-tpa_input" step="10" min="60" max="1800" /> degrees per second
                                 </td>
                             </tr>
                             <tr>
-                                <th class="pitch" i18n="pidTuningPitchRate"></th>
+                                <th class="pitch" data-i18n="pidTuningPitchRate"></th>
                                 <td class="pitch">
                                     <input type="number" name="pitch" class="rate-tpa_input" step="10" min="60" max="1800" /> degrees per second
                                 </td>
                             </tr>
                             <tr>
-                                <th class="yaw" i18n="pidTuningYawRate"></th>
+                                <th class="yaw" data-i18n="pidTuningYawRate"></th>
                                 <td class="yaw">
                                     <input type="number" name="yaw" class="rate-tpa_input" step="10" min="20" max="1800" /> degrees per second
                                 </td>
                             </tr>
                             <tr class="requires-v1_4">
-                                <th i18n="magHoldYawRate"></th>
+                                <th data-i18n="magHoldYawRate"></th>
                                 <td >
                                     <input type="number" id="magHoldYawRate" class="rate-tpa_input" step="5" min="10" max="250" /> degrees per second
-                                    <div class="helpicon cf_tip" i18n_title="pidTuningMagHoldYawRateHelp"></div>
+                                    <div class="helpicon cf_tip" data-i18n_title="pidTuningMagHoldYawRateHelp"></div>
                                 </td>
                             </tr>
                         </tbody>
@@ -178,10 +179,10 @@
                     <table class="rate-tpa rate-tpa--no-dps cf">
                         <thead>
                             <tr>
-                                <th class="roll-pitch" i18n="pidTuningRollPitchRate"></th>
-                                <th class="roll" i18n="pidTuningRollRate"></th>
-                                <th class="pitch" i18n="pidTuningPitchRate"></th>
-                                <th i18n="pidTuningYawRate"></th>
+                                <th class="roll-pitch" data-i18n="pidTuningRollPitchRate"></th>
+                                <th class="roll" data-i18n="pidTuningRollRate"></th>
+                                <th class="pitch" data-i18n="pidTuningPitchRate"></th>
+                                <th data-i18n="pidTuningYawRate"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -199,22 +200,22 @@
             </div>
         </form>
         <div class="clear-both"></div>
-        <div class="tab_title requires-v1_4" i18n="tabFiltering" style="margin-top: 1em;"></div>
+        <div class="tab_title requires-v1_4" data-i18n="tabFiltering" style="margin-top: 1em;"></div>
         <div class="cf_column half requires-v1_4">
             <table class="rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>
-                        <th i18n="gyroLpfCutoffFrequency"></th>
+                        <th data-i18n="gyroLpfCutoffFrequency"></th>
                         <td>
                             <input type="number" id="gyroSoftLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" i18n_title="gyroLpfCutoffFrequencyHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="gyroLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th i18n="accLpfCutoffFrequency"></th>
+                        <th data-i18n="accLpfCutoffFrequency"></th>
                         <td>
                             <input type="number" id="accSoftLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" i18n_title="accLpfCutoffFrequencyHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="accLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
 
@@ -225,17 +226,17 @@
             <table class="spacer_left rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>
-                        <th i18n="dtermLpfCutoffFrequency"></th>
+                        <th data-i18n="dtermLpfCutoffFrequency"></th>
                         <td>
                             <input type="number" id="dtermLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" i18n_title="dtermLpfCutoffFrequencyHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="dtermLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th i18n="yawLpfCutoffFrequency"></th>
+                        <th data-i18n="yawLpfCutoffFrequency"></th>
                         <td>
                             <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" i18n_title="yawLpfCutoffFrequencyHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
                 </tbody>
@@ -243,35 +244,35 @@
         </div>
 
         <div class="clear-both requires-v1_4"></div>
-        <div class="tab_title requires-v1_4" i18n="tabMisc" style="margin-top: 1em;"></div>
+        <div class="tab_title requires-v1_4" data-i18n="tabMisc" style="margin-top: 1em;"></div>
         <div class="cf_column half requires-v1_4">
             <table class="rate-tpa rate-tpa--misc">
                 <tr>
-                    <th i18n="yawJumpPreventionLimit"></th>
+                    <th data-i18n="yawJumpPreventionLimit"></th>
                     <td >
                         <input type="number" id="yawJumpPreventionLimit" class="rate-tpa_input" step="10" min="80" max="500" />
-                        <div class="helpicon cf_tip" i18n_title="yawJumpPreventionLimitHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="yawJumpPreventionLimitHelp"></div>
                     </td>
                 </tr>
                 <tr>
-                    <th i18n="yawPLimit"></th>
+                    <th data-i18n="yawPLimit"></th>
                     <td >
                         <input type="number" id="yawPLimit" class="rate-tpa_input" step="10" min="100" max="500" />
-                        <div class="helpicon cf_tip" i18n_title="yawPLimitHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="yawPLimitHelp"></div>
                     </td>
                 </tr>
                 <tr>
-                    <th i18n="rollPitchItermIgnoreRate"></th>
+                    <th data-i18n="rollPitchItermIgnoreRate"></th>
                     <td >
                         <input type="number" id="rollPitchItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
-                        <div class="helpicon cf_tip" i18n_title="rollPitchItermIgnoreRateHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="rollPitchItermIgnoreRateHelp"></div>
                     </td>
                 </tr>
                 <tr>
-                    <th i18n="yawItermIgnoreRate"></th>
+                    <th data-i18n="yawItermIgnoreRate"></th>
                     <td >
                         <input type="number" id="yawItermIgnoreRate" class="rate-tpa_input" step="5" min="15" max="1000" />
-                        <div class="helpicon cf_tip" i18n_title="yawItermIgnoreRateHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="yawItermIgnoreRateHelp"></div>
                     </td>
                 </tr>
             </table>
@@ -280,34 +281,34 @@
             <table class="spacer_left rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>
-                        <th i18n="axisAccelerationLimitRollPitch"></th>
+                        <th data-i18n="axisAccelerationLimitRollPitch"></th>
                         <td >
                             <input type="number" id="axisAccelerationLimitRollPitch" class="rate-tpa_input" step="10" min="0" max="655350" />
                             dps^2
-                            <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitRollPitchHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="axisAccelerationLimitRollPitchHelp"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th i18n="axisAccelerationLimitYaw"></th>
+                        <th data-i18n="axisAccelerationLimitYaw"></th>
                         <td >
                             <input type="number" id="axisAccelerationLimitYaw" class="rate-tpa_input" step="10" min="0" max="655350" />
                             dps^2
-                            <div class="helpicon cf_tip" i18n_title="axisAccelerationLimitYawHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="axisAccelerationLimitYawHelp"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th i18n="pidTuningTPA"></th>
+                        <th data-i18n="pidTuningTPA"></th>
                         <td >
                             <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
                             %
-                            <div class="helpicon cf_tip" i18n_title="pidTuningTPAHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th i18n="pidTuningTPABreakPoint"></th>
+                        <th data-i18n="pidTuningTPABreakPoint"></th>
                         <td >
                             <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000" max="2000" />
-                            <div class="helpicon cf_tip" i18n_title="pidTuningTPABreakPointHelp"></div>
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
                         </td>
                     </tr>
                 </tbody>
@@ -317,10 +318,10 @@
     <div class="clear-both"></div>
     <div class="content_toolbar">
         <div class="btn save_btn">
-            <a class="update" href="#" i18n="pidTuningButtonSave"></a>
+            <a class="update" href="#" data-i18n="pidTuningButtonSave"></a>
         </div>
         <div class="btn refresh_btn">
-            <a class="refresh" href="#" i18n="pidTuningButtonRefresh"></a>
+            <a class="refresh" href="#" data-i18n="pidTuningButtonRefresh"></a>
         </div>
     </div>
 </div>
