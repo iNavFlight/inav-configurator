@@ -866,6 +866,21 @@ var mspHelper = (function (gui) {
                 console.log("MSP_INAV_PID saved");
                 break;
 
+            case MSPCodes.MSP_NAV_POSHOLD:
+                NAV_POSHOLD.userControlMode = data.getUint8(0);
+                NAV_POSHOLD.maxSpeed = data.getUint16(1, true);
+                NAV_POSHOLD.maxClimbRate = data.getUint16(3, true);
+                NAV_POSHOLD.maxManualSpeed = data.getUint16(5, true);
+                NAV_POSHOLD.maxManualClimbRate = data.getUint16(7, true);
+                NAV_POSHOLD.maxBankAngle = data.getUint8(9);
+                NAV_POSHOLD.useThrottleMidForAlthold = data.getUint8(10);
+                NAV_POSHOLD.hoverThrottle = data.getUint16(11, true);
+                break;
+
+            case MSPCodes.MSP_SET_NAV_POSHOLD:
+                console.log('NAV_POSHOLD saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1170,6 +1185,28 @@ var mspHelper = (function (gui) {
                 buffer.push(0); //reserved
                 buffer.push(0); //reserved
                 buffer.push(0); //reserved
+                break;
+
+            case MSPCodes.MSP_SET_NAV_POSHOLD:
+                buffer.push(NAV_POSHOLD.userControlMode);
+
+                buffer.push(lowByte(NAV_POSHOLD.maxSpeed));
+                buffer.push(highByte(NAV_POSHOLD.maxSpeed));
+
+                buffer.push(lowByte(NAV_POSHOLD.maxClimbRate));
+                buffer.push(highByte(NAV_POSHOLD.maxClimbRate));
+
+                buffer.push(lowByte(NAV_POSHOLD.maxManualSpeed));
+                buffer.push(highByte(NAV_POSHOLD.maxManualSpeed));
+
+                buffer.push(lowByte(NAV_POSHOLD.maxManualClimbRate));
+                buffer.push(highByte(NAV_POSHOLD.maxManualClimbRate));
+
+                buffer.push(NAV_POSHOLD.maxBankAngle);
+                buffer.push(NAV_POSHOLD.useThrottleMidForAlthold);
+
+                buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
+                buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:

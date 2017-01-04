@@ -43,6 +43,7 @@ var PID_ADVANCED;
 var FILTER_CONFIG;
 var SENSOR_STATUS;
 var SENSOR_CONFIG;
+var NAV_POSHOLD;
 
 var FC = {
     isRatesInDps: function () {
@@ -256,6 +257,17 @@ var FC = {
             yawJumpPreventionLimit: null,
             gyroscopeLpf: null,
             accSoftLpfHz: null
+        };
+
+        NAV_POSHOLD = {
+            userControlMode: null,
+            maxSpeed: null,
+            maxClimbRate: null,
+            maxManualSpeed: null,
+            maxManualClimbRate: null,
+            maxBankAngle: null,
+            useThrottleMidForAlthold: null,
+            hoverThrottle: null
         };
 
         _3D = {
@@ -677,5 +689,5 @@ var FC = {
         }
 
         return retVal;
-    },
+    }
 };

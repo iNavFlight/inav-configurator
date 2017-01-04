@@ -10,6 +10,9 @@ var MSPCodes = {
     MSP_INAV_PID:               6,
     MSP_SET_INAV_PID:           7,
 
+    MSP_NAV_POSHOLD:            12,
+    MSP_SET_NAV_POSHOLD:        13,
+
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
     MSP_SET_CHANNEL_FORWARDING: 33,
