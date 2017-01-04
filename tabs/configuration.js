@@ -51,6 +51,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
     }
 
+    //FIXME duplicate
     function loadINAVPidConfig() {
         var next_callback = loadSensorConfig;
         if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {

@@ -1894,5 +1894,14 @@
     },
     "armingCheckFail": {
         "message": "<span class=\"arming-state-fail\">FAIL</span>"
+    },
+    "tabPresets": {
+        "message": "Presets"
+    },
+    "presetsPreset": {
+        "message": "Preset"
+    },
+    "presetsDescription": {
+        "message": "Description"
     }
 }
