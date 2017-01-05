@@ -812,14 +812,14 @@ var mspHelper = (function (gui) {
                 FILTER_CONFIG.gyroSoftLpfHz = data.getUint8(0, true);
                 FILTER_CONFIG.dtermLpfHz = data.getUint16(1, true);
                 FILTER_CONFIG.yawLpfHz = data.getUint16(3, true);
-                /*
-                 sbufWriteU16(dst, 1); //masterConfig.gyro_soft_notch_hz_1
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_1
-                 sbufWriteU16(dst, 1); //BF: currentProfile->pidProfile.dterm_notch_hz
-                 sbufWriteU16(dst, 1); //currentProfile->pidProfile.dterm_notch_cutoff
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_hz_2
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_2
-                 */
+
+                FILTER_CONFIG.gyroNotchHz1 = data.getUint16(5, true);
+                FILTER_CONFIG.gyroNotchCutoff1 = data.getUint16(7, true);
+                FILTER_CONFIG.dtermNotchHz = data.getUint16(9, true);
+                FILTER_CONFIG.dtermNotchCutoff = data.getUint16(11, true);
+                FILTER_CONFIG.gyroNotchHz2 = data.getUint16(13, true);
+                FILTER_CONFIG.gyroNotchCutoff2 = data.getUint16(15, true);
+
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -1218,23 +1218,23 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FILTER_CONFIG.yawLpfHz));
                 buffer.push(highByte(FILTER_CONFIG.yawLpfHz));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchHz1));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchHz1));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff1));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff1));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.dtermNotchHz));
+                buffer.push(highByte(FILTER_CONFIG.dtermNotchHz));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.dtermNotchCutoff));
+                buffer.push(highByte(FILTER_CONFIG.dtermNotchCutoff));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchHz2));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchHz2));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff2));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff2));
                 break;
 
             case MSPCodes.MSP_SET_PID_ADVANCED:

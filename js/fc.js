@@ -237,7 +237,13 @@ var FC = {
         FILTER_CONFIG = {
             gyroSoftLpfHz: null,
             dtermLpfHz: null,
-            yawLpfHz: null
+            yawLpfHz: null,
+            gyroNotchHz1: null,
+            gyroNotchCutoff1: null,
+            dtermNotchHz: null,
+            dtermNotchCutoff: null,
+            gyroNotchHz2: null,
+            gyroNotchCutoff2: null
         };
 
         PID_ADVANCED = {
