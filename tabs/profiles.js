@@ -1,14 +1,26 @@
 'use strict';
 
-function elementHelper(group, field, value) {
+var presets = presets || {};
+
+presets.elementHelper = function (group, field, value) {
     return {
         group: group,
         field: field,
         value: value
     }
-}
+};
 
-var availablePresets = [
+presets.defaultValues = {
+    PIDs: [[40,30,23],[40,30,23],[85,45,0],[50,0,0],[65,120,10],[180,15,100],[10,5,8],[20,15,75],[60,0,0],[100,50,10]],
+    INAV_PID_CONFIG: {"asynchronousMode":"0","accelerometerTaskFrequency":500,"attitudeTaskFrequency":250,"magHoldRateLimit":90,"magHoldErrorLpfFrequency":2,"yawJumpPreventionLimit":200,"gyroscopeLpf":"3","accSoftLpfHz":15},
+    ADVANCED_CONFIG: {"gyroSyncDenominator":2,"pidProcessDenom":1,"useUnsyncedPwm":1,"motorPwmProtocol":0,"motorPwmRate":400,"servoPwmRate":50,"gyroSync":0},
+    RC_tuning: {"RC_RATE":0,"RC_EXPO":0,"roll_pitch_rate":0,"roll_rate":0,"pitch_rate":0,"yaw_rate":0,"dynamic_THR_PID":0,"throttle_MID":0,"throttle_EXPO":0,"dynamic_THR_breakpoint":0,"RC_YAW_EXPO":0},
+    PID_ADVANCED: {"rollPitchItermIgnoreRate":200,"yawItermIgnoreRate":50,"yawPLimit":300,"axisAccelerationLimitRollPitch":0,"axisAccelerationLimitYaw":1000},
+    FILTER_CONFIG: {"gyroSoftLpfHz":60,"dtermLpfHz":40,"yawLpfHz":30,"gyroNotchHz1":0,"gyroNotchCutoff1":0,"dtermNotchHz":0,"dtermNotchCutoff":0,"gyroNotchHz2":0,"gyroNotchCutoff2":0},
+    FC_CONFIG: {"loopTime":2000}
+};
+
+presets.presets = [
     {
         name: '5" Racer',
         description: "210-250 class racer with F3/F4 CPU on 4S battery",
@@ -21,17 +33,19 @@ var availablePresets = [
             "MPU6000 gyro",
             "No GPS capabilities"
         ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
-            elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
-            elementHelper("FC_CONFIG", "loopTime", 1000),
-            elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
-            elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
-            elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
-            elementHelper("RC_tuning", "roll_rate", 800),
-            elementHelper("RC_tuning", "pitch_rate", 800),
-            elementHelper("RC_tuning", "yaw_rate", 650)
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 800),
+            presets.elementHelper("RC_tuning", "pitch_rate", 800),
+            presets.elementHelper("RC_tuning", "yaw_rate", 650)
         ]
     },
     {
@@ -41,14 +55,44 @@ var availablePresets = [
             "3S-4S battery",
             "300g-500g weight"
         ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
-            elementHelper("PIDs", 0, [15, 30, 15]),  //ROLL PIDs
-            elementHelper("PIDs", 1, [15, 40, 15]),  //PITCH PIDs
-            elementHelper("RC_tuning", "roll_rate", 400),
-            elementHelper("RC_tuning", "pitch_rate", 150)
+            presets.elementHelper("PIDs", 0, [15, 30, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [15, 40, 15]),  //PITCH PIDs
+            presets.elementHelper("RC_tuning", "roll_rate", 400),
+            presets.elementHelper("RC_tuning", "pitch_rate", 150)
         ]
     }
 ];
+
+presets.model = (function () {
+
+    var self = {};
+
+    /**
+     * @param {Array} toApply
+     * @param {Object} defaults
+     */
+    self.applyDefaults = function (toApply, defaults) {
+
+        for (var settingToApply in toApply) {
+            if (toApply.hasOwnProperty(settingToApply)) {
+
+                var settingName = toApply[settingToApply],
+                    values = defaults[settingName];
+
+                for (var key in values) {
+                    if (values.hasOwnProperty(key)) {
+                        window[settingName][key] = values[key];
+                    }
+                }
+
+            }
+        }
+    };
+
+    return self;
+})();
 
 TABS.profiles = {};
 
@@ -101,7 +145,16 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     }
 
     function loadPidData() {
-        MSP.send_message(MSPCodes.MSP_PID, false, false, loadHtml);
+        MSP.send_message(MSPCodes.MSP_PID, false, false, loadPidAdvanced);
+    }
+
+    function loadPidAdvanced() {
+        var next_callback = loadHtml;
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, next_callback);
+        } else {
+            next_callback();
+        }
     }
 
     function loadHtml() {
@@ -143,19 +196,22 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var $presetList = $('#presets-list');
 
-        GUI.fillSelect($presetList, extractPresetNames(availablePresets));
+        GUI.fillSelect($presetList, extractPresetNames(presets.presets));
 
         $presetList.change(function () {
             currentPresetId = $presetList.val();
-            currentPreset = availablePresets[currentPresetId];
+            currentPreset = presets.presets[currentPresetId];
             fillPresetDescription(currentPreset);
         });
 
         localize();
 
+        //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         $('#save-button').click(function () {
+
+            presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
 
             var setting;
 
@@ -211,7 +267,16 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         }
 
         function saveRcTuning() {
-            MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, saveToEeprom);
+            MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, savePidAdvanced);
+        }
+
+        function savePidAdvanced() {
+            var next_callback = saveToEeprom;
+            if(semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+                MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, next_callback);
+            } else {
+                next_callback();
+            }
         }
 
         //FIXME duplicate from configuration.js
@@ -231,7 +296,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         function reinitialize() {
             //noinspection JSUnresolvedVariable
             GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-            GUI.handleReconnect($('.tab_profiles a'));
+            GUI.handleReconnect($('.tab_setup a'));
         }
 
         GUI.interval_add('status_pull', function status_pull() {
