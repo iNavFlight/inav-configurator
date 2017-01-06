@@ -37,7 +37,11 @@ var mspHelper = (function (gui) {
             offset = 0,
             needle = 0,
             i = 0,
-            buff = [];
+            buff = [],
+            identifier = '',
+            flags,
+            colorCount,
+            color;
 
         if (!dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
@@ -277,7 +281,7 @@ var mspHelper = (function (gui) {
                 //noinspection JSUndeclaredVariable
                 PID_names = []; // empty the array as new data is coming in
 
-                var buff = [];
+                buff = [];
                 for (i = 0; i < data.byteLength; i++) {
                     if (data.getUint8(i) == 0x3B) { // ; (delimiter char)
                         PID_names.push(String.fromCharCode.apply(null, buff)); // convert bytes into ASCII and save as strings
@@ -425,7 +429,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_FC_VARIANT:
-                var identifier = '';
                 for (offset = 0; offset < 4; offset++) {
                     identifier += String.fromCharCode(data.getUint8(offset));
                 }
@@ -438,7 +441,8 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_BUILD_INFO:
                 var dateLength = 11;
-                var buff = [];
+
+                buff = [];
                 for (i = 0; i < dateLength; i++) {
                     buff.push(data.getUint8(offset++));
                 }
@@ -452,7 +456,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_BOARD_INFO:
-                var identifier = '';
                 for (offset = 0; offset < 4; offset++) {
                     identifier += String.fromCharCode(data.getUint8(offset));
                 }
@@ -602,17 +605,24 @@ var mspHelper = (function (gui) {
                 LED_STRIP = [];
 
                 var ledCount = data.byteLength / 7; // v1.4.0 and below incorrectly reported 4 bytes per led.
+
                 if (semver.gte(CONFIG.apiVersion, "1.20.0"))
                     ledCount = data.byteLength / 4;
+
+                var directionMask,
+                    directions,
+                    directionLetterIndex,
+                    functions,
+                    led;
 
                 for (i = 0; offset < data.byteLength && i < ledCount; i++) {
 
                     if (semver.lt(CONFIG.apiVersion, "1.20.0")) {
-                        var directionMask = data.getUint16(offset, true);
+                        directionMask = data.getUint16(offset, true);
                         offset += 2;
 
-                        var directions = [];
-                        for (var directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        directions = [];
+                        for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
                             if (bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
@@ -621,14 +631,14 @@ var mspHelper = (function (gui) {
                         var functionMask = data.getUint16(offset, 1);
                         offset += 2;
 
-                        var functions = [];
+                        functions = [];
                         for (var functionLetterIndex = 0; functionLetterIndex < MSP.ledFunctionLetters.length; functionLetterIndex++) {
                             if (bit_check(functionMask, functionLetterIndex)) {
                                 functions.push(MSP.ledFunctionLetters[functionLetterIndex]);
                             }
                         }
 
-                        var led = {
+                        led = {
                             directions: directions,
                             functions: functions,
                             x: data.getUint8(offset++),
@@ -642,7 +652,8 @@ var mspHelper = (function (gui) {
                         offset += 4;
 
                         var functionId = (mask >> 8) & 0xF;
-                        var functions = [];
+
+                        functions = [];
                         for (var baseFunctionLetterIndex = 0; baseFunctionLetterIndex < MSP.ledBaseFunctionLetters.length; baseFunctionLetterIndex++) {
                             if (functionId == baseFunctionLetterIndex) {
                                 functions.push(MSP.ledBaseFunctionLetters[baseFunctionLetterIndex]);
@@ -657,14 +668,15 @@ var mspHelper = (function (gui) {
                             }
                         }
 
-                        var directionMask = (mask >> 22) & 0x3F;
-                        var directions = [];
-                        for (var directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        directionMask = (mask >> 22) & 0x3F;
+
+                        directions = [];
+                        for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
                             if (bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
                         }
-                        var led = {
+                        led = {
                             y: (mask) & 0xF,
                             x: (mask >> 4) & 0xF,
                             functions: functions,
@@ -685,7 +697,7 @@ var mspHelper = (function (gui) {
                 //noinspection JSUndeclaredVariable
                 LED_COLORS = [];
 
-                var colorCount = data.byteLength / 4;
+                colorCount = data.byteLength / 4;
 
                 for (i = 0; offset < data.byteLength && i < colorCount; i++) {
 
@@ -694,7 +706,7 @@ var mspHelper = (function (gui) {
                     var v = data.getUint8(offset + 3);
                     offset += 4;
 
-                    var color = {
+                    color = {
                         h: h,
                         s: s,
                         v: v
@@ -713,21 +725,20 @@ var mspHelper = (function (gui) {
                     //noinspection JSUndeclaredVariable
                     LED_MODE_COLORS = [];
 
-                    var colorCount = data.byteLength / 3;
+                    colorCount = data.byteLength / 3;
 
                     for (i = 0; offset < data.byteLength && i < colorCount; i++) {
 
                         var mode = data.getUint8(offset++);
                         var direction = data.getUint8(offset++);
-                        var color = data.getUint8(offset++);
 
-                        var mode_color = {
+                        color = data.getUint8(offset++);
+
+                        LED_MODE_COLORS.push({
                             mode: mode,
                             direction: direction,
                             color: color
-                        };
-
-                        LED_MODE_COLORS.push(mode_color);
+                        });
                     }
                 }
                 break;
@@ -737,7 +748,7 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_DATAFLASH_SUMMARY:
                 if (data.byteLength >= 13) {
-                    var flags = data.getUint8(0);
+                    flags = data.getUint8(0);
                     DATAFLASH.ready = (flags & 1) != 0;
                     DATAFLASH.supported = (flags & 2) != 0 || DATAFLASH.ready;
                     DATAFLASH.sectors = data.getUint32(1, 1);
@@ -760,7 +771,7 @@ var mspHelper = (function (gui) {
                 console.log("Data flash erase begun...");
                 break;
             case MSPCodes.MSP_SDCARD_SUMMARY:
-                var flags = data.getUint8(0);
+                flags = data.getUint8(0);
 
                 SDCARD.supported = (flags & 0x01) != 0;
                 SDCARD.state = data.getUint8(1);
@@ -1302,6 +1313,7 @@ var mspHelper = (function (gui) {
                 BLACKBOX.blackboxRateDenom & 0xFF
         ];
 
+        //noinspection JSUnusedLocalSymbols
         MSP.send_message(MSPCodes.MSP_SET_BLACKBOX_CONFIG, message, false, function (response) {
             onDataCallback();
         });
@@ -1362,7 +1374,10 @@ var mspHelper = (function (gui) {
             MSP.send_message(MSPCodes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
         }
 
+        //FIXME looks like this is not used and not ever implemented
+        //noinspection JSUnusedLocalSymbols
         function send_channel_forwarding() {
+
             var buffer = [];
 
             for (var i = 0; i < SERVO_CONFIG.length; i++) {
@@ -1575,27 +1590,34 @@ var mspHelper = (function (gui) {
              color: data.getUint8(offset++, 1)
              };
              */
-            var buffer = [];
+            var buffer = [],
+                directionLetterIndex,
+                functionLetterIndex,
+                bitIndex;
 
             buffer.push(ledIndex);
 
             if (semver.lt(CONFIG.apiVersion, "1.20.0")) {
                 var directionMask = 0;
-                for (var directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
-                    var bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
+                for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
+
+                    bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                     if (bitIndex >= 0) {
                         directionMask = bit_set(directionMask, bitIndex);
                     }
+
                 }
                 buffer.push(specificByte(directionMask, 0));
                 buffer.push(specificByte(directionMask, 1));
 
                 var functionMask = 0;
-                for (var functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
-                    var bitIndex = MSP.ledFunctionLetters.indexOf(led.functions[functionLetterIndex]);
+                for (functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
+
+                    bitIndex = MSP.ledFunctionLetters.indexOf(led.functions[functionLetterIndex]);
                     if (bitIndex >= 0) {
                         functionMask = bit_set(functionMask, bitIndex);
                     }
+
                 }
                 buffer.push(specificByte(functionMask, 0));
                 buffer.push(specificByte(functionMask, 1));
@@ -1616,7 +1638,7 @@ var mspHelper = (function (gui) {
                 mask |= (led.y << 0);
                 mask |= (led.x << 4);
 
-                for (var functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
+                for (functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
                     var fnIndex = MSP.ledBaseFunctionLetters.indexOf(led.functions[functionLetterIndex]);
                     if (fnIndex >= 0) {
                         mask |= (fnIndex << 8);
@@ -1625,19 +1647,23 @@ var mspHelper = (function (gui) {
                 }
 
                 for (var overlayLetterIndex = 0; overlayLetterIndex < led.functions.length; overlayLetterIndex++) {
-                    var bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
+
+                    bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                     if (bitIndex >= 0) {
                         mask |= bit_set(mask, bitIndex + 12);
                     }
+
                 }
 
                 mask |= (led.color << 18);
 
-                for (var directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
-                    var bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
+                for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
+
+                    bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                     if (bitIndex >= 0) {
                         mask |= bit_set(mask, bitIndex + 22);
                     }
+
                 }
 
                 mask |= (0 << 28); // parameters
