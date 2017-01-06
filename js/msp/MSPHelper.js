@@ -1766,5 +1766,13 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
     };
 
+    self.loadPidNames = function (callback) {
+        MSP.send_message(MSPCodes.MSP_PIDNAMES, false, false, callback);
+    };
+
+    self.loadStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
+    };
+
     return self;
 })(GUI);
