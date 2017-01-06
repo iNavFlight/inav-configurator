@@ -9,80 +9,27 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         googleAnalytics.sendAppView('Configuration');
     }
 
-    function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_misc);
-    }
+    var loadChainer = new MSPChainerClass();
 
-    function load_misc() {
-        MSP.send_message(MSPCodes.MSP_MISC, false, false, load_arming_config);
-    }
-
-    function load_arming_config() {
-        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, load_loop_time);
-    }
-
-    function load_loop_time() {
-        MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, load_rx_config);
-    }
-
-    function load_rx_config() {
-        var next_callback = load_3d;
-        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    function load_3d() {
-        MSP.send_message(MSPCodes.MSP_3D, false, false, load_sensor_alignment);
-    }
-
-    function load_sensor_alignment() {
-        MSP.send_message(MSPCodes.MSP_SENSOR_ALIGNMENT, false, false, loadAdvancedConfig);
-    }
-
-    function loadAdvancedConfig() {
-        var next_callback = loadINAVPidConfig;
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    //FIXME duplicate
-    function loadINAVPidConfig() {
-        var next_callback = loadSensorConfig;
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    function loadSensorConfig() {
-        var next_callback = load_html;
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    //Update Analog/Battery Data
-    function load_analog() {
-        MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-	        $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
-	        $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
-        });
-    }
+    loadChainer.setChain([
+        mspHelper.loadMspIdent,
+        mspHelper.loadBfConfig,
+        mspHelper.loadMisc,
+        mspHelper.loadArmingConfig,
+        mspHelper.loadLoopTime,
+        mspHelper.loadRxConfig,
+        mspHelper.load3dConfig,
+        mspHelper.loadSensorAlignment,
+        mspHelper.loadAdvancedConfig,
+        mspHelper.loadINAVPidConfig,
+        mspHelper.loadSensorConfig
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
     function load_html() {
         $('#content').load("./tabs/configuration.html", process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_config);
 
     function process_html() {
 
@@ -737,7 +684,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
         }, 250, true);
-        GUI.interval_add('config_load_analog', load_analog, 250, true); // 4 fps
+        GUI.interval_add('config_load_analog', function () {
+            MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
+                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+                $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+            });
+        }, 250, true); // 4 fps
         GUI.content_ready(callback);
     }
 };

@@ -1774,5 +1774,41 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
     };
 
+    self.loadBfConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
+    };
+
+    self.loadMisc = function (callback) {
+        MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
+    };
+
+    self.loadArmingConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, callback);
+    };
+
+    self.loadRxConfig = function (callback) {
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.load3dConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_3D, false, false, callback);
+    };
+
+    self.loadSensorAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SENSOR_ALIGNMENT, false, false, callback);
+    };
+
+    self.loadSensorConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
     return self;
 })(GUI);
