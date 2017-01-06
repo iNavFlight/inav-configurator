@@ -1810,5 +1810,21 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadRcDeadband = function (callback) {
+        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
+            MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRcMap = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RX_MAP, false, false, callback);
+    };
+
+    self.loadRcData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RC, false, false, callback);
+    };
+
     return self;
 })(GUI);

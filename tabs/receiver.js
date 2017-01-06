@@ -1,3 +1,5 @@
+/*global chrome*/
+
 'use strict';
 
 TABS.receiver = {
@@ -12,37 +14,22 @@ TABS.receiver.initialize = function (callback) {
         googleAnalytics.sendAppView('Receiver');
     }
 
-    function get_misc_data() {
-        MSP.send_message(MSPCodes.MSP_MISC, false, false, get_rc_data);
-    }
+    var loadChainer = new MSPChainerClass();
 
-    function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, get_rc_map);
-    }
-
-    function get_rc_map() {
-        MSP.send_message(MSPCodes.MSP_RX_MAP, false, false, load_config);
-    }
-
-    // Fetch features so we can check if RX_MSP is enabled:
-    function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_rc_configs);
-    }
-
-    function load_rc_configs() {
-        var next_callback = load_html;
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
+    loadChainer.setChain([
+        mspHelper.loadRcTuningData,
+        mspHelper.loadMisc,
+        mspHelper.loadRcData,
+        mspHelper.loadRcMap,
+        mspHelper.loadBfConfig,
+        mspHelper.loadRcDeadband
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
     function load_html() {
         $('#content').load("./tabs/receiver.html", process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, get_misc_data);
 
     function process_html() {
         // translate to user-selected language
