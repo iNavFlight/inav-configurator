@@ -1715,5 +1715,56 @@ var mspHelper = (function (gui) {
         }
     };
 
+    /*
+     * Basic sending methods used for chaining purposes
+     */
+    self.loadMspIdent = function (callback) {
+        MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
+    };
+
+    self.loadINAVPidConfig = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadLoopTime = function (callback) {
+        MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, callback);
+    };
+
+    self.loadAdvancedConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadFilterConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadPidAdvanced = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRcTuningData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, callback);
+    };
+
+    self.loadPidData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+    };
+
     return self;
 })(GUI);
