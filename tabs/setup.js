@@ -1,3 +1,4 @@
+/*global chrome*/
 'use strict';
 
 TABS.setup = {
@@ -12,23 +13,20 @@ TABS.setup.initialize = function (callback) {
         googleAnalytics.sendAppView('Setup');
     }
 
-    function load_ident() {
-        MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_config);
-    }
+    var loadChainer = new MSPChainerClass();
 
-    function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_misc_data);
-    }
-
-    function load_misc_data() {
-        MSP.send_message(MSPCodes.MSP_MISC, false, false, load_html);
-    }
+    loadChainer.setChain([
+        mspHelper.loadStatus,
+        mspHelper.loadMspIdent,
+        mspHelper.loadBfConfig,
+        mspHelper.loadMisc
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
     function load_html() {
         $('#content').load("./tabs/setup.html", process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_ident);
 
     function process_html() {
         // translate to user-selected language
@@ -246,9 +244,19 @@ TABS.setup.initializeInstruments = function() {
     };
 };
 
-TABS.setup.initialize3D = function (compatibility) {
+TABS.setup.initialize3D = function () {
     var self = this,
-        loader, canvas, wrapper, renderer, camera, scene, light, light2, modelWrapper, model, model_file,
+        loader,
+        canvas,
+        wrapper,
+        renderer,
+        camera,
+        scene,
+        light,
+        light2,
+        modelWrapper,
+        model,
+        model_file,
         useWebGlRenderer = false;
 
     canvas = $('.model-and-info #canvas');
@@ -269,7 +277,7 @@ TABS.setup.initialize3D = function (compatibility) {
 
 
 //    // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
-    modelWrapper = new THREE.Object3D()
+    modelWrapper = new THREE.Object3D();
 //
     // load the model including materials
     if (useWebGlRenderer) {
@@ -279,10 +287,8 @@ TABS.setup.initialize3D = function (compatibility) {
     }
 
     // Temporary workaround for 'custom' model until akfreak's custom model is merged.
-    var useLegacyCustomModel = false;
     if (model_file == 'custom') {
         model_file = 'fallback';
-        useLegacyCustomModel = true;
     }
 
     // setup scene
