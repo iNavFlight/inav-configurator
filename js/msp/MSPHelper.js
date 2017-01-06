@@ -36,7 +36,12 @@ var mspHelper = (function (gui) {
         var data = new DataView(dataHandler.message_buffer, 0), // DataView (allowing us to view arrayBuffer as struct/union)
             offset = 0,
             needle = 0,
-            i = 0;
+            i = 0,
+            buff = [],
+            identifier = '',
+            flags,
+            colorCount,
+            color;
 
         if (!dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
@@ -45,13 +50,13 @@ var mspHelper = (function (gui) {
                 CONFIG.version = parseFloat((data.getUint8(0) / 100).toFixed(2));
                 CONFIG.multiType = data.getUint8(1);
                 CONFIG.msp_version = data.getUint8(2);
-                CONFIG.capability = data.getUint32(3, 1);
+                CONFIG.capability = data.getUint32(3, true);
                 break;
             case MSPCodes.MSP_STATUS:
-                CONFIG.cycleTime = data.getUint16(0, 1);
-                CONFIG.i2cError = data.getUint16(2, 1);
-                CONFIG.activeSensors = data.getUint16(4, 1);
-                CONFIG.mode = data.getUint32(6, 1);
+                CONFIG.cycleTime = data.getUint16(0, true);
+                CONFIG.i2cError = data.getUint16(2, true);
+                CONFIG.activeSensors = data.getUint16(4, true);
+                CONFIG.mode = data.getUint32(6, true);
                 CONFIG.profile = data.getUint8(10);
                 gui.updateProfileChange();
                 gui.updateStatusBar();
@@ -66,15 +71,15 @@ var mspHelper = (function (gui) {
 
                 break;
             case MSPCodes.MSP_STATUS_EX:
-                CONFIG.cycleTime = data.getUint16(0, 1);
-                CONFIG.i2cError = data.getUint16(2, 1);
-                CONFIG.activeSensors = data.getUint16(4, 1);
-                CONFIG.mode = data.getUint32(6, 1);
+                CONFIG.cycleTime = data.getUint16(0, true);
+                CONFIG.i2cError = data.getUint16(2, true);
+                CONFIG.activeSensors = data.getUint16(4, true);
+                CONFIG.mode = data.getUint32(6, true);
                 CONFIG.profile = data.getUint8(10);
-                CONFIG.cpuload = data.getUint16(11, 1);
+                CONFIG.cpuload = data.getUint16(11, true);
 
                 if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    CONFIG.armingFlags = data.getUint16(13, 2);
+                    CONFIG.armingFlags = data.getUint16(13, true);
                 }
 
                 if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
@@ -101,24 +106,24 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_RAW_IMU:
                 // 512 for mpu6050, 256 for mma
                 // currently we are unable to differentiate between the sensor types, so we are goign with 512
-                SENSOR_DATA.accelerometer[0] = data.getInt16(0, 1) / 512;
-                SENSOR_DATA.accelerometer[1] = data.getInt16(2, 1) / 512;
-                SENSOR_DATA.accelerometer[2] = data.getInt16(4, 1) / 512;
+                SENSOR_DATA.accelerometer[0] = data.getInt16(0, true) / 512;
+                SENSOR_DATA.accelerometer[1] = data.getInt16(2, true) / 512;
+                SENSOR_DATA.accelerometer[2] = data.getInt16(4, true) / 512;
 
                 // properly scaled
-                SENSOR_DATA.gyroscope[0] = data.getInt16(6, 1) * (4 / 16.4);
-                SENSOR_DATA.gyroscope[1] = data.getInt16(8, 1) * (4 / 16.4);
-                SENSOR_DATA.gyroscope[2] = data.getInt16(10, 1) * (4 / 16.4);
+                SENSOR_DATA.gyroscope[0] = data.getInt16(6, true) * (4 / 16.4);
+                SENSOR_DATA.gyroscope[1] = data.getInt16(8, true) * (4 / 16.4);
+                SENSOR_DATA.gyroscope[2] = data.getInt16(10, true) * (4 / 16.4);
 
                 // no clue about scaling factor
-                SENSOR_DATA.magnetometer[0] = data.getInt16(12, 1) / 1090;
-                SENSOR_DATA.magnetometer[1] = data.getInt16(14, 1) / 1090;
-                SENSOR_DATA.magnetometer[2] = data.getInt16(16, 1) / 1090;
+                SENSOR_DATA.magnetometer[0] = data.getInt16(12, true) / 1090;
+                SENSOR_DATA.magnetometer[1] = data.getInt16(14, true) / 1090;
+                SENSOR_DATA.magnetometer[2] = data.getInt16(16, true) / 1090;
                 break;
             case MSPCodes.MSP_SERVO:
                 var servoCount = dataHandler.message_length_expected / 2;
                 for (i = 0; i < servoCount; i++) {
-                    SERVO_DATA[i] = data.getUint16(needle, 1);
+                    SERVO_DATA[i] = data.getUint16(needle, true);
 
                     needle += 2;
                 }
@@ -126,7 +131,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_MOTOR:
                 var motorCount = dataHandler.message_length_expected / 2;
                 for (i = 0; i < motorCount; i++) {
-                    MOTOR_DATA[i] = data.getUint16(needle, 1);
+                    MOTOR_DATA[i] = data.getUint16(needle, true);
 
                     needle += 2;
                 }
@@ -135,18 +140,18 @@ var mspHelper = (function (gui) {
                 RC.active_channels = dataHandler.message_length_expected / 2;
 
                 for (i = 0; i < RC.active_channels; i++) {
-                    RC.channels[i] = data.getUint16((i * 2), 1);
+                    RC.channels[i] = data.getUint16((i * 2), true);
                 }
                 break;
             case MSPCodes.MSP_RAW_GPS:
                 GPS_DATA.fix = data.getUint8(0);
                 GPS_DATA.numSat = data.getUint8(1);
-                GPS_DATA.lat = data.getInt32(2, 1);
-                GPS_DATA.lon = data.getInt32(6, 1);
-                GPS_DATA.alt = data.getUint16(10, 1);
-                GPS_DATA.speed = data.getUint16(12, 1);
-                GPS_DATA.ground_course = data.getUint16(14, 1);
-                GPS_DATA.hdop = data.getUint16(16, 1);
+                GPS_DATA.lat = data.getInt32(2, true);
+                GPS_DATA.lon = data.getInt32(6, true);
+                GPS_DATA.alt = data.getUint16(10, true);
+                GPS_DATA.speed = data.getUint16(12, true);
+                GPS_DATA.ground_course = data.getUint16(14, true);
+                GPS_DATA.hdop = data.getUint16(16, true);
                 break;
             case MSPCodes.MSP_COMP_GPS:
                 GPS_DATA.distanceToHome = data.getUint16(0, 1);
@@ -154,30 +159,31 @@ var mspHelper = (function (gui) {
                 GPS_DATA.update = data.getUint8(4);
                 break;
             case MSPCodes.MSP_GPSSTATISTICS:
-                GPS_DATA.messageDt = data.getUint16(0, 1);
-                GPS_DATA.errors = data.getUint32(2, 1);
-                GPS_DATA.timeouts = data.getUint32(6, 1);
-                GPS_DATA.packetCount = data.getUint32(10, 1);
-                GPS_DATA.hdop = data.getUint16(14, 1);
-                GPS_DATA.eph = data.getUint16(16, 1);
-                GPS_DATA.epv = data.getUint16(18, 1);
+                GPS_DATA.messageDt = data.getUint16(0, true);
+                GPS_DATA.errors = data.getUint32(2, true);
+                GPS_DATA.timeouts = data.getUint32(6, true);
+                GPS_DATA.packetCount = data.getUint32(10, true);
+                GPS_DATA.hdop = data.getUint16(14, true);
+                GPS_DATA.eph = data.getUint16(16, true);
+                GPS_DATA.epv = data.getUint16(18, true);
                 break;
             case MSPCodes.MSP_ATTITUDE:
-                SENSOR_DATA.kinematics[0] = data.getInt16(0, 1) / 10.0; // x
-                SENSOR_DATA.kinematics[1] = data.getInt16(2, 1) / 10.0; // y
-                SENSOR_DATA.kinematics[2] = data.getInt16(4, 1); // z
+                SENSOR_DATA.kinematics[0] = data.getInt16(0, true) / 10.0; // x
+                SENSOR_DATA.kinematics[1] = data.getInt16(2, true) / 10.0; // y
+                SENSOR_DATA.kinematics[2] = data.getInt16(4, true); // z
                 break;
             case MSPCodes.MSP_ALTITUDE:
-                SENSOR_DATA.altitude = parseFloat((data.getInt32(0, 1) / 100.0).toFixed(2)); // correct scale factor
+                SENSOR_DATA.altitude = parseFloat((data.getInt32(0, true) / 100.0).toFixed(2)); // correct scale factor
                 break;
             case MSPCodes.MSP_SONAR:
-                SENSOR_DATA.sonar = data.getInt32(0, 1);
+                SENSOR_DATA.sonar = data.getInt32(0, true);
                 break;
             case MSPCodes.MSP_ANALOG:
                 ANALOG.voltage = data.getUint8(0) / 10.0;
-                ANALOG.mAhdrawn = data.getUint16(1, 1);
-                ANALOG.rssi = data.getUint16(3, 1); // 0-1023
-                ANALOG.amperage = data.getInt16(5, 1) / 100; // A
+                ANALOG.mAhdrawn = data.getUint16(1, true);
+                ANALOG.rssi = data.getUint16(3, true); // 0-1023
+                ANALOG.amperage = data.getInt16(5, true) / 100; // A
+                //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
             case MSPCodes.MSP_RC_TUNING:
@@ -198,7 +204,7 @@ var mspHelper = (function (gui) {
                 RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.throttle_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                RC_tuning.dynamic_THR_breakpoint = data.getUint16(offset, 1);
+                RC_tuning.dynamic_THR_breakpoint = data.getUint16(offset, true);
                 offset += 2;
                 RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 break;
@@ -211,22 +217,22 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_ARMING_CONFIG:
-                ARMING_CONFIG.auto_disarm_delay = data.getUint8(0, 1);
+                ARMING_CONFIG.auto_disarm_delay = data.getUint8(0);
                 ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
                 break;
             case MSPCodes.MSP_LOOP_TIME:
-                FC_CONFIG.loopTime = data.getInt16(0, 1);
+                FC_CONFIG.loopTime = data.getInt16(0, true);
                 break;
             case MSPCodes.MSP_MISC: // 22 bytes
-                MISC.midrc = data.getInt16(offset, 1);
+                MISC.midrc = data.getInt16(offset, true);
                 offset += 2;
-                MISC.minthrottle = data.getUint16(offset, 1); // 0-2000
+                MISC.minthrottle = data.getUint16(offset, true); // 0-2000
                 offset += 2;
-                MISC.maxthrottle = data.getUint16(offset, 1); // 0-2000
+                MISC.maxthrottle = data.getUint16(offset, true); // 0-2000
                 offset += 2;
-                MISC.mincommand = data.getUint16(offset, 1); // 0-2000
+                MISC.mincommand = data.getUint16(offset, true); // 0-2000
                 offset += 2;
-                MISC.failsafe_throttle = data.getUint16(offset, 1); // 1000-2000
+                MISC.failsafe_throttle = data.getUint16(offset, true); // 1000-2000
                 offset += 2;
                 MISC.gps_type = data.getUint8(offset++);
                 MISC.gps_baudrate = data.getUint8(offset++);
@@ -236,21 +242,21 @@ var mspHelper = (function (gui) {
                 MISC.placeholder2 = data.getUint8(offset++);
                 MISC.mag_declination = data.getInt16(offset, 1) / 10; // -18000-18000
                 offset += 2;
-                MISC.vbatscale = data.getUint8(offset++, 1); // 10-200
-                MISC.vbatmincellvoltage = data.getUint8(offset++, 1) / 10; // 10-50
-                MISC.vbatmaxcellvoltage = data.getUint8(offset++, 1) / 10; // 10-50
-                MISC.vbatwarningcellvoltage = data.getUint8(offset++, 1) / 10; // 10-50
+                MISC.vbatscale = data.getUint8(offset++); // 10-200
+                MISC.vbatmincellvoltage = data.getUint8(offset++) / 10; // 10-50
+                MISC.vbatmaxcellvoltage = data.getUint8(offset++) / 10; // 10-50
+                MISC.vbatwarningcellvoltage = data.getUint8(offset++) / 10; // 10-50
                 break;
             case MSPCodes.MSP_3D:
-                _3D.deadband3d_low = data.getUint16(offset, 1);
+                _3D.deadband3d_low = data.getUint16(offset, true);
                 offset += 2;
-                _3D.deadband3d_high = data.getUint16(offset, 1);
+                _3D.deadband3d_high = data.getUint16(offset, true);
                 offset += 2;
-                _3D.neutral3d = data.getUint16(offset, 1);
+                _3D.neutral3d = data.getUint16(offset, true);
 
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                     offset += 2;
-                    _3D.deadband3d_throttle = data.getUint16(offset, 1);
+                    _3D.deadband3d_throttle = data.getUint16(offset, true);
                 }
                 break;
             case MSPCodes.MSP_MOTOR_PINS:
@@ -259,8 +265,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_BOXNAMES:
                 //noinspection JSUndeclaredVariable
                 AUX_CONFIG = []; // empty the array as new data is coming in
-
-                var buff = [];
+                buff = [];
                 for (i = 0; i < data.byteLength; i++) {
                     if (data.getUint8(i) == 0x3B) { // ; (delimeter char)
                         AUX_CONFIG.push(String.fromCharCode.apply(null, buff)); // convert bytes into ASCII and save as strings
@@ -276,7 +281,7 @@ var mspHelper = (function (gui) {
                 //noinspection JSUndeclaredVariable
                 PID_names = []; // empty the array as new data is coming in
 
-                var buff = [];
+                buff = [];
                 for (i = 0; i < data.byteLength; i++) {
                     if (data.getUint8(i) == 0x3B) { // ; (delimiter char)
                         PID_names.push(String.fromCharCode.apply(null, buff)); // convert bytes into ASCII and save as strings
@@ -309,9 +314,9 @@ var mspHelper = (function (gui) {
                 if (data.byteLength % 14 == 0) {
                     for (i = 0; i < data.byteLength; i += 14) {
                         var arr = {
-                            'min': data.getInt16(i + 0, 1),
-                            'max': data.getInt16(i + 2, 1),
-                            'middle': data.getInt16(i + 4, 1),
+                            'min': data.getInt16(i + 0, true),
+                            'max': data.getInt16(i + 2, true),
+                            'middle': data.getInt16(i + 4, true),
                             'rate': data.getInt8(i + 6),
                             'angleAtMin': data.getInt8(i + 7),
                             'angleAtMax': data.getInt8(i + 8),
@@ -324,14 +329,14 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_RC_DEADBAND:
-                RC_deadband.deadband = data.getUint8(offset++, 1);
-                RC_deadband.yaw_deadband = data.getUint8(offset++, 1);
-                RC_deadband.alt_hold_deadband = data.getUint8(offset++, 1);
+                RC_deadband.deadband = data.getUint8(offset++);
+                RC_deadband.yaw_deadband = data.getUint8(offset++);
+                RC_deadband.alt_hold_deadband = data.getUint8(offset++);
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
-                SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++, 1);
-                SENSOR_ALIGNMENT.align_acc = data.getUint8(offset++, 1);
-                SENSOR_ALIGNMENT.align_mag = data.getUint8(offset++, 1);
+                SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
+                SENSOR_ALIGNMENT.align_acc = data.getUint8(offset++);
+                SENSOR_ALIGNMENT.align_mag = data.getUint8(offset++);
                 break;
             case MSPCodes.MSP_SET_RAW_RC:
                 break;
@@ -375,13 +380,13 @@ var mspHelper = (function (gui) {
                 break;
             // Additional baseflight commands that are not compatible with MultiWii
             case MSPCodes.MSP_UID:
-                CONFIG.uid[0] = data.getUint32(0, 1);
-                CONFIG.uid[1] = data.getUint32(4, 1);
-                CONFIG.uid[2] = data.getUint32(8, 1);
+                CONFIG.uid[0] = data.getUint32(0, true);
+                CONFIG.uid[1] = data.getUint32(4, true);
+                CONFIG.uid[2] = data.getUint32(8, true);
                 break;
             case MSPCodes.MSP_ACC_TRIM:
-                CONFIG.accelerometerTrims[0] = data.getInt16(0, 1); // pitch
-                CONFIG.accelerometerTrims[1] = data.getInt16(2, 1); // roll
+                CONFIG.accelerometerTrims[0] = data.getInt16(0, true); // pitch
+                CONFIG.accelerometerTrims[1] = data.getInt16(2, true); // roll
                 break;
             case MSPCodes.MSP_SET_ACC_TRIM:
                 console.log('Accelerometer trimms saved.');
@@ -400,13 +405,13 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_BF_CONFIG:
                 BF_CONFIG.mixerConfiguration = data.getUint8(0);
-                BF_CONFIG.features = data.getUint32(1, 1);
+                BF_CONFIG.features = data.getUint32(1, true);
                 BF_CONFIG.serialrx_type = data.getUint8(5);
-                BF_CONFIG.board_align_roll = data.getInt16(6, 1); // -180 - 360
-                BF_CONFIG.board_align_pitch = data.getInt16(8, 1); // -180 - 360
-                BF_CONFIG.board_align_yaw = data.getInt16(10, 1); // -180 - 360
-                BF_CONFIG.currentscale = data.getInt16(12, 1);
-                BF_CONFIG.currentoffset = data.getUint16(14, 1);
+                BF_CONFIG.board_align_roll = data.getInt16(6, true); // -180 - 360
+                BF_CONFIG.board_align_pitch = data.getInt16(8, true); // -180 - 360
+                BF_CONFIG.board_align_yaw = data.getInt16(10, true); // -180 - 360
+                BF_CONFIG.currentscale = data.getInt16(12, true);
+                BF_CONFIG.currentoffset = data.getUint16(14, true);
                 break;
             case MSPCodes.MSP_SET_BF_CONFIG:
                 break;
@@ -424,7 +429,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_FC_VARIANT:
-                var identifier = '';
                 for (offset = 0; offset < 4; offset++) {
                     identifier += String.fromCharCode(data.getUint8(offset));
                 }
@@ -437,7 +441,8 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_BUILD_INFO:
                 var dateLength = 11;
-                var buff = [];
+
+                buff = [];
                 for (i = 0; i < dateLength; i++) {
                     buff.push(data.getUint8(offset++));
                 }
@@ -451,7 +456,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_BOARD_INFO:
-                var identifier = '';
                 for (offset = 0; offset < 4; offset++) {
                     identifier += String.fromCharCode(data.getUint8(offset));
                 }
@@ -471,12 +475,12 @@ var mspHelper = (function (gui) {
 
                 for (i = 0; i < serialPortCount; i++) {
                     var serialPort = {
-                        identifier: data.getUint8(offset, 1),
-                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, 1)),
-                        msp_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 3, 1)],
-                        gps_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 4, 1)],
-                        telemetry_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 5, 1)],
-                        blackbox_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 6, 1)]
+                        identifier: data.getUint8(offset),
+                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
+                        msp_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 3)],
+                        gps_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 4)],
+                        telemetry_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 5)],
+                        blackbox_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
                     offset += bytesPerPort;
@@ -496,11 +500,11 @@ var mspHelper = (function (gui) {
 
                 for (i = 0; offset < data.byteLength && i < modeRangeCount; i++) {
                     var modeRange = {
-                        id: data.getUint8(offset++, 1),
-                        auxChannelIndex: data.getUint8(offset++, 1),
+                        id: data.getUint8(offset++),
+                        auxChannelIndex: data.getUint8(offset++),
                         range: {
-                            start: 900 + (data.getUint8(offset++, 1) * 25),
-                            end: 900 + (data.getUint8(offset++, 1) * 25)
+                            start: 900 + (data.getUint8(offset++) * 25),
+                            end: 900 + (data.getUint8(offset++) * 25)
                         }
                     };
                     MODE_RANGES.push(modeRange);
@@ -515,14 +519,14 @@ var mspHelper = (function (gui) {
 
                 for (i = 0; offset < data.byteLength && i < adjustmentRangeCount; i++) {
                     var adjustmentRange = {
-                        slotIndex: data.getUint8(offset++, 1),
-                        auxChannelIndex: data.getUint8(offset++, 1),
+                        slotIndex: data.getUint8(offset++),
+                        auxChannelIndex: data.getUint8(offset++),
                         range: {
-                            start: 900 + (data.getUint8(offset++, 1) * 25),
-                            end: 900 + (data.getUint8(offset++, 1) * 25)
+                            start: 900 + (data.getUint8(offset++) * 25),
+                            end: 900 + (data.getUint8(offset++) * 25)
                         },
-                        adjustmentFunction: data.getUint8(offset++, 1),
-                        auxSwitchChannelIndex: data.getUint8(offset++, 1)
+                        adjustmentFunction: data.getUint8(offset++),
+                        auxSwitchChannelIndex: data.getUint8(offset++)
                     };
                     ADJUSTMENT_RANGES.push(adjustmentRange);
                 }
@@ -540,42 +544,42 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_RX_CONFIG:
-                RX_CONFIG.serialrx_provider = data.getUint8(offset, 1);
+                RX_CONFIG.serialrx_provider = data.getUint8(offset);
                 offset++;
-                RX_CONFIG.maxcheck = data.getUint16(offset, 1);
+                RX_CONFIG.maxcheck = data.getUint16(offset, true);
                 offset += 2;
-                RX_CONFIG.midrc = data.getUint16(offset, 1);
+                RX_CONFIG.midrc = data.getUint16(offset, true);
                 offset += 2;
-                RX_CONFIG.mincheck = data.getUint16(offset, 1);
+                RX_CONFIG.mincheck = data.getUint16(offset, true);
                 offset += 2;
-                RX_CONFIG.spektrum_sat_bind = data.getUint8(offset, 1);
+                RX_CONFIG.spektrum_sat_bind = data.getUint8(offset);
                 offset++;
-                RX_CONFIG.rx_min_usec = data.getUint16(offset, 1);
+                RX_CONFIG.rx_min_usec = data.getUint16(offset, true);
                 offset += 2;
-                RX_CONFIG.rx_max_usec = data.getUint16(offset, 1);
+                RX_CONFIG.rx_max_usec = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
                     offset += 4; // 4 null bytes for betaflight compatibility
-                    RX_CONFIG.nrf24rx_protocol = data.getUint8(offset, 1);
+                    RX_CONFIG.nrf24rx_protocol = data.getUint8(offset);
                     offset++;
-                    RX_CONFIG.nrf24rx_id = data.getUint32(offset, 1);
+                    RX_CONFIG.nrf24rx_id = data.getUint32(offset, true);
                     offset += 4;
                 }
                 break;
 
             case MSPCodes.MSP_FAILSAFE_CONFIG:
-                FAILSAFE_CONFIG.failsafe_delay = data.getUint8(offset, 1);
+                FAILSAFE_CONFIG.failsafe_delay = data.getUint8(offset);
                 offset++;
-                FAILSAFE_CONFIG.failsafe_off_delay = data.getUint8(offset, 1);
+                FAILSAFE_CONFIG.failsafe_off_delay = data.getUint8(offset);
                 offset++;
-                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, 1);
+                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset);
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset, 1);
+                    FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
                     offset++;
-                    FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, 1);
+                    FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, true);
                     offset += 2;
-                    FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset, 1);
+                    FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                     offset++;
                 }
                 break;
@@ -588,8 +592,8 @@ var mspHelper = (function (gui) {
 
                 for (i = 0; offset < data.byteLength && i < channelCount; i++, offset++) {
                     var rxfailChannel = {
-                        mode: data.getUint8(offset++, 1),
-                        value: data.getUint16(offset++, 1)
+                        mode: data.getUint8(offset++),
+                        value: data.getUint16(offset++, true)
                     };
                     RXFAIL_CONFIG.push(rxfailChannel);
                 }
@@ -601,17 +605,24 @@ var mspHelper = (function (gui) {
                 LED_STRIP = [];
 
                 var ledCount = data.byteLength / 7; // v1.4.0 and below incorrectly reported 4 bytes per led.
+
                 if (semver.gte(CONFIG.apiVersion, "1.20.0"))
                     ledCount = data.byteLength / 4;
+
+                var directionMask,
+                    directions,
+                    directionLetterIndex,
+                    functions,
+                    led;
 
                 for (i = 0; offset < data.byteLength && i < ledCount; i++) {
 
                     if (semver.lt(CONFIG.apiVersion, "1.20.0")) {
-                        var directionMask = data.getUint16(offset, 1);
+                        directionMask = data.getUint16(offset, true);
                         offset += 2;
 
-                        var directions = [];
-                        for (var directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        directions = [];
+                        for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
                             if (bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
@@ -620,19 +631,19 @@ var mspHelper = (function (gui) {
                         var functionMask = data.getUint16(offset, 1);
                         offset += 2;
 
-                        var functions = [];
+                        functions = [];
                         for (var functionLetterIndex = 0; functionLetterIndex < MSP.ledFunctionLetters.length; functionLetterIndex++) {
                             if (bit_check(functionMask, functionLetterIndex)) {
                                 functions.push(MSP.ledFunctionLetters[functionLetterIndex]);
                             }
                         }
 
-                        var led = {
+                        led = {
                             directions: directions,
                             functions: functions,
-                            x: data.getUint8(offset++, 1),
-                            y: data.getUint8(offset++, 1),
-                            color: data.getUint8(offset++, 1)
+                            x: data.getUint8(offset++),
+                            y: data.getUint8(offset++),
+                            color: data.getUint8(offset++)
                         };
 
                         LED_STRIP.push(led);
@@ -641,7 +652,8 @@ var mspHelper = (function (gui) {
                         offset += 4;
 
                         var functionId = (mask >> 8) & 0xF;
-                        var functions = [];
+
+                        functions = [];
                         for (var baseFunctionLetterIndex = 0; baseFunctionLetterIndex < MSP.ledBaseFunctionLetters.length; baseFunctionLetterIndex++) {
                             if (functionId == baseFunctionLetterIndex) {
                                 functions.push(MSP.ledBaseFunctionLetters[baseFunctionLetterIndex]);
@@ -656,14 +668,15 @@ var mspHelper = (function (gui) {
                             }
                         }
 
-                        var directionMask = (mask >> 22) & 0x3F;
-                        var directions = [];
-                        for (var directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        directionMask = (mask >> 22) & 0x3F;
+
+                        directions = [];
+                        for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
                             if (bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
                         }
-                        var led = {
+                        led = {
                             y: (mask) & 0xF,
                             x: (mask >> 4) & 0xF,
                             functions: functions,
@@ -684,16 +697,16 @@ var mspHelper = (function (gui) {
                 //noinspection JSUndeclaredVariable
                 LED_COLORS = [];
 
-                var colorCount = data.byteLength / 4;
+                colorCount = data.byteLength / 4;
 
                 for (i = 0; offset < data.byteLength && i < colorCount; i++) {
 
-                    var h = data.getUint16(offset, 1);
-                    var s = data.getUint8(offset + 2, 1);
-                    var v = data.getUint8(offset + 3, 1);
+                    var h = data.getUint16(offset, true);
+                    var s = data.getUint8(offset + 2);
+                    var v = data.getUint8(offset + 3);
                     offset += 4;
 
-                    var color = {
+                    color = {
                         h: h,
                         s: s,
                         v: v
@@ -712,21 +725,20 @@ var mspHelper = (function (gui) {
                     //noinspection JSUndeclaredVariable
                     LED_MODE_COLORS = [];
 
-                    var colorCount = data.byteLength / 3;
+                    colorCount = data.byteLength / 3;
 
                     for (i = 0; offset < data.byteLength && i < colorCount; i++) {
 
-                        var mode = data.getUint8(offset++, 1);
-                        var direction = data.getUint8(offset++, 1);
-                        var color = data.getUint8(offset++, 1);
+                        var mode = data.getUint8(offset++);
+                        var direction = data.getUint8(offset++);
 
-                        var mode_color = {
+                        color = data.getUint8(offset++);
+
+                        LED_MODE_COLORS.push({
                             mode: mode,
                             direction: direction,
                             color: color
-                        };
-
-                        LED_MODE_COLORS.push(mode_color);
+                        });
                     }
                 }
                 break;
@@ -736,7 +748,7 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_DATAFLASH_SUMMARY:
                 if (data.byteLength >= 13) {
-                    var flags = data.getUint8(0);
+                    flags = data.getUint8(0);
                     DATAFLASH.ready = (flags & 1) != 0;
                     DATAFLASH.supported = (flags & 2) != 0 || DATAFLASH.ready;
                     DATAFLASH.sectors = data.getUint32(1, 1);
@@ -759,13 +771,13 @@ var mspHelper = (function (gui) {
                 console.log("Data flash erase begun...");
                 break;
             case MSPCodes.MSP_SDCARD_SUMMARY:
-                var flags = data.getUint8(0);
+                flags = data.getUint8(0);
 
                 SDCARD.supported = (flags & 0x01) != 0;
                 SDCARD.state = data.getUint8(1);
                 SDCARD.filesystemLastError = data.getUint8(2);
-                SDCARD.freeSizeKB = data.getUint32(3, 1);
-                SDCARD.totalSizeKB = data.getUint32(7, 1);
+                SDCARD.freeSizeKB = data.getUint32(3, true);
+                SDCARD.totalSizeKB = data.getUint32(7, true);
                 break;
             case MSPCodes.MSP_BLACKBOX_CONFIG:
                 BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
@@ -789,19 +801,19 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_ADVANCED_CONFIG:
-                ADVANCED_CONFIG.gyroSyncDenominator = data.getUint8(offset, 1);
+                ADVANCED_CONFIG.gyroSyncDenominator = data.getUint8(offset);
                 offset++;
-                ADVANCED_CONFIG.pidProcessDenom = data.getUint8(offset, 1);
+                ADVANCED_CONFIG.pidProcessDenom = data.getUint8(offset);
                 offset++;
-                ADVANCED_CONFIG.useUnsyncedPwm = data.getUint8(offset, 1);
+                ADVANCED_CONFIG.useUnsyncedPwm = data.getUint8(offset);
                 offset++;
-                ADVANCED_CONFIG.motorPwmProtocol = data.getUint8(offset, 1);
+                ADVANCED_CONFIG.motorPwmProtocol = data.getUint8(offset);
                 offset++;
-                ADVANCED_CONFIG.motorPwmRate = data.getUint16(offset, 1);
+                ADVANCED_CONFIG.motorPwmRate = data.getUint16(offset, true);
                 offset += 2;
-                ADVANCED_CONFIG.servoPwmRate = data.getUint16(offset, 1);
+                ADVANCED_CONFIG.servoPwmRate = data.getUint16(offset, true);
                 offset += 2;
-                ADVANCED_CONFIG.gyroSync = data.getUint8(offset, 1);
+                ADVANCED_CONFIG.gyroSync = data.getUint8(offset);
                 break;
 
             case MSPCodes.MSP_SET_ADVANCED_CONFIG:
@@ -809,7 +821,7 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_FILTER_CONFIG:
-                FILTER_CONFIG.gyroSoftLpfHz = data.getUint8(0, true);
+                FILTER_CONFIG.gyroSoftLpfHz = data.getUint8(0);
                 FILTER_CONFIG.dtermLpfHz = data.getUint16(1, true);
                 FILTER_CONFIG.yawLpfHz = data.getUint16(3, true);
                 /*
@@ -1301,6 +1313,7 @@ var mspHelper = (function (gui) {
                 BLACKBOX.blackboxRateDenom & 0xFF
         ];
 
+        //noinspection JSUnusedLocalSymbols
         MSP.send_message(MSPCodes.MSP_SET_BLACKBOX_CONFIG, message, false, function (response) {
             onDataCallback();
         });
@@ -1361,7 +1374,10 @@ var mspHelper = (function (gui) {
             MSP.send_message(MSPCodes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
         }
 
+        //FIXME looks like this is not used and not ever implemented
+        //noinspection JSUnusedLocalSymbols
         function send_channel_forwarding() {
+
             var buffer = [];
 
             for (var i = 0; i < SERVO_CONFIG.length; i++) {
@@ -1574,27 +1590,34 @@ var mspHelper = (function (gui) {
              color: data.getUint8(offset++, 1)
              };
              */
-            var buffer = [];
+            var buffer = [],
+                directionLetterIndex,
+                functionLetterIndex,
+                bitIndex;
 
             buffer.push(ledIndex);
 
             if (semver.lt(CONFIG.apiVersion, "1.20.0")) {
                 var directionMask = 0;
-                for (var directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
-                    var bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
+                for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
+
+                    bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                     if (bitIndex >= 0) {
                         directionMask = bit_set(directionMask, bitIndex);
                     }
+
                 }
                 buffer.push(specificByte(directionMask, 0));
                 buffer.push(specificByte(directionMask, 1));
 
                 var functionMask = 0;
-                for (var functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
-                    var bitIndex = MSP.ledFunctionLetters.indexOf(led.functions[functionLetterIndex]);
+                for (functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
+
+                    bitIndex = MSP.ledFunctionLetters.indexOf(led.functions[functionLetterIndex]);
                     if (bitIndex >= 0) {
                         functionMask = bit_set(functionMask, bitIndex);
                     }
+
                 }
                 buffer.push(specificByte(functionMask, 0));
                 buffer.push(specificByte(functionMask, 1));
@@ -1615,7 +1638,7 @@ var mspHelper = (function (gui) {
                 mask |= (led.y << 0);
                 mask |= (led.x << 4);
 
-                for (var functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
+                for (functionLetterIndex = 0; functionLetterIndex < led.functions.length; functionLetterIndex++) {
                     var fnIndex = MSP.ledBaseFunctionLetters.indexOf(led.functions[functionLetterIndex]);
                     if (fnIndex >= 0) {
                         mask |= (fnIndex << 8);
@@ -1624,19 +1647,23 @@ var mspHelper = (function (gui) {
                 }
 
                 for (var overlayLetterIndex = 0; overlayLetterIndex < led.functions.length; overlayLetterIndex++) {
-                    var bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
+
+                    bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                     if (bitIndex >= 0) {
                         mask |= bit_set(mask, bitIndex + 12);
                     }
+
                 }
 
                 mask |= (led.color << 18);
 
-                for (var directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
-                    var bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
+                for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
+
+                    bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                     if (bitIndex >= 0) {
                         mask |= bit_set(mask, bitIndex + 22);
                     }
+
                 }
 
                 mask |= (0 << 28); // parameters
