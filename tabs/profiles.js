@@ -46,6 +46,7 @@ presets.presets = [
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
             presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
             presets.elementHelper("FC_CONFIG", "loopTime", 1000),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
@@ -68,10 +69,13 @@ presets.presets = [
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
             presets.elementHelper("PIDs", 0, [15, 30, 15]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [15, 40, 15]),  //PITCH PIDs
             presets.elementHelper("RC_tuning", "roll_rate", 400),
-            presets.elementHelper("RC_tuning", "pitch_rate", 150)
+            presets.elementHelper("RC_tuning", "pitch_rate", 150),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ]
     }
 ];
@@ -134,6 +138,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
     loadChainer.setChain([
         mspHelper.loadMspIdent,
+        mspHelper.loadBfConfig,
         mspHelper.loadLoopTime,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadAdvancedConfig,
@@ -153,6 +158,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         mspHelper.savePidData,
         mspHelper.saveRcTuningData,
         mspHelper.savePidAdvanced,
+        mspHelper.saveBfConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);

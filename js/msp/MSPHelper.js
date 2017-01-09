@@ -1874,5 +1874,9 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.saveBfConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, callback);
+    };
+
     return self;
 })(GUI);
