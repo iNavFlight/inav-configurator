@@ -1,3 +1,4 @@
+/*global chrome*/
 'use strict';
 
 TABS.configuration = {};
@@ -22,10 +23,43 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig
+        mspHelper.loadSensorConfig,
+        mspHelper.loadAccTrim
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
+
+    var saveChainer = new MSPChainerClass();
+
+    saveChainer.setChain([
+        mspHelper.saveMisc,
+        mspHelper.save3dConfig,
+        mspHelper.saveSensorAlignment,
+        mspHelper.saveAccTrim,
+        mspHelper.saveArmingConfig,
+        mspHelper.saveLooptimeConfig,
+        mspHelper.saveRxConfig,
+        mspHelper.saveAdvancedConfig,
+        mspHelper.saveINAVPidConfig,
+        mspHelper.saveSensorConfig,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(reboot);
+
+    function reboot() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+
+        GUI.tab_switch_cleanup(function() {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+        });
+    }
+
+    function reinitialize() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.handleReconnect($('.tab_configuration a'));
+    }
 
     function load_html() {
         $('#content').load("./tabs/configuration.html", process_html);
@@ -594,86 +628,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-            function save_misc() {
-                MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, save_3d);
-            }
-
-            function save_3d() {
-               MSP.send_message(MSPCodes.MSP_SET_3D, mspHelper.crunch(MSPCodes.MSP_SET_3D), false, save_sensor_alignment);
-            }
-
-            function save_sensor_alignment() {
-               MSP.send_message(MSPCodes.MSP_SET_SENSOR_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_ALIGNMENT), false, save_acc_trim);
-            }
-
-            function save_acc_trim() {
-                MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, save_arming_config);
-            }
-
-            function save_arming_config() {
-                MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, save_looptime_config);
-            }
-
-            function save_looptime_config() {
-                MSP.send_message(MSPCodes.MSP_SET_LOOP_TIME, mspHelper.crunch(MSPCodes.MSP_SET_LOOP_TIME), false, save_rx_config);
-            }
-
-            function save_rx_config() {
-                var next_callback = saveAdvancedConfig;
-                if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
-                   MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, next_callback);
-                } else {
-                   next_callback();
-                }
-            }
-
-            function saveAdvancedConfig() {
-                var next_callback = saveINAVPidConfig;
-                if(semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-                   MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, next_callback);
-                } else {
-                   next_callback();
-                }
-            }
-
-            function saveINAVPidConfig() {
-                var next_callback = saveSensorConfig;
-                if(semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-                   MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, next_callback);
-                } else {
-                   next_callback();
-                }
-            }
-
-            function saveSensorConfig() {
-                var next_callback = save_to_eeprom;
-                if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, next_callback);
-                } else {
-                    next_callback();
-                }
-            }
-
-            function save_to_eeprom() {
-                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, reboot);
-            }
-
-            function reboot() {
-                //noinspection JSUnresolvedVariable
-                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-
-                GUI.tab_switch_cleanup(function() {
-                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
-                });
-            }
-
-            function reinitialize() {
-                //noinspection JSUnresolvedVariable
-                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect($('.tab_configuration a'));
-            }
-
-            MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, save_misc);
+            saveChainer.execute();
         });
 
         // status data pulled via separate timer with static speed

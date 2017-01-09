@@ -1826,6 +1826,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_RC, false, false, callback);
     };
 
+    self.loadAccTrim = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ACC_TRIM, false, false, callback);
+    };
+
     self.saveToEeprom = function saveToEeprom(callback) {
         MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, callback);
     };
@@ -1876,6 +1880,42 @@ var mspHelper = (function (gui) {
 
     self.saveBfConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, callback);
+    };
+
+    self.saveMisc = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, callback);
+    };
+
+    self.save3dConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_3D, mspHelper.crunch(MSPCodes.MSP_SET_3D), false, callback);
+    };
+
+    self.saveSensorAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_SENSOR_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_ALIGNMENT), false, callback);
+    };
+
+    self.saveAccTrim = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, callback);
+    };
+
+    self.saveArmingConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, callback);
+    };
+
+    self.saveRxConfig = function (callback) {
+        if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveSensorConfig = function (callback) {
+        if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
+        } else {
+            callback();
+        }
     };
 
     return self;

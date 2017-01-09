@@ -31,6 +31,12 @@ presets.defaultValues = {
     FC_CONFIG: {"loopTime": 2000}
 };
 
+/*
+ * When defining a preset, following fields are required:
+ *
+ * BF_CONFIG::mixerConfiguration
+ *
+ */
 presets.presets = [
     {
         name: '5" Racer',
