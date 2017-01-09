@@ -1826,5 +1826,53 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_RC, false, false, callback);
     };
 
+    self.saveToEeprom = function saveToEeprom(callback) {
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, callback);
+    };
+
+    self.saveINAVPidConfig = function (callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveLooptimeConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_LOOP_TIME, mspHelper.crunch(MSPCodes.MSP_SET_LOOP_TIME), false, callback);
+    };
+
+    self.saveAdvancedConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveFilterConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.savePidData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+    };
+
+    self.saveRcTuningData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, callback);
+    };
+
+    self.savePidAdvanced = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
+        } else {
+            callback();
+        }
+    };
+
     return self;
 })(GUI);
