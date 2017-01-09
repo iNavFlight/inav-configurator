@@ -187,6 +187,24 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         GUI.handleReconnect($('.tab_setup a'));
     }
 
+    function applyAndSave() {
+
+        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
+
+        var setting;
+
+        //Iterate over settings saved in preset
+        for (var i in currentPreset.settings) {
+            if (currentPreset.settings.hasOwnProperty(i)) {
+                setting = currentPreset.settings[i];
+                //Apply setting
+                window[setting.group][setting.field] = setting.value;
+            }
+        }
+
+        saveChainer.execute();
+    }
+
     function fillPresetDescription(preset) {
 
         var $features = $('#preset-features');
@@ -214,6 +232,12 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             currentPresetId = $presetList.val();
             currentPreset = presets.presets[currentPresetId];
             fillPresetDescription(currentPreset);
+            $('#save-button').removeClass('disabled');
+        });
+
+        $('#execute-button').click(function () {
+            applyAndSave();
+            OSD.GUI.jbox.close();
         });
 
         localize();
@@ -221,22 +245,14 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        $('#save-button').click(function () {
-
-            presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
-
-            var setting;
-
-            //Iterate over settings saved in preset
-            for (var i in currentPreset.settings) {
-                if (currentPreset.settings.hasOwnProperty(i)) {
-                    setting = currentPreset.settings[i];
-                    //Apply setting
-                    window[setting.group][setting.field] = setting.value;
-                }
-            }
-
-            saveChainer.execute();
+        OSD.GUI.jbox = new jBox('Modal', {
+            width: 600,
+            height: 240,
+            closeButton: 'title',
+            animation: false,
+            attach: $('#save-button'),
+            title: chrome.i18n.getMessage("presetApplyTitle"),
+            content: $('#presetApplyContent')
         });
 
         GUI.interval_add('status_pull', function status_pull() {
