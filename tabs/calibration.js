@@ -28,9 +28,10 @@ TABS.calibration.initialize = function (callback) {
         $('#content').load("./tabs/calibration.html", process_html);
     }
 
-    MSP.send_message(MSP_codes.MSP_STATUS, false, false, load_html);
+    MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_html);
 
     function process_html() {
+
         // translate to user-selected language
         localize();
 
