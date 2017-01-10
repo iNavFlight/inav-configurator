@@ -1375,11 +1375,16 @@ dialog {
     padding-top: 2px;
     padding-bottom: 5px;
     border: 0 dotted;
-    border-bottom: 1px #ccc;
+    border-bottom: 1px #ccc dotted;
 }
 
 .noboarder td {
     border: none;
+    border-bottom: none;
+}
+
+.cf_table tr:last-child td {
+    border-bottom: 0px #ccc dotted;
 }
 
 .cf_table td:last-child {
@@ -1467,7 +1472,7 @@ dialog {
 /* fixing padding for all Tabs*/
 .tab-setup, .tab-landing, .tab-adjustments, .tab-auxiliary, .tab-cli, .tab-configuration, .tab-failsafe, .tab-onboard_logging,
 .tab-firmware_flasher, .tab-gps, .tab-help, .tab-led-strip, .tab-logging, .tab-modes, .tab-motors, .tab-pid_tuning,
-.tab-ports, .tab-receiver, .tab-sensors, .tab-servos {
+.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-calibration {
     height: 100%;
     position: relative;
 }

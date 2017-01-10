@@ -1897,5 +1897,23 @@
     },
     "armingCheckFail": {
         "message": "<span class=\"arming-state-fail\">FAIL</span>"
+    },
+    "calibrationHead1": {
+        "message": "Acellerometer Calibration"
+    },  
+    "calibrationHead2": {
+        "message": "Acellerometer Values"
+    },    
+    "calibrationHead3": {
+        "message": "Level Calibration"
+    },    
+    "calibrationHead4": {
+        "message": "Compass Calibration"
+    },
+    "accZero": {
+        "message": "Acc Zero"
+    },
+    "accGain": {
+        "message": "Acc Gain"
     }
 }
