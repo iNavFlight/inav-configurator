@@ -25,28 +25,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, load_rx_config);
     }
 
-<<<<<<< HEAD
-    function load_arming_config() {
-        var next_callback = load_loop_time;
-        if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            MSP.send_message(MSP_codes.MSP_ARMING_CONFIG, false, false, next_callback);
-=======
     function load_rx_config() {
         var next_callback = load_3d;
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, next_callback);
->>>>>>> master
         } else {
             next_callback();
         }
     }
 
-<<<<<<< HEAD
-    function load_loop_time() {
-        var next_callback = load_3d;
-        if (semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            MSP.send_message(MSP_codes.MSP_LOOP_TIME, false, false, next_callback);
-=======
     function load_3d() {
         MSP.send_message(MSPCodes.MSP_3D, false, false, load_sensor_alignment);
     }
@@ -59,7 +46,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var next_callback = loadINAVPidConfig;
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, next_callback);
->>>>>>> master
         } else {
             next_callback();
         }
@@ -74,11 +60,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
     }
 
-<<<<<<< HEAD
-    function load_sensor_alignment() {
-=======
     function loadSensorConfig() {
->>>>>>> master
         var next_callback = load_html;
         if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
             MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, next_callback);
@@ -101,26 +83,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_config);
 
-<<<<<<< HEAD
-    function recalculate_cycles_sec() {
-        var looptime = $('input[name="looptime"]').val();
-
-        var message = 'Max';
-        if (looptime > 0) {
-            message = parseFloat((1 / looptime) * 1000 * 1000).toFixed(0);
-        }
-
-        $('input[name="looptimehz"]').val(message);
-    }
-
-    function process_html() {
-
-=======
     function process_html() {
 
         var i;
 
->>>>>>> master
         var mixer_list_e = $('select.mixerList');
         for (i = 0; i < mixerList.length; i++) {
             mixer_list_e.append('<option value="' + (i + 1) + '">' + mixerList[i].name + '</option>');
@@ -138,38 +104,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mixer_list_e.val(BF_CONFIG.mixerConfiguration).change();
 
         // generate features
-<<<<<<< HEAD
-        var features = [
-            {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
-            {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL'},
-            {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
-            {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
-            {bit: 5, group: 'other', name: 'SERVO_TILT'},
-            {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
-            {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'},
-            {bit: 9, group: 'other', name: 'SONAR'},
-            {bit: 10, group: 'other', name: 'TELEMETRY'},
-            {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
-            {bit: 12, group: 'other', name: '3D'},
-            {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM'},
-            {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP'},
-            {bit: 15, group: 'rssi', name: 'RSSI_ADC'},
-            {bit: 16, group: 'other', name: 'LED_STRIP'},
-            {bit: 17, group: 'other', name: 'DISPLAY'},
-            {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true},
-            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true}
-        ];
-
-        if (semver.gte(CONFIG.apiVersion, "1.12.0")) {
-            features.push(
-                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING'}
-            );
-        }
-=======
         var features = FC.getFeatures();
->>>>>>> master
 
         var radioGroups = [];
 
@@ -183,51 +118,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 tips.push(chrome.i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
             }
 
-<<<<<<< HEAD
-        var radioGroups = [];
-
-        var features_e = $('.features');
-        for (var i = 0; i < features.length; i++) {
-            var row_e;
-
-            var feature_tip_html = '';
-=======
->>>>>>> master
             if (features[i].haveTip) {
                 tips.push(chrome.i18n.getMessage("feature" + features[i].name + "Tip"));
             }
 
-<<<<<<< HEAD
-            if (features[i].mode === 'group') {
-                row_e = $('<tr><td style="width: 15px;"><input style="width: 13px;" class="feature" id="feature-'
-                        + i
-                        + '" value="'
-                        + features[i].bit
-                        + '" title="'
-                        + features[i].name
-                        + '" type="radio" name="'
-                        + features[i].group
-                        + '" /></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
-                radioGroups.push(features[i].group);
-            } else {
-                row_e = $('<tr><td><input class="feature toggle"'
-                        + i
-                        + '" name="'
-                        + features[i].name
-                        + '" title="'
-                        + features[i].name
-                        + '" type="checkbox"/></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span i18n="feature' + features[i].name + '"></span>'
-                        + feature_tip_html + '</td></tr>');
-=======
             if (tips.length > 0) {
                 feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
@@ -257,7 +151,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                     + '</label>'
                     + feature_tip_html
                     + '</div>');
->>>>>>> master
 
                 var feature_e = row_e.find('input.feature');
 
@@ -289,20 +182,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
 
-<<<<<<< HEAD
-        var alignments = [
-            'CW 0°',
-            'CW 90°',
-            'CW 180°',
-            'CW 270°',
-            'CW 0° flip',
-            'CW 90° flip',
-            'CW 180° flip',
-            'CW 270° flip'
-        ];
-=======
         var alignments = FC.getSensorAlignments();
->>>>>>> master
 
         var orientation_gyro_e = $('select.gyroalign');
         var orientation_acc_e = $('select.accalign');
@@ -313,13 +193,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             orientation_acc_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
             orientation_mag_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
         }
-<<<<<<< HEAD
-
-=======
         orientation_gyro_e.val(SENSOR_ALIGNMENT.align_gyro);
         orientation_acc_e.val(SENSOR_ALIGNMENT.align_acc);
         orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
->>>>>>> master
 
         // generate GPS
         var gpsProtocols = FC.getGpsProtocols();
@@ -336,29 +212,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         gps_protocol_e.val(MISC.gps_type);
 
-<<<<<<< HEAD
-
-        var gps_baudrate_e = $('select.gps_baudrate');
-        for (var i = 0; i < gpsBaudRates.length; i++) {
-            gps_baudrate_e.append('<option value="' + gpsBaudRates[i] + '">' + gpsBaudRates[i] + '</option>');
-        }
-
-        if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-            gps_baudrate_e.change(function () {
-                SERIAL_CONFIG.gpsBaudRate = parseInt($(this).val());
-            });
-            gps_baudrate_e.val(SERIAL_CONFIG.gpsBaudRate);
-        } else {
-            gps_baudrate_e.prop("disabled", true);
-            gps_baudrate_e.parent().hide();
-        }
-
-        var gps_ubx_sbas_e = $('select.gps_ubx_sbas');
-        for (var i = 0; i < gpsSbas.length; i++) {
-=======
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (i = 0; i < gpsSbas.length; i++) {
->>>>>>> master
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
         }
 
@@ -407,33 +262,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
         // fill magnetometer
-<<<<<<< HEAD
-        $('input[name="mag_declination"]').val(MISC.mag_declination);
-
-        //fill motor disarm params and FC loop time
-        if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
-            $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-            $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
-            $('div.disarm').show();
-            if(bit_check(BF_CONFIG.features, 4))//MOTOR_STOP
-                $('div.disarmdelay').show();
-            else
-                $('div.disarmdelay').hide();
-
-            // fill FC loop time
-            $('input[name="looptime"]').val(FC_CONFIG.loopTime);
-
-            recalculate_cycles_sec();
-
-            $('div.cycles').show();
-        }
-
-        // fill throttle
-        $('input[name="minthrottle"]').val(MISC.minthrottle);
-        $('input[name="midthrottle"]').val(MISC.midrc);
-        $('input[name="maxthrottle"]').val(MISC.maxthrottle);
-        $('input[name="mincommand"]').val(MISC.mincommand);
-=======
         $('#mag_declination').val(MISC.mag_declination);
 
         //fill motor disarm params and FC loop time
@@ -451,7 +279,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#midthrottle').val(MISC.midrc);
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
->>>>>>> master
 
         // fill battery
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
@@ -749,34 +576,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
             BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
 
-<<<<<<< HEAD
-            MISC.mag_declination = parseFloat($('input[name="mag_declination"]').val());
-
-            // motor disarm
-            if(semver.gte(CONFIG.apiVersion, "1.8.0")) {
-                ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
-                ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
-                FC_CONFIG.loopTime = parseInt($('input[name="looptime"]').val());
-            }
-
-            MISC.minthrottle = parseInt($('input[name="minthrottle"]').val());
-            MISC.midrc = parseInt($('input[name="midthrottle"]').val());
-            MISC.maxthrottle = parseInt($('input[name="maxthrottle"]').val());
-            MISC.mincommand = parseInt($('input[name="mincommand"]').val());
-
-            MISC.vbatmincellvoltage = parseFloat($('input[name="mincellvoltage"]').val());
-            MISC.vbatmaxcellvoltage = parseFloat($('input[name="maxcellvoltage"]').val());
-            MISC.vbatwarningcellvoltage = parseFloat($('input[name="warningcellvoltage"]').val());
-            MISC.vbatscale = parseInt($('input[name="voltagescale"]').val());
-
-            BF_CONFIG.currentscale = parseInt($('input[name="currentscale"]').val());
-            BF_CONFIG.currentoffset = parseInt($('input[name="currentoffset"]').val());
-            MISC.multiwiicurrentoutput = ~~$('input[name="multiwiicurrentoutput"]').is(':checked'); // ~~ boolean to decimal conversion
-
-            _3D.deadband3d_low = parseInt($('input[name="3ddeadbandlow"]').val());
-            _3D.deadband3d_high = parseInt($('input[name="3ddeadbandhigh"]').val());
-            _3D.neutral3d = parseInt($('input[name="3dneutral"]').val());
-=======
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
@@ -799,7 +598,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
             _3D.neutral3d = parseInt($('#3dneutral').val());
->>>>>>> master
             if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                 _3D.deadband3d_throttle = ($('#3ddeadbandthrottle').val());
             }
@@ -814,17 +612,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRxTypes[RX_CONFIG.serialrx_provider]);
             }
 
-<<<<<<< HEAD
-            for (var i = 0; i < features.length; i++) {
-                var featureName = features[i].name;
-                if (isFeatureEnabled(featureName)) {
-                    googleAnalytics.sendEvent('Setting', 'Feature', featureName);
-                }
-=======
             // track feature usage
             if (FC.isFeatureEnabled('RX_NRF24', features)) {
                 googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getNrf24ProtocolTypes()[RX_CONFIG.nrf24rx_protocol]);
->>>>>>> master
             }
 
             if (FC.isFeatureEnabled('GPS', features)) {
@@ -861,29 +651,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             function save_3d() {
-<<<<<<< HEAD
-                var next_callback = save_sensor_alignment;
-                if(semver.gte(CONFIG.apiVersion, "1.14.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_3D, MSP.crunch(MSP_codes.MSP_SET_3D), false, next_callback);
-                } else {
-                   next_callback();
-                }
-            }
-
-            function save_sensor_alignment() {
-                var next_callback = save_acc_trim;
-                if(semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                   MSP.send_message(MSP_codes.MSP_SET_SENSOR_ALIGNMENT, MSP.crunch(MSP_codes.MSP_SET_SENSOR_ALIGNMENT), false, next_callback);
-                } else {
-                   next_callback();
-                }
-=======
                MSP.send_message(MSPCodes.MSP_SET_3D, mspHelper.crunch(MSPCodes.MSP_SET_3D), false, save_sensor_alignment);
             }
 
             function save_sensor_alignment() {
                MSP.send_message(MSPCodes.MSP_SET_SENSOR_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_ALIGNMENT), false, save_acc_trim);
->>>>>>> master
             }
 
             function save_acc_trim() {
