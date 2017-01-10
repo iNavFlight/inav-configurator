@@ -16,14 +16,14 @@ TABS.logging.initialize = function (callback) {
 
     if (CONFIGURATOR.connectionValid) {
         var get_motor_data = function () {
-            MSP.send_message(MSP_codes.MSP_MOTOR, false, false, load_html);
+            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, load_html);
         }
 
         var load_html = function () {
             $('#content').load("./tabs/logging.html", process_html);
         }
 
-        MSP.send_message(MSP_codes.MSP_RC, false, false, get_motor_data);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);
     }
 
     function process_html() {
@@ -61,7 +61,7 @@ TABS.logging.initialize = function (callback) {
 
                                 // request new
                                 for (var i = 0; i < requested_properties.length; i++, requests++) {
-                                    MSP.send_message(MSP_codes[requested_properties[i]]);
+                                    MSP.send_message(MSPCodes[requested_properties[i]]);
                                 }
                             }
 
@@ -231,7 +231,7 @@ TABS.logging.initialize = function (callback) {
 
     function prepare_file() {
         // create or load the file
-        chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'cleanflight_data_log', accepts: [{extensions: ['csv']}]}, function(entry) {
+        chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav_data_log', accepts: [{extensions: ['csv']}]}, function(entry) {
             if (!entry) {
                 console.log('No file selected');
                 return;

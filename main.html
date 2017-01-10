@@ -28,6 +28,7 @@
 <link type="text/css" rel="stylesheet" href="./tabs/auxiliary.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/failsafe.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/transponder.css" media="all" />
+<link type="text/css" rel="stylesheet" href="./tabs/osd.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/opensans_webfontkit/fonts.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/dropdown-lists/css/style_lists.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./js/libraries/switchery/switchery.css" media="all" />
@@ -45,12 +46,17 @@
 <script type="text/javascript" src="./js/libraries/semver.js"></script>
 <script type="text/javascript" src="./js/libraries/jbox/jBox.min.js"></script>
 <script type="text/javascript" src="./js/libraries/switchery/switchery.js"></script>
+<script type="text/javascript" src="./js/libraries/jquery.ba-throttle-debounce.min.js"></script>
+<script type="text/javascript" src="./js/libraries/inflection.min.js"></script>
+<script type="text/javascript" src="./js/libraries/bluebird.min.js"></script>
+<script type="text/javascript" src="./js/injected_methods.js"></script>
+<script type="text/javascript" src="./js/gui.js"></script>
+<script type="text/javascript" src="./js/msp/MSPCodes.js"></script>
+<script type="text/javascript" src="./js/msp/MSPHelper.js"></script>
 <script type="text/javascript" src="./js/port_handler.js"></script>
 <script type="text/javascript" src="./js/port_usage.js"></script>
 <script type="text/javascript" src="./js/serial.js"></script>
-<script type="text/javascript" src="./js/gui.js"></script>
 <script type="text/javascript" src="./js/model.js"></script>
-<script type="text/javascript" src="./js/request_balancer.js"></script>
 <script type="text/javascript" src="./js/serial_backend.js"></script>
 <script type="text/javascript" src="./js/data_storage.js"></script>
 <script type="text/javascript" src="./js/fc.js"></script>
@@ -82,6 +88,7 @@
 <script type="text/javascript" src="./tabs/firmware_flasher.js"></script>
 <script type="text/javascript" src="./tabs/failsafe.js"></script>
 <script type="text/javascript" src="./tabs/transponder.js"></script>
+<script type="text/javascript" src="./tabs/osd.js"></script>
 <title></title>
 </head>
 <body>
@@ -93,22 +100,24 @@
                     <div class="version"></div>
                 </div>
             </div>
-            <a id="options" href="#" i18n_title="options_title"></a>
+            <a id="options" href="#" data-i18n_title="options_title"></a>
             <div id="port-picker">
                 <div class="connect_controls" id="connectbutton">
                     <div class="connect_b">
                         <a class="connect" href="#"></a>
                     </div>
-                    <a class="connect_state" i18n="connect"></a>
+                    <a class="connect_state" data-i18n="connect"></a>
                 </div>
                 <div id="portsinput">
                     <div class="dropdown dropdown-dark">
+                        <!--suppress HtmlFormInputWithoutLabel -->
                         <select class="dropdown-select" id="port" title="Port">
                             <option value="manual">Manual</option>
                             <!-- port list gets generated here -->
                         </select>
                     </div>
                     <div class="dropdown dropdown-dark">
+                        <!--suppress HtmlFormInputWithoutLabel -->
                         <select class="dropdown-select" id="baud" title="Baud Rate">
                             <option value="115200" selected="selected">115200</option>
                             <option value="57600">57600</option>
@@ -128,7 +137,7 @@
                     </div>
                     <div>
                         <label><input class="auto_connect togglesmall" type="checkbox" /><span
-                            class="auto_connect" i18n="autoConnect"></span></label>
+                            class="auto_connect" data-i18n="autoConnect"></span></label>
                     </div>
                 </div>
             </div>
@@ -143,11 +152,12 @@
                     <div id="profile_change">
                         <div class="dropdown dropdown-dark">
                            <form name="profile-change" id="profile-change">
-                            <select class="dropdown-select" name="profilechange">
-                            <option value="0">Profile 1</option>
-                            <option value="1">Profile 2</option>
-                            <option value="2">Profile 3</option>
-                            </select>
+                                <!--suppress HtmlFormInputWithoutLabel -->
+                                <select class="dropdown-select" id="profilechange">
+                                    <option value="0">Profile 1</option>
+                                    <option value="1">Profile 2</option>
+                                    <option value="2">Profile 3</option>
+                                </select>
                            </form>
                         </div>
                     </div>
@@ -175,6 +185,9 @@
                         <li class="sonar" title="Sonar / Range finder">
                             <div class="sonaricon">Sonar</div>
                         </li>
+                        <li class="airspeed" title="Airspeed">
+                            <div class="airspeedicon">Speed</div>
+                        </li>
                     </ul>
                 </div>
                 <div id="quad-status_wrapper">
@@ -185,9 +198,9 @@
                     </div>
                     <div class="battery-legend">Battery voltage</div>
                     <div class="bottomStatusIcons">
-                        <div class="armedicon cf_tip" i18n_title="mainHelpArmed"></div>
-                        <div class="failsafeicon cf_tip" i18n_title="mainHelpFailsafe"></div>
-                        <div class="linkicon cf_tip" i18n_title="mainHelpLink"></div>
+                        <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
+                        <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
+                        <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
                     </div>
                 </div>
             </div>
@@ -203,9 +216,9 @@
         <div class="tab_container">
             <div id="tabs">
                 <ul class="mode-disconnected">
-                    <li class="tab_landing"><a href="#" i18n="tabLanding" class="tabicon ic_welcome" title="Welcome"></a></li>
-                    <li class="tab_help"><a href="#" i18n="tabHelp" class="tabicon ic_help" title="Documentation &amp; Support"></a></li>
-                    <li class="tab_firmware_flasher"><a href="#" i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a></li>
+                    <li class="tab_landing"><a href="#" data-i18n="tabLanding" class="tabicon ic_welcome" title="Welcome"></a></li>
+                    <li class="tab_help"><a href="#" data-i18n="tabHelp" class="tabicon ic_help" title="Documentation &amp; Support"></a></li>
+                    <li class="tab_firmware_flasher"><a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a></li>
                 </ul>
                 <ul class="mode-connected">
                     <li class="tab_setup"><a href="#" i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
@@ -238,17 +251,20 @@
         <div id="content"></div>
         <div id="status-bar">
             <div>
-                <span i18n="statusbar_port_utilization"></span> <span class="port_usage_down">D: 0%</span> <span
+                <span data-i18n="statusbar_port_utilization"></span> <span class="port_usage_down">D: 0%</span> <span
                     class="port_usage_up">U: 0%</span>
             </div>
             <div>
-                <span i18n="statusbar_packet_error"></span> <span class="packet-error">0</span>
+                <span data-i18n="statusbar_packet_error"></span> <span class="packet-error">0</span>
             </div>
             <div>
-                <span i18n="statusbar_i2c_error"></span> <span class="i2c-error">0</span>
+                <span data-i18n="statusbar_i2c_error"></span> <span class="i2c-error">0</span>
             </div>
             <div>
-                <span i18n="statusbar_cycle_time"></span> <span class="cycle-time">0</span>
+                <span data-i18n="statusbar_cycle_time"></span> <span class="cycle-time">0</span>
+            </div>
+            <div>
+                <span class="cpu-load"> </span>
             </div>
             <div class="version">
                 <!-- configuration version generated here -->

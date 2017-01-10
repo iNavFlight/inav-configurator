@@ -56,6 +56,22 @@ var BOARD_DEFINITIONS = [
         name: "MotoLab",
         identifier: "MOTO",
         vcp: true
+    }, {
+        name: "Omnibus",
+        identifier: "OMNI",
+        vcp: true
+    }, {
+        name: "Airbot F4",
+        identifier: "ABF4",
+        vcp: true
+    }, {
+        name: "Revolution",
+        identifier: "REVO",
+        vcp: true
+    }, {
+        name: "Omnibus F4",
+        identifier: "OBF4",
+        vcp: true
     }
 ];
 
@@ -66,7 +82,6 @@ var DEFAULT_BOARD_DEFINITION = {
 };
 
 var BOARD = {
-    
 };
 
 BOARD.find_board_definition = function (identifier) {

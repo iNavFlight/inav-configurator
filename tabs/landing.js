@@ -1,4 +1,5 @@
 'use strict';
+/*global $*/
 
 TABS.landing = {};
 TABS.landing.initialize = function (callback) {

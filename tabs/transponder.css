@@ -19,12 +19,12 @@
 
 .tab-transponder .text .disabled {
     width: 43px;
-    padding: 0px 5px;
+    padding: 0 5px;
     background-color: #ececec;
 }
 
 .tab-transponder .text span {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .tab-transponder input {
@@ -32,7 +32,7 @@
 }
 
 .tab-transponder span {
-    margin: 0px;
+    margin: 0;
 }
 
 .tab-transponder .text
@@ -47,8 +47,8 @@
 
 .tab-transponder .text:last-child {
     border-bottom: none;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-transponder .textspacer {
@@ -59,7 +59,7 @@
 
 .tab-transponder .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial,serif;
     line-height: 19px;
     color: #4F4F4F;
     font-size: 11px;

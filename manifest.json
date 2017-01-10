@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "minimum_chrome_version": "38",
-    "version": "1.0.0",
+    "version": "1.5.2",
     "author": "Several",
     "name": "INAV - Configurator",
     "short_name": "INAV",
@@ -27,8 +27,6 @@
         "https://maps.googleapis.com/*",    
         "https://*.github.com/",
         "https://*.githubusercontent.com/",
-        "http://*.baseflight.net/",
-        "http://*.cleanflight.com/",
         "https://*.amazonaws.com/",
         "serial",
         "usb",

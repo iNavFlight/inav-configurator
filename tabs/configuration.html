@@ -1,18 +1,18 @@
 <div class="tab-configuration toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title" i18n="tabConfiguration">Configuration</div>
+        <div class="tab_title" data-i18n="tabConfiguration">Configuration</div>
         <div class="cf_doc_version_bt">
-            <a id="button-documentation" href="https://github.com/cleanflight/cleanflight/releases" target="_blank"></a>
+            <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
         </div>
         <div class="note" style="margin-bottom: 20px;">
             <div class="note_spacer">
-                <p i18n="configurationFeaturesHelp"></p>
+                <p data-i18n="configurationFeaturesHelp"></p>
             </div>
         </div>
-        <div class="leftWrapper mixer">
-            <div class="gui_box grey">
+        <div class="leftWrapper">
+            <div class="mixer gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationMixer"></div>
+                    <div class="spacer_box_title" data-i18n="configurationMixer"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="mixerPreview half">
@@ -25,105 +25,63 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="rightWrapper motorstop">
-            <div class="gui_box grey">
+            <div class="config-section sensors gui_box grey requires-v1_5">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationEscFeatures"></div>
+                    <div class="spacer_box_title" data-i18n="configurationSensors"></div>
                 </div>
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <tbody class="features esc">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                    <!--   -->
-                    <div class="disarm">
-                        <div class="checkbox">
-                            <div style="float: left; height: 20px; margin-right: 15px; margin-left: 3px;">
-                                <input type="checkbox" name="disarmkillswitch" class="toggle" />
-                            </div>
-                            <label for="disarmkillswitch"> <span class="freelabel"
-                                i18n="configurationDisarmKillSwitch"></span>
-                            </label>
-                        </div>
-                        <div class="number disarmdelay" style="display: none; margin-bottom: 5px;">
-                            <label>
-                                <div class="numberspacer">
-                                    <input type="number" name="autodisarmdelay" min="0" max="60" />
-                                </div>
-                                <span i18n="configurationAutoDisarmDelay"></span>
-                            </label>
-                        </div>
+
+                    <div class="select">
+                        <select id="sensor-acc"></select>
+                        <label for="sensor-acc"> <span data-i18n="sensorAccelerometer"></span></label>
                     </div>
-                    <!--   -->
-                    <div class="number">
-                        <label>
-                            <div class="numberspacer">
-                                <input type="number" name="minthrottle" min="0" max="2000" />
-                            </div>
-                            <span i18n="configurationThrottleMinimum"></span>
-                        </label>
+
+                    <div class="select">
+                        <select id="sensor-mag"></select>
+                        <label for="sensor-mag"> <span data-i18n="sensorMagnetometer"></span></label>
                     </div>
-                    <div class="number">
-                        <label>
-                            <div class="numberspacer">
-                                <input type="number" name="midthrottle" min="0" max="2000" />
-                            </div>
-                            <span i18n="configurationThrottleMid"></span>
-                        </label>
+
+                    <div class="select">
+                        <select id="sensor-baro"></select>
+                        <label for="sensor-baro"> <span data-i18n="sensorBarometer"></span></label>
                     </div>
-                    <div class="number">
-                        <label>
-                            <div class="numberspacer">
-                                <input type="number" name="maxthrottle" min="0" max="2000" />
-                            </div>
-                            <span i18n="configurationThrottleMaximum"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label>
-                            <div class="numberspacer">
-                                <input type="number" name="mincommand" min="0" max="2000" />
-                            </div>
-                            <span i18n="configurationThrottleMinimumCommand"></span>
-                        </label>
+
+                    <div class="select">
+                        <select id="sensor-pitot"></select>
+                        <label for="sensor-pitot"> <span data-i18n="sensorPitot"></span></label>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="clear-both"></div>
-        <div class="leftWrapper board">
-            <div class="gui_box grey">
+            <div class="board gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationBoardAlignment"></div>
-                    <div class="helpicon cf_tip" i18n_title="configHelp2"></div>
+                    <div class="spacer_box_title" data-i18n="configurationBoardAlignment"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="configHelp2"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="board_align_content">
                         <div class="number">
                             <label> <input type="number" name="board_align_roll" step="0.1" min="-180" max="360" /> <span
-                                i18n="configurationBoardAlignmentRoll"></span>
+                                    data-i18n="configurationBoardAlignmentRoll"></span>
                             </label>
                             <div class="alignicon roll"></div>
                         </div>
                         <div class="number">
                             <label> <input type="number" name="board_align_pitch" step="0.1" min="-180" max="360" />
-                            <span i18n="configurationBoardAlignmentPitch"></span>
+                                <span data-i18n="configurationBoardAlignmentPitch"></span>
                             </label>
                             <div class="alignicon pitch"></div>
                         </div>
                         <div class="number">
                             <label> <input type="number" name="board_align_yaw" step="0.1" min="-180" max="360" /> <span
-                                i18n="configurationBoardAlignmentYaw"></span>
+                                    data-i18n="configurationBoardAlignmentYaw"></span>
                             </label>
                             <div class="alignicon yaw"></div>
                         </div>
                     </div>
                     <div class="sensoralignment">
                         <div class="select">
-                            <label> 
-                                <span i18n="configurationSensorAlignmentGyro"></span>
+                            <label>
+                                <span data-i18n="configurationSensorAlignmentGyro"></span>
                                 <select class="gyroalign">
                                     <option value="0">Default</option>
                                     <!-- list generated here -->
@@ -131,8 +89,8 @@
                             </label>
                         </div>
                         <div class="select">
-                            <label> 
-                                <span i18n="configurationSensorAlignmentAcc"></span>
+                            <label>
+                                <span data-i18n="configurationSensorAlignmentAcc"></span>
                                 <select class="accalign">
                                     <option value="0">Default</option>
                                     <!-- list generated here -->
@@ -141,7 +99,7 @@
                         </div>
                         <div class="select">
                             <label>
-                                <span i18n="configurationSensorAlignmentMag"></span>
+                                <span data-i18n="configurationSensorAlignmentMag"></span>
                                 <select class="magalign">
                                     <option value="0">Default</option>
                                     <!-- list generated here -->
@@ -151,281 +109,341 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="rightWrapper system">
-            <div class="gui_box grey">
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationSystem"></div>
+                    <div class="spacer_box_title" data-i18n="configurationReceiver"></div>
                 </div>
                 <div class="spacer_box">
+                    <div class="features rxMode"></div>
+                    <!--feature list goes here-->
+                </div>
+                <div class="spacer_box">
+                    <h3 data-i18n="configurationSerialRX"></h3>
                     <div class="note">
                         <div class="note_spacer">
-                            <p i18n="configurationLoopTimeHelp"></p>
+                            <p data-i18n="configurationSerialRXHelp"></p>
                         </div>
                     </div>
-                    <div class="number">
-                        <label> <input type="number" name="looptime" step="100" min="0" max="9000" /> <span
-                            i18n="configurationLoopTime"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="text" name="looptimehz" readonly class="disabled" /> <span
-                            i18n="configurationCalculatedCyclesSec"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="clear-both"></div>
-        <div class="leftWrapper">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationReceiver"></div>
+                    <select id="serial-rx-protocol" class="full-width" size="1">
+                        <!-- list generated here -->
+                    </select>
                 </div>
                 <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features rxMode">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="gui_box grey rxprovider">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationSerialRX"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="note">
-                        <div class="note_spacer">
-                            <p i18n="configurationSerialRXHelp"></p>
-                        </div>
-                    </div>
-                    <select class="serialRX" size="8">
+                    <h3 data-i18n="configurationNrf24Protocol"></h3>
+                    <select id="nrf24-protocol" class="full-width" size="1">
                         <!-- list generated here -->
                     </select>
                 </div>
             </div>
-        </div>
-        <div class="rightWrapper current voltage">
-            <div class="gui_box grey">
+
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationBatteryVoltage"></div>
-                </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features batteryVoltage">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                    <div class="number">
-                        <label> <input type="number" name="mincellvoltage" step="0.1" min="1" max="5" /> <span
-                            i18n="configurationBatteryMinimum"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="maxcellvoltage" step="0.1" min="1" max="5" /> <span
-                            i18n="configurationBatteryMaximum"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="warningcellvoltage" step="0.1" min="1" max="5" /> <span
-                            i18n="configurationBatteryWarning"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="voltagescale" step="1" min="10" max="255" /> <span
-                            i18n="configurationBatteryScale"></span>
-                        </label>
-                    </div>
-                     <div class="number">
-                        <label> <input type="text" name="batteryvoltage" readonly class="disabled" /> <span
-                            i18n="configurationBatteryVoltage"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationCurrent"></div>
-                </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features batteryCurrent">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                    <div class="number">
-                        <label> <input type="number" name="currentscale" step="1" min="-1000" max="1000" /> <span
-                            i18n="configurationCurrentScale"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="number" name="currentoffset" step="1" min="0" max="3300" /> <span
-                            i18n="configurationCurrentOffset"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <label> <input type="text" name="batterycurrent" readonly class="disabled" /> <span
-                            i18n="configurationBatteryCurrent"></span>
-                    </div>
-                    <div class="checkbox">
-                        <div class="numberspacer">
-                            <input type="checkbox" name="multiwiicurrentoutput" class="toggle" />
-                        </div>
-                        <label> <span i18n="configurationBatteryMultiwiiCurrent"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="clear-both"></div>
-        <div class="leftWrapper gps">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationGPS"></div>
+                    <div class="spacer_box_title" data-i18n="configurationGPS"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="note">
                         <div class="note_spacer">
-                            <p i18n="configurationGPSHelp"></p>
+                            <p data-i18n="configurationGPSHelp"></p>
                         </div>
                     </div>
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features gps">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                    <div class="line">
-                        <select class="gps_protocol">
+
+                    <div class="features gps"></div>
+                    <!--feature list generated content-->
+
+                    <div class="select">
+                        <select id="gps_protocol" class="gps_protocol">
                             <!-- list generated here -->
                         </select>
-                        <span i18n="configurationGPSProtocol"></span>
+                        <label for="gps_protocol">
+                            <span data-i18n="configurationGPSProtocol"></span>
+                        </label>
                     </div>
-                    <div class="line">
-                        <select class="gps_baudrate">
+                    <div class="select">
+                        <select id="gps_ubx_sbas" class="gps_ubx_sbas">
                             <!-- list generated here -->
                         </select>
-                        <span i18n="configurationGPSBaudrate"></span>
-                    </div>
-                    <div class="line">
-                        <select class="gps_ubx_sbas">
-                            <!-- list generated here -->
-                        </select>
-                        <span i18n="configurationGPSubxSbas"></span>
+                        <label for="gps_ubx_sbas">
+                            <span data-i18n="configurationGPSubxSbas"></span>
+                        </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="mag_declination" step="0.1" min="-180" max="180" />
-                        <span i18n="configurationMagDeclination"></span>
+                        <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
+                        <label for="mag_declination">
+                            <span data-i18n="configurationMagDeclination"></span>
                         </label>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="rightWrapper other">
-            <div class="gui_box grey">
+
+            <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationFeatures"></div>
-                </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features other" id="noline">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="leftWrapper rssi">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configurationRSSI"></div>
-                        <div class="helpicon cf_tip" i18n_title="configurationRSSIHelp"></div>
-                    </div>
-                <div class="spacer_box">
-                    <table cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th i18n="configurationFeatureEnabled"></th>
-                                <th i18n="configurationFeatureDescription"></th>
-                                <th i18n="configurationFeatureName"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="features rssi">
-                            <!-- table generated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="rightWrapper 3d">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" i18n="configuration3d"></div>
+                    <div class="spacer_box_title" data-i18n="configuration3d"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="number">
-                        <label> <input type="number" name="3ddeadbandlow" step="1" min="1425" max="1500" /> <span
-                            i18n="configuration3dDeadbandLow"></span>
+                        <input type="number" id="3ddeadbandlow" name="3ddeadbandlow" step="1" min="1425" max="1500" />
+                        <label for="3ddeadbandlow">
+                            <span data-i18n="configuration3dDeadbandLow"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="3ddeadbandhigh" step="1" min="1500" max="1575" /> <span
-                            i18n="configuration3dDeadbandHigh"></span>
+                        <input type="number" id="3ddeadbandhigh" name="3ddeadbandhigh" step="1" min="1500" max="1575" />
+                        <label for="3ddeadbandhigh">
+                            <span data-i18n="configuration3dDeadbandHigh"></span>
                         </label>
                     </div>
                     <div class="number">
-                        <label> <input type="number" name="3dneutral" step="1" min="1475" max="1525" /> <span
-                            i18n="configuration3dNeutral"></span>
+                        <input type="number" id="3dneutral" name="3dneutral" step="1" min="1475" max="1525" />
+                        <label for="3dneutral">
+                            <span data-i18n="configuration3dNeutral"></span>
                         </label>
                     </div>
-                    <div class="number 3ddeadbandthrottle" >
-                        <label> <input type="number" name="3ddeadbandthrottle" step="1" min="0" max="1000" /> <span
-                            i18n="configuration3dDeadbandThrottle"></span>
+                    <div id="deadband-3d-throttle-container" class="number">
+                        <input type="number" id="3ddeadbandthrottle" name="3ddeadbandthrottle" step="1" min="0" max="1000" />
+                        <label for="3ddeadbandthrottle">
+                            <span data-i18n="configuration3dDeadbandThrottle"></span>
                         </label>
                     </div>
                 </div>
             </div>
+
         </div>
+
+        <!--Right column begins here-->
+
+        <div class="rightWrapper">
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationEscFeatures"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="features esc-priority"></div>
+                    <!--list of generated features goes here-->
+                    <div id="esc-protocols">
+                        <div class="select">
+                            <select name="esc-protocol" id="esc-protocol"></select>
+                            <label for="esc-protocol">
+                                <span data-i18n="escProtocol"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="escProtocolHelp"></div>
+                        </div>
+                        <div class="select">
+                            <select name="esc-rate" id="esc-rate"></select>
+                            <label for="esc-rate">
+                                <span data-i18n="escRefreshRate"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="escRefreshRatelHelp"></div>
+                        </div>
+                        <div class="clear-both"></div>
+                    </div>
+
+                    <div id="servo-rate-container">
+                        <div class="select">
+                            <select name="servo-rate" id="servo-rate"></select>
+                            <label for="servo-rate">
+                                <span data-i18n="servoRefreshRate"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="servoRefreshRatelHelp"></div>
+                        </div>
+                        <div class="clear-both"></div>
+                    </div>
+
+                    <div class="features esc"></div>
+                    <!--list of generated features goes here-->
+
+                    <div class="checkbox">
+                            <input type="checkbox" id="disarmkillswitch" name="disarmkillswitch" class="toggle" />
+                        <label for="disarmkillswitch">
+                            <span data-i18n="configurationDisarmKillSwitch"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationDisarmKillSwitchHelp"></div>
+                    </div>
+
+                    <div class="number disarmdelay" style="display: none; margin-bottom: 5px;">
+                        <input type="number" id="autodisarmdelay" name="autodisarmdelay" min="0" max="60" />
+                        <label for="autodisarmdelay">
+                            <span data-i18n="configurationAutoDisarmDelay"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationAutoDisarmDelayHelp"></div>
+                    </div>
+
+                    <!--   -->
+                    <div class="number">
+                        <input type="number" id="minthrottle" name="minthrottle" min="0" max="2000" />
+                        <label for="minthrottle">
+                            <span data-i18n="configurationThrottleMinimum"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="midthrottle" name="midthrottle" min="0" max="2000" />
+                        <label for="midthrottle">
+                            <span data-i18n="configurationThrottleMid"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="maxthrottle" name="maxthrottle" min="0" max="2000" />
+                        <label for="maxthrottle">
+                            <span data-i18n="configurationThrottleMaximum"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="mincommand" name="mincommand" min="0" max="2000" />
+                        <label for="mincommand">
+                            <span data-i18n="configurationThrottleMinimumCommand"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationSystem"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="select requires-v1_4">
+                        <select id="gyro-lpf"></select>
+                        <label for="gyro-lpf"> <span data-i18n="configurationGyroLpfTitle"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationGyroLpfHelp"></div>
+                    </div>
+
+                    <div class="select requires-v1_4">
+                        <select id="async-mode"></select>
+                        <label for="async-mode"> <span data-i18n="configurationAsyncMode"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationAsyncModeHelp"></div>
+                    </div>
+
+                    <div id="gyro-sync-wrapper" class="checkbox requires-v1_4">
+                        <input type="checkbox" id="gyro-sync-checkbox" class="toggle" />
+                        <label for="gyro-sync-checkbox">
+                            <span data-i18n="configurationGyroSyncTitle"></span>
+                        </label>
+                    </div>
+
+                    <div id="gyro-frequency-wrapper" class="checkbox requires-v1_4">
+                        <select id="gyro-frequency"></select>
+                        <label for="gyro-frequency">
+                            <span data-i18n="configurationGyroFrequencyTitle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationGyroFrequencyHelp"></div>
+                    </div>
+
+                    <div id="accelerometer-frequency-wrapper" class="checkbox requires-v1_4">
+                        <select id="accelerometer-frequency"></select>
+                        <label for="accelerometer-frequency">
+                            <span data-i18n="configurationAccelerometerFrequencyTitle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationAccelerometerFrequencyHelp"></div>
+                    </div>
+
+                    <div id="attitude-frequency-wrapper" class="checkbox requires-v1_4">
+                        <select id="attitude-frequency"></select>
+                        <label for="attitude-frequency">
+                            <span data-i18n="configurationAttitudeFrequencyTitle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationAttitudeFrequencyHelp"></div>
+                    </div>
+
+                    <div class="select">
+                        <select id="looptime"></select>
+                        <label for="looptime">
+                            <span data-i18n="configurationLoopTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLoopTimeHelp"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationBatteryVoltage"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="features batteryVoltage"></div>
+                    <!--list of generated features goes here-->
+
+                    <div class="number">
+                        <input type="number" id="mincellvoltage" name="mincellvoltage" step="0.1" min="1" max="5" />
+                        <label for="mincellvoltage"><span data-i18n="configurationBatteryMinimum"></span></label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="maxcellvoltage" name="maxcellvoltage" step="0.1" min="1" max="5" />
+                        <label for="maxcellvoltage">
+                            <span data-i18n="configurationBatteryMaximum"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="warningcellvoltage" name="warningcellvoltage" step="0.1" min="1" max="5" />
+                        <label for="warningcellvoltage">
+                            <span data-i18n="configurationBatteryWarning"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="255" />
+                        <label for="voltagescale">
+                            <span data-i18n="configurationBatteryScale"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="text" id="batteryvoltage" name="batteryvoltage" readonly class="disabled" />
+                        <label for="batteryvoltage">
+                            <span data-i18n="configurationBatteryVoltage"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationCurrent"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="features batteryCurrent"></div>
+                    <!--list of generated features goes here-->
+
+                    <div class="number">
+                        <input type="number" id="currentscale" name="currentscale" step="1" min="-1000" max="1000" />
+                        <label for="currentscale">
+                            <span data-i18n="configurationCurrentScale"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="currentoffset" name="currentoffset" step="1" min="0" max="3300" />
+                        <label for="currentoffset">
+                            <span data-i18n="configurationCurrentOffset"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="text" id="batterycurrent" name="batterycurrent" readonly class="disabled" />
+                        <label for="batterycurrent">
+                            <span data-i18n="configurationBatteryCurrent"></span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" id="multiwiicurrentoutput" name="multiwiicurrentoutput" class="toggle" />
+                        <label for="multiwiicurrentoutput">
+                            <span data-i18n="configurationBatteryMultiwiiCurrent"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section gui_box grey other">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationFeatures"></div>
+                </div>
+
+                <div class="spacer_box">
+                    <div class="features other"></div>
+                    <!--feature list generated content-->
+                </div>
+            </div>
+
+        </div>
+
         <div class="clear-both"></div>
     </div>
     <div class="content_toolbar">
         <div class="btn save_btn">
-            <a class="save" href="#" i18n="configurationButtonSave"></a>
+            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
         </div>
     </div>
 </div>

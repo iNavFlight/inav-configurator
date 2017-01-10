@@ -78,10 +78,13 @@
         "message": "Ports"
     },
     "tabPidTuning": {
-        "message": "PID Tuning"
+        "message": "PID tuning"
     },
     "tabReceiver": {
         "message": "Receiver"
+    },
+    "tabMisc": {
+        "message": "Miscelanous"
     },
     "tabModeSelection": {
         "message": "Mode Selection"
@@ -216,6 +219,9 @@
     "statusbar_cycle_time": {
         "message": "Cycle Time:"
     },
+    "statusbar_cpu_load": {
+        "message": "CPU Load: $1%"
+    },
 
     "dfu_connect_message": {
         "message": "Please use the Firmware Flasher to access DFU devices"
@@ -245,7 +251,7 @@
         "message": "Contributing"
     },
     "defaultContributingText": {
-        "message": "If you would like to help make INAV even better you can help in many ways, including:<br /><ul><li>Answering other users questions on the forums and IRC.</li><li>Contributing code to the firmware and configurator - new features, fixes, improvements</li><li>Testing <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new features/fixes</a> and providing feedback.</li><li>Helping out with <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">issues and commenting on feature requests</a>.</li><li><a href=\"https://www.paypal.me/KonstantinSharlaimov\" target=\"_blank\" title=\"Donate\">Donating</a></li></ul>"
+        "message": "If you would like to help make INAV even better you can help in many ways, including:<br /><ul><li>Answering other users questions on the forums and IRC.</li><li>Contributing code to the firmware and configurator - new features, fixes, improvements</li><li>Testing <a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">new features/fixes</a> and providing feedback.</li><li>Helping out with <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">issues and commenting on feature requests</a>.</li></ul>"
     },
     "defaultChangelogHead": {
         "message": "Configurator - Changelog"
@@ -257,7 +263,7 @@
         "message": "Open Source / Donation Notice"
     },
     "defaultDonateText": {
-        "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAVF</strong> users.<br />If you found the INAV or INAV Configurator useful, please consider <strong>supporting</strong> its development by donating."
+        "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAV</strong> users.<br />If you found the INAV or INAV Configurator useful, please consider <strong>supporting</strong> its development by donating."
     },
     "defaultSponsorsHead": {
         "message": "Sponsors"
@@ -266,13 +272,13 @@
         "message": "Documentation / Manual"
     },
     "defaultDocumentation": {
-        "message": "Cleanflight documentation is available in Markdown and PDF formats.<br /><br />"
+        "message": "INAV documentation is available in Markdown format.<br /><br />"
     },
     "defaultDocumentation1": {
-        "message": "The PDF manual appropriate to the firmware can be downloaded from the github releases page, <a href=\"https://github.com/cleanflight/cleanflight/releases\" target=\"_blank\">here</a>."
+        "message": "The PDF manual appropriate to the firmware can be downloaded from the github releases page, <a href=\"https://github.com/iNavFlight/inav/releases\" target=\"_blank\">here</a>."
     },
     "defaultDocumentation2": {
-        "message": "The Markdown latest online documentation is available <a href=\"https://github.com/cleanflight/cleanflight/tree/master/docs\" target=\"_blank\">here</a> - you can switch to the appropriate version of the documentation by selecting the tag."
+        "message": "The Markdown latest online documentation is available <a href=\"https://github.com/iNavFlight/inav/tree/master/docs\" target=\"_blank\">here</a> - you can switch to the appropriate version of the documentation by selecting the tag."
     },
     "defaultSupportHead": {
         "message": "Support"
@@ -293,23 +299,23 @@
         "message": "<a href=\"http://www.multiwii.com/forum/viewtopic.php?f=23&t=5149\" target=\"_blank\">MultiWii forums thread</a>"
     },
     "defaultSupport3": {
-        "message": "<a href=\"https://github.com/cleanflight\" target=\"_blank\">GitHub</a>"
+        "message": "<a href=\"https://github.com/iNavFlight\" target=\"_blank\">GitHub</a>"
     },
     "defaultSupport4": {
-        "message": "<a href=\"irc://irc.freenode.net/#cleanflight\" target=\"_blank\">IRC channel on freenode</a>"
+        "message": "<a href=\"https://gitter.im/iNavFlight/inav\" target=\"_blank\">Gitter channel</a>"
     },
     "defaultSupport5": {
-        "message": "<a href=\"http://webchat.freenode.net/?channels=cleanflight\" target=\"_blank\">Join via WebClient</a>"
+        "message": "<a href=\"https://gitter.im/iNavFlight/inav\" target=\"_blank\">Join via WebClient</a>"
     },
 
     "initialSetupBackupAndRestoreApiVersion": {
-        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see Cleanflight documentation for procedure."
+        "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
     "initialSetupButtonCalibrateAccel": {
         "message": "Calibrate Accelerometer"
     },
     "initialSetupCalibrateAccelText": {
-        "message": "Place board or frame on <strong>leveled</strong> surface, proceed with calibration, ensure platform is not moving during calibration period"
+        "message": "6-point calibration of accelerometer. Go to wiki for iNav and follow Sensor Calibration for more infomation"
     },
     "initialSetupButtonCalibrateMag": {
         "message": "Calibrate Magnetometer"
@@ -516,6 +522,12 @@
     "featureONESHOT125Tip": {
         "message": "Disconnect flight battery and remove props before enabling."
     },
+    "featurePWM_OUTPUT_ENABLE": {
+        "message": "Enable motor and servo output"
+    },
+    "featurePWM_OUTPUT_ENABLETip": {
+        "message": "Enabling this option is required for INAV to send signals to ESC. It is a safety precaution that prevents servos from being damaged right after flashing flight controller."
+    },
     "featureBLACKBOX": {
         "message": "Blackbox flight data recorder"
     },
@@ -531,7 +543,24 @@
     "featureTRANSPONDERTip": {
         "message": "Configure via the Race Transponder tab after enabling."
     },
-
+    "featureRX_NRF24": {
+        "message": "NRF24L01 based receiver"
+    },
+    "featureRX_NRF24Tip": {
+        "message": "Remember to set the NRF24 protocol after enabling."
+    },
+    "featureSOFTSPI": {
+        "message": "CPU based SPI"
+    },
+    "featurePWM_SERVO_DRIVER": {
+        "message": "External PWM servo driver"
+    },
+    "featurePWM_SERVO_DRIVERTip": {
+        "message": "Use external PCA9685 PMW driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
+    },
+    "featureRSSI_ADCTip": {
+        "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
@@ -552,9 +581,6 @@
     },
     "configurationRSSI": {
         "message": "RSSI (Signal Strength)"
-    },
-    "configurationRSSIHelp": {
-        "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
     },
     "configurationEscFeatures": {
         "message": "ESC/Motor Features"
@@ -599,10 +625,16 @@
         "message": "Magnetometer Declination [deg]"
     },
     "configurationAutoDisarmDelay": {
-        "message": "Disarm motors after set delay(Seconds) (Requires MOTOR_STOP feature)"
+        "message": "Disarm delay [Seconds]"
+    },
+    "configurationAutoDisarmDelayHelp": {
+        "message": "Requires MOTOR_STOP feature"
     },
     "configurationDisarmKillSwitch": {
-        "message": "Disarm motors regardless of throttle value (When arming via AUX channel)"
+        "message": "Disarm regardless of throttle value"
+    },
+    "configurationDisarmKillSwitchHelp": {
+        "message": "When arming via AUX channel"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -670,9 +702,6 @@
     "configurationCalculatedCyclesSec": {
         "message": "Cycles/Sec (Hz)"
     },
-    "configurationLoopTimeHelp": {
-        "message": "<strong>Note:</strong> Changing this may require PID re-tuning."
-    },
     "configurationGPS": {
         "message": "GPS"
     },
@@ -690,6 +719,9 @@
     },
     "configurationSerialRX": {
         "message": "Serial Receiver Provider"
+    },
+    "configurationNrf24Protocol": {
+        "message": "NRF24 protocol"
     },
     "configurationEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
@@ -731,6 +763,9 @@
     "portsFunction_TELEMETRY_MAVLINK": {
         "message": "MAVLink"
     },
+    "portsFunction_TELEMETRY_IBUS": {
+        "message": "IBUS"
+    },
     "portsFunction_TELEMETRY_MSP": {
         "message": "MSP"
     },
@@ -766,6 +801,12 @@
     },
     "pidTuningYawRate": {
         "message": "YAW rate"
+    },
+    "magHoldYawRate": {
+        "message": "MagHold rate"
+    },
+    "pidTuningMagHoldYawRateHelp": {
+        "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
     },
     "pidTuningTPA": {
         "message": "TPA"
@@ -1367,8 +1408,12 @@
     "firmwareFlasherNoReboot": {
         "message": "No reboot sequence"
     },
-    "firmwareFlasherOnlineReleasesDescription": {
-        "message": "Available online firmware releases - Select the correct firmware appropriate for your board."
+    "firmwareFlasherOnlineSelectBoardDescription": {
+
+        "message": "Select your board to see available online firmware releases - Select the correct firmware appropriate for your board."
+    },
+    "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
+        "message": "Select firmware version for your board."
     },
     "firmwareFlasherNoRebootDescription": {
         "message": "Enable if you powered your FC while the bootloader pins are jumpered or have your FC's BOOT button pressed."
@@ -1406,6 +1451,15 @@
     "firmwareFlasherOptionLabelSelectFirmware": {
         "message": "Choose a Firmware / Board"
     },
+    "firmwareFlasherOptionLabelSelectBoard": {
+        "message": "Choose a Board"
+    },
+    "firmwareFlasherOptionLabelSelectFirmwareVersion": {
+        "message": "Choose a Firmware version"
+    },
+    "firmwareFlasherOptionLabelSelectFirmwareVersionFor": {
+        "message": "Choose a Firmware version for"
+    },
     "firmwareFlasherButtonLoadLocal": {
         "message": "Load Firmware [Local]"
     },
@@ -1437,13 +1491,13 @@
         "message": "Warning"
     },
     "firmwareFlasherWarningText": {
-        "message": "Please do <span style=\"color: red\">not</span> try to flash <strong>non-cleanflight</strong> hardware with this firmware flasher.<br />Do <span style=\"color: red\">not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br /><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (SPRacingF3Mini, Sparky, ColibriRace, etc) ensure you have read the USB Flashing section of the Cleanflight manual and have the correct software and drivers installed"
+        "message": "Please do <span style=\"color: red\">not</span> try to flash <strong>non-iNAV</strong> hardware with this firmware flasher.<br />Do <span style=\"color: red\">not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br /><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (SPRacingF3Mini, Sparky, ColibriRace, etc) ensure you have read the USB Flashing section of the INAV manual and have the correct software and drivers installed"
     },
     "firmwareFlasherRecoveryHead": {
         "message": "<strong>Recovery / Lost communication<strong>"
     },
     "firmwareFlasherRecoveryText": {
-        "message": "If you have lost communication with your board follow these steps to restore communication: <ul><li>Power off</li><li>Enable 'No reboot sequence', enable 'Full chip erase'.</li><li>Jumper the BOOT pins or hold BOOT button.</li><li>Power on (activity LED will NOT flash if done correctly).</li><li>Install all STM32 drivers and Zadig if required (see <a href=\"https://github.com/cleanflight/cleanflight/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> section of cleanflight manual).</li><li>Close configurator, Close all running chrome instances, Close all Chrome apps, Restart Configurator.</li><li>Release BOOT button if your FC has one.</li><li>Flash with correct firmware (using manual baud rate if specified in your FC's manual).</li><li>Power off.</li><li>Remove BOOT jumper.</li><li>Power on (activity LED should flash).</li><li>Connect normally.</li></ul>"
+        "message": "If you have lost communication with your board follow these steps to restore communication: <ul><li>Power off</li><li>Enable 'No reboot sequence', enable 'Full chip erase'.</li><li>Jumper the BOOT pins or hold BOOT button.</li><li>Power on (activity LED will NOT flash if done correctly).</li><li>Install all STM32 drivers and Zadig if required (see <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> section of INAV manual).</li><li>Close configurator, Close all running chrome instances, Close all Chrome apps, Restart Configurator.</li><li>Release BOOT button if your FC has one.</li><li>Flash with correct firmware (using manual baud rate if specified in your FC's manual).</li><li>Power off.</li><li>Remove BOOT jumper.</li><li>Power on (activity LED should flash).</li><li>Connect normally.</li></ul>"
     },
     "firmwareFlasherButtonLeave": {
         "message": "Leave Firmware Flasher"
@@ -1462,7 +1516,7 @@
     },
 
     "ledStripHelp": {
-        "message": "The flight controller can control colors and effects of individual LEDs on a strip.<br />Configure LEDs on the grid, configure wiring order then attach LEDs on your aircraft according to grid positions."
+        "message": "The flight controller can control colors and effects of individual LEDs on a strip.<br />Configure LEDs on the grid, configure wiring order then attach LEDs on your aircraft according to grid positions. LEDs without wire ordering number will not be saved.<br />Double-click on a color to edit the HSV values."
     },
     "ledStripButtonSave": {
         "message": "Save"
@@ -1548,10 +1602,10 @@
         "message": "GPS Navigation"
     },
     "pidTuningLevelP": {
-        "message": "Strength (Angle)"
+        "message": "Strength"
     },
     "pidTuningLevelI": {
-        "message": "Strength (Horizon)"
+        "message": "LPF cutoff (Hz)"
     },
     "pidTuningLevelD": {
         "message": "Transition (Horizon)"
@@ -1563,7 +1617,7 @@
         "message": "Arbitrary board rotation in degrees, to allow mounting it sideways / upside down / rotated etc. When running external sensors, use the sensor alignments (Gyro, Acc, Mag) to define sensor position independent from board orientation. "
     },
     "failsafeFeaturesHelpOld": {
-        "message": "Failsafe configuration has changed considerably. Use Cleanflight <strong>v1.12.0+</strong> to enable the improved configuration panel."
+        "message": "Failsafe configuration has changed considerably. Use latest INAV"
     },
     "failsafePaneTitleOld": {
         "message": "Receiver failsafe"
@@ -1657,5 +1711,191 @@
     },
     "mainHelpLink": {
         "message": "Serial Link Status"
+    },
+    "warning": {
+        "message": "Warning"
+    },
+    "boardLimitedFunctionality": {
+        "message": "Due to limited flash size, the board you have selected will have limited functionality, not all functions and features will be available. Hardware support map is available on <a href=\"https://github.com/iNavFlight/inav/wiki/Hardware-support-map\" target=\"_blank\">INAV Wiki pages</a>"
+    },
+    "escProtocol": {
+        "message": "ESC protocol"
+    },
+    "escRefreshRate": {
+        "message" : "ESC refresh rate"
+    },
+    "escProtocolHelp": {
+        "message" : "ESC has to support chosen protocol. Change only if you know that ESC supports it!"
+    },
+    "escRefreshRatelHelp": {
+        "message" : "ESC has to support refresh rate. Change only if you know that ESC supports it!"
+    },
+    "servoRefreshRate": {
+        "message" : "Servo refresh rate"
+    },
+    "servoRefreshRatelHelp": {
+        "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
+    },
+    "logPwmOutputDisabled": {
+        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Configuration</u> tab to enable!"
+    },
+    "configurationGyroSyncTitle": {
+        "message" : "Synchronize looptime with gyroscope"
+    },
+    "configurationGyroLpfTitle": {
+        "message" : "Gyroscope LPF cutoff frequency"
+    },
+    "configurationGyroSyncDenominator": {
+        "message" : "Gyroscope denominator"
+    },
+    "yawJumpPreventionLimit": {
+        "message": "Yaw jump prevention"
+    },
+    "yawJumpPreventionLimitHelp": {
+        "message": "Prevent yaw jumps during yaw stops and rapid YAW input. To disable set to 500. Adjust this if your aircraft 'skids out'. Higher values increases YAW authority but can cause roll/pitch instability in case of underpowered UAVs. Lower values makes yaw adjustments more gentle but can cause UAV unable to keep heading"
+    },
+    "yawPLimit": {
+        "message": "Yaw P limit"
+    },
+    "yawPLimitHelp": {
+        "message": "Limiter for yaw P term. Increasing it improves yaw authority but can cause instability on ROLL and PITCH."
+    },
+    "tabFiltering": {
+        "message": "Filtering"
+    },
+    "gyroLpfCutoffFrequency": {
+        "message": "Gyro LPF cutoff frequency"
+    },
+    "gyroLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the gyro signal. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value. Too high value can cause motor and ESC overheating."
+    },
+    "accLpfCutoffFrequency": {
+        "message": "Accelerometer LPF cutoff frequency"
+    },
+    "accLpfCutoffFrequencyHelp": {
+        "message": "Software-based filter to remove mechanical vibrations from the accelerometer measurements. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value."
+    },
+    "dtermLpfCutoffFrequency": {
+        "message": "D-term LPF cutoff frequency"
+    },
+    "dtermLpfCutoffFrequencyHelp": {
+        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
+    },
+    "yawLpfCutoffFrequency": {
+        "message": "Yaw LPF cutoff frequency"
+    },
+    "yawLpfCutoffFrequencyHelp": {
+        "message": "Yaw P-term LPF cutoff frequency"
+    },
+    "rollPitchItermIgnoreRate": {
+        "message": "Roll/Pitch I-term ignore rate"
+    },
+    "rollPitchItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "yawItermIgnoreRate": {
+        "message": "Yaw I-term ignore rate"
+    },
+    "yawItermIgnoreRateHelp": {
+        "message": "PID I-Term is ignored above this rotation rate. This prevents I-term from accumulation during maneuvers"
+    },
+    "axisAccelerationLimitRollPitch": {
+        "message": "Roll/Pitch acceleration limit"
+    },
+    "axisAccelerationLimitRollPitchHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "axisAccelerationLimitYaw": {
+        "message": "Yaw acceleration limit"
+    },
+    "axisAccelerationLimitYawHelp": {
+        "message": "This is maximum angular acceleration rate pilot is allowed to require from UAV. UAV should be able to satisfy this accelaration rate. As a rule of thumb, the bigger the UAV, to lower acceleration it can handle"
+    },
+    "pidTuningTPAHelp": {
+        "message": "Throttle PID Attenuation factor. PID gains will be reduced lineary starting from 0 at TPA Breakpoint (Throttle) to TPA factor at max throttle"
+    },
+    "pidTuningTPABreakPointHelp": {
+        "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
+    },
+    "configurationAsyncMode": {
+        "message": "Asynchronous mode"
+    },
+    "configurationGyroFrequencyTitle": {
+        "message": "Gyroscope task frequency"
+    },
+    "configurationAccelerometerFrequencyTitle": {
+        "message": "Accelerometer task frequency"
+    },
+    "configurationAttitudeFrequencyTitle": {
+        "message": "Attitude task frequency"
+    },
+    "configurationGyroLpfHelp": {
+        "message": "Hardware based cutoff frequency for gyroscope. In general, bigger value is better but makes UAV more sensitive to vibrations"
+    },
+    "configurationAsyncModeHelp": {
+        "message": "See Firmware \"Looptime\" documentation for details"
+    },
+    "configurationGyroFrequencyHelp": {
+        "message": "In general, higher value is better but makes UAV more sensitive to vibrations. Should be kept above 'Flight Controller Loop Time' frequency. Maximal practical value is hardware dependant. If set too high, board might not run properly. Observe CPU usage."
+    },
+    "configurationAccelerometerFrequencyHelp": {
+        "message": "For Acro purposes, this value can be lowered from default"
+    },
+    "configurationAttitudeFrequencyHelp": {
+        "message": "For Acro purposes, this value can be lowered from default"
+    },
+    "configurationLoopTimeHelp": {
+        "message": "In general, higher value is better. With asynchronous gyroscope, should be kept below gyro update frequency. Maximal practical value is hardware dependant. If set too high, board might not run properly. Observe CPU usage."
+    },
+    "tabOSD": {
+        "message": "OSD"
+    },
+    "configurationSensors": {
+        "message": "Sensors"
+    },
+    "sensorAccelerometer": {
+        "message": "Accelerometer"
+    },
+    "sensorMagnetometer": {
+        "message": "Magnetometer"
+    },
+    "sensorBarometer": {
+        "message": "Barometer"
+    },
+    "sensorPitot": {
+        "message": "Pitot tube"
+    },
+    "manualEnablingTemplate": {
+        "message": "To enable via CLI use <strong>feature {name}</strong> command"
+    },
+    "armingFailureReasonTitle": {
+        "message": "Pre-arming checks"
+    },
+    "BLOCKED_UAV_NOT_LEVEL": {
+        "message": "UAV is levelled"
+    },
+    "BLOCKED_SENSORS_CALIBRATING": {
+        "message": "Run-time calibration"
+    },
+    "BLOCKED_SYSTEM_OVERLOADED": {
+        "message": "CPU load"
+    },
+    "BLOCKED_NAVIGATION_SAFETY": {
+        "message": "Navigation is safe"
+    },
+    "BLOCKED_COMPASS_NOT_CALIBRATED": {
+        "message": "Compass calibrated"
+    },
+    "BLOCKED_ACCELEROMETER_NOT_CALIBRATED": {
+        "message": "Accelerometer calibrated"
+    },
+    "BLOCKED_HARDWARE_FAILURE": {
+        "message": "Hardware health"
+    },
+    "armingCheckPass": {
+        "message": "<span class=\"arming-state-pass\">PASS</span>"
+    },
+    "armingCheckFail": {
+        "message": "<span class=\"arming-state-fail\">FAIL</span>"
     }
 }

@@ -14,8 +14,7 @@
 
 .tab-landing .content_top {
     height: 140px;
-    background: white;
-	background-image:url(/images/map_bg.svg);
+    background: white url(/images/map_bg.svg);
     padding: 20px;
 }
 
@@ -30,8 +29,7 @@
 
 .tab-landing .content_foot {
     clear: both;
-    padding: 20px;
-    padding-bottom: 5px;
+    padding: 20px 20px 5px;
 }
 
 /* hero block */
@@ -42,7 +40,7 @@
     width: 800px;
     color: black;
     font-size: 14px;
-    font-family: 'open_sanslight', Arial;
+    font-family: 'open_sanslight', Arial,serif;
 }
 
 .tab-landing .logowrapper img {
@@ -75,14 +73,12 @@
 
 .sponsors li a {
     border-radius: 3px;
-    padding: 2px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 2px 4px;
     font-size: 13px;
     line-height: 22px;
     color: white;
     font-weight: normal;
-    font-family: 'open_sanslight', Arial;
+    font-family: 'open_sanslight', Arial,serif;
 }
 
 .sponsors li a:hover {
@@ -94,7 +90,7 @@
     margin-top: 15px;
     margin-bottom: 15px;
     font-weight: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial,serif;
     font-size: 12px;
 	color: #c2efff;
 }
@@ -105,15 +101,11 @@
 
 /* text columns */
 .tab-landing .content_mid .column .wrap {
-    padding: 15px;
-    padding-bottom: 0px;
-    padding-top: 0px;
+    padding: 0 15px;
 }
 
 .tab-landing .content_mid .column .wrap2 {
     padding: 10px;
-    padding-bottom: 10px;
-    padding-top: 10px;
 }
 
 .tab-landing .content_mid h2 {
@@ -125,11 +117,10 @@
 .tab-landing .content_mid h3 {
     font-size: 12px;
     margin-bottom: 5px;
-
 }
 
 .tab-landing .content_mid .text1 .wrap {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .tab-landing .content_mid .text1 {
@@ -175,7 +166,8 @@
     height: 100%;
     position: fixed;
     right: -245px;
-    top: 0px;
+    top: 0;
+    background: white;
 }
 
 #changelog .wrapper {
@@ -210,16 +202,10 @@
     font-size: 16px;
 }
 
-#content.log_open #changelog {
-    right: 0px;
-    background: white;
-}
-
-#content.log_open #changelog .wrapper {
+#changelog .wrapper {
     display: block;
 }
 
-/* changelog content */
 #changelog .log {
     line-height: 17px;
 }

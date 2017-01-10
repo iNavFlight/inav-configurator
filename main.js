@@ -1,12 +1,15 @@
+/*global $, chrome, analytics*/
 'use strict';
 
 // Google Analytics
 var googleAnalyticsService = analytics.getService('ice_cream_app');
-var googleAnalytics = googleAnalyticsService.getTracker(atob("VUEtNTI4MjA5MjAtMQ=="));
+var googleAnalytics = googleAnalyticsService.getTracker("UA-75834706-2");
 var googleAnalyticsConfig = false;
 googleAnalyticsService.getConfig().addCallback(function (config) {
     googleAnalyticsConfig = config;
 });
+
+chrome.storage = chrome.storage || {};
 
 $(document).ready(function () {
     // translate to user-selected language
@@ -166,6 +169,9 @@ $(document).ready(function () {
                     case 'motors':
                         TABS.motors.initialize(content_ready);
                         break;
+                    case 'osd':
+                        TABS.osd.initialize(content_ready);
+                        break;
                     case 'sensors':
                         TABS.sensors.initialize(content_ready);
                         break;
@@ -189,7 +195,7 @@ $(document).ready(function () {
     $('#tabs ul.mode-disconnected li a:first').click();
 
     // options
-    $('a#options').click(function () {
+    $('#options').click(function () {
         var el = $(this);
 
         if (!el.hasClass('active')) {
@@ -245,8 +251,10 @@ $(document).ready(function () {
         }
     });
 
+    var $content = $("#content");
+
     // listen to all input change events and adjust the value within limits if necessary
-    $("#content").on('focus', 'input[type="number"]', function () {
+    $content.on('focus', 'input[type="number"]', function () {
         var element = $(this),
             val = element.val();
 
@@ -255,7 +263,7 @@ $(document).ready(function () {
         }
     });
 
-    $("#content").on('keydown', 'input[type="number"]', function (e) {
+    $content.on('keydown', 'input[type="number"]', function (e) {
         // whitelist all that we need for numeric control
         var whitelist = [
             96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // numpad and standard number keypad
@@ -270,7 +278,7 @@ $(document).ready(function () {
         }
     });
 
-    $("#content").on('change', 'input[type="number"]', function () {
+    $content.on('change', 'input[type="number"]', function () {
         var element = $(this),
             min = parseFloat(element.prop('min')),
             max = parseFloat(element.prop('max')),
@@ -321,13 +329,16 @@ $(document).ready(function () {
     });
 
     $("#showlog").on('click', function() {
-    var state = $(this).data('state');
-    if ( state ) {
-        $("#log").animate({height: 27}, 200, function() {
+    var state = $(this).data('state'),
+        $log = $("#log");
+
+    if (state) {
+        $log.animate({height: 27}, 200, function() {
              var command_log = $('div#log');
-             command_log.scrollTop($('div.wrapper', command_log).height());
+             //noinspection JSValidateTypes
+            command_log.scrollTop($('div.wrapper', command_log).height());
         });
-        $("#log").removeClass('active');
+        $log.removeClass('active');
         $("#content").removeClass('logopen');
         $(".tab_container").removeClass('logopen');
         $("#scrollicon").removeClass('active');
@@ -335,8 +346,8 @@ $(document).ready(function () {
 
         state = false;
     }else{
-        $("#log").animate({height: 111}, 200);
-        $("#log").addClass('active');
+        $log.animate({height: 111}, 200);
+        $log.addClass('active');
         $("#content").addClass('logopen');
         $(".tab_container").addClass('logopen');
         $("#scrollicon").addClass('active');
@@ -349,11 +360,11 @@ $(document).ready(function () {
 
     });
 
-    var profile_e = $('select[name="profilechange"]');
+    var profile_e = $('#profilechange');
 
     profile_e.change(function () {
         var profile = parseInt($(this).val());
-        MSP.send_message(MSP_codes.MSP_SELECT_SETTING, [profile], false, function () {
+        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
             GUI.log(chrome.i18n.getMessage('pidTuningLoadedProfile', [profile + 1]));
             updateActivatedTab();
         });
@@ -367,16 +378,8 @@ function catch_startup_time(startTime) {
     googleAnalytics.sendTiming('Load Times', 'Application Startup', timeSpent);
 }
 
-function microtime() {
-    var now = new Date().getTime() / 1000;
-
-    return now;
-}
-
 function millitime() {
-    var now = new Date().getTime();
-
-    return now;
+    return new Date().getTime();
 }
 
 function bytesToSize(bytes) {

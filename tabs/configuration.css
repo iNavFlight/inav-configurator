@@ -1,48 +1,5 @@
-.tab-configuration table {
-    margin-bottom: 10px;
-    width: 100%;
-    float: left;
-}
-
-.tab-configuration table, .tab-configuration table th, .tab-configuration table td {
-    padding: 0px;
-    padding-left: 0px;
-    text-align: left;
-}
-
-.tab-configuration table th {
-    padding-left: 3px;
-    padding: 3px;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-configuration table td {
-    padding-left: 5px;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-configuration table tr td:first-child {
-    text-align: left;
-    width: 55px;
-}
-
-.tab-configuration table td {
-    padding: 5px 3px;
-}
-
-.tab-configuration table thead tr:first-child {
-    background-color: #ececec;
-}
-
 .tab-configuration {
     position: relative;
-}
-
-.tab-configuration .groupTitle {
-    padding: 0 0 5px 0;
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    border-bottom: 1px solid #dddddd;
 }
 
 .tab-configuration .leftWrapper {
@@ -61,28 +18,10 @@
     height: 20px;
     margin-top: 5px;
     font-weight: bold;
-    border: 1px solid silver;
-}
-
-.tab-configuration dl.features dt {
-    float: left;
-    width: 10px;
-    height: 18px;
-    line-height: 18px;
-}
-
-.tab-configuration dl.features dt input {
-    margin-top: 2px;
-}
-
-.tab-configuration dl.features dd {
-    margin: 0 0 0 20px;
-    height: 18px;
-    line-height: 18px;
 }
 
 .tab-configuration .number input {
-    width: 50px;
+    width: 57px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -95,91 +34,12 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 43px;
-    padding: 0px 5px;
+    width: 57px;
     background-color: #ececec;
-}
-
-.tab-configuration .number span {
-    margin-left: 0px;
-}
-
-.tab-configuration .gps .line {
-    clear: left;
-}
-
-.tab-configuration .gps select {
-    float: left;
-    width: 100px;
-    height: 20px;
-    margin: 0 10px 5px 0;
-    border: 1px solid silver;
-}
-
-.tab-configuration .gps span {
-    line-height: 20px;
-}
-
-.tab-configuration .serialRX {
-    width: 100%;
-    border: 1px solid silver;
-    margin-bottom: 5px;
-}
-
-.tab-configuration .current .checkbox {
-    margin-top: 0px;
-    float: left;
-}
-
-.tab-configuration .current .checkbox div {
-    float: left;
-    width: 66px;
-}
-
-.tab-configuration .current .checkbox div input {
-    margin: 0px;
-    float: left;
-}
-
-.tab-configuration .disarm .checkbox {
-    margin-top: 2px;
-    margin-right: 5px;
-}
-
-.tab-configuration .disarm .checkbox div {
-    margin-bottom: 0px;
-    margin-top: 0px;
-}
-
-.tab-configuration .disarm .checkbox div input {
-    margin: 0px;
-    float: left;
-}
-
-.tab-configuration .disarm .checkbox span {
-    margin-left: 0px;
-}
-
-.tab-configuration .freelabel {
-    margin-left: 10px;
-    position: relative;
 }
 
 .tab-configuration input {
     float: left;
-}
-
-.tab-configuration span {
-    margin: 0px;
-}
-
-.tab-configuration .disarm .checkbox {
-    float: left;
-    padding-left: 0px;
-    margin-top: -5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
-    width: 100%;
 }
 
 .tab-configuration .spacer_box {
@@ -203,8 +63,10 @@
 }
 
 .tab-configuration .number,
-.tab-configuration .select
- {
+.tab-configuration .select,
+.tab-configuration .radio,
+.tab-configuration .checkbox,
+hr {
     margin-bottom: 5px;
     clear: left;
     padding-bottom: 5px;
@@ -214,20 +76,16 @@
 }
 
 .tab-configuration .number:last-child,
-.tab-configuration .select:last-child {
+.tab-configuration .select:last-child,
+.tab-configuration .radio:last-child,
+.tab-configuration .checkbox:last-child {
     border-bottom: none;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .tab-configuration .gui_box_titlebar {
-    margin-bottom: 0px;
-}
-
-.tab-configuration .numberspacer {
-    float: left;
-    width: 65px;
-    height: 21px;
+    margin-bottom: 0;
 }
 
 .tab-configuration thead {
@@ -239,65 +97,11 @@
     float: left;
 }
 
-.tab-configuration .rssi td {
-    border-bottom: none;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
-}
-
-.tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
-    min-height: 145px;
-    float: left;
-}
-
-.tab-configuration .mixer .gui_box, .tab-configuration .motorstop .gui_box {
-    min-height: 290px;
-    float: left;
-}
-
-.tab-configuration .board .gui_box, .tab-configuration .acc .gui_box {
-    min-height: 137px;
-    float: left;
-}
-
-.tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
-    min-height: 355px;
-    float: left;
-    margin-bottom: 10px;
-}
-
-.tab-configuration .current .gui_box {
-    float: left;
-}
-
-.tab-configuration .rxprovider {
-    min-height: 214px;
-}
-
-.tab-configuration .current td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .voltage td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .rssi td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .rxFailsafe td:nth-child(2) {
-    width: 30px;
-}
-
-.tab-configuration .gps td:nth-child(2) {
-    width: 38px;
-}
-
-.tab-configuration .other tr:last-child td {
-    border-bottom: 0px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+.tab-configuration .gui_box h3 {
+    text-decoration: underline;
+    font-size: 1.07em;
+    color: #333;
+    margin-left: 2px;
 }
 
 .tab-configuration .mixerPreview {
@@ -315,23 +119,16 @@
     padding: 5%;
 }
 
-.tab-configuration .rxMode tr:last-child td {
-    border-bottom: 0px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
-}
-
 .tab-configuration .gui_box {
-    font-style: bold;
-    font-family: 'open_sanssemibold', Arial;
+    font-family: 'open_sanssemibold', Arial, serif;
 }
 
 .tab-configuration .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial, serif;
     line-height: 19px;
     color: #4F4F4F;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .tab-configuration .alignicon {
@@ -343,108 +140,28 @@
 }
 
 .tab-configuration .pitch {
-    background-image: url(../images/icons/cf_icon_pitch.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_pitch.svg) no-repeat center;
 }
 
 .tab-configuration .yaw {
-    background-image: url(../images/icons/cf_icon_yaw.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_yaw.svg) no-repeat center;
 }
 
 .tab-configuration .roll {
-    background-image: url(../images/icons/cf_icon_roll.svg);
-    background-repeat: no-repeat;
     background-size: 20px;
-    background-position: center;
+    background: url(../images/icons/cf_icon_roll.svg) no-repeat center;
 }
 
 .tab-configuration .board select {
-    /*float: left;*/
     width: 45%;
     height: 20px;
-    margin: 0 0px 2px 0;
-    border: 1px solid silver;
-    border-radius:3px;
-}
-
-
-#mixercontent .mixerheadline {
-    font-size: 13px;
-    width: 100%;
-    padding-bottom: 0px;
-    float: left;
-    margin-bottom: 7px;
-    font-family: 'open_sanssemibold', Arial;
-}
-
-#mixercontent select {
-    float: left;
-    width: 100%;
-    height: 20px;
-    margin: 0 0px 2px 0;
-    border: 1px solid silver;
-    border-radius:3px;
-    margin-bottom: 20px;
-    margin-top:3px;
-
-}
-
-#mixercontent input {
-    width: 50px;
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 1px solid silver;
-    border-radius: 3px;
-    margin-right: 11px;
-    font-size: 12px;
-    font-weight: normal;
-
-}
-
-#mixercontent .mixerletter {
-    width: 23px;
-    height: 23px;
-    background-color: #d0d0d0;
-    line-height: 23px;
-    text-align: center;
-    border-radius: 100px;
-    margin-right: 10px;
-    font-size: 12px;
-    font-weight: bold;
-    float: left;
-}
-
-#mixercontent .number {
-    margin-bottom: 5px;
-    clear: left;
-    padding-top: 5px;
-    border-top: 1px solid #ddd;
-    width: 100%;
-    float: left;
-}
-
-#mixercontent .number:last-child {
-    padding-top: 0px;
-    margin-bottom: 0px;
-}
-
-#mixercontent .mixercanvas {
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    border: 1px solid #e4e4e4;
-    height: 340px;
-    margin-top: 3px;
+    margin: 0 0 2px 0;
 }
 
 .tab-configuration .sensoralignment {
-    width: 50%; 
+    width: 50%;
     float: left;
 }
 
@@ -458,36 +175,63 @@
     float: left;
 }
 
-
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-configuration .gui_box span {
         line-height: 17px;
     }
+
     .tab-configuration .leftWrapper {
         width: calc(50% - 15px);
     }
+
     .tab-configuration .rightWrapper {
         float: left;
         width: calc(50% - 0px);
         margin: 0 0 10px 15px;
     }
-    .tab-configuration .rssi .gui_box, .tab-configuration .system .gui_box {
-        min-height: 145px;
-        float: left;
-    }
-    .tab-configuration .mixer .gui_box, .tab-configuration .motorstop .gui_box {
-        min-height: 290px;
-        float: left;
-    }
-    .tab-configuration .board .gui_box, .tab-configuration .acc .gui_box {
-        min-height: 137px;
-        float: left;
-    }
-    .tab-configuration .gps .gui_box, .tab-configuration .other .gui_box {
-        min-height: 355px;
-        float: left;
-    }
-    .tab-configuration .current .gui_box {
-        float: left;
-    }
+}
+
+#esc-protocols,
+#servo-rate-container {
+    display: none;
+}
+
+.config-section .select,
+.config-section .checkbox,
+.config-section .radio,
+.config-section .number {
+    position: relative;
+    height: 22px;
+}
+
+.config-section .checkbox label,
+.config-section .radio label {
+    cursor: pointer;
+}
+
+.config-section label {
+    position: absolute;
+    left: 9em;
+}
+
+.config-section .radio label {
+    left: 2em;
+}
+
+.config-section .radio input {
+    margin-top: 3px;
+    margin-left: 5px;
+}
+
+.esc-priority label,
+.features.esc label {
+    position: inherit;
+}
+
+.config-section select {
+    width: 7em;
+}
+
+.config-section .helpicon {
+    margin-top: 3px;
 }
