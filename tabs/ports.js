@@ -71,7 +71,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         '57600',
         '115200',
         '230400',
-        '250000',
+        '250000'
     ];
 
     var columns = ['data', 'logging', 'gps', 'telemetry', 'rx'];
@@ -111,6 +111,8 @@ TABS.ports.initialize = function (callback, scrollPosition) {
            3: 'UART4',
            4: 'UART5',
            5: 'UART6',
+           6: 'UART7',
+           7: 'UART8',
            20: 'USB VCP',
            30: 'SOFTSERIAL1',
            31: 'SOFTSERIAL2'
