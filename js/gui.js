@@ -36,13 +36,9 @@ var GUI_control = function () {
         'receiver',
         'sensors',
         'servos',
-<<<<<<< HEAD
         'calibration',
-        'setup'
-=======
         'setup',
         'osd'
->>>>>>> master
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
