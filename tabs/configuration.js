@@ -32,6 +32,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
+        mspHelper.saveBfConfig,
         mspHelper.saveMisc,
         mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
