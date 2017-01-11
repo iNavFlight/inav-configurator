@@ -1899,10 +1899,10 @@
         "message": "<span class=\"arming-state-fail\">FAIL</span>"
     },
     "calibrationHead1": {
-        "message": "Acellerometer Calibration"
+        "message": "Accelerometer Calibration"
     },  
     "calibrationHead2": {
-        "message": "Acellerometer Values"
+        "message": "Accelerometer Values"
     },    
     "calibrationHead3": {
         "message": "Level Calibration"
@@ -1915,5 +1915,11 @@
     },
     "accGain": {
         "message": "Acc Gain"
+    },
+    "NoteCalibration": {
+        "message": "Note: If the flightcontroller is mounted in another angle or upside down, do the calibration steps with the flightcontroller pointing as shown in the pictures, not the quad (otherwise calibration won´t work)."
+    },
+    "AccBtn": {
+        "message": "Calibrate Accelerometer"
     }
 }
