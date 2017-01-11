@@ -1904,3 +1904,7 @@ select {
     line-height: 1.5em;
     font-size: 1.3em;
 }
+
+.jBox-Tooltip {
+    max-width: 180px;
+}
