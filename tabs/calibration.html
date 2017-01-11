@@ -49,29 +49,27 @@
                                 <div class="steptitle">Step 6</div>
                                 <div class="indicator"></div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="spacer_right">
-                    <div class="gui_box grey">
-                        <div class="gui_box_titlebar">
-                            <div class="spacer_box_title" i18n="calibrationHead2"></div>
-                        </div>
-                        <div class="spacer_box">
-                            <table class="cf_table">
-                                <tr>
-                                    <td i18n="accZero"></td>
-                                    <td>input</td>
-                                    <td>input</td>
-                                    <td>input</td>
-                                </tr>
-                                <tr>
-                                    <td i18n="accGain"></td>
-                                    <td>input</td>
-                                    <td>input</td>
-                                    <td>input</td>
-                                </tr>
-                            </table>
+                            <div class="gui_box grey">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title" i18n="calibrationHead2"></div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="cf_table acc">
+                                        <tr>
+                                            <td i18n="accZero"></td>
+                                            <td><label for="accZeroX"><span>X</span></label><input type="number" name="accZeroX" min="0" max="2000"></td>
+                                            <td><label for="accZeroY"><span>Y</span></label><input type="number" name="accZeroY" min="0" max="2000"></td>
+                                            <td><label for="accZeroZ"><span>Z</span></label><input type="number" name="accZeroZ" min="0" max="2000"></td>
+                                        </tr>
+                                        <tr>
+                                            <td i18n="accGain"></td>
+                                            <td><label for="accGainX"><span>X</span></label><input type="number" name="accGainX" min="0" max="2000"></td>
+                                            <td><label for="accGainX"><span>Y</span></label><input type="number" name="accGainX" min="0" max="2000"></td>
+                                            <td><label for="accGainX"><span>Z</span></label><input type="number" name="accGainX" min="0" max="2000"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -82,6 +80,12 @@
                         <div class="spacer_box_title" i18n="calibrationHead3"></div>
                     </div>
                     <div class="spacer_box">
+                        <span i18n="LevCalText">text</span>
+                        <div class="default_btn">
+                            <div id="level_btn">
+                                <a class="level" href="#" data-i18n="LevBtn"></a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="gui_box grey">
@@ -89,18 +93,24 @@
                         <div class="spacer_box_title" i18n="calibrationHead4"></div>
                     </div>
                     <div class="spacer_box">
+                        <span i18n="MagCalText">text</span>
+                        <div class="default_btn">
+                            <div id="mag_btn">
+                                <a class="calibratemag" href="#" data-i18n="MagBtn"></a>
+                            </div>
+                        </div>
                         <table class="cf_table">
                             <tr>
-                                <td>input</td>
-                                <td>X</td>
+                                <td><label for="MagX"><span>X</span></label></td>
+                                <td><input type="number" name="MagX" min="0" max="2000"></td>
                             </tr>
                             <tr>
-                                <td>input</td>
-                                <td>Y</td>
+                                <td><label for="MagY"><span>Y</span></label></td>
+                                <td><input type="number" name="MagY" min="0" max="2000"></td>
                             </tr>
                             <tr>
-                                <td>input</td>
-                                <td>Z</td>
+                                <td><label for="MagZ"><span>Z</span></label></td>
+                                <td><input type="number" name="MagZ" min="0" max="2000"></td>
                             </tr>
                         </table>
                     </div>

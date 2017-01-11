@@ -1921,5 +1921,17 @@
     },
     "AccBtn": {
         "message": "Calibrate Accelerometer"
+    },
+    "MagCalText": {
+        "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
+    },
+    "MagBtn": {
+        "message": "Calibrate Compass"
+    },
+    "LevCalText": {
+        "message": "Please put some Text here…"
+    },
+    "LevBtn": {
+        "message": "Level calibration"
     }
 }

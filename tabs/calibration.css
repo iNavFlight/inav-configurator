@@ -1,6 +1,3 @@
-.initialstyle {
-}
-
 .tab-calibration .content_toolbar {
     left: 0px;
     }
@@ -19,14 +16,17 @@
     background-position: center;
     background-repeat: no-repeat;
     background-position-y: 30px;
-}
-    
+} 
+  
 .tab-calibration .tile:nth-child(4) {
     margin-right: 0px;
+    margin-left: 1px;
 }
     
 .tab-calibration .tile:nth-child(7) {
     margin-right: 0px;
+    margin-left: 1px;
+
 }
 
 .tab-calibration .steptitle {
@@ -43,7 +43,7 @@
 .tab-calibration .indicator {
     float: right;
     margin-right: 20px;
-    margin-top: 110px;
+    margin-top: 106px;
     width: 30px;
     height: 30px;
     text-align: center;
@@ -100,16 +100,32 @@
     background-image: url(../images/icons/pos3_grey.svg);
 }
 
+ .tab-calibration .step3.active, .tab-calibration .step3.finished {
+    background-image: url(../images/icons/pos3.svg);
+}
+
  .tab-calibration .step4 {
     background-image: url(../images/icons/pos4_grey.svg);
 }
 
- .tab-calibration .step5 {
+.tab-calibration .step4.active, .tab-calibration .step4.finished {
+    background-image: url(../images/icons/pos4.svg);
+}
+
+.tab-calibration .step5 {
     background-image: url(../images/icons/pos5_grey.svg);
 }
 
- .tab-calibration .step6 {
+.tab-calibration .step5.active, .tab-calibration .step5.finished {
+    background-image: url(../images/icons/pos5.svg);
+}
+
+.tab-calibration .step6 {
     background-image: url(../images/icons/pos6_grey.svg);
+}
+
+ .tab-calibration .step6.active, .tab-calibration .step6.finished {
+    background-image: url(../images/icons/pos6.svg);
 }
 
  .tab-calibration .note {
@@ -129,4 +145,37 @@
     height:30px;
     padding-top: 20px;
     width: calc(100% - 5px);
+    }
+ 
+.tab-calibration input {
+    width: 57px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    margin-left: 11px;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tab-calibration .spacer_box div input {
+    margin-right: 0px;
+    }
+
+.tab-calibration #mag_btn {
+    margin-top: 10px;
+    }
+
+.tab-calibration #level_btn {
+    margin-top: 10px;
+    }
+
+.tab-calibration .acc tr td {
+    width: 25%;
+    }
+    
+.tab-calibration .acc tr td:nth-child(1){
+    width: 34%;
     }
