@@ -29,6 +29,7 @@
 <link type="text/css" rel="stylesheet" href="./tabs/failsafe.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/transponder.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/osd.css" media="all" />
+<link type="text/css" rel="stylesheet" href="./tabs/profiles.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/opensans_webfontkit/fonts.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/dropdown-lists/css/style_lists.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./js/libraries/switchery/switchery.css" media="all" />
@@ -53,6 +54,7 @@
 <script type="text/javascript" src="./js/gui.js"></script>
 <script type="text/javascript" src="./js/msp/MSPCodes.js"></script>
 <script type="text/javascript" src="./js/msp/MSPHelper.js"></script>
+<script type="text/javascript" src="./js/msp/MSPChainer.js"></script>
 <script type="text/javascript" src="./js/port_handler.js"></script>
 <script type="text/javascript" src="./js/port_usage.js"></script>
 <script type="text/javascript" src="./js/serial.js"></script>
@@ -89,6 +91,7 @@
 <script type="text/javascript" src="./tabs/failsafe.js"></script>
 <script type="text/javascript" src="./tabs/transponder.js"></script>
 <script type="text/javascript" src="./tabs/osd.js"></script>
+<script type="text/javascript" src="./tabs/profiles.js"></script>
 <title></title>
 </head>
 <body>
@@ -221,29 +224,31 @@
                     <li class="tab_firmware_flasher"><a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a></li>
                 </ul>
                 <ul class="mode-connected">
-                    <li class="tab_setup"><a href="#" i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
+
+                    <li class="tab_setup"><a href="#" data-i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
                     <li class="tab_calibration"><a href="#" i18n="tabCalibration" class="tabicon ic_calibration" title="Calibration"></a></li>
-                    <li class="tab_ports"><a href="#" i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a></li>
-                    <li class="tab_configuration"><a href="#" i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a></li>
-                    <li class="tab_failsafe"><a href="#" i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a></li>
-                    <li class="tab_pid_tuning"><a href="#" i18n="tabPidTuning" class="tabicon ic_pid" title="PID Tuning"></a></li>
-                    <li class="tab_receiver"><a href="#" i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a></li>
-                    <li class="tab_auxiliary"><a href="#" i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a></li>
-                    <li class="tab_adjustments"><a href="#" i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a></li>
-                    <li class="tab_servos"><a href="#" i18n="tabServos" class="tabicon ic_servo" title="Servos"></a></li>
-                    <li class="tab_gps"><a href="#" i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a></li>
-                    <li class="tab_motors"><a href="#" i18n="tabMotorTesting" class="tabicon ic_motor" title="Motors"></a></li>
-                    <li class="tab_transponder"><a href="#" i18n="tabTransponder" class="tabicon ic_transponder" title="Transponder"></a></li>
-                    <li class="tab_led_strip"><a href="#" i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a></li>
-                    <li class="tab_sensors"><a href="#" i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a></li>
-                    <li class="tab_logging"><a href="#" i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a></li>
-                    <li class="tab_onboard_logging"><a href="#" i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a></li>
-                    <li class="tab_cli"><a href="#" i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
-                    <!-- spare icons
-                    <li class=""><a href="#"class="tabicon ic_mission">Mission (spare icon)</a></li>
-                    <li class=""><a href="#"class="tabicon ic_advanced">Advanced (spare icon)</a></li>
-                    <li class=""><a href="#"class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>
-                    -->
+                    <li class="tab_profiles"><a href="#" data-i18n="tabPresets" class="tabicon ic_wizzard" title="Presets"></a></li>
+                    <li class="tab_ports"><a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a></li>
+                    <li class="tab_configuration"><a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a></li>
+                    <li class="tab_failsafe"><a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a></li>
+                    <li class="tab_pid_tuning"><a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" title="PID Tuning"></a></li>
+                    <li class="tab_receiver"><a href="#" data-i18n="tabReceiver" class="tabicon ic_rx" title="Receiver"></a></li>
+                    <li class="tab_auxiliary"><a href="#" data-i18n="tabAuxiliary" class="tabicon ic_modes" title="Modes"></a></li>
+                    <li class="tab_adjustments"><a href="#" data-i18n="tabAdjustments" class="tabicon ic_adjust" title="Adjustments"></a></li>
+                    <li class="tab_servos"><a href="#" data-i18n="tabServos" class="tabicon ic_servo" title="Servos"></a></li>
+                    <li class="tab_gps"><a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a></li>
+                    <li class="tab_motors"><a href="#" data-i18n="tabMotorTesting" class="tabicon ic_motor" title="Motors"></a></li>
+                    <li class="tab_osd"><a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a></li>
+                    <!--<li class="tab_transponder"><a href="#" data-i18n="tabTransponder" class="tabicon ic_transponder" title="Transponder"></a></li>-->
+                    <li class="tab_led_strip"><a href="#" data-i18n="tabLedStrip" class="tabicon ic_led" title="LED Strip"></a></li>
+                    <li class="tab_sensors"><a href="#" data-i18n="tabRawSensorData" class="tabicon ic_sensors" title="Sensors"></a></li>
+                    <li class="tab_logging"><a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a></li>
+                    <li class="tab_onboard_logging"><a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a></li>
+                    <li class="tab_cli"><a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
+
+                    <!--<li class=""><a href="#" class="tabicon ic_mission">Mission (spare icon)</a></li>-->
+                    <!--<li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li>-->
+                    <!--<li class=""><a href="#" class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>-->
                 </ul>
             </div>
             <div class="clear-both"></div>

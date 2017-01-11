@@ -1933,5 +1933,29 @@
     },
     "LevBtn": {
         "message": "Level calibration"
+    },
+    "tabPresets": {
+        "message": "Presets"
+    },
+    "presetsPreset": {
+        "message": "Preset"
+    },
+    "presetsDescription": {
+        "message": "Description"
+    },
+    "presetsButtonApply": {
+        "message": "Apply"
+    },
+    "presetApplyTitle" : {
+        "message": "Confirm"
+    },
+    "presetsButtonSaveAndReboot": {
+        "message": "Save and reboot"
+    },
+    "presetsApplyHeader": {
+        "message": "Warning"
+    },
+    "presetApplyDescription": {
+        "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
     }
 }

@@ -824,14 +824,14 @@ var mspHelper = (function (gui) {
                 FILTER_CONFIG.gyroSoftLpfHz = data.getUint8(0);
                 FILTER_CONFIG.dtermLpfHz = data.getUint16(1, true);
                 FILTER_CONFIG.yawLpfHz = data.getUint16(3, true);
-                /*
-                 sbufWriteU16(dst, 1); //masterConfig.gyro_soft_notch_hz_1
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_1
-                 sbufWriteU16(dst, 1); //BF: currentProfile->pidProfile.dterm_notch_hz
-                 sbufWriteU16(dst, 1); //currentProfile->pidProfile.dterm_notch_cutoff
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_hz_2
-                 sbufWriteU16(dst, 1); //BF: masterConfig.gyro_soft_notch_cutoff_2
-                 */
+
+                FILTER_CONFIG.gyroNotchHz1 = data.getUint16(5, true);
+                FILTER_CONFIG.gyroNotchCutoff1 = data.getUint16(7, true);
+                FILTER_CONFIG.dtermNotchHz = data.getUint16(9, true);
+                FILTER_CONFIG.dtermNotchCutoff = data.getUint16(11, true);
+                FILTER_CONFIG.gyroNotchHz2 = data.getUint16(13, true);
+                FILTER_CONFIG.gyroNotchCutoff2 = data.getUint16(15, true);
+
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -1230,23 +1230,23 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FILTER_CONFIG.yawLpfHz));
                 buffer.push(highByte(FILTER_CONFIG.yawLpfHz));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchHz1));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchHz1));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff1));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff1));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.dtermNotchHz));
+                buffer.push(highByte(FILTER_CONFIG.dtermNotchHz));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.dtermNotchCutoff));
+                buffer.push(highByte(FILTER_CONFIG.dtermNotchCutoff));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchHz2));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchHz2));
 
-                buffer.push(0);
-                buffer.push(0);
+                buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff2));
+                buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff2));
                 break;
 
             case MSPCodes.MSP_SET_PID_ADVANCED:
@@ -1712,6 +1712,209 @@ var mspHelper = (function (gui) {
             }
 
             MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_MODECOLOR, buffer, false, nextFunction);
+        }
+    };
+
+    /*
+     * Basic sending methods used for chaining purposes
+     */
+    self.loadMspIdent = function (callback) {
+        MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
+    };
+
+    self.loadINAVPidConfig = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadLoopTime = function (callback) {
+        MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, callback);
+    };
+
+    self.loadAdvancedConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadFilterConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadPidAdvanced = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRcTuningData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, callback);
+    };
+
+    self.loadPidData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+    };
+
+    self.loadPidNames = function (callback) {
+        MSP.send_message(MSPCodes.MSP_PIDNAMES, false, false, callback);
+    };
+
+    self.loadStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
+    };
+
+    self.loadBfConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
+    };
+
+    self.loadMisc = function (callback) {
+        MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
+    };
+
+    self.loadArmingConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, callback);
+    };
+
+    self.loadRxConfig = function (callback) {
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.load3dConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_3D, false, false, callback);
+    };
+
+    self.loadSensorAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SENSOR_ALIGNMENT, false, false, callback);
+    };
+
+    self.loadSensorConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRcDeadband = function (callback) {
+        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
+            MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRcMap = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RX_MAP, false, false, callback);
+    };
+
+    self.loadRcData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RC, false, false, callback);
+    };
+
+    self.loadAccTrim = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ACC_TRIM, false, false, callback);
+    };
+
+    self.saveToEeprom = function saveToEeprom(callback) {
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, callback);
+    };
+
+    self.saveINAVPidConfig = function (callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveLooptimeConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_LOOP_TIME, mspHelper.crunch(MSPCodes.MSP_SET_LOOP_TIME), false, callback);
+    };
+
+    self.saveAdvancedConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveFilterConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.savePidData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+    };
+
+    self.saveRcTuningData = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, callback);
+    };
+
+    self.savePidAdvanced = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveBfConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, callback);
+    };
+
+    self.saveMisc = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, callback);
+    };
+
+    self.save3dConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_3D, mspHelper.crunch(MSPCodes.MSP_SET_3D), false, callback);
+    };
+
+    self.saveSensorAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_SENSOR_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_ALIGNMENT), false, callback);
+    };
+
+    self.saveAccTrim = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, callback);
+    };
+
+    self.saveArmingConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, callback);
+    };
+
+    self.saveRxConfig = function (callback) {
+        if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveSensorConfig = function (callback) {
+        if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
+        } else {
+            callback();
         }
     };
 
