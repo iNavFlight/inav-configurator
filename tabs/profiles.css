@@ -1,0 +1,27 @@
+#presets-list option {
+    padding: 0.4em;
+    cursor: pointer;
+}
+
+.preset__head {
+    color: #37a8db;
+}
+
+.preset__description {
+    margin-top: 1em;
+}
+
+.preset__features {
+    margin-top: 1em;
+}
+
+.preset__feature {
+    list-style: disc;
+    color: #37a8db;
+    margin-left: 1.5em;
+}
+
+.preset__feature-text {
+    color: #000000;
+    margin-left: -0.5em;
+}

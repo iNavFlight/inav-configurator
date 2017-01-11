@@ -260,6 +260,13 @@ function onOpen(openInfo) {
                                             GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('osd'), 1);
                                         }
 
+                                        /*
+                                         * Remove Presets on older than 1.6
+                                         */
+                                        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('profiles'), 1);
+                                        }
+
                                         onConnect();
 
                                         $('#tabs ul.mode-connected .tab_setup a').click();

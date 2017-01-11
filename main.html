@@ -28,6 +28,7 @@
 <link type="text/css" rel="stylesheet" href="./tabs/failsafe.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/transponder.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./tabs/osd.css" media="all" />
+<link type="text/css" rel="stylesheet" href="./tabs/profiles.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/opensans_webfontkit/fonts.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./css/dropdown-lists/css/style_lists.css" media="all" />
 <link type="text/css" rel="stylesheet" href="./js/libraries/switchery/switchery.css" media="all" />
@@ -52,6 +53,7 @@
 <script type="text/javascript" src="./js/gui.js"></script>
 <script type="text/javascript" src="./js/msp/MSPCodes.js"></script>
 <script type="text/javascript" src="./js/msp/MSPHelper.js"></script>
+<script type="text/javascript" src="./js/msp/MSPChainer.js"></script>
 <script type="text/javascript" src="./js/port_handler.js"></script>
 <script type="text/javascript" src="./js/port_usage.js"></script>
 <script type="text/javascript" src="./js/serial.js"></script>
@@ -87,6 +89,7 @@
 <script type="text/javascript" src="./tabs/failsafe.js"></script>
 <script type="text/javascript" src="./tabs/transponder.js"></script>
 <script type="text/javascript" src="./tabs/osd.js"></script>
+<script type="text/javascript" src="./tabs/profiles.js"></script>
 <title></title>
 </head>
 <body>
@@ -220,6 +223,7 @@
                 </ul>
                 <ul class="mode-connected">
                     <li class="tab_setup"><a href="#" data-i18n="tabSetup" class="tabicon ic_setup" title="Setup"></a></li>
+                    <li class="tab_profiles"><a href="#" data-i18n="tabPresets" class="tabicon ic_wizzard" title="Presets"></a></li>
                     <li class="tab_ports"><a href="#" data-i18n="tabPorts" class="tabicon ic_ports" title="Ports"></a></li>
                     <li class="tab_configuration"><a href="#" data-i18n="tabConfiguration" class="tabicon ic_config" title="Configuration"></a></li>
                     <li class="tab_failsafe"><a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a></li>
@@ -237,11 +241,10 @@
                     <li class="tab_logging"><a href="#" data-i18n="tabLogging" class="tabicon ic_log" title="Tethered Logging"></a></li>
                     <li class="tab_onboard_logging"><a href="#" data-i18n="tabOnboardLogging" class="tabicon ic_data" title="Onboard Logging"></a></li>
                     <li class="tab_cli"><a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
-                    <!-- spare icons
-                    <li class=""><a href="#"class="tabicon ic_mission">Mission (spare icon)</a></li>
-                    <li class=""><a href="#"class="tabicon ic_advanced">Advanced (spare icon)</a></li>
-                    <li class=""><a href="#"class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>
-                    -->
+
+                    <!--<li class=""><a href="#" class="tabicon ic_mission">Mission (spare icon)</a></li>-->
+                    <!--<li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li>-->
+                    <!--<li class=""><a href="#" class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>-->
                 </ul>
             </div>
             <div class="clear-both"></div>

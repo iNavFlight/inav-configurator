@@ -1,3 +1,4 @@
+/*global chrome*/
 'use strict';
 
 TABS.pid_tuning = {
@@ -5,59 +6,29 @@ TABS.pid_tuning = {
 };
 
 TABS.pid_tuning.initialize = function (callback) {
-    var self = this;
+
+    var loadChainer = new MSPChainerClass();
+
+    loadChainer.setChain([
+        mspHelper.loadStatus,
+        mspHelper.loadPidNames,
+        mspHelper.loadPidData,
+        mspHelper.loadRcTuningData,
+        mspHelper.loadINAVPidConfig,
+        mspHelper.loadPidAdvanced,
+        mspHelper.loadFilterConfig
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
     if (GUI.active_tab != 'pid_tuning') {
         GUI.active_tab = 'pid_tuning';
         googleAnalytics.sendAppView('PID Tuning');
     }
 
-    function get_pid_names() {
-        MSP.send_message(MSPCodes.MSP_PIDNAMES, false, false, get_pid_data);
-    }
-
-    function get_pid_data() {
-        MSP.send_message(MSPCodes.MSP_PID, false, false, get_rc_tuning_data);
-    }
-
-    function get_rc_tuning_data() {
-        MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, loadINAVPidConfig);
-    }
-
-    function loadINAVPidConfig() {
-        var next_callback = loadPidAdvanced;
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    function loadPidAdvanced() {
-        var next_callback = loadFilterConfig;
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-    function loadFilterConfig() {
-        var next_callback = load_html;
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, next_callback);
-        } else {
-            next_callback();
-        }
-    }
-
-
     function load_html() {
         $('#content').load("./tabs/pid_tuning.html", process_html);
     }
-
-    // requesting MSP_STATUS manually because it contains CONFIG.profile
-    MSP.send_message(MSPCodes.MSP_STATUS, false, false, get_pid_names);
 
     var sectionClasses = [
         'ROLL', // 0
@@ -180,8 +151,6 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         pid_and_rc_to_form();
-
-        var form_e = $('#pid-tuning');
 
         if (FC.isRatesInDps()) {
            $('.rate-tpa--no-dps').hide();
