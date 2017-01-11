@@ -1363,11 +1363,16 @@ dialog {
     padding-top: 2px;
     padding-bottom: 5px;
     border: 0 dotted;
-    border-bottom: 1px #ccc;
+    border-bottom: 1px #ccc dotted;
 }
 
 .noboarder td {
     border: none;
+    border-bottom: none;
+}
+
+.cf_table tr:last-child td {
+    border-bottom: 0px #ccc dotted;
 }
 
 .cf_table td:last-child {

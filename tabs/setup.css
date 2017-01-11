@@ -271,3 +271,26 @@
 .armin-status-failed {
     color: red;
 }
+
+    
+.checkspass {
+    margin-top: 3px;
+    float: right;
+    height: 15px;
+    width: 15px;
+    background-image:url(../images/icons/pass.svg);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+    }
+    
+.checksfail {
+    float: right;
+    margin-top: 3px;
+    height: 15px;
+    width: 15px;
+    background-image:url(../images/icons/nopass.svg);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+}
