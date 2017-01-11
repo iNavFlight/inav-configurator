@@ -68,6 +68,8 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
             presets.elementHelper("RC_tuning", "roll_rate", 800),
@@ -119,6 +121,62 @@ presets.presets = [
             presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
+        ]
+    },
+    {
+        name: '12" General Purpose',
+        description: "550 and above general purpose multirotor",
+        features: [
+            "12 inch propellers",
+            "1.4kg-2kg weight",
+            "F3 or F4 CPU",
+            "MPU6000 or MPU6050 gyro",
+            "GPS optional"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 2000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 55),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 30),
+            presets.elementHelper("RC_tuning", "roll_rate", 180),
+            presets.elementHelper("RC_tuning", "pitch_rate", 180),
+            presets.elementHelper("RC_tuning", "yaw_rate", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 108),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 72),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 144),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 90),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 72),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 18),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 9),
+            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
+            presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
+        ]
+    },
+    {
+        name: "Airplane General",
+        description: "General setup for airplanes",
+        features: [
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 14),
+            presets.elementHelper("PIDs", 0, [20, 30, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [20, 30, 15]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [45, 5, 15]),  //YAW PIDs
+            presets.elementHelper("RC_tuning", "roll_rate", 200),
+            presets.elementHelper("RC_tuning", "pitch_rate", 150),
+            presets.elementHelper("RC_tuning", "yaw_rate", 90),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ]
     },
     {
