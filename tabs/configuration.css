@@ -21,7 +21,7 @@
 }
 
 .tab-configuration .number input {
-    width: 57px;
+    width: 65px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -34,7 +34,7 @@
 }
 
 .tab-configuration .number .disabled {
-    width: 57px;
+    width: 65px;
     background-color: #ececec;
 }
 
@@ -102,6 +102,7 @@ hr {
     font-size: 1.07em;
     color: #333;
     margin-left: 2px;
+    margin-bottom: 5px;
 }
 
 .tab-configuration .mixerPreview {
@@ -211,7 +212,7 @@ hr {
 
 .config-section label {
     position: absolute;
-    left: 9em;
+    left: 80px;
 }
 
 .config-section .radio label {
@@ -229,7 +230,7 @@ hr {
 }
 
 .config-section select {
-    width: 7em;
+    width: 70px;
 }
 
 .config-section .helpicon {
