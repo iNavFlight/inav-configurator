@@ -572,7 +572,7 @@ var mspHelper = (function (gui) {
                 offset++;
                 FAILSAFE_CONFIG.failsafe_off_delay = data.getUint8(offset);
                 offset++;
-                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset);
+                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
                     FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
