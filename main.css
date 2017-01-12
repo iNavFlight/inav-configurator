@@ -856,7 +856,7 @@ li.active .ic_backup {
     background-image: url(images/icons/cf_icon_wizard_white.svg);
 }
 
-li.active .ic_wizard {
+li.active .ic_wizzard {
     background-image: url(images/icons/cf_icon_wizard_white.svg);
 }
 
@@ -1363,11 +1363,16 @@ dialog {
     padding-top: 2px;
     padding-bottom: 5px;
     border: 0 dotted;
-    border-bottom: 1px #ccc;
+    border-bottom: 1px #ccc dotted;
 }
 
 .noboarder td {
     border: none;
+    border-bottom: none;
+}
+
+.cf_table tr:last-child td {
+    border-bottom: 0px #ccc dotted;
 }
 
 .cf_table td:last-child {
@@ -1898,4 +1903,8 @@ select {
 .modal__text {
     line-height: 1.5em;
     font-size: 1.3em;
+}
+
+.jBox-Tooltip {
+    max-width: 180px;
 }
