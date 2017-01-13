@@ -165,6 +165,17 @@ presets.presets = [
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
+            "General setup for airplanes",
+			"",
+            "What it applies:",
+			"PID ROLL:&nbsp;&nbsp;P-gain 20. I-Gain 30. D-Gain 15.",
+			"PID PITCH: P-gain 20. I-Gain 30. D-Gain 15.",
+			"PID YAW:&nbsp;&nbsp;&nbsp;&nbsp;P-gain 45. I-Gain 5.&nbsp;&nbsp; D-Gain 15.",
+			"Roll_rate  200",
+			"Pitch_rate 150",
+			"Yaw_rate   90",
+			"gyro_sync on",
+			"gyroscopeLpf 188Hz",
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -182,9 +193,17 @@ presets.presets = [
     {
         name: "600mm Flying Wing",
         description: "Small flying wing on multirotor racer parts",
-        features: [
+		        features: [
             "3S-4S battery",
-            "300g-500g weight"
+            "300g-500g weight",
+			"",
+            "What it applies:",
+			"PID ROLL:&nbsp;&nbsp;P-gain 15. I-Gain 30. D-Gain 15.",
+			"PID PITCH: P-gain 15. I-Gain 40. D-Gain 15.",
+			"Roll_rate  400",
+			"Pitch_rate 150",
+			"gyro_sync on",
+			"gyroscopeLpf 188Hz",
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
