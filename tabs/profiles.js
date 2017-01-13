@@ -193,7 +193,7 @@ presets.presets = [
     {
         name: "600mm Flying Wing",
         description: "Small flying wing on multirotor racer parts",
-		        features: [
+	features: [
             "3S-4S battery",
             "300g-500g weight",
 			"",
