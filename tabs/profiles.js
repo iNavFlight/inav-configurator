@@ -349,10 +349,10 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
         for(var preset in presetsList) {
-            $presetList.append( '<li class=”profileitem”><a href="#/" class="preset__single" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            $presetList.append( '<li class=”preset__element-wrapper”><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
         }
 
-        $('.preset__single').click(function () {
+        $('.preset__element-link').click(function () {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
             fillPresetDescription(currentPreset);
