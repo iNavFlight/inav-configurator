@@ -1918,5 +1918,21 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadNavPosholdConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_NAV_POSHOLD, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveNavPosholdConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_NAV_POSHOLD, mspHelper.crunch(MSPCodes.MSP_SET_NAV_POSHOLD), false, callback);
+        } else {
+            callback();
+        }
+    };
+
     return self;
 })(GUI);
