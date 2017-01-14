@@ -45,7 +45,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3)
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '5" Racer',
@@ -84,7 +85,8 @@ presets.presets = [
             presets.elementHelper("PIDs", 0, [43, 40, 20]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [58, 50, 22]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '10" General Purpose',
@@ -121,7 +123,8 @@ presets.presets = [
             presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '12" General Purpose',
@@ -159,7 +162,8 @@ presets.presets = [
             presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
             presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: "Airplane General",
@@ -177,7 +181,8 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "yaw_rate", 90),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ]
+        ],
+        type: 'airplane'
     },
     {
         name: "600mm Flying Wing",
@@ -195,7 +200,8 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 150),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ]
+        ],
+        type: 'flyingwing'
     }
 ];
 
@@ -322,6 +328,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var $features = $('#preset-features');
 
+        $('#preset-image').html('<div class="' + preset.type + '"></div>');
         $('#preset-name').html(preset.name);
         $('#preset-description').html(preset.description);
 
