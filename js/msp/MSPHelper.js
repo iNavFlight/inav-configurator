@@ -148,7 +148,7 @@ var mspHelper = (function (gui) {
                 GPS_DATA.numSat = data.getUint8(1);
                 GPS_DATA.lat = data.getInt32(2, true);
                 GPS_DATA.lon = data.getInt32(6, true);
-                GPS_DATA.alt = data.getUint16(10, true);
+                GPS_DATA.alt = data.getInt16(10, true);
                 GPS_DATA.speed = data.getUint16(12, true);
                 GPS_DATA.ground_course = data.getUint16(14, true);
                 GPS_DATA.hdop = data.getUint16(16, true);
@@ -572,7 +572,7 @@ var mspHelper = (function (gui) {
                 offset++;
                 FAILSAFE_CONFIG.failsafe_off_delay = data.getUint8(offset);
                 offset++;
-                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset);
+                FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
                     FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
@@ -842,6 +842,11 @@ var mspHelper = (function (gui) {
                 PID_ADVANCED.rollPitchItermIgnoreRate = data.getUint16(0, true);
                 PID_ADVANCED.yawItermIgnoreRate = data.getUint16(2, true);
                 PID_ADVANCED.yawPLimit = data.getUint16(4, true);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
+                }
+
                 PID_ADVANCED.axisAccelerationLimitRollPitch = data.getUint16(13, true);
                 PID_ADVANCED.axisAccelerationLimitYaw = data.getUint16(15, true);
                 break;
@@ -1262,7 +1267,13 @@ var mspHelper = (function (gui) {
                 buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
                 buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
                 buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
-                buffer.push(0); //BF: currentProfile->pidProfile.dtermSetpointWeight
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    buffer.push(PID_ADVANCED.dtermSetpointWeight);
+                } else {
+                    buffer.push(0);
+                }
+
                 buffer.push(0); // reserved
                 buffer.push(0); // reserved
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain

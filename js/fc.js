@@ -251,7 +251,8 @@ var FC = {
             yawItermIgnoreRate: null,
             yawPLimit: null,
             axisAccelerationLimitRollPitch: null,
-            axisAccelerationLimitYaw: null
+            axisAccelerationLimitYaw: null,
+            dtermSetpointWeight: null
         };
 
         INAV_PID_CONFIG = {

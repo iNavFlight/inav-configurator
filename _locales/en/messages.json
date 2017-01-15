@@ -1893,10 +1893,10 @@
         "message": "Hardware health"
     },
     "armingCheckPass": {
-        "message": "<span class=\"arming-state-pass\">PASS</span>"
+        "message": "<div class=\"checkspass\"></div>"
     },
     "armingCheckFail": {
-        "message": "<span class=\"arming-state-fail\">FAIL</span>"
+        "message": "<div class=\"checksfail\"></div>"
     },
     "calibrationHead1": {
         "message": "Accelerometer Calibration"

@@ -868,7 +868,7 @@ li.active .ic_backup {
     background-image: url(images/icons/cf_icon_wizard_white.svg);
 }
 
-li.active .ic_wizard {
+li.active .ic_wizzard {
     background-image: url(images/icons/cf_icon_wizard_white.svg);
 }
 
@@ -1915,4 +1915,8 @@ select {
 .modal__text {
     line-height: 1.5em;
     font-size: 1.3em;
+}
+
+.jBox-Tooltip {
+    max-width: 180px;
 }
