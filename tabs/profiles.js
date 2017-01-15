@@ -40,8 +40,8 @@ presets.defaultValues = {
 presets.presets = [
     {
         name: 'Default Preset',
-        description: "INAV default Quad X configuration",
-        features: [],
+        description: "INAV Quad X configuration",
+        features: ["Default INAV Settings"],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3)
