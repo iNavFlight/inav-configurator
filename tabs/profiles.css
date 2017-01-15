@@ -5,10 +5,16 @@
 
 .tab-configuration .preset__head {
     color: #37a8db;
+    margin-top: 15px;
 }
 
 .tab-configuration .preset__description {
-    margin-top: 1em;
+    margin-top: 3px;
+}
+
+.tab-configuration .preset__description span {
+    margin-top: 5px;
+    font-family: 'open_sansregular', Arial, serif;    
 }
 
 .tab-configuration .preset__features {
@@ -16,9 +22,9 @@
 }
 
 .tab-configuration .preset__feature {
-    list-style: disc;
+    list-style: inside disc;
+    list-style-type: afar;
     color: #37a8db;
-    margin-left: 1.5em;
 }
 
 .tab-configuration .preset__feature-text {
@@ -133,3 +139,10 @@
     margin-top: 20px;
     margin-bottom: 0px;
 } 
+
+.tab-configuration #details-head {
+    display: none;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+}

@@ -90,13 +90,11 @@ presets.presets = [
     },
     {
         name: '10" General Purpose',
-        description: "450-600 class general purpose multirotor",
+        description: "450-600 class general purpose multirotor <br><span>0.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
-            "10 inch propellers",
-            "0.kg - 1.4kg weight",
-            "F1, F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "GPS optional"
+            "some text",
+            "some text",
+            "some text"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -346,6 +344,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         $('#preset-name').html(preset.name);
         $('#preset-description').html(preset.description);
         document.getElementById('preset-info').style.display = "none";
+        document.getElementById('details-head').style.display = "block";
 
 
         $features.find('*').remove();
@@ -353,6 +352,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         for (var i in preset.features) {
             if (preset.features.hasOwnProperty(i)) {
                 $features.append('<li class="preset__feature"><span class="preset__feature-text">' + preset.features[i] + "</span></li>");
+
             }
         }
 
@@ -367,7 +367,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         for(var preset in presetsList) {
             $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
         }
-
+    
         $('.preset__element-link').click(function () {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
