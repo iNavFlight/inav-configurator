@@ -898,6 +898,22 @@ var mspHelper = (function (gui) {
                 console.log('NAV_POSHOLD saved');
                 break;
 
+            case MSPCodes.MSP_CALIBRATION_DATA:
+                CALIBRATION_DATA.accZero.X = data.getInt16(0, true);
+                CALIBRATION_DATA.accZero.Y = data.getInt16(2, true);
+                CALIBRATION_DATA.accZero.Z = data.getInt16(4, true);
+                CALIBRATION_DATA.accGain.X = data.getInt16(6, true);
+                CALIBRATION_DATA.accGain.Y = data.getInt16(8, true);
+                CALIBRATION_DATA.accGain.Z = data.getInt16(10, true);
+                CALIBRATION_DATA.magZero.X = data.getInt16(12, true);
+                CALIBRATION_DATA.magZero.Y = data.getInt16(14, true);
+                CALIBRATION_DATA.magZero.Z = data.getInt16(16, true);
+                break;
+
+            case MSPCodes.MSP_SET_CALIBRATION_DATA:
+                console.log('Calibration data saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1224,6 +1240,36 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
                 buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
+                break;
+
+            case MSPCodes.MSP_SET_CALIBRATION_DATA:
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.X));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.Y));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.Z));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.Z));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.X));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.Y));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.Z));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.Z));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.X));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.Y));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.Z));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.Z));
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -1924,6 +1970,22 @@ var mspHelper = (function (gui) {
     self.saveSensorConfig = function (callback) {
         if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
             MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadCalibrationData = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveCalibrationData = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
         } else {
             callback();
         }

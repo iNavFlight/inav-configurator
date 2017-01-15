@@ -12,6 +12,8 @@ var MSPCodes = {
 
     MSP_NAV_POSHOLD:            12,
     MSP_SET_NAV_POSHOLD:        13,
+    MSP_CALIBRATION_DATA:       14,
+    MSP_SET_CALIBRATION_DATA:   15,
 
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
