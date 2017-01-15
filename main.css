@@ -824,15 +824,15 @@ li.active .ic_transponder {
 }
 
 .ic_calibration {
-    background-image: url(images/icons/cf_icon_wizard_grey.svg);
+    background-image: url(images/icons/cf_icon_cal_grey.svg);
 }
 
 .ic_calibration:hover {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
+    background-image: url(images/icons/cf_icon_cal_white.svg);
 }
 
 li.active .ic_calibration {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
+    background-image: url(images/icons/cf_icon_cal_white.svg);
 }
 
 /* SPARE Tab-Icons */
