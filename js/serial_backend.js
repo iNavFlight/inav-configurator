@@ -265,6 +265,7 @@ function onOpen(openInfo) {
                                          */
                                         if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
                                             GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('profiles'), 1);
+                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('advanced_tuning'), 1);
                                         }
 
                                         onConnect();
