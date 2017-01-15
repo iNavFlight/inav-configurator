@@ -842,6 +842,11 @@ var mspHelper = (function (gui) {
                 PID_ADVANCED.rollPitchItermIgnoreRate = data.getUint16(0, true);
                 PID_ADVANCED.yawItermIgnoreRate = data.getUint16(2, true);
                 PID_ADVANCED.yawPLimit = data.getUint16(4, true);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
+                }
+
                 PID_ADVANCED.axisAccelerationLimitRollPitch = data.getUint16(13, true);
                 PID_ADVANCED.axisAccelerationLimitYaw = data.getUint16(15, true);
                 break;
@@ -1262,7 +1267,13 @@ var mspHelper = (function (gui) {
                 buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
                 buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
                 buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
-                buffer.push(0); //BF: currentProfile->pidProfile.dtermSetpointWeight
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    buffer.push(PID_ADVANCED.dtermSetpointWeight);
+                } else {
+                    buffer.push(0);
+                }
+
                 buffer.push(0); // reserved
                 buffer.push(0); // reserved
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
