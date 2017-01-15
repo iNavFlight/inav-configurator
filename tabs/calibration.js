@@ -1,44 +1,170 @@
+/*global chrome */
 'use strict';
 
 TABS.calibration = {};
 
+TABS.calibration.model = (function () {
+    var publicScope = {},
+        privateScope = {};
+
+    privateScope.step = null;
+
+    publicScope.next = function () {
+
+        if (privateScope.step === null) {
+            privateScope.step = 1;
+        } else {
+            privateScope.step++;
+        }
+
+        if (privateScope.step > 6) {
+            privateScope.step = null;
+        }
+
+        return privateScope.step;
+    };
+
+    publicScope.getStep = function () {
+        return privateScope.step;
+    };
+
+    return publicScope;
+})();
+
 TABS.calibration.initialize = function (callback) {
-    var self = this;
+
+    var loadChainer = new MSPChainerClass(),
+        saveChainer = new MSPChainerClass(),
+        modalStart,
+        modalStop,
+        modalProcessing;
 
     if (GUI.active_tab != 'calibration') {
         GUI.active_tab = 'calibration';
         googleAnalytics.sendAppView('Calibration');
     }
 
-    /*
-    function load_ident() {
-        MSP.send_message(MSP_codes.MSP_IDENT, false, false, load_config);
+    loadChainer.setChain([
+        mspHelper.loadStatus,
+        mspHelper.loadCalibrationData
+    ]);
+    loadChainer.setExitPoint(loadHtml);
+    loadChainer.execute();
+
+    saveChainer.setChain([
+        mspHelper.saveCalibrationData
+    ]);
+    saveChainer.setExitPoint(loadChainer.execute);
+
+    function loadHtml() {
+        $('#content').load("./tabs/calibration.html", processHtml);
     }
 
-    function load_config() {
-        MSP.send_message(MSP_codes.MSP_BF_CONFIG, false, false, load_misc_data);
+    MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
+
+    /**
+     *
+     * @param {int} currentStep
+     */
+    function updateCalibrationSteps(currentStep) {
+        for (var i = 1; i <= 6; i++) {
+            var $element = $('[data-step="' + i + '"]');
+
+            if (currentStep === null) {
+                $element.removeClass('finished').removeClass('active');
+            } else if (i < currentStep) {
+                $element.addClass("finished");
+            } else if (currentStep === i) {
+                $element.addClass('active');
+            }
+
+        }
     }
 
-    function load_misc_data() {
-        MSP.send_message(MSP_codes.MSP_MISC, false, false, load_html);
-    }
-    */
+    function processHtml() {
 
-    function load_html() {
-        $('#content').load("./tabs/calibration.html", process_html);
-    }
+        $('#calibrate-start-button').click(function () {
+            var newStep = TABS.calibration.model.next(),
+                $button = $(this);
 
-    MSP.send_message(MSPCodes.MSP_IDENT, false, false, load_html);
+            if (newStep === 1) {
+                updateCalibrationSteps(newStep);
+                modalStart = new jBox('Modal', {
+                    width: 400,
+                    height: 200,
+                    animation: false,
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    content: $('#modal-acc-calibration-start')
+                }).open();
+            }
 
-    function process_html() {
+            /*
+             * Communication
+             */
+            if (newStep > 1 || newStep === null) {
+
+                $button.addClass('disabled');
+
+                modalProcessing = new jBox('Modal', {
+                    width: 400,
+                    height: 100,
+                    animation: false,
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    content: $('#modal-acc-processing')
+                }).open();
+
+                GUI.interval_pause('status_pull');
+                MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
+                    GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
+                });
+
+                GUI.timeout_add('acc_calibration_timeout', function () {
+
+                    updateCalibrationSteps(newStep);
+
+                    $button.removeClass('disabled');
+
+                    modalProcessing.close();
+
+                    GUI.interval_resume('status_pull');
+                    GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
+
+                    if (newStep === null) {
+                        modalStop = new jBox('Modal', {
+                            width: 400,
+                            height: 200,
+                            animation: false,
+                            closeOnClick: false,
+                            closeOnEsc: false,
+                            content: $('#modal-acc-calibration-stop')
+                        }).open();
+                    }
+                }, 2000);
+            }
+
+        });
+
+        $('#modal-start-button').click(function () {
+            modalStart.close();
+        });
+
+        $('#modal-stop-button').click(function () {
+            modalStop.close();
+        });
+
+        updateCalibrationSteps(TABS.calibration.model.getStep());
 
         // translate to user-selected language
         localize();
 
-        // status data pulled via separate timer with static speed
         GUI.interval_add('status_pull', function status_pull() {
             MSP.send_message(MSPCodes.MSP_STATUS);
-            
+
+            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
+            }
         }, 250, true);
         GUI.content_ready(callback);
     }

@@ -1957,5 +1957,23 @@
     },
     "presetApplyDescription": {
         "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
+    },
+    "OK": {
+        "message": "OK"
+    },
+    "accCalibrationStartTitle": {
+        "message": "Accelerometer Calibration"
+    },
+    "accCalibrationStartBody": {
+        "message": "Place flight controller in a position showed in image, then press <strong>Calibrate</strong> button again. Repeat for each of 6 position. Keep it stable during calibration."
+    },
+    "accCalibrationStopTitle": {
+        "message": "Calibration finished"
+    },
+    "accCalibrationStopBody": {
+        "message": "Accelerometer calibration finished, check if values have been saved."
+    },
+    "accCalibrationProcessing": {
+        "message": "Processing..."
     }
 }
