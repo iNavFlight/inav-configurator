@@ -351,7 +351,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
         for(var preset in presetsList) {
-            $presetList.append( '<li class=”preset__element-wrapper”><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
         }
 
         $('.preset__element-link').click(function () {
@@ -361,7 +361,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
             $presetList.find('li').removeClass('active');
             $(this).parent().addClass('active');
-            
+
             $('#save-button').removeClass('disabled');
         });
 
