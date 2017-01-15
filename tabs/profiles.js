@@ -331,6 +331,8 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         $('#preset-image').html('<div class="' + preset.type + '"></div>');
         $('#preset-name').html(preset.name);
         $('#preset-description').html(preset.description);
+        document.getElementById('preset-info').style.display = "none";
+
 
         $features.find('*').remove();
 
