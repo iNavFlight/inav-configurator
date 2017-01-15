@@ -358,6 +358,10 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
             fillPresetDescription(currentPreset);
+
+            $presetList.find('li').removeClass('active');
+            $(this).parent().addClass('active');
+            
             $('#save-button').removeClass('disabled');
         });
 
