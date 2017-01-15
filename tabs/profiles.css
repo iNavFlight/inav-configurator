@@ -91,9 +91,11 @@
     width: calc(100% - 38px);
 }
      
-.tab-configuration .list-menu li a:active {
+.tab-configuration .list-menu li.active a {
     background-color: #37a8db;
     text-shadow: 0 1px rgba(0, 0, 0, 0.45);
+    color: white;
+
 }
  
 .tab-configuration .airplane {
