@@ -29,7 +29,9 @@
 .tab-configuration #preset-image {
     width: 120px;
     height: 120px;
-    background-color: silver;
+    background-image:url(../images/icons/peset_default.svg);
+    background-size:contain;
+    background-repeat:no-repeat;
     float: left;
     margin-right: 20px;
 }
@@ -101,31 +103,33 @@
 .tab-configuration .airplane {
     width: 100%;
     height: 100%;
-    background-image: url();
-    background-color: blue;
+    background-image:url(../images/icons/peset_plane.svg);
 }
     
 .tab-configuration .flyingwing {
     width: 100%;
     height: 100%;
-    background-image: url();
-    background-color: red;    
+    background-image:url(../images/icons/peset_wing.svg);
+   
 }
     
 .tab-configuration .multirotor {
     width: 100%;
     height: 100%;
-    background-image: url();
-    background-color: green;    
+    background-image:url(../images/icons/peset_quad.svg);
 }
      
-.tab-configuration .top {
+.tab-configuration .preset .top {
     background-color: #e6e6e6;
     box-shadow: inset 0px -5px 5px rgba(50,50,50, 0.1);
     border-top-right-radius: 3px;
 }
     
-.tab-configuration .bottom {
+.tab-configuration .preset .bottom {
     border-bottom-right-radius: 3px;    
 }
-    
+
+.tab-configuration .modal__content h1 {
+    margin-top: 20px;
+    margin-bottom: 0px;
+} 
