@@ -73,9 +73,9 @@ TABS.calibration.initialize = function (callback) {
             if (currentStep === null) {
                 $element.removeClass('finished').removeClass('active');
             } else if (i < currentStep) {
-                $element.addClass("finished");
+                $element.addClass("finished").removeClass('active');
             } else if (currentStep === i) {
-                $element.addClass('active');
+                $element.addClass('active').removeClass('finished');
             }
 
         }
