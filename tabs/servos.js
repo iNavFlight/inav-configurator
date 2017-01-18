@@ -171,7 +171,7 @@ TABS.servos.initialize = function (callback) {
         $('table.directions select, table.directions input, table.fields select, table.fields input').change(function () {
             if ($('div.live input').is(':checked')) {
                 // apply small delay as there seems to be some funky update business going wrong
-                GUI.timeout_add('servos_update', servos_update, 10);
+                helper.timeout.add('servos_update', servos_update, 10);
             }
         });
 
@@ -189,7 +189,7 @@ TABS.servos.initialize = function (callback) {
         localize();
 
         // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function () {
+        helper.interval.add('status_pull', function () {
             MSP.send_message(MSPCodes.MSP_STATUS);
 
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {

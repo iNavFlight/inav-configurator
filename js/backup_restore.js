@@ -802,7 +802,7 @@ function configuration_restore(callback) {
             function reinitialize() {
                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
 
-                GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
+                helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
                     MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
                         GUI.log(chrome.i18n.getMessage('deviceReady'));
 

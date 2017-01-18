@@ -142,10 +142,10 @@ TABS.modes.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        GUI.interval_add('aux_data_pull', get_rc_data, 50);
+        helper.interval.add('aux_data_pull', get_rc_data, 50);
 
         // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
+        helper.interval.add('status_pull', function status_pull() {
             MSP.send_message(MSPCodes.MSP_STATUS);
             
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {

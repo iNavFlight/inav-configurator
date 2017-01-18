@@ -35,7 +35,7 @@ $(document).ready(function () {
             }, 5000);
         } else {
 
-            GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
+            helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
                 MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('deviceReady'));
@@ -98,8 +98,8 @@ $(document).ready(function () {
 
                     serial.connect(selected_port, {bitrate: selected_baud}, onOpen);
                 } else {
-                    GUI.timeout_kill_all();
-                    GUI.interval_kill_all();
+                    helper.timeout.killAll();
+                    helper.interval.killAll();
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
 
@@ -213,7 +213,7 @@ function onOpen(openInfo) {
         serial.onReceive.addListener(read_serial);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
-        GUI.timeout_add('connecting', function () {
+        helper.timeout.add('connecting', function () {
             if (!CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
@@ -306,7 +306,7 @@ function onOpen(openInfo) {
 }
 
 function onConnect() {
-    GUI.timeout_remove('connecting'); // kill connecting timer
+    helper.timeout.remove('connecting'); // kill connecting timer
     $('div#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
     $('div#connectbutton a.connect').addClass('active');
     $('#tabs ul.mode-disconnected').hide();
@@ -488,7 +488,7 @@ function update_dataflash_global() {
 
 function startLiveDataRefreshTimer() {
     // live data refresh
-    GUI.timeout_add('data_refresh', function () { update_live_status(); }, 100);
+    helper.timeout.add('data_refresh', function () { update_live_status(); }, 100);
 }
 
 function update_live_status() {
@@ -566,7 +566,7 @@ function update_live_status() {
     }
 
     statuswrapper.show();
-    GUI.timeout_remove('data_refresh');
+    helper.timeout.remove('data_refresh');
     startLiveDataRefreshTimer();
 }
 

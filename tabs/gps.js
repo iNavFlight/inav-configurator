@@ -102,7 +102,7 @@ TABS.gps.initialize = function (callback) {
         }
 
         // enable data pulling
-        GUI.interval_add('gps_pull', function gps_update() {
+        helper.interval.add('gps_pull', function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
                 //return;
@@ -112,7 +112,7 @@ TABS.gps.initialize = function (callback) {
         }, 75, true);
 
         // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
+        helper.interval.add('status_pull', function status_pull() {
             MSP.send_message(MSPCodes.MSP_STATUS);
             
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {

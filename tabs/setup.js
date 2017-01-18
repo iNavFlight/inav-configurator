@@ -70,15 +70,16 @@ TABS.setup.initialize = function (callback) {
 
                 // During this period MCU won't be able to process any serial commands because its locked in a for/while loop
                 // until this operation finishes, sending more commands through data_poll() will result in serial buffer overflow
-                GUI.interval_pause('setup_data_pull');
+                helper.interval.pause('setup_data_pull');
+
                 MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
                     $('#accel_calib_running').show();
                     $('#accel_calib_rest').hide();
                 });
 
-                GUI.timeout_add('button_reset', function () {
-                    GUI.interval_resume('setup_data_pull');
+                helper.timeout.add('button_reset', function () {
+                    helper.interval.resume('setup_data_pull');
 
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
 
@@ -101,7 +102,7 @@ TABS.setup.initialize = function (callback) {
                     $('#mag_calib_rest').hide();
                 });
 
-                GUI.timeout_add('button_reset', function () {
+                helper.timeout.add('button_reset', function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
                     self.removeClass('calibrating');
                     $('#mag_calib_running').hide();
@@ -206,8 +207,8 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        GUI.interval_add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
-        GUI.interval_add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+        helper.interval.add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
+        helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
 
         function updateArminFailure() {
             var flagNames = FC.getArmingFlags();
@@ -226,7 +227,7 @@ TABS.setup.initialize = function (callback) {
         /*
          * 1fps update rate will be fully enough
          */
-        GUI.interval_add('updateArminFailure', updateArminFailure, 500, true);
+        helper.interval.add('updateArminFailure', updateArminFailure, 500, true);
 
         GUI.content_ready(callback);
     }

@@ -239,9 +239,9 @@ TABS.motors.initialize = function (callback) {
             accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-scale, scale]);
 
             // timer initialization
-            GUI.interval_kill_all(['motor_and_status_pull']);
+            helper.interval.killAll(['motor_and_status_pull']);
 
-            GUI.interval_add('IMU_pull', function imu_data_pull() {
+            helper.interval.add('IMU_pull', function imu_data_pull() {
                 MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
             }, rate, true);
 
@@ -519,7 +519,7 @@ TABS.motors.initialize = function (callback) {
         }
 
         // enable Status and Motor data pulling
-        GUI.interval_add('motor_and_status_pull', periodicUpdateHandler, 75, true);
+        helper.interval.add('motor_and_status_pull', periodicUpdateHandler, 75, true);
 
         GUI.content_ready(callback);
     }
