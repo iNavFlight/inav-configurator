@@ -53,6 +53,7 @@ var mspHelper = (function (gui) {
                 CONFIG.capability = data.getUint32(3, true);
                 break;
             case MSPCodes.MSP_STATUS:
+                console.log('Using deprecated msp command: MSP_STATUS');
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
@@ -86,6 +87,7 @@ var mspHelper = (function (gui) {
                     sensor_status(CONFIG.activeSensors);
                 }
                 gui.updateStatusBar();
+                gui.updateProfileChange();
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:

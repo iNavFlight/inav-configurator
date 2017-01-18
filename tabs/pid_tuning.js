@@ -289,10 +289,7 @@ TABS.pid_tuning.initialize = function (callback) {
             send_pids();
         });
 
-        // status data pulled via separate timer with static speed
-        helper.interval.add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-        }, 250, true);
+        helper.task.statusPullStart();
 
         GUI.content_ready(callback);
     }

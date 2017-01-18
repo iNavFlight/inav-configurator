@@ -175,6 +175,7 @@ TABS.setup.initialize = function (callback) {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
 
+            //TODO ah man.... compare with update_live_status from serial_backend.js
             MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
                 bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
                 bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));

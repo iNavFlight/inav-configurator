@@ -443,14 +443,7 @@ TABS.sensors.initialize = function (callback) {
             }
         });
 
-        // status data pulled via separate timer with static speed
-        helper.interval.add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
+        helper.task.statusPullStart();
 
         GUI.content_ready(callback);
     });

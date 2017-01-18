@@ -499,6 +499,7 @@ function update_live_status() {
        display: 'inline-block'
     });
 
+    //FIXME probably this is a duplication on status polling... one of those is probably very very not needed
     if (GUI.active_tab != 'cli') {
         MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
         if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
