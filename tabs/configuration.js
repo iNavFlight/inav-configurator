@@ -636,11 +636,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         helper.task.statusPullStart();
 
         helper.interval.add('config_load_analog', function () {
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
-                $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
-            });
-        }, 250, true); // 4 fps
+            $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+        }, 100, true); // 10 fps
         GUI.content_ready(callback);
     }
 };

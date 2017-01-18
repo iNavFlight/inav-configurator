@@ -175,14 +175,6 @@ TABS.setup.initialize = function (callback) {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }
 
-            //TODO ah man.... compare with update_live_status from serial_backend.js
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
-                bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
-                bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
-                rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
-            });
-
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
@@ -210,6 +202,12 @@ TABS.setup.initialize = function (callback) {
 
         helper.interval.add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
         helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+        helper.interval.add('gui_analog_update', function () {
+                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
+                bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
+                bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
+                rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
+        }, 100, true);
 
         function updateArminFailure() {
             var flagNames = FC.getArmingFlags();
