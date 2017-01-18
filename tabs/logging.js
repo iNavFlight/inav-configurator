@@ -87,7 +87,7 @@ TABS.logging.initialize = function (callback) {
                             GUI.log(chrome.i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
-                        helper.interval.killAll();
+                        helper.interval.killAll(['global_data_refresh']);
 
                         $('.speed').prop('disabled', false);
                         $(this).text(chrome.i18n.getMessage('loggingStart'));

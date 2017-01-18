@@ -18,6 +18,12 @@ helper.interval = (function () {
      * @returns {{name: *, timer: null, code: *, interval: *, fired: number, paused: boolean}}
      */
     publicScope.add = function (name, code, interval, first) {
+
+        /*
+         * Kill existing interval with this name if exists
+         */
+        publicScope.remove(name);
+
         var data = {
             'name': name,
             'timer': null,

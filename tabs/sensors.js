@@ -356,7 +356,7 @@ TABS.sensors.initialize = function (callback) {
             });
 
             // timer initialization
-            helper.interval.killAll(['status_pull']);
+            helper.interval.killAll(['status_pull', 'global_data_refresh']);
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {

@@ -235,7 +235,7 @@ TABS.motors.initialize = function (callback) {
             accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-scale, scale]);
 
             // timer initialization
-            helper.interval.killAll(['motor_and_status_pull']);
+            helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh']);
 
             helper.interval.add('IMU_pull', function imu_data_pull() {
                 MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);

@@ -98,14 +98,14 @@ $(document).ready(function () {
 
                     serial.connect(selected_port, {bitrate: selected_baud}, onOpen);
                 } else {
-                    helper.timeout.killAll();
-                    helper.interval.killAll();
+                    var wasConnected = CONFIGURATOR.connectionValid;
+
+                    helper.timeout.killAll(['global_data_refresh']);
+                    helper.interval.killAll(['global_data_refresh']);
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
 
                     serial.disconnect(onClosed);
-
-                    var wasConnected = CONFIGURATOR.connectionValid;
 
                     GUI.connected_to = false;
                     CONFIGURATOR.connectionValid = false;
@@ -324,7 +324,8 @@ function onConnect() {
     $('#portsinput').hide();
     $('#dataflash_wrapper_global').show();
 
-    startLiveDataRefreshTimer();
+    console.log('ready to start');
+    helper.interval.add('global_data_refresh', update_live_status, 100, true);
 }
 
 function onClosed(result) {
@@ -458,42 +459,39 @@ function lowByte(num) {
 }
 
 function update_dataflash_global() {
-        var supportsDataflash = DATAFLASH.totalSize > 0;
-        if (supportsDataflash){
+    var supportsDataflash = DATAFLASH.totalSize > 0;
+    if (supportsDataflash) {
 
-             $(".noflash_global").css({
-                 display: 'none'
-             });
+        $(".noflash_global").css({
+            display: 'none'
+        });
 
-             $(".dataflash-contents_global").css({
-                 display: 'block'
-             });
+        $(".dataflash-contents_global").css({
+            display: 'block'
+        });
 
-             $(".dataflash-free_global").css({
-                 width: (100-(DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
-                 display: 'block'
-             });
-             $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(DATAFLASH.totalSize - DATAFLASH.usedSize));
-        } else {
-             $(".noflash_global").css({
-                 display: 'block'
-             });
+        $(".dataflash-free_global").css({
+            width: (100 - (DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
+            display: 'block'
+        });
+        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(DATAFLASH.totalSize - DATAFLASH.usedSize));
+    } else {
+        $(".noflash_global").css({
+            display: 'block'
+        });
 
-             $(".dataflash-contents_global").css({
-                 display: 'none'
-             });
-        }
-
+        $(".dataflash-contents_global").css({
+            display: 'none'
+        });
     }
 
-function startLiveDataRefreshTimer() {
-    // live data refresh
-    helper.timeout.add('data_refresh', function () { update_live_status(); }, 100);
 }
 
 function update_live_status() {
 
-    var statuswrapper = $('#quad-status_wrapper');
+    if (!CONFIGURATOR.connectionValid) {
+        return;
+    }
 
     $(".quad-status-contents").css({
        display: 'inline-block'
@@ -570,9 +568,7 @@ function update_live_status() {
         $(".battery-legend").text(ANALOG.voltage + " V");
     }
 
-    statuswrapper.show();
-    helper.timeout.remove('data_refresh');
-    startLiveDataRefreshTimer();
+    $('#quad-status_wrapper').show();
 }
 
 function specificByte(num, pos) {
