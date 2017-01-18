@@ -177,7 +177,7 @@ var MSP = {
                 console.log('MSP data request timed-out: ' + code);
 
                 serial.send(bufferOut, false);
-            }, 1000); // we should be able to define timeout in the future
+            }, serial.getTimeout()); // we should be able to define timeout in the future
         }
 
         MSP.callbacks.push(obj);
