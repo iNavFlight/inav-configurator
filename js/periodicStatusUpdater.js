@@ -19,43 +19,23 @@ helper.periodicStatusUpdater = (function () {
         }
 
         if (baudSpeed >= 115200) {
-            return 100;
-        } else if (baudSpeed >= 57600) {
             return 200;
-        } else if (baudSpeed >= 38400) {
-            return 250;
-        } else if (baudSpeed >= 19200) {
+        } else if (baudSpeed >= 57600) {
             return 400;
-        } else if (baudSpeed >= 9600) {
+        } else if (baudSpeed >= 38400) {
             return 500;
+        } else if (baudSpeed >= 19200) {
+            return 600;
+        } else if (baudSpeed >= 9600) {
+            return 750;
         } else {
             return 1000;
         }
     };
 
-    publicScope.run = function () {
+    privateScope.updateView = function () {
 
-        if (!CONFIGURATOR.connectionValid) {
-            return;
-        }
-
-        $(".quad-status-contents").css({
-            display: 'inline-block'
-        });
-
-        //FIXME MSP_SENSOR_STATUS has to be added here!!
-        if (GUI.active_tab != 'cli') {
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-                MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-            } else {
-                MSP.send_message(MSPCodes.MSP_STATUS, false, false);
-            }
-
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
-        }
-
-        var active = ((Date.now() - MSP.analog_last_received_timestamp) < 300);
+        var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(serial.bitrate) * 3);
 
         for (var i = 0; i < AUX_CONFIG.length; i++) {
             if (AUX_CONFIG[i] == 'ARM') {
@@ -114,6 +94,34 @@ helper.periodicStatusUpdater = (function () {
         }
 
         $('#quad-status_wrapper').show();
+    };
+
+    publicScope.run = function () {
+
+        if (!CONFIGURATOR.connectionValid) {
+            return;
+        }
+
+        $(".quad-status-contents").css({
+            display: 'inline-block'
+        });
+
+        if (GUI.active_tab != 'cli') {
+
+            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
+            }
+
+            if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
+                MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
+            } else {
+                MSP.send_message(MSPCodes.MSP_STATUS, false, false);
+            }
+
+            MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
+
+            privateScope.updateView();
+        }
     };
 
     return publicScope;

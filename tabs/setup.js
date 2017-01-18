@@ -168,10 +168,6 @@ TABS.setup.initialize = function (callback) {
             heading_e = $('dd.heading');
 
         function get_slow_data() {
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
@@ -197,7 +193,7 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        helper.interval.add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
+        helper.interval.add('setup_data_pull_fast', get_fast_data, 40, true); // 25 fps
         helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
         helper.interval.add('gui_analog_update', function () {
                 bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));

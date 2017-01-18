@@ -14,7 +14,7 @@ helper.interval = (function () {
      * @param {String} name
      * @param {Function} code function reference (code to be executed)
      * @param {int} interval time interval in milliseconds
-     * @param {boolean} first true/false if code should be ran initially before next timer interval hits
+     * @param {boolean=} first true/false if code should be ran initially before next timer interval hits
      * @returns {{name: *, timer: null, code: *, interval: *, fired: number, paused: boolean}}
      */
     publicScope.add = function (name, code, interval, first) {

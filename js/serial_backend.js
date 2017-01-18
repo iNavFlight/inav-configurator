@@ -323,7 +323,7 @@ function onConnect() {
      */
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
-    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), true);
+    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
 }
 
 function onClosed(result) {

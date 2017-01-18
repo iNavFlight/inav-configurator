@@ -23,8 +23,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig,
-        mspHelper.loadAccTrim
+        mspHelper.loadSensorConfig
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();

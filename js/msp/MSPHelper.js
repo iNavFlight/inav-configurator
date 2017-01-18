@@ -1823,6 +1823,14 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadSensorStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
     self.loadRcDeadband = function (callback) {
         if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
             MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
@@ -1841,6 +1849,10 @@ var mspHelper = (function (gui) {
 
     self.loadAccTrim = function (callback) {
         MSP.send_message(MSPCodes.MSP_ACC_TRIM, false, false, callback);
+    };
+
+    self.loadAnalog = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ANALOG, false, false, callback);
     };
 
     self.saveToEeprom = function saveToEeprom(callback) {
