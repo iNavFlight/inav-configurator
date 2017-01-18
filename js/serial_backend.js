@@ -312,20 +312,18 @@ function onConnect() {
     $('#tabs ul.mode-disconnected').hide();
     $('#tabs ul.mode-connected').show();
 
-    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-    } else {
-        MSP.send_message(MSPCodes.MSP_STATUS, false, false);
-    }
-
     MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false);
 
     $('#sensor-status').show();
     $('#portsinput').hide();
     $('#dataflash_wrapper_global').show();
 
-    console.log('ready to start');
-    helper.interval.add('global_data_refresh', update_live_status, 100, true);
+    /*
+     * Get BOXNAMES since it is used for some reason....
+     */
+    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
+
+    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), true);
 }
 
 function onClosed(result) {
@@ -485,90 +483,6 @@ function update_dataflash_global() {
         });
     }
 
-}
-
-function update_live_status() {
-
-    if (!CONFIGURATOR.connectionValid) {
-        return;
-    }
-
-    $(".quad-status-contents").css({
-       display: 'inline-block'
-    });
-
-    //FIXME probably this is a duplication on status polling... one of those is probably very very not needed
-    //FIXME MSP_SENSOR_STATUS has to be added here!!
-    if (GUI.active_tab != 'cli') {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-        } else {
-            MSP.send_message(MSPCodes.MSP_STATUS, false, false);
-        }
-
-        MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
-    }
-
-    var active = ((Date.now() - MSP.analog_last_received_timestamp) < 300);
-
-    for (var i = 0; i < AUX_CONFIG.length; i++) {
-       if (AUX_CONFIG[i] == 'ARM') {
-               if (bit_check(CONFIG.mode, i))
-                       $(".armedicon").css({
-                               'background-image': 'url(images/icons/cf_icon_armed_active.svg)'
-                           });
-               else
-                       $(".armedicon").css({
-                               'background-image': 'url(images/icons/cf_icon_armed_grey.svg)'
-                           });
-       }
-       if (AUX_CONFIG[i] == 'FAILSAFE') {
-               if (bit_check(CONFIG.mode, i))
-                       $(".failsafeicon").css({
-                               'background-image': 'url(images/icons/cf_icon_failsafe_active.svg)'
-                           });
-               else
-                       $(".failsafeicon").css({
-                               'background-image': 'url(images/icons/cf_icon_failsafe_grey.svg)'
-                           });
-       }
-    }
-    if (ANALOG != undefined) {
-        var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
-        if (ANALOG.voltage == 0)
-            nbCells = 1;
-
-        var min = MISC.vbatmincellvoltage * nbCells;
-        var max = MISC.vbatmaxcellvoltage * nbCells;
-        var warn = MISC.vbatwarningcellvoltage * nbCells;
-
-        $(".battery-status").css({
-            width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
-            display: 'inline-block'
-        });
-
-        if (active) {
-            $(".linkicon").css({
-                'background-image': 'url(images/icons/cf_icon_link_active.svg)'
-            });
-        } else {
-            $(".linkicon").css({
-                'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
-            });
-        }
-
-        if (ANALOG.voltage < warn) {
-            $(".battery-status").css('background-color', '#D42133');
-        } else {
-            $(".battery-status").css('background-color', '#59AA29');
-        }
-
-        $(".battery-legend").text(ANALOG.voltage + " V");
-    }
-
-    $('#quad-status_wrapper').show();
 }
 
 function specificByte(num, pos) {
