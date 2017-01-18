@@ -16,7 +16,6 @@ TABS.setup.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadStatus,
         mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadMisc
@@ -169,8 +168,6 @@ TABS.setup.initialize = function (callback) {
             heading_e = $('dd.heading');
 
         function get_slow_data() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             }

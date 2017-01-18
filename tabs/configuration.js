@@ -632,9 +632,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             saveChainer.execute();
         });
 
-        // status data pulled via separate timer with static speed
-        helper.task.statusPullStart();
-
         helper.interval.add('config_load_analog', function () {
             $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);

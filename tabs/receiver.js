@@ -470,7 +470,6 @@ TABS.receiver.initialize = function (callback) {
             helper.interval.add('receiver_pull', get_rc_data, plot_update_rate, true);
         });
 
-        helper.task.statusPullStart();
         GUI.content_ready(callback);
     }
 };

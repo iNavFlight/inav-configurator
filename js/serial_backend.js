@@ -500,12 +500,16 @@ function update_live_status() {
     });
 
     //FIXME probably this is a duplication on status polling... one of those is probably very very not needed
+    //FIXME MSP_SENSOR_STATUS has to be added here!!
     if (GUI.active_tab != 'cli') {
         MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
-        if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
-        	MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-        else
-        	MSP.send_message(MSPCodes.MSP_STATUS, false, false);
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
+            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
+        } else {
+            MSP.send_message(MSPCodes.MSP_STATUS, false, false);
+        }
+
         MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
     }
 
@@ -534,36 +538,36 @@ function update_live_status() {
        }
     }
     if (ANALOG != undefined) {
-    var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
-    if (ANALOG.voltage == 0)
-           nbCells = 1;
+        var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
+        if (ANALOG.voltage == 0)
+            nbCells = 1;
 
-       var min = MISC.vbatmincellvoltage * nbCells;
-       var max = MISC.vbatmaxcellvoltage * nbCells;
-       var warn = MISC.vbatwarningcellvoltage * nbCells;
+        var min = MISC.vbatmincellvoltage * nbCells;
+        var max = MISC.vbatmaxcellvoltage * nbCells;
+        var warn = MISC.vbatwarningcellvoltage * nbCells;
 
-       $(".battery-status").css({
-          width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
-          display: 'inline-block'
-       });
+        $(".battery-status").css({
+            width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
+            display: 'inline-block'
+        });
 
-       if (active) {
-           $(".linkicon").css({
-               'background-image': 'url(images/icons/cf_icon_link_active.svg)'
-           });
-       } else {
-           $(".linkicon").css({
-               'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
-           });
-       }
+        if (active) {
+            $(".linkicon").css({
+                'background-image': 'url(images/icons/cf_icon_link_active.svg)'
+            });
+        } else {
+            $(".linkicon").css({
+                'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
+            });
+        }
 
-       if (ANALOG.voltage < warn) {
-           $(".battery-status").css('background-color', '#D42133');
-       } else  {
-           $(".battery-status").css('background-color', '#59AA29');
-       }
+        if (ANALOG.voltage < warn) {
+            $(".battery-status").css('background-color', '#D42133');
+        } else {
+            $(".battery-status").css('background-color', '#59AA29');
+        }
 
-       $(".battery-legend").text(ANALOG.voltage + " V");
+        $(".battery-legend").text(ANALOG.voltage + " V");
     }
 
     statuswrapper.show();

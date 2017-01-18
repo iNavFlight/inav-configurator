@@ -358,8 +358,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             }
         });
 
-        helper.task.statusPullStart();
-
         GUI.content_ready(callback);
     }
 };

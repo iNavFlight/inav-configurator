@@ -221,8 +221,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
 
         $('a.save').click(on_save_handler);
 
-        helper.task.statusPullStart();
-
         GUI.content_ready(callback);
     }
 

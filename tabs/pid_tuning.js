@@ -10,7 +10,6 @@ TABS.pid_tuning.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadStatus,
         mspHelper.loadPidNames,
         mspHelper.loadPidData,
         mspHelper.loadRcTuningData,
@@ -288,8 +287,6 @@ TABS.pid_tuning.initialize = function (callback) {
 
             send_pids();
         });
-
-        helper.task.statusPullStart();
 
         GUI.content_ready(callback);
     }

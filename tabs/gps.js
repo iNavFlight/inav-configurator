@@ -13,7 +13,7 @@ TABS.gps.initialize = function (callback) {
         $('#content').load("./tabs/gps.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_html);
+    load_html();
     
     function set_online(){
         $('#connect').hide();
@@ -110,8 +110,6 @@ TABS.gps.initialize = function (callback) {
             
             get_raw_gps_data();
         }, 75, true);
-
-        helper.task.statusPullStart();
 
         //check for internet connection on load
         if (navigator.onLine) {

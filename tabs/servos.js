@@ -188,8 +188,6 @@ TABS.servos.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        helper.task.statusPullStart();
-
         GUI.content_ready(callback);
     }
 };

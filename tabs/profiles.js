@@ -368,7 +368,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             content: $('#presetApplyContent')
         });
 
-        helper.task.statusPullStart();
         GUI.content_ready(callback);
     }
 };

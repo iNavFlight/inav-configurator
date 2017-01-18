@@ -443,8 +443,6 @@ TABS.sensors.initialize = function (callback) {
             }
         });
 
-        helper.task.statusPullStart();
-
         GUI.content_ready(callback);
     });
 };

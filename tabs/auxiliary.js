@@ -290,8 +290,6 @@ TABS.auxiliary.initialize = function (callback) {
         // enable data pulling
         helper.interval.add('aux_data_pull', get_rc_data, 50);
 
-        helper.task.statusPullStart();
-
         GUI.content_ready(callback);
     }
 };
