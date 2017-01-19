@@ -1,37 +1,29 @@
 <div class="tab-configuration tab-profiles toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabPresets">Presets</div>
-
-        <div class="cf_column third_left">
-            <div class="spacer_right">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="presetsPreset"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="select">
-                            <select id="presets-list" class="full-width" size="8">
-                                <!-- list generated here -->
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cf_column twothird">
+        <div class="cf_column full">
             <div class="gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="presetsDescription"></div>
+                <div class="cf_column fourth preset__list-wrapper">
+                    <div class="select">
+                        <ul id="presets-list" class="full-width list-menu">
+                            <!-- list generated here -->
+                        </ul>
+                    </div>
                 </div>
-                <div class="spacer_box preset">
-                    <h2 id="preset-name" class="preset__head"></h2>
-                    <p id="preset-description" class="preset__description"></p>
-                    <ul id="preset-features" class="preset__features"></ul>
+                <div class="threefourth_left preset">
+                    <div class="preset-spacer top">
+                        <div id="preset-image"></div>
+                        <h2 id="preset-name" class="preset__head"></h2>
+                        <div id="preset-info" data-i18n="presetApplyDescription"></div>
+                        <p id="preset-description" class="preset__description"></p>
+                    </div>
+                    <div class="preset-spacer bottom">
+                    <div id="details-head"><p data-i18n="presetApplyHead"></p></div>
+                        <ul id="preset-features" class="preset__features"></ul>
+                    </div>
                 </div>
             </div>
         </div>
-
         <div id="presetApplyContent" class="is-hidden">
             <div class="modal__content">
                 <h1 class="modal__title modal__title--warning" data-i18n="presetsApplyHeader"></h1>
@@ -41,7 +33,6 @@
                 <a id="execute-button" class="modal__button modal__button--main" data-i18n="presetsButtonSaveAndReboot"></a>
             </div>
         </div>
-
         <div class="clear-both"></div>
     </div>
     <div class="content_toolbar">
