@@ -13,7 +13,7 @@ TABS.gps.initialize = function (callback) {
         $('#content').load("./tabs/gps.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_html);
+    load_html();
     
     function set_online(){
         $('#connect').hide();
@@ -102,7 +102,7 @@ TABS.gps.initialize = function (callback) {
         }
 
         // enable data pulling
-        GUI.interval_add('gps_pull', function gps_update() {
+        helper.interval.add('gps_pull', function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
                 //return;
@@ -110,16 +110,6 @@ TABS.gps.initialize = function (callback) {
             
             get_raw_gps_data();
         }, 75, true);
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-            
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
-
 
         //check for internet connection on load
         if (navigator.onLine) {

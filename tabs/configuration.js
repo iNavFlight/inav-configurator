@@ -13,7 +13,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadMisc,
         mspHelper.loadArmingConfig,
@@ -23,8 +22,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig,
-        mspHelper.loadAccTrim
+        mspHelper.loadSensorConfig
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -632,20 +630,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             saveChainer.execute();
         });
 
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-            
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
-        GUI.interval_add('config_load_analog', function () {
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
-                $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
-            });
-        }, 250, true); // 4 fps
+        helper.interval.add('config_load_analog', function () {
+            $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+        }, 100, true); // 10 fps
         GUI.content_ready(callback);
     }
 };

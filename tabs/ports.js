@@ -96,12 +96,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
 
     function update_ui() {
 
-        if (semver.lt(CONFIG.apiVersion, "1.6.0")) {
-
-            $(".tab-ports").removeClass("supported");
-            return;
-        }
-
         $(".tab-ports").addClass("supported");
 
         var portIdentifierToNameMapping = {
@@ -220,15 +214,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         update_ui();
 
         $('a.save').click(on_save_handler);
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
 
         GUI.content_ready(callback);
     }

@@ -513,7 +513,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 console.log('Detected: ' + port + ' - triggering flash on connect');
 
                                 // Trigger regular Flashing sequence
-                                GUI.timeout_add('initialization_timeout', function () {
+                                helper.timeout.add('initialization_timeout', function () {
                                     $('a.flash_firmware').click();
                                 }, 100); // timeout so bus have time to initialize after being detected by the system
                             } else {
