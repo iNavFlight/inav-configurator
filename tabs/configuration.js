@@ -13,7 +13,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadMisc,
         mspHelper.loadArmingConfig,

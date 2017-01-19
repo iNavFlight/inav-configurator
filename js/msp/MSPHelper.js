@@ -45,6 +45,7 @@ var mspHelper = (function (gui) {
 
         if (!dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
+                //FIXME remove this frame when proven not needed
                 console.log('Using deprecated msp command: MSP_IDENT');
                 // Deprecated
                 CONFIG.version = parseFloat((data.getUint8(0) / 100).toFixed(2));
@@ -1730,6 +1731,11 @@ var mspHelper = (function (gui) {
 
     /*
      * Basic sending methods used for chaining purposes
+     */
+
+    /**
+     * @deprecated
+     * @param callback
      */
     self.loadMspIdent = function (callback) {
         MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
