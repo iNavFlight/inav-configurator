@@ -50,15 +50,15 @@ presets.presets = [
     },
     {
         name: '5" Racer',
-        description: "210-250 class racer with F3/F4 CPU on 4S battery",
+        description: "210-250 class racer with F3/F4 CPU on 4S battery<br>" +
+            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, no GPS capabilities</span>",
         features: [
-            "4S battery",
-            "2000KV - 2600KV motors",
-            "5 inch propellers",
-            "400g-650g weight",
-            "F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "No GPS capabilities"
+            "Asynchronous processing",
+            "OneShot125 at 2kHz",
+            "800dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -90,11 +90,13 @@ presets.presets = [
     },
     {
         name: '10" General Purpose',
-        description: "450-600 class general purpose multirotor <br><span>0.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
+        description: "450-600 class general purpose multirotor <br><span>10.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
-            "some text",
-            "some text",
-            "some text"
+            "Asynchronous gyro processing",
+            "400dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -126,13 +128,15 @@ presets.presets = [
     },
     {
         name: '12" General Purpose',
-        description: "550 and above general purpose multirotor",
+        description: "550 and above general purpose multirotor<br>" +
+            "<span>12 inch propellers, 1.4kg-2kg weight, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional</span>",
         features: [
-            "12 inch propellers",
-            "1.4kg-2kg weight",
-            "F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "GPS optional"
+            "Asynchronous gyro processing",
+            "180dps rates",
+            "Limited rate acceleration",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -167,14 +171,9 @@ presets.presets = [
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
-	    "PID ROLL:&nbsp;&nbsp;P-gain 20. I-Gain 30. D-Gain 15.",
-	    "PID PITCH: P-gain 20. I-Gain 30. D-Gain 15.",
-	    "PID YAW:&nbsp;&nbsp;&nbsp;&nbsp;P-gain 45. I-Gain 5.&nbsp;&nbsp; D-Gain 15.",
-	    "Roll_rate  200",
-	    "Pitch_rate 150",
-	    "Yaw_rate   90",
-	    "gyro_sync on",
-	    "gyroscopeLpf 188Hz",
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -192,16 +191,12 @@ presets.presets = [
     },
     {
         name: "600mm Flying Wing",
-        description: "Small flying wing on multirotor racer parts",
+        description: "Small flying wing on multirotor racer parts<br>" +
+            "<span>300g-500g weight, 3S-4S battery</span>",
         features: [
-            "3S-4S battery",
-            "300g-500g weight",
-            "PID ROLL:&nbsp;&nbsp;P-gain 15. I-Gain 30. D-Gain 15.",
-            "PID PITCH: P-gain 15. I-Gain 40. D-Gain 15.",
-            "Roll_rate  400",
-            "Pitch_rate 150",
-            "gyro_sync on",
-            "gyroscopeLpf 188Hz",
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
