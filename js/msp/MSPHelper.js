@@ -577,14 +577,12 @@ var mspHelper = (function (gui) {
                 offset++;
                 FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, true);
                 offset += 2;
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
-                    offset++;
-                    FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
-                    offset++;
-                }
+                FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
+                offset++;
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -1003,10 +1001,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RC_TUNING:
                 buffer.push(Math.round(RC_tuning.RC_RATE * 100));
                 buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
-                if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-                    buffer.push(Math.round(RC_tuning.roll_pitch_rate * 100));
-                    buffer.push(Math.round(RC_tuning.yaw_rate * 100));
-                } else if (FC.isRatesInDps()) {
+                if (FC.isRatesInDps()) {
                     buffer.push(Math.round(RC_tuning.roll_rate / 10));
                     buffer.push(Math.round(RC_tuning.pitch_rate / 10));
                     buffer.push(Math.round(RC_tuning.yaw_rate / 10));
@@ -1019,13 +1014,9 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_tuning.dynamic_THR_PID);
                 buffer.push(Math.round(RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
-                if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
-                    buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
-                    buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
-                }
-                if (semver.gte(CONFIG.apiVersion, "1.10.0")) {
-                    buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
-                }
+                buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
                 break;
 
             case MSPCodes.MSP_SET_RX_MAP:
@@ -1103,12 +1094,10 @@ var mspHelper = (function (gui) {
                 buffer.push(FAILSAFE_CONFIG.failsafe_off_delay);
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle));
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                    buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-                }
+                buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
@@ -1838,11 +1827,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadRcDeadband = function (callback) {
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
     };
 
     self.loadRcMap = function (callback) {

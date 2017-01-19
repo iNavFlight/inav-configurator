@@ -34,12 +34,6 @@ TABS.setup.initialize = function (callback) {
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 
-        if (semver.lt(CONFIG.apiVersion, CONFIGURATOR.backupRestoreMinApiVersionAccepted)) {
-            $('#content .backup').addClass('disabled');
-            $('#content .restore').addClass('disabled');
-
-            GUI.log(chrome.i18n.getMessage('initialSetupBackupAndRestoreApiVersion', [CONFIG.apiVersion, CONFIGURATOR.backupRestoreMinApiVersionAccepted]));
-        }
         // initialize 3D
         self.initialize3D();
 
