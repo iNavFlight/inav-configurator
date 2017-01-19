@@ -45,6 +45,7 @@ var mspHelper = (function (gui) {
 
         if (!dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
+                //FIXME remove this frame when proven not needed
                 console.log('Using deprecated msp command: MSP_IDENT');
                 // Deprecated
                 CONFIG.version = parseFloat((data.getUint8(0) / 100).toFixed(2));
@@ -53,6 +54,7 @@ var mspHelper = (function (gui) {
                 CONFIG.capability = data.getUint32(3, true);
                 break;
             case MSPCodes.MSP_STATUS:
+                console.log('Using deprecated msp command: MSP_STATUS');
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
@@ -86,6 +88,7 @@ var mspHelper = (function (gui) {
                     sensor_status(CONFIG.activeSensors);
                 }
                 gui.updateStatusBar();
+                gui.updateProfileChange();
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:
@@ -574,14 +577,12 @@ var mspHelper = (function (gui) {
                 offset++;
                 FAILSAFE_CONFIG.failsafe_throttle = data.getUint16(offset, true);
                 offset += 2;
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
-                    offset++;
-                    FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
-                    offset++;
-                }
+                FAILSAFE_CONFIG.failsafe_kill_switch = data.getUint8(offset);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_throttle_low_delay = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
+                offset++;
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -842,6 +843,11 @@ var mspHelper = (function (gui) {
                 PID_ADVANCED.rollPitchItermIgnoreRate = data.getUint16(0, true);
                 PID_ADVANCED.yawItermIgnoreRate = data.getUint16(2, true);
                 PID_ADVANCED.yawPLimit = data.getUint16(4, true);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
+                }
+
                 PID_ADVANCED.axisAccelerationLimitRollPitch = data.getUint16(13, true);
                 PID_ADVANCED.axisAccelerationLimitYaw = data.getUint16(15, true);
                 break;
@@ -995,10 +1001,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RC_TUNING:
                 buffer.push(Math.round(RC_tuning.RC_RATE * 100));
                 buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
-                if (semver.lt(CONFIG.apiVersion, "1.7.0")) {
-                    buffer.push(Math.round(RC_tuning.roll_pitch_rate * 100));
-                    buffer.push(Math.round(RC_tuning.yaw_rate * 100));
-                } else if (FC.isRatesInDps()) {
+                if (FC.isRatesInDps()) {
                     buffer.push(Math.round(RC_tuning.roll_rate / 10));
                     buffer.push(Math.round(RC_tuning.pitch_rate / 10));
                     buffer.push(Math.round(RC_tuning.yaw_rate / 10));
@@ -1011,13 +1014,9 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_tuning.dynamic_THR_PID);
                 buffer.push(Math.round(RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
-                if (semver.gte(CONFIG.apiVersion, "1.7.0")) {
-                    buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
-                    buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
-                }
-                if (semver.gte(CONFIG.apiVersion, "1.10.0")) {
-                    buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
-                }
+                buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
                 break;
 
             case MSPCodes.MSP_SET_RX_MAP:
@@ -1095,12 +1094,10 @@ var mspHelper = (function (gui) {
                 buffer.push(FAILSAFE_CONFIG.failsafe_off_delay);
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle));
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                    buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                    buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-                }
+                buffer.push(FAILSAFE_CONFIG.failsafe_kill_switch);
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
@@ -1262,7 +1259,13 @@ var mspHelper = (function (gui) {
                 buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
                 buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
                 buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
-                buffer.push(0); //BF: currentProfile->pidProfile.dtermSetpointWeight
+
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    buffer.push(PID_ADVANCED.dtermSetpointWeight);
+                } else {
+                    buffer.push(0);
+                }
+
                 buffer.push(0); // reserved
                 buffer.push(0); // reserved
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
@@ -1718,6 +1721,11 @@ var mspHelper = (function (gui) {
     /*
      * Basic sending methods used for chaining purposes
      */
+
+    /**
+     * @deprecated
+     * @param callback
+     */
     self.loadMspIdent = function (callback) {
         MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
     };
@@ -1810,12 +1818,16 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self.loadRcDeadband = function (callback) {
-        if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-            MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
+    self.loadSensorStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
         } else {
             callback();
         }
+    };
+
+    self.loadRcDeadband = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RC_DEADBAND, false, false, callback);
     };
 
     self.loadRcMap = function (callback) {
@@ -1828,6 +1840,10 @@ var mspHelper = (function (gui) {
 
     self.loadAccTrim = function (callback) {
         MSP.send_message(MSPCodes.MSP_ACC_TRIM, false, false, callback);
+    };
+
+    self.loadAnalog = function (callback) {
+        MSP.send_message(MSPCodes.MSP_ANALOG, false, false, callback);
     };
 
     self.saveToEeprom = function saveToEeprom(callback) {

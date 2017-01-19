@@ -1927,5 +1927,8 @@
     },
     "tabAdvancedTuningTitle": {
         "message": "Advanced tuning"
+    },
+    "presetApplyHead": {
+        "message": "Applies following settings:"
     }
 }

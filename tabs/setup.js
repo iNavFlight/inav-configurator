@@ -16,8 +16,6 @@ TABS.setup.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadStatus,
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadMisc
     ]);
@@ -36,12 +34,6 @@ TABS.setup.initialize = function (callback) {
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 
-        if (semver.lt(CONFIG.apiVersion, CONFIGURATOR.backupRestoreMinApiVersionAccepted)) {
-            $('#content .backup').addClass('disabled');
-            $('#content .restore').addClass('disabled');
-
-            GUI.log(chrome.i18n.getMessage('initialSetupBackupAndRestoreApiVersion', [CONFIG.apiVersion, CONFIGURATOR.backupRestoreMinApiVersionAccepted]));
-        }
         // initialize 3D
         self.initialize3D();
 
@@ -70,15 +62,16 @@ TABS.setup.initialize = function (callback) {
 
                 // During this period MCU won't be able to process any serial commands because its locked in a for/while loop
                 // until this operation finishes, sending more commands through data_poll() will result in serial buffer overflow
-                GUI.interval_pause('setup_data_pull');
+                helper.interval.pause('setup_data_pull');
+
                 MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
                     $('#accel_calib_running').show();
                     $('#accel_calib_rest').hide();
                 });
 
-                GUI.timeout_add('button_reset', function () {
-                    GUI.interval_resume('setup_data_pull');
+                helper.timeout.add('button_reset', function () {
+                    helper.interval.resume('setup_data_pull');
 
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
 
@@ -101,7 +94,7 @@ TABS.setup.initialize = function (callback) {
                     $('#mag_calib_rest').hide();
                 });
 
-                GUI.timeout_add('button_reset', function () {
+                helper.timeout.add('button_reset', function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
                     self.removeClass('calibrating');
                     $('#mag_calib_running').hide();
@@ -131,29 +124,6 @@ TABS.setup.initialize = function (callback) {
             console.log('YAW reset to 0 deg, fix: ' + self.yaw_fix + ' deg');
         });
 
-        $('#content .backup').click(function () {
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            configuration_backup(function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupBackupSuccess'));
-                googleAnalytics.sendEvent('Configuration', 'Backup', 'true');
-            });
-        });
-
-        $('#content .restore').click(function () {
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            configuration_restore(function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupRestoreSuccess'));
-                googleAnalytics.sendEvent('Configuration', 'Restore', 'true');
-
-                // get latest settings
-                TABS.setup.initialize();
-            });
-        });
-
         // cached elements
         var bat_voltage_e = $('.bat-voltage'),
             bat_mah_drawn_e = $('.bat-mah-drawn'),
@@ -168,19 +138,6 @@ TABS.setup.initialize = function (callback) {
             heading_e = $('dd.heading');
 
         function get_slow_data() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false, function () {
-                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
-                bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
-                bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
-                rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
-            });
-
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
@@ -206,8 +163,14 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        GUI.interval_add('setup_data_pull_fast', get_fast_data, 33, true); // 30 fps
-        GUI.interval_add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+        helper.interval.add('setup_data_pull_fast', get_fast_data, 40, true); // 25 fps
+        helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+        helper.interval.add('gui_analog_update', function () {
+                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
+                bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
+                bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
+                rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
+        }, 100, true);
 
         function updateArminFailure() {
             var flagNames = FC.getArmingFlags();
@@ -226,7 +189,7 @@ TABS.setup.initialize = function (callback) {
         /*
          * 1fps update rate will be fully enough
          */
-        GUI.interval_add('updateArminFailure', updateArminFailure, 500, true);
+        helper.interval.add('updateArminFailure', updateArminFailure, 500, true);
 
         GUI.content_ready(callback);
     }
@@ -281,7 +244,7 @@ TABS.setup.initialize3D = function () {
 //
     // load the model including materials
     if (useWebGlRenderer) {
-        model_file = mixerList[CONFIG.multiType - 1].model;
+        model_file = mixerList[BF_CONFIG.mixerConfiguration - 1].model;
     } else {
         model_file = 'fallback'
     }

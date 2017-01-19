@@ -40,24 +40,25 @@ presets.defaultValues = {
 presets.presets = [
     {
         name: 'Default Preset',
-        description: "INAV default Quad X configuration",
-        features: [],
+        description: "INAV Quad X configuration",
+        features: ["Default INAV Settings"],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3)
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '5" Racer',
-        description: "210-250 class racer with F3/F4 CPU on 4S battery",
+        description: "210-250 class racer with F3/F4 CPU on 4S battery<br>" +
+            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, no GPS capabilities</span>",
         features: [
-            "4S battery",
-            "2000KV - 2600KV motors",
-            "5 inch propellers",
-            "400g-650g weight",
-            "F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "No GPS capabilities"
+            "Asynchronous processing",
+            "OneShot125 at 2kHz",
+            "800dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -84,17 +85,18 @@ presets.presets = [
             presets.elementHelper("PIDs", 0, [43, 40, 20]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [58, 50, 22]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '10" General Purpose',
-        description: "450-600 class general purpose multirotor",
+        description: "450-600 class general purpose multirotor <br><span>10.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
-            "10 inch propellers",
-            "0.kg - 1.4kg weight",
-            "F1, F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "GPS optional"
+            "Asynchronous gyro processing",
+            "400dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -121,17 +123,20 @@ presets.presets = [
             presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: '12" General Purpose',
-        description: "550 and above general purpose multirotor",
+        description: "550 and above general purpose multirotor<br>" +
+            "<span>12 inch propellers, 1.4kg-2kg weight, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional</span>",
         features: [
-            "12 inch propellers",
-            "1.4kg-2kg weight",
-            "F3 or F4 CPU",
-            "MPU6000 or MPU6050 gyro",
-            "GPS optional"
+            "Asynchronous gyro processing",
+            "180dps rates",
+            "Limited rate acceleration",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -159,12 +164,16 @@ presets.presets = [
             presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
             presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
-        ]
+        ],
+        type: 'multirotor'
     },
     {
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -177,14 +186,17 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "yaw_rate", 90),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ]
+        ],
+        type: 'airplane'
     },
     {
         name: "600mm Flying Wing",
-        description: "Small flying wing on multirotor racer parts",
+        description: "Small flying wing on multirotor racer parts<br>" +
+            "<span>300g-500g weight, 3S-4S battery</span>",
         features: [
-            "3S-4S battery",
-            "300g-500g weight"
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
@@ -195,7 +207,8 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 150),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ]
+        ],
+        type: 'flyingwing'
     }
 ];
 
@@ -256,7 +269,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     }
 
     loadChainer.setChain([
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadLoopTime,
         mspHelper.loadINAVPidConfig,
@@ -322,14 +334,19 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var $features = $('#preset-features');
 
+        $('#preset-image').html('<div class="' + preset.type + '"></div>');
         $('#preset-name').html(preset.name);
         $('#preset-description').html(preset.description);
+        document.getElementById('preset-info').style.display = "none";
+        document.getElementById('details-head').style.display = "block";
+
 
         $features.find('*').remove();
 
         for (var i in preset.features) {
             if (preset.features.hasOwnProperty(i)) {
                 $features.append('<li class="preset__feature"><span class="preset__feature-text">' + preset.features[i] + "</span></li>");
+
             }
         }
 
@@ -339,12 +356,20 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var $presetList = $('#presets-list');
 
-        GUI.fillSelect($presetList, presets.model.extractPresetNames(presets.presets));
+        var presetsList = presets.model.extractPresetNames(presets.presets);
 
-        $presetList.change(function () {
-            currentPresetId = $presetList.val();
+        for(var preset in presetsList) {
+            $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+        }
+    
+        $('.preset__element-link').click(function () {
+            currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
             fillPresetDescription(currentPreset);
+
+            $presetList.find('li').removeClass('active');
+            $(this).parent().addClass('active');
+
             $('#save-button').removeClass('disabled');
         });
 
@@ -368,13 +393,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             content: $('#presetApplyContent')
         });
 
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
         GUI.content_ready(callback);
     }
 };

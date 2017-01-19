@@ -41,11 +41,7 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
-		    $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
-
-		    if (semver.lt(CONFIG.apiVersion, "1.10.0")) {
-            $('.tunings .yaw_rate input[name="yaw_expo"]').hide();
-        }
+        $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
 
         chrome.storage.local.get('rx_refresh_rate', function (result) {
             if (result.rx_refresh_rate) {
@@ -55,12 +51,8 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
-        if (semver.lt(CONFIG.apiVersion, "1.15.0")) {
-            $('.deadband').hide();
-        } else {
-            $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
-            $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
-        }
+        $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
+        $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
 
         // generate bars
         var bar_names = [
@@ -295,10 +287,8 @@ TABS.receiver.initialize = function (callback) {
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
-            if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-               RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
-               RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
-            }
+           RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
+           RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
             var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
@@ -320,12 +310,7 @@ TABS.receiver.initialize = function (callback) {
             }
 
             function save_rc_configs() {
-                var next_callback = save_to_eeprom;
-                if (semver.gte(CONFIG.apiVersion, "1.15.0")) {
-                   MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, next_callback);
-                } else {
-                   next_callback();
-                }
+               MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, save_to_eeprom);
             }
 
             function save_to_eeprom() {
@@ -464,20 +449,11 @@ TABS.receiver.initialize = function (callback) {
             }
 
             // timer initialization
-            GUI.interval_remove('receiver_pull');
+            helper.interval.remove('receiver_pull');
 
             // enable RC data pulling
-            GUI.interval_add('receiver_pull', get_rc_data, plot_update_rate, true);
+            helper.interval.add('receiver_pull', get_rc_data, plot_update_rate, true);
         });
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
 
         GUI.content_ready(callback);
     }
