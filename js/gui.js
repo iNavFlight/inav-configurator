@@ -220,5 +220,23 @@ GUI_control.prototype.fillSelect = function ($element, values, currentValue, uni
     }
 };
 
+GUI_control.prototype.simpleBind = function () {
+    $('input[data-simple-bind]').not('[data-simple-binded="true"]').each(function () {
+        var $this = $(this),
+            toBind = $this.data('simple-bind').split(".");
+
+        if (toBind.length !== 2 || window[toBind[0]][toBind[1]] === undefined) {
+            return;
+        }
+
+        $this.change(function () {
+            window[toBind[0]][toBind[1]] = $(this).val();
+        });
+
+        $this.val(window[toBind[0]][toBind[1]]);
+        $this.attr('data-simple-binded', true);
+    });
+};
+
 // initialize object into GUI variable
 var GUI = new GUI_control();
