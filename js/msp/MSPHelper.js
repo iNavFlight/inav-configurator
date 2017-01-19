@@ -1731,6 +1731,11 @@ var mspHelper = (function (gui) {
     /*
      * Basic sending methods used for chaining purposes
      */
+
+    /**
+     * @deprecated
+     * @param callback
+     */
     self.loadMspIdent = function (callback) {
         MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
     };

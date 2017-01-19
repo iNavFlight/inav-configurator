@@ -61,7 +61,7 @@ var MSPCodes = {
     MSP_SET_SENSOR_CONFIG:      97,
 
     // Multiwii MSP commands
-    MSP_IDENT:              100,
+    MSP_IDENT:              100, //deprecated, do not use
     MSP_STATUS:             101,
     MSP_RAW_IMU:            102,
     MSP_SERVO:              103,

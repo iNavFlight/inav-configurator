@@ -256,7 +256,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     }
 
     loadChainer.setChain([
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadLoopTime,
         mspHelper.loadINAVPidConfig,

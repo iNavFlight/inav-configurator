@@ -16,7 +16,6 @@ TABS.setup.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadMspIdent,
         mspHelper.loadBfConfig,
         mspHelper.loadMisc
     ]);
@@ -274,7 +273,7 @@ TABS.setup.initialize3D = function () {
 //
     // load the model including materials
     if (useWebGlRenderer) {
-        model_file = mixerList[CONFIG.multiType - 1].model;
+        model_file = mixerList[BF_CONFIG.mixerConfiguration - 1].model;
     } else {
         model_file = 'fallback'
     }

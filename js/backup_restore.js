@@ -803,7 +803,7 @@ function configuration_restore(callback) {
                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
 
                 helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                    MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
+                    MSP.send_message(MSPCodes.MSP_STATUS, false, false, function () {
                         GUI.log(chrome.i18n.getMessage('deviceReady'));
 
                         if (callback) callback();

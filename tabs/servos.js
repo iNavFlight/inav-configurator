@@ -39,11 +39,11 @@ TABS.servos.initialize = function (callback) {
         $('#content').load("./tabs/servos.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_IDENT, false, false, get_servo_configurations);
+    get_servo_configurations();
 
     function update_ui() {
 
-        if (semver.lt(CONFIG.apiVersion, "1.12.0") || SERVO_CONFIG.length == 0) {
+        if (SERVO_CONFIG.length == 0) {
 
             $(".tab-servos").removeClass("supported");
             return;
