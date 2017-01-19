@@ -35,7 +35,7 @@ $(document).ready(function () {
             }, 5000);
         } else {
 
-            GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
+            helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
                 MSP.send_message(MSPCodes.MSP_IDENT, false, false, function () {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('deviceReady'));
@@ -98,14 +98,14 @@ $(document).ready(function () {
 
                     serial.connect(selected_port, {bitrate: selected_baud}, onOpen);
                 } else {
-                    GUI.timeout_kill_all();
-                    GUI.interval_kill_all();
+                    var wasConnected = CONFIGURATOR.connectionValid;
+
+                    helper.timeout.killAll(['global_data_refresh']);
+                    helper.interval.killAll(['global_data_refresh']);
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
 
                     serial.disconnect(onClosed);
-
-                    var wasConnected = CONFIGURATOR.connectionValid;
 
                     GUI.connected_to = false;
                     CONFIGURATOR.connectionValid = false;
@@ -213,7 +213,7 @@ function onOpen(openInfo) {
         serial.onReceive.addListener(read_serial);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
-        GUI.timeout_add('connecting', function () {
+        helper.timeout.add('connecting', function () {
             if (!CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
@@ -306,17 +306,11 @@ function onOpen(openInfo) {
 }
 
 function onConnect() {
-    GUI.timeout_remove('connecting'); // kill connecting timer
+    helper.timeout.remove('connecting'); // kill connecting timer
     $('div#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
     $('div#connectbutton a.connect').addClass('active');
     $('#tabs ul.mode-disconnected').hide();
     $('#tabs ul.mode-connected').show();
-
-    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-    } else {
-        MSP.send_message(MSPCodes.MSP_STATUS, false, false);
-    }
 
     MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false);
 
@@ -324,7 +318,12 @@ function onConnect() {
     $('#portsinput').hide();
     $('#dataflash_wrapper_global').show();
 
-    startLiveDataRefreshTimer();
+    /*
+     * Get BOXNAMES since it is used for some reason....
+     */
+    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
+
+    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
 }
 
 function onClosed(result) {
@@ -458,116 +457,32 @@ function lowByte(num) {
 }
 
 function update_dataflash_global() {
-        var supportsDataflash = DATAFLASH.totalSize > 0;
-        if (supportsDataflash){
+    var supportsDataflash = DATAFLASH.totalSize > 0;
+    if (supportsDataflash) {
 
-             $(".noflash_global").css({
-                 display: 'none'
-             });
+        $(".noflash_global").css({
+            display: 'none'
+        });
 
-             $(".dataflash-contents_global").css({
-                 display: 'block'
-             });
+        $(".dataflash-contents_global").css({
+            display: 'block'
+        });
 
-             $(".dataflash-free_global").css({
-                 width: (100-(DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
-                 display: 'block'
-             });
-             $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(DATAFLASH.totalSize - DATAFLASH.usedSize));
-        } else {
-             $(".noflash_global").css({
-                 display: 'block'
-             });
+        $(".dataflash-free_global").css({
+            width: (100 - (DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
+            display: 'block'
+        });
+        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(DATAFLASH.totalSize - DATAFLASH.usedSize));
+    } else {
+        $(".noflash_global").css({
+            display: 'block'
+        });
 
-             $(".dataflash-contents_global").css({
-                 display: 'none'
-             });
-        }
-
+        $(".dataflash-contents_global").css({
+            display: 'none'
+        });
     }
 
-function startLiveDataRefreshTimer() {
-    // live data refresh
-    GUI.timeout_add('data_refresh', function () { update_live_status(); }, 100);
-}
-
-function update_live_status() {
-
-    var statuswrapper = $('#quad-status_wrapper');
-
-    $(".quad-status-contents").css({
-       display: 'inline-block'
-    });
-
-    if (GUI.active_tab != 'cli') {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
-        if (semver.gte(CONFIG.flightControllerVersion, "1.2.0"))
-        	MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
-        else
-        	MSP.send_message(MSPCodes.MSP_STATUS, false, false);
-        MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
-    }
-
-    var active = ((Date.now() - MSP.analog_last_received_timestamp) < 300);
-
-    for (var i = 0; i < AUX_CONFIG.length; i++) {
-       if (AUX_CONFIG[i] == 'ARM') {
-               if (bit_check(CONFIG.mode, i))
-                       $(".armedicon").css({
-                               'background-image': 'url(images/icons/cf_icon_armed_active.svg)'
-                           });
-               else
-                       $(".armedicon").css({
-                               'background-image': 'url(images/icons/cf_icon_armed_grey.svg)'
-                           });
-       }
-       if (AUX_CONFIG[i] == 'FAILSAFE') {
-               if (bit_check(CONFIG.mode, i))
-                       $(".failsafeicon").css({
-                               'background-image': 'url(images/icons/cf_icon_failsafe_active.svg)'
-                           });
-               else
-                       $(".failsafeicon").css({
-                               'background-image': 'url(images/icons/cf_icon_failsafe_grey.svg)'
-                           });
-       }
-    }
-    if (ANALOG != undefined) {
-    var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
-    if (ANALOG.voltage == 0)
-           nbCells = 1;
-
-       var min = MISC.vbatmincellvoltage * nbCells;
-       var max = MISC.vbatmaxcellvoltage * nbCells;
-       var warn = MISC.vbatwarningcellvoltage * nbCells;
-
-       $(".battery-status").css({
-          width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
-          display: 'inline-block'
-       });
-
-       if (active) {
-           $(".linkicon").css({
-               'background-image': 'url(images/icons/cf_icon_link_active.svg)'
-           });
-       } else {
-           $(".linkicon").css({
-               'background-image': 'url(images/icons/cf_icon_link_grey.svg)'
-           });
-       }
-
-       if (ANALOG.voltage < warn) {
-           $(".battery-status").css('background-color', '#D42133');
-       } else  {
-           $(".battery-status").css('background-color', '#59AA29');
-       }
-
-       $(".battery-legend").text(ANALOG.voltage + " V");
-    }
-
-    statuswrapper.show();
-    GUI.timeout_remove('data_refresh');
-    startLiveDataRefreshTimer();
 }
 
 function specificByte(num, pos) {

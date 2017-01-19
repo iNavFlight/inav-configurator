@@ -114,6 +114,11 @@ var MSP = {
             bufView,
             i;
 
+        /*
+         * For debug reasons, check how ofter MSP frames are executed
+         */
+        helper.eventFrequencyAnalyzer.put(code);
+
         // always reserve 6 bytes for protocol overhead !
         if (data) {
             var size = data.length + 6,
@@ -172,7 +177,7 @@ var MSP = {
                 console.log('MSP data request timed-out: ' + code);
 
                 serial.send(bufferOut, false);
-            }, 1000); // we should be able to define timeout in the future
+            }, serial.getTimeout()); // we should be able to define timeout in the future
         }
 
         MSP.callbacks.push(obj);

@@ -368,13 +368,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             content: $('#presetApplyContent')
         });
 
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
         GUI.content_ready(callback);
     }
 };

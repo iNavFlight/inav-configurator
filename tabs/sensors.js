@@ -356,29 +356,29 @@ TABS.sensors.initialize = function (callback) {
             });
 
             // timer initialization
-            GUI.interval_kill_all(['status_pull']);
+            helper.interval.killAll(['status_pull', 'global_data_refresh']);
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
-                GUI.interval_add('IMU_pull', function imu_data_pull() {
+                helper.interval.add('IMU_pull', function imu_data_pull() {
                     MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_imu_graphs);
                 }, fastest, true);
             }
 
             if (checkboxes[3]) {
-                GUI.interval_add('altitude_pull', function altitude_data_pull() {
+                helper.interval.add('altitude_pull', function altitude_data_pull() {
                     MSP.send_message(MSPCodes.MSP_ALTITUDE, false, false, update_altitude_graph);
                 }, rates.baro, true);
             }
 
             if (checkboxes[4]) {
-                GUI.interval_add('sonar_pull', function sonar_data_pull() {
+                helper.interval.add('sonar_pull', function sonar_data_pull() {
                     MSP.send_message(MSPCodes.MSP_SONAR, false, false, update_sonar_graphs);
                 }, rates.sonar, true);
             }
 
             if (checkboxes[5]) {
-                GUI.interval_add('debug_pull', function debug_data_pull() {
+                helper.interval.add('debug_pull', function debug_data_pull() {
                     MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
                 }, rates.debug, true);
             }
@@ -442,15 +442,6 @@ TABS.sensors.initialize = function (callback) {
                 samples_debug_i++;
             }
         });
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
 
         GUI.content_ready(callback);
     });

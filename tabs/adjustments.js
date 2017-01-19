@@ -269,16 +269,7 @@ TABS.adjustments.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        GUI.interval_add('aux_data_pull', get_rc_data, 50);
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function () {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-            
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
+        helper.interval.add('aux_data_pull', get_rc_data, 50);
 
         GUI.content_ready(callback);
     }
