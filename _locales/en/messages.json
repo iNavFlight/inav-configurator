@@ -1921,5 +1921,41 @@
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
+    },
+    "gyroNotchHz1": {
+        "message": "First gyro notch filter freq."
+    },
+    "gyroNotchCutoff1": {
+        "message": "First gyro notch filter cutoff freq."
+    },
+    "gyroNotchHz2": {
+        "message": "Second gyro notch filter freq."
+    },
+    "gyroNotchCutoff2": {
+        "message": "Second gyro notch filter cutoff freq."
+    },
+    "gyroNotchHz1Help": {
+        "message": "Should be tuned to propeller harmonic frequency. Usually equals <i>[motor_frequency] * [propeller_blades_number]</i><br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+    },
+    "gyroNotchHz2Help": {
+        "message": "Should be tuned to motor frequency.<br><br>Has to be above cutoff frequency and below first gyro notch filter frequency.<br><br><i>0</i> disables the filter"
+    },
+    "gyroNotchCutoff1Help": {
+        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "gyroNotchCutoff2Help": {
+        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "dtermNotchHz": {
+        "message": "Dterm notch filter freq."
+    },
+    "dtermNotchCutoff": {
+        "message": "Dterm notch filter cutoff freq."
+    },
+    "dtermNotchHzHelp": {
+        "message": "Should be placed between first and second gyro notch filter frequency<br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+    },
+    "dtermNotchCutoffHelp": {
+        "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
     }
 }

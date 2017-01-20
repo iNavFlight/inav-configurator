@@ -231,6 +231,15 @@ TABS.pid_tuning.initialize = function (callback) {
         } else {
             $('.requires-v1_4').hide();
         }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            $('.requires-v1_6').show();
+        } else {
+            $('.requires-v1_6').hide();
+        }
+
+        GUI.simpleBind();
+
         // UI Hooks
 
         $('a.refresh').click(function () {

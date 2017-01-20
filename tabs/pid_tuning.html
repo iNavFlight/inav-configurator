@@ -219,6 +219,35 @@
                         </td>
                     </tr>
 
+                    <tr class="requires-v1_6">
+                        <th data-i18n="gyroNotchHz1"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchHz1" id="gyroNotchHz1" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="gyroNotchHz1Help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v1_6">
+                        <th data-i18n="gyroNotchCutoff1"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchCutoff1" id="gyroNotchCutoff1" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="gyroNotchCutoff1Help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v1_6">
+                        <th data-i18n="gyroNotchHz2"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchHz2" id="gyroNotchHz2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="gyroNotchHz2Help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v1_6">
+                        <th data-i18n="gyroNotchCutoff2"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchCutoff2" id="gyroNotchCutoff2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="gyroNotchCutoff2Help"></div>
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>
@@ -237,6 +266,20 @@
                         <td>
                             <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
                             <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v1_6">
+                        <th data-i18n="dtermNotchHz"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.dtermNotchHz" id="dtermNotchHz" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="dtermNotchHzHelp"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v1_6">
+                        <th data-i18n="dtermNotchCutoff"></th>
+                        <td>
+                            <input type="number" data-simple-bind="FILTER_CONFIG.dtermNotchCutoff" id="dtermNotchCutoff" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="dtermNotchCutoffHelp"></div>
                         </td>
                     </tr>
                 </tbody>
