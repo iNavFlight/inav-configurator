@@ -109,6 +109,10 @@ var MSP = {
         this.last_received_timestamp = Date.now();
     },
 
+    putCallback: function (mspData) {
+        MSP.callbacks.push(mspData);
+    },
+
     send_message: function (code, data, callback_sent, callback_msp) {
         var bufferOut,
             bufView,
@@ -157,39 +161,47 @@ var MSP = {
         // dev version 0.57 code below got recently changed due to the fact that queueing same MSP codes was unsupported
         // and was causing trouble while backup/restoring configurations
         // watch out if the recent change create any inconsistencies and then adjust accordingly
-        var obj = {'code': code, 'requestBuffer': bufferOut, 'callback': (callback_msp) ? callback_msp : false, 'timer': false};
+        var obj = {
+            'code': code,
+            'requestBuffer': bufferOut,
+            'callback': (callback_msp) ? callback_msp : false,
+            'onSend': callback_sent,
+            'timer': false
+        };
 
-        var requestExists = false;
-        for (i = 0; i < MSP.callbacks.length; i++) {
-            if (i < MSP.callbacks.length) {
-                if (MSP.callbacks[i].code == code) {
-                    // request already exist, we will just attach
-                    requestExists = true;
-                    break;
-                }
-            } else {
-                console.log("Callback index error: "+ i);
-            }
-        }
+        helper.mspQueue.put(obj);
 
-        if (!requestExists) {
-            obj.timer = setInterval(function () {
-                console.log('MSP data request timed-out: ' + code);
+        // var requestExists = false;
+        // for (i = 0; i < MSP.callbacks.length; i++) {
+        //     if (i < MSP.callbacks.length) {
+        //         if (MSP.callbacks[i].code == code) {
+        //             // request already exist, we will just attach
+        //             requestExists = true;
+        //             break;
+        //         }
+        //     } else {
+        //         console.log("Callback index error: "+ i);
+        //     }
+        // }
 
-                serial.send(bufferOut, false);
-            }, serial.getTimeout()); // we should be able to define timeout in the future
-        }
+        // if (!requestExists) {
+        //     obj.timer = setInterval(function () {
+        //         console.log('MSP data request timed-out: ' + code);
+        //
+        //         serial.send(bufferOut, false);
+        //     }, serial.getTimeout()); // we should be able to define timeout in the future
+        // }
 
-        MSP.callbacks.push(obj);
+        // MSP.callbacks.push(obj);
 
         // always send messages with data payload (even when there is a message already in the queue)
-        if (data || !requestExists) {
-            serial.send(bufferOut, function (sendInfo) {
-                if (sendInfo.bytesSent == bufferOut.byteLength) {
-                    if (callback_sent) callback_sent();
-                }
-            });
-        }
+        // if (data || !requestExists) {
+        //     serial.send(bufferOut, function (sendInfo) {
+        //         if (sendInfo.bytesSent == bufferOut.byteLength) {
+        //             if (callback_sent) callback_sent();
+        //         }
+        //     });
+        // }
         return true;
     },
     promise: function(code, data) {
