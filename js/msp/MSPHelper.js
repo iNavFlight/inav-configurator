@@ -957,7 +957,7 @@ var mspHelper = (function (gui) {
                     var callback = dataHandler.callbacks[i].callback;
 
                     // remove timeout
-                    clearInterval(dataHandler.callbacks[i].timer);
+                    clearTimeout(dataHandler.callbacks[i].timer);
 
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);

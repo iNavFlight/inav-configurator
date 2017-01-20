@@ -40,7 +40,18 @@ helper.mspQueue = (function (serial, MSP) {
              */
             privateScope.portInUse = true;
 
-            //TODO implement timeout scenario
+            request.timer = setTimeout(function () {
+                console.log('MSP data request timed-out: ' + request.code);
+                /*
+                 * Remove current callback
+                 */
+                MSP.removeCallback(request.code);
+
+                /*
+                 * Create new entry in the queue
+                 */
+                publicScope.put(request);
+            }, serial.getTimeout());
 
             /*
              * Set receive callback here

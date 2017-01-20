@@ -92,6 +92,7 @@ var MSP = {
                         mspHelper.processData(this);
                     } else {
                         console.log('code: ' + this.code + ' - crc failed');
+                        console.log(data);
 
                         this.packet_error++;
                         $('span.packet-error').html(this.packet_error);
@@ -109,8 +110,25 @@ var MSP = {
         this.last_received_timestamp = Date.now();
     },
 
+    /**
+     *
+     * @param {MSP} mspData
+     */
     putCallback: function (mspData) {
         MSP.callbacks.push(mspData);
+    },
+
+    /**
+     * @param {number} code
+     */
+    removeCallback: function (code) {
+
+        for (var i in this.callbacks) {
+            if (this.callbacks.hasOwnProperty(i) && this.callbacks[i].code == code) {
+                clearTimeout(this.callbacks[i].timer);
+                this.callbacks.splice(i, 1);
+            }
+        }
     },
 
     send_message: function (code, data, callback_sent, callback_msp) {
