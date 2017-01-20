@@ -27,7 +27,7 @@ helper.mspQueue = (function (serial, MSP) {
         /*
          * if port is blocked or there is no connection, do not process the queue
          */
-        if (privateScope.portInUse || !CONFIGURATOR.connectionValid) {
+        if (privateScope.portInUse || serial.connectionId === false) {
             return false;
         }
 
