@@ -104,12 +104,16 @@ $(document).ready(function () {
                     helper.interval.killAll(['global_data_refresh']);
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
+                    CONFIGURATOR.connectionValid = false;
+                    GUI.connected_to = false;
+                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
+
+                    /*
+                     * Flush
+                     */
+                    helper.mspQueue.flush();
 
                     serial.disconnect(onClosed);
-
-                    GUI.connected_to = false;
-                    CONFIGURATOR.connectionValid = false;
-                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
                     MSP.disconnect_cleanup();
                     PortUsage.reset();
 

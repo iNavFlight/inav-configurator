@@ -24,7 +24,10 @@ helper.mspQueue = (function (serial, MSP) {
      */
     publicScope.executor = function () {
 
-        if (privateScope.portInUse) {
+        /*
+         * if port is blocked or there is no connection, do not process the queue
+         */
+        if (privateScope.portInUse || !CONFIGURATOR.connectionValid) {
             return false;
         }
 
@@ -37,12 +40,12 @@ helper.mspQueue = (function (serial, MSP) {
              */
             privateScope.portInUse = true;
 
+            //TODO implement timeout scenario
+
             /*
              * Set receive callback here
              */
             MSP.putCallback(request);
-
-            //TODO implement timeout scenario
 
             /*
              * Send data to serial port
@@ -63,6 +66,10 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.get = function () {
         return privateScope.queue.shift();
+    };
+
+    publicScope.flush = function () {
+        privateScope.queue = [];
     };
 
     publicScope.freeSerialPort = function () {
