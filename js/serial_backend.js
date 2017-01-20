@@ -100,8 +100,8 @@ $(document).ready(function () {
                 } else {
                     var wasConnected = CONFIGURATOR.connectionValid;
 
-                    helper.timeout.killAll(['global_data_refresh']);
-                    helper.interval.killAll(['global_data_refresh']);
+                    helper.timeout.killAll();
+                    helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
                     CONFIGURATOR.connectionValid = false;
@@ -326,6 +326,10 @@ function onConnect() {
      * Get BOXNAMES since it is used for some reason....
      */
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
+
+    helper.interval.add('msp-load-update', function () {
+        $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(2));
+    }, 100);
 
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
 }

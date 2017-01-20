@@ -2,10 +2,39 @@
 
 var helper = helper || {};
 
+//FIXME extract it to separate file
+var walkingAverageClass = function (maxLength) {
+
+    var table = [],
+        self = {};
+
+    /**
+     *
+     * @param {number} data
+     */
+    self.put = function (data) {
+        table.push(data);
+        if (table.length > maxLength) {
+            table.shift();
+        }
+    };
+
+    self.getAverage = function () {
+        var sum = table.reduce(function(a, b) { return a + b; });
+        return sum / table.length;
+    };
+
+    return self;
+};
+
 helper.mspQueue = (function (serial, MSP) {
 
     var publicScope = {},
         privateScope = {};
+
+    privateScope.handlerFrequency = 200;
+
+    privateScope.loadAverage = new walkingAverageClass(privateScope.handlerFrequency);
 
     privateScope.queue = [];
 
@@ -23,6 +52,8 @@ helper.mspQueue = (function (serial, MSP) {
      * MSP class no longer implements blocking, it is queue responsibility
      */
     publicScope.executor = function () {
+
+        privateScope.loadAverage.put(privateScope.queue.length);
 
         /*
          * if port is blocked or there is no connection, do not process the queue
@@ -95,7 +126,15 @@ helper.mspQueue = (function (serial, MSP) {
         return privateScope.queue.length;
     };
 
-    setInterval(publicScope.executor, 20);
+    /**
+     * 1s MSP load computed as number of messages in a queue in given period
+     * @returns {string}
+     */
+    publicScope.getLoad = function () {
+        return privateScope.loadAverage.getAverage();
+    };
+
+    setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));
 
     return publicScope;
 })(serial, MSP);
