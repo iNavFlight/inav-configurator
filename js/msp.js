@@ -184,7 +184,8 @@ var MSP = {
             'requestBuffer': bufferOut,
             'callback': (callback_msp) ? callback_msp : false,
             'onSend': callback_sent,
-            'timer': false
+            'timer': false,
+            'created': new Date().getTime()
         };
 
         helper.mspQueue.put(obj);

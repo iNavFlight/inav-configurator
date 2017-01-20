@@ -962,6 +962,13 @@ var mspHelper = (function (gui) {
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);
 
+                    /*
+                     * Compute roundtrip
+                     */
+                    if (dataHandler.callbacks[i]) {
+                        helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].created);
+                    }
+
                     // fire callback
                     if (callback) callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
                 }

@@ -329,6 +329,7 @@ function onConnect() {
 
     helper.interval.add('msp-load-update', function () {
         $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(2));
+        $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
     }, 100);
 
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);

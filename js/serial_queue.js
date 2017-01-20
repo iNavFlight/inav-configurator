@@ -20,8 +20,14 @@ var walkingAverageClass = function (maxLength) {
     };
 
     self.getAverage = function () {
-        var sum = table.reduce(function(a, b) { return a + b; });
-        return sum / table.length;
+        if (table.length > 0) {
+            var sum = table.reduce(function (a, b) {
+                return a + b;
+            });
+            return sum / table.length;
+        } else {
+            return 0;
+        }
     };
 
     return self;
@@ -35,6 +41,7 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.handlerFrequency = 200;
 
     privateScope.loadAverage = new walkingAverageClass(privateScope.handlerFrequency);
+    privateScope.roundtripAverage = new walkingAverageClass(50);
 
     privateScope.queue = [];
 
@@ -132,6 +139,18 @@ helper.mspQueue = (function (serial, MSP) {
      */
     publicScope.getLoad = function () {
         return privateScope.loadAverage.getAverage();
+    };
+
+    publicScope.getRoundtrip = function () {
+        return privateScope.roundtripAverage.getAverage();
+    };
+
+    /**
+     *
+     * @param {number} number
+     */
+    publicScope.putRoundtrip = function (number) {
+        privateScope.roundtripAverage.put(number);
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

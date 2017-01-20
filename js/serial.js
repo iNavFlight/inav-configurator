@@ -302,7 +302,7 @@ var serial = {
         if (serial.bitrate >= 57600) {
             return 1000;
         } else {
-            return 2000;
+            return 1500;
         }
     }
 
