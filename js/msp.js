@@ -156,11 +156,6 @@ var MSP = {
             bufView,
             i;
 
-        /*
-         * For debug reasons, check how ofter MSP frames are executed
-         */
-        helper.eventFrequencyAnalyzer.put(code);
-
         // always reserve 6 bytes for protocol overhead !
         if (data) {
             var size = data.length + 6,

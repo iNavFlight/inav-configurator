@@ -56,12 +56,18 @@ helper.mspQueue = (function (serial, MSP) {
      */
     publicScope.executor = function () {
 
+        /*
+         * Debug
+         */
+        helper.eventFrequencyAnalyzer.put("execute");
+
         privateScope.loadFilter.apply(privateScope.queue.length);
 
         /*
          * if port is blocked or there is no connection, do not process the queue
          */
         if (privateScope.portInUse || serial.connectionId === false) {
+            helper.eventFrequencyAnalyzer.put("port in use");
             return false;
         }
 
@@ -82,9 +88,17 @@ helper.mspQueue = (function (serial, MSP) {
                 MSP.removeCallback(request.code);
 
                 /*
-                 * Create new entry in the queue
+                 * To prevent infinite retry situation, allow retry only while counter is positive
                  */
-                publicScope.put(request);
+                if (request.retryCounter > 0) {
+                    request.retryCounter--;
+
+                    /*
+                     * Create new entry in the queue
+                     */
+                    publicScope.put(request);
+                }
+
             }, serial.getTimeout());
 
             if (request.sentOn === null) {
