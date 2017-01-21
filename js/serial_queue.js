@@ -2,65 +2,6 @@
 
 var helper = helper || {};
 
-var SimpleSmoothFilterClass = function (initialValue, smoothingFactor) {
-
-    var publicScope = {};
-
-    publicScope.value = initialValue;
-    publicScope.smoothFactor = smoothingFactor;
-
-    if (publicScope.smoothFactor >= 1) {
-        publicScope.smoothFactor = 0.99;
-    }
-
-    if (publicScope.smoothFactor <= 0) {
-        publicScope.smoothFactor = 0;
-    }
-
-    publicScope.apply = function (newValue) {
-        publicScope.value = (newValue * (1 - publicScope.smoothFactor)) + (publicScope.value  *  publicScope.smoothFactor);
-
-        return publicScope;
-    };
-
-    publicScope.get = function () {
-        return publicScope.value;
-    };
-
-    return publicScope;
-};
-
-//FIXME extract it to separate file
-var WalkingAverageClass = function (maxLength) {
-
-    var table = [],
-        self = {};
-
-    /**
-     *
-     * @param {number} data
-     */
-    self.put = function (data) {
-        table.push(data);
-        if (table.length > maxLength) {
-            table.shift();
-        }
-    };
-
-    self.getAverage = function () {
-        if (table.length > 0) {
-            var sum = table.reduce(function (a, b) {
-                return a + b;
-            });
-            return sum / table.length;
-        } else {
-            return 0;
-        }
-    };
-
-    return self;
-};
-
 helper.mspQueue = (function (serial, MSP) {
 
     var publicScope = {},
@@ -69,12 +10,9 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.handlerFrequency = 100;
     privateScope.balancerFrequency = 10;
 
-    privateScope.loadAverage = new WalkingAverageClass(privateScope.handlerFrequency);
-    privateScope.roundtripAverage = new WalkingAverageClass(50);
-    privateScope.hardwareRoundtripAverage = new WalkingAverageClass(50);
-
-    privateScope.pastLoadFilter = new SimpleSmoothFilterClass(1, 0.99);
-    privateScope.currentLoadFilter = new SimpleSmoothFilterClass(1, 0.7);
+    privateScope.loadFilter = new classes.SimpleSmoothFilter(0.5, 0.996);
+    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.996);
+    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.996);
 
     privateScope.targetLoad = 1.5;
     privateScope.statusDropFactor = 0.75;
@@ -88,12 +26,12 @@ helper.mspQueue = (function (serial, MSP) {
             D: 2
         },
         Iterm: 0,
-        ItermLimit: 80,
+        ItermLimit: 85,
         previousError: 0,
         output: {
             min: 0,
-            max: 95,
-            minThreshold: 2
+            max: 97,
+            minThreshold: 0
         }
     };
 
@@ -103,7 +41,7 @@ helper.mspQueue = (function (serial, MSP) {
         var error = privateScope.currentLoad - privateScope.targetLoad;
 
         var Pterm = error * privateScope.loadPid.gains.P,
-            Dterm = (error - privateScope.loadPid.previousError) * privateScope.loadPid.gains.P;
+            Dterm = (error - privateScope.loadPid.previousError) * privateScope.loadPid.gains.D;
 
         privateScope.loadPid.previousError = error;
 
@@ -144,9 +82,7 @@ helper.mspQueue = (function (serial, MSP) {
      */
     publicScope.executor = function () {
 
-        privateScope.loadAverage.put(privateScope.queue.length);
-        privateScope.pastLoadFilter.apply(privateScope.currentLoad);
-        privateScope.currentLoadFilter.apply(privateScope.currentLoad);
+        privateScope.loadFilter.apply(privateScope.queue.length);
 
         /*
          * if port is blocked or there is no connection, do not process the queue
@@ -228,11 +164,11 @@ helper.mspQueue = (function (serial, MSP) {
      * @returns {number}
      */
     publicScope.getLoad = function () {
-        return privateScope.currentLoad;
+        return privateScope.loadFilter.get();
     };
 
     publicScope.getRoundtrip = function () {
-        return privateScope.roundtripAverage.getAverage();
+        return privateScope.roundtripFilter.get();
     };
 
     /**
@@ -240,11 +176,11 @@ helper.mspQueue = (function (serial, MSP) {
      * @param {number} number
      */
     publicScope.putRoundtrip = function (number) {
-        privateScope.roundtripAverage.put(number);
+        privateScope.roundtripFilter.apply(number);
     };
 
     publicScope.getHardwareRoundtrip = function () {
-        return privateScope.hardwareRoundtripAverage.getAverage();
+        return privateScope.hardwareRoundtripFilter.get();
     };
 
     /**
@@ -252,11 +188,11 @@ helper.mspQueue = (function (serial, MSP) {
      * @param {number} number
      */
     publicScope.putHardwareRoundtrip = function (number) {
-        privateScope.hardwareRoundtripAverage.put(number);
+        privateScope.hardwareRoundtripFilter.apply(number);
     };
 
     publicScope.balancer = function () {
-        privateScope.currentLoad = privateScope.loadAverage.getAverage();
+        privateScope.currentLoad = privateScope.loadFilter.get();
         helper.mspQueue.computeDropRatio();
     };
 
