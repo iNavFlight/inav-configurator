@@ -17,7 +17,7 @@
 
 	function fromPrefix ( target, method ) {
 
-		// If target is a string, a new hidden input will be created.
+		// If target is a string, a new hidden input will be createdOn.
 		if ( typeof target === 'string' && target.indexOf('-inline-') === 0 ) {
 
 			// By default, use the 'html' method.

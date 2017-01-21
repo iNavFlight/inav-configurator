@@ -1,6 +1,26 @@
 'use strict';
 
 /**
+ *
+ * @constructor
+ */
+var MspMessageClass = function () {
+
+    var publicScope = {};
+
+    publicScope.code = null;
+    publicScope.messageBody = null;
+    publicScope.onFinish = null;
+    publicScope.onSend = null;
+    publicScope.timer = false;
+    publicScope.createdOn = new Date().getTime();
+    publicScope.sentOn = null;
+    publicScope.retryCounter = 5;
+
+    return publicScope;
+};
+
+/**
  * @typedef {{state: number, message_direction: number, code: number, message_length_expected: number, message_length_received: number, message_buffer: null, message_buffer_uint8_view: null, message_checksum: number, callbacks: Array, packet_error: number, unsupported: number, ledDirectionLetters: [*], ledFunctionLetters: [*], ledBaseFunctionLetters: [*], ledOverlayLetters: [*], last_received_timestamp: null, analog_last_received_timestamp: number, read: MSP.read, send_message: MSP.send_message, promise: MSP.promise, callbacks_cleanup: MSP.callbacks_cleanup, disconnect_cleanup: MSP.disconnect_cleanup}} MSP
  */
 var MSP = {
@@ -176,20 +196,13 @@ var MSP = {
             bufView[5] = bufView[3] ^ bufView[4]; // checksum
         }
 
-        // dev version 0.57 code below got recently changed due to the fact that queueing same MSP codes was unsupported
-        // and was causing trouble while backup/restoring configurations
-        // watch out if the recent change create any inconsistencies and then adjust accordingly
-        var obj = {
-            'code': code,
-            'requestBuffer': bufferOut,
-            'callback': (callback_msp) ? callback_msp : false,
-            'onSend': callback_sent,
-            'timer': false,
-            'created': new Date().getTime(),
-            'sentOn': null
-        };
+        var message = new MspMessageClass();
+        message.code = code;
+        message.messageBody = bufferOut;
+        message.onFinish = callback_msp;
+        message.onSend = callback_sent;
 
-        helper.mspQueue.put(obj);
+        helper.mspQueue.put(message);
 
         return true;
     },

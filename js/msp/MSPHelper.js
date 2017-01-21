@@ -954,7 +954,7 @@ var mspHelper = (function (gui) {
             if (i < dataHandler.callbacks.length) {
                 if (dataHandler.callbacks[i].code == dataHandler.code) {
                     // save callback reference
-                    var callback = dataHandler.callbacks[i].callback;
+                    var callback = dataHandler.callbacks[i].onFinish;
 
                     // remove timeout
                     clearTimeout(dataHandler.callbacks[i].timer);
@@ -966,7 +966,7 @@ var mspHelper = (function (gui) {
                      * Compute roundtrip
                      */
                     if (dataHandler.callbacks[i]) {
-                        helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].created);
+                        helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
                         helper.mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
                     }
 

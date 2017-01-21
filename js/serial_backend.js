@@ -8,6 +8,7 @@ $(document).ready(function () {
         $portOverride = $('#port-override');
 
     GUI.handleReconnect = function ($tabElement) {
+
         if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
 
             /*
@@ -112,6 +113,7 @@ $(document).ready(function () {
                      * Flush
                      */
                     helper.mspQueue.flush();
+                    helper.mspQueue.freeSerialPort();
 
                     serial.disconnect(onClosed);
                     MSP.disconnect_cleanup();
@@ -331,6 +333,7 @@ function onConnect() {
         $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(2));
         $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
         $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));
+        $('#drop-rate').text("Drop ratio: " + helper.mspQueue.getDropRatio().toFixed(0) + "%");
     }, 100);
 
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);

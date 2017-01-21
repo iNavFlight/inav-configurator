@@ -450,7 +450,7 @@
      */
     function Q(value) {
         // If the object is already a Promise, return it directly.  This enables
-        // the resolve function to both be used to created references from objects,
+        // the resolve function to both be used to createdOn references from objects,
         // but to tolerably coerce non-promises to promises.
         if (value instanceof Promise) {
             return value;
@@ -993,7 +993,7 @@
 
 // This promise library consumes exceptions thrown in handlers so they can be
 // handled by a subsequent promise.  The exceptions get added to this array when
-// they are created, and removed when they are handled.  Note that in ES6 or
+// they are createdOn, and removed when they are handled.  Note that in ES6 or
 // shimmed environments, this would naturally be a `Set`.
     var unhandledReasons = [];
     var unhandledRejections = [];
