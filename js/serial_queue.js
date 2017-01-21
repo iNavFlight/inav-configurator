@@ -77,6 +77,7 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.currentLoadFilter = new SimpleSmoothFilterClass(1, 0.7);
 
     privateScope.targetLoad = 1.5;
+    privateScope.statusDropFactor = 0.75;
 
     privateScope.currentLoad = 0;
 
@@ -261,6 +262,10 @@ helper.mspQueue = (function (serial, MSP) {
 
     publicScope.shouldDrop = function () {
         return (Math.round(Math.random()*100) < privateScope.dropRatio);
+    };
+
+    publicScope.shouldDropStatus = function () {
+        return (Math.round(Math.random()*100) < (privateScope.dropRatio * privateScope.statusDropFactor));
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

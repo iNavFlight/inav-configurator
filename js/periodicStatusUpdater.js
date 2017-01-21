@@ -108,6 +108,10 @@ helper.periodicStatusUpdater = (function () {
 
         if (GUI.active_tab != 'cli') {
 
+            if (helper.mspQueue.shouldDropStatus()) {
+                return;
+            }
+
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
             }

@@ -139,6 +139,14 @@ TABS.setup.initialize = function (callback) {
 
         function get_slow_data() {
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
+
+                /*
+                 * Enable balancer
+                 */
+                if (helper.mspQueue.shouldDrop()) {
+                    return;
+                }
+
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
                     if (GPS_DATA.fix >= 2)
@@ -154,6 +162,14 @@ TABS.setup.initialize = function (callback) {
         }
 
         function get_fast_data() {
+
+            /*
+             * Enable balancer
+             */
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
 	            roll_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
 	            pitch_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));

@@ -78,7 +78,7 @@ TABS.gps.initialize = function (callback) {
             var message = {
                 action: 'center',
                 lat: lat,
-                lon: lon,
+                lon: lon
             };
 
             var frame = document.getElementById('map');
@@ -107,7 +107,11 @@ TABS.gps.initialize = function (callback) {
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
                 //return;
             }
-            
+
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
             get_raw_gps_data();
         }, 75, true);
 
@@ -135,7 +139,7 @@ TABS.gps.initialize = function (callback) {
         $('#zoom_in').click(function() {
             console.log('zoom in');
             var message = {
-                action: 'zoom_in',
+                action: 'zoom_in'
             };
             frame.contentWindow.postMessage(message, '*');
         });
