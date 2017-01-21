@@ -185,42 +185,12 @@ var MSP = {
             'callback': (callback_msp) ? callback_msp : false,
             'onSend': callback_sent,
             'timer': false,
-            'created': new Date().getTime()
+            'created': new Date().getTime(),
+            'sentOn': null
         };
 
         helper.mspQueue.put(obj);
 
-        // var requestExists = false;
-        // for (i = 0; i < MSP.callbacks.length; i++) {
-        //     if (i < MSP.callbacks.length) {
-        //         if (MSP.callbacks[i].code == code) {
-        //             // request already exist, we will just attach
-        //             requestExists = true;
-        //             break;
-        //         }
-        //     } else {
-        //         console.log("Callback index error: "+ i);
-        //     }
-        // }
-
-        // if (!requestExists) {
-        //     obj.timer = setInterval(function () {
-        //         console.log('MSP data request timed-out: ' + code);
-        //
-        //         serial.send(bufferOut, false);
-        //     }, serial.getTimeout()); // we should be able to define timeout in the future
-        // }
-
-        // MSP.callbacks.push(obj);
-
-        // always send messages with data payload (even when there is a message already in the queue)
-        // if (data || !requestExists) {
-        //     serial.send(bufferOut, function (sendInfo) {
-        //         if (sendInfo.bytesSent == bufferOut.byteLength) {
-        //             if (callback_sent) callback_sent();
-        //         }
-        //     });
-        // }
         return true;
     },
     promise: function(code, data) {

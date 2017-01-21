@@ -38,10 +38,11 @@ helper.mspQueue = (function (serial, MSP) {
     var publicScope = {},
         privateScope = {};
 
-    privateScope.handlerFrequency = 200;
+    privateScope.handlerFrequency = 100;
 
     privateScope.loadAverage = new walkingAverageClass(privateScope.handlerFrequency);
     privateScope.roundtripAverage = new walkingAverageClass(50);
+    privateScope.hardwareRoundtripAverage = new walkingAverageClass(50);
 
     privateScope.queue = [];
 
@@ -90,6 +91,10 @@ helper.mspQueue = (function (serial, MSP) {
                  */
                 publicScope.put(request);
             }, serial.getTimeout());
+
+            if (request.sentOn === null) {
+                request.sentOn = new Date().getTime();
+            }
 
             /*
              * Set receive callback here
@@ -151,6 +156,18 @@ helper.mspQueue = (function (serial, MSP) {
      */
     publicScope.putRoundtrip = function (number) {
         privateScope.roundtripAverage.put(number);
+    };
+
+    publicScope.getHardwareRoundtrip = function () {
+        return privateScope.hardwareRoundtripAverage.getAverage();
+    };
+
+    /**
+     *
+     * @param {number} number
+     */
+    publicScope.putHardwareRoundtrip = function (number) {
+        privateScope.hardwareRoundtripAverage.put(number);
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

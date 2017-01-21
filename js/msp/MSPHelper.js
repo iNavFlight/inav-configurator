@@ -967,6 +967,7 @@ var mspHelper = (function (gui) {
                      */
                     if (dataHandler.callbacks[i]) {
                         helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].created);
+                        helper.mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
                     }
 
                     // fire callback
