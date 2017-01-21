@@ -19,46 +19,20 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.currentLoad = 0;
 
-    privateScope.loadPid = {
-        gains: {
-            P: 10,
-            I: 4,
-            D: 2
-        },
-        Iterm: 0,
-        ItermLimit: 85,
-        previousError: 0,
-        output: {
-            min: 0,
-            max: 97,
-            minThreshold: 0
-        }
-    };
+    /**
+     * PID controller used to perform throttling
+     * @type {classes.PidController}
+     */
+    privateScope.loadPidController = new classes.PidController();
+    privateScope.loadPidController.setTarget(privateScope.targetLoad);
+    privateScope.loadPidController.setOutput(0, 97, 0);
+    privateScope.loadPidController.setGains(16, 6, 4);
+    privateScope.loadPidController.setItermLimit(0, 90);
 
     privateScope.dropRatio = 0;
 
     publicScope.computeDropRatio = function () {
-        var error = privateScope.currentLoad - privateScope.targetLoad;
-
-        var Pterm = error * privateScope.loadPid.gains.P,
-            Dterm = (error - privateScope.loadPid.previousError) * privateScope.loadPid.gains.D;
-
-        privateScope.loadPid.previousError = error;
-
-        privateScope.loadPid.Iterm += error * privateScope.loadPid.gains.I;
-        if (privateScope.loadPid.Iterm > privateScope.loadPid.ItermLimit) {
-            privateScope.loadPid.Iterm = privateScope.loadPid.ItermLimit;
-        } else if (privateScope.loadPid.Iterm < -privateScope.loadPid.ItermLimit) {
-            privateScope.loadPid.Iterm = -privateScope.loadPid.ItermLimit;
-        }
-
-        privateScope.dropRatio = Pterm + privateScope.loadPid.Iterm + Dterm;
-        if (privateScope.dropRatio < privateScope.loadPid.output.minThreshold) {
-            privateScope.dropRatio = privateScope.loadPid.output.min;
-        }
-        if (privateScope.dropRatio > privateScope.loadPid.output.max) {
-            privateScope.dropRatio = privateScope.loadPid.output.max;
-        }
+        privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
     };
 
     publicScope.getDropRatio = function () {
