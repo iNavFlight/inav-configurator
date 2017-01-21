@@ -112,11 +112,15 @@ var MSP = {
                         mspHelper.processData(this);
                     } else {
                         console.log('code: ' + this.code + ' - crc failed');
-                        console.log(data);
 
                         this.packet_error++;
                         $('span.packet-error').html(this.packet_error);
                     }
+
+                    /*
+                     * Free port
+                     */
+                    helper.mspQueue.freeHardLock();
 
                     // Reset variables
                     this.message_length_received = 0;
@@ -124,6 +128,10 @@ var MSP = {
                     break;
 
                 default:
+                    /*
+                     * Free port
+                     */
+                    helper.mspQueue.freeHardLock();
                     console.log('Unknown state detected: ' + this.state);
             }
         }

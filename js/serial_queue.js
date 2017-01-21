@@ -14,6 +14,10 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.996);
     privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.996);
 
+    /**
+     * Target load for MSP queue. When load is above target, throttling might start to appear
+     * @type {number}
+     */
     privateScope.targetLoad = 1.5;
     privateScope.statusDropFactor = 0.75;
 
@@ -41,7 +45,40 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.queue = [];
 
-    privateScope.portInUse = false;
+    privateScope.softLock = false;
+    privateScope.hardLock = false;
+
+    privateScope.lockMethod = 'soft';
+
+    publicScope.setLockMethod = function (method) {
+        privateScope.lockMethod = method;
+    };
+
+    publicScope.setSoftLock = function () {
+        privateScope.softLock = new Date().getTime();
+    };
+
+    publicScope.setHardLock = function () {
+        privateScope.hardLock = new Date().getTime();
+    };
+
+    publicScope.freeSoftLock = function () {
+        privateScope.softLock = false;
+    };
+
+    publicScope.freeHardLock = function () {
+        privateScope.hardLock = false;
+    };
+
+    publicScope.isLocked = function () {
+
+        if (privateScope.lockMethod === 'soft') {
+            return privateScope.softLock !== false;
+        } else {
+            return privateScope.hardLock !== false;
+        }
+
+    };
 
     /**
      * This method is periodically executed and moves MSP request
@@ -66,7 +103,7 @@ helper.mspQueue = (function (serial, MSP) {
         /*
          * if port is blocked or there is no connection, do not process the queue
          */
-        if (privateScope.portInUse || serial.connectionId === false) {
+        if (publicScope.isLocked() || serial.connectionId === false) {
             helper.eventFrequencyAnalyzer.put("port in use");
             return false;
         }
@@ -78,7 +115,8 @@ helper.mspQueue = (function (serial, MSP) {
             /*
              * Lock serial port as being in use right now
              */
-            privateScope.portInUse = true;
+            publicScope.setSoftLock();
+            publicScope.setHardLock();
 
             request.timer = setTimeout(function () {
                 console.log('MSP data request timed-out: ' + request.code);
@@ -110,6 +148,8 @@ helper.mspQueue = (function (serial, MSP) {
              */
             MSP.putCallback(request);
 
+            helper.eventFrequencyAnalyzer.put('message sent');
+
             /*
              * Send data to serial port
              */
@@ -121,7 +161,7 @@ helper.mspQueue = (function (serial, MSP) {
                     if (request.onSend) {
                         request.onSend();
                     }
-                    privateScope.portInUse = false;
+                    publicScope.freeSoftLock();
                 }
             });
         }
@@ -133,10 +173,6 @@ helper.mspQueue = (function (serial, MSP) {
 
     publicScope.flush = function () {
         privateScope.queue = [];
-    };
-
-    publicScope.freeSerialPort = function () {
-        privateScope.portInUse = false;
     };
 
     publicScope.put = function (mspRequest) {
@@ -182,6 +218,26 @@ helper.mspQueue = (function (serial, MSP) {
     publicScope.balancer = function () {
         privateScope.currentLoad = privateScope.loadFilter.get();
         helper.mspQueue.computeDropRatio();
+
+        /*
+         * Also, check if port lock if hanging. Free is so
+         */
+        var currentTimestamp = new Date().getTime(),
+            threshold = publicScope.getHardwareRoundtrip() * 4;
+
+        if (threshold > 1000) {
+            threshold = 1000;
+        }
+
+        if (privateScope.softLock !== false && currentTimestamp - privateScope.softLock > threshold) {
+            privateScope.softLock = false;
+            helper.eventFrequencyAnalyzer.put('force free soft lock');
+        }
+        if (privateScope.hardLock !== false && currentTimestamp - privateScope.hardLock > threshold) {
+            privateScope.hardLock = false;
+            helper.eventFrequencyAnalyzer.put('force free hard lock');
+        }
+
     };
 
     publicScope.shouldDrop = function () {

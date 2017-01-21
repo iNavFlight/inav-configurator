@@ -113,7 +113,8 @@ $(document).ready(function () {
                      * Flush
                      */
                     helper.mspQueue.flush();
-                    helper.mspQueue.freeSerialPort();
+                    helper.mspQueue.freeHardLock();
+                    helper.mspQueue.freeSoftLock();
 
                     serial.disconnect(onClosed);
                     MSP.disconnect_cleanup();
