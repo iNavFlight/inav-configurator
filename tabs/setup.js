@@ -181,6 +181,7 @@ TABS.setup.initialize = function (callback) {
 
         helper.interval.add('setup_data_pull_fast', get_fast_data, 40, true); // 25 fps
         helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+
         helper.interval.add('gui_analog_update', function () {
                 bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
                 bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));

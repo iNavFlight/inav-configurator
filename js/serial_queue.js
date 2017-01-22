@@ -10,9 +10,9 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.handlerFrequency = 100;
     privateScope.balancerFrequency = 10;
 
-    privateScope.loadFilter = new classes.SimpleSmoothFilter(0.5, 0.996);
-    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.996);
-    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.996);
+    privateScope.loadFilter = new classes.SimpleSmoothFilter(0.5, 0.995);
+    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.95);
+    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.95);
 
     /**
      * Target load for MSP queue. When load is above target, throttling might start to appear
@@ -29,7 +29,7 @@ helper.mspQueue = (function (serial, MSP) {
      */
     privateScope.loadPidController = new classes.PidController();
     privateScope.loadPidController.setTarget(privateScope.targetLoad);
-    privateScope.loadPidController.setOutput(0, 97, 0);
+    privateScope.loadPidController.setOutput(0, 99, 0);
     privateScope.loadPidController.setGains(16, 6, 4);
     privateScope.loadPidController.setItermLimit(0, 90);
 
@@ -223,7 +223,7 @@ helper.mspQueue = (function (serial, MSP) {
          * Also, check if port lock if hanging. Free is so
          */
         var currentTimestamp = new Date().getTime(),
-            threshold = publicScope.getHardwareRoundtrip() * 4;
+            threshold = publicScope.getHardwareRoundtrip() * 3;
 
         if (threshold > 1000) {
             threshold = 1000;
@@ -246,6 +246,23 @@ helper.mspQueue = (function (serial, MSP) {
 
     publicScope.shouldDropStatus = function () {
         return (Math.round(Math.random()*100) < (privateScope.dropRatio * privateScope.statusDropFactor));
+    };
+
+    /**
+     * This method return periodic for polling interval that should populate queue in 75% or less
+     * @param {number} requestedInterval
+     * @param {number} messagesInInterval
+     * @returns {number}
+     */
+    publicScope.getIntervalPrediction = function (requestedInterval, messagesInInterval) {
+        var openWindow = publicScope.getRoundtrip() * 1.25,
+            requestedWindow = requestedInterval / messagesInInterval;
+
+        if (requestedWindow < openWindow) {
+            return openWindow;
+        } else {
+            return requestedInterval;
+        }
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

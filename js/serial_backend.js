@@ -442,6 +442,11 @@ function sensor_status_hash(hw_status)
  * @deprecated
  */
 function sensor_status(sensors_detected) {
+
+    if (typeof SENSOR_STATUS === 'undefined') {
+        return;
+    }
+
     SENSOR_STATUS.isHardwareHealthy = 1;
     SENSOR_STATUS.gyroHwStatus      = have_sensor(sensors_detected, 'gyro') ? 1 : 0;
     SENSOR_STATUS.accHwStatus       = have_sensor(sensors_detected, 'acc') ? 1 : 0;

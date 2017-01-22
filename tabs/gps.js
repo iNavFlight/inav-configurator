@@ -28,7 +28,6 @@ TABS.gps.initialize = function (callback) {
     }
     
     function process_html() {
-        // translate to user-selected languageconsole.log('Online');
         localize();
 
         function get_raw_gps_data() {
@@ -101,7 +100,10 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        // enable data pulling
+        /*
+         * enable data pulling
+         * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
+         */
         helper.interval.add('gps_pull', function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
@@ -113,7 +115,7 @@ TABS.gps.initialize = function (callback) {
             }
 
             get_raw_gps_data();
-        }, 75, true);
+        }, 250, true);
 
         //check for internet connection on load
         if (navigator.onLine) {
