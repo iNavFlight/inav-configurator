@@ -7,6 +7,19 @@ $(document).ready(function () {
         $baud = $('#baud'),
         $portOverride = $('#port-override');
 
+    /*
+     * Handle "Wireless" mode with strict queueing of messages
+     */
+    $('#wireless-mode').change(function () {
+        var $this = $(this);
+
+        if ($this.is(':checked')) {
+            helper.mspQueue.setLockMethod('hard');
+        } else {
+            helper.mspQueue.setLockMethod('soft');
+        }
+    });
+
     GUI.handleReconnect = function ($tabElement) {
 
         if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect

@@ -1957,5 +1957,8 @@
     },
     "dtermNotchCutoffHelp": {
         "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "wirelessModeSwitch": {
+        "message": "Wireless mode"
     }
 }
