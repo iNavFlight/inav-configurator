@@ -753,7 +753,6 @@ STM32_protocol.prototype.upload_procedure = function (step) {
 
             // close connection
             serial.disconnect(function (result) {
-                PortUsage.reset();
 
                 // unlocking connect button
                 GUI.connect_lock = false;

@@ -131,7 +131,6 @@ $(document).ready(function () {
 
                     serial.disconnect(onClosed);
                     MSP.disconnect_cleanup();
-                    PortUsage.reset();
 
                     // Reset various UI elements
                     $('span.i2c-error').text(0);
@@ -204,7 +203,6 @@ $(document).ready(function () {
     });
 
     PortHandler.initialize();
-    PortUsage.initialize();
 });
 
 function onOpen(openInfo) {
