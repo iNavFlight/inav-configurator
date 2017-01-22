@@ -11,8 +11,8 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.balancerFrequency = 10;
 
     privateScope.loadFilter = new classes.SimpleSmoothFilter(0.5, 0.995);
-    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.95);
-    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.95);
+    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.97);
+    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(5, 0.97);
 
     /**
      * Target load for MSP queue. When load is above target, throttling might start to appear
@@ -255,13 +255,13 @@ helper.mspQueue = (function (serial, MSP) {
      * @returns {number}
      */
     publicScope.getIntervalPrediction = function (requestedInterval, messagesInInterval) {
-        var openWindow = publicScope.getRoundtrip() * 1.25,
-            requestedWindow = requestedInterval / messagesInInterval;
+        var requestedRate = (1000 / requestedInterval) * messagesInInterval,
+            availableRate = (1000 / publicScope.getRoundtrip()) * 0.75;
 
-        if (requestedWindow < openWindow) {
-            return openWindow;
-        } else {
+        if (requestedRate < availableRate) {
             return requestedInterval;
+        } else {
+            return (1000 / availableRate) * messagesInInterval;
         }
     };
 

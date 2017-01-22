@@ -2,7 +2,6 @@
 
 TABS.gps = {};
 TABS.gps.initialize = function (callback) {
-    var self = this;
 
     if (GUI.active_tab != 'gps') {
         GUI.active_tab = 'gps';
@@ -115,7 +114,7 @@ TABS.gps.initialize = function (callback) {
             }
 
             get_raw_gps_data();
-        }, 250, true);
+        }, helper.mspQueue.getIntervalPrediction(200, 3), true);
 
         //check for internet connection on load
         if (navigator.onLine) {
@@ -159,8 +158,6 @@ TABS.gps.initialize = function (callback) {
 
 };
 
-
- 
 TABS.gps.cleanup = function (callback) {
     if (callback) callback();
 };

@@ -258,6 +258,11 @@ TABS.auxiliary.initialize = function (callback) {
 
         // data pulling functions used inside interval timer
         function get_rc_data() {
+
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
@@ -288,7 +293,7 @@ TABS.auxiliary.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        helper.interval.add('aux_data_pull', get_rc_data, 50);
+        helper.interval.add('aux_data_pull', get_rc_data, helper.mspQueue.getIntervalPrediction(50, 1));
 
         GUI.content_ready(callback);
     }
