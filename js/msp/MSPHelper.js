@@ -846,6 +846,7 @@ var mspHelper = (function (gui) {
 
                 if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
                     PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
+                    PID_ADVANCED.pidSumLimit = data.getUint16(10, true);
                 }
 
                 PID_ADVANCED.axisAccelerationLimitRollPitch = data.getUint16(13, true);
@@ -1262,12 +1263,14 @@ var mspHelper = (function (gui) {
 
                 if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
                     buffer.push(PID_ADVANCED.dtermSetpointWeight);
+                    buffer.push(lowByte(PID_ADVANCED.pidSumLimit));
+                    buffer.push(highByte(PID_ADVANCED.pidSumLimit));
                 } else {
                     buffer.push(0);
+                    buffer.push(0); // reserved
+                    buffer.push(0); // reserved
                 }
 
-                buffer.push(0); // reserved
-                buffer.push(0); // reserved
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
 
                 buffer.push(lowByte(PID_ADVANCED.axisAccelerationLimitRollPitch));
