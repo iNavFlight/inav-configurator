@@ -228,6 +228,9 @@ function onOpen(openInfo) {
             }
         });
 
+        chrome.storage.local.set({last_used_bps: serial.bitrate});
+        chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
+
         serial.onReceive.addListener(read_serial);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
