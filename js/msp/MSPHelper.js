@@ -959,9 +959,6 @@ var mspHelper = (function (gui) {
                     // remove timeout
                     clearTimeout(dataHandler.callbacks[i].timer);
 
-                    // remove object from array
-                    dataHandler.callbacks.splice(i, 1);
-
                     /*
                      * Compute roundtrip
                      */
@@ -969,6 +966,9 @@ var mspHelper = (function (gui) {
                         helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
                         helper.mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
                     }
+
+                    // remove object from array
+                    dataHandler.callbacks.splice(i, 1);
 
                     // fire callback
                     if (callback) callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});

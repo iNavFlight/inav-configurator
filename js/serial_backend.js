@@ -342,7 +342,7 @@ function onConnect() {
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
     helper.interval.add('msp-load-update', function () {
-        $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(2));
+        $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(1));
         $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
         $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));
         $('#drop-rate').text("Drop ratio: " + helper.mspQueue.getDropRatio().toFixed(0) + "%");
