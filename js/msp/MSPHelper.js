@@ -900,6 +900,20 @@ var mspHelper = (function (gui) {
                 console.log('NAV_POSHOLD saved');
                 break;
 
+            case MSPCodes.MSP_POSITION_ESTIMATION_CONFIG:
+                POSITION_ESTIMATOR.w_z_baro_p = data.getUint16(0, true);
+                POSITION_ESTIMATOR.w_z_gps_p = data.getUint16(2, true);
+                POSITION_ESTIMATOR.w_z_gps_v = data.getUint16(4, true);
+                POSITION_ESTIMATOR.w_xy_gps_p = data.getUint16(6, true);
+                POSITION_ESTIMATOR.w_xy_gps_v = data.getUint16(8, true);
+                POSITION_ESTIMATOR.gps_min_sats = data.getUint8(10);
+                POSITION_ESTIMATOR.use_gps_velned = data.getUint8(11);
+                break;
+
+            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
+                console.log('POSITION_ESTIMATOR saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1217,6 +1231,26 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
                 buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
+                break;
+
+            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_baro_p));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_baro_p));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_p));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_p));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_v));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_v));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_p));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_p));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_v));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_v));
+
+                buffer.push(POSITION_ESTIMATOR.gps_min_sats);
+                buffer.push(POSITION_ESTIMATOR.use_gps_velned);
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
