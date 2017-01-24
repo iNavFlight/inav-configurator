@@ -20,6 +20,7 @@
     font-weight: bold;
 }
 
+.config-section .number input,
 .tab-configuration .number input {
     width: 65px;
     padding-left: 3px;
@@ -38,10 +39,12 @@
     background-color: #ececec;
 }
 
+.config-section input,
 .tab-configuration input {
     float: left;
 }
 
+.config-section .spacer_box,
 .tab-configuration .spacer_box {
     padding-bottom: 10px;
     float: left;
@@ -62,6 +65,8 @@
     border-bottom: 1px solid #ddd;
 }
 
+.config-section .number,
+.config-section .select,
 .tab-configuration .number,
 .tab-configuration .select,
 .tab-configuration .radio,
@@ -75,6 +80,8 @@ hr {
     float: left;
 }
 
+.config-section .number:last-child,
+.config-section .select:last-child,
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
 .tab-configuration .radio:last-child,

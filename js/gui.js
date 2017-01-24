@@ -36,7 +36,8 @@ var GUI_control = function () {
         'servos',
         'setup',
         'osd',
-        'profiles'
+        'profiles',
+        'advanced_tuning'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 

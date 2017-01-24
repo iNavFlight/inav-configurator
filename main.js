@@ -181,6 +181,9 @@ $(document).ready(function () {
                     case 'onboard_logging':
                         TABS.onboard_logging.initialize(content_ready);
                         break;
+                    case 'advanced_tuning':
+                        TABS.advanced_tuning.initialize(content_ready);
+                        break;
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
