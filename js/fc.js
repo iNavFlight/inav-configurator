@@ -708,5 +708,11 @@ var FC = {
         }
 
         return retVal;
+    },
+    getUserControlMode: function () {
+        return [
+            "Attitude",
+            "Cruise"
+        ]
     }
 };

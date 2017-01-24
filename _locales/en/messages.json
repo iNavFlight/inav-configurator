@@ -1966,5 +1966,69 @@
     },
     "dtermNotchCutoffHelp": {
         "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "positionHoldConfiguration": {
+        "message": "Basic Navigation Settings"
+    },
+    "userControlMode": {
+        "message": "User Control Mode"
+    },
+    "posholdMaxSpeed": {
+        "message": "Max. navigation speed [cm/s]"
+    },
+    "posholdMaxManualSpeed": {
+        "message": "Max. CRUISE speed [cm/s]"
+    },
+    "posholdMaxClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "posholdMaxManualClimbRate": {
+        "message": "Max. ALTHOLD climb rate [cm/s]"
+    },
+    "posholdMaxBankAngle": {
+        "message": "Multirotor max. banking angle [deg]"
+    },
+    "posholdHoverThrottle": {
+        "message": "Hover throttle"
+    },
+    "posholdHoverMidThrottle": {
+        "message": "Use mid. throttle for ALTHOLD"
+    },
+    "positionEstimatorConfiguration": {
+        "message": "Position Estimator"
+    },
+    "w_z_baro_p": {
+        "message": "Vertical Position Baro Weight"
+    },
+    "w_z_gps_p": {
+        "message": "Vertical Position GPS Weight"
+    },
+    "w_z_gps_v": {
+        "message": "Vertical Speed GPS Weight"
+    },
+    "w_xy_gps_p": {
+        "message": "Horizontal Position GPS Weight"
+    },
+    "w_xy_gps_v": {
+        "message": "Horizontal Speed GPS Weight"
+    },
+    "positionEstimatorConfigurationDisclaimer": {
+        "message": "Those value should be changed very carefully. In most cases there is not need to change them. For advanced users only!"
+    },
+    "gps_min_sats": {
+        "message": "Min. GPS sats for valid fix"
+    },
+    "use_gps_velned": {
+        "message": "Use GPS data for velocity calculation"
+    },
+    "use_gps_velned_help": {
+        "message": "Defined if iNav should use velocity data provided by GPS module for doing position and speed estimation. If set to OFF iNav will fallback to calculating velocity from GPS coordinates. Using native velocity data may improve performance on some GPS modules. Some GPS modules introduce significant delay and using native velocity may actually result in much worse performance."
+    },
+    "w_z_baro_p_help": {
+        "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
+    },
+    "w_z_gos_p_help": {
+        "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
     }
+
 }

@@ -1908,3 +1908,7 @@ select {
 .jBox-Tooltip {
     max-width: 180px;
 }
+
+.spacebottom {
+    margin-bottom: 15px;
+}
