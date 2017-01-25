@@ -265,6 +265,7 @@ function onOpen(openInfo) {
                                          */
                                         if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
                                             GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('profiles'), 1);
+                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('advanced_tuning'), 1);
                                         }
 
                                         onConnect();
@@ -294,23 +295,25 @@ function onOpen(openInfo) {
         console.log('Failed to open serial port');
         GUI.log(chrome.i18n.getMessage('serialPortOpenFail'));
 
-        $('div#connectbutton a.connect_state').text(chrome.i18n.getMessage('connect'));
-        $('div#connectbutton a.connect').removeClass('active');
+        var $connectButton = $('#connectbutton');
+
+        $connectButton.find('.connect_state').text(chrome.i18n.getMessage('connect'));
+        $connectButton.find('.connect').removeClass('active');
 
         // unlock port select & baud
         $('#port, #baud, #delay').prop('disabled', false);
 
         // reset data
-        $('div#connectbutton a.connect').data("clicks", false);
+        $connectButton.find('.connect').data("clicks", false);
     }
 }
 
 function onConnect() {
     helper.timeout.remove('connecting'); // kill connecting timer
-    $('div#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
-    $('div#connectbutton a.connect').addClass('active');
-    $('#tabs ul.mode-disconnected').hide();
-    $('#tabs ul.mode-connected').show();
+    $('#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
+    $('#connectbutton a.connect').addClass('active');
+    $('.mode-disconnected').hide();
+    $('.mode-connected').show();
 
     MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false);
 
@@ -333,8 +336,8 @@ function onClosed(result) {
         GUI.log(chrome.i18n.getMessage('serialPortClosedFail'));
     }
 
-    $('#tabs ul.mode-connected').hide();
-    $('#tabs ul.mode-disconnected').show();
+    $('.mode-connected').hide();
+    $('.mode-disconnected').show();
 
     $('#sensor-status').hide();
     $('#portsinput').show();
@@ -454,35 +457,6 @@ function highByte(num) {
 
 function lowByte(num) {
     return 0x00FF & num;
-}
-
-function update_dataflash_global() {
-    var supportsDataflash = DATAFLASH.totalSize > 0;
-    if (supportsDataflash) {
-
-        $(".noflash_global").css({
-            display: 'none'
-        });
-
-        $(".dataflash-contents_global").css({
-            display: 'block'
-        });
-
-        $(".dataflash-free_global").css({
-            width: (100 - (DATAFLASH.totalSize - DATAFLASH.usedSize) / DATAFLASH.totalSize * 100) + "%",
-            display: 'block'
-        });
-        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(DATAFLASH.totalSize - DATAFLASH.usedSize));
-    } else {
-        $(".noflash_global").css({
-            display: 'block'
-        });
-
-        $(".dataflash-contents_global").css({
-            display: 'none'
-        });
-    }
-
 }
 
 function specificByte(num, pos) {
