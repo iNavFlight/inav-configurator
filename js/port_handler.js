@@ -84,6 +84,12 @@ PortHandler.check = function () {
                     }
                 });
 
+                chrome.storage.local.get('wireless_mode_enabled', function (result) {
+                    if (result['wireless_mode_enabled']) {
+                        $('#wireless-mode').prop('checked', true).change();
+                    }
+                });
+
             }
 
             if (!self.initial_ports) {
