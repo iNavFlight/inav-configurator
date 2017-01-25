@@ -236,6 +236,7 @@ TABS.motors.initialize = function (callback) {
 
             // timer initialization
             helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+            helper.mspBalancedInterval.flush();
 
             helper.interval.add('IMU_pull', function imu_data_pull() {
 

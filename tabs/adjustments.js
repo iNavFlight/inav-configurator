@@ -274,7 +274,7 @@ TABS.adjustments.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        helper.interval.add('aux_data_pull', get_rc_data, helper.mspQueue.getIntervalPrediction(50, 1));
+        helper.mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
 
         GUI.content_ready(callback);
     }

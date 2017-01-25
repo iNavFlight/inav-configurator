@@ -116,6 +116,8 @@ $(document).ready(function () {
 
                     helper.timeout.killAll();
                     helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
+                    helper.mspBalancedInterval.flush();
+
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
                     CONFIGURATOR.connectionValid = false;

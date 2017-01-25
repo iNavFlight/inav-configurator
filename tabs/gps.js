@@ -103,7 +103,7 @@ TABS.gps.initialize = function (callback) {
          * enable data pulling
          * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
          */
-        helper.interval.add('gps_pull', function gps_update() {
+        helper.mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
                 //return;
@@ -114,7 +114,7 @@ TABS.gps.initialize = function (callback) {
             }
 
             get_raw_gps_data();
-        }, helper.mspQueue.getIntervalPrediction(200, 3), true);
+        });
 
         //check for internet connection on load
         if (navigator.onLine) {

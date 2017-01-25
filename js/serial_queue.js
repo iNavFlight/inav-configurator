@@ -249,14 +249,14 @@ helper.mspQueue = (function (serial, MSP) {
     };
 
     /**
-     * This method return periodic for polling interval that should populate queue in 75% or less
+     * This method return periodic for polling interval that should populate queue in 80% or less
      * @param {number} requestedInterval
      * @param {number} messagesInInterval
      * @returns {number}
      */
     publicScope.getIntervalPrediction = function (requestedInterval, messagesInInterval) {
         var requestedRate = (1000 / requestedInterval) * messagesInInterval,
-            availableRate = (1000 / publicScope.getRoundtrip()) * 0.75;
+            availableRate = (1000 / publicScope.getRoundtrip()) * 0.8;
 
         if (requestedRate < availableRate) {
             return requestedInterval;
