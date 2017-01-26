@@ -70,13 +70,26 @@ PortHandler.check = function () {
                             if (port == result.last_used_port) {
                                 console.log('Selecting last used port: ' + result.last_used_port);
 
-                                $('div#port-picker #port').val(result.last_used_port);
+                                $('#port').val(result.last_used_port);
                             }
                         });
                     } else {
                         console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
                     }
                 });
+
+                chrome.storage.local.get('last_used_bps', function (result) {
+                    if (result['last_used_bps']) {
+                        $('#baud').val(result['last_used_bps']);
+                    }
+                });
+
+                chrome.storage.local.get('wireless_mode_enabled', function (result) {
+                    if (result['wireless_mode_enabled']) {
+                        $('#wireless-mode').prop('checked', true).change();
+                    }
+                });
+
             }
 
             if (!self.initial_ports) {

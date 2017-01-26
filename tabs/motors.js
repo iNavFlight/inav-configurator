@@ -235,9 +235,19 @@ TABS.motors.initialize = function (callback) {
             accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-scale, scale]);
 
             // timer initialization
-            helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh']);
+            helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+            helper.mspBalancedInterval.flush();
 
             helper.interval.add('IMU_pull', function imu_data_pull() {
+
+                /*
+                 * Enable balancer
+                 */
+                if (helper.mspQueue.shouldDrop()) {
+                    update_accel_graph();
+                    return;
+                }
+
                 MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
             }, rate, true);
 
@@ -445,10 +455,21 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.change();
         
         function getPeriodicMotorOutput() {
+
+            if (helper.mspQueue.shouldDrop()) {
+                getPeriodicServoOutput();
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
         }
 
         function getPeriodicServoOutput() {
+            if (helper.mspQueue.shouldDrop()) {
+                update_ui();
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 

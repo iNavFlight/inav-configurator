@@ -218,7 +218,7 @@ var STAR = R++;
 src[STAR] = '(<|>)?=?\\s*\\*';
 
 // Compile to actual regexp objects.
-// All are flag-free, unless they were created above with a flag.
+// All are flag-free, unless they were createdOn above with a flag.
 for (var i = 0; i < R; i++) {
   ;
   if (!re[i])

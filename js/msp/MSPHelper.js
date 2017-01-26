@@ -968,10 +968,18 @@ var mspHelper = (function (gui) {
             if (i < dataHandler.callbacks.length) {
                 if (dataHandler.callbacks[i].code == dataHandler.code) {
                     // save callback reference
-                    var callback = dataHandler.callbacks[i].callback;
+                    var callback = dataHandler.callbacks[i].onFinish;
 
                     // remove timeout
-                    clearInterval(dataHandler.callbacks[i].timer);
+                    clearTimeout(dataHandler.callbacks[i].timer);
+
+                    /*
+                     * Compute roundtrip
+                     */
+                    if (dataHandler.callbacks[i]) {
+                        helper.mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
+                        helper.mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
+                    }
 
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);

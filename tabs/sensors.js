@@ -356,29 +356,65 @@ TABS.sensors.initialize = function (callback) {
             });
 
             // timer initialization
-            helper.interval.killAll(['status_pull', 'global_data_refresh']);
+            helper.interval.killAll(['status_pull', 'global_data_refresh', 'msp-load-update']);
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
                 helper.interval.add('IMU_pull', function imu_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_imu_graphs();
+                        return;
+                    }
+
                     MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_imu_graphs);
                 }, fastest, true);
             }
 
             if (checkboxes[3]) {
                 helper.interval.add('altitude_pull', function altitude_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_altitude_graph();
+                        return;
+                    }
+
                     MSP.send_message(MSPCodes.MSP_ALTITUDE, false, false, update_altitude_graph);
                 }, rates.baro, true);
             }
 
             if (checkboxes[4]) {
                 helper.interval.add('sonar_pull', function sonar_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_sonar_graphs();
+                        return;
+                    }
+
                     MSP.send_message(MSPCodes.MSP_SONAR, false, false, update_sonar_graphs);
                 }, rates.sonar, true);
             }
 
             if (checkboxes[5]) {
                 helper.interval.add('debug_pull', function debug_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_debug_graphs();
+                        return;
+                    }
+
                     MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
                 }, rates.debug, true);
             }

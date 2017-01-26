@@ -14,6 +14,12 @@ TABS.cli.initialize = function (callback) {
         googleAnalytics.sendAppView('CLI');
     }
 
+    /*
+     * Flush MSP queue as well as all MSP registered callbacks
+     */
+    helper.mspQueue.flush();
+    MSP.callbacks_cleanup();
+
     $('#content').load("./tabs/cli.html", function () {
         // translate to user-selected language
         localize();

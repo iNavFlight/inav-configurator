@@ -3,7 +3,7 @@
 'use strict';
 
 TABS.receiver = {
-  rateChartHeight: 117
+    rateChartHeight: 117
 };
 
 TABS.receiver.initialize = function (callback) {
@@ -42,14 +42,6 @@ TABS.receiver.initialize = function (callback) {
         $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
         $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
-
-        chrome.storage.local.get('rx_refresh_rate', function (result) {
-            if (result.rx_refresh_rate) {
-                $('select[name="rx_refresh_rate"]').val(result.rx_refresh_rate).change();
-            } else {
-                $('select[name="rx_refresh_rate"]').change(); // start with default value
-            }
-        });
 
         $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
         $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
@@ -100,7 +92,7 @@ TABS.receiver.initialize = function (callback) {
 
         var meter_label_array = [];
         $('.meter', bar_container).each(function () {
-            meter_label_array.push($('.label' , this));
+            meter_label_array.push($('.label', this));
         });
 
         // correct inner label margin on window resize (i don't know how we could do this in css)
@@ -125,15 +117,16 @@ TABS.receiver.initialize = function (callback) {
         }
 
         // reconstruct
-        var str = strBuffer.join('');
+        var str = strBuffer.join(''),
+            $rcMap = $('input[name="rcmap"]');
 
         // set current value
-        $('input[name="rcmap"]').val(str);
+        $rcMap.val(str);
 
         // validation / filter
         var last_valid = str;
 
-        $('input[name="rcmap"]').on('input', function () {
+        $rcMap.on('input', function () {
             var val = $(this).val();
 
             // limit length to max 8
@@ -143,7 +136,7 @@ TABS.receiver.initialize = function (callback) {
             }
         });
 
-        $('input[name="rcmap"]').focusout(function () {
+        $rcMap.focusout(function () {
             var val = $(this).val(),
                 strBuffer = val.split(''),
                 duplicityBuffer = [];
@@ -172,7 +165,7 @@ TABS.receiver.initialize = function (callback) {
         // handle helper
         $('select[name="rcmap_helper"]').val(0); // go out of bounds
         $('select[name="rcmap_helper"]').change(function () {
-            $('input[name="rcmap"]').val($(this).val());
+            $rcMap.val($(this).val());
         });
 
         // rssi
@@ -212,7 +205,7 @@ TABS.receiver.initialize = function (callback) {
                     midxl = midx * 0.5,
                     midxr = (((200 - midx) * 0.5) + midx),
                     midy = rateHeight - (midx * (rateHeight / 200)),
-                    midyl = rateHeight - ((rateHeight - midy) * 0.5 *(expo + 1)),
+                    midyl = rateHeight - ((rateHeight - midy) * 0.5 * (expo + 1)),
                     midyr = (midy / 2) * (expo + 1);
 
                 // draw
@@ -223,7 +216,7 @@ TABS.receiver.initialize = function (callback) {
                 context.moveTo(midx, midy);
                 context.quadraticCurveTo(midxr, midyr, 200, 0);
                 context.lineWidth = 2;
-				context.strokeStyle = '#37a8db';
+                context.strokeStyle = '#37a8db';
                 context.stroke();
             }, 0);
         }).trigger('input');
@@ -256,7 +249,7 @@ TABS.receiver.initialize = function (callback) {
                 context.moveTo(0, rateHeight);
                 context.quadraticCurveTo(110, rateHeight - ((ratey / 2) * (1 - expo)), 200, rateHeight - ratey);
                 context.lineWidth = 2;
-				context.strokeStyle = '#37a8db';
+                context.strokeStyle = '#37a8db';
                 context.stroke();
             }, 0);
         }).trigger('input');
@@ -287,8 +280,8 @@ TABS.receiver.initialize = function (callback) {
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
-           RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
-           RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
+            RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
+            RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
             var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
@@ -310,7 +303,7 @@ TABS.receiver.initialize = function (callback) {
             }
 
             function save_rc_configs() {
-               MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, save_to_eeprom);
+                MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, save_to_eeprom);
             }
 
             function save_to_eeprom() {
@@ -322,7 +315,7 @@ TABS.receiver.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, save_rc_map);
         });
 
-        $("a.sticks").click(function() {
+        $("a.sticks").click(function () {
             var
                 windowWidth = 370,
                 windowHeight = 510;
@@ -335,9 +328,9 @@ TABS.receiver.initialize = function (callback) {
                     maxWidth: windowWidth, maxHeight: windowHeight
                 },
                 alwaysOnTop: true
-            }, function(createdWindow) {
+            }, function (createdWindow) {
                 // Give the window a callback it can use to send the channels (otherwise it can't see those objects)
-                createdWindow.contentWindow.setRawRx = function(channels) {
+                createdWindow.contentWindow.setRawRx = function (channels) {
                     if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
                         mspHelper.setRawRx(channels);
                         return true;
@@ -351,109 +344,123 @@ TABS.receiver.initialize = function (callback) {
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         $(".sticks_btn").toggle(bit_check(BF_CONFIG.features, 14 /* RX_MSP */));
 
-        $('select[name="rx_refresh_rate"]').change(function () {
-            var plot_update_rate = parseInt($(this).val(), 10);
+        var plot_update_rate = parseInt($(this).val(), 10);
 
-            // save update rate
-            chrome.storage.local.set({'rx_refresh_rate': plot_update_rate});
+        function get_rc_data() {
 
-            function get_rc_data() {
-                MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
+            /*
+             * Throttling
+             */
+            if (helper.mspQueue.shouldDrop()) {
+                update_ui();
+                return;
             }
 
-            // setup plot
-            var RX_plot_data = new Array(RC.active_channels);
-            for (var i = 0; i < RX_plot_data.length; i++) {
-                RX_plot_data[i] = [];
+            MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
+        }
+
+        // setup plot
+        var RX_plot_data = new Array(RC.active_channels);
+        for (var i = 0; i < RX_plot_data.length; i++) {
+            RX_plot_data[i] = [];
+        }
+
+        var samples = 0,
+            svg = d3.select("svg"),
+            RX_plot_e = $('#RX_plot'),
+            margin = {top: 20, right: 0, bottom: 10, left: 40},
+            width, height, widthScale, heightScale;
+
+        function update_receiver_plot_size() {
+            width = RX_plot_e.width() - margin.left - margin.right;
+            height = RX_plot_e.height() - margin.top - margin.bottom;
+
+            widthScale.range([0, width]);
+            heightScale.range([height, 0]);
+        }
+
+        function update_ui() {
+            var i;
+
+            // update bars with latest data
+            for (i = 0; i < RC.active_channels; i++) {
+                meter_fill_array[i].css('width', ((RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
+                meter_label_array[i].text(RC.channels[i]);
             }
 
-            var samples = 0,
-                svg = d3.select("svg"),
-                RX_plot_e = $('#RX_plot'),
-                margin = {top: 20, right: 0, bottom: 10, left: 40},
-                width, height, widthScale, heightScale;
-
-            function update_receiver_plot_size() {
-                width = RX_plot_e.width() - margin.left - margin.right;
-                height = RX_plot_e.height() - margin.top - margin.bottom;
-
-                widthScale.range([0, width]);
-                heightScale.range([height, 0]);
+            // push latest data to the main array
+            for (i = 0; i < RC.active_channels; i++) {
+                RX_plot_data[i].push([samples, RC.channels[i]]);
             }
 
-            function update_ui() {
-                // update bars with latest data
-                for (var i = 0; i < RC.active_channels; i++) {
-                    meter_fill_array[i].css('width', ((RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
-                    meter_label_array[i].text(RC.channels[i]);
+            // Remove old data from array
+            while (RX_plot_data[0].length > 300) {
+                for (i = 0; i < RX_plot_data.length; i++) {
+                    RX_plot_data[i].shift();
                 }
-
-                // push latest data to the main array
-                for (var i = 0; i < RC.active_channels; i++) {
-                    RX_plot_data[i].push([samples, RC.channels[i]]);
-                }
-
-                // Remove old data from array
-                while (RX_plot_data[0].length > 300) {
-                    for (var i = 0; i < RX_plot_data.length; i++) {
-                        RX_plot_data[i].shift();
-                    }
-                }
-
-                // update required parts of the plot
-                widthScale = d3.scale.linear().
-                    domain([(samples - 299), samples]);
-
-                heightScale = d3.scale.linear().
-                    domain([800, 2200]);
-
-                update_receiver_plot_size();
-
-                var xGrid = d3.svg.axis().
-                    scale(widthScale).
-                    orient("bottom").
-                    tickSize(-height, 0, 0).
-                    tickFormat("");
-
-                var yGrid = d3.svg.axis().
-                    scale(heightScale).
-                    orient("left").
-                    tickSize(-width, 0, 0).
-                    tickFormat("");
-
-                var xAxis = d3.svg.axis().
-                    scale(widthScale).
-                    orient("bottom").
-                    tickFormat(function (d) {return d;});
-
-                var yAxis = d3.svg.axis().
-                    scale(heightScale).
-                    orient("left").
-                    tickFormat(function (d) {return d;});
-
-                var line = d3.svg.line().
-                    x(function (d) {return widthScale(d[0]);}).
-                    y(function (d) {return heightScale(d[1]);});
-
-                svg.select(".x.grid").call(xGrid);
-                svg.select(".y.grid").call(yGrid);
-                svg.select(".x.axis").call(xAxis);
-                svg.select(".y.axis").call(yAxis);
-
-                var data = svg.select("g.data"),
-                    lines = data.selectAll("path").data(RX_plot_data, function (d, i) {return i;}),
-                    newLines = lines.enter().append("path").attr("class", "line");
-                lines.attr('d', line);
-
-                samples++;
             }
 
-            // timer initialization
-            helper.interval.remove('receiver_pull');
+            // update required parts of the plot
+            widthScale = d3.scale.linear().
+                domain([(samples - 299), samples]);
 
-            // enable RC data pulling
-            helper.interval.add('receiver_pull', get_rc_data, plot_update_rate, true);
-        });
+            heightScale = d3.scale.linear().
+                domain([800, 2200]);
+
+            update_receiver_plot_size();
+
+            var xGrid = d3.svg.axis().
+                scale(widthScale).
+                orient("bottom").
+                tickSize(-height, 0, 0).
+                tickFormat("");
+
+            var yGrid = d3.svg.axis().
+                scale(heightScale).
+                orient("left").
+                tickSize(-width, 0, 0).
+                tickFormat("");
+
+            var xAxis = d3.svg.axis().
+                scale(widthScale).
+                orient("bottom").
+                tickFormat(function (d) {
+                    return d;
+                });
+
+            var yAxis = d3.svg.axis().
+                scale(heightScale).
+                orient("left").
+                tickFormat(function (d) {
+                    return d;
+                });
+
+            var line = d3.svg.line().
+                x(function (d) {
+                    return widthScale(d[0]);
+                }).
+                y(function (d) {
+                    return heightScale(d[1]);
+                });
+
+            svg.select(".x.grid").call(xGrid);
+            svg.select(".y.grid").call(yGrid);
+            svg.select(".x.axis").call(xAxis);
+            svg.select(".y.axis").call(yAxis);
+
+            var data = svg.select("g.data"),
+                lines = data.selectAll("path").data(RX_plot_data, function (d, i) {
+                    return i;
+                });
+
+            lines.enter().append("path").attr("class", "line");
+
+            lines.attr('d', line);
+
+            samples++;
+        }
+
+        helper.mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
 
         GUI.content_ready(callback);
     }

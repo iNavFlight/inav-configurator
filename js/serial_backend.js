@@ -7,7 +7,21 @@ $(document).ready(function () {
         $baud = $('#baud'),
         $portOverride = $('#port-override');
 
+    /*
+     * Handle "Wireless" mode with strict queueing of messages
+     */
+    $('#wireless-mode').change(function () {
+        var $this = $(this);
+
+        if ($this.is(':checked')) {
+            helper.mspQueue.setLockMethod('hard');
+        } else {
+            helper.mspQueue.setLockMethod('soft');
+        }
+    });
+
     GUI.handleReconnect = function ($tabElement) {
+
         if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
 
             /*
@@ -100,18 +114,25 @@ $(document).ready(function () {
                 } else {
                     var wasConnected = CONFIGURATOR.connectionValid;
 
-                    helper.timeout.killAll(['global_data_refresh']);
-                    helper.interval.killAll(['global_data_refresh']);
+                    helper.timeout.killAll();
+                    helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
+                    helper.mspBalancedInterval.flush();
+
                     GUI.tab_switch_cleanup();
                     GUI.tab_switch_in_progress = false;
+                    CONFIGURATOR.connectionValid = false;
+                    GUI.connected_to = false;
+                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
+
+                    /*
+                     * Flush
+                     */
+                    helper.mspQueue.flush();
+                    helper.mspQueue.freeHardLock();
+                    helper.mspQueue.freeSoftLock();
 
                     serial.disconnect(onClosed);
-
-                    GUI.connected_to = false;
-                    CONFIGURATOR.connectionValid = false;
-                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
                     MSP.disconnect_cleanup();
-                    PortUsage.reset();
 
                     // Reset various UI elements
                     $('span.i2c-error').text(0);
@@ -184,7 +205,6 @@ $(document).ready(function () {
     });
 
     PortHandler.initialize();
-    PortUsage.initialize();
 });
 
 function onOpen(openInfo) {
@@ -209,6 +229,9 @@ function onOpen(openInfo) {
                 chrome.storage.local.set({'last_used_port': GUI.connected_to});
             }
         });
+
+        chrome.storage.local.set({last_used_bps: serial.bitrate});
+        chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
 
         serial.onReceive.addListener(read_serial);
 
@@ -326,6 +349,13 @@ function onConnect() {
      */
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
+    helper.interval.add('msp-load-update', function () {
+        $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(1));
+        $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
+        $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));
+        $('#drop-rate').text("Drop ratio: " + helper.mspQueue.getDropRatio().toFixed(0) + "%");
+    }, 100);
+
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
 }
 
@@ -418,6 +448,11 @@ function sensor_status_hash(hw_status)
  * @deprecated
  */
 function sensor_status(sensors_detected) {
+
+    if (typeof SENSOR_STATUS === 'undefined') {
+        return;
+    }
+
     SENSOR_STATUS.isHardwareHealthy = 1;
     SENSOR_STATUS.gyroHwStatus      = have_sensor(sensors_detected, 'gyro') ? 1 : 0;
     SENSOR_STATUS.accHwStatus       = have_sensor(sensors_detected, 'acc') ? 1 : 0;

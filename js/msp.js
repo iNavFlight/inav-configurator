@@ -1,6 +1,26 @@
 'use strict';
 
 /**
+ *
+ * @constructor
+ */
+var MspMessageClass = function () {
+
+    var publicScope = {};
+
+    publicScope.code = null;
+    publicScope.messageBody = null;
+    publicScope.onFinish = null;
+    publicScope.onSend = null;
+    publicScope.timer = false;
+    publicScope.createdOn = new Date().getTime();
+    publicScope.sentOn = null;
+    publicScope.retryCounter = 5;
+
+    return publicScope;
+};
+
+/**
  * @typedef {{state: number, message_direction: number, code: number, message_length_expected: number, message_length_received: number, message_buffer: null, message_buffer_uint8_view: null, message_checksum: number, callbacks: Array, packet_error: number, unsupported: number, ledDirectionLetters: [*], ledFunctionLetters: [*], ledBaseFunctionLetters: [*], ledOverlayLetters: [*], last_received_timestamp: null, analog_last_received_timestamp: number, read: MSP.read, send_message: MSP.send_message, promise: MSP.promise, callbacks_cleanup: MSP.callbacks_cleanup, disconnect_cleanup: MSP.disconnect_cleanup}} MSP
  */
 var MSP = {
@@ -97,27 +117,52 @@ var MSP = {
                         $('span.packet-error').html(this.packet_error);
                     }
 
+                    /*
+                     * Free port
+                     */
+                    helper.mspQueue.freeHardLock();
+
                     // Reset variables
                     this.message_length_received = 0;
                     this.state = 0;
                     break;
 
                 default:
+                    /*
+                     * Free port
+                     */
+                    helper.mspQueue.freeHardLock();
                     console.log('Unknown state detected: ' + this.state);
             }
         }
         this.last_received_timestamp = Date.now();
     },
 
+    /**
+     *
+     * @param {MSP} mspData
+     */
+    putCallback: function (mspData) {
+        MSP.callbacks.push(mspData);
+    },
+
+    /**
+     * @param {number} code
+     */
+    removeCallback: function (code) {
+
+        for (var i in this.callbacks) {
+            if (this.callbacks.hasOwnProperty(i) && this.callbacks[i].code == code) {
+                clearTimeout(this.callbacks[i].timer);
+                this.callbacks.splice(i, 1);
+            }
+        }
+    },
+
     send_message: function (code, data, callback_sent, callback_msp) {
         var bufferOut,
             bufView,
             i;
-
-        /*
-         * For debug reasons, check how ofter MSP frames are executed
-         */
-        helper.eventFrequencyAnalyzer.put(code);
 
         // always reserve 6 bytes for protocol overhead !
         if (data) {
@@ -154,42 +199,14 @@ var MSP = {
             bufView[5] = bufView[3] ^ bufView[4]; // checksum
         }
 
-        // dev version 0.57 code below got recently changed due to the fact that queueing same MSP codes was unsupported
-        // and was causing trouble while backup/restoring configurations
-        // watch out if the recent change create any inconsistencies and then adjust accordingly
-        var obj = {'code': code, 'requestBuffer': bufferOut, 'callback': (callback_msp) ? callback_msp : false, 'timer': false};
+        var message = new MspMessageClass();
+        message.code = code;
+        message.messageBody = bufferOut;
+        message.onFinish = callback_msp;
+        message.onSend = callback_sent;
 
-        var requestExists = false;
-        for (i = 0; i < MSP.callbacks.length; i++) {
-            if (i < MSP.callbacks.length) {
-                if (MSP.callbacks[i].code == code) {
-                    // request already exist, we will just attach
-                    requestExists = true;
-                    break;
-                }
-            } else {
-                console.log("Callback index error: "+ i);
-            }
-        }
+        helper.mspQueue.put(message);
 
-        if (!requestExists) {
-            obj.timer = setInterval(function () {
-                console.log('MSP data request timed-out: ' + code);
-
-                serial.send(bufferOut, false);
-            }, serial.getTimeout()); // we should be able to define timeout in the future
-        }
-
-        MSP.callbacks.push(obj);
-
-        // always send messages with data payload (even when there is a message already in the queue)
-        if (data || !requestExists) {
-            serial.send(bufferOut, function (sendInfo) {
-                if (sendInfo.bytesSent == bufferOut.byteLength) {
-                    if (callback_sent) callback_sent();
-                }
-            });
-        }
         return true;
     },
     promise: function(code, data) {

@@ -139,6 +139,14 @@ TABS.setup.initialize = function (callback) {
 
         function get_slow_data() {
             if (have_sensor(CONFIG.activeSensors, 'gps')) {
+
+                /*
+                 * Enable balancer
+                 */
+                if (helper.mspQueue.shouldDrop()) {
+                    return;
+                }
+
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
                     if (GPS_DATA.fix >= 2)
@@ -154,6 +162,14 @@ TABS.setup.initialize = function (callback) {
         }
 
         function get_fast_data() {
+
+            /*
+             * Enable balancer
+             */
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
 	            roll_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
 	            pitch_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
@@ -163,8 +179,9 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        helper.interval.add('setup_data_pull_fast', get_fast_data, 40, true); // 25 fps
-        helper.interval.add('setup_data_pull_slow', get_slow_data, 250, true); // 4 fps
+        helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
+        helper.mspBalancedInterval.add('setup_data_pull_slow', 250, 1, get_slow_data);
+
         helper.interval.add('gui_analog_update', function () {
                 bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
                 bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));

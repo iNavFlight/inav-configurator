@@ -2029,6 +2029,9 @@
     },
     "w_z_gos_p_help": {
         "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
+    },
+    "wirelessModeSwitch": {
+        "message": "Wireless mode"
     }
 
 }
