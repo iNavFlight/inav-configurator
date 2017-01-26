@@ -900,6 +900,20 @@ var mspHelper = (function (gui) {
                 console.log('NAV_POSHOLD saved');
                 break;
 
+            case MSPCodes.MSP_POSITION_ESTIMATION_CONFIG:
+                POSITION_ESTIMATOR.w_z_baro_p = data.getUint16(0, true) / 100;
+                POSITION_ESTIMATOR.w_z_gps_p = data.getUint16(2, true) / 100;
+                POSITION_ESTIMATOR.w_z_gps_v = data.getUint16(4, true) / 100;
+                POSITION_ESTIMATOR.w_xy_gps_p = data.getUint16(6, true) / 100;
+                POSITION_ESTIMATOR.w_xy_gps_v = data.getUint16(8, true) / 100;
+                POSITION_ESTIMATOR.gps_min_sats = data.getUint8(10);
+                POSITION_ESTIMATOR.use_gps_velned = data.getUint8(11);
+                break;
+
+            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
+                console.log('POSITION_ESTIMATOR saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1225,6 +1239,26 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
                 buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
+                break;
+
+            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_baro_p * 100));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_baro_p * 100));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_p * 100));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_p * 100));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_v * 100));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_v * 100));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_p * 100));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_p * 100));
+
+                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_v * 100));
+                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_v * 100));
+
+                buffer.push(POSITION_ESTIMATOR.gps_min_sats);
+                buffer.push(POSITION_ESTIMATOR.use_gps_velned);
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -1940,6 +1974,38 @@ var mspHelper = (function (gui) {
     self.saveSensorConfig = function (callback) {
         if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
             MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadNavPosholdConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_NAV_POSHOLD, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveNavPosholdConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_NAV_POSHOLD, mspHelper.crunch(MSPCodes.MSP_SET_NAV_POSHOLD), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadPositionEstimationConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_POSITION_ESTIMATION_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.savePositionEstimationConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
         } else {
             callback();
         }

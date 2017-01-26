@@ -44,6 +44,7 @@ var FILTER_CONFIG;
 var SENSOR_STATUS;
 var SENSOR_CONFIG;
 var NAV_POSHOLD;
+var POSITION_ESTIMATOR;
 
 var FC = {
     isRatesInDps: function () {
@@ -335,6 +336,16 @@ var FC = {
             rx_max_usec: 0,
             nrf24rx_protocol: 0,
             nrf24rx_id: 0
+        };
+
+        POSITION_ESTIMATOR = {
+            w_z_baro_p: null,
+            w_z_gps_p: null,
+            w_z_gps_v: null,
+            w_xy_gps_p: null,
+            w_xy_gps_v: null,
+            gps_min_sats: null,
+            use_gps_velned: null
         };
 
         FAILSAFE_CONFIG = {
@@ -697,5 +708,11 @@ var FC = {
         }
 
         return retVal;
+    },
+    getUserControlMode: function () {
+        return [
+            "Attitude",
+            "Cruise"
+        ]
     }
 };
