@@ -371,11 +371,15 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             $(this).parent().addClass('active');
 
             $('#save-button').removeClass('disabled');
+
+            googleAnalytics.sendEvent('Presets', 'Displayed', currentPreset.name);
         });
 
         $('#execute-button').click(function () {
             applyAndSave();
             OSD.GUI.jbox.close();
+
+            googleAnalytics.sendEvent('Presets', 'Applied', currentPreset.name);
         });
 
         localize();

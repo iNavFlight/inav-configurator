@@ -3,8 +3,6 @@
 TABS.ports = {};
 
 TABS.ports.initialize = function (callback, scrollPosition) {
-    var self = this;
-
     var board_definition = {};
 
     var functionRules = [
@@ -15,7 +13,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
          {name: 'TELEMETRY_SMARTPORT',  groups: ['telemetry'], maxPorts: 1},
          {name: 'TELEMETRY_LTM',        groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1},
          {name: 'RX_SERIAL',            groups: ['rx'], maxPorts: 1},
-         {name: 'BLACKBOX',             groups: ['logging', 'blackbox'], sharableWith: ['msp'], notSharableWith: ['telemetry'], maxPorts: 1},
+         {name: 'BLACKBOX',             groups: ['logging', 'blackbox'], sharableWith: ['msp'], notSharableWith: ['telemetry'], maxPorts: 1}
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
@@ -90,7 +88,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
             $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
 
             board_definition = BOARD.find_board_definition(CONFIG.boardIdentifier);
-            console.log('Using board definition', board_definition);
         }
     }
 
@@ -223,7 +220,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         // update configuration based on current ui state
         SERIAL_CONFIG.ports = [];
 
-        var ports_e = $('.tab-ports .portConfiguration').each(function (portConfiguration_e) {
+        $('.tab-ports .portConfiguration').each(function () {
 
             var portConfiguration_e = this;
 
@@ -236,6 +233,10 @@ TABS.ports.initialize = function (callback, scrollPosition) {
             var telemetryFunction = $(portConfiguration_e).find('select[name=function-telemetry]').val();
             if (telemetryFunction) {
                 functions.push(telemetryFunction);
+            }
+
+            if (telemetryFunction.length > 0) {
+                googleAnalytics.sendEvent('Setting', 'Telemetry Protocol', telemetryFunction);
             }
 
             var serialPort = {
