@@ -21,6 +21,13 @@
   "author": "iNavFlight",
   "license": "GPL-3.0",
   "dependencies": {
-    "nw": "^0.18.0"
+    "nw": "^0.18.0",
+    "openlayers": "^3.20.0",
+    "gulp": "^3.9.1",
+    "gulp-uglify": "^2.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify-css": "1.2.4",
+    "jquery": "3.1.1",
+    "jquery-ui": "1.12.1"
   }
 }

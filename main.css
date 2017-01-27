@@ -115,13 +115,14 @@ input[type="number"]::-webkit-inner-spin-button {
     background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.15));
 }
 
+/*noinspection CssUnknownTarget*/
 #logo {
     position: absolute;
     float: left;
     height: 80px;
     z-index: 0;
     width: 450px;
-    background: url("images/light-wide-2.svg") no-repeat left center;
+    background: url("../images/light-wide-2.svg") no-repeat left center;
     background-size: contain;
     margin-left: 15px;
     margin-top: 10px;
@@ -447,7 +448,7 @@ input[type="number"]::-webkit-inner-spin-button {
     height: 20px;
     margin-top: 10px;
     margin-right: 10px;
-    background: url('./images/CF_settings_white.svg') no-repeat -1px -1px;
+    background: url('../images/CF_settings_white.svg') no-repeat -1px -1px;
     opacity: 0.4;
 }
 
@@ -1469,7 +1470,7 @@ dialog {
 .connect_b a.connect {
     border: 1px solid #339cc1;
     background-size: 44px;
-    background: #37a8db url(images/icons/cf_icon_usb2_white.svg) no-repeat center 6px;
+    background: #37a8db url('../images/icons/cf_icon_usb2_white.svg') no-repeat center 6px;
     transition: none;
 }
 
@@ -1479,7 +1480,7 @@ dialog {
 
 .connect_b a.connect.active {
     border: 1px solid #fe0000;
-    background: #e60000 url(images/icons/cf_icon_usb1_white.svg);
+    background: #e60000 url('../images/icons/cf_icon_usb1_white.svg');
     transition: none;
 }
 
