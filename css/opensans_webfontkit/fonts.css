@@ -13,6 +13,7 @@
     font-style: normal;
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansregular';
     src: url('../css/opensans_webfontkit/opensans-regular-webfont.eot');
@@ -25,6 +26,7 @@
     font-style: normal;
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sanslight';
     src: url('../css/opensans_webfontkit/opensans-light-webfont.eot');
@@ -37,6 +39,7 @@
     font-style: normal;
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansitalic';
     src: url('../css/opensans_webfontkit/opensans-italic-webfont.eot');
@@ -49,6 +52,7 @@
     font-style: normal;
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansbold_italic';
     src: url('../css/opensans_webfontkit/opensans-bolditalic-webfont.eot');
@@ -61,6 +65,7 @@
     font-style: normal;
 }
 
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansbold';
     src: url('../css/opensans_webfontkit/opensans-bold-webfont.eot');
@@ -76,37 +81,42 @@
 /* Fonts shouldn't be transformed by browser. 
 Using specific fonts for bold, italic and bold_italic instead.*/
 
+/*noinspection CssNoGenericFontName*/
 i {
     font-family: 'open_sansitalic';
     font-weight: normal;
     font-style: normal;
 }
 
-em {    
+/*noinspection CssNoGenericFontName*/
+em {
     font-family: 'open_sansitalic';
     font-style:normal;
     font-weight: normal;
 }
 
-
-em strong {    
+/*noinspection CssNoGenericFontName*/
+em strong {
     font-family: 'open_sansbold_italic';
     font-style:normal;
     font-weight: normal;
 }
 
- strong em {    
+/*noinspection CssNoGenericFontName*/
+strong em {
     font-family: 'open_sansbold_italic';
     font-style:normal;
     font-weight: normal;
 }
 
+/*noinspection CssNoGenericFontName*/
 strong {
     font-family: 'open_sansbold';
     font-weight: normal;
     font-style: normal;
 }
 
+/*noinspection CssNoGenericFontName*/
 b {
     font-family: 'open_sansbold';
     font-weight: normal;

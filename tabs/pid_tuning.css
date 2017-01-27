@@ -25,7 +25,7 @@
 .tab-pid_tuning .rate-tpa th {
     background-color: #828885;
     padding: 4px;
-    border-left: 0px solid #ccc;
+    border-left: 0 solid #ccc;
     border-bottom: 1px solid #ccc;
     font-weight: bold;
     color: white;
@@ -44,7 +44,7 @@
 }
 
 .tab-pid_tuning .cf th:last-child {
-    border-right: 0px;
+    border-right: 0;
 }
 
 .tab-pid_tuning .cf td:first-child {
@@ -53,7 +53,7 @@
 
 .tab-pid_tuning .cf td:last-child {
     border-bottom-right-radius: 3px;
-    border-right: 0px;
+    border-right: 0;
 }
 
 .tab-pid_tuning .cf input {
@@ -87,23 +87,23 @@
 
 .tab-pid_tuning table {
     float: left;
-    margin: 0px;
+    margin: 0;
     border-collapse: collapse;
     width: calc(100% - -1px);
 }
 
 .tab-pid_tuning .gui_box {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .tab-pid_tuning table, .tab-pid_tuning table td {
     padding: 1px;
-    border-bottom: 0px solid #ccc;
+    border-bottom: 0 solid #ccc;
 }
 
 .tab-pid_tuning table th {
-    padding: 0px;
-    border: 0px;
+    padding: 0;
+    border: 0;
     height: 10px;
     font-weight: normal;
 }
@@ -129,7 +129,7 @@
 }
 
 .tab-pid_tuning table tr td:last-child {
-    border-right: 0px solid #ccc;
+    border-right: 0 solid #ccc;
 }
 
 .tab-pid_tuning table td {
@@ -140,7 +140,7 @@
 
 .tab-pid_tuning table tr td {
     text-align: left;
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .pid-section input {
@@ -149,8 +149,7 @@
     height: 20px;
     line-height: 20px;
     text-align: right;
-    border: 0px solid #ccc;
-    border-radius: 0px;
+    border: none;
 }
 
 .tab-pid_tuning .profile {
@@ -169,9 +168,7 @@
     color: white;
     height: 19px;
     font-weight: normal;
-    padding: 2px;
-    padding-bottom: 3px;
-    padding-left: 6px;
+    padding: 2px 2px 3px 6px;
 }
 
 .tab-pid_tuning .profile select {
@@ -209,30 +206,27 @@
 .tab-pid_tuning .fixed_band {
     position: absolute;
     width: 100%;
-    bottom: 0px;
+    bottom: 0;
 }
 
 .pid_mode {
     width: calc(100% - 5px);
     height: 20px;
-    background-color: #D6D6D6;
     float: left;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
     text-align: left;
-    padding-left: 5px;
     line-height: 13px;
-    padding-top: 8px;
+    padding: 8px 0 0 5px;
     font-size: 12px;
     border-bottom: 1px solid #ccc;
     color: #828282;
-    font-family: 'open_sans', Arial;
-    background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 10%, transparent 10%, transparent 20%,
-        rgba(255, 255, 255, .2) 20%, rgba(255, 255, 255, .2) 30%, transparent 30%, transparent 40%,
-        rgba(255, 255, 255, .2) 40%, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent 60%,
-        rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .2) 70%, transparent 70%, transparent 80%,
-        rgba(255, 255, 255, .2) 80%, rgba(255, 255, 255, .2) 90%, transparent 90%, transparent 100%,
-        rgba(255, 255, 255, .2) 100%, transparent);
+    font-family: 'open_sans', Arial, serif;
+    background: #D6D6D6 linear-gradient(-45deg, rgba(255, 255, 255, .2) 10%, transparent 10%, transparent 20%,
+    rgba(255, 255, 255, .2) 20%, rgba(255, 255, 255, .2) 30%, transparent 30%, transparent 40%,
+    rgba(255, 255, 255, .2) 40%, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent 60%,
+    rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .2) 70%, transparent 70%, transparent 80%,
+    rgba(255, 255, 255, .2) 80%, rgba(255, 255, 255, .2) 90%, transparent 90%, transparent 100%,
+    rgba(255, 255, 255, .2) 100%, transparent);
 }
 
 .pid_titlebar {
@@ -264,7 +258,7 @@
 
 .tab-pid_tuning .number .helpicon {
     margin-top: 3px;
-    margin-right: 0px;
+    margin-right: 0;
 }
 
 .tab-pid_tuning .gui_box_titlebar .helpicon {
@@ -295,7 +289,7 @@
 
 .tab-pid_tuning .number:last-child {
     padding-bottom: 5px;
-    border-bottom: 0px;
+    border-bottom: 0;
 }
 
 .tab-pid_tuning .number input {
@@ -312,7 +306,7 @@
 
 .tab-pid_tuning .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial, serif;
     line-height: 19px;
     color: #7d7d7d;
     font-size: 11px;
@@ -325,9 +319,7 @@
     right: 0;
     z-index: -1;
     overflow: hidden;
-    background-image: url("../images/light-wide-2.svg");
-    background-repeat: no-repeat;
-    background-position: 95% 20%;
+    background: url("../images/light-wide-2.svg") no-repeat 95% 20%;
     background-size: 430px;
     height: 174px;
     opacity: 0.15;
@@ -348,11 +340,11 @@
 }
 
 .tab-pid_tuning .leftzero {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .tab-pid_tuning .tpa-breakpoint {
-    border-top-left-radius: 0px;
+    border-top-left-radius: 0;
 }
 
 .tab-pid_tuning .pidTuningLevel {
