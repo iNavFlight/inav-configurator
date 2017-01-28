@@ -58,7 +58,7 @@ For INAV configurator issues raise them here
 
 https://github.com/iNavFlight/inav-configurator/issues
 
-For Cleanflight firmware issues raise them here
+For INAV firmware issues raise them here
 
 https://github.com/iNavFlight/inav/issues
 
@@ -67,8 +67,8 @@ https://github.com/iNavFlight/inav/issues
 This branch uses NW.js to pack Crome app into single package with node.js and chromium
 
 ```
-npm install nwjs-builder -g
-nwb nwbuild -p win64 --production
+npm install
+./node_modules/nw-builder/bin/nwbuild -p win32 ./
 ```
 
 ## Developers
