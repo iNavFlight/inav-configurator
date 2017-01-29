@@ -11,21 +11,34 @@ presets.elementHelper = function (group, field, value) {
 };
 
 presets.defaultValues = {
-    PIDs: [
-        [40,30,23],
-        [40,30,23],
-        [85,45,0],
-        [50,0,0],
-        [65,120,10],
-        [180,15,100],
-        [0,0,0],
-        [20,15,75],
-        [60,0,0],
-        [100,50,10]
-    ],
+    PIDs: {
+        mr: [
+            [40, 30, 23],
+            [40, 30, 23],
+            [85, 45, 0],
+            [50, 0, 0],
+            [65, 120, 10],
+            [180, 15, 100],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [100, 50, 10]
+        ],
+        fw: [
+            [25, 35, 10],
+            [20, 35, 10],
+            [50, 45, 0],
+            [50, 0, 0],
+            [75, 5, 8],
+            [0, 0, 0],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [0, 0, 0]
+        ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
-    RC_tuning: {"RC_RATE":1,"RC_EXPO":0.7,"roll_pitch_rate":0,"roll_rate":200,"pitch_rate":200,"yaw_rate":200,"dynamic_THR_PID":0,"throttle_MID":0.5,"throttle_EXPO":0,"dynamic_THR_breakpoint":1500,"RC_YAW_EXPO":0.2},
+    RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
     FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0},
     FC_CONFIG: {"loopTime": 2000}
@@ -36,6 +49,15 @@ presets.defaultValues = {
  *
  * BF_CONFIG::mixerConfiguration
  *
+ */
+
+
+/**
+ * When defining a preset, following fields are required:
+ *
+ * BF_CONFIG::mixerConfiguration
+ *
+ * @type {{name: string, description: string, features: string[], applyDefaults: string[], settings: *[], type: string}[]}
  */
 presets.presets = [
     {
@@ -219,14 +241,25 @@ presets.model = (function () {
     /**
      * @param {Array} toApply
      * @param {Object} defaults
+     * @param {String} mixerType
      */
-    self.applyDefaults = function (toApply, defaults) {
+    self.applyDefaults = function (toApply, defaults, mixerType) {
 
         for (var settingToApply in toApply) {
             if (toApply.hasOwnProperty(settingToApply)) {
 
                 var settingName = toApply[settingToApply],
+                    values;
+
+                if (settingName == 'PIDs') {
+                    if (mixerType == 'multirotor') {
+                        values = defaults[settingName]['mr'];
+                    } else {
+                        values = defaults[settingName]['fw'];
+                    }
+                } else {
                     values = defaults[settingName];
+                }
 
                 for (var key in values) {
                     if (values.hasOwnProperty(key)) {
@@ -238,7 +271,7 @@ presets.model = (function () {
         }
     };
 
-    self.extractPresetNames = function(presets) {
+    self.extractPresetNames = function (presets) {
 
         var retVal = {};
 
@@ -282,6 +315,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     loadChainer.execute();
 
     saveChainer.setChain([
+        mspHelper.saveBfConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveLooptimeConfig,
         mspHelper.saveAdvancedConfig,
@@ -289,7 +323,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         mspHelper.savePidData,
         mspHelper.saveRcTuningData,
         mspHelper.savePidAdvanced,
-        mspHelper.saveBfConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -314,7 +347,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
     function applyAndSave() {
 
-        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
+        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues, currentPreset.type);
 
         var setting;
 
@@ -358,10 +391,10 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
-        for(var preset in presetsList) {
-            $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+        for (var preset in presetsList) {
+            $presetList.append('<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
         }
-    
+
         $('.preset__element-link').click(function () {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];

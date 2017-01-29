@@ -417,6 +417,7 @@ var mspHelper = (function (gui) {
                 BF_CONFIG.currentoffset = data.getUint16(14, true);
                 break;
             case MSPCodes.MSP_SET_BF_CONFIG:
+                console.log('BF_CONFIG saved');
                 break;
             case MSPCodes.MSP_SET_REBOOT:
                 console.log('Reboot request accepted');
