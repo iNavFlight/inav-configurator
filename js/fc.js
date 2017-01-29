@@ -162,6 +162,7 @@ var FC = {
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
             altitude: 0,
+            barometer: 0,
             sonar: 0,
             kinematics: [0.0, 0.0, 0.0],
             debug: [0, 0, 0, 0]
