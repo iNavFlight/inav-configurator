@@ -12,16 +12,16 @@ presets.elementHelper = function (group, field, value) {
 
 presets.defaultValues = {
     PIDs: [
-        [40, 30, 23],
-        [40, 30, 23],
-        [85, 45, 0],
-        [50, 0, 0],
-        [65, 120, 10],
-        [180, 15, 100],
-        [10, 5, 8],
-        [20, 15, 75],
-        [60, 0, 0],
-        [100, 50, 10]
+        [40,30,23],
+        [40,30,23],
+        [85,45,0],
+        [50,0,0],
+        [65,120,10],
+        [180,15,100],
+        [0,0,0],
+        [20,15,75],
+        [60,0,0],
+        [100,50,10]
     ],
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
