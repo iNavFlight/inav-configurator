@@ -363,14 +363,11 @@ var FC = {
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
             {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
-            {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'},
-            {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
@@ -382,6 +379,14 @@ var FC = {
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            features.push(
+                {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
+                {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
+                {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'}
+            );
+        }
 
         if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
             features.push(
@@ -397,7 +402,10 @@ var FC = {
             $('.features.esc-priority').parent().hide();
         }
 
-        if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
+        /*
+         * Transponder disabled until not implemented in firmware
+         */
+        if (false && semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
                 {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true, showNameInTip: true}
             );
