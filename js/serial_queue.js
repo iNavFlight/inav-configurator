@@ -50,6 +50,23 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.lockMethod = 'soft';
 
+    privateScope.queueLocked = false;
+
+    /**
+     * Method locks queue
+     * All future put requests will be rejected
+     */
+    publicScope.lock = function () {
+        privateScope.queueLocked = true;
+    };
+
+    /**
+     * Method unlocks queue making it possible to put new requests in it
+     */
+    publicScope.unlock = function () {
+        privateScope.queueLocked = false;
+    };
+
     publicScope.setLockMethod = function (method) {
         privateScope.lockMethod = method;
     };
@@ -78,6 +95,14 @@ helper.mspQueue = (function (serial, MSP) {
             return privateScope.hardLock !== false;
         }
 
+    };
+
+    privateScope.getTimeout = function (code) {
+        if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
+            return 5000;
+        } else {
+            return serial.getTimeout();
+        }
     };
 
     /**
@@ -137,7 +162,7 @@ helper.mspQueue = (function (serial, MSP) {
                     publicScope.put(request);
                 }
 
-            }, serial.getTimeout());
+            }, privateScope.getTimeout(request.code));
 
             if (request.sentOn === null) {
                 request.sentOn = new Date().getTime();
@@ -175,8 +200,19 @@ helper.mspQueue = (function (serial, MSP) {
         privateScope.queue = [];
     };
 
+    /**
+     * Method puts new request into queue
+     * @param {MspMessageClass} mspRequest
+     * @returns {boolean} true on success, false when queue is locked
+     */
     publicScope.put = function (mspRequest) {
+
+        if (privateScope.queueLocked === true) {
+            return false;
+        }
+
         privateScope.queue.push(mspRequest);
+        return true;
     };
 
     publicScope.getLength = function () {
