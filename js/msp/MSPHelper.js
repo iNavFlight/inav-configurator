@@ -177,6 +177,10 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_ALTITUDE:
                 SENSOR_DATA.altitude = parseFloat((data.getInt32(0, true) / 100.0).toFixed(2)); // correct scale factor
+                // On 1.6 and above this provides also baro raw altitude
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    SENSOR_DATA.barometer = parseFloat((data.getInt32(6, true) / 100.0).toFixed(2)); // correct scale factor
+                }
                 break;
             case MSPCodes.MSP_SONAR:
                 SENSOR_DATA.sonar = data.getInt32(0, true);
