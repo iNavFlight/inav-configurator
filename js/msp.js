@@ -205,6 +205,13 @@ var MSP = {
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
 
+        /*
+         * In case of MSP_REBOOT special procedure is required
+         */
+        if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
+            message.retryCounter = 10;
+        }
+
         helper.mspQueue.put(message);
 
         return true;
