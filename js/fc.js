@@ -423,6 +423,13 @@ var FC = {
                 {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
             );
         }
+
+        if (semver.gte(CONFIG.flightControllerVersion, '1.5.0')) {
+            features.push(
+                {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
