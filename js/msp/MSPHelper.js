@@ -260,8 +260,8 @@ var mspHelper = (function (gui) {
                 _3D.deadband3d_high = data.getUint16(offset, true);
                 offset += 2;
                 _3D.neutral3d = data.getUint16(offset, true);
-                offset += 2;
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
+                    offset += 2;
                     _3D.deadband3d_throttle = data.getUint16(offset, true);
                 }
                 break;
