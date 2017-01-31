@@ -378,6 +378,30 @@ OSD.constants = {
             default_position: -1,
             positionable: true,
             preview: FONT.symbol(SYM.GPS_SAT) + '14'
+        },
+        ROLL_PIDS: {
+            name: 'ROLL_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'ROL 40 30 23'
+        },
+        PITCH_PIDS: {
+            name: 'PITCH_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'PIT 40 30 23'
+        },
+        YAW_PIDS: {
+            name: 'YAW_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'YAW 85 45 0'
+        },
+        POWER: {
+            name: 'POWER',
+            default_position: -1,
+            positionable: true,
+            preview: '50W'
         }
     }
 };
@@ -402,7 +426,14 @@ OSD.chooseFields = function () {
         F.GPS_SPEED,
         F.GPS_SATS,
         F.ALTITUDE
-    ]
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+        OSD.constants.DISPLAY_FIELDS.push(F.ROLL_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.PITCH_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.YAW_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.POWER);
+    }
 
 };
 
