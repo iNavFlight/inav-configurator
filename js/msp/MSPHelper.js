@@ -260,9 +260,8 @@ var mspHelper = (function (gui) {
                 _3D.deadband3d_high = data.getUint16(offset, true);
                 offset += 2;
                 _3D.neutral3d = data.getUint16(offset, true);
-
+                offset += 2;
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                    offset += 2;
                     _3D.deadband3d_throttle = data.getUint16(offset, true);
                 }
                 break;
@@ -339,6 +338,9 @@ var mspHelper = (function (gui) {
                 RC_deadband.deadband = data.getUint8(offset++);
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
+                if (semver.gte(CONFIG.apiVersion, "1.17.0")) {
+                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                }
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
                 SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
@@ -1177,6 +1179,10 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.deadband);
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
+                if (semver.gte(CONFIG.apiVersion, "1.17.0")) {
+                    buffer.push(lowByte(_3D.deadband3d_throttle));
+                    buffer.push(highByte(_3D.deadband3d_throttle));
+                }
                 break;
 
             case MSPCodes.MSP_SET_SENSOR_ALIGNMENT:
