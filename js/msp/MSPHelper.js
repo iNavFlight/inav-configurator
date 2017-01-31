@@ -338,7 +338,7 @@ var mspHelper = (function (gui) {
                 RC_deadband.deadband = data.getUint8(offset++);
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
-                if (semver.gte(CONFIG.apiVersion, "1.17.0")) {
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
                     _3D.deadband3d_throttle = data.getUint16(offset, true);
                 }
                 break;
@@ -1179,7 +1179,7 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.deadband);
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
-                if (semver.gte(CONFIG.apiVersion, "1.17.0")) {
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
                     buffer.push(lowByte(_3D.deadband3d_throttle));
                     buffer.push(highByte(_3D.deadband3d_throttle));
                 }
