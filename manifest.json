@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "minimum_chrome_version": "38",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "author": "Several",
     "name": "INAV - Configurator",
     "short_name": "INAV",
