@@ -232,6 +232,27 @@ presets.presets = [
         ],
         type: 'flyingwing'
     }
+        {
+        name: "Flying wing Z84",
+        description: "Small flying wing on multirotor racer parts<br>" +
+            "<span>300g-500g weight, 3S-4S battery</span>",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [2, 15, 30]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [2, 15, 70]),  //PITCH PIDs
+            presets.elementHelper("RC_tuning", "roll_rate", 350),
+            presets.elementHelper("RC_tuning", "pitch_rate", 90),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
+        ],
+        type: 'flyingwing'
+    }
 ];
 
 presets.model = (function () {
