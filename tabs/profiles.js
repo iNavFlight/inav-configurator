@@ -231,8 +231,8 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ],
         type: 'flyingwing'
-    }
-        {
+    },
+    {
         name: "Flying wing Z84",
         description: "Small flying wing on multirotor racer parts<br>" +
             "<span>300g-500g weight, 3S-4S battery</span>",
@@ -246,10 +246,13 @@ presets.presets = [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
             presets.elementHelper("PIDs", 0, [2, 15, 30]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [2, 15, 70]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 7, [10, 15, 75]),  //LEVEL PIDs
             presets.elementHelper("RC_tuning", "roll_rate", 350),
             presets.elementHelper("RC_tuning", "pitch_rate", 90),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1300),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         type: 'flyingwing'
     }
@@ -413,7 +416,9 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
         for (var preset in presetsList) {
-            $presetList.append('<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            if (presetsList.hasOwnProperty(preset)) {
+                $presetList.append('<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            }
         }
 
         $('.preset__element-link').click(function () {
