@@ -39,7 +39,6 @@ TABS.receiver.initialize = function (callback) {
         $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
         $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
 
-        $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
         $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
 
@@ -223,31 +222,24 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input').on('input change', function () {
             setTimeout(function () { // let global validation trigger and adjust the values first
-                var rateE = $('.tunings .rate input[name="rate"]'),
-                    expoE = $('.tunings .rate input[name="expo"]'),
-                    rate = parseFloat(rateE.val()),
+                var expoE = $('.tunings .rate input[name="expo"]'),
                     expo = parseFloat(expoE.val()),
                     pitch_roll_curve = $('.pitch_roll_curve canvas').get(0),
                     context = pitch_roll_curve.getContext("2d");
 
                 // local validation to deal with input event
-                if (rate >= parseFloat(rateE.prop('min')) &&
-                    rate <= parseFloat(rateE.prop('max')) &&
-                    expo >= parseFloat(expoE.prop('min')) &&
+                if (expo >= parseFloat(expoE.prop('min')) &&
                     expo <= parseFloat(expoE.prop('max'))) {
                     // continue
                 } else {
                     return;
                 }
 
-                // math magic by englishman
-                var ratey = rateHeight * rate;
-
                 // draw
                 context.clearRect(0, 0, 200, rateHeight);
                 context.beginPath();
                 context.moveTo(0, rateHeight);
-                context.quadraticCurveTo(110, rateHeight - ((ratey / 2) * (1 - expo)), 200, rateHeight - ratey);
+                context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expo)), 200, 0);
                 context.lineWidth = 2;
                 context.strokeStyle = '#37a8db';
                 context.stroke();
@@ -262,7 +254,6 @@ TABS.receiver.initialize = function (callback) {
                 $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
                 $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
 
-                $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
                 $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
 
                 // update visual representation
@@ -276,7 +267,6 @@ TABS.receiver.initialize = function (callback) {
             RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
 
-            RC_tuning.RC_RATE = parseFloat($('.tunings .rate input[name="rate"]').val());
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
