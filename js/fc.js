@@ -556,7 +556,7 @@ var FC = {
         ];
     },
     getSerialRxTypes: function () {
-        return [
+        var data = [
             'SPEKTRUM1024',
             'SPEKTRUM2048',
             'SBUS',
@@ -566,6 +566,13 @@ var FC = {
             'XBUS_MODE_B_RJ01',
             'IBUS'
         ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            data.push('JETI EXBUS');
+            data.push('TBS Crossfire');
+        }
+
+        return data;
     },
     getNrf24ProtocolTypes: function () {
         return [
