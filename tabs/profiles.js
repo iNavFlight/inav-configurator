@@ -190,6 +190,83 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '280mm Tricopter',
+        description: "280mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 700),
+            presets.elementHelper("RC_tuning", "pitch_rate", 550),
+            presets.elementHelper("RC_tuning", "yaw_rate", 250),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("PIDs", 0, [55, 40, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [55, 40, 15]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [90, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
+        name: '600mm Tricopter',
+        description: "600mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "GPS ready",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
+            presets.elementHelper("RC_tuning", "roll_rate", 550),
+            presets.elementHelper("RC_tuning", "pitch_rate", 480),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 125),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 90),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 170),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 125),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 85),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("PIDs", 0, [110, 20, 52]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [110, 20, 52]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [75, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
