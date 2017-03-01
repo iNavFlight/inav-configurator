@@ -1,0 +1,93 @@
+'use strict';
+
+TABS.advanced_tuning = {};
+
+TABS.advanced_tuning.initialize = function (callback) {
+
+    var loadChainer = new MSPChainerClass(),
+        saveChainer = new MSPChainerClass();
+
+    if (GUI.active_tab != 'advanced_tuning') {
+        GUI.active_tab = 'advanced_tuning';
+        googleAnalytics.sendAppView('AdvancedTuning');
+    }
+
+    loadChainer.setChain([
+        mspHelper.loadNavPosholdConfig,
+        mspHelper.loadPositionEstimationConfig
+    ]);
+    loadChainer.setExitPoint(loadHtml);
+    loadChainer.execute();
+
+    saveChainer.setChain([
+        mspHelper.saveNavPosholdConfig,
+        mspHelper.savePositionEstimationConfig,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(reboot);
+
+    function loadHtml() {
+        $('#content').load("./tabs/advanced_tuning.html", processHtml);
+    }
+
+    function reboot() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.tab_switch_cleanup(function () {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+        });
+    }
+
+    function reinitialize() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.handleReconnect($('.tab_advanced_tuning a'));
+    }
+
+    function processHtml() {
+
+        var $userControlMode = $('#user-control-mode'),
+            $useMidThrottle = $("#use-mid-throttle"),
+            $useGpsVelned = $('#use_gps_velned');
+
+        GUI.fillSelect($userControlMode, FC.getUserControlMode(), NAV_POSHOLD.userControlMode);
+        $userControlMode.val(NAV_POSHOLD.userControlMode);
+        $userControlMode.change(function () {
+            NAV_POSHOLD.userControlMode = $userControlMode.val();
+        });
+
+        $useMidThrottle.prop("checked", NAV_POSHOLD.useThrottleMidForAlthold);
+        $useMidThrottle.change(function () {
+            if ($(this).is(":checked")) {
+                NAV_POSHOLD.useThrottleMidForAlthold = 1;
+            } else {
+                NAV_POSHOLD.useThrottleMidForAlthold = 0;
+            }
+        });
+        $useMidThrottle.change();
+
+        $useGpsVelned.prop("checked", POSITION_ESTIMATOR.use_gps_velned);
+        $useGpsVelned.change(function () {
+            if ($(this).is(":checked")) {
+                POSITION_ESTIMATOR.use_gps_velned = 1;
+            } else {
+                POSITION_ESTIMATOR.use_gps_velned = 0;
+            }
+        });
+        $useGpsVelned.change();
+
+        GUI.simpleBind();
+
+        localize();
+
+        $('#advanced-tuning-save-button').click(function () {
+            saveChainer.execute();
+        });
+
+        GUI.content_ready(callback);
+    }
+};
+
+TABS.advanced_tuning.cleanup = function (callback) {
+    if (callback) callback();
+};

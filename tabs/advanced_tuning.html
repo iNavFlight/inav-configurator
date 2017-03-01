@@ -1,0 +1,135 @@
+<div class="tab-configuration tab-advanced-tuning toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabAdvancedTuningTitle">Advanced tuning</div>
+
+        <div class="leftWrapper">
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="positionHoldConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="select">
+                        <select id="user-control-mode"></select>
+                        <label for="user-control-mode"> <span data-i18n="userControlMode"></span></label>
+                    </div>
+                    <div class="number">
+                        <input id="max-speed" type="number" data-simple-bind="NAV_POSHOLD.maxSpeed" step="1" min="10" max="2000">
+                        <label for="max-speed">
+                            <span data-i18n="posholdMaxSpeed"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="max-manual-speed" type="number" data-simple-bind="NAV_POSHOLD.maxManualSpeed" step="1" min="10" max="2000">
+                        <label for="max-manual-speed">
+                            <span data-i18n="posholdMaxManualSpeed"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="max-climb-rate" type="number" data-simple-bind="NAV_POSHOLD.maxClimbRate" step="1" min="10" max="2000">
+                        <label for="max-climb-rate">
+                            <span data-i18n="posholdMaxClimbRate"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="max-manual-climb-rate" type="number" data-simple-bind="NAV_POSHOLD.maxManualClimbRate" step="1" min="10" max="2000">
+                        <label for="max-manual-climb-rate">
+                            <span data-i18n="posholdMaxManualClimbRate"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="max-bank-angle" type="number" data-simple-bind="NAV_POSHOLD.maxBankAngle" step="1" min="15" max="45">
+                        <label for="max-bank-angle">
+                            <span data-i18n="posholdMaxBankAngle"></span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" id="use-mid-throttle" class="toggle" />
+                        <label for="use-mid-throttle">
+                            <span data-i18n="posholdHoverMidThrottle"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="hover-throttle" type="number" data-simple-bind="NAV_POSHOLD.hoverThrottle" step="1" min="1000" max="2000">
+                        <label for="hover-throttle">
+                            <span data-i18n="posholdHoverThrottle"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rightWrapper">
+
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="positionEstimatorConfiguration"></div>
+                </div>
+
+                <div class="spacer_box">
+                    <div class="note spacebottom">
+                        <div class="note_spacer" >
+                            <p data-i18n="positionEstimatorConfigurationDisclaimer"></p>
+                        </div>
+                    </div>
+                    <div class="number">
+                        <input id="w_z_baro_p" type="number" data-simple-bind="POSITION_ESTIMATOR.w_z_baro_p" step="0.01" min="0" max="10">
+                        <label for="w_z_baro_p">
+                            <span data-i18n="w_z_baro_p"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="w_z_baro_p_help"></div>
+                    </div>
+                    <div class="number">
+                        <input id="w_z_gps_p" type="number" data-simple-bind="POSITION_ESTIMATOR.w_z_gps_p" step="0.01" min="0" max="10">
+                        <label for="w_z_gps_p">
+                            <span data-i18n="w_z_gps_p"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="w_z_gos_p_help"></div>
+                    </div>
+                    <div class="number">
+                        <input id="w_z_gps_v" type="number" data-simple-bind="POSITION_ESTIMATOR.w_z_gps_v" step="0.01" min="0" max="10">
+                        <label for="w_z_gps_v">
+                            <span data-i18n="w_z_gps_v"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="w_xy_gps_p" type="number" data-simple-bind="POSITION_ESTIMATOR.w_xy_gps_p" step="0.01" min="0" max="10">
+                        <label for="w_xy_gps_p">
+                            <span data-i18n="w_xy_gps_p"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="w_xy_gps_v" type="number" data-simple-bind="POSITION_ESTIMATOR.w_xy_gps_v" step="0.01" min="0" max="10">
+                        <label for="w_xy_gps_v">
+                            <span data-i18n="w_xy_gps_v"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input id="gps_min_sats" type="number" data-simple-bind="POSITION_ESTIMATOR.gps_min_sats" step="1" min="5" max="10">
+                        <label for="gps_min_sats">
+                            <span data-i18n="gps_min_sats"></span>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" id="use_gps_velned" class="toggle" />
+                        <label for="use_gps_velned">
+                            <span data-i18n="use_gps_velned"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="use_gps_velned_help"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="clear-both"></div>
+
+    </div>
+
+
+
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a id="advanced-tuning-save-button" class="save" href="#" data-i18n="advancedTuningSave"></a>
+        </div>
+    </div>
+</div>

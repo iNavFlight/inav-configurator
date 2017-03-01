@@ -150,35 +150,77 @@ input[type="number"]::-webkit-inner-spin-button {
     float: right;
     margin-top: 20px;
     margin-right: 20px;
-    /*width:180px;*/
+    width: 450px;
 }
 
 #portsinput .dropdown {
     margin-bottom: 5px;
 }
 
+#portsinput .portsinput__top-element {
+    display: inline-block;
+    width: 125px;
+}
+
+#portsinput .portsinput__top-element .dropdown-select {
+    width: 122px;
+}
+
+.portsinput__top-element--inline {
+    display: inline-block;
+}
+
+.portsinput__top-element--inline .switchery {
+    position: relative;
+    top: 1px;
+    margin-left: 5px;
+}
+
+.portsinput__top-element--inline span {
+    color: #ddd;
+}
+
+.portsinput__top-element--port-override {
+    position: relative;
+    overflow: hidden;
+    height: 20px;
+    width: 140px !important;
+    margin-bottom: 7px;
+    border: 1px solid;
+    border-radius: 3px;
+    background: #3e403f;
+    border-color: #111 #0a0a0a black;
+    background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.4));
+    background-image: -moz-linear-gradient(top, transparent, rgba(0, 0, 0, 0.4));
+    background-image: -o-linear-gradient(top, transparent, rgba(0, 0, 0, 0.4));
+    background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.4));
+    -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.1), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.1), 0 1px 1px rgba(0, 0, 0, 0.2);
+    color: #a6a6a6;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    top: 2px;
+}
+
+.portsinput__row {
+    text-align: right;
+}
+
 #port-override {
     background-color: rgba(0, 0, 0, 0.1);
     color: #888888;
-    width: 140px;
+    width: 90px;
     margin-left: 2px;
     margin-top: 0;
     padding: 1px;
     border-radius: 3px;
     height: 15px;
-    float: right;
     font-size: 12px;
 }
 
 #port-override-option label {
-    background-color: #2b2b2b;
-    border-radius: 3px;
-    padding: 3px;
-    margin-bottom: 5px;
     color: #ddd;
-    position: absolute;
-    margin-top: -59px;
-    margin-left: -187px;
+    position: relative;
+    top: 1px;
 }
 
 #port-override input {
@@ -1472,7 +1514,7 @@ dialog {
 /* fixing padding for all Tabs*/
 .tab-setup, .tab-landing, .tab-adjustments, .tab-auxiliary, .tab-cli, .tab-configuration, .tab-failsafe, .tab-onboard_logging,
 .tab-firmware_flasher, .tab-gps, .tab-help, .tab-led-strip, .tab-logging, .tab-modes, .tab-motors, .tab-pid_tuning,
-.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-calibration {
+.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-osd, .tab-calibration {
     height: 100%;
     position: relative;
 }
@@ -1919,4 +1961,8 @@ select {
 
 .jBox-Tooltip {
     max-width: 180px;
+}
+
+.spacebottom {
+    margin-bottom: 15px;
 }

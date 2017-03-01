@@ -258,6 +258,11 @@ TABS.auxiliary.initialize = function (callback) {
 
         // data pulling functions used inside interval timer
         function get_rc_data() {
+
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
@@ -288,16 +293,7 @@ TABS.auxiliary.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        GUI.interval_add('aux_data_pull', get_rc_data, 50);
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function () {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-            
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
+        helper.mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
 
         GUI.content_ready(callback);
     }

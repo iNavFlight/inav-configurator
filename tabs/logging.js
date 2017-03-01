@@ -65,8 +65,8 @@ TABS.logging.initialize = function (callback) {
                                 }
                             }
 
-                            GUI.interval_add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
-                            GUI.interval_add('write_data', function write_data() {
+                            helper.interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
+                            helper.interval.add('write_data', function write_data() {
                                 if (log_buffer.length) { // only execute when there is actual data to write
                                     if (fileWriter.readyState == 0 || fileWriter.readyState == 2) {
                                         append_to_file(log_buffer.join('\n'));
@@ -87,7 +87,8 @@ TABS.logging.initialize = function (callback) {
                             GUI.log(chrome.i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
-                        GUI.interval_kill_all();
+                        helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
+                        helper.mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
                         $(this).text(chrome.i18n.getMessage('loggingStart'));

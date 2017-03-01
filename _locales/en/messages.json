@@ -561,6 +561,9 @@
     "featureRSSI_ADCTip": {
         "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
     },
+    "featureOSD": {
+        "message": "OSD"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
@@ -1900,13 +1903,13 @@
     },
     "calibrationHead1": {
         "message": "Accelerometer Calibration"
-    },  
+    },
     "calibrationHead2": {
         "message": "Accelerometer Values"
-    },    
+    },
     "calibrationHead3": {
         "message": "Level Calibration"
-    },    
+    },
     "calibrationHead4": {
         "message": "Compass Calibration"
     },
@@ -1975,5 +1978,120 @@
     },
     "accCalibrationProcessing": {
         "message": "Processing..."
+    },
+    "tabAdvancedTuning": {
+        "message": "Advanced tuning"
+    },
+    "advancedTuningSave": {
+        "message": "Save and Reboot"
+    },
+    "tabAdvancedTuningTitle": {
+        "message": "Advanced tuning"
+    },
+    "presetApplyHead": {
+        "message": "Applies following settings:"
+    },
+    "gyroNotchHz1": {
+        "message": "First gyro notch filter freq."
+    },
+    "gyroNotchCutoff1": {
+        "message": "First gyro notch filter cutoff freq."
+    },
+    "gyroNotchHz2": {
+        "message": "Second gyro notch filter freq."
+    },
+    "gyroNotchCutoff2": {
+        "message": "Second gyro notch filter cutoff freq."
+    },
+    "gyroNotchHz1Help": {
+        "message": "Should be tuned to propeller harmonic frequency. Usually equals <i>[motor_frequency] * [propeller_blades_number]</i><br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+    },
+    "gyroNotchHz2Help": {
+        "message": "Should be tuned to motor frequency.<br><br>Has to be above cutoff frequency and below first gyro notch filter frequency.<br><br><i>0</i> disables the filter"
+    },
+    "gyroNotchCutoff1Help": {
+        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "gyroNotchCutoff2Help": {
+        "message": "Defines band of notch filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "dtermNotchHz": {
+        "message": "Dterm notch filter freq."
+    },
+    "dtermNotchCutoff": {
+        "message": "Dterm notch filter cutoff freq."
+    },
+    "dtermNotchHzHelp": {
+        "message": "Should be placed between first and second gyro notch filter frequency<br><br>Has to be above cutoff frequency<br><br><i>0</i> disables the filter"
+    },
+    "dtermNotchCutoffHelp": {
+        "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
+    },
+    "positionHoldConfiguration": {
+        "message": "Basic Navigation Settings"
+    },
+    "userControlMode": {
+        "message": "User Control Mode"
+    },
+    "posholdMaxSpeed": {
+        "message": "Max. navigation speed [cm/s]"
+    },
+    "posholdMaxManualSpeed": {
+        "message": "Max. CRUISE speed [cm/s]"
+    },
+    "posholdMaxClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "posholdMaxManualClimbRate": {
+        "message": "Max. ALTHOLD climb rate [cm/s]"
+    },
+    "posholdMaxBankAngle": {
+        "message": "Multirotor max. banking angle [deg]"
+    },
+    "posholdHoverThrottle": {
+        "message": "Hover throttle"
+    },
+    "posholdHoverMidThrottle": {
+        "message": "Use mid. throttle for ALTHOLD"
+    },
+    "positionEstimatorConfiguration": {
+        "message": "Position Estimator"
+    },
+    "w_z_baro_p": {
+        "message": "Vertical Position Baro Weight"
+    },
+    "w_z_gps_p": {
+        "message": "Vertical Position GPS Weight"
+    },
+    "w_z_gps_v": {
+        "message": "Vertical Speed GPS Weight"
+    },
+    "w_xy_gps_p": {
+        "message": "Horizontal Position GPS Weight"
+    },
+    "w_xy_gps_v": {
+        "message": "Horizontal Speed GPS Weight"
+    },
+    "positionEstimatorConfigurationDisclaimer": {
+        "message": "Those value should be changed very carefully. In most cases there is not need to change them. For advanced users only!"
+    },
+    "gps_min_sats": {
+        "message": "Min. GPS sats for valid fix"
+    },
+    "use_gps_velned": {
+        "message": "Use GPS data for velocity calculation"
+    },
+    "use_gps_velned_help": {
+        "message": "Defined if iNav should use velocity data provided by GPS module for doing position and speed estimation. If set to OFF iNav will fallback to calculating velocity from GPS coordinates. Using native velocity data may improve performance on some GPS modules. Some GPS modules introduce significant delay and using native velocity may actually result in much worse performance."
+    },
+    "w_z_baro_p_help": {
+        "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
+    },
+    "w_z_gos_p_help": {
+        "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
+    },
+    "wirelessModeSwitch": {
+        "message": "Wireless mode"
     }
+
 }

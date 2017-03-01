@@ -2,7 +2,6 @@
 
 TABS.gps = {};
 TABS.gps.initialize = function (callback) {
-    var self = this;
 
     if (GUI.active_tab != 'gps') {
         GUI.active_tab = 'gps';
@@ -13,7 +12,7 @@ TABS.gps.initialize = function (callback) {
         $('#content').load("./tabs/gps.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_html);
+    load_html();
     
     function set_online(){
         $('#connect').hide();
@@ -28,7 +27,6 @@ TABS.gps.initialize = function (callback) {
     }
     
     function process_html() {
-        // translate to user-selected languageconsole.log('Online');
         localize();
 
         function get_raw_gps_data() {
@@ -78,7 +76,7 @@ TABS.gps.initialize = function (callback) {
             var message = {
                 action: 'center',
                 lat: lat,
-                lon: lon,
+                lon: lon
             };
 
             var frame = document.getElementById('map');
@@ -101,25 +99,22 @@ TABS.gps.initialize = function (callback) {
             }
         }
 
-        // enable data pulling
-        GUI.interval_add('gps_pull', function gps_update() {
+        /*
+         * enable data pulling
+         * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
+         */
+        helper.mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
                 //return;
             }
-            
-            get_raw_gps_data();
-        }, 75, true);
 
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-            
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
+            if (helper.mspQueue.shouldDrop()) {
+                return;
             }
-        }, 250, true);
 
+            get_raw_gps_data();
+        });
 
         //check for internet connection on load
         if (navigator.onLine) {
@@ -145,7 +140,7 @@ TABS.gps.initialize = function (callback) {
         $('#zoom_in').click(function() {
             console.log('zoom in');
             var message = {
-                action: 'zoom_in',
+                action: 'zoom_in'
             };
             frame.contentWindow.postMessage(message, '*');
         });
@@ -163,8 +158,6 @@ TABS.gps.initialize = function (callback) {
 
 };
 
-
- 
 TABS.gps.cleanup = function (callback) {
     if (callback) callback();
 };

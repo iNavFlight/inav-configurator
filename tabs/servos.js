@@ -14,17 +14,7 @@ TABS.servos.initialize = function (callback) {
     }
 
     function get_servo_mix_rules() {
-        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, get_channel_forwarding);
-    }
-
-    function get_channel_forwarding() {
-        var nextFunction = get_rc_data;
-
-        if (semver.lt(CONFIG.apiVersion, "1.12.0")) {
-            MSP.send_message(MSPCodes.MSP_CHANNEL_FORWARDING, false, false, nextFunction);
-        } else {
-            nextFunction();
-        }
+        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, get_rc_data);
     }
 
     function get_rc_data() {
@@ -39,11 +29,11 @@ TABS.servos.initialize = function (callback) {
         $('#content').load("./tabs/servos.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_IDENT, false, false, get_servo_configurations);
+    get_servo_configurations();
 
     function update_ui() {
 
-        if (semver.lt(CONFIG.apiVersion, "1.12.0") || SERVO_CONFIG.length == 0) {
+        if (SERVO_CONFIG.length == 0) {
 
             $(".tab-servos").removeClass("supported");
             return;
@@ -171,7 +161,7 @@ TABS.servos.initialize = function (callback) {
         $('table.directions select, table.directions input, table.fields select, table.fields input').change(function () {
             if ($('div.live input').is(':checked')) {
                 // apply small delay as there seems to be some funky update business going wrong
-                GUI.timeout_add('servos_update', servos_update, 10);
+                helper.timeout.add('servos_update', servos_update, 10);
             }
         });
 
@@ -187,15 +177,6 @@ TABS.servos.initialize = function (callback) {
 
         // translate to user-selected language
         localize();
-
-        // status data pulled via separate timer with static speed
-        GUI.interval_add('status_pull', function () {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-            }
-        }, 250, true);
 
         GUI.content_ready(callback);
     }

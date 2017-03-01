@@ -70,13 +70,26 @@ PortHandler.check = function () {
                             if (port == result.last_used_port) {
                                 console.log('Selecting last used port: ' + result.last_used_port);
 
-                                $('div#port-picker #port').val(result.last_used_port);
+                                $('#port').val(result.last_used_port);
                             }
                         });
                     } else {
                         console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
                     }
                 });
+
+                chrome.storage.local.get('last_used_bps', function (result) {
+                    if (result['last_used_bps']) {
+                        $('#baud').val(result['last_used_bps']);
+                    }
+                });
+
+                chrome.storage.local.get('wireless_mode_enabled', function (result) {
+                    if (result['wireless_mode_enabled']) {
+                        $('#wireless-mode').prop('checked', true).change();
+                    }
+                });
+
             }
 
             if (!self.initial_ports) {
@@ -112,7 +125,7 @@ PortHandler.check = function () {
             if (GUI.auto_connect && !GUI.connecting_to && !GUI.connected_to) {
                 // we need firmware flasher protection over here
                 if (GUI.active_tab != 'firmware_flasher') {
-                    GUI.timeout_add('auto-connect_timeout', function () {
+                    helper.timeout.add('auto-connect_timeout', function () {
                         $('div#port-picker a.connect').click();
                     }, 100); // timeout so bus have time to initialize after being detected by the system
                 }

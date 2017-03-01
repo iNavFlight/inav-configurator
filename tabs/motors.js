@@ -19,10 +19,6 @@ TABS.motors.initialize = function (callback) {
         googleAnalytics.sendAppView('Motors');
     }
 
-    function get_arm_status() {
-        MSP.send_message(MSPCodes.MSP_STATUS, false, false, load_config);
-    }
-    
     function load_config() {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_3d);
     }
@@ -40,7 +36,7 @@ TABS.motors.initialize = function (callback) {
         $('#content').load("./tabs/motors.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_MISC, false, false, get_arm_status);
+    MSP.send_message(MSPCodes.MSP_MISC, false, false, load_config);
 
     function update_arm_status() {
         self.armed = bit_check(CONFIG.mode, 0);
@@ -182,7 +178,7 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
         
-        update_model(CONFIG.multiType);
+        update_model(BF_CONFIG.mixerConfiguration);
         
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();
@@ -239,9 +235,19 @@ TABS.motors.initialize = function (callback) {
             accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-scale, scale]);
 
             // timer initialization
-            GUI.interval_kill_all(['motor_and_status_pull']);
+            helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+            helper.mspBalancedInterval.flush();
 
-            GUI.interval_add('IMU_pull', function imu_data_pull() {
+            helper.interval.add('IMU_pull', function imu_data_pull() {
+
+                /*
+                 * Enable balancer
+                 */
+                if (helper.mspQueue.shouldDrop()) {
+                    update_accel_graph();
+                    return;
+                }
+
                 MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
             }, rate, true);
 
@@ -448,34 +454,28 @@ TABS.motors.initialize = function (callback) {
 
         $motorsEnableTestMode.change();
         
-        // data pulling functions used inside interval timer
-        
-        function periodicUpdateHandler() {
-
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                getPeriodicSensorStatus();
-            } else {
-                getPeriodicMotorOutput();
-            }
-        }
-        
-        function getPeriodicSensorStatus() {
-            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, getPeriodicMotorOutput);
-        }
-
         function getPeriodicMotorOutput() {
+
+            if (helper.mspQueue.shouldDrop()) {
+                getPeriodicServoOutput();
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
         }
 
         function getPeriodicServoOutput() {
+            if (helper.mspQueue.shouldDrop()) {
+                update_ui();
+                return;
+            }
+
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
         
-        function update_ui() {            
+        function update_ui() {
             var previousArmState = self.armed;                                   
             var block_height = $('div.m-block:first').height();
 
@@ -519,7 +519,7 @@ TABS.motors.initialize = function (callback) {
         }
 
         // enable Status and Motor data pulling
-        GUI.interval_add('motor_and_status_pull', periodicUpdateHandler, 75, true);
+        helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 75, true);
 
         GUI.content_ready(callback);
     }

@@ -44,7 +44,8 @@ var CONFIG,
     SENSOR_STATUS,
     SENSOR_CONFIG,
     NAV_POSHOLD,
-    CALIBRATION_DATA;
+    CALIBRATION_DATA,
+    POSITION_ESTIMATOR;
 
 var FC = {
     isRatesInDps: function () {
@@ -162,6 +163,7 @@ var FC = {
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
             altitude: 0,
+            barometer: 0,
             sonar: 0,
             kinematics: [0.0, 0.0, 0.0],
             debug: [0, 0, 0, 0]
@@ -253,7 +255,8 @@ var FC = {
             yawPLimit: null,
             axisAccelerationLimitRollPitch: null,
             axisAccelerationLimitYaw: null,
-            dtermSetpointWeight: null
+            dtermSetpointWeight: null,
+            pidSumLimit: null
         };
 
         INAV_PID_CONFIG = {
@@ -355,6 +358,16 @@ var FC = {
             nrf24rx_id: 0
         };
 
+        POSITION_ESTIMATOR = {
+            w_z_baro_p: null,
+            w_z_gps_p: null,
+            w_z_gps_v: null,
+            w_xy_gps_p: null,
+            w_xy_gps_v: null,
+            gps_min_sats: null,
+            use_gps_velned: null
+        };
+
         FAILSAFE_CONFIG = {
             failsafe_delay: 0,
             failsafe_off_delay: 0,
@@ -370,14 +383,11 @@ var FC = {
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
             {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
-            {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'},
-            {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
@@ -389,6 +399,14 @@ var FC = {
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            features.push(
+                {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
+                {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
+                {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'}
+            );
+        }
 
         if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
             features.push(
@@ -404,7 +422,10 @@ var FC = {
             $('.features.esc-priority').parent().hide();
         }
 
-        if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
+        /*
+         * Transponder disabled until not implemented in firmware
+         */
+        if (false && semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
                 {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true, showNameInTip: true}
             );
@@ -422,6 +443,13 @@ var FC = {
                 {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
             );
         }
+
+        if (semver.gte(CONFIG.flightControllerVersion, '1.5.0')) {
+            features.push(
+                {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
@@ -547,7 +575,7 @@ var FC = {
         ];
     },
     getSerialRxTypes: function () {
-        return [
+        var data = [
             'SPEKTRUM1024',
             'SPEKTRUM2048',
             'SBUS',
@@ -557,6 +585,13 @@ var FC = {
             'XBUS_MODE_B_RJ01',
             'IBUS'
         ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            data.push('JETI EXBUS');
+            data.push('TBS Crossfire');
+        }
+
+        return data;
     },
     getNrf24ProtocolTypes: function () {
         return [
@@ -639,8 +674,8 @@ var FC = {
             50: "50Hz",
             60: "60Hz",
             100: "100Hz",
-            200: "200Hz",
-            400: "400Hz"
+            160: "160Hz",
+            330: "330Hz"
         };
     },
     getAsyncModes: function () {
@@ -715,5 +750,11 @@ var FC = {
         }
 
         return retVal;
+    },
+    getUserControlMode: function () {
+        return [
+            "Attitude",
+            "Cruise"
+        ]
     }
 };

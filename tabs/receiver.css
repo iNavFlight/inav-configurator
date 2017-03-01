@@ -161,7 +161,7 @@
 }
 
 .tab-receiver .tunings .yaw_rate {
-    margin-left: 0px;
+    margin-left: 0;
     margin-bottom: 10px;
 }
 
@@ -184,7 +184,7 @@
 
 .tab-receiver .tunings table th:last-child {
     border-top-right-radius: 3px;
-    border-right: 0px;
+    border-right: 0;
 }
 
 .tab-receiver .tunings table td {
@@ -328,11 +328,6 @@
     background-image: url(../images/paper.jpg);
     background-size: 200%;
     background-position: center;
-}
-
-.tab-receiver select[name="rx_refresh_rate"] {
-    float: right;
-    border: 1px solid silver;
 }
 
 .tab-receiver #RX_plot {

@@ -14,6 +14,12 @@ TABS.cli.initialize = function (callback) {
         googleAnalytics.sendAppView('CLI');
     }
 
+    /*
+     * Flush MSP queue as well as all MSP registered callbacks
+     */
+    helper.mspQueue.flush();
+    MSP.callbacks_cleanup();
+
     $('#content').load("./tabs/cli.html", function () {
         // translate to user-selected language
         localize();
@@ -55,7 +61,7 @@ TABS.cli.initialize = function (callback) {
         // give input element user focus
         textarea.focus();
 
-        GUI.timeout_add('enter_cli', function enter_cli() {
+        helper.timeout.add('enter_cli', function enter_cli() {
             // Enter CLI mode
             var bufferOut = new ArrayBuffer(1);
             var bufView = new Uint8Array(bufferOut);
@@ -88,7 +94,7 @@ TABS.cli.history.next = function () {
 };
 
 TABS.cli.sendSlowly = function (out_arr, i, timeout_needle) {
-    GUI.timeout_add('CLI_send_slowly', function () {
+    helper.timeout.add('CLI_send_slowly', function () {
         var bufferOut = new ArrayBuffer(out_arr[i].length + 1);
         var bufView = new Uint8Array(bufferOut);
 
@@ -202,7 +208,7 @@ TABS.cli.cleanup = function (callback) {
         // (another approach is however much more complicated):
         // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
         // we could probably implement this someday
-        GUI.timeout_add('waiting_for_bootup', function waiting_for_bootup() {
+        helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;

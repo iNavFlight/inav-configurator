@@ -292,6 +292,18 @@ var serial = {
     emptyOutputBuffer: function () {
         this.outputBuffer = [];
         this.transmitting = false;
+    },
+
+    /**
+     * Default timeout value for serial messages
+     * @returns {number} [ms]
+     */
+    getTimeout: function () {
+        if (serial.bitrate >= 57600) {
+            return 1500;
+        } else {
+            return 2500;
+        }
     }
 
 };

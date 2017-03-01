@@ -154,7 +154,7 @@ STM32_protocol.prototype.initialize = function () {
         self.read(info);
     });
 
-    GUI.interval_add('STM32_timeout', function () {
+    helper.interval.add('STM32_timeout', function () {
         if (self.upload_process_alive) { // process is running
             self.upload_process_alive = false;
         } else {
@@ -166,7 +166,7 @@ STM32_protocol.prototype.initialize = function () {
             googleAnalytics.sendEvent('Flashing', 'Programming', 'timeout');
 
             // protocol got stuck, clear timer and disconnect
-            GUI.interval_remove('STM32_timeout');
+            helper.interval.remove('STM32_timeout');
 
             // exit
             self.upload_procedure(99);
@@ -361,10 +361,10 @@ STM32_protocol.prototype.upload_procedure = function (step) {
             $('span.progressLabel').text('Contacting bootloader ...');
 
             var send_counter = 0;
-            GUI.interval_add('stm32_initialize_mcu', function () { // 200 ms interval (just in case mcu was already initialized), we need to break the 2 bytes command requirement
+            helper.interval.add('stm32_initialize_mcu', function () { // 200 ms interval (just in case mcu was already initialized), we need to break the 2 bytes command requirement
                 self.send([0x7F], 1, function (reply) {
                     if (reply[0] == 0x7F || reply[0] == self.status.ACK || reply[0] == self.status.NACK) {
-                        GUI.interval_remove('stm32_initialize_mcu');
+                        helper.interval.remove('stm32_initialize_mcu');
                         console.log('STM32 - Serial interface initialized on the MCU side');
 
                         // proceed to next step
@@ -373,7 +373,7 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         $('span.progressLabel').text('Communication with bootloader failed');
                         self.progress_bar_e.addClass('invalid');
 
-                        GUI.interval_remove('stm32_initialize_mcu');
+                        helper.interval.remove('stm32_initialize_mcu');
 
                         // disconnect
                         self.upload_procedure(99);
@@ -387,8 +387,8 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                     $('span.progressLabel').text('No response from the bootloader, programming: FAILED');
                     self.progress_bar_e.addClass('invalid');
 
-                    GUI.interval_remove('stm32_initialize_mcu');
-                    GUI.interval_remove('STM32_timeout');
+                    helper.interval.remove('stm32_initialize_mcu');
+                    helper.interval.remove('STM32_timeout');
 
                     // exit
                     self.upload_procedure(99);
@@ -749,11 +749,10 @@ STM32_protocol.prototype.upload_procedure = function (step) {
             break;
         case 99:
             // disconnect
-            GUI.interval_remove('STM32_timeout'); // stop STM32 timeout timer (everything is finished now)
+            helper.interval.remove('STM32_timeout'); // stop STM32 timeout timer (everything is finished now)
 
             // close connection
             serial.disconnect(function (result) {
-                PortUsage.reset();
 
                 // unlocking connect button
                 GUI.connect_lock = false;
