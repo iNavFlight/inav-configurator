@@ -9698,6 +9698,10 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_ALTITUDE:
                 SENSOR_DATA.altitude = parseFloat((data.getInt32(0, true) / 100.0).toFixed(2)); // correct scale factor
+                // On 1.6 and above this provides also baro raw altitude
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    SENSOR_DATA.barometer = parseFloat((data.getInt32(6, true) / 100.0).toFixed(2)); // correct scale factor
+                }
                 break;
             case MSPCodes.MSP_SONAR:
                 SENSOR_DATA.sonar = data.getInt32(0, true);
@@ -9777,7 +9781,6 @@ var mspHelper = (function (gui) {
                 _3D.deadband3d_high = data.getUint16(offset, true);
                 offset += 2;
                 _3D.neutral3d = data.getUint16(offset, true);
-
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                     offset += 2;
                     _3D.deadband3d_throttle = data.getUint16(offset, true);
@@ -9856,6 +9859,9 @@ var mspHelper = (function (gui) {
                 RC_deadband.deadband = data.getUint8(offset++);
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
+                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                }
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
                 SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
@@ -9938,6 +9944,7 @@ var mspHelper = (function (gui) {
                 BF_CONFIG.currentoffset = data.getUint16(14, true);
                 break;
             case MSPCodes.MSP_SET_BF_CONFIG:
+                console.log('BF_CONFIG saved');
                 break;
             case MSPCodes.MSP_SET_REBOOT:
                 console.log('Reboot request accepted');
@@ -10693,6 +10700,10 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.deadband);
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
+                    buffer.push(lowByte(_3D.deadband3d_throttle));
+                    buffer.push(highByte(_3D.deadband3d_throttle));
+                }
                 break;
 
             case MSPCodes.MSP_SET_SENSOR_ALIGNMENT:
@@ -12149,9 +12160,9 @@ var serial = {
      */
     getTimeout: function () {
         if (serial.bitrate >= 57600) {
-            return 1000;
-        } else {
             return 1500;
+        } else {
+            return 2500;
         }
     }
 
@@ -12921,6 +12932,7 @@ var FC = {
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
             altitude: 0,
+            barometer: 0,
             sonar: 0,
             kinematics: [0.0, 0.0, 0.0],
             debug: [0, 0, 0, 0]
@@ -13122,14 +13134,11 @@ var FC = {
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
             {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
-            {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'},
-            {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
@@ -13141,6 +13150,14 @@ var FC = {
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            features.push(
+                {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
+                {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
+                {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'}
+            );
+        }
 
         if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
             features.push(
@@ -13156,7 +13173,10 @@ var FC = {
             $('.features.esc-priority').parent().hide();
         }
 
-        if (semver.gte(CONFIG.apiVersion, "1.16.0")) {
+        /*
+         * Transponder disabled until not implemented in firmware
+         */
+        if (false && semver.gte(CONFIG.apiVersion, "1.16.0")) {
             features.push(
                 {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true, showNameInTip: true}
             );
@@ -13174,6 +13194,13 @@ var FC = {
                 {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
             );
         }
+
+        if (semver.gte(CONFIG.flightControllerVersion, '1.5.0')) {
+            features.push(
+                {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
@@ -13299,7 +13326,7 @@ var FC = {
         ];
     },
     getSerialRxTypes: function () {
-        return [
+        var data = [
             'SPEKTRUM1024',
             'SPEKTRUM2048',
             'SBUS',
@@ -13309,6 +13336,13 @@ var FC = {
             'XBUS_MODE_B_RJ01',
             'IBUS'
         ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            data.push('JETI EXBUS');
+            data.push('TBS Crossfire');
+        }
+
+        return data;
     },
     getNrf24ProtocolTypes: function () {
         return [
@@ -13391,8 +13425,8 @@ var FC = {
             50: "50Hz",
             60: "60Hz",
             100: "100Hz",
-            200: "200Hz",
-            400: "400Hz"
+            160: "160Hz",
+            330: "330Hz"
         };
     },
     getAsyncModes: function () {
@@ -13682,6 +13716,13 @@ var MSP = {
         message.messageBody = bufferOut;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
+
+        /*
+         * In case of MSP_REBOOT special procedure is required
+         */
+        if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
+            message.retryCounter = 10;
+        }
 
         helper.mspQueue.put(message);
 
@@ -15392,6 +15433,10 @@ var BOARD_DEFINITIONS = [
     }, {
         name: "Omnibus F4",
         identifier: "OBF4",
+        vcp: true
+    }, {
+        name: "Omnibus F4 Pro",
+        identifier: "OBSD",
         vcp: true
     }
 ];
@@ -21435,6 +21480,72 @@ OSD.constants = {
             default_position: -1,
             positionable: true,
             preview: FONT.symbol(SYM.GPS_SAT) + '14'
+        },
+        ROLL_PIDS: {
+            name: 'ROLL_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'ROL 40 30 23'
+        },
+        PITCH_PIDS: {
+            name: 'PITCH_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'PIT 40 30 23'
+        },
+        YAW_PIDS: {
+            name: 'YAW_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'YAW 85 45 0'
+        },
+        POWER: {
+            name: 'POWER',
+            default_position: -1,
+            positionable: true,
+            preview: '50W'
+        },
+        GPS_LON: {
+            name: 'LONGITUDE',
+            default_position: -1,
+            positionable: true,
+            preview: '14.7652'
+        },
+        GPS_LAT: {
+            name: 'LATITUDE',
+            default_position: -1,
+            positionable: true,
+            preview: '52.9872'
+        },
+        HOME_DIR: {
+            name: 'DIRECTION_TO_HOME',
+            default_position: -1,
+            positionable: true,
+            preview: '165'
+        },
+        HOME_DIST: {
+            name: 'DISTANCE_TO_HOME',
+            default_position: -1,
+            positionable: true,
+            preview: '300m'
+        },
+        HEADING: {
+            name: 'HEADING',
+            default_position: -1,
+            positionable: true,
+            preview: '175'
+        },
+        VARIO: {
+            name: 'VARIO',
+            default_position: -1,
+            positionable: true,
+            preview: '-'
+        },
+        VARIO_NUM: {
+            name: 'VARIO_NUM',
+            default_position: -1,
+            positionable: true,
+            preview: '2'
         }
     }
 };
@@ -21459,7 +21570,22 @@ OSD.chooseFields = function () {
         F.GPS_SPEED,
         F.GPS_SATS,
         F.ALTITUDE
-    ]
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+        OSD.constants.DISPLAY_FIELDS.push(F.ROLL_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.PITCH_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.YAW_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.POWER);
+
+        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LON);
+        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LAT);
+        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIR);
+        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIST);
+        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);
+        OSD.constants.DISPLAY_FIELDS.push(F.VARIO);
+        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);
+    }
 
 };
 
@@ -22598,21 +22724,34 @@ presets.elementHelper = function (group, field, value) {
 };
 
 presets.defaultValues = {
-    PIDs: [
-        [40, 30, 23],
-        [40, 30, 23],
-        [85, 45, 0],
-        [50, 0, 0],
-        [65, 120, 10],
-        [180, 15, 100],
-        [10, 5, 8],
-        [20, 15, 75],
-        [60, 0, 0],
-        [100, 50, 10]
-    ],
+    PIDs: {
+        mr: [
+            [40, 30, 23],
+            [40, 30, 23],
+            [85, 45, 0],
+            [50, 0, 0],
+            [65, 120, 10],
+            [180, 15, 100],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [100, 50, 10]
+        ],
+        fw: [
+            [25, 35, 10],
+            [20, 35, 10],
+            [50, 45, 0],
+            [50, 0, 0],
+            [75, 5, 8],
+            [0, 0, 0],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [0, 0, 0]
+        ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
-    RC_tuning: {"RC_RATE": 0, "RC_EXPO": 0, "roll_pitch_rate": 0, "roll_rate": 0, "pitch_rate": 0, "yaw_rate": 0, "dynamic_THR_PID": 0, "throttle_MID": 0, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 0, "RC_YAW_EXPO": 0},
+    RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
     FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0},
     FC_CONFIG: {"loopTime": 2000}
@@ -22623,6 +22762,15 @@ presets.defaultValues = {
  *
  * BF_CONFIG::mixerConfiguration
  *
+ */
+
+
+/**
+ * When defining a preset, following fields are required:
+ *
+ * BF_CONFIG::mixerConfiguration
+ *
+ * @type {{name: string, description: string, features: string[], applyDefaults: string[], settings: *[], type: string}[]}
  */
 presets.presets = [
     {
@@ -22677,7 +22825,7 @@ presets.presets = [
     },
     {
         name: '10" General Purpose',
-        description: "450-600 class general purpose multirotor <br><span>10.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
+        description: "450-600 class general purpose multirotor <br><span>1.0kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
             "Asynchronous gyro processing",
             "400dps rates",
@@ -22755,6 +22903,83 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '280mm Tricopter',
+        description: "280mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 700),
+            presets.elementHelper("RC_tuning", "pitch_rate", 550),
+            presets.elementHelper("RC_tuning", "yaw_rate", 250),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("PIDs", 0, [55, 40, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [55, 40, 15]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [90, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
+        name: '600mm Tricopter',
+        description: "600mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "GPS ready",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
+            presets.elementHelper("RC_tuning", "roll_rate", 550),
+            presets.elementHelper("RC_tuning", "pitch_rate", 480),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 125),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 90),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 170),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 125),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 85),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("PIDs", 0, [110, 20, 52]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [110, 20, 52]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [75, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
@@ -22796,6 +23021,30 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Flying wing Z84",
+        description: "Small flying wing on multirotor racer parts<br>" +
+            "<span>300g-500g weight, 3S-4S battery</span>",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [2, 15, 30]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [2, 15, 70]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 7, [10, 15, 75]),  //LEVEL PIDs
+            presets.elementHelper("RC_tuning", "roll_rate", 350),
+            presets.elementHelper("RC_tuning", "pitch_rate", 90),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1300),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
+        ],
+        type: 'flyingwing'
     }
 ];
 
@@ -22806,14 +23055,25 @@ presets.model = (function () {
     /**
      * @param {Array} toApply
      * @param {Object} defaults
+     * @param {String} mixerType
      */
-    self.applyDefaults = function (toApply, defaults) {
+    self.applyDefaults = function (toApply, defaults, mixerType) {
 
         for (var settingToApply in toApply) {
             if (toApply.hasOwnProperty(settingToApply)) {
 
                 var settingName = toApply[settingToApply],
+                    values;
+
+                if (settingName == 'PIDs') {
+                    if (mixerType == 'multirotor') {
+                        values = defaults[settingName]['mr'];
+                    } else {
+                        values = defaults[settingName]['fw'];
+                    }
+                } else {
                     values = defaults[settingName];
+                }
 
                 for (var key in values) {
                     if (values.hasOwnProperty(key)) {
@@ -22825,7 +23085,7 @@ presets.model = (function () {
         }
     };
 
-    self.extractPresetNames = function(presets) {
+    self.extractPresetNames = function (presets) {
 
         var retVal = {};
 
@@ -22869,6 +23129,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     loadChainer.execute();
 
     saveChainer.setChain([
+        mspHelper.saveBfConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveLooptimeConfig,
         mspHelper.saveAdvancedConfig,
@@ -22876,7 +23137,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         mspHelper.savePidData,
         mspHelper.saveRcTuningData,
         mspHelper.savePidAdvanced,
-        mspHelper.saveBfConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -22901,7 +23161,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
     function applyAndSave() {
 
-        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
+        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues, currentPreset.type);
 
         var setting;
 
@@ -22945,10 +23205,12 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
-        for(var preset in presetsList) {
-            $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+        for (var preset in presetsList) {
+            if (presetsList.hasOwnProperty(preset)) {
+                $presetList.append('<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            }
         }
-    
+
         $('.preset__element-link').click(function () {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
@@ -23033,7 +23295,6 @@ TABS.receiver.initialize = function (callback) {
         $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
         $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
 
-        $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
         $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
 
@@ -23217,31 +23478,24 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input').on('input change', function () {
             setTimeout(function () { // let global validation trigger and adjust the values first
-                var rateE = $('.tunings .rate input[name="rate"]'),
-                    expoE = $('.tunings .rate input[name="expo"]'),
-                    rate = parseFloat(rateE.val()),
+                var expoE = $('.tunings .rate input[name="expo"]'),
                     expo = parseFloat(expoE.val()),
                     pitch_roll_curve = $('.pitch_roll_curve canvas').get(0),
                     context = pitch_roll_curve.getContext("2d");
 
                 // local validation to deal with input event
-                if (rate >= parseFloat(rateE.prop('min')) &&
-                    rate <= parseFloat(rateE.prop('max')) &&
-                    expo >= parseFloat(expoE.prop('min')) &&
+                if (expo >= parseFloat(expoE.prop('min')) &&
                     expo <= parseFloat(expoE.prop('max'))) {
                     // continue
                 } else {
                     return;
                 }
 
-                // math magic by englishman
-                var ratey = rateHeight * rate;
-
                 // draw
                 context.clearRect(0, 0, 200, rateHeight);
                 context.beginPath();
                 context.moveTo(0, rateHeight);
-                context.quadraticCurveTo(110, rateHeight - ((ratey / 2) * (1 - expo)), 200, rateHeight - ratey);
+                context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expo)), 200, 0);
                 context.lineWidth = 2;
                 context.strokeStyle = '#37a8db';
                 context.stroke();
@@ -23256,7 +23510,6 @@ TABS.receiver.initialize = function (callback) {
                 $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
                 $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
 
-                $('.tunings .rate input[name="rate"]').val(RC_tuning.RC_RATE.toFixed(2));
                 $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
 
                 // update visual representation
@@ -23270,7 +23523,6 @@ TABS.receiver.initialize = function (callback) {
             RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
 
-            RC_tuning.RC_RATE = parseFloat($('.tunings .rate input[name="rate"]').val());
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
@@ -23809,11 +24061,11 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    function plot_baro(enable) {
+    function plot_altitude(enable) {
         if (enable) {
-            $('.wrapper.baro').show();
+            $('.wrapper.altitude').show();
         } else {
-            $('.wrapper.baro').hide();
+            $('.wrapper.altitude').hide();
         }
     }
 
@@ -23839,9 +24091,6 @@ TABS.sensors.initialize = function (callback) {
 
         // disable graphs for sensors that are missing
         var checkboxes = $('.tab-sensors .info .checkboxes input');
-        if (!bit_check(CONFIG.activeSensors, 1)) { // baro
-            checkboxes.eq(3).prop('disabled', true);
-        }
         if (!bit_check(CONFIG.activeSensors, 2)) { // mag
             checkboxes.eq(2).prop('disabled', true);
         }
@@ -23864,7 +24113,7 @@ TABS.sensors.initialize = function (callback) {
                     plot_mag(enable);
                     break;
                 case 3:
-                    plot_baro(enable);
+                    plot_altitude(enable);
                     break;
                 case 4:
                     plot_sonar(enable);
@@ -23902,13 +24151,13 @@ TABS.sensors.initialize = function (callback) {
         var samples_gyro_i = 0,
             samples_accel_i = 0,
             samples_mag_i = 0,
-            samples_baro_i = 0,
+            samples_altitude_i = 0,
             samples_sonar_i = 0,
             samples_debug_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
-            baro_data = initDataArray(1),
+            altitude_data = (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) ? initDataArray(2) : initDataArray(1),
             sonar_data = initDataArray(1),
             debug_data = [
             initDataArray(1),
@@ -23920,7 +24169,7 @@ TABS.sensors.initialize = function (callback) {
         var gyroHelpers = initGraphHelpers('#gyro', samples_gyro_i, [-2000, 2000]);
         var accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-2, 2]);
         var magHelpers = initGraphHelpers('#mag', samples_mag_i, [-1, 1]);
-        var baroHelpers = initGraphHelpers('#baro', samples_baro_i);
+        var altitudeHelpers = initGraphHelpers('#altitude', samples_altitude_i);
         var sonarHelpers = initGraphHelpers('#sonar', samples_sonar_i);
         var debugHelpers = [
             initGraphHelpers('#debug1', samples_debug_i),
@@ -24105,11 +24354,17 @@ TABS.sensors.initialize = function (callback) {
             }
 
             function update_altitude_graph() {
-                updateGraphHelperSize(baroHelpers);
+                updateGraphHelperSize(altitudeHelpers);
 
-                samples_baro_i = addSampleToData(baro_data, samples_baro_i, [SENSOR_DATA.altitude]);
-                drawGraph(baroHelpers, baro_data, samples_baro_i);
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
+                }
+                else {
+                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude]);
+                }
+                drawGraph(altitudeHelpers, altitude_data, samples_altitude_i);
                 raw_data_text_ements.x[3].text(SENSOR_DATA.altitude.toFixed(2));
+                raw_data_text_ements.y[3].text(SENSOR_DATA.barometer.toFixed(2));
             }
 
             function update_sonar_graphs() {
@@ -25029,6 +25284,23 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.lockMethod = 'soft';
 
+    privateScope.queueLocked = false;
+
+    /**
+     * Method locks queue
+     * All future put requests will be rejected
+     */
+    publicScope.lock = function () {
+        privateScope.queueLocked = true;
+    };
+
+    /**
+     * Method unlocks queue making it possible to put new requests in it
+     */
+    publicScope.unlock = function () {
+        privateScope.queueLocked = false;
+    };
+
     publicScope.setLockMethod = function (method) {
         privateScope.lockMethod = method;
     };
@@ -25057,6 +25329,14 @@ helper.mspQueue = (function (serial, MSP) {
             return privateScope.hardLock !== false;
         }
 
+    };
+
+    privateScope.getTimeout = function (code) {
+        if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
+            return 5000;
+        } else {
+            return serial.getTimeout();
+        }
     };
 
     /**
@@ -25116,7 +25396,7 @@ helper.mspQueue = (function (serial, MSP) {
                     publicScope.put(request);
                 }
 
-            }, serial.getTimeout());
+            }, privateScope.getTimeout(request.code));
 
             if (request.sentOn === null) {
                 request.sentOn = new Date().getTime();
@@ -25154,8 +25434,19 @@ helper.mspQueue = (function (serial, MSP) {
         privateScope.queue = [];
     };
 
+    /**
+     * Method puts new request into queue
+     * @param {MspMessageClass} mspRequest
+     * @returns {boolean} true on success, false when queue is locked
+     */
     publicScope.put = function (mspRequest) {
+
+        if (privateScope.queueLocked === true) {
+            return false;
+        }
+
         privateScope.queue.push(mspRequest);
+        return true;
     };
 
     publicScope.getLength = function () {

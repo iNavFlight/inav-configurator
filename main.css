@@ -45,14 +45,14 @@ a.disabled {
     height: 14px;
     width: 14px;
     opacity: 0.2;
-    background: url(images/icons/cf_icon_info_grey.svg) center;
+    background: url("../images/icons/cf_icon_info_grey.svg") center;
     background-size: contain;
     transition: none;
 }
 
 .helpicon:hover {
     opacity: 0.9;
-    background-image: url(images/icons/cf_icon_info_green.svg);
+    background-image: url("../images/icons/cf_icon_info_green.svg");
     transition: none;
 }
 
@@ -501,7 +501,7 @@ input[type="number"]::-webkit-inner-spin-button {
     top: 113px;
     height: 27px;
     width: 27px;
-    background: url(images/icons/scroll.svg) no-repeat;
+    background: url("../images/icons/scroll.svg") no-repeat;
     background-size: 100%;
     opacity: 0.0;
     transition: all ease 0.3s;
@@ -639,292 +639,292 @@ input[type="number"]::-webkit-inner-spin-button {
 
 /* Tab-Icons */
 .ic_setup {
-    background-image: url(images/icons/cf_icon_setup_grey.svg);
+    background-image: url("../images/icons/cf_icon_setup_grey.svg");
 }
 
 .ic_setup:hover {
-    background-image: url(images/icons/cf_icon_setup_white.svg);
+    background-image: url("../images/icons/cf_icon_setup_white.svg");
 }
 
 li.active .ic_setup {
-    background-image: url(images/icons/cf_icon_setup_white.svg);
+    background-image: url("../images/icons/cf_icon_setup_white.svg");
 }
 
 .ic_ports {
-    background-image: url(images/icons/cf_icon_ports_grey.svg);
+    background-image: url("../images/icons/cf_icon_ports_grey.svg");
 }
 
 .ic_ports:hover {
-    background-image: url(images/icons/cf_icon_ports_white.svg);
+    background-image: url("../images/icons/cf_icon_ports_white.svg");
 }
 
 li.active .ic_ports {
-    background-image: url(images/icons/cf_icon_ports_white.svg);
+    background-image: url("../images/icons/cf_icon_ports_white.svg");
 }
 
 .ic_config {
-    background-image: url(images/icons/cf_icon_config_grey.svg);
+    background-image: url("../images/icons/cf_icon_config_grey.svg");
 }
 
 .ic_config:hover {
-    background-image: url(images/icons/cf_icon_config_white.svg);
+    background-image: url("../images/icons/cf_icon_config_white.svg");
 }
 
 li.active .ic_config {
-    background-image: url(images/icons/cf_icon_config_white.svg);
+    background-image: url("../images/icons/cf_icon_config_white.svg");
 }
 
 .ic_pid {
-    background-image: url(images/icons/cf_icon_pid_grey.svg);
+    background-image: url("../images/icons/cf_icon_pid_grey.svg");
 }
 
 .ic_pid:hover {
-    background-image: url(images/icons/cf_icon_pid_white.svg);
+    background-image: url("../images/icons/cf_icon_pid_white.svg");
 }
 
 li.active .ic_pid {
-    background-image: url(images/icons/cf_icon_pid_white.svg);
+    background-image: url("../images/icons/cf_icon_pid_white.svg");
 }
 
 .ic_rx {
-    background-image: url(images/icons/cf_icon_rx_grey.svg);
+    background-image: url("../images/icons/cf_icon_rx_grey.svg");
 }
 
 .ic_rx:hover {
-    background-image: url(images/icons/cf_icon_rx_white.svg);
+    background-image: url("../images/icons/cf_icon_rx_white.svg");
 }
 
 li.active .ic_rx {
-    background-image: url(images/icons/cf_icon_rx_white.svg);
+    background-image: url("../images/icons/cf_icon_rx_white.svg");
 }
 
 .ic_modes {
-    background-image: url(images/icons/cf_icon_modes_grey.svg);
+    background-image: url("../images/icons/cf_icon_modes_grey.svg");
 }
 
 .ic_modes:hover {
-    background-image: url(images/icons/cf_icon_modes_white.svg);
+    background-image: url("../images/icons/cf_icon_modes_white.svg");
 }
 
 li.active .ic_modes {
-    background-image: url(images/icons/cf_icon_modes_white.svg);
+    background-image: url("../images/icons/cf_icon_modes_white.svg");
 }
 
 .ic_adjust {
-    background-image: url(images/icons/cf_icon_adjust_grey.svg);
+    background-image: url("../images/icons/cf_icon_adjust_grey.svg");
 }
 
 .ic_adjust:hover {
-    background-image: url(images/icons/cf_icon_adjust_white.svg);
+    background-image: url("../images/icons/cf_icon_adjust_white.svg");
 }
 
 li.active .ic_adjust {
-    background-image: url(images/icons/cf_icon_adjust_white.svg);
+    background-image: url("../images/icons/cf_icon_adjust_white.svg");
 }
 
 .ic_servo {
-    background-image: url(images/icons/cf_icon_servo_grey.svg);
+    background-image: url("../images/icons/cf_icon_servo_grey.svg");
 }
 
 .ic_servo:hover {
-    background-image: url(images/icons/cf_icon_servo_white.svg);
+    background-image: url("../images/icons/cf_icon_servo_white.svg");
 }
 
 li.active .ic_servo {
-    background-image: url(images/icons/cf_icon_servo_white.svg);
+    background-image: url("../images/icons/cf_icon_servo_white.svg");
 }
 
 .ic_gps {
-    background-image: url(images/icons/cf_icon_gps_grey.svg);
+    background-image: url("../images/icons/cf_icon_gps_grey.svg");
 }
 
 .ic_gps:hover {
-    background-image: url(images/icons/cf_icon_gps_white.svg);
+    background-image: url("../images/icons/cf_icon_gps_white.svg");
 }
 
 li.active .ic_gps {
-    background-image: url(images/icons/cf_icon_gps_white.svg);
+    background-image: url("../images/icons/cf_icon_gps_white.svg");
 }
 
 .ic_led {
-    background-image: url(images/icons/cf_icon_led_grey.svg);
+    background-image: url("../images/icons/cf_icon_led_grey.svg");
 }
 
 .ic_led:hover {
-    background-image: url(images/icons/cf_icon_led_white.svg);
+    background-image: url("../images/icons/cf_icon_led_white.svg");
 }
 
 li.active .ic_led {
-    background-image: url(images/icons/cf_icon_led_white.svg);
+    background-image: url("../images/icons/cf_icon_led_white.svg");
 }
 
 .ic_sensors {
-    background-image: url(images/icons/cf_icon_sensors_grey.svg);
+    background-image: url("../images/icons/cf_icon_sensors_grey.svg");
 }
 
 .ic_sensors:hover {
-    background-image: url(images/icons/cf_icon_sensors_white.svg);
+    background-image: url("../images/icons/cf_icon_sensors_white.svg");
 }
 
 li.active .ic_sensors {
-    background-image: url(images/icons/cf_icon_sensors_white.svg);
+    background-image: url("../images/icons/cf_icon_sensors_white.svg");
 }
 
 .ic_log {
-    background-image: url(images/icons/cf_icon_log_grey.svg);
+    background-image: url("../images/icons/cf_icon_log_grey.svg");
 }
 
 .ic_log:hover {
-    background-image: url(images/icons/cf_icon_log_white.svg);
+    background-image: url("../images/icons/cf_icon_log_white.svg");
 }
 
 li.active .ic_log {
-    background-image: url(images/icons/cf_icon_log_white.svg);
+    background-image: url("../images/icons/cf_icon_log_white.svg");
 }
 
 .ic_data {
-    background-image: url(images/icons/cf_icon_data_grey.svg);
+    background-image: url("../images/icons/cf_icon_data_grey.svg");
 }
 
 .ic_data:hover {
-    background-image: url(images/icons/cf_icon_data_white.svg);
+    background-image: url("../images/icons/cf_icon_data_white.svg");
 }
 
 li.active .ic_data {
-    background-image: url(images/icons/cf_icon_data_white.svg);
+    background-image: url("../images/icons/cf_icon_data_white.svg");
 }
 
 .ic_cli {
-    background-image: url(images/icons/cf_icon_cli_grey.svg);
+    background-image: url("../images/icons/cf_icon_cli_grey.svg");
 }
 
 .ic_cli:hover {
-    background-image: url(images/icons/cf_icon_cli_white.svg);
+    background-image: url("../images/icons/cf_icon_cli_white.svg");
 }
 
 li.active .ic_cli {
-    background-image: url(images/icons/cf_icon_cli_white.svg);
+    background-image: url("../images/icons/cf_icon_cli_white.svg");
 }
 
 .ic_motor {
-    background-image: url(images/icons/cf_icon_motor_grey.svg);
+    background-image: url("../images/icons/cf_icon_motor_grey.svg");
 }
 
 .ic_motor:hover {
-    background-image: url(images/icons/cf_icon_motor_white.svg);
+    background-image: url("../images/icons/cf_icon_motor_white.svg");
 }
 
 li.active .ic_motor {
-    background-image: url(images/icons/cf_icon_motor_white.svg);
+    background-image: url("../images/icons/cf_icon_motor_white.svg");
 }
 
 .ic_welcome {
-    background-image: url(images/icons/cf_icon_welcome_grey.svg);
+    background-image: url("../images/icons/cf_icon_welcome_grey.svg");
 }
 
 .ic_welcome:hover {
-    background-image: url(images/icons/cf_icon_welcome_white.svg);
+    background-image: url("../images/icons/cf_icon_welcome_white.svg");
 }
 
 li.active .ic_welcome {
-    background-image: url(images/icons/cf_icon_welcome_white.svg);
+    background-image: url("../images/icons/cf_icon_welcome_white.svg");
 }
 
 .ic_help {
-    background-image: url(images/icons/cf_icon_help_grey.svg);
+    background-image: url("../images/icons/cf_icon_help_grey.svg");
 }
 
 .ic_help:hover {
-    background-image: url(images/icons/cf_icon_help_white.svg);
+    background-image: url("../images/icons/cf_icon_help_white.svg");
 }
 
 li.active .ic_help {
-    background-image: url(images/icons/cf_icon_help_white.svg);
+    background-image: url("../images/icons/cf_icon_help_white.svg");
 }
 
 .ic_flasher {
-    background-image: url(images/icons/cf_icon_flasher_grey.svg);
+    background-image: url("../images/icons/cf_icon_flasher_grey.svg");
 }
 
 .ic_flasher:hover {
-    background-image: url(images/icons/cf_icon_flasher_white.svg);
+    background-image: url("../images/icons/cf_icon_flasher_white.svg");
 }
 
 li.active .ic_flasher {
-    background-image: url(images/icons/cf_icon_flasher_white.svg);
+    background-image: url("../images/icons/cf_icon_flasher_white.svg");
 }
 
 .ic_transponder {
-    background-image: url(images/icons/cf_icon_transponder_grey.svg);
+    background-image: url("../images/icons/cf_icon_transponder_grey.svg");
 }
 
 .ic_transponder:hover {
-    background-image: url(images/icons/cf_icon_transponder_white.svg);
+    background-image: url("../images/icons/cf_icon_transponder_white.svg");
 }
 
 li.active .ic_transponder {
-    background-image: url(images/icons/cf_icon_transponder_white.svg);
+    background-image: url("../images/icons/cf_icon_transponder_white.svg");
 }
 
 /* SPARE Tab-Icons */
 .ic_failsafe {
-    background-image: url(images/icons/cf_icon_failsafe_grey.svg);
+    background-image: url("../images/icons/cf_icon_failsafe_grey.svg");
 }
 
 .ic_failsafe:hover {
-    background-image: url(images/icons/cf_icon_failsafe_white.svg);
+    background-image: url("../images/icons/cf_icon_failsafe_white.svg");
 }
 
 li.active .ic_failsafe {
-    background-image: url(images/icons/cf_icon_failsafe_white.svg);
+    background-image: url("../images/icons/cf_icon_failsafe_white.svg");
 }
 
 .ic_backup {
-    background-image: url(images/icons/cf_icon_backup_grey.svg);
+    background-image: url("../images/icons/cf_icon_backup_grey.svg");
 }
 
 .ic_backup:hover {
-    background-image: url(images/icons/cf_icon_backup_white.svg);
+    background-image: url("../images/icons/cf_icon_backup_white.svg");
 }
 
 li.active .ic_backup {
-    background-image: url(images/icons/cf_icon_backup_white.svg);
+    background-image: url("../images/icons/cf_icon_backup_white.svg");
 }
 
 .ic_wizzard {
-    background-image: url(images/icons/cf_icon_wizard_grey.svg);
+    background-image: url("../images/icons/cf_icon_wizard_grey.svg");
 }
 
 .ic_wizzard:hover {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
+    background-image: url("../images/icons/cf_icon_wizard_white.svg");
 }
 
 li.active .ic_wizzard {
-    background-image: url(images/icons/cf_icon_wizard_white.svg);
+    background-image: url("../images/icons/cf_icon_wizard_white.svg");
 }
 
 .ic_advanced {
-    background-image: url(images/icons/cf_icon_advanced_grey.svg);
+    background-image: url("../images/icons/cf_icon_advanced_grey.svg");
 }
 
 .ic_advanced:hover {
-    background-image: url(images/icons/cf_icon_advanced_white.svg);
+    background-image: url("../images/icons/cf_icon_advanced_white.svg");
 }
 
 li.active .ic_advanced {
-    background-image: url(images/icons/cf_icon_advanced_white.svg);
+    background-image: url("../images/icons/cf_icon_advanced_white.svg");
 }
 
 .ic_mission {
-    background-image: url(images/icons/cf_icon_mission_grey.svg);
+    background-image: url("../images/icons/cf_icon_mission_grey.svg");
 }
 
 .ic_mission:hover {
-    background-image: url(images/icons/cf_icon_mission_white.svg);
+    background-image: url("../images/icons/cf_icon_mission_white.svg");
 }
 
 li.active .ic_mission {
-    background-image: url(images/icons/cf_icon_mission_white.svg);
+    background-image: url("../images/icons/cf_icon_mission_white.svg");
 }
 
 #content {
@@ -1411,7 +1411,6 @@ dialog {
 
 .noboarder td {
     border: none;
-    border-bottom: none;
 }
 
 .cf_table tr:last-child td {
