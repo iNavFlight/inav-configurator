@@ -156,11 +156,11 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    function plot_baro(enable) {
+    function plot_altitude(enable) {
         if (enable) {
-            $('.wrapper.baro').show();
+            $('.wrapper.altitude').show();
         } else {
-            $('.wrapper.baro').hide();
+            $('.wrapper.altitude').hide();
         }
     }
 
@@ -186,9 +186,6 @@ TABS.sensors.initialize = function (callback) {
 
         // disable graphs for sensors that are missing
         var checkboxes = $('.tab-sensors .info .checkboxes input');
-        if (!bit_check(CONFIG.activeSensors, 1)) { // baro
-            checkboxes.eq(3).prop('disabled', true);
-        }
         if (!bit_check(CONFIG.activeSensors, 2)) { // mag
             checkboxes.eq(2).prop('disabled', true);
         }
@@ -211,7 +208,7 @@ TABS.sensors.initialize = function (callback) {
                     plot_mag(enable);
                     break;
                 case 3:
-                    plot_baro(enable);
+                    plot_altitude(enable);
                     break;
                 case 4:
                     plot_sonar(enable);
@@ -249,13 +246,13 @@ TABS.sensors.initialize = function (callback) {
         var samples_gyro_i = 0,
             samples_accel_i = 0,
             samples_mag_i = 0,
-            samples_baro_i = 0,
+            samples_altitude_i = 0,
             samples_sonar_i = 0,
             samples_debug_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
-            baro_data = initDataArray(1),
+            altitude_data = (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) ? initDataArray(2) : initDataArray(1),
             sonar_data = initDataArray(1),
             debug_data = [
             initDataArray(1),
@@ -267,7 +264,7 @@ TABS.sensors.initialize = function (callback) {
         var gyroHelpers = initGraphHelpers('#gyro', samples_gyro_i, [-2000, 2000]);
         var accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-2, 2]);
         var magHelpers = initGraphHelpers('#mag', samples_mag_i, [-1, 1]);
-        var baroHelpers = initGraphHelpers('#baro', samples_baro_i);
+        var altitudeHelpers = initGraphHelpers('#altitude', samples_altitude_i);
         var sonarHelpers = initGraphHelpers('#sonar', samples_sonar_i);
         var debugHelpers = [
             initGraphHelpers('#debug1', samples_debug_i),
@@ -452,11 +449,17 @@ TABS.sensors.initialize = function (callback) {
             }
 
             function update_altitude_graph() {
-                updateGraphHelperSize(baroHelpers);
+                updateGraphHelperSize(altitudeHelpers);
 
-                samples_baro_i = addSampleToData(baro_data, samples_baro_i, [SENSOR_DATA.altitude]);
-                drawGraph(baroHelpers, baro_data, samples_baro_i);
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
+                }
+                else {
+                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude]);
+                }
+                drawGraph(altitudeHelpers, altitude_data, samples_altitude_i);
                 raw_data_text_ements.x[3].text(SENSOR_DATA.altitude.toFixed(2));
+                raw_data_text_ements.y[3].text(SENSOR_DATA.barometer.toFixed(2));
             }
 
             function update_sonar_graphs() {

@@ -378,6 +378,72 @@ OSD.constants = {
             default_position: -1,
             positionable: true,
             preview: FONT.symbol(SYM.GPS_SAT) + '14'
+        },
+        ROLL_PIDS: {
+            name: 'ROLL_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'ROL 40 30 23'
+        },
+        PITCH_PIDS: {
+            name: 'PITCH_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'PIT 40 30 23'
+        },
+        YAW_PIDS: {
+            name: 'YAW_PIDS',
+            default_position: -1,
+            positionable: true,
+            preview: 'YAW 85 45 0'
+        },
+        POWER: {
+            name: 'POWER',
+            default_position: -1,
+            positionable: true,
+            preview: '50W'
+        },
+        GPS_LON: {
+            name: 'LONGITUDE',
+            default_position: -1,
+            positionable: true,
+            preview: '14.7652'
+        },
+        GPS_LAT: {
+            name: 'LATITUDE',
+            default_position: -1,
+            positionable: true,
+            preview: '52.9872'
+        },
+        HOME_DIR: {
+            name: 'DIRECTION_TO_HOME',
+            default_position: -1,
+            positionable: true,
+            preview: '165'
+        },
+        HOME_DIST: {
+            name: 'DISTANCE_TO_HOME',
+            default_position: -1,
+            positionable: true,
+            preview: '300m'
+        },
+        HEADING: {
+            name: 'HEADING',
+            default_position: -1,
+            positionable: true,
+            preview: '175'
+        },
+        VARIO: {
+            name: 'VARIO',
+            default_position: -1,
+            positionable: true,
+            preview: '-'
+        },
+        VARIO_NUM: {
+            name: 'VARIO_NUM',
+            default_position: -1,
+            positionable: true,
+            preview: '2'
         }
     }
 };
@@ -402,7 +468,22 @@ OSD.chooseFields = function () {
         F.GPS_SPEED,
         F.GPS_SATS,
         F.ALTITUDE
-    ]
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+        OSD.constants.DISPLAY_FIELDS.push(F.ROLL_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.PITCH_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.YAW_PIDS);
+        OSD.constants.DISPLAY_FIELDS.push(F.POWER);
+
+        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LON);
+        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LAT);
+        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIR);
+        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIST);
+        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);
+        OSD.constants.DISPLAY_FIELDS.push(F.VARIO);
+        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);
+    }
 
 };
 

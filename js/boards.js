@@ -72,6 +72,10 @@ var BOARD_DEFINITIONS = [
         name: "Omnibus F4",
         identifier: "OBF4",
         vcp: true
+    }, {
+        name: "Omnibus F4 Pro",
+        identifier: "OBSD",
+        vcp: true
     }
 ];
 

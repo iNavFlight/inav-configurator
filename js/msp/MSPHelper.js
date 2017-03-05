@@ -177,6 +177,10 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_ALTITUDE:
                 SENSOR_DATA.altitude = parseFloat((data.getInt32(0, true) / 100.0).toFixed(2)); // correct scale factor
+                // On 1.6 and above this provides also baro raw altitude
+                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+                    SENSOR_DATA.barometer = parseFloat((data.getInt32(6, true) / 100.0).toFixed(2)); // correct scale factor
+                }
                 break;
             case MSPCodes.MSP_SONAR:
                 SENSOR_DATA.sonar = data.getInt32(0, true);
@@ -256,7 +260,6 @@ var mspHelper = (function (gui) {
                 _3D.deadband3d_high = data.getUint16(offset, true);
                 offset += 2;
                 _3D.neutral3d = data.getUint16(offset, true);
-
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                     offset += 2;
                     _3D.deadband3d_throttle = data.getUint16(offset, true);
@@ -335,6 +338,9 @@ var mspHelper = (function (gui) {
                 RC_deadband.deadband = data.getUint8(offset++);
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
+                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                }
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
                 SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
@@ -417,6 +423,7 @@ var mspHelper = (function (gui) {
                 BF_CONFIG.currentoffset = data.getUint16(14, true);
                 break;
             case MSPCodes.MSP_SET_BF_CONFIG:
+                console.log('BF_CONFIG saved');
                 break;
             case MSPCodes.MSP_SET_REBOOT:
                 console.log('Reboot request accepted');
@@ -1172,6 +1179,10 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.deadband);
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
+                if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
+                    buffer.push(lowByte(_3D.deadband3d_throttle));
+                    buffer.push(highByte(_3D.deadband3d_throttle));
+                }
                 break;
 
             case MSPCodes.MSP_SET_SENSOR_ALIGNMENT:

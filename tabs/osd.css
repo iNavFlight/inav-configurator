@@ -452,3 +452,7 @@ button {
         height: calc(100% - 30px);
     }
 }
+
+.osd__elements {
+    margin-bottom: 3em;
+}

@@ -11,21 +11,34 @@ presets.elementHelper = function (group, field, value) {
 };
 
 presets.defaultValues = {
-    PIDs: [
-        [40, 30, 23],
-        [40, 30, 23],
-        [85, 45, 0],
-        [50, 0, 0],
-        [65, 120, 10],
-        [180, 15, 100],
-        [10, 5, 8],
-        [20, 15, 75],
-        [60, 0, 0],
-        [100, 50, 10]
-    ],
+    PIDs: {
+        mr: [
+            [40, 30, 23],
+            [40, 30, 23],
+            [85, 45, 0],
+            [50, 0, 0],
+            [65, 120, 10],
+            [180, 15, 100],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [100, 50, 10]
+        ],
+        fw: [
+            [25, 35, 10],
+            [20, 35, 10],
+            [50, 45, 0],
+            [50, 0, 0],
+            [75, 5, 8],
+            [0, 0, 0],
+            [0, 0, 0],
+            [20, 15, 75],
+            [60, 0, 0],
+            [0, 0, 0]
+        ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
-    RC_tuning: {"RC_RATE": 0, "RC_EXPO": 0, "roll_pitch_rate": 0, "roll_rate": 0, "pitch_rate": 0, "yaw_rate": 0, "dynamic_THR_PID": 0, "throttle_MID": 0, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 0, "RC_YAW_EXPO": 0},
+    RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
     FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0},
     FC_CONFIG: {"loopTime": 2000}
@@ -36,6 +49,15 @@ presets.defaultValues = {
  *
  * BF_CONFIG::mixerConfiguration
  *
+ */
+
+
+/**
+ * When defining a preset, following fields are required:
+ *
+ * BF_CONFIG::mixerConfiguration
+ *
+ * @type {{name: string, description: string, features: string[], applyDefaults: string[], settings: *[], type: string}[]}
  */
 presets.presets = [
     {
@@ -90,7 +112,7 @@ presets.presets = [
     },
     {
         name: '10" General Purpose',
-        description: "450-600 class general purpose multirotor <br><span>10.kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
+        description: "450-600 class general purpose multirotor <br><span>1.0kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
             "Asynchronous gyro processing",
             "400dps rates",
@@ -168,6 +190,83 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '280mm Tricopter',
+        description: "280mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 700),
+            presets.elementHelper("RC_tuning", "pitch_rate", 550),
+            presets.elementHelper("RC_tuning", "yaw_rate", 250),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("PIDs", 0, [55, 40, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [55, 40, 15]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [90, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
+        name: '600mm Tricopter',
+        description: "600mm class tricopter with F3/F4 CPU<br>" +
+            "<span>Fast digital tail servo</span>",
+        features: [
+            "Asynchronous processing",
+            "Dterm and gyro notch filter",
+            "GPS ready",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
+            presets.elementHelper("RC_tuning", "roll_rate", 550),
+            presets.elementHelper("RC_tuning", "pitch_rate", 480),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 125),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 90),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 170),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 125),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 85),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("PIDs", 0, [110, 20, 52]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [110, 20, 52]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [75, 20, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: "Airplane General",
         description: "General setup for airplanes",
         features: [
@@ -209,6 +308,30 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Flying wing Z84",
+        description: "Small flying wing on multirotor racer parts<br>" +
+            "<span>300g-500g weight, 3S-4S battery</span>",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [2, 15, 30]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [2, 15, 70]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 7, [10, 15, 75]),  //LEVEL PIDs
+            presets.elementHelper("RC_tuning", "roll_rate", 350),
+            presets.elementHelper("RC_tuning", "pitch_rate", 90),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1300),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
+        ],
+        type: 'flyingwing'
     }
 ];
 
@@ -219,14 +342,25 @@ presets.model = (function () {
     /**
      * @param {Array} toApply
      * @param {Object} defaults
+     * @param {String} mixerType
      */
-    self.applyDefaults = function (toApply, defaults) {
+    self.applyDefaults = function (toApply, defaults, mixerType) {
 
         for (var settingToApply in toApply) {
             if (toApply.hasOwnProperty(settingToApply)) {
 
                 var settingName = toApply[settingToApply],
+                    values;
+
+                if (settingName == 'PIDs') {
+                    if (mixerType == 'multirotor') {
+                        values = defaults[settingName]['mr'];
+                    } else {
+                        values = defaults[settingName]['fw'];
+                    }
+                } else {
                     values = defaults[settingName];
+                }
 
                 for (var key in values) {
                     if (values.hasOwnProperty(key)) {
@@ -238,7 +372,7 @@ presets.model = (function () {
         }
     };
 
-    self.extractPresetNames = function(presets) {
+    self.extractPresetNames = function (presets) {
 
         var retVal = {};
 
@@ -282,6 +416,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     loadChainer.execute();
 
     saveChainer.setChain([
+        mspHelper.saveBfConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveLooptimeConfig,
         mspHelper.saveAdvancedConfig,
@@ -289,7 +424,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         mspHelper.savePidData,
         mspHelper.saveRcTuningData,
         mspHelper.savePidAdvanced,
-        mspHelper.saveBfConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -314,7 +448,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
     function applyAndSave() {
 
-        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues);
+        presets.model.applyDefaults(currentPreset.applyDefaults, presets.defaultValues, currentPreset.type);
 
         var setting;
 
@@ -358,10 +492,12 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         var presetsList = presets.model.extractPresetNames(presets.presets);
 
-        for(var preset in presetsList) {
-            $presetList.append( '<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+        for (var preset in presetsList) {
+            if (presetsList.hasOwnProperty(preset)) {
+                $presetList.append('<li class="preset__element-wrapper"><a href="#" class="preset__element-link" data-val="' + preset + '">' + presetsList[preset] + '</a></li>');
+            }
         }
-    
+
         $('.preset__element-link').click(function () {
             currentPresetId = $(this).data('val');
             currentPreset = presets.presets[currentPresetId];
