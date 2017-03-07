@@ -142,9 +142,9 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 40),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 18),
-            presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
+            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [95, 45, 0])  //YAW PIDs
         ],
         type: 'multirotor'
     },
@@ -178,13 +178,13 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 144),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 90),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 72),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 50),
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 18),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 36),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 9),
-            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
+            presets.elementHelper("PIDs", 0, [100, 30, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [100, 30, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [120, 45, 0]),  //YAW PIDs
             presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
         ],
         type: 'multirotor'
