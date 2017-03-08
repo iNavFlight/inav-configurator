@@ -264,7 +264,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .gyroicon {
-    background: url(images/icons/sensor_gyro_off.png) no-repeat top;
+    background: url("../images/icons/sensor_gyro_off.png") no-repeat top;
     background-size: 43px;
     height: 30px;
     margin-top: 3px;
@@ -275,12 +275,12 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .gyroicon.active {
-    background-image: url(images/icons/sensor_gyro_on.png);
+    background-image: url("../images/icons/sensor_gyro_on.png");
     color: #818181;
 }
 
 .accicon {
-    background: url(images/icons/sensor_acc_off.png) no-repeat -5px 2px;
+    background: url("../images/icons/sensor_acc_off.png") no-repeat -5px 2px;
     background-size: 40px;
     height: 30px;
     margin-top: 3px;
@@ -291,17 +291,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .accicon.active {
-    background-image: url(images/icons/sensor_acc_on.png);
+    background-image: url("../images/icons/sensor_acc_on.png");
     color: #818181;
 }
 
 .accicon.error {
-    background-image: url(images/icons/sensor_acc_error.png);
+    background-image: url("../images/icons/sensor_acc_error.png");
     color: #d40000;
 }
 
 .magicon {
-    background: url(images/icons/sensor_mag_off.png) no-repeat -5px 2px;
+    background: url("../images/icons/sensor_mag_off.png") no-repeat -5px 2px;
     background-size: 42px;
     height: 30px;
     margin-top: 3px;
@@ -312,17 +312,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .magicon.active {
-    background-image: url(images/icons/sensor_mag_on.png);
+    background-image: url("../images/icons/sensor_mag_on.png");
     color: #818181;
 }
 
 .magicon.error {
-    background-image: url(images/icons/sensor_mag_error.png);
+    background-image: url("../images/icons/sensor_mag_error.png");
     color: #d40000;
 }
 
 .gpsicon {
-    background: url(images/icons/sensor_sat_off.png) no-repeat -5px 2px;
+    background: url("../images/icons/sensor_sat_off.png") no-repeat -5px 2px;
     background-size: 42px;
     height: 30px;
     margin-top: 3px;
@@ -333,17 +333,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .gpsicon.active {
-    background-image: url(images/icons/sensor_sat_on.png);
+    background-image: url("../images/icons/sensor_sat_on.png");
     color: #818181;
 }
 
 .gpsicon.error {
-    background-image: url(images/icons/sensor_sat_error.png);
+    background-image: url("../images/icons/sensor_sat_error.png");
     color: #d40000;
 }
 
 .opflowicon {
-    background: url(images/icons/sensor_flow_off.png) no-repeat -5px 0;
+    background: url("../images/icons/sensor_flow_off.png") no-repeat -5px 0;
     background-size: 42px;
     height: 30px;
     margin-top: 3px;
@@ -354,17 +354,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .opflowicon.active {
-    background-image: url(images/icons/sensor_flow_on.png);
+    background-image: url("../images/icons/sensor_flow_on.png");
     color: #818181;
 }
 
 .opflowicon.error {
-    background-image: url(images/icons/sensor_flow_error.png);
+    background-image: url("../images/icons/sensor_flow_error.png");
     color: #d40000;
 }
 
 .baroicon {
-    background: url(images/icons/sensor_baro_off.png) no-repeat -5px 2px;
+    background: url("../images/icons/sensor_baro_off.png") no-repeat -5px 2px;
     background-size: 40px;
     height: 30px;
     margin-top: 3px;
@@ -375,17 +375,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .baroicon.active {
-    background-image: url(images/icons/sensor_baro_on.png);
+    background-image: url("../images/icons/sensor_baro_on.png");
     color: #818181;
 }
 
 .baroicon.error {
-    background-image: url(images/icons/sensor_baro_error.png);
+    background-image: url("../images/icons/sensor_baro_error.png");
     color: #d40000;
 }
 
 .sonaricon {
-    background: url(images/icons/sensor_sonar_off.png) no-repeat -4px 1px;
+    background: url("../images/icons/sensor_sonar_off.png") no-repeat -4px 1px;
     background-size: 41px;
     height: 30px;
     margin-top: 3px;
@@ -396,17 +396,17 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .sonaricon.active {
-    background-image: url(images/icons/sensor_sonar_on.png);
+    background-image: url("images/icons/sensor_sonar_on.png");
     color: #818181;
 }
 
 .sonaricon.error {
-    background-image: url(images/icons/sensor_sonar_error.png);
+    background-image: url("../images/icons/sensor_sonar_error.png");
     color: #d40000;
 }
 
 .airspeedicon {
-    background: url(images/icons/sensor_airspeed_off.png) no-repeat -4px 1px;
+    background: url("../images/icons/sensor_airspeed_off.png") no-repeat -4px 1px;
     background-size: 41px;
     height: 30px;
     margin-top: 3px;
@@ -417,12 +417,12 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .airspeedicon.active {
-    background-image: url(images/icons/sensor_airspeed_on.png);
+    background-image: url("../images/icons/sensor_airspeed_on.png");
     color: #818181;
 }
 
 .airspeedicon.error {
-    background-image: url(images/icons/sensor_airspeed_error.png);
+    background-image: url("../images/icons/sensor_airspeed_error.png");
     color: #d40000;
 }
 
@@ -1694,7 +1694,7 @@ dialog {
     width: 60px;
     transition: none;
     margin-top: 4px;
-    background: url(images/icons/cf_icon_bat_grey.svg) no-repeat center;
+    background: url("../images/icons/cf_icon_bat_grey.svg") no-repeat center;
     background-size: contain;
 }
 
@@ -1715,15 +1715,15 @@ dialog {
 }
 
 .armedicon {
-    background-image: url(images/icons/cf_icon_armed_grey.svg);
+    background-image: url("../images/icons/cf_icon_armed_grey.svg");
 }
 
 .failsafeicon {
-    background-image: url(images/icons/cf_icon_failsafe_grey.svg);
+    background-image: url("../images/icons/cf_icon_failsafe_grey.svg");
 }
 
 .linkicon {
-    background-image: url(images/icons/cf_icon_link_grey.svg);
+    background-image: url("../images/icons/cf_icon_link_grey.svg");
 }
 
 .bottomStatusIcons {
@@ -1856,12 +1856,12 @@ select {
 }
 
 .ic_osd {
-    background-image: url(images/icons/icon_osd.svg);
+    background-image: url("../images/icons/icon_osd.svg");
     background-position-y: 4px;
 }
 
 .ic_osd:hover, li.active .ic_osd {
-    background-image: url(images/icons/icon_osd_white.svg);
+    background-image: url("../images/icons/icon_osd_white.svg");
 }
 
 .full-width {

@@ -8,6 +8,14 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 [![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
 
+## Build system
+
+For local development, **node.js** build system is used.
+
+1. Install node.js
+1. From project folder run `npm install`
+1. To rebuild JS and CSS use ` ./node_modules/gulp/bin/gulp.js`
+
 ## Authors
 
 Konstantin Sharlaimov/DigitalEntity - maintainer of the INAV firmware and configurator.
