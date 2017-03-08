@@ -18,11 +18,25 @@ sources.css = [
     './js/libraries/jbox/jBox.css'
 ];
 
+sources.receiver = [
+    './node_modules/jquery/dist/jquery.min.js',
+    './node_modules/jquery-ui-npm/jquery-ui.min.js',
+    './js/libraries/jquery.nouislider.all.min.js',
+    './tabs/receiver_msp.js'
+];
+
+sources.receiverCss = [
+    './css/opensans_webfontkit/fonts.css',
+    './js/libraries/jquery.nouislider.min.css',
+    './js/libraries/jquery.nouislider.pips.min.css',
+    './tabs/receiver_msp.css'
+];
+
 sources.js = [
     './js/libraries/q.js',
     './js/libraries/google-analytics-bundle.js',
-    './js/libraries/jquery-2.1.4.min.js',
-    './js/libraries/jquery-ui-1.11.4.min.js',
+    './node_modules/jquery/dist/jquery.min.js',
+    './node_modules/jquery-ui-npm/jquery-ui.min.js',
     './js/libraries/d3.min.js',
     './js/libraries/jquery.nouislider.all.min.js',
     './js/libraries/three/three.min.js',
@@ -96,7 +110,37 @@ gulp.task('deploy-js', function () {
         .pipe(gulp.dest('./build/'));
 });
 
-gulp.task('deploy', ['deploy-css', 'deploy-js']);
+gulp.task('build-receiver-css', function () {
+
+    return gulp.src(sources.receiverCss)
+        .pipe(concat('receiver-msp.css'))
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('deploy-receiver-css', function () {
+
+    return gulp.src(sources.receiverCss)
+        .pipe(concat('receiver-msp.css'))
+        .pipe(uglify())
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('build-receiver-msp-js', function () {
+
+    return gulp.src(sources.receiver)
+        .pipe(concat('receiver-msp.js'))
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('deploy-receiver-msp-js', function () {
+
+    return gulp.src(sources.receiver)
+        .pipe(concat('receiver-msp.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('deploy', ['deploy-css', 'deploy-js', 'deploy-receiver-msp-js', 'deploy-receiver-css']);
 
 gulp.task('watch', function () {
     gulp.watch('js/*.js', ['build-js']);
@@ -108,4 +152,4 @@ gulp.task('watch', function () {
     gulp.watch('eventPage.js', ['build-js']);
 });
 
-gulp.task('default', ['build-js', 'build-css']);
+gulp.task('default', ['build-js', 'build-css', 'build-receiver-msp-js', 'build-receiver-css']);
