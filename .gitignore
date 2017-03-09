@@ -5,3 +5,4 @@ npm-debug.log
 .idea/
 npm-debug.log
 inav-configurator.iml
+build/inav-configurator/

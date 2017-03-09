@@ -21,6 +21,11 @@
   "author": "iNavFlight",
   "license": "GPL-3.0",
   "dependencies": {
-    "nw": "^0.18.0"
+      "nw": "^0.18.0",
+      "jquery": "2.1.4",
+      "jquery-ui-npm": "1.12.0",
+      "three": "0.72.0",
+      "inflection": "1.12.0",
+      "bluebird": "3.4.1"
   }
 }
