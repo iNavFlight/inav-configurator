@@ -79,6 +79,14 @@ sources.js = [
     './tabs/advanced_tuning.js'
 ];
 
+sources.mapJs = [
+    './node_modules/openlayers/dist/ol.js'
+];
+
+sources.mapCss = [
+    './node_modules/openlayers/dist/ol.css'
+];
+
 gulp.task('build-css', function () {
 
     return gulp.src(sources.css)
@@ -90,6 +98,20 @@ gulp.task('build-js', function () {
 
     return gulp.src(sources.js)
         .pipe(concat('script.js'))
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('build-map-css', function () {
+
+    return gulp.src(sources.mapCss)
+        .pipe(concat('map.css'))
+        .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('build-map-js', function () {
+
+    return gulp.src(sources.mapJs)
+        .pipe(concat('map.js'))
         .pipe(gulp.dest('./build/'));
 });
 
@@ -151,4 +173,4 @@ gulp.task('watch', function () {
     gulp.watch('eventPage.js', ['build-js']);
 });
 
-gulp.task('default', ['build-js', 'build-css', 'build-receiver-msp-js', 'build-receiver-css']);
+gulp.task('default', ['build-js', 'build-css', 'build-receiver-msp-js', 'build-receiver-css', 'build-map-js', 'build-map-css']);
