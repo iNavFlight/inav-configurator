@@ -2753,6 +2753,12 @@ hr {
     background-size: 200px;
 }
 
+.tab-failsafe .pro5 {
+    background-color: #fafafa;
+    background-size: 200px;
+    height: auto;
+}
+
 .tab-failsafe .spacer_box .helpicon {
     margin-top: 3px;
     margin-right: 0;
