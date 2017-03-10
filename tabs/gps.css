@@ -12,10 +12,6 @@
     background-color: #ececec;
 }
 
-.tab-gps .gps_map {
-    height: 460px;
-}
-
 .tab-gps #connect {
     display: none;
     text-align: center;
@@ -28,7 +24,7 @@
     text-align: center;
     padding-top: 0;
     background-size: 15%;
-    height: 70%;
+    min-height: 400px;
     background: url(../images/loading-bars.svg) no-repeat center 40%;
     float: left;
     width: 100%;
@@ -126,10 +122,6 @@ progress[value]::-webkit-progress-value {
         height: 347px;
         width: 100%;
         float: left;
-    }
-
-    .tab-gps .gps_map {
-        height: 403px;
     }
 
 }

@@ -16370,19 +16370,7 @@ TABS.gps.initialize = function (callback) {
     }
 
     load_html();
-    
-    function set_online(){
-        $('#connect').hide();
-        $('#waiting').show();
-        $('#loadmap').hide();
-    }
-    
-    function set_offline(){
-        $('#connect').show();
-        $('#waiting').hide();
-        $('#loadmap').hide();
-    }
-    
+
     function process_html() {
         localize();
 
@@ -16399,9 +16387,17 @@ TABS.gps.initialize = function (callback) {
         }
 
         function update_ui() {
+
+            if (GPS_DATA.fix > 0) {
+                $('#loadmap').show();
+                $('#waiting').hide();
+            } else {
+                $('#loadmap').hide();
+                $('#waiting').show();
+            }
+
             var lat = GPS_DATA.lat / 10000000;
             var lon = GPS_DATA.lon / 10000000;
-            var url = 'https://maps.google.com/?q=' + lat + ',' + lon;
 
             var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
             if (GPS_DATA.fix >= 2)
@@ -16411,8 +16407,8 @@ TABS.gps.initialize = function (callback) {
 
             $('.GPS_info td.fix').html(gpsFixType);
             $('.GPS_info td.alt').text(GPS_DATA.alt + ' m');
-            $('.GPS_info td.lat a').prop('href', url).text(lat.toFixed(4) + ' deg');
-            $('.GPS_info td.lon a').prop('href', url).text(lon.toFixed(4) + ' deg');
+            $('.GPS_info td.lat').text(lat.toFixed(4) + ' deg');
+            $('.GPS_info td.lon').text(lon.toFixed(4) + ' deg');
             $('.GPS_info td.speed').text(GPS_DATA.speed + ' cm/s');
             $('.GPS_info td.sats').text(GPS_DATA.numSat);
             $('.GPS_info td.distToHome').text(GPS_DATA.distanceToHome + ' m');
@@ -16431,29 +16427,14 @@ TABS.gps.initialize = function (callback) {
             $('.GPS_stat td.hdop').text((GPS_DATA.hdop / 100).toFixed(2));
 
             var message = {
-                action: 'center',
+                action: 'update',
                 lat: lat,
                 lon: lon
             };
 
             var frame = document.getElementById('map');
-            if (navigator.onLine) {
-                $('#connect').hide();
 
-                //if(lat != 0 && lon != 0){
-                if(GPS_DATA.fix){
-                   frame.contentWindow.postMessage(message, '*');
-                   $('#loadmap').show();
-                   $('#waiting').hide();
-                }else{
-                   $('#loadmap').hide();
-                   $('#waiting').show();
-                }
-            }else{
-                $('#connect').show();
-                $('#waiting').hide(); 
-                $('#loadmap').hide();
-            }
+            frame.contentWindow.postMessage(message, '*');
         }
 
         /*
@@ -16463,7 +16444,8 @@ TABS.gps.initialize = function (callback) {
         helper.mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!have_sensor(CONFIG.activeSensors, 'gps')) {
-                //return;
+                update_ui();
+                return;
             }
 
             if (helper.mspQueue.shouldDrop()) {
@@ -16473,43 +16455,6 @@ TABS.gps.initialize = function (callback) {
             get_raw_gps_data();
         });
 
-        //check for internet connection on load
-        if (navigator.onLine) {
-            console.log('Online');
-            set_online();
-        } else {
-            console.log('Offline');
-            set_offline();
-        }
-
-        $("#check").on('click',function(){
-            if (navigator.onLine) {
-                console.log('Online');
-                set_online();
-            } else {
-                console.log('Offline');
-                set_offline();
-            }
-        });
-
-        var frame = document.getElementById('map');
-
-        $('#zoom_in').click(function() {
-            console.log('zoom in');
-            var message = {
-                action: 'zoom_in'
-            };
-            frame.contentWindow.postMessage(message, '*');
-        });
-        
-        $('#zoom_out').click(function() {
-            console.log('zoom out');
-            var message = {
-                action: 'zoom_out'
-            };
-            frame.contentWindow.postMessage(message, '*');
-        });
- 
         GUI.content_ready(callback);
     }
 
@@ -20882,9 +20827,9 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 40),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 18),
-            presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
+            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [95, 45, 0])  //YAW PIDs
         ],
         type: 'multirotor'
     },
@@ -20918,13 +20863,13 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 144),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 90),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 72),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 50),
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 18),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 36),
             presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 9),
-            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
+            presets.elementHelper("PIDs", 0, [100, 30, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [100, 30, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [120, 45, 0]),  //YAW PIDs
             presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
         ],
         type: 'multirotor'
