@@ -11534,6 +11534,25 @@ var FC = {
             "Attitude",
             "Cruise"
         ]
+    },
+    getPidNames: function () {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            return PID_names;
+        } else {
+            return [
+                'Roll',
+                'Pitch',
+                'Yaw',
+                'Position Z',
+                'Position XY',
+                'Velocity XY',
+                'Surface',
+                'Level',
+                'Heading',
+                'Velocity Z'
+            ];
+        }
     }
 };
 
@@ -20128,38 +20147,21 @@ TABS.pid_tuning.initialize = function (callback) {
         $('#content').load("./tabs/pid_tuning.html", process_html);
     }
 
-    var sectionClasses = [
-        'ROLL', // 0
-        'PITCH', // 1
-        'YAW', // 2
-        'ALT', // 3
-        'Pos', // 4
-        'PosR', // 5
-        'NavR', // 6
-        'LEVEL', // 7
-        'MAG', // 8
-        'Vario' // 9
-    ];
-
     function pid_and_rc_to_form() {
 
         // Fill in the data from PIDs array
-        var i;
-        /*
-         * Iterate over registered sections/PID controllers
-         */
-        for (var sectionId = 0; sectionId < sectionClasses.length; sectionId++) {
+        var pidNames = FC.getPidNames();
 
-            i = 0;
-            /*
-             * Now, iterate over inputs inside PID constroller section
-             */
-            $('.pid_tuning .' + sectionClasses[sectionId] + ' input').each(function () {
-                $(this).val(PIDs[sectionId][i]);
-                i++;
+        $('[data-pid-bank-position]').each(function () {
+            var $this = $(this),
+                bankPosition = $this.data('pid-bank-position');
+
+            $this.find('td:first').text(pidNames[bankPosition]);
+
+            $this.find('input').each(function (index) {
+               $(this).val(PIDs[bankPosition][index]);
             });
-
-        }
+        });
 
         // Fill in data from RC_tuning object
         $('.rate-tpa input[name="roll-pitch"]').val(RC_tuning.roll_pitch_rate.toFixed(2));
@@ -20180,14 +20182,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
     function form_to_pid_and_rc() {
 
-        var i;
-        for (var sectionId = 0; sectionId < sectionClasses.length; sectionId++) {
-          i = 0;
-          $('table.pid_tuning tr.' + sectionClasses[sectionId] + ' input').each(function () {
-              PIDs[sectionId][i] = parseFloat($(this).val());
-              i++;
-          });
-        }
+        $('[data-pid-bank-position]').each(function () {
+            var $this = $(this),
+                bankPosition = $this.data('pid-bank-position');
+
+            $this.find('input').each(function (index) {
+                PIDs[bankPosition][index] = parseFloat($(this).val());
+            })
+        });
 
         // catch RC_tuning changes
         RC_tuning.roll_pitch_rate = parseFloat($('.rate-tpa input[name="roll-pitch"]').val());
@@ -20238,16 +20240,6 @@ TABS.pid_tuning.initialize = function (callback) {
 	        updateActivatedTab();
         });
 
-        var i;
-
-        $('.pid_tuning tr').each(function(){
-          for(i = 0; i < PID_names.length; i++) {
-            if($(this).hasClass(PID_names[i])) {
-              $(this).find('td:first').text(PID_names[i]);
-            }
-          }
-        });
-
         pid_and_rc_to_form();
 
         if (FC.isRatesInDps()) {
@@ -20276,11 +20268,11 @@ TABS.pid_tuning.initialize = function (callback) {
             $gyroSoftLpfHz.val(FILTER_CONFIG.gyroSoftLpfHz);
             $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
             $dtermLpfHz.val(FILTER_CONFIG.dtermLpfHz);
-            $yawLpfHz.val(FILTER_CONFIG.yawLpfHz),
+            $yawLpfHz.val(FILTER_CONFIG.yawLpfHz);
             $rollPitchItermIgnoreRate.val(PID_ADVANCED.rollPitchItermIgnoreRate);
             $yawItermIgnoreRate.val(PID_ADVANCED.yawItermIgnoreRate);
             $axisAccelerationLimitRollPitch.val(PID_ADVANCED.axisAccelerationLimitRollPitch * 10);
-            $axisAccelerationLimitYaw.val(PID_ADVANCED.axisAccelerationLimitYaw * 10)
+            $axisAccelerationLimitYaw.val(PID_ADVANCED.axisAccelerationLimitYaw * 10);
 
             $magHoldYawRate.change(function () {
                 INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);

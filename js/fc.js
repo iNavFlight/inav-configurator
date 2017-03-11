@@ -737,5 +737,24 @@ var FC = {
             "Attitude",
             "Cruise"
         ]
+    },
+    getPidNames: function () {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            return PID_names;
+        } else {
+            return [
+                'Roll',
+                'Pitch',
+                'Yaw',
+                'Position Z',
+                'Position XY',
+                'Velocity XY',
+                'Surface',
+                'Level',
+                'Heading',
+                'Velocity Z'
+            ];
+        }
     }
 };
