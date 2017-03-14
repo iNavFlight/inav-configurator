@@ -696,7 +696,12 @@ var FC = {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
     },
     getBarometerNames: function () {
-        return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "FAKE"];
+        }
+        else {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
+        }
     },
     getPitotNames: function () {
         return ["NONE", "AUTO", "MS4525", "FAKE"];
