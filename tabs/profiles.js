@@ -126,9 +126,9 @@ presets.presets = [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
             presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 0),
             presets.elementHelper("FC_CONFIG", "loopTime", 2000),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 2),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 1000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
@@ -498,7 +498,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
                 window[setting.group][setting.field] = setting.value;
             }
         }
-
         saveChainer.execute();
     }
 
