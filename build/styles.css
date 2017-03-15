@@ -396,7 +396,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .sonaricon.active {
-    background-image: url("images/icons/sensor_sonar_on.png");
+    background-image: url("../images/icons/sensor_sonar_on.png");
     color: #818181;
 }
 
