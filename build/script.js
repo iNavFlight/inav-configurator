@@ -15514,15 +15514,27 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_rxfail_config() {
-        MSP.send_message(MSPCodes.MSP_RXFAIL_CONFIG, false, false, get_box_names);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_RXFAIL_CONFIG, false, false, get_box_names);
+        } else {
+            get_box_names();
+        }
     }
 
     function get_box_names() {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
+        } else {
+            get_mode_ranges();
+        }
     }
 
     function get_mode_ranges() {
-        MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
+        } else {
+            get_box_ids();
+        }
     }
 
     function get_box_ids() {
@@ -15548,6 +15560,12 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     load_rx_config();
 
     function process_html() {
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            $('.pre-v1_6').hide();
+            $('.requires-v1_6').show();
+        }
+
         var failsafeFeature;
 
         // translate to user-selected language
@@ -15677,6 +15695,14 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             channel_mode_array[i].change();
         }
 
+        var isFailsafeEnabled;
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            isFailsafeEnabled = true;
+        } else {
+            isFailsafeEnabled = bit_check(BF_CONFIG.features, 8);
+        }
+
         // fill stage 2 fields
         failsafeFeature = $('input[name="failsafe_feature_new"]');
         failsafeFeature.change(function () {
@@ -15687,7 +15713,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             }
         });
 
-        failsafeFeature.prop('checked', bit_check(BF_CONFIG.features, 8));
+        failsafeFeature.prop('checked', isFailsafeEnabled);
         failsafeFeature.change();
 
         $('input[name="failsafe_throttle"]').val(FAILSAFE_CONFIG.failsafe_throttle);
@@ -15734,6 +15760,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 element.prop('checked', true);
                 element.change();
                 break;
+            case 3:
+                element = $('input[id="nothing"]');
+                element.prop('checked', true);
+                element.change();
+                break;
         }
 
         // set stage 2 kill switch option
@@ -15744,11 +15775,12 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             RX_CONFIG.rx_min_usec = parseInt($('input[name="rx_min_usec"]').val());
             RX_CONFIG.rx_max_usec = parseInt($('input[name="rx_max_usec"]').val());
 
-            // get FAILSAFE feature option (>= API 1.15.0)
-            if ($('input[name="failsafe_feature_new"]').is(':checked')) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, 8);
-            } else {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, 8);
+            if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+                if ($('input[name="failsafe_feature_new"]').is(':checked')) {
+                    BF_CONFIG.features = bit_set(BF_CONFIG.features, 8);
+                } else {
+                    BF_CONFIG.features = bit_clear(BF_CONFIG.features, 8);
+                }
             }
 
             FAILSAFE_CONFIG.failsafe_throttle = parseInt($('input[name="failsafe_throttle"]').val());
@@ -15762,6 +15794,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 FAILSAFE_CONFIG.failsafe_procedure = 1;
             } else if ($('input[id="rth"]').is(':checked')) {
                 FAILSAFE_CONFIG.failsafe_procedure = 2;
+            } else if ($('input[id="nothing"]').is(':checked')) {
+                FAILSAFE_CONFIG.failsafe_procedure = 3;
             }
 
             FAILSAFE_CONFIG.failsafe_kill_switch = $('input[name="failsafe_kill_switch"]').is(':checked') ? 1 : 0;
@@ -15771,7 +15805,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             }
 
             function save_rxfail_config() {
-                mspHelper.sendRxFailConfig(save_bf_config);
+                if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+                    mspHelper.sendRxFailConfig(save_bf_config);
+                } else {
+                    save_bf_config();
+                }
             }
 
             function save_bf_config() {

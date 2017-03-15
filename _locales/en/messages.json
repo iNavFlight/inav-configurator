@@ -1656,16 +1656,16 @@
         "message": "<strong>Hold</strong> means maintain the last good value received. <strong>Set</strong> means the value given here will be used"
     },
     "failsafeStageTwoSettingsTitle": {
-        "message": "Stage 2 - Settings"
+        "message": "Settings"
     },
     "failsafeFeatureItem": {
-        "message": "Failsafe Stage 2 enabled"
+        "message": "Enabled"
     },
     "failsafeFeatureHelp": {
         "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
     },
     "failsafeDelayItem": {
-        "message": "Guard time for stage 2 activation after signal lost [1 = 0.1 sec.]"
+        "message": "Guard time for activation after signal lost [1 = 0.1 sec.]"
     },
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
@@ -1686,7 +1686,7 @@
         "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
     },
     "failsafeSubTitle1": {
-        "message": "Stage 2 - Failsafe Procedure"
+        "message": "Procedure"
     },
     "failsafeProcedureItemSelect1": {
         "message": "Land"
@@ -1696,6 +1696,9 @@
     },
     "failsafeProcedureItemSelect3": {
         "message": "RTH"
+    },
+    "failsafeProcedureItemSelect4": {
+        "message": "Do nothing"
     },
     "failsafeKillSwitchItem": {
         "message": "Failsafe Kill Switch (setup Failsafe in Modes Tab)"
