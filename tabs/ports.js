@@ -54,8 +54,20 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         '115200'
     ];
 
-    var telemetryBaudRates = [
+    var telemetryBaudRates_pre1_6_3 = [
         'AUTO',
+        '9600',
+        '19200',
+        '38400',
+        '57600',
+        '115200'
+    ];
+
+    var telemetryBaudRates_post1_6_3 = [
+        'AUTO',
+        '1200',
+        '2400',
+        '4800',
         '9600',
         '19200',
         '38400',
@@ -120,6 +132,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         }
 
         var telemetry_baudrate_e = $('select.telemetry_baudrate');
+        var telemetryBaudRates = semver.gte(CONFIG.flightControllerVersion, "1.6.3") ? telemetryBaudRates_post1_6_3 : telemetryBaudRates_pre1_6_3;
         for (var i = 0; i < telemetryBaudRates.length; i++) {
             telemetry_baudrate_e.append('<option value="' + telemetryBaudRates[i] + '">' + telemetryBaudRates[i] + '</option>');
         }

@@ -7552,7 +7552,23 @@ var MSPCodes = {
 var mspHelper = (function (gui) {
     var self = {};
 
-    self.BAUD_RATES = [
+    self.BAUD_RATES_post1_6_3 = [
+        'AUTO',
+        '1200',
+        '2400',
+        '4800',
+        '9600',
+        '19200',
+        '38400',
+        '57600',
+        '115200',
+        '230400',
+        '250000',
+        '460800',
+        '921600'
+    ];
+
+    self.BAUD_RATES_pre1_6_3 = [
         'AUTO',
         '9600',
         '19200',
@@ -8032,13 +8048,15 @@ var mspHelper = (function (gui) {
                 var serialPortCount = data.byteLength / bytesPerPort;
 
                 for (i = 0; i < serialPortCount; i++) {
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+
                     var serialPort = {
                         identifier: data.getUint8(offset),
                         functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
-                        msp_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 3)],
-                        gps_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 4)],
-                        telemetry_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 5)],
-                        blackbox_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 6)]
+                        msp_baudrate: BAUD_RATES[data.getUint8(offset + 3)],
+                        gps_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
+                        telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
+                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
                     offset += bytesPerPort;
@@ -8703,10 +8721,11 @@ var mspHelper = (function (gui) {
                     buffer.push(specificByte(functionMask, 0));
                     buffer.push(specificByte(functionMask, 1));
 
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.msp_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.gps_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+                    buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.gps_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
                 }
                 break;
 
@@ -20497,8 +20516,20 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         '115200'
     ];
 
-    var telemetryBaudRates = [
+    var telemetryBaudRates_pre1_6_3 = [
         'AUTO',
+        '9600',
+        '19200',
+        '38400',
+        '57600',
+        '115200'
+    ];
+
+    var telemetryBaudRates_post1_6_3 = [
+        'AUTO',
+        '1200',
+        '2400',
+        '4800',
         '9600',
         '19200',
         '38400',
@@ -20563,6 +20594,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         }
 
         var telemetry_baudrate_e = $('select.telemetry_baudrate');
+        var telemetryBaudRates = semver.gte(CONFIG.flightControllerVersion, "1.6.3") ? telemetryBaudRates_post1_6_3 : telemetryBaudRates_pre1_6_3;
         for (var i = 0; i < telemetryBaudRates.length; i++) {
             telemetry_baudrate_e.append('<option value="' + telemetryBaudRates[i] + '">' + telemetryBaudRates[i] + '</option>');
         }
