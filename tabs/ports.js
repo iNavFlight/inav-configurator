@@ -67,6 +67,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         'AUTO',
         '1200',
         '2400',
+        '4800',
         '9600',
         '19200',
         '38400',
