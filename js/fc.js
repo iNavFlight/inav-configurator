@@ -704,7 +704,12 @@ var FC = {
         }
     },
     getPitotNames: function () {
-        return ["NONE", "AUTO", "MS4525", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        }
+        else {
+            return ["NONE", "AUTO", "MS4525", "FAKE"];
+        }
     },
     getRangefinderNames: function () {
         return ["NONE", "AUTO", "HCSR04", "SRF10"];
