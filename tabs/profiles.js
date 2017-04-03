@@ -73,7 +73,7 @@ presets.presets = [
     {
         name: '5" Racer',
         description: "210-250 class racer with F3/F4 CPU on 4S battery<br>" +
-            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, no GPS capabilities</span>",
+            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, acro flight optimized</span>",
         features: [
             "Asynchronous processing",
             "OneShot125 at 2kHz",
@@ -98,6 +98,44 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "roll_rate", 800),
             presets.elementHelper("RC_tuning", "pitch_rate", 800),
             presets.elementHelper("RC_tuning", "yaw_rate", 650),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("PIDs", 0, [43, 40, 20]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [58, 50, 22]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
+        name: '5" GPS',
+        description: "210-250 class quadcopter with F1/F3/F4 CPU on 3S or 4S battery<br>" +
+            "<span>500g-700g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, GPS optimized</span>",
+        features: [
+            "OneShot125 at 1kHz",
+            "500dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 0),
+            presets.elementHelper("FC_CONFIG", "loopTime", 2000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 2),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 1000),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 500),
+            presets.elementHelper("RC_tuning", "pitch_rate", 500),
+            presets.elementHelper("RC_tuning", "yaw_rate", 450),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
@@ -460,7 +498,6 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
                 window[setting.group][setting.field] = setting.value;
             }
         }
-
         saveChainer.execute();
     }
 
