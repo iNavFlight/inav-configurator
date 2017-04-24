@@ -20893,12 +20893,12 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "roll_rate", 500),
             presets.elementHelper("RC_tuning", "pitch_rate", 500),
             presets.elementHelper("RC_tuning", "yaw_rate", 450),
-            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
-            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 200),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 100),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 100),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 1),
             presets.elementHelper("PIDs", 0, [43, 40, 20]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [58, 50, 22]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
@@ -20992,6 +20992,7 @@ presets.presets = [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "Increased LPF cutoff frequencies",
+            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
@@ -21032,6 +21033,7 @@ presets.presets = [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "GPS ready",
+            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
