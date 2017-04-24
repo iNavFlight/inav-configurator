@@ -235,6 +235,7 @@ presets.presets = [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "Increased LPF cutoff frequencies",
+            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
@@ -275,6 +276,7 @@ presets.presets = [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "GPS ready",
+            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
