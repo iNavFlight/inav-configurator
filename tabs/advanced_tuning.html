@@ -56,6 +56,100 @@
                     </div>
                 </div>
             </div>
+
+            <div class="config-section gui_box grey requires-v1_7_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="rthConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="select">
+                        <select id="rthAltControlMode"></select>
+                        <label for="rthAltControlMode"> <span data-i18n="rthAltControlMode"></span></label>
+                    </div>
+
+                    <div class="number">
+                        <input id="rthAltitude" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.rthAltitude" step="1" min="0" max="65000">
+                        <label for="rthAltitude">
+                            <span data-i18n="rthAltitude"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="rthAltitudeHelp"></div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rth-climb-first" class="toggle" />
+                        <label for="rth-climb-first">
+                            <span data-i18n="rthClimbFirst"></span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rthClimbIgnoreEmergency" class="toggle" />
+                        <label for="rthClimbIgnoreEmergency">
+                            <span data-i18n="rthClimbIgnoreEmergency"></span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rthTailFirst" class="toggle" />
+                        <label for="rthTailFirst">
+                            <span data-i18n="rthTailFirst"></span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rthAllowLanding" class="toggle" />
+                        <label for="rthAllowLanding">
+                            <span data-i18n="rthAllowLanding"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landDescentRate" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landDescentRate" step="1" min="100" max="2000">
+                        <label for="landDescentRate">
+                            <span data-i18n="landDescentRate"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landSlowdownMinAlt" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landSlowdownMinAlt" step="1" min="50" max="1000">
+                        <label for="landSlowdownMinAlt">
+                            <span data-i18n="landSlowdownMinAlt"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landSlowdownMaxAlt" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landSlowdownMaxAlt" step="1" min="500" max="4000">
+                        <label for="landSlowdownMaxAlt">
+                            <span data-i18n="landSlowdownMaxAlt"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="rth-min-distance" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.minRthDistance" step="1" min="0" max="5000">
+                        <label for="rth-min-distance">
+                            <span data-i18n="minRthDistance"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="minRthDistanceHelp"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="rthAbortThreshold" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.rthAbortThreshold" step="1" min="0" max="65000">
+                        <label for="rthAbortThreshold">
+                            <span data-i18n="rthAbortThreshold"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="rthAbortThresholdHelp"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="emergencyDescentRate" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.emergencyDescentRate" step="1" min="10" max="2000">
+                        <label for="emergencyDescentRate">
+                            <span data-i18n="emergencyDescentRate"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="rightWrapper">
