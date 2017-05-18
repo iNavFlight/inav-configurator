@@ -1,50 +1,51 @@
 'use strict';
 
 // define all the global variables that are uses to hold FC state
-var CONFIG;
-var BF_CONFIG;
-var LED_STRIP;
-var LED_COLORS;
-var LED_MODE_COLORS;
-var PID;
-var PID_names;
-var PIDs;
-var RC_MAP;
-var RC;
-var RC_tuning;
-var AUX_CONFIG;
-var AUX_CONFIG_IDS;
-var MODE_RANGES;
-var ADJUSTMENT_RANGES;
-var SERVO_CONFIG;
-var SERVO_RULES;
-var SERIAL_CONFIG;
-var SENSOR_DATA;
-var MOTOR_DATA;
-var SERVO_DATA;
-var GPS_DATA;
-var ANALOG;
-var ARMING_CONFIG;
-var FC_CONFIG;
-var MISC;
-var _3D;
-var DATAFLASH;
-var SDCARD;
-var BLACKBOX;
-var TRANSPONDER;
-var RC_deadband;
-var SENSOR_ALIGNMENT;
-var RX_CONFIG;
-var FAILSAFE_CONFIG;
-var RXFAIL_CONFIG;
-var ADVANCED_CONFIG;
-var INAV_PID_CONFIG;
-var PID_ADVANCED;
-var FILTER_CONFIG;
-var SENSOR_STATUS;
-var SENSOR_CONFIG;
-var NAV_POSHOLD;
-var POSITION_ESTIMATOR;
+var CONFIG,
+    BF_CONFIG,
+    LED_STRIP,
+    LED_COLORS,
+    LED_MODE_COLORS,
+    PID,
+    PID_names,
+    PIDs,
+    RC_MAP,
+    RC,
+    RC_tuning,
+    AUX_CONFIG,
+    AUX_CONFIG_IDS,
+    MODE_RANGES,
+    ADJUSTMENT_RANGES,
+    SERVO_CONFIG,
+    SERVO_RULES,
+    SERIAL_CONFIG,
+    SENSOR_DATA,
+    MOTOR_DATA,
+    SERVO_DATA,
+    GPS_DATA,
+    ANALOG,
+    ARMING_CONFIG,
+    FC_CONFIG,
+    MISC,
+    _3D,
+    DATAFLASH,
+    SDCARD,
+    BLACKBOX,
+    TRANSPONDER,
+    RC_deadband,
+    SENSOR_ALIGNMENT,
+    RX_CONFIG,
+    FAILSAFE_CONFIG,
+    RXFAIL_CONFIG,
+    ADVANCED_CONFIG,
+    INAV_PID_CONFIG,
+    PID_ADVANCED,
+    FILTER_CONFIG,
+    SENSOR_STATUS,
+    SENSOR_CONFIG,
+    NAV_POSHOLD,
+    POSITION_ESTIMATOR,
+    RTH_AND_LAND_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -278,6 +279,21 @@ var FC = {
             maxBankAngle: null,
             useThrottleMidForAlthold: null,
             hoverThrottle: null
+        };
+
+        RTH_AND_LAND_CONFIG = {
+             minRthDistance: null,
+             rthClimbFirst: null,
+             rthClimbIgnoreEmergency: null,
+             rthTailFirst: null,
+             rthAllowLanding: null,
+             rthAltControlMode: null,
+             rthAbortThreshold: null,
+             rthAltitude: null,
+             landDescentRate: null,
+             landSlowdownMinAlt: null,
+             landSlowdownMaxAlt: null,
+             emergencyDescentRate: null
         };
 
         _3D = {
@@ -766,5 +782,8 @@ var FC = {
                 'Velocity Z'
             ];
         }
+    },
+    getRthAltControlMode: function () {
+        return ["Current", "Extra", "Fixed", "Max", "At Least"];
     }
 };

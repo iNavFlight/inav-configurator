@@ -7424,6 +7424,9 @@ var MSPCodes = {
     MSP_POSITION_ESTIMATION_CONFIG: 16,
     MSP_SET_POSITION_ESTIMATION_CONFIG: 17,
 
+    MSP_RTH_AND_LAND_CONFIG:     21,
+    MSP_SET_RTH_AND_LAND_CONFIG: 22,
+
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
     MSP_SET_CHANNEL_FORWARDING: 33,
@@ -8487,6 +8490,25 @@ var mspHelper = (function (gui) {
                 console.log('POSITION_ESTIMATOR saved');
                 break;
 
+            case MSPCodes.MSP_RTH_AND_LAND_CONFIG:
+                RTH_AND_LAND_CONFIG.minRthDistance = data.getUint16(0, true);
+                RTH_AND_LAND_CONFIG.rthClimbFirst = data.getUint8(2);
+                RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = data.getUint8(3);
+                RTH_AND_LAND_CONFIG.rthTailFirst = data.getUint8(4);
+                RTH_AND_LAND_CONFIG.rthAllowLanding = data.getUint8(5);
+                RTH_AND_LAND_CONFIG.rthAltControlMode = data.getUint8(6);
+                RTH_AND_LAND_CONFIG.rthAbortThreshold = data.getUint16(7, true);
+                RTH_AND_LAND_CONFIG.rthAltitude = data.getUint16(9, true);
+                RTH_AND_LAND_CONFIG.landDescentRate = data.getUint16(11, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(13, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(15, true);
+                RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(17, true);
+                break;
+
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                console.log('RTH_AND_LAND_CONFIG saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -8837,6 +8859,35 @@ var mspHelper = (function (gui) {
 
                 buffer.push(POSITION_ESTIMATOR.gps_min_sats);
                 buffer.push(POSITION_ESTIMATOR.use_gps_velned);
+                break;
+
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.minRthDistance));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.minRthDistance));
+
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+                buffer.push(RTH_AND_LAND_CONFIG.rthTailFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAllowLanding);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAltControlMode);
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAltitude));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAltitude));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landDescentRate));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -9584,6 +9635,22 @@ var mspHelper = (function (gui) {
     self.savePositionEstimationConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
             MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
         } else {
             callback();
         }
@@ -10817,50 +10884,51 @@ var CONFIGURATOR = {
 'use strict';
 
 // define all the global variables that are uses to hold FC state
-var CONFIG;
-var BF_CONFIG;
-var LED_STRIP;
-var LED_COLORS;
-var LED_MODE_COLORS;
-var PID;
-var PID_names;
-var PIDs;
-var RC_MAP;
-var RC;
-var RC_tuning;
-var AUX_CONFIG;
-var AUX_CONFIG_IDS;
-var MODE_RANGES;
-var ADJUSTMENT_RANGES;
-var SERVO_CONFIG;
-var SERVO_RULES;
-var SERIAL_CONFIG;
-var SENSOR_DATA;
-var MOTOR_DATA;
-var SERVO_DATA;
-var GPS_DATA;
-var ANALOG;
-var ARMING_CONFIG;
-var FC_CONFIG;
-var MISC;
-var _3D;
-var DATAFLASH;
-var SDCARD;
-var BLACKBOX;
-var TRANSPONDER;
-var RC_deadband;
-var SENSOR_ALIGNMENT;
-var RX_CONFIG;
-var FAILSAFE_CONFIG;
-var RXFAIL_CONFIG;
-var ADVANCED_CONFIG;
-var INAV_PID_CONFIG;
-var PID_ADVANCED;
-var FILTER_CONFIG;
-var SENSOR_STATUS;
-var SENSOR_CONFIG;
-var NAV_POSHOLD;
-var POSITION_ESTIMATOR;
+var CONFIG,
+    BF_CONFIG,
+    LED_STRIP,
+    LED_COLORS,
+    LED_MODE_COLORS,
+    PID,
+    PID_names,
+    PIDs,
+    RC_MAP,
+    RC,
+    RC_tuning,
+    AUX_CONFIG,
+    AUX_CONFIG_IDS,
+    MODE_RANGES,
+    ADJUSTMENT_RANGES,
+    SERVO_CONFIG,
+    SERVO_RULES,
+    SERIAL_CONFIG,
+    SENSOR_DATA,
+    MOTOR_DATA,
+    SERVO_DATA,
+    GPS_DATA,
+    ANALOG,
+    ARMING_CONFIG,
+    FC_CONFIG,
+    MISC,
+    _3D,
+    DATAFLASH,
+    SDCARD,
+    BLACKBOX,
+    TRANSPONDER,
+    RC_deadband,
+    SENSOR_ALIGNMENT,
+    RX_CONFIG,
+    FAILSAFE_CONFIG,
+    RXFAIL_CONFIG,
+    ADVANCED_CONFIG,
+    INAV_PID_CONFIG,
+    PID_ADVANCED,
+    FILTER_CONFIG,
+    SENSOR_STATUS,
+    SENSOR_CONFIG,
+    NAV_POSHOLD,
+    POSITION_ESTIMATOR,
+    RTH_AND_LAND_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -11094,6 +11162,21 @@ var FC = {
             maxBankAngle: null,
             useThrottleMidForAlthold: null,
             hoverThrottle: null
+        };
+
+        RTH_AND_LAND_CONFIG = {
+             minRthDistance: null,
+             rthClimbFirst: null,
+             rthClimbIgnoreEmergency: null,
+             rthTailFirst: null,
+             rthAllowLanding: null,
+             rthAltControlMode: null,
+             rthAbortThreshold: null,
+             rthAltitude: null,
+             landDescentRate: null,
+             landSlowdownMinAlt: null,
+             landSlowdownMaxAlt: null,
+             emergencyDescentRate: null
         };
 
         _3D = {
@@ -11582,6 +11665,9 @@ var FC = {
                 'Velocity Z'
             ];
         }
+    },
+    getRthAltControlMode: function () {
+        return ["Current", "Extra", "Fixed", "Max", "At Least"];
     }
 };
 
@@ -14275,7 +14361,8 @@ TABS.advanced_tuning.initialize = function (callback) {
 
     loadChainer.setChain([
         mspHelper.loadNavPosholdConfig,
-        mspHelper.loadPositionEstimationConfig
+        mspHelper.loadPositionEstimationConfig,
+        mspHelper.loadRthAndLandConfig
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -14283,6 +14370,7 @@ TABS.advanced_tuning.initialize = function (callback) {
     saveChainer.setChain([
         mspHelper.saveNavPosholdConfig,
         mspHelper.savePositionEstimationConfig,
+        mspHelper.saveRthAndLandConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -14309,7 +14397,65 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         var $userControlMode = $('#user-control-mode'),
             $useMidThrottle = $("#use-mid-throttle"),
-            $useGpsVelned = $('#use_gps_velned');
+            $useGpsVelned = $('#use_gps_velned'),
+            $rthClimbFirst = $('#rth-climb-first'),
+            $rthClimbIgnoreEmergency = $('#rthClimbIgnoreEmergency'),
+            $rthTailFirst = $('#rthTailFirst'),
+            $rthAllowLanding = $('#rthAllowLanding'),
+            $rthAltControlMode = $('#rthAltControlMode');
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+
+            $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
+            $rthClimbFirst.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthClimbFirst = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthClimbFirst = 0;
+                }
+            });
+            $rthClimbFirst.change();
+
+            $rthClimbIgnoreEmergency.prop("checked", RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+            $rthClimbIgnoreEmergency.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 0;
+                }
+            });
+            $rthClimbIgnoreEmergency.change();
+
+            $rthTailFirst.prop("checked", RTH_AND_LAND_CONFIG.rthTailFirst);
+            $rthTailFirst.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthTailFirst = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthTailFirst = 0;
+                }
+            });
+            $rthTailFirst.change();
+
+            $rthAllowLanding.prop("checked", RTH_AND_LAND_CONFIG.rthAllowLanding);
+            $rthAllowLanding.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthAllowLanding = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthAllowLanding = 0;
+                }
+            });
+            $rthAllowLanding.change();
+
+            GUI.fillSelect($rthAltControlMode, FC.getRthAltControlMode(), RTH_AND_LAND_CONFIG.rthAltControlMode);
+            $rthAltControlMode.val(RTH_AND_LAND_CONFIG.rthAltControlMode);
+            $rthAltControlMode.change(function () {
+                RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
+            });
+
+            $('.requires-v1_7_1').show();
+        } else {
+            $('.requires-v1_7_1').hide();
+        }
 
         GUI.fillSelect($userControlMode, FC.getUserControlMode(), NAV_POSHOLD.userControlMode);
         $userControlMode.val(NAV_POSHOLD.userControlMode);

@@ -939,6 +939,25 @@ var mspHelper = (function (gui) {
                 console.log('POSITION_ESTIMATOR saved');
                 break;
 
+            case MSPCodes.MSP_RTH_AND_LAND_CONFIG:
+                RTH_AND_LAND_CONFIG.minRthDistance = data.getUint16(0, true);
+                RTH_AND_LAND_CONFIG.rthClimbFirst = data.getUint8(2);
+                RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = data.getUint8(3);
+                RTH_AND_LAND_CONFIG.rthTailFirst = data.getUint8(4);
+                RTH_AND_LAND_CONFIG.rthAllowLanding = data.getUint8(5);
+                RTH_AND_LAND_CONFIG.rthAltControlMode = data.getUint8(6);
+                RTH_AND_LAND_CONFIG.rthAbortThreshold = data.getUint16(7, true);
+                RTH_AND_LAND_CONFIG.rthAltitude = data.getUint16(9, true);
+                RTH_AND_LAND_CONFIG.landDescentRate = data.getUint16(11, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(13, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(15, true);
+                RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(17, true);
+                break;
+
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                console.log('RTH_AND_LAND_CONFIG saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1289,6 +1308,35 @@ var mspHelper = (function (gui) {
 
                 buffer.push(POSITION_ESTIMATOR.gps_min_sats);
                 buffer.push(POSITION_ESTIMATOR.use_gps_velned);
+                break;
+
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.minRthDistance));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.minRthDistance));
+
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+                buffer.push(RTH_AND_LAND_CONFIG.rthTailFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAllowLanding);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAltControlMode);
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAltitude));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAltitude));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landDescentRate));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -2036,6 +2084,22 @@ var mspHelper = (function (gui) {
     self.savePositionEstimationConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
             MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
         } else {
             callback();
         }
