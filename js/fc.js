@@ -545,12 +545,18 @@ var FC = {
         ];
     },
     getGpsProtocols: function () {
-        return [
+        var data = [
             'NMEA',
             'UBLOX',
             'I2C-NAV',
             'DJI NAZA'
-        ]
+        ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            data.push('UBLOX7')
+        }
+
+        return data;
     },
     getGpsBaudRates: function () {
         return [
