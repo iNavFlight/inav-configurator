@@ -2086,5 +2086,32 @@
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed [cm/s]"
+    },
+    "cruiseThrottle": {
+        "message": "Cruise throttle"
+    },
+    "minThrottle": {
+        "message": "Min. throttle"
+    },
+    "maxThrottle": {
+        "message": "Max. throttle"
+    },
+    "maxBankAngle": {
+        "message": "Max. bank angle"
+    },
+    "maxClimbAngle": {
+        "message": "Max. climb angle"
+    },
+    "maxDiveAngle": {
+        "message": "Max. dive angle"
+    },
+    "pitchToThrottle": {
+        "message": "Pitch to throttle ratio"
+    },
+    "loiterRadius": {
+        "message": "Loiter radius [cm]"
+    },
+    "fixedWingConfiguration": {
+      "message": "Fixed Wing Settings"
     }
 }

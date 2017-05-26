@@ -45,7 +45,8 @@ var CONFIG,
     SENSOR_CONFIG,
     NAV_POSHOLD,
     POSITION_ESTIMATOR,
-    RTH_AND_LAND_CONFIG;
+    RTH_AND_LAND_CONFIG,
+    FW_CONFIG;
 
 var FC = {
     isRatesInDps: function () {
@@ -372,6 +373,17 @@ var FC = {
             failsafe_kill_switch: 0,
             failsafe_throttle_low_delay: 0,
             failsafe_procedure: 0
+        };
+
+        FW_CONFIG = {
+            cruiseThrottle: null,
+            minThrottle: null,
+            maxThrottle: null,
+            maxBankAngle: null,
+            maxClimbAngle: null,
+            maxDiveAngle: null,
+            pitchToThrottle: null,
+            loiterRadius: null
         };
 
         RXFAIL_CONFIG = [];

@@ -958,6 +958,21 @@ var mspHelper = (function (gui) {
                 console.log('RTH_AND_LAND_CONFIG saved');
                 break;
 
+            case MSPCodes.MSP_FW_CONFIG:
+                FW_CONFIG.cruiseThrottle = data.getUint16(0, true);
+                FW_CONFIG.minThrottle = data.getUint16(2, true);
+                FW_CONFIG.maxThrottle = data.getUint16(4, true);
+                FW_CONFIG.maxBankAngle = data.getUint8(6);
+                FW_CONFIG.maxClimbAngle = data.getUint8(7);
+                FW_CONFIG.maxDiveAngle = data.getUint8(8);
+                FW_CONFIG.pitchToThrottle = data.getUint8(9);
+                FW_CONFIG.loiterRadius = data.getUint16(10, true);
+                break;
+
+            case MSPCodes.MSP_SET_FW_CONFIG:
+                console.log('FW_CONFIG saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -1337,6 +1352,27 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
                 buffer.push(highByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                break;
+
+            case MSPCodes.MSP_SET_FW_CONFIG:
+
+                buffer.push(lowByte(FW_CONFIG.cruiseThrottle));
+                buffer.push(highByte(FW_CONFIG.cruiseThrottle));
+
+                buffer.push(lowByte(FW_CONFIG.minThrottle));
+                buffer.push(highByte(FW_CONFIG.minThrottle));
+
+                buffer.push(lowByte(FW_CONFIG.maxThrottle));
+                buffer.push(highByte(FW_CONFIG.maxThrottle));
+
+                buffer.push(FW_CONFIG.maxBankAngle);
+                buffer.push(FW_CONFIG.maxClimbAngle);
+                buffer.push(FW_CONFIG.maxDiveAngle);
+                buffer.push(FW_CONFIG.pitchToThrottle);
+
+                buffer.push(lowByte(FW_CONFIG.loiterRadius));
+                buffer.push(highByte(FW_CONFIG.loiterRadius));
+
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -2100,6 +2136,22 @@ var mspHelper = (function (gui) {
     self.saveRthAndLandConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
             MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadFwConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveFwConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
         } else {
             callback();
         }
