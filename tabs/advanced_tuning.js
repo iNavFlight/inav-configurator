@@ -15,7 +15,8 @@ TABS.advanced_tuning.initialize = function (callback) {
     loadChainer.setChain([
         mspHelper.loadNavPosholdConfig,
         mspHelper.loadPositionEstimationConfig,
-        mspHelper.loadRthAndLandConfig
+        mspHelper.loadRthAndLandConfig,
+        mspHelper.loadFwConfig
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -24,6 +25,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         mspHelper.saveNavPosholdConfig,
         mspHelper.savePositionEstimationConfig,
         mspHelper.saveRthAndLandConfig,
+        mspHelper.saveFwConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);

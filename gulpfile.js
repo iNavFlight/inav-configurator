@@ -164,7 +164,7 @@ gulp.task('deploy-receiver-msp-js', function () {
 gulp.task('deploy', ['deploy-css', 'deploy-js', 'deploy-receiver-msp-js', 'deploy-receiver-css']);
 
 gulp.task('watch', function () {
-    gulp.watch('js/*.js', ['build-js']);
+    gulp.watch('js/**/*.js', ['build-js']);
     gulp.watch('css/*.css', ['build-css']);
     gulp.watch('main.css', ['build-css']);
     gulp.watch('main.js', ['build-js']);

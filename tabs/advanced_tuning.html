@@ -213,6 +213,72 @@
                 </div>
             </div>
 
+            <div class="config-section gui_box grey requires-v1_7_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="fixedWingConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="number">
+                        <input id="cruiseThrottle" type="number" data-simple-bind="FW_CONFIG.cruiseThrottle" step="1" min="1000" max="2000">
+                        <label for="cruiseThrottle">
+                            <span data-i18n="cruiseThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="minThrottle" type="number" data-simple-bind="FW_CONFIG.minThrottle" step="1" min="1000" max="2000">
+                        <label for="minThrottle">
+                            <span data-i18n="minThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxThrottle" type="number" data-simple-bind="FW_CONFIG.maxThrottle" step="1" min="1000" max="2000">
+                        <label for="maxThrottle">
+                            <span data-i18n="maxThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxBankAngle" type="number" data-simple-bind="FW_CONFIG.maxBankAngle" step="1" min="5" max="80">
+                        <label for="maxBankAngle">
+                            <span data-i18n="maxBankAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxClimbAngle" type="number" data-simple-bind="FW_CONFIG.maxClimbAngle" step="1" min="5" max="80">
+                        <label for="maxClimbAngle">
+                            <span data-i18n="maxClimbAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxDiveAngle" type="number" data-simple-bind="FW_CONFIG.maxDiveAngle" step="1" min="5" max="80">
+                        <label for="maxDiveAngle">
+                            <span data-i18n="maxDiveAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="pitchToThrottle" type="number" data-simple-bind="FW_CONFIG.pitchToThrottle" step="1" min="0" max="100">
+                        <label for="pitchToThrottle">
+                            <span data-i18n="pitchToThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="loiterRadius" type="number" data-simple-bind="FW_CONFIG.loiterRadius" step="1" min="0" max="10000">
+                        <label for="loiterRadius">
+                            <span data-i18n="loiterRadius"></span>
+                        </label>
+                    </div>
+
+
+                </div>
+            </div>
+
         </div>
 
         <div class="clear-both"></div>

@@ -18,6 +18,8 @@ var MSPCodes = {
 
     MSP_RTH_AND_LAND_CONFIG:     21,
     MSP_SET_RTH_AND_LAND_CONFIG: 22,
+    MSP_FW_CONFIG:              23,
+    MSP_SET_FW_CONFIG:          24,
 
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
