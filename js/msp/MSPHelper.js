@@ -340,8 +340,6 @@ var mspHelper = (function (gui) {
                             'max': data.getInt16(i + 2, true),
                             'middle': data.getInt16(i + 4, true),
                             'rate': data.getInt8(i + 6),
-                            'angleAtMin': data.getInt8(i + 7),
-                            'angleAtMax': data.getInt8(i + 8),
                             'indexOfChannelToForward': data.getInt8(i + 9),
                             'reversedInputSources': data.getUint32(i + 10)
                         };
@@ -1514,8 +1512,8 @@ var mspHelper = (function (gui) {
 
             buffer.push(lowByte(servoConfiguration.rate));
 
-            buffer.push(servoConfiguration.angleAtMin);
-            buffer.push(servoConfiguration.angleAtMax);
+            buffer.push(0);
+            buffer.push(0);
 
             var out = servoConfiguration.indexOfChannelToForward;
             if (out == undefined) {
