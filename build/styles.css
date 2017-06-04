@@ -2309,7 +2309,7 @@ div.instrument.altimeter div.needleSmall {
     float: right;
     margin-right: 5px;
     margin-top: -9px;
-    background: url('../images/icons/close1.svg') no-repeat center 100%;
+    background: url('../../../images/icons/close1.svg') no-repeat center 100%;
     display: block;
 }
 
@@ -2357,7 +2357,7 @@ div.instrument.altimeter div.needleSmall {
     border: 1px solid silver;
     margin-top: 0;
     height: calc(100% - 90px); /* - (p, textarea) */
-    background: rgba(0, 0, 0, 0.75) url("../images/light-wide-1.svg") no-repeat 50% 80%;
+    background: rgba(0, 0, 0, 0.75) url("../../../images/light-wide-1.svg") no-repeat 50% 80%;
     background-size: 600px;
     border-radius: 5px;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.80);
@@ -3196,7 +3196,7 @@ hr {
     padding-top: 0;
     background-size: 15%;
     min-height: 400px;
-    background: url(../images/loading-bars.svg) no-repeat center 40%;
+    background: url(../../../images/loading-bars.svg) no-repeat center 40%;
     float: left;
     width: 100%;
 }
@@ -3315,7 +3315,7 @@ progress[value]::-webkit-progress-value {
     border-top: 1px dotted silver;
     padding-top: 5px;
     padding-bottom: 5px;
-    background: url(../images/arrow.svg) no-repeat 0 8px;
+    background: url(../../../images/arrow.svg) no-repeat 0 8px;
     background-size: 12px;
 }
 
@@ -5519,7 +5519,7 @@ button {
     right: 0;
     z-index: -1;
     overflow: hidden;
-    background: url("../images/light-wide-2.svg") no-repeat 95% 20%;
+    background: url("../../../images/light-wide-2.svg") no-repeat 95% 20%;
     background-size: 430px;
     height: 174px;
     opacity: 0.15;
@@ -5706,7 +5706,7 @@ button {
 .tab-configuration #preset-image {
     width: 120px;
     height: 120px;
-    background-image:url(../images/icons/peset_default.svg);
+    background-image:url(../../../images/icons/peset_default.svg);
     background-size:contain;
     background-repeat:no-repeat;
     float: left;
@@ -5780,20 +5780,20 @@ button {
 .tab-configuration .airplane {
     width: 100%;
     height: 100%;
-    background-image:url(../images/icons/peset_plane.svg);
+    background-image:url(../../../images/icons/peset_plane.svg);
 }
     
 .tab-configuration .flyingwing {
     width: 100%;
     height: 100%;
-    background-image:url(../images/icons/peset_wing.svg);
+    background-image:url(../../../images/icons/peset_wing.svg);
    
 }
     
 .tab-configuration .multirotor {
     width: 100%;
     height: 100%;
-    background-image:url(../images/icons/peset_quad.svg);
+    background-image:url(../../../images/icons/peset_quad.svg);
 }
      
 .tab-configuration .preset .top {
@@ -6133,7 +6133,7 @@ button {
     height: 117px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-image: url(../images/paper.jpg);
+    background-image: url(../../../images/paper.jpg);
     background-size: 200%;
     background-position: center;
 }
@@ -6144,7 +6144,7 @@ button {
     height: 117px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-image: url(../images/paper.jpg);
+    background-image: url(../../../images/paper.jpg);
     background-size: 200%;
     background-position: center;
 }
@@ -6804,7 +6804,7 @@ a:hover {
     height: 100%;
     top: 0;
     left: 0;
-    background: url(../images/paper.jpg) center;
+    background: url(../../../images/paper.jpg) center;
     border-radius: 5px;
     background-size: contain;
 }
@@ -7015,7 +7015,7 @@ a:hover {
     float: right;
     height: 15px;
     width: 15px;
-    background-image:url(../images/icons/pass.svg);
+    background-image:url(../../../images/icons/pass.svg);
     background-size:contain;
     background-position:center;
     background-repeat:no-repeat;
@@ -7026,7 +7026,7 @@ a:hover {
     margin-top: 3px;
     height: 15px;
     width: 15px;
-    background-image:url(../images/icons/nopass.svg);
+    background-image:url(../../../images/icons/nopass.svg);
     background-size:contain;
     background-position:center;
     background-repeat:no-repeat;
@@ -7112,12 +7112,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sanssemibold';
-    src: url('../css/opensans_webfontkit/opensans-semibold-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-semibold-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-semibold-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-semibold-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-semibold-webfont.svg#open_sanssemibold') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-semibold-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-semibold-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-semibold-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-semibold-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-semibold-webfont.svg#open_sanssemibold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -7125,12 +7125,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansregular';
-    src: url('../css/opensans_webfontkit/opensans-regular-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-regular-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-regular-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-regular-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-regular-webfont.svg#open_sansregular') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-regular-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-regular-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-regular-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-regular-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-regular-webfont.svg#open_sansregular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -7138,12 +7138,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sanslight';
-    src: url('../css/opensans_webfontkit/opensans-light-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-light-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-light-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-light-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-light-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-light-webfont.svg#open_sanslight') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-light-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-light-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-light-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-light-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-light-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-light-webfont.svg#open_sanslight') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -7151,12 +7151,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansitalic';
-    src: url('../css/opensans_webfontkit/opensans-italic-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-italic-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-italic-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-italic-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-italic-webfont.svg#open_sansitalic') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-italic-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-italic-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-italic-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-italic-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-italic-webfont.svg#open_sansitalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -7164,12 +7164,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansbold_italic';
-    src: url('../css/opensans_webfontkit/opensans-bolditalic-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-bolditalic-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-bolditalic-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-bolditalic-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-bolditalic-webfont.svg#open_sansbold_italic') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-bolditalic-webfont.svg#open_sansbold_italic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -7177,12 +7177,12 @@ a:hover {
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'open_sansbold';
-    src: url('../css/opensans_webfontkit/opensans-bold-webfont.eot');
-    src: url('../css/opensans_webfontkit/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../css/opensans_webfontkit/opensans-bold-webfont.woff2') format('woff2'),
-         url('../css/opensans_webfontkit/opensans-bold-webfont.woff') format('woff'),
-         url('../css/opensans_webfontkit/opensans-bold-webfont.ttf') format('truetype'),
-         url('../css/opensans_webfontkit/opensans-bold-webfont.svg#open_sansbold') format('svg');
+    src: url('../src/css/opensans_webfontkit/opensans-bold-webfont.eot');
+    src: url('../src/css/opensans_webfontkit/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../src/css/opensans_webfontkit/opensans-bold-webfont.woff2') format('woff2'),
+         url('../src/css/opensans_webfontkit/opensans-bold-webfont.woff') format('woff'),
+         url('../src/css/opensans_webfontkit/opensans-bold-webfont.ttf') format('truetype'),
+         url('../src/css/opensans_webfontkit/opensans-bold-webfont.svg#open_sansbold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
