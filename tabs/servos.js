@@ -1,8 +1,8 @@
+/*global fc*/
 'use strict';
 
 TABS.servos = {};
 TABS.servos.initialize = function (callback) {
-    var self = this;
 
     if (GUI.active_tab != 'servos') {
         GUI.active_tab = 'servos';
@@ -33,27 +33,25 @@ TABS.servos.initialize = function (callback) {
 
     function update_ui() {
 
-        if (SERVO_CONFIG.length == 0) {
+        var i,
+            $tabServos = $(".tab-servos");
 
-            $(".tab-servos").removeClass("supported");
+        if (SERVO_CONFIG.length == 0) {
+            $tabServos.removeClass("supported");
             return;
         }
 
-        $(".tab-servos").addClass("supported");
+        $tabServos.addClass("supported");
 
         var servoCheckbox = '';
         var servoHeader = '';
-        for (var i = 0; i < RC.active_channels-4; i++) {
-            servoHeader = servoHeader + '\
-                <th class="short">A' + (i+1) + '</th>\
-            ';
+        for (i = 0; i < RC.active_channels-4; i++) {
+            servoHeader = servoHeader + '<th class="short">A' + (i+1) + '</th>';
         }
         servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
 
-        for (var i = 0; i < RC.active_channels; i++) {
-            servoCheckbox = servoCheckbox + '\
-                <td class="channel"><input type="checkbox"/></td>\
-            ';
+        for (i = 0; i < RC.active_channels; i++) {
+            servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
         }
 
         $('div.tab-servos table.fields tr.main').append(servoHeader);
@@ -79,13 +77,11 @@ TABS.servos.initialize = function (callback) {
             }
 
             // adding select box and generating options
-            $('div.tab-servos table.fields tr:last td.direction').append('\
-                <select class="rate" name="rate"></select>\
-            ');
+            $('div.tab-servos table.fields tr:last td.direction').append('<select class="rate" name="rate"></select>');
 
             var select = $('div.tab-servos table.fields tr:last td.direction select');
 
-            for (var i = 100; i > -101; i--) {
+            for (var i = FC.MAX_SERVO_RATE; i >= FC.MIN_SERVO_RATE; i--) {
                 select.append('<option value="' + i + '">Rate: ' + i + '%</option>');
             }
 
