@@ -11,9 +11,9 @@ sources.css = [
     './js/libraries/jquery.nouislider.min.css',
     './js/libraries/jquery.nouislider.pips.min.css',
     './js/libraries/flightindicators.css',
-    './tabs/*.css',
-    './css/opensans_webfontkit/fonts.css',
-    './css/dropdown-lists/css/style_lists.css',
+    './src/css/tabs/*.css',
+    './src/css/opensans_webfontkit/fonts.css',
+    './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css'
 ];
