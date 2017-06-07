@@ -49,6 +49,8 @@ var CONFIG,
     FW_CONFIG;
 
 var FC = {
+    MAX_SERVO_RATE: 125,
+    MIN_SERVO_RATE: -125,
     isRatesInDps: function () {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
