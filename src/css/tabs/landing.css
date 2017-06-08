@@ -37,15 +37,16 @@
     font-size: 20px;
     text-align: center;
     width: 400px;
-    height: 50px;
+    height: 45px;
     display: inline-block;
     position: relative;
 }
 
 .tab-landing .community ul i {
-    font-size: 50px;
+    font-size: 35px;
     color: white;
     margin-left: -200px;
+    margin-top: 5px;
 }
 
 .tab-landing .content_mid {
