@@ -541,7 +541,7 @@
         "message": "Configure via the Race Transponder tab after enabling."
     },
     "featureRX_NRF24": {
-        "message": "RX SPI based receiver"
+        "message": "RX SPI based receiver (NRF24L01, RFM22)"
     },
     "featureRX_NRF24Tip": {
         "message": "Remember to set the RX SPI protocol after enabling."
