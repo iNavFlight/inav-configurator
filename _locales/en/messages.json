@@ -541,10 +541,10 @@
         "message": "Configure via the Race Transponder tab after enabling."
     },
     "featureRX_NRF24": {
-        "message": "NRF24L01 based receiver"
+        "message": "RX SPI based receiver (NRF24L01, RFM22)"
     },
     "featureRX_NRF24Tip": {
-        "message": "Remember to set the NRF24 protocol after enabling."
+        "message": "Remember to set the RX SPI protocol after enabling."
     },
     "featureSOFTSPI": {
         "message": "CPU based SPI"
@@ -721,7 +721,7 @@
         "message": "Serial Receiver Provider"
     },
     "configurationNrf24Protocol": {
-        "message": "NRF24 protocol"
+        "message": "RX SPI protocol"
     },
     "configurationEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"

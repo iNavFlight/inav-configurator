@@ -619,7 +619,9 @@ var FC = {
             'Cheerson CX10',
             'Cheerson CX10A',
             'JJRC H8_3D',
-            'iNav Reference protocol'
+            'iNav Reference protocol',
+            'eLeReS'
+            
         ];
     },
     getSensorAlignments: function () {
