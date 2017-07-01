@@ -1862,6 +1862,9 @@
     "sensorPitot": {
         "message": "Pitot tube"
     },
+    "sensorRangefinder": {
+        "message": "Rangefinder"
+    },
     "manualEnablingTemplate": {
         "message": "To enable via CLI use <strong>feature {name}</strong> command"
     },
