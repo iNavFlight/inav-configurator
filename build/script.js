@@ -11685,7 +11685,7 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return ["NONE", "AUTO", "HCSR04", "SRF10"];
+        return [ "NONE", "HCSR04", "SRF10"];
     },
     getArmingFlags: function () {
         return {
