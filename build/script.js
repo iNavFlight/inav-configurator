@@ -11505,6 +11505,10 @@ var FC = {
             data.push('UBLOX7')
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.2")) {
+            data.push('MTK')
+        }
+
         return data;
     },
     getGpsBaudRates: function () {
