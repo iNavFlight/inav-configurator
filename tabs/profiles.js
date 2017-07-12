@@ -229,13 +229,11 @@ presets.presets = [
     },
     {
         name: '280mm Tricopter',
-        description: "280mm class tricopter with F3/F4 CPU<br>" +
-            "<span>Fast digital tail servo</span>",
+        description: "280mm class tricopter with F3/F4 CPU",
         features: [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "Increased LPF cutoff frequencies",
-            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
@@ -248,7 +246,7 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
-            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 300),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
             presets.elementHelper("RC_tuning", "roll_rate", 700),
@@ -270,13 +268,11 @@ presets.presets = [
     },
     {
         name: '600mm Tricopter',
-        description: "600mm class tricopter with F3/F4 CPU<br>" +
-            "<span>Fast digital tail servo</span>",
+        description: "600mm class tricopter with F3/F4 CPU<br>",
         features: [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
             "GPS ready",
-            "Faster PWM update for servos",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
@@ -288,7 +284,7 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
-            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 160),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
             presets.elementHelper("RC_tuning", "roll_rate", 550),
             presets.elementHelper("RC_tuning", "pitch_rate", 480),
