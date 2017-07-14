@@ -19399,7 +19399,7 @@ TABS.onboard_logging.cleanup = function (callback) {
 'use strict';
 
 var SYM = SYM || {};
-SYM.VOLT = 0x06;
+SYM.VOLT = 0x90;
 SYM.RSSI = 0x01;
 SYM.AH_RIGHT = 0x02;
 SYM.AH_LEFT = 0x03;
@@ -19417,7 +19417,17 @@ SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
 SYM.METRE = 0xC;
 SYM.FEET = 0xF;
-SYM.GPS_SAT = 0x1F;
+SYM.GPS_SAT1 = 0x1E;
+SYM.GPS_SAT2 = 0x1F;
+SYM.GPS_SPEED = 0xA1;
+SYM.ALT = 0xAA;
+SYM.LAT = 0xA6;
+SYM.LON = 0xA7;
+SYM.DIR_TO_HOME = 0x60;
+SYM.DIST_TO_HOME = 0xA0;
+SYM.HEADING1 = 0xA9;
+SYM.HEADING2 = 0xA8;
+SYM.VARIO = 0x9F;
 
 var FONT = FONT || {};
 
@@ -19655,7 +19665,7 @@ OSD.constants = {
             name: 'MAIN_BATT_VOLTAGE',
             default_position: -29,
             positionable: true,
-            preview: FONT.symbol(SYM.VOLT) + '16.8'
+            preview: FONT.symbol(SYM.VOLT) + '16.8V'
         },
         RSSI_VALUE: {
             name: 'RSSI_VALUE',
@@ -19743,7 +19753,7 @@ OSD.constants = {
             default_position: 62,
             positionable: true,
             preview: function (osd_data) {
-                return '399.7' + FONT.symbol(osd_data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
+                return FONT.symbol(SYM.ALT) + '399.7' + FONT.symbol(osd_data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
             }
         },
         ONTIME: {
@@ -19768,13 +19778,13 @@ OSD.constants = {
             name: 'GPS_SPEED',
             default_position: -1,
             positionable: true,
-            preview: '40'
+            preview: '40' + FONT.symbol(SYM.GPS_SPEED)
         },
         GPS_SATS: {
             name: 'GPS_SATS',
             default_position: -1,
             positionable: true,
-            preview: FONT.symbol(SYM.GPS_SAT) + '14'
+            preview: FONT.symbol(SYM.GPS_SAT1) + FONT.symbol(SYM.GPS_SAT2) + '14'
         },
         ROLL_PIDS: {
             name: 'ROLL_PIDS',
@@ -19804,31 +19814,31 @@ OSD.constants = {
             name: 'LONGITUDE',
             default_position: -1,
             positionable: true,
-            preview: '14.7652'
+            preview: FONT.symbol(SYM.LON) + '14.76521'
         },
         GPS_LAT: {
             name: 'LATITUDE',
             default_position: -1,
             positionable: true,
-            preview: '52.9872'
+            preview: FONT.symbol(SYM.LAT) + '52.98723'
         },
         HOME_DIR: {
             name: 'DIRECTION_TO_HOME',
             default_position: -1,
             positionable: true,
-            preview: '165'
+            preview: FONT.symbol(SYM.DIR_TO_HOME)
         },
         HOME_DIST: {
             name: 'DISTANCE_TO_HOME',
             default_position: -1,
             positionable: true,
-            preview: '300m'
+            preview:  FONT.symbol(SYM.DIST_TO_HOME) + '300' +  FONT.symbol(SYM.METRE)
         },
         HEADING: {
             name: 'HEADING',
             default_position: -1,
             positionable: true,
-            preview: '175'
+            preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
         },
         VARIO: {
             name: 'VARIO',
@@ -19840,7 +19850,7 @@ OSD.constants = {
             name: 'VARIO_NUM',
             default_position: -1,
             positionable: true,
-            preview: '2'
+            preview: '-0.5' + FONT.symbol(SYM.VARIO)
         }
     }
 };
@@ -19877,9 +19887,13 @@ OSD.chooseFields = function () {
         OSD.constants.DISPLAY_FIELDS.push(F.GPS_LAT);
         OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIR);
         OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIST);
-        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);
+        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);       
         OSD.constants.DISPLAY_FIELDS.push(F.VARIO);
-        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);
+        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);        
+    }
+
+    if (semver.gte(CONFIG.flightControllerVersion, "1.7.2")) {
+        OSD.constants.DISPLAY_FIELDS.push(F.CRAFT_NAME);
     }
 
 };
@@ -20230,7 +20244,7 @@ TABS.osd.initialize = function (callback) {
                         }
                         field.preview_img.src = canvas.toDataURL('image/png');
                     }
-                    var centerishPosition = 194;
+                    var centerishPosition = 225;
 
                     // artificial horizon
                     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
