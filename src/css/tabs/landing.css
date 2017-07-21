@@ -9,13 +9,44 @@
     min-height: 100%;
     height: 100%;
     overflow-y: auto;
-    background-color: #424242;
+    background-color: #104156;
 }
 
 .tab-landing .content_top {
     height: 140px;
     background: white url(/images/map_bg.svg);
     padding: 20px;
+}
+
+.tab-landing .community {
+    text-align: center;
+    margin: 15px 0px;
+}
+
+.tab-landing .community a {
+    display: block;
+}
+
+.tab-landing .community ul span {
+    color: white;
+    position: absolute;
+    padding: 10px;
+}
+
+.tab-landing .community ul {
+    font-size: 20px;
+    text-align: center;
+    width: 400px;
+    height: 45px;
+    display: inline-block;
+    position: relative;
+}
+
+.tab-landing .community ul i {
+    font-size: 35px;
+    color: white;
+    margin-left: -200px;
+    margin-top: 5px;
 }
 
 .tab-landing .content_mid {

@@ -13,6 +13,7 @@ sources.css = [
     './js/libraries/flightindicators.css',
     './src/css/tabs/*.css',
     './src/css/opensans_webfontkit/fonts.css',
+    './src/css/font-awesome/css/font-awesome.css',
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css'
