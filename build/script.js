@@ -19851,6 +19851,12 @@ OSD.constants = {
             default_position: -1,
             positionable: true,
             preview: '-0.5' + FONT.symbol(SYM.VARIO)
+        },
+        AIR_SPEED: {
+            name: 'AIR_SPEED',
+            default_position: -1,
+            positionable: true,
+            preview: '55' + FONT.symbol(SYM.GPS_SPEED)
         }
     }
 };
@@ -19892,8 +19898,8 @@ OSD.chooseFields = function () {
         OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);        
     }
 
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.2")) {
-        OSD.constants.DISPLAY_FIELDS.push(F.CRAFT_NAME);
+    if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+        OSD.constants.DISPLAY_FIELDS.push(F.AIR_SPEED);
     }
 
 };
@@ -19982,6 +19988,7 @@ OSD.msp = {
 
             var j = d.display_items.length;
             var c = OSD.constants.DISPLAY_FIELDS[j];
+
             if (c) {
                 d.display_items.push($.extend({
                     name: c.name,
@@ -20154,6 +20161,7 @@ TABS.osd.initialize = function (callback) {
 
                     // display fields on/off and position
                     var $displayFields = $('.display-fields').empty();
+
                     for (let field of OSD.data.display_items) {
 
                         // versioning related, if the field doesn't exist at the current flight controller version, just skip it
@@ -20355,7 +20363,6 @@ TABS.osd.initialize = function (callback) {
                 $('.progressLabel').text('Uploading...');
                 FONT.upload($('.progress').val(0)).then(function () {
                     var msg = 'Uploaded all ' + FONT.data.characters.length + ' characters';
-                    console.log(msg);
                     $('.progressLabel').text(msg);
                 });
             }
