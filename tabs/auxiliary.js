@@ -16,7 +16,15 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        if (SERIAL_CONFIG.ports.length == 0) {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, get_serial_config);
+        } else {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        }
+    }
+
+    function get_serial_config() {
+        MSP.send_message(MSPCodes.MSP_CF_SERIAL_CONFIG, false, false, load_html);
     }
 
     function load_html() {
@@ -28,8 +36,10 @@ TABS.auxiliary.initialize = function (callback) {
     function createMode(modeIndex, modeId) {
         var modeTemplate = $('#tab-auxiliary-templates .mode');
         var newMode = modeTemplate.clone();
-
         var modeName = AUX_CONFIG[modeIndex];
+        // if user choose the runcam split at peripheral column, then adjust the boxname(BOXCAMERA1, BOXCAMERA2, BOXCAMERA3)
+        modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
+ 
         $(newMode).attr('id', 'mode-' + modeIndex);
         $(newMode).find('.name').text(modeName);
 

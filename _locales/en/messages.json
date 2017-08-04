@@ -783,6 +783,9 @@
     "portsFunction_BLACKBOX": {
         "message": "Blackbox"
     },
+    "portsFunction_RUNCAM_SPLIT_CONTROL": {
+        "message": "RunCam Split"
+    },
     "pidTuningName": {
         "message": "Name"
     },

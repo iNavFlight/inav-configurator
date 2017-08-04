@@ -7594,7 +7594,8 @@ var mspHelper = (function (gui) {
         'RX_SERIAL': 6,
         'BLACKBOX': 7,
         'TELEMETRY_MAVLINK': 8,
-        'TELEMETRY_IBUS': 9
+        'TELEMETRY_IBUS': 9,
+        'RUNCAM_SPLIT_CONTROL' : 10,
     };
 
     /**
@@ -14594,7 +14595,15 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        if (SERIAL_CONFIG.ports.length == 0) {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, get_serial_config);
+        } else {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        }
+    }
+
+    function get_serial_config() {
+        MSP.send_message(MSPCodes.MSP_CF_SERIAL_CONFIG, false, false, load_html);
     }
 
     function load_html() {
@@ -14606,8 +14615,10 @@ TABS.auxiliary.initialize = function (callback) {
     function createMode(modeIndex, modeId) {
         var modeTemplate = $('#tab-auxiliary-templates .mode');
         var newMode = modeTemplate.clone();
-
         var modeName = AUX_CONFIG[modeIndex];
+        // if user choose the runcam split at peripheral column, then adjust the boxname(BOXCAMERA1, BOXCAMERA2, BOXCAMERA3)
+        modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
+ 
         $(newMode).attr('id', 'mode-' + modeIndex);
         $(newMode).find('.name').text(modeName);
 
@@ -15858,7 +15869,9 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                     continue; // invalid!
                 }
 
-                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + AUX_CONFIG[modeIndex] + "</span>";
+                var modeName = AUX_CONFIG[modeIndex];                      
+                modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
+                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + modeName + "</span>";
             }
         }
 
@@ -20722,6 +20735,7 @@ TABS.ports = {};
 
 TABS.ports.initialize = function (callback, scrollPosition) {
     var board_definition = {};
+    var isSupportPeripherals = semver.gte(CONFIG.apiVersion, "1.27.0");
 
     var functionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
@@ -20752,6 +20766,12 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         });
     }
 
+    // support configure RunCam Split
+    GUI.log('API version is ' + CONFIG.apiVersion);
+    if (isSupportPeripherals) {
+        functionRules.push({ name: 'RUNCAM_SPLIT_CONTROL', groups: ['peripherals'], maxPorts: 1 });
+    }
+ 
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
@@ -20802,7 +20822,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         '250000'
     ];
 
-    var columns = ['data', 'logging', 'gps', 'telemetry', 'rx'];
+    var columns = ['data', 'logging', 'gps', 'telemetry', 'rx', 'peripherals'];
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
@@ -20838,6 +20858,12 @@ TABS.ports.initialize = function (callback, scrollPosition) {
            30: 'SOFTSERIAL1',
            31: 'SOFTSERIAL2'
         };
+
+        // if apiVersion < 1.27.0, than remove the peripherals column
+        if (!isSupportPeripherals) {
+            $('.peripherls-column').remove();
+            $('.functionsCell-peripherals').remove();
+        }
 
         var gps_baudrate_e = $('select.gps_baudrate');
         for (var i = 0; i < gpsBaudRates.length; i++) {
@@ -20901,7 +20927,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
                     }
 
                     var select_e;
-                    if (column != 'telemetry') {
+                    if (column !== 'telemetry' && column !== 'peripherals') {
                         var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
                         functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
 
@@ -20964,6 +20990,13 @@ TABS.ports.initialize = function (callback, scrollPosition) {
             var telemetryFunction = $(portConfiguration_e).find('select[name=function-telemetry]').val();
             if (telemetryFunction) {
                 functions.push(telemetryFunction);
+            }
+
+            if (isSupportPeripherals) {
+                var peripheralFunction = $(portConfiguration_e).find('select[name=function-peripherals]').val();
+                if (peripheralFunction) {
+                    functions.push(peripheralFunction);
+                }
             }
 
             if (telemetryFunction.length > 0) {
@@ -23932,3 +23965,36 @@ helper.mspBalancedInterval = (function (mspQueue, intervalHandler) {
 
     return publicScope;
 })(helper.mspQueue, helper.interval);
+
+'use strict';
+
+// return true if user has choose a special peripheral
+function isPeripheralSelected(peripheralName) {
+    for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
+        var serialPort = SERIAL_CONFIG.ports[portIndex];
+        if (serialPort.functions.indexOf(peripheralName) >= 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Adjust the real name for a modeId. Useful if it belongs to a peripheral
+function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
+    if (isPeripheralSelected("RUNCAM_SPLIT_CONTROL")) {
+        switch (modeId) {
+            case 39: // BOXCAMERA1
+                return "CAMERA WI-FI";
+            case 40: // BOXCAMERA2
+                return "CAMERA POWER";
+            case 41: // BOXCAMERA3
+                return "CAMERA CHANGE MODE";
+            default:
+                return defaultName;
+        }
+    } 
+    
+    return defaultName;
+    
+}
