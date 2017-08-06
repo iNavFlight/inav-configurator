@@ -4,7 +4,7 @@ TABS.ports = {};
 
 TABS.ports.initialize = function (callback, scrollPosition) {
     var board_definition = {};
-    var isSupportPeripherals = semver.gte(CONFIG.apiVersion, "1.27.0");
+    var isSupportPeripherals = semver.gte(CONFIG.flightControllerVersion, "1.7.3");
 
     var functionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
@@ -128,7 +128,6 @@ TABS.ports.initialize = function (callback, scrollPosition) {
            31: 'SOFTSERIAL2'
         };
 
-        // if apiVersion < 1.27.0, than remove the peripherals column
         if (!isSupportPeripherals) {
             $('.peripherls-column').remove();
             $('.functionsCell-peripherals').remove();
