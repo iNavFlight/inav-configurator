@@ -101,7 +101,9 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                     continue; // invalid!
                 }
 
-                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + AUX_CONFIG[modeIndex] + "</span>";
+                var modeName = AUX_CONFIG[modeIndex];                      
+                modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
+                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + modeName + "</span>";
             }
         }
 

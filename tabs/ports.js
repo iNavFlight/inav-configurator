@@ -4,6 +4,7 @@ TABS.ports = {};
 
 TABS.ports.initialize = function (callback, scrollPosition) {
     var board_definition = {};
+    var isSupportPeripherals = semver.gte(CONFIG.flightControllerVersion, "1.7.3");
 
     var functionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
@@ -34,6 +35,12 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         });
     }
 
+    // support configure RunCam Split
+    GUI.log('API version is ' + CONFIG.apiVersion);
+    if (isSupportPeripherals) {
+        functionRules.push({ name: 'RUNCAM_SPLIT_CONTROL', groups: ['peripherals'], maxPorts: 1 });
+    }
+ 
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
@@ -84,7 +91,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
         '250000'
     ];
 
-    var columns = ['data', 'logging', 'gps', 'telemetry', 'rx'];
+    var columns = ['data', 'logging', 'gps', 'telemetry', 'rx', 'peripherals'];
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
@@ -120,6 +127,11 @@ TABS.ports.initialize = function (callback, scrollPosition) {
            30: 'SOFTSERIAL1',
            31: 'SOFTSERIAL2'
         };
+
+        if (!isSupportPeripherals) {
+            $('.peripherls-column').remove();
+            $('.functionsCell-peripherals').remove();
+        }
 
         var gps_baudrate_e = $('select.gps_baudrate');
         for (var i = 0; i < gpsBaudRates.length; i++) {
@@ -183,7 +195,7 @@ TABS.ports.initialize = function (callback, scrollPosition) {
                     }
 
                     var select_e;
-                    if (column != 'telemetry') {
+                    if (column !== 'telemetry' && column !== 'peripherals') {
                         var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
                         functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
 
@@ -246,6 +258,13 @@ TABS.ports.initialize = function (callback, scrollPosition) {
             var telemetryFunction = $(portConfiguration_e).find('select[name=function-telemetry]').val();
             if (telemetryFunction) {
                 functions.push(telemetryFunction);
+            }
+
+            if (isSupportPeripherals) {
+                var peripheralFunction = $(portConfiguration_e).find('select[name=function-peripherals]').val();
+                if (peripheralFunction) {
+                    functions.push(peripheralFunction);
+                }
             }
 
             if (telemetryFunction.length > 0) {

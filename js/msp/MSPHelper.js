@@ -41,7 +41,8 @@ var mspHelper = (function (gui) {
         'RX_SERIAL': 6,
         'BLACKBOX': 7,
         'TELEMETRY_MAVLINK': 8,
-        'TELEMETRY_IBUS': 9
+        'TELEMETRY_IBUS': 9,
+        'RUNCAM_SPLIT_CONTROL' : 10,
     };
 
     /**

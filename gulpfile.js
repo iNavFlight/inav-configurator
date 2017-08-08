@@ -77,7 +77,8 @@ sources.js = [
     './js/periodicStatusUpdater.js',
     './js/serial_queue.js',
     './js/msp_balanced_interval.js',
-    './tabs/advanced_tuning.js'
+    './tabs/advanced_tuning.js',
+    './js/peripherals.js'
 ];
 
 sources.mapJs = [
