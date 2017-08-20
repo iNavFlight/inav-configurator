@@ -11397,6 +11397,12 @@ var FC = {
             );
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
+            features.push(
+                {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
