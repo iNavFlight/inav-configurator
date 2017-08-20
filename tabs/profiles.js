@@ -406,6 +406,15 @@ presets.model = (function () {
 
             }
         }
+        if (mixerType == 'airplane' || mixerType == 'flyingwing') {
+            // Always set MOTOR_STOP and feature AIRMODE for fixed wing
+            window.BF_CONFIG.features |= 1 << 4; // MOTOR_STOP
+            if (semver.gt(CONFIG.flightControllerVersion, '1.7.2')) {
+                // Note that feature_AIRMODE is only supported on
+                // INAV > 1.7.2.
+                window.BF_CONFIG.features |= 1 << 22; // AIRMODE
+            }
+        }
     };
 
     self.extractPresetNames = function (presets) {
