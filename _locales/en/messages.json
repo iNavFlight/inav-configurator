@@ -566,6 +566,9 @@
     "featureOSD": {
         "message": "OSD"
     },
+    "featureAIRMODE": {
+        "message": "Permanently enable AIRMODE"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
