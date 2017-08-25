@@ -15,7 +15,6 @@ SYM.AH_CENTER_LINE_RIGHT = 0x27;
 SYM.AH_CENTER = 0x7E;
 SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
-SYM.LOGO = 0xA0;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
 SYM.METRE = 0xC;
@@ -31,6 +30,7 @@ SYM.DIST_TO_HOME = 0xA0;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.VARIO = 0x9F;
+SYM.LAST_CHAR = 187;
 
 var FONT = FONT || {};
 
@@ -215,7 +215,7 @@ FONT.upload = function ($progress) {
 
 FONT.preview = function ($el) {
     $el.empty();
-    for (var i = 0; i < SYM.LOGO; i++) {
+    for (var i = 0; i <= SYM.LAST_CHAR; i++) {
         var url = FONT.data.character_image_urls[i];
         $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img>');
     }
