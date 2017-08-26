@@ -11778,7 +11778,31 @@ var MspMessageClass = function () {
  * @typedef {{state: number, message_direction: number, code: number, message_length_expected: number, message_length_received: number, message_buffer: null, message_buffer_uint8_view: null, message_checksum: number, callbacks: Array, packet_error: number, unsupported: number, ledDirectionLetters: [*], ledFunctionLetters: [*], ledBaseFunctionLetters: [*], ledOverlayLetters: [*], last_received_timestamp: null, analog_last_received_timestamp: number, read: MSP.read, send_message: MSP.send_message, promise: MSP.promise, callbacks_cleanup: MSP.callbacks_cleanup, disconnect_cleanup: MSP.disconnect_cleanup}} MSP
  */
 var MSP = {
-    state:                      0,
+    symbols: {
+        BEGIN: '$'.charCodeAt(0),
+        PROTO_V1: 'M'.charCodeAt(0),
+        PROTO_V2: 'X'.charCodeAt(0),
+        FROM_MWC: '>'.charCodeAt(0),
+        TO_MWC: '<'.charCodeAt(0),
+        UNSUPPORTED: '!'.charCodeAt(0),
+    },
+    decoder_states:             {
+        IDLE:                   0,
+        PROTO_IDENTIFIER:       1,
+        DIRECTION_V1:           2,
+        DIRECTION_V2:           3,
+        PAYLOAD_LENGTH_V1:      4,
+        PAYLOAD_LENGTH_V2_LOW:  5,
+        PAYLOAD_LENGTH_V2_HIGH: 6,
+        CODE_V1:                7,
+        CODE_V2_LOW:            8,
+        CODE_V2_HIGH:           9,
+        PAYLOAD_V1:             10,
+        PAYLOAD_V2:             11,
+        CHECKSUM_V1:            12,
+        CHECKSUM_V2:            13,
+    },
+    state:                      0, // this.decoder_states.IDLE
     message_direction:          1,
     code:                       0,
     message_length_expected:    0,
@@ -11803,32 +11827,38 @@ var MSP = {
 
         for (var i = 0; i < data.length; i++) {
             switch (this.state) {
-                case 0: // sync char 1
-                    if (data[i] == 36) { // $
-                        this.state++;
+                case this.decoder_states.IDLE: // sync char 1
+                    if (data[i] == this.symbols.BEGIN) {
+                        this.state = this.decoder_states.PROTO_IDENTIFIER;
                     }
                     break;
-                case 1: // sync char 2
-                    if (data[i] == 77) { // M
-                        this.state++;
-                    } else { // restart and try again
-                        this.state = 0;
+                case this.decoder_states.PROTO_IDENTIFIER: // sync char 2
+                    switch (data[i]) {
+                        case this.symbols.PROTO_V1:
+                            this.state = this.decoder_states.DIRECTION_V1;
+                            break;
+                        case this.symbols.PROTO_V2:
+                            // eventually, MSPv2
+                        default:
+                            this.state = this.decoder_states.IDLE;
                     }
                     break;
-                case 2: // direction (should be >)
+                case this.decoder_states.DIRECTION_V1: // direction (should be >)
                     this.unsupported = 0;
-                    if (data[i] == 62) { // >
-                        this.message_direction = 1;
-                    } else if (data[i] == 60) { // <
-                        this.message_direction = 0;
-                    } else if (data[i] == 33) { // !
-                        // FC reports unsupported message error
-                        this.unsupported = 1;
+                    switch (data[i]) {
+                        case this.symbols.FROM_MWC:
+                            this.message_direction = 1;
+                            break;
+                        case this.symbols.TO_MWC:
+                            this.message_direction = 0;
+                            break;
+                        case this.symbols.UNSUPPORTED:
+                            this.unsupported = 1;
+                            break;
                     }
-
-                    this.state++;
+                    this.state = this.decoder_states.PAYLOAD_LENGTH_V1;
                     break;
-                case 3:
+                case this.decoder_states.PAYLOAD_LENGTH_V1:
                     this.message_length_expected = data[i];
 
                     this.message_checksum = data[i];
@@ -11837,30 +11867,30 @@ var MSP = {
                     this.message_buffer = new ArrayBuffer(this.message_length_expected);
                     this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
 
-                    this.state++;
+                    this.state = this.decoder_states.CODE_V1;
                     break;
-                case 4:
+                case this.decoder_states.CODE_V1:
                     this.code = data[i];
                     this.message_checksum ^= data[i];
 
                     if (this.message_length_expected > 0) {
                         // process payload
-                        this.state++;
+                        this.state = this.decoder_states.PAYLOAD_V1;
                     } else {
                         // no payload
-                        this.state += 2;
+                        this.state = this.decoder_states.CHECKSUM_V1;
                     }
                     break;
-                case 5: // payload
+                case this.decoder_states.PAYLOAD_V1:
                     this.message_buffer_uint8_view[this.message_length_received] = data[i];
                     this.message_checksum ^= data[i];
                     this.message_length_received++;
 
                     if (this.message_length_received >= this.message_length_expected) {
-                        this.state++;
+                        this.state = this.decoder_states.CHECKSUM_V1;
                     }
                     break;
-                case 6:
+                case this.decoder_states.CHECKSUM_V1:
                     if (this.message_checksum == data[i]) {
                         // message received, process
                         mspHelper.processData(this);
@@ -11878,7 +11908,7 @@ var MSP = {
 
                     // Reset variables
                     this.message_length_received = 0;
-                    this.state = 0;
+                    this.state = this.decoder_states.IDLE;
                     break;
 
                 default:
