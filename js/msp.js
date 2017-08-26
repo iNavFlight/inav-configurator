@@ -33,6 +33,8 @@ var MSP = {
         UNSUPPORTED: '!'.charCodeAt(0),
     },
     constants:                  {
+        PROTOCOL_V1:                1,
+        PROTOCOL_V2:                2,
         JUMBO_FRAME_MIN_SIZE:       255,
     },
     decoder_states:             {
@@ -40,20 +42,22 @@ var MSP = {
         PROTO_IDENTIFIER:           1,
         DIRECTION_V1:               2,
         DIRECTION_V2:               3,
-        PAYLOAD_LENGTH_V1:          4,
-        PAYLOAD_LENGTH_JUMBO_LOW:   5,
-        PAYLOAD_LENGTH_JUMBO_HIGH:  6,
-        PAYLOAD_LENGTH_V2_LOW:      7,
-        PAYLOAD_LENGTH_V2_HIGH:     8,
-        CODE_V1:                    9,
-        CODE_JUMBO_V1:              10,
-        CODE_V2_LOW:                11,
-        CODE_V2_HIGH:               12,
-        PAYLOAD_V1:                 13,
-        PAYLOAD_V2:                 14,
-        CHECKSUM_V1:                15,
-        CHECKSUM_V2:                16,
+        FLAG_V2:                    4,
+        PAYLOAD_LENGTH_V1:          5,
+        PAYLOAD_LENGTH_JUMBO_LOW:   6,
+        PAYLOAD_LENGTH_JUMBO_HIGH:  7,
+        PAYLOAD_LENGTH_V2_LOW:      8,
+        PAYLOAD_LENGTH_V2_HIGH:     9,
+        CODE_V1:                    10,
+        CODE_JUMBO_V1:              11,
+        CODE_V2_LOW:                12,
+        CODE_V2_HIGH:               13,
+        PAYLOAD_V1:                 14,
+        PAYLOAD_V2:                 15,
+        CHECKSUM_V1:                16,
+        CHECKSUM_V2:                17,
     },
+    protocolVersion:            1, // this.constants.PROTOCOL_V1
     state:                      0, // this.decoder_states.IDLE
     message_direction:          1,
     code:                       0,
@@ -90,12 +94,15 @@ var MSP = {
                             this.state = this.decoder_states.DIRECTION_V1;
                             break;
                         case this.symbols.PROTO_V2:
-                            // eventually, MSPv2
+                            this.state = this.decoder_states.DIRECTION_V2;
+                            break;
                         default:
+                            console.log("Unknown protocol char " + String.fromCharCode(data[i]));
                             this.state = this.decoder_states.IDLE;
                     }
                     break;
                 case this.decoder_states.DIRECTION_V1: // direction (should be >)
+                case this.decoder_states.DIRECTION_V2:
                     this.unsupported = 0;
                     switch (data[i]) {
                         case this.symbols.FROM_MWC:
@@ -108,7 +115,13 @@ var MSP = {
                             this.unsupported = 1;
                             break;
                     }
-                    this.state = this.decoder_states.PAYLOAD_LENGTH_V1;
+                    this.state = this.state == this.decoder_states.DIRECTION_V1 ?
+                         this.decoder_states.PAYLOAD_LENGTH_V1 :
+                         this.decoder_states.FLAG_V2;
+                    break;
+                case this.decoder_states.FLAG_V2:
+                    // Ignored for now
+                    this.state = this.decoder_states.CODE_V2_LOW;
                     break;
                 case this.decoder_states.PAYLOAD_LENGTH_V1:
                     this.message_length_expected = data[i];
@@ -120,6 +133,17 @@ var MSP = {
                         this.state = this.decoder_states.CODE_V1;
                     }
 
+                    break;
+                case this.decoder_states.PAYLOAD_LENGTH_V2_LOW:
+                    this.message_length_expected = data[i];
+                    this.state = this.decoder_states.PAYLOAD_LENGTH_V2_HIGH;
+                    break;
+                case this.decoder_states.PAYLOAD_LENGTH_V2_HIGH:
+                    this.message_length_expected |= data[i] << 8;
+                    this._initialize_read_buffer();
+                    this.state = this.message_length_expected > 0 ?
+                        this.decoder_states.PAYLOAD_V2 :
+                        this.state = this.decoder_states.CHECKSUM_V2;
                     break;
                 case this.decoder_states.CODE_V1:
                 case this.decoder_states.CODE_JUMBO_V1:
@@ -136,6 +160,14 @@ var MSP = {
                         this.state = this.decoder_states.CHECKSUM_V1;
                     }
                     break;
+                case this.decoder_states.CODE_V2_LOW:
+                    this.code = data[i];
+                    this.state = this.decoder_states.CODE_V2_HIGH;
+                    break;
+                case this.decoder_states.CODE_V2_HIGH:
+                    this.message_length_expected |= data[i] << 8;
+                    this.state = this.decoder_states.PAYLOAD_LENGTH_V2_LOW;
+                    break;
                 case this.decoder_states.PAYLOAD_LENGTH_JUMBO_LOW:
                     this.message_length_expected = data[i];
                     this.state = this.decoder_states.PAYLOAD_LENGTH_JUMBO_HIGH;
@@ -146,11 +178,14 @@ var MSP = {
                     this.state = this.decoder_states.PAYLOAD_V1;
                     break;
                 case this.decoder_states.PAYLOAD_V1:
+                case this.decoder_states.PAYLOAD_V2:
                     this.message_buffer_uint8_view[this.message_length_received] = data[i];
                     this.message_length_received++;
 
                     if (this.message_length_received >= this.message_length_expected) {
-                        this.state = this.decoder_states.CHECKSUM_V1;
+                        this.state = this.state == this.decoder_states.PAYLOAD_V1 ?
+                            this.decoder_states.CHECKSUM_V1 :
+                            this.decoder_states.CHECKSUM_V2;
                     }
                     break;
                 case this.decoder_states.CHECKSUM_V1:
@@ -167,26 +202,20 @@ var MSP = {
                     for (var ii = 0; ii < this.message_length_received; ii++) {
                         this.message_checksum ^= this.message_buffer_uint8_view[ii];
                     }
-                    if (this.message_checksum == data[i]) {
-                        // message received, process
-                        mspHelper.processData(this);
-                    } else {
-                        console.log('code: ' + this.code + ' - crc failed');
-
-                        this.packet_error++;
-                        $('span.packet-error').html(this.packet_error);
-                    }
-
-                    /*
-                     * Free port
-                     */
-                    helper.mspQueue.freeHardLock();
-
-                    // Reset variables
-                    this.message_length_received = 0;
-                    this.state = this.decoder_states.IDLE;
+                    this._dispatch_message(data[i]);
                     break;
-
+                case this.decoder_states.CHECKSUM_V2:
+                    this.message_checksum = 0;
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, 0); // flag
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.code & 0xFF);
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, (this.code & 0xFF00) >> 8);
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_length_expected & 0xFF);
+                    this.message_checksum = this._crc8_dvb_s2(this.message_checksum, (this.message_length_expected & 0xFF00) >> 8);
+                    for (var ii = 0; ii < this.message_length_received; ii++) {
+                        this.message_checksum = this._crc8_dvb_s2(this.message_checksum, this.message_buffer_uint8_view[ii]);
+                    }
+                    this._dispatch_message(data[i]);
+                    break;
                 default:
                     /*
                      * Free port
@@ -201,6 +230,26 @@ var MSP = {
     _initialize_read_buffer: function() {
         this.message_buffer = new ArrayBuffer(this.message_length_expected);
         this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
+    },
+
+    _dispatch_message: function(expected_checksum) {
+        if (this.message_checksum == expected_checksum) {
+            // message received, process
+            mspHelper.processData(this);
+        } else {
+            console.log('code: ' + this.code + ' - crc failed');
+            this.packet_error++;
+            $('span.packet-error').html(this.packet_error);
+        }
+
+        /*
+         * Free port
+         */
+        helper.mspQueue.freeHardLock();
+
+        // Reset variables
+        this.message_length_received = 0;
+        this.state = this.decoder_states.IDLE;
     },
 
     /**
@@ -225,48 +274,60 @@ var MSP = {
     },
 
     send_message: function (code, data, callback_sent, callback_msp) {
-        var bufferOut,
-            bufView,
-            i;
+        var payloadLength = data && data.length ? data.length : 0;
+        var length;
+        var buffer;
+        var view;
+        var checksum;
+        var ii;
 
-        // always reserve 6 bytes for protocol overhead !
-        if (data) {
-            var size = data.length + 6,
-                checksum;
+        switch (this.protocolVersion) {
+            case this.constants.PROTOCOL_V1:
+                length = payloadLength + 6;
+                buffer = new ArrayBuffer(length);
+                view = new Uint8Array(buffer);
+                view[0] = this.symbols.BEGIN;
+                view[1] = this.symbols.PROTO_V1;
+                view[2] = this.symbols.TO_MWC;
+                view[3] = payloadLength;
+                view[4] = code;
 
-            bufferOut = new ArrayBuffer(size);
-            bufView = new Uint8Array(bufferOut);
+                checksum = view[3] ^ view[4];
+                for (ii = 0; ii < payloadLength; ii++) {
+                    view[ii + 5] = data[ii];
+                    checksum ^= data[ii];
+                }
+                view[length-1] = checksum;
+                break;
+            case this.constants.PROTOCOL_V2:
+                length = payloadLength + 9;
+                buffer = new ArrayBuffer(length);
+                view = new Uint8Array(buffer);
+                view[0] = this.symbols.BEGIN;
+                view[1] = this.symbols.PROTO_V2;
+                view[2] = this.symbols.TO_MWC;
+                view[3] = 0; // flag: reserved, set to 0
+                view[4] = code & 0xFF;  // code lower byte
+                view[5] = (code & 0xFF00) >> 8; // code upper byte
+                view[6] = payloadLength & 0xFF; // payloadLength lower byte
+                view[7] = (payloadLength & 0xFF00) >> 8; // payloadLength upper byte
+                for (ii = 0; ii < payloadLength; ii++) {
+                    view[8+ii] = data[ii];
+                }
+                checksum = 0;
+                for (ii = 3; ii < length-1; ii++) {
+                    checksum = this._crc8_dvb_s2(checksum, view[ii]);
+                }
+                view[length-1] = checksum;
+                break;
+            default:
+                throw "Invalid MSP protocol version " + this.protocolVersion;
 
-            bufView[0] = 36; // $
-            bufView[1] = 77; // M
-            bufView[2] = 60; // <
-            bufView[3] = data.length;
-            bufView[4] = code;
-
-            checksum = bufView[3] ^ bufView[4];
-
-            for (i = 0; i < data.length; i++) {
-                bufView[i + 5] = data[i];
-
-                checksum ^= bufView[i + 5];
-            }
-
-            bufView[5 + data.length] = checksum;
-        } else {
-            bufferOut = new ArrayBuffer(6);
-            bufView = new Uint8Array(bufferOut);
-
-            bufView[0] = 36; // $
-            bufView[1] = 77; // M
-            bufView[2] = 60; // <
-            bufView[3] = 0; // data length
-            bufView[4] = code; // code
-            bufView[5] = bufView[3] ^ bufView[4]; // checksum
         }
 
         var message = new MspMessageClass();
         message.code = code;
-        message.messageBody = bufferOut;
+        message.messageBody = buffer;
         message.onFinish = callback_msp;
         message.onSend = callback_sent;
 
@@ -280,6 +341,17 @@ var MSP = {
         helper.mspQueue.put(message);
 
         return true;
+    },
+     _crc8_dvb_s2: function(crc, ch) {
+        crc ^= ch;
+        for (var ii = 0; ii < 8; ++ii) {
+            if (crc & 0x80) {
+                crc = ((crc << 1) & 0xFF) ^ 0xD5;
+            } else {
+                crc = (crc << 1) & 0xFF;
+            }
+        }
+        return crc;
     },
     promise: function(code, data) {
         var self = this;

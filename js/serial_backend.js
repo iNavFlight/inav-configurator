@@ -246,8 +246,13 @@ function onOpen(openInfo) {
 
         FC.resetState();
 
-        // request configuration data
+        // request configuration data. Start with MSPv1 and
+        // upgrade to MSPv2 if possible.
+        MSP.protocolVersion = MSP.constants.PROTOCOL_V1;
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
+            if (CONFIG.apiVersion && semver.gte(CONFIG.apiVersion, "2.0.0")) {
+                MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
+            }
             GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
             if (semver.gte(CONFIG.apiVersion, CONFIGURATOR.apiVersionAccepted)) {
