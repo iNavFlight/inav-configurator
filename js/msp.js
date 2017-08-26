@@ -32,21 +32,27 @@ var MSP = {
         TO_MWC: '<'.charCodeAt(0),
         UNSUPPORTED: '!'.charCodeAt(0),
     },
+    constants:                  {
+        JUMBO_FRAME_MIN_SIZE:       255,
+    },
     decoder_states:             {
-        IDLE:                   0,
-        PROTO_IDENTIFIER:       1,
-        DIRECTION_V1:           2,
-        DIRECTION_V2:           3,
-        PAYLOAD_LENGTH_V1:      4,
-        PAYLOAD_LENGTH_V2_LOW:  5,
-        PAYLOAD_LENGTH_V2_HIGH: 6,
-        CODE_V1:                7,
-        CODE_V2_LOW:            8,
-        CODE_V2_HIGH:           9,
-        PAYLOAD_V1:             10,
-        PAYLOAD_V2:             11,
-        CHECKSUM_V1:            12,
-        CHECKSUM_V2:            13,
+        IDLE:                       0,
+        PROTO_IDENTIFIER:           1,
+        DIRECTION_V1:               2,
+        DIRECTION_V2:               3,
+        PAYLOAD_LENGTH_V1:          4,
+        PAYLOAD_LENGTH_JUMBO_LOW:   5,
+        PAYLOAD_LENGTH_JUMBO_HIGH:  6,
+        PAYLOAD_LENGTH_V2_LOW:      7,
+        PAYLOAD_LENGTH_V2_HIGH:     8,
+        CODE_V1:                    9,
+        CODE_JUMBO_V1:              10,
+        CODE_V2_LOW:                11,
+        CODE_V2_HIGH:               12,
+        PAYLOAD_V1:                 13,
+        PAYLOAD_V2:                 14,
+        CHECKSUM_V1:                15,
+        CHECKSUM_V2:                16,
     },
     state:                      0, // this.decoder_states.IDLE
     message_direction:          1,
@@ -107,29 +113,40 @@ var MSP = {
                 case this.decoder_states.PAYLOAD_LENGTH_V1:
                     this.message_length_expected = data[i];
 
-                    this.message_checksum = data[i];
+                    if (this.message_length_expected == this.constants.JUMBO_FRAME_MIN_SIZE) {
+                        this.state = this.decoder_states.CODE_JUMBO_V1;
+                    } else {
+                        this._initialize_read_buffer();
+                        this.state = this.decoder_states.CODE_V1;
+                    }
 
-                    // setup arraybuffer
-                    this.message_buffer = new ArrayBuffer(this.message_length_expected);
-                    this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
-
-                    this.state = this.decoder_states.CODE_V1;
                     break;
                 case this.decoder_states.CODE_V1:
+                case this.decoder_states.CODE_JUMBO_V1:
                     this.code = data[i];
-                    this.message_checksum ^= data[i];
-
                     if (this.message_length_expected > 0) {
                         // process payload
-                        this.state = this.decoder_states.PAYLOAD_V1;
+                        if (this.state == this.decoder_states.CODE_JUMBO_V1) {
+                            this.state = this.decoder_states.PAYLOAD_LENGTH_JUMBO_LOW;
+                        } else {
+                            this.state = this.decoder_states.PAYLOAD_V1;
+                        }
                     } else {
                         // no payload
                         this.state = this.decoder_states.CHECKSUM_V1;
                     }
                     break;
+                case this.decoder_states.PAYLOAD_LENGTH_JUMBO_LOW:
+                    this.message_length_expected = data[i];
+                    this.state = this.decoder_states.PAYLOAD_LENGTH_JUMBO_HIGH;
+                    break;
+                case this.decoder_states.PAYLOAD_LENGTH_JUMBO_HIGH:
+                    this.message_length_expected |= data[i] << 8;
+                    this._initialize_read_buffer();
+                    this.state = this.decoder_states.PAYLOAD_V1;
+                    break;
                 case this.decoder_states.PAYLOAD_V1:
                     this.message_buffer_uint8_view[this.message_length_received] = data[i];
-                    this.message_checksum ^= data[i];
                     this.message_length_received++;
 
                     if (this.message_length_received >= this.message_length_expected) {
@@ -137,6 +154,19 @@ var MSP = {
                     }
                     break;
                 case this.decoder_states.CHECKSUM_V1:
+                    if (this.message_length_expected >= this.constants.JUMBO_FRAME_MIN_SIZE) {
+                        this.message_checksum = this.constants.JUMBO_FRAME_MIN_SIZE;
+                    } else {
+                        this.message_checksum = this.message_length_expected;
+                    }
+                    this.message_checksum ^= this.code;
+                    if (this.message_length_expected >= this.constants.JUMBO_FRAME_MIN_SIZE) {
+                        this.message_checksum ^= this.message_length_expected & 0xFF;
+                        this.message_checksum ^= (this.message_length_expected & 0xFF00) >> 8;
+                    }
+                    for (var ii = 0; ii < this.message_length_received; ii++) {
+                        this.message_checksum ^= this.message_buffer_uint8_view[ii];
+                    }
                     if (this.message_checksum == data[i]) {
                         // message received, process
                         mspHelper.processData(this);
@@ -166,6 +196,11 @@ var MSP = {
             }
         }
         this.last_received_timestamp = Date.now();
+    },
+
+    _initialize_read_buffer: function() {
+        this.message_buffer = new ArrayBuffer(this.message_length_expected);
+        this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
     },
 
     /**
