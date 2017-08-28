@@ -134,34 +134,10 @@ gulp.task('build-map-js', function () {
         .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('deploy-css', function () {
-
-    return gulp.src(sources.css)
-        .pipe(concat(output.css))
-        .pipe(minifyCSS())
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('deploy-js', function () {
-
-    return gulp.src(sources.js)
-        .pipe(concat(output.js))
-        .pipe(uglify())
-        .pipe(gulp.dest(outputDir));
-});
-
 gulp.task('build-receiver-css', function () {
 
     return gulp.src(sources.receiverCss)
         .pipe(concat(output.receiverCss))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('deploy-receiver-css', function () {
-
-    return gulp.src(sources.receiverCss)
-        .pipe(concat(output.receiverCss))
-        .pipe(minifyCSS())
         .pipe(gulp.dest(outputDir));
 });
 
@@ -172,22 +148,40 @@ gulp.task('build-receiver-msp-js', function () {
         .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('deploy-receiver-msp-js', function () {
+gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js']);
+gulp.task('build-all-css', ['build-css', 'build-receiver-css', 'build-map-css']);
+gulp.task('build', ['build-all-css', 'build-all-js']);
 
-    return gulp.src(sources.receiverJs)
-        .pipe(concat(output.receiverJs))
+function get_outputs(ext) {
+    var src = [];
+    for (var k in output) {
+        var val = output[k];
+        if (val.endsWith('.' + ext)) {
+            src.push(outputDir + val);
+        }
+    }
+    return src;
+}
+
+gulp.task('minify-js', ['build-all-js'], function () {
+    return gulp.src(get_outputs('js'))
         .pipe(uglify())
         .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('build', ['build-css', 'build-js', 'build-receiver-css', 'build-receiver-msp-js', 'build-map-css', 'build-map-js']);
-gulp.task('deploy', ['deploy-css', 'deploy-js', 'deploy-receiver-css', 'deploy-receiver-msp-js']);
+gulp.task('minify-css', ['build-all-css'], function () {
+    return gulp.src(get_outputs('css'))
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(outputDir));
+});
+
+gulp.task('minify', ['minify-css', 'minify-js']);
 
 gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
 
 // Real work for dist task. Done in another task to call it via
 // run-sequence.
-gulp.task('dist-build', ['deploy'], function() {
+gulp.task('dist-build', ['minify'], function() {
     var distSources = [
         './package.json', // For NW.js
         './manifest.json', // For Chrome app
