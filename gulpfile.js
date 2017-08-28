@@ -194,7 +194,6 @@ gulp.task('dist-build', ['deploy'], function() {
         './eventPage.js',
         './*.html',
         './tabs/*.html',
-        './images/*',
         './images/**/*',
         './_locales/**/*',
         './build/*',
