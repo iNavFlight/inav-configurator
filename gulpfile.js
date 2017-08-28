@@ -5,6 +5,9 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-minify-css');
+var del = require('del');
+var runSequence = require('run-sequence');
+var NwBuilder = require('nw-builder');
 
 var sources = {};
 
@@ -101,6 +104,7 @@ var output = {
 };
 
 var outputDir = './build/';
+var distDir = './dist/';
 
 gulp.task('build-css', function () {
 
@@ -178,6 +182,52 @@ gulp.task('deploy-receiver-msp-js', function () {
 
 gulp.task('build', ['build-css', 'build-js', 'build-receiver-css', 'build-receiver-msp-js', 'build-map-css', 'build-map-js']);
 gulp.task('deploy', ['deploy-css', 'deploy-js', 'deploy-receiver-css', 'deploy-receiver-msp-js']);
+
+gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
+
+// Real work for dist task. Done in another task to call it via
+// run-sequence.
+gulp.task('dist-build', ['deploy'], function() {
+    var distSources = [
+        './package.json', // For NW.js
+        './manifest.json', // For Chrome app
+        './eventPage.js',
+        './*.html',
+        './tabs/*.html',
+        './images/*',
+        './images/**/*',
+        './_locales/**/*',
+        './build/*',
+        './src/css/font-awesome/fonts/*',
+        './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
+        './resources/models/*',
+        './resources/osd/*.mcm',
+        './resources/motor_order/*.svg',
+    ];
+    return gulp.src(distSources, { base: '.' })
+        .pipe(gulp.dest(distDir));
+});
+
+gulp.task('dist', function() {
+    return runSequence('clean', 'dist-build');
+});
+
+// Create app packages in ./apps
+gulp.task('release', ['dist'], function(done) {
+    var builder = new NwBuilder({
+        files: './dist/**/*',
+        buildDir: './apps',
+        platforms: ['win32', 'osx64', 'linux64'],
+        flavor: 'normal',
+    });
+    builder.on('log', console.log);
+    builder.build(function (err) {
+        if (err) {
+            console.log("Error building NW apps:" + err);
+        }
+        done();
+    });
+});
 
 gulp.task('watch', function () {
     gulp.watch('js/**/*.js', ['build-js']);
