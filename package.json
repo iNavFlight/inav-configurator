@@ -5,7 +5,7 @@
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
-    "start": "node_modules/nw/bin/nw ."
+    "start": "node_modules/gulp/bin/gulp.js build && node_modules/nw/bin/nw ."
   },
   "window": {
     "title": "INAV Configurator",
@@ -21,16 +21,19 @@
   "author": "iNavFlight",
   "license": "GPL-3.0",
   "dependencies": {
-    "nw": "^0.24.4-sdk",
-    "jquery": "2.1.4",
-    "jquery-ui-npm": "1.12.0",
-    "three": "0.72.0",
-    "inflection": "1.12.0",
     "bluebird": "3.4.1",
+    "del": "^3.0.0",
     "gulp": "~3.9.1",
+    "gulp-concat": "~2.6.1",
+    "gulp-minify-css": "~1.2.4",
     "gulp-rename": "~1.2.2",
     "gulp-uglify": "~3.0.0",
-    "gulp-concat": "~2.6.1",
-    "gulp-minify-css": "~1.2.4"
+    "inflection": "1.12.0",
+    "jquery": "2.1.4",
+    "jquery-ui-npm": "1.12.0",
+    "nw": "^0.24.4-sdk",
+    "nw-builder": "^3.4.1",
+    "openlayers": "^4.3.1",
+    "three": "0.72.0"
   }
 }
