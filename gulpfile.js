@@ -196,6 +196,7 @@ gulp.task('dist-build', ['minify'], function() {
         './resources/models/*',
         './resources/osd/*.mcm',
         './resources/motor_order/*.svg',
+        './js/workers/hex_parser.js',
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(distDir));
