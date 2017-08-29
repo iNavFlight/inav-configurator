@@ -1592,21 +1592,32 @@ var mspHelper = (function (gui) {
      * of the returned data to the given callback (or null for the data if an error occured).
      */
     self.dataflashRead = function (address, onDataCallback) {
-        MSP.send_message(MSPCodes.MSP_DATAFLASH_READ, [address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF, (address >> 24) & 0xFF],
-            false, function (response) {
-                var chunkAddress = response.data.getUint32(0, 1);
+        var buffer = [];
+        buffer.push(address & 0xFF);
+        buffer.push((address >> 8) & 0xFF);
+        buffer.push((address >> 16) & 0xFF);
+        buffer.push((address >> 24) & 0xFF);
 
-                // Verify that the address of the memory returned matches what the caller asked for
-                if (chunkAddress == address) {
-                    /* Strip that address off the front of the reply and deliver it separately so the caller doesn't have to
-                     * figure out the reply format:
-                     */
-                    onDataCallback(address, new DataView(response.data.buffer, response.data.byteOffset + 4, response.data.buffer.byteLength - 4));
-                } else {
-                    // Report error
-                    onDataCallback(address, null);
-                }
-            });
+        // For API > 2.0.0 we support requesting payload size - request 4KiB and let firmware decide what actual size to send
+        if (CONFIG.apiVersion && semver.gte(CONFIG.apiVersion, "2.0.0")) {
+            buffer.push(lowByte(4096));
+            buffer.push(highByte(4096));
+        }
+
+        MSP.send_message(MSPCodes.MSP_DATAFLASH_READ, buffer, false, function (response) {
+            var chunkAddress = response.data.getUint32(0, 1);
+
+            // Verify that the address of the memory returned matches what the caller asked for
+            if (chunkAddress == address) {
+                /* Strip that address off the front of the reply and deliver it separately so the caller doesn't have to
+                 * figure out the reply format:
+                 */
+                onDataCallback(address, new DataView(response.data.buffer, response.data.byteOffset + 4, response.data.buffer.byteLength - 4));
+            } else {
+                // Report error
+                onDataCallback(address, null);
+            }
+        });
     };
 
     self.sendRxFailConfig = function (onCompleteCallback) {
