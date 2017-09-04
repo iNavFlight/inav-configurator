@@ -14,7 +14,7 @@ For local development, **node.js** build system is used.
 
 1. Install node.js
 1. From project folder run `npm install`
-1. To rebuild JS and CSS use ` ./node_modules/gulp/bin/gulp.js`
+1. To build JS and CSS use ` ./node_modules/gulp/bin/gulp.js`
 
 ## Authors
 

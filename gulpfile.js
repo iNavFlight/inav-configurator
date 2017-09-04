@@ -1,8 +1,13 @@
+'use strict';
+
 var gulp = require('gulp');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-minify-css');
+var del = require('del');
+var runSequence = require('run-sequence');
+var NwBuilder = require('nw-builder');
 
 var sources = {};
 
@@ -17,20 +22,6 @@ sources.css = [
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css'
-];
-
-sources.receiver = [
-    './node_modules/jquery/dist/jquery.min.js',
-    './node_modules/jquery-ui-npm/jquery-ui.min.js',
-    './js/libraries/jquery.nouislider.all.min.js',
-    './tabs/receiver_msp.js'
-];
-
-sources.receiverCss = [
-    './css/opensans_webfontkit/fonts.css',
-    './js/libraries/jquery.nouislider.min.css',
-    './js/libraries/jquery.nouislider.pips.min.css',
-    './tabs/receiver_msp.css'
 ];
 
 sources.js = [
@@ -81,89 +72,156 @@ sources.js = [
     './js/peripherals.js'
 ];
 
-sources.mapJs = [
-    './node_modules/openlayers/dist/ol.js'
-];
-
 sources.mapCss = [
     './node_modules/openlayers/dist/ol.css'
 ];
 
+sources.mapJs = [
+    './node_modules/openlayers/dist/ol.js'
+];
+
+sources.receiverCss = [
+    './css/opensans_webfontkit/fonts.css',
+    './js/libraries/jquery.nouislider.min.css',
+    './js/libraries/jquery.nouislider.pips.min.css',
+    './tabs/receiver_msp.css'
+];
+
+sources.receiverJs = [
+    './node_modules/jquery/dist/jquery.min.js',
+    './node_modules/jquery-ui-npm/jquery-ui.min.js',
+    './js/libraries/jquery.nouislider.all.min.js',
+    './tabs/receiver_msp.js'
+];
+
+var output = {
+    css: 'styles.css',
+    js: 'script.js',
+    mapCss: 'map.css',
+    mapJs: 'map.js',
+    receiverCss: 'receiver-msp.css',
+    receiverJs: 'receiver-msp.js',
+};
+
+var outputDir = './build/';
+var distDir = './dist/';
+
 gulp.task('build-css', function () {
 
     return gulp.src(sources.css)
-        .pipe(concat('styles.css'))
-        .pipe(gulp.dest('./build/'));
+        .pipe(concat(output.css))
+        .pipe(gulp.dest(outputDir));
 });
 
 gulp.task('build-js', function () {
 
     return gulp.src(sources.js)
-        .pipe(concat('script.js'))
-        .pipe(gulp.dest('./build/'));
+        .pipe(concat(output.js))
+        .pipe(gulp.dest(outputDir));
 });
 
 gulp.task('build-map-css', function () {
 
     return gulp.src(sources.mapCss)
-        .pipe(concat('map.css'))
-        .pipe(gulp.dest('./build/'));
+        .pipe(concat(output.mapCss))
+        .pipe(gulp.dest(outputDir));
 });
 
 gulp.task('build-map-js', function () {
 
     return gulp.src(sources.mapJs)
-        .pipe(concat('map.js'))
-        .pipe(gulp.dest('./build/'));
-});
-
-gulp.task('deploy-css', function () {
-
-    return gulp.src(sources.css)
-        .pipe(concat('styles.css'))
-        .pipe(minifyCSS())
-        .pipe(gulp.dest('./build/'));
-});
-
-gulp.task('deploy-js', function () {
-
-    return gulp.src(sources.js)
-        .pipe(concat('script.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest('./build/'));
+        .pipe(concat(output.mapJs))
+        .pipe(gulp.dest(outputDir));
 });
 
 gulp.task('build-receiver-css', function () {
 
     return gulp.src(sources.receiverCss)
-        .pipe(concat('receiver-msp.css'))
-        .pipe(gulp.dest('./build/'));
-});
-
-gulp.task('deploy-receiver-css', function () {
-
-    return gulp.src(sources.receiverCss)
-        .pipe(concat('receiver-msp.css'))
-        .pipe(uglify())
-        .pipe(gulp.dest('./build/'));
+        .pipe(concat(output.receiverCss))
+        .pipe(gulp.dest(outputDir));
 });
 
 gulp.task('build-receiver-msp-js', function () {
 
-    return gulp.src(sources.receiver)
-        .pipe(concat('receiver-msp.js'))
-        .pipe(gulp.dest('./build/'));
+    return gulp.src(sources.receiverJs)
+        .pipe(concat(output.receiverJs))
+        .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('deploy-receiver-msp-js', function () {
+gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js']);
+gulp.task('build-all-css', ['build-css', 'build-receiver-css', 'build-map-css']);
+gulp.task('build', ['build-all-css', 'build-all-js']);
 
-    return gulp.src(sources.receiver)
-        .pipe(concat('receiver-msp.js'))
+function get_outputs(ext) {
+    var src = [];
+    for (var k in output) {
+        var val = output[k];
+        if (val.endsWith('.' + ext)) {
+            src.push(outputDir + val);
+        }
+    }
+    return src;
+}
+
+gulp.task('minify-js', ['build-all-js'], function () {
+    return gulp.src(get_outputs('js'))
         .pipe(uglify())
-        .pipe(gulp.dest('./build/'));
+        .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('deploy', ['deploy-css', 'deploy-js', 'deploy-receiver-msp-js', 'deploy-receiver-css']);
+gulp.task('minify-css', ['build-all-css'], function () {
+    return gulp.src(get_outputs('css'))
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(outputDir));
+});
+
+gulp.task('minify', ['minify-css', 'minify-js']);
+
+gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
+
+// Real work for dist task. Done in another task to call it via
+// run-sequence.
+gulp.task('dist-build', ['minify'], function() {
+    var distSources = [
+        './package.json', // For NW.js
+        './manifest.json', // For Chrome app
+        './eventPage.js',
+        './*.html',
+        './tabs/*.html',
+        './images/**/*',
+        './_locales/**/*',
+        './build/*',
+        './src/css/font-awesome/fonts/*',
+        './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
+        './resources/models/*',
+        './resources/osd/*.mcm',
+        './resources/motor_order/*.svg',
+        './js/workers/hex_parser.js',
+    ];
+    return gulp.src(distSources, { base: '.' })
+        .pipe(gulp.dest(distDir));
+});
+
+gulp.task('dist', function() {
+    return runSequence('clean', 'dist-build');
+});
+
+// Create app packages in ./apps
+gulp.task('release', ['dist'], function(done) {
+    var builder = new NwBuilder({
+        files: './dist/**/*',
+        buildDir: './apps',
+        platforms: ['win32', 'osx64', 'linux64'],
+        flavor: 'normal',
+    });
+    builder.on('log', console.log);
+    builder.build(function (err) {
+        if (err) {
+            console.log("Error building NW apps:" + err);
+        }
+        done();
+    });
+});
 
 gulp.task('watch', function () {
     gulp.watch('js/**/*.js', ['build-js']);
@@ -175,4 +233,4 @@ gulp.task('watch', function () {
     gulp.watch('eventPage.js', ['build-js']);
 });
 
-gulp.task('default', ['build-js', 'build-css', 'build-receiver-msp-js', 'build-receiver-css', 'build-map-js', 'build-map-css']);
+gulp.task('default', ['build']);

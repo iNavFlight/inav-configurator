@@ -747,7 +747,7 @@ TABS.osd.initialize = function (callback) {
                     // alarms
                     $('.alarms-container').show();
                     var $alarms = $('.alarms').empty();
-                    for (let k in OSD.data.alarms) {
+                    for (var k in OSD.data.alarms) {
                         var alarm = OSD.data.alarms[k];
                         var alarmInput = $('<input name="alarm" type="number" id="' + k + '"/>' + alarm.display_name + '</label>');
                         alarmInput.val(alarm.value);
@@ -764,9 +764,8 @@ TABS.osd.initialize = function (callback) {
 
                     // display fields on/off and position
                     var $displayFields = $('.display-fields').empty();
-
-                    for (let field of OSD.data.display_items) {
-
+                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
+                        var field = OSD.data.display_items[ii];
                         // versioning related, if the field doesn't exist at the current flight controller version, just skip it
                         if (!field.name) {
                             continue;
@@ -822,7 +821,8 @@ TABS.osd.initialize = function (callback) {
                     // buffer the preview
                     OSD.data.preview = [];
                     OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-                    for (let field of OSD.data.display_items) {
+                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
+                        var field = OSD.data.display_items[ii];
                         // reset fields that somehow end up off the screen
                         if (field.position > OSD.data.display_size.total) {
                             field.position = 0;
@@ -835,7 +835,8 @@ TABS.osd.initialize = function (callback) {
                     }
 
                     // draw all the displayed items and the drag and drop preview images
-                    for (let field of OSD.data.display_items) {
+                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
+                        var field = OSD.data.display_items[ii];
                         if (!field.preview || !field.isVisible) {
                             continue;
                         }
