@@ -7,6 +7,31 @@ var del = require('del');
 var runSequence = require('run-sequence');
 var NwBuilder = require('nw-builder');
 
+
+// Each key in the *sources* variable must be an array of
+// the source files that will be combined into a single
+// file and stored in *outputDir*. Each key in *sources*
+// must be also present in *output*, whose value indicates
+// the filename for the output file which combines the
+// contents of the source files.
+//
+// Keys must be camel cased and end with either 'Css' or
+// 'Js' (e.g. someSourcesCss or someSourcesJs). For each
+// key, a build task will be generated named by prepending
+// 'build-' and converting the key to dash-separated words
+// (e.g. someSourcesCss will generate build-some-sources-css).
+//
+// Tasks with names ending with '-js' will be executed by the
+// build-all-js task, while the ones ending with '-css' will
+// be done by build-all-css. There's also a build task which
+// runs both build-all-css and build-all-js.
+//
+// The watch task will monitor any files mentioned in the *sources*
+// variable and regenerate the corresponding output file when
+// they change.
+//
+// See README.md for details on the other tasks.
+
 var sources = {};
 
 sources.css = [

@@ -14,7 +14,20 @@ For local development, **node.js** build system is used.
 
 1. Install node.js
 1. From project folder run `npm install`
-1. To build JS and CSS use ` ./node_modules/gulp/bin/gulp.js`
+1. To build the JS and CSS files and start the configurator:
+    - With NW.js: Run `npm start`.
+    - With Chrome: Run `./node_modules/gulp/bin/gulp.js`. Then open `chrome://extensions`, enable
+    the `Developer mode`, click on the `Load unpacked extension...` button and select the `inav-configurator` directory.
+
+Other tasks are also defined in `gulpfile.js`. To run a task, use `./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
+
+- **build**: Generate JS and CSS output files used by the configurator from their sources. It must be run whenever changes are made to any `.js` or `.css` files in order to have those changes appear
+in the configurator. If new files are added, they must be included in `gulpfile.js`. See the comments at the top of `gulpfile.js` to learn how to do so. See also the `watch` task.
+- **watch**: Watch JS and CSS sources for changes and run the `build` task whenever they're edited.
+- **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or a NW.js app)
+in the `./dist/` directory.
+- **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
+directory.
 
 ## Authors
 
