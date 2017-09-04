@@ -229,6 +229,20 @@ function get_release_filename(platform, ext) {
     return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
 }
 
+gulp.task('release-windows', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'win32');
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator');
+    return archive.finalize();
+});
+
 gulp.task('release-macos', function() {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
@@ -250,7 +264,7 @@ gulp.task('release-macos', function() {
 
 // Create distributable .zip files in ./apps
 gulp.task('release', function() {
-    // TODO: Windows, Linux
+    // TODO: Linux
     return runSequence('apps', 'release-macos');
 });
 
