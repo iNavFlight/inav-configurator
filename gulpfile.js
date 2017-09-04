@@ -204,6 +204,7 @@ gulp.task('release', ['dist'], function(done) {
         platforms: ['win32', 'osx64', 'linux64'],
         flavor: 'normal',
         macIcns: './images/inav.icns',
+        winIco: './images/inav.ico',
     });
     builder.on('log', console.log);
     builder.build(function (err) {

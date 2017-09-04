@@ -27,7 +27,8 @@ in the configurator. If new files are added, they must be included in `gulpfile.
 - **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or a NW.js app)
 in the `./dist/` directory.
 - **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
-directory.
+directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
+for the Windows app.
 
 ## Authors
 
