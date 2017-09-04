@@ -106,59 +106,41 @@ var output = {
     hexParserJs: 'hex_parser.js',
 };
 
+
 var outputDir = './build/';
 var distDir = './dist/';
 
-gulp.task('build-css', function () {
+function get_task_name(key) {
+    return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
+}
 
-    return gulp.src(sources.css)
-        .pipe(concat(output.css))
-        .pipe(gulp.dest(outputDir));
-});
+// Define build tasks dynamically based on the sources
+// and output variables.
+var buildCssTasks = [];
+var buildJsTasks = [];
+(function() {
+    // Convers fooBarBaz to foo-bar-baz
+    for (var k in output) {
+        (function (key) {
+            var name = get_task_name(key);
+            if (name.endsWith('-css')) {
+                buildCssTasks.push(name);
+            } else if (name.endsWith('-js')) {
+                buildJsTasks.push(name);
+            } else {
+                throw 'Invalid task name: "' + name + '": must end with -css or -js';
+            }
+            gulp.task(name, function() {
+                return gulp.src(sources[key])
+                    .pipe(concat(output[key]))
+                    .pipe(gulp.dest(outputDir));
+            });
+        })(k);
+    }
+})();
 
-gulp.task('build-js', function () {
-
-    return gulp.src(sources.js)
-        .pipe(concat(output.js))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-map-css', function () {
-
-    return gulp.src(sources.mapCss)
-        .pipe(concat(output.mapCss))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-map-js', function () {
-
-    return gulp.src(sources.mapJs)
-        .pipe(concat(output.mapJs))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-receiver-css', function () {
-
-    return gulp.src(sources.receiverCss)
-        .pipe(concat(output.receiverCss))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-receiver-msp-js', function () {
-
-    return gulp.src(sources.receiverJs)
-        .pipe(concat(output.receiverJs))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-hex-parser-js', function() {
-
-    return gulp.src(sources.hexParserJs)
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js', 'build-hex-parser-js']);
-gulp.task('build-all-css', ['build-css', 'build-receiver-css', 'build-map-css']);
+gulp.task('build-all-js', buildJsTasks);
+gulp.task('build-all-css', buildCssTasks);
 gulp.task('build', ['build-all-css', 'build-all-js']);
 
 gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
@@ -207,13 +189,9 @@ gulp.task('release', ['dist'], function(done) {
 });
 
 gulp.task('watch', function () {
-    gulp.watch('js/**/*.js', ['build-js']);
-    gulp.watch('css/*.css', ['build-css']);
-    gulp.watch('main.css', ['build-css']);
-    gulp.watch('main.js', ['build-js']);
-    gulp.watch('tabs/*.js', ['build-js']);
-    gulp.watch('tabs/*.css', ['build-css']);
-    gulp.watch('eventPage.js', ['build-js']);
+    for(var k in output) {
+        gulp.watch(sources[k], [get_task_name(k)]);
+    }
 });
 
 gulp.task('default', ['build']);
