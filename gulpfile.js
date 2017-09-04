@@ -92,6 +92,10 @@ sources.receiverJs = [
     './tabs/receiver_msp.js'
 ];
 
+sources.hexParserJs = [
+    './js/workers/hex_parser.js',
+];
+
 var output = {
     css: 'styles.css',
     js: 'script.js',
@@ -99,6 +103,7 @@ var output = {
     mapJs: 'map.js',
     receiverCss: 'receiver-msp.css',
     receiverJs: 'receiver-msp.js',
+    hexParserJs: 'hex_parser.js',
 };
 
 var outputDir = './build/';
@@ -146,7 +151,13 @@ gulp.task('build-receiver-msp-js', function () {
         .pipe(gulp.dest(outputDir));
 });
 
-gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js']);
+gulp.task('build-hex-parser-js', function() {
+
+    return gulp.src(sources.hexParserJs)
+        .pipe(gulp.dest(outputDir));
+});
+
+gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js', 'build-hex-parser-js']);
 gulp.task('build-all-css', ['build-css', 'build-receiver-css', 'build-map-css']);
 gulp.task('build', ['build-all-css', 'build-all-js']);
 
@@ -169,7 +180,6 @@ gulp.task('dist-build', ['build'], function() {
         './resources/models/*',
         './resources/osd/*.mcm',
         './resources/motor_order/*.svg',
-        './js/workers/hex_parser.js',
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(distDir));
