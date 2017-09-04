@@ -1,11 +1,16 @@
 'use strict';
 
-var gulp = require('gulp');
-var rename = require('gulp-rename');
-var concat = require('gulp-concat');
+var child_process = require('child_process');
+var fs = require('fs');
+var path = require('path');
+
+var archiver = require('archiver');
 var del = require('del');
-var runSequence = require('run-sequence');
 var NwBuilder = require('nw-builder');
+
+var gulp = require('gulp');
+var concat = require('gulp-concat');
+var runSequence = require('run-sequence');
 
 
 // Each key in the *sources* variable must be an array of
@@ -134,6 +139,7 @@ var output = {
 
 var outputDir = './build/';
 var distDir = './dist/';
+var appsDir = './apps/';
 
 function get_task_name(key) {
     return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
@@ -196,11 +202,11 @@ gulp.task('dist', function() {
     return runSequence('clean', 'dist-build');
 });
 
-// Create app packages in ./apps
-gulp.task('release', ['dist'], function(done) {
+// Create app directories in ./apps
+gulp.task('apps', ['dist'], function(done) {
     var builder = new NwBuilder({
         files: './dist/**/*',
-        buildDir: './apps',
+        buildDir: appsDir,
         platforms: ['win32', 'osx64', 'linux64'],
         flavor: 'normal',
         macIcns: './images/inav.icns',
@@ -210,9 +216,42 @@ gulp.task('release', ['dist'], function(done) {
     builder.build(function (err) {
         if (err) {
             console.log("Error building NW apps:" + err);
+            done();
+            return;
         }
+        // Package apps as .zip files
         done();
     });
+});
+
+function get_release_filename(platform, ext) {
+    var pkg = require('./package.json');
+    return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+}
+
+gulp.task('release-macos', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
+    // Check if we want to sign the .app bundle
+    if (process.env.CODESIGN_IDENTITY) {
+        var sign_cmd = 'codesign --verbose --force --sign "' + process.env.CODESIGN_IDENTITY + '" ' + src;
+        child_process.execSync(sign_cmd);
+    }
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('macOS', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator.app');
+    return archive.finalize();
+});
+
+// Create distributable .zip files in ./apps
+gulp.task('release', function() {
+    // TODO: Windows, Linux
+    return runSequence('apps', 'release-macos');
 });
 
 gulp.task('watch', function () {
