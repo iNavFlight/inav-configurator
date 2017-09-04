@@ -203,6 +203,7 @@ gulp.task('release', ['dist'], function(done) {
         buildDir: './apps',
         platforms: ['win32', 'osx64', 'linux64'],
         flavor: 'normal',
+        macIcns: './images/inav.icns',
     });
     builder.on('log', console.log);
     builder.build(function (err) {
