@@ -855,6 +855,9 @@ TABS.osd.initialize = function (callback) {
                             ctx.drawImage(img, i * 12, 0);
                         }
                         field.preview_img.src = canvas.toDataURL('image/png');
+                        // Required for NW.js - Otherwise the <img /> will
+                        // consume drag/drop events.
+                        field.preview_img.style.pointerEvents = 'none';
                     }
                     var centerishPosition = 225;
 
@@ -902,6 +905,9 @@ TABS.osd.initialize = function (callback) {
                             .on('drop', OSD.GUI.preview.onDrop)
                             .data('field', field)
                             .data('position', i);
+                        // Required for NW.js - Otherwise the <img /> will
+                        // consume drag/drop events.
+                        $img.find('img').css('pointer-events', 'none');
                         if (field && field.positionable) {
                             $img
                                 .addClass('field-' + field.index)
