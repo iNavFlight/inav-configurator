@@ -1,13 +1,41 @@
 'use strict';
 
-var gulp = require('gulp');
-var rename = require('gulp-rename');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var minifyCSS = require('gulp-minify-css');
+var child_process = require('child_process');
+var fs = require('fs');
+var path = require('path');
+
+var archiver = require('archiver');
 var del = require('del');
-var runSequence = require('run-sequence');
 var NwBuilder = require('nw-builder');
+
+var gulp = require('gulp');
+var concat = require('gulp-concat');
+var runSequence = require('run-sequence');
+
+
+// Each key in the *sources* variable must be an array of
+// the source files that will be combined into a single
+// file and stored in *outputDir*. Each key in *sources*
+// must be also present in *output*, whose value indicates
+// the filename for the output file which combines the
+// contents of the source files.
+//
+// Keys must be camel cased and end with either 'Css' or
+// 'Js' (e.g. someSourcesCss or someSourcesJs). For each
+// key, a build task will be generated named by prepending
+// 'build-' and converting the key to dash-separated words
+// (e.g. someSourcesCss will generate build-some-sources-css).
+//
+// Tasks with names ending with '-js' will be executed by the
+// build-all-js task, while the ones ending with '-css' will
+// be done by build-all-css. There's also a build task which
+// runs both build-all-css and build-all-js.
+//
+// The watch task will monitor any files mentioned in the *sources*
+// variable and regenerate the corresponding output file when
+// they change.
+//
+// See README.md for details on the other tasks.
 
 var sources = {};
 
@@ -94,6 +122,10 @@ sources.receiverJs = [
     './tabs/receiver_msp.js'
 ];
 
+sources.hexParserJs = [
+    './js/workers/hex_parser.js',
+];
+
 var output = {
     css: 'styles.css',
     js: 'script.js',
@@ -101,87 +133,52 @@ var output = {
     mapJs: 'map.js',
     receiverCss: 'receiver-msp.css',
     receiverJs: 'receiver-msp.js',
+    hexParserJs: 'hex_parser.js',
 };
+
 
 var outputDir = './build/';
 var distDir = './dist/';
+var appsDir = './apps/';
 
-gulp.task('build-css', function () {
-
-    return gulp.src(sources.css)
-        .pipe(concat(output.css))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-js', function () {
-
-    return gulp.src(sources.js)
-        .pipe(concat(output.js))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-map-css', function () {
-
-    return gulp.src(sources.mapCss)
-        .pipe(concat(output.mapCss))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-map-js', function () {
-
-    return gulp.src(sources.mapJs)
-        .pipe(concat(output.mapJs))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-receiver-css', function () {
-
-    return gulp.src(sources.receiverCss)
-        .pipe(concat(output.receiverCss))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-receiver-msp-js', function () {
-
-    return gulp.src(sources.receiverJs)
-        .pipe(concat(output.receiverJs))
-        .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('build-all-js', ['build-js', 'build-receiver-msp-js', 'build-map-js']);
-gulp.task('build-all-css', ['build-css', 'build-receiver-css', 'build-map-css']);
-gulp.task('build', ['build-all-css', 'build-all-js']);
-
-function get_outputs(ext) {
-    var src = [];
-    for (var k in output) {
-        var val = output[k];
-        if (val.endsWith('.' + ext)) {
-            src.push(outputDir + val);
-        }
-    }
-    return src;
+function get_task_name(key) {
+    return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
 }
 
-gulp.task('minify-js', ['build-all-js'], function () {
-    return gulp.src(get_outputs('js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(outputDir));
-});
+// Define build tasks dynamically based on the sources
+// and output variables.
+var buildCssTasks = [];
+var buildJsTasks = [];
+(function() {
+    // Convers fooBarBaz to foo-bar-baz
+    for (var k in output) {
+        (function (key) {
+            var name = get_task_name(key);
+            if (name.endsWith('-css')) {
+                buildCssTasks.push(name);
+            } else if (name.endsWith('-js')) {
+                buildJsTasks.push(name);
+            } else {
+                throw 'Invalid task name: "' + name + '": must end with -css or -js';
+            }
+            gulp.task(name, function() {
+                return gulp.src(sources[key])
+                    .pipe(concat(output[key]))
+                    .pipe(gulp.dest(outputDir));
+            });
+        })(k);
+    }
+})();
 
-gulp.task('minify-css', ['build-all-css'], function () {
-    return gulp.src(get_outputs('css'))
-    .pipe(minifyCSS())
-    .pipe(gulp.dest(outputDir));
-});
-
-gulp.task('minify', ['minify-css', 'minify-js']);
+gulp.task('build-all-js', buildJsTasks);
+gulp.task('build-all-css', buildCssTasks);
+gulp.task('build', ['build-all-css', 'build-all-js']);
 
 gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
 
 // Real work for dist task. Done in another task to call it via
 // run-sequence.
-gulp.task('dist-build', ['minify'], function() {
+gulp.task('dist-build', ['build'], function() {
     var distSources = [
         './package.json', // For NW.js
         './manifest.json', // For Chrome app
@@ -196,7 +193,6 @@ gulp.task('dist-build', ['minify'], function() {
         './resources/models/*',
         './resources/osd/*.mcm',
         './resources/motor_order/*.svg',
-        './js/workers/hex_parser.js',
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(distDir));
@@ -206,31 +202,76 @@ gulp.task('dist', function() {
     return runSequence('clean', 'dist-build');
 });
 
-// Create app packages in ./apps
-gulp.task('release', ['dist'], function(done) {
+// Create app directories in ./apps
+gulp.task('apps', ['dist'], function(done) {
     var builder = new NwBuilder({
         files: './dist/**/*',
-        buildDir: './apps',
+        buildDir: appsDir,
         platforms: ['win32', 'osx64', 'linux64'],
         flavor: 'normal',
+        macIcns: './images/inav.icns',
+        winIco: './images/inav.ico',
     });
     builder.on('log', console.log);
     builder.build(function (err) {
         if (err) {
             console.log("Error building NW apps:" + err);
+            done();
+            return;
         }
+        // Package apps as .zip files
         done();
     });
 });
 
+function get_release_filename(platform, ext) {
+    var pkg = require('./package.json');
+    return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+}
+
+gulp.task('release-windows', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'win32');
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator');
+    return archive.finalize();
+});
+
+gulp.task('release-macos', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
+    // Check if we want to sign the .app bundle
+    if (process.env.CODESIGN_IDENTITY) {
+        var sign_cmd = 'codesign --verbose --force --sign "' + process.env.CODESIGN_IDENTITY + '" ' + src;
+        child_process.execSync(sign_cmd);
+    }
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('macOS', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator.app');
+    return archive.finalize();
+});
+
+// Create distributable .zip files in ./apps
+gulp.task('release', function() {
+    // TODO: Linux
+    return runSequence('apps', 'release-macos');
+});
+
 gulp.task('watch', function () {
-    gulp.watch('js/**/*.js', ['build-js']);
-    gulp.watch('css/*.css', ['build-css']);
-    gulp.watch('main.css', ['build-css']);
-    gulp.watch('main.js', ['build-js']);
-    gulp.watch('tabs/*.js', ['build-js']);
-    gulp.watch('tabs/*.css', ['build-css']);
-    gulp.watch('eventPage.js', ['build-js']);
+    for(var k in output) {
+        gulp.watch(sources[k], [get_task_name(k)]);
+    }
 });
 
 gulp.task('default', ['build']);
