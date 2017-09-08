@@ -10732,6 +10732,7 @@ function onConnect() {
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
     helper.interval.add('msp-load-update', function () {
+        $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
         $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(1));
         $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
         $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));
@@ -19829,8 +19830,9 @@ OSD.constants = {
         NTSC: 390
     },
     UNIT_TYPES: [
-        'IMPERIAL',
-        'METRIC'
+        {name: 'osdUnitImperial', value: 0},
+        {name: 'osdUnitMetric', value: 1},
+        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 2, min_version: "1.7.3"},
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
@@ -20255,6 +20257,17 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
+        var $unitMode = $('.units select').empty();
+
+        $unitMode.change(function (e) {
+            var selected = $(this).find(':selected');
+            OSD.data.unit_mode = selected.data('type');
+            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
+                .then(function () {
+                    updateOsdView();
+                });
+        });
+
         // 2 way binding... sorta
         function updateOsdView() {
 
@@ -20298,24 +20311,32 @@ TABS.osd.initialize = function (callback) {
 
                     // units
                     $('.units-container').show();
-                    var $unitMode = $('.units').empty();
+                    $unitMode.empty();
+                    var $unitTip = $('.units .cf_tip');
                     for (i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
-                        var $checkbox = $('<label/>')
-                            .append(
-                                $('<input name="unit_mode" type="radio"/>' + OSD.constants.UNIT_TYPES[i] + '</label>'
-                            )
-                            .prop('checked', i === OSD.data.unit_mode)
-                            .data('type', i)
-                        );
-                        $unitMode.append($checkbox);
+                        var unitType = OSD.constants.UNIT_TYPES[i];
+                        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
+                            continue;
+                        }
+                        var name = chrome.i18n.getMessage(unitType.name);
+                        var $option = $('<option>' + name + '</option>');
+                        $option.attr('value', name);
+                        $option.data('type', unitType.value);
+                        var tip = null;
+                        if (unitType.tip) {
+                            tip = chrome.i18n.getMessage(unitType.tip);
+                        }
+                        if (OSD.data.unit_mode === unitType.value) {
+                            $option.prop('selected', true);
+                            if (unitType.tip) {
+                                $unitTip.attr('title', chrome.i18n.getMessage(unitType.tip));
+                                $unitTip.fadeIn();
+                            } else {
+                                $unitTip.fadeOut();
+                            }
+                        }
+                        $unitMode.append($option);
                     }
-                    $unitMode.find(':radio').click(function (e) {
-                        OSD.data.unit_mode = $(this).data('type');
-                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
-                            .then(function () {
-                                updateOsdView();
-                            });
-                    });
 
                     // alarms
                     $('.alarms-container').show();
