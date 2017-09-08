@@ -355,6 +355,7 @@ function onConnect() {
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
     helper.interval.add('msp-load-update', function () {
+        $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
         $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(1));
         $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
         $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));

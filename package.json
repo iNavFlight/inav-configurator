@@ -33,6 +33,7 @@
     "nw-builder": "^3.4.1",
     "openlayers": "^4.3.1",
     "run-sequence": "^2.1.0",
+    "temp": "^0.8.3",
     "three": "0.72.0"
   }
 }
