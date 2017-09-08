@@ -2121,5 +2121,17 @@
     },
     "fixedWingConfiguration": {
       "message": "Fixed Wing Settings"
+    },
+    "osdUnitImperial": {
+        "message": "Imperial"
+    },
+    "osdUnitMetric": {
+        "message": "Metric"
+    },
+    "osdUnitUK": {
+        "message": "UK"
+    },
+    "osdUnitUKTip": {
+        "message": "Use metric units except for the speed, which is displayed in miles per hour."
     }
 }
