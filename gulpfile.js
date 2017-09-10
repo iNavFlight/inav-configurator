@@ -265,7 +265,7 @@ gulp.task('release-macos', function() {
 // Create distributable .zip files in ./apps
 gulp.task('release', function() {
     // TODO: Linux
-    return runSequence('apps', 'release-macos');
+    return runSequence('apps', 'release-macos', 'release-windows');
 });
 
 gulp.task('watch', function () {
