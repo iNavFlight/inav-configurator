@@ -42,7 +42,9 @@ var mspHelper = (function (gui) {
         'BLACKBOX': 7,
         'TELEMETRY_MAVLINK': 8,
         'TELEMETRY_IBUS': 9,
-        'RUNCAM_SPLIT_CONTROL' : 10
+        'RUNCAM_SPLIT_CONTROL' : 10,
+        'TBS_SMARTAUDIO': 11,
+        'IRC_TRAMP': 12
     };
 
     /**

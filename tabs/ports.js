@@ -17,8 +17,13 @@ TABS.ports.initialize = function (callback, scrollPosition) {
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-        var mavlinkFunctionRule = {name: 'TELEMETRY_MAVLINK',    groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1};
-        functionRules.push(mavlinkFunctionRule);
+        functionRules.push({
+            name: 'TELEMETRY_MAVLINK',
+            groups: ['telemetry'],
+            sharableWith: ['msp'],
+            notSharableWith: ['blackbox'],
+            maxPorts: 1
+        });
     }
 
     /*
@@ -38,6 +43,19 @@ TABS.ports.initialize = function (callback, scrollPosition) {
     if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
         functionRules.push({
             name: 'RUNCAM_SPLIT_CONTROL',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
+    if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+        functionRules.push({
+            name: 'TBS_SMARTAUDIO',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+        functionRules.push({
+            name: 'IRC_TRAMP',
             groups: ['peripherals'],
             maxPorts: 1 }
         );
