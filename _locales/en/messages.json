@@ -2137,6 +2137,36 @@
     "osdElement_ONTIME_FLYTIME": {
         "message": "On Time / Fly Time"
     },
+    "osdElement_RSSI_VALUE": {
+        "message": "RSSI (Signal Strength)"
+    },
+    "osdElement_RSSI_VALUE_HELP": {
+        "message": "Shows the quality of the signal received from the RC radio (the higher the better)."
+    },
+    "osdElement_MAIN_BATT_VOLTAGE": {
+        "message": "Battery Voltage"
+    },
+    "osdElement_GPS_SPEED": {
+        "message": "GPS Speed"
+    },
+    "osdElement_GPS_SPEED_HELP": {
+        "message": "Shows GPS ground speed."
+    },
+    "osdElement_GPS_SATS": {
+        "message": "GPS Satellites"
+    },
+    "osdElement_GPS_SATS_HELP": {
+        "message": "Shows the number of GPS satellites located by the GPS receiver."
+    },
+    "osdElement_ROLL_PIDS": {
+        "message": "Roll PIDs"
+    },
+    "osdElement_PITCH_PIDS": {
+        "message": "Pitch PIDs"
+    },
+    "osdElement_YAW_PIDS": {
+        "message": "Yaw PIDs"
+    },
     "osdElement_ONTIME_FLYTIME_HELP": {
         "message": "Shows \"On Time\" while unarmed and \"Fly Time\" while armed."
     },
