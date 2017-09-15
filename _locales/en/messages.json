@@ -2133,5 +2133,17 @@
     },
     "osdUnitUKTip": {
         "message": "Use metric units except for the speed, which is displayed in miles per hour."
+    },
+    "osdElement_ONTIME_FLYTIME": {
+        "message": "On Time / Fly Time"
+    },
+    "osdElement_ONTIME_FLYTIME_HELP": {
+        "message": "Shows \"On Time\" while unarmed and \"Fly Time\" while armed."
+    },
+    "osdElement_RTC_TIME": {
+        "message": "Time of the Day"
+    },
+    "osdElement_RTC_TIME_HELP": {
+        "message": "Shows the current time, as retrieved from the GPS or set via the radio."
     }
 }
