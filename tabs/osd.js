@@ -30,6 +30,7 @@ SYM.DIST_TO_HOME = 0xA0;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.VARIO = 0x9F;
+SYM.CLOCK = 0xBC;
 SYM.LAST_CHAR = 188;
 
 var FONT = FONT || {};
@@ -461,7 +462,19 @@ OSD.constants = {
             default_position: -1,
             positionable: true,
             preview: '55' + FONT.symbol(SYM.GPS_SPEED)
-        }
+        },
+        ONTIME_FLYTIME: {
+            name: 'ONTIME_FLYTIME',
+            default_position: -1,
+            positionable: true,
+            preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+        },
+        RTC_TIME: {
+            name: 'RTC_TIME',
+            default_position: -1,
+            positionable: true,
+            preview: FONT.symbol(SYM.CLOCK) + ' 13:37'
+        },
     }
 };
 
@@ -506,6 +519,10 @@ OSD.chooseFields = function () {
         OSD.constants.DISPLAY_FIELDS.push(F.AIR_SPEED);
     }
 
+    if (semver.gte(CONFIG.flightControllerVersion, '1.7.4')) {
+        OSD.constants.DISPLAY_FIELDS.push(F.ONTIME_FLYTIME);
+        OSD.constants.DISPLAY_FIELDS.push(F.RTC_TIME);
+    }
 };
 
 OSD.updateDisplaySize = function () {
@@ -796,6 +813,30 @@ TABS.osd.initialize = function (callback) {
                         if (FC.getOsdDisabledFields().indexOf(field.name) != -1) {
                             $field.hide();
                         }
+                        var name = field.name;
+                        var nameKey = 'osdElement_' + name;
+                        var nameMessage = chrome.i18n.getMessage(nameKey);
+                        if (nameMessage) {
+                            name = nameMessage;
+                        } else {
+                            name = inflection.titleize(name);
+                        }
+                        var help = chrome.i18n.getMessage(nameKey + '_HELP');
+                        if (help) {
+                            $('<div class="helpicon cf_tip"></div>')
+                                .css('margin-top', '1px')
+                                .attr('title', help)
+                                .appendTo($field)
+                                .jBox('Tooltip', {
+                                    delayOpen: 100,
+                                    delayClose: 100,
+                                    position: {
+                                        x: 'right',
+                                        y: 'center'
+                                    },
+                                    outside: 'x'
+                                });
+                        }
                         $field.append(
                             $('<input type="checkbox" name="' + field.name + '" class="togglesmall"></input>')
                                 .data('field', field)
@@ -818,7 +859,7 @@ TABS.osd.initialize = function (callback) {
                                 })
                         );
 
-                        $field.append('<label for="' + field.name + '" class="char-label">' + inflection.titleize(field.name) + '</label>');
+                        $field.append('<label for="' + field.name + '" class="char-label">' + name + '</label>');
                         if (field.positionable && field.isVisible) {
                             $field.append(
                                 $('<input type="number" class="' + field.index + ' position"></input>')
