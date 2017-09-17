@@ -2188,6 +2188,12 @@
     "osdElement_GPS_SATS_HELP": {
         "message": "Shows the number of GPS satellites located by the GPS receiver."
     },
+    "osdElement_GPS_HDOP": {
+        "message": "GPS HDOP"
+    },
+    "osdElement_GPS_HDOP_HELP": {
+        "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
+    },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
     },

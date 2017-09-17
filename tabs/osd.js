@@ -21,6 +21,8 @@ SYM.METRE = 0xC;
 SYM.FEET = 0xF;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
+SYM.GPS_HDP1 = 0xBD;
+SYM.GPS_HDP2 = 0xBE;
 SYM.GPS_SPEED = 0xA1;
 SYM.ALT = 0xAA;
 SYM.LAT = 0xA6;
@@ -31,7 +33,7 @@ SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.VARIO = 0x9F;
 SYM.CLOCK = 0xBC;
-SYM.LAST_CHAR = 188;
+SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
 
@@ -449,6 +451,12 @@ OSD.constants = {
                     id: 23,
                     min_version: '1.6.0',
                     preview: FONT.symbol(SYM.DIST_TO_HOME) + '300' +  FONT.symbol(SYM.METRE)
+                },
+                {
+                    name: 'GPS_HDOP',
+                    id: 31,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + ' 3'
                 },
             ]
         },
