@@ -756,8 +756,8 @@
     "portsFunction_MSP": {
         "message": "MSP"
     },
-    "portsFunction_GSP": {
-        "message": "GSP"
+    "portsFunction_GPS": {
+        "message": "GPS"
     },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
@@ -2181,5 +2181,8 @@
     },
     "osdElement_RTC_TIME_HELP": {
         "message": "Shows the current time, as retrieved from the GPS or set via the radio."
+    },
+    "portColumnSensors": {
+        "message": "Sensors"
     }
 }
