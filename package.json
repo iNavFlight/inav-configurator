@@ -31,8 +31,8 @@
     "jquery-ui-npm": "1.12.0",
     "nw": "0.24.4-sdk",
     "nw-builder": "^3.4.1",
-    "openlayers": "^4.3.1",
-    "run-sequence": "^2.1.0",
+    "openlayers": "^4.3.3",
+    "run-sequence": "^2.2.0",
     "temp": "^0.8.3",
     "three": "0.72.0"
   }
