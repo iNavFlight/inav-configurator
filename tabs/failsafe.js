@@ -137,7 +137,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 fullChannels_e.append('\
                         <div class="number">\
                             <div class="channelauxiliary">\
-                                <span class="channelname">' + chrome.i18n.getMessage("controlAxisAux" + (aux_index++)) + '</span>\
+                                <span class="channelname">' + chrome.i18n.getMessage("radioChannelShort") + (i + 1) + '</span>\
                                 ' + auxAssignment[aux_assignment_index++] + '\
                             </div>\
                             <div class="cf_tip channelsetting" title="' + chrome.i18n.getMessage("failsafeChannelFallbackSettingsHold") + '">\

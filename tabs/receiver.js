@@ -60,7 +60,7 @@ TABS.receiver.initialize = function (callback) {
             if (i < bar_names.length) {
                 name = bar_names[i];
             } else {
-                name = chrome.i18n.getMessage("controlAxisAux" + (aux_index++));
+                name = chrome.i18n.getMessage("radioChannelShort") + (i + 1);
             }
 
             bar_container.append('\
