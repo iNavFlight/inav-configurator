@@ -789,6 +789,12 @@
     "portsFunction_RUNCAM_SPLIT_CONTROL": {
         "message": "RunCam Split"
     },
+    "portsFunction_TBS_SMARTAUDIO": {
+        "message": "TBS SmartAudio"
+    },
+    "portsFunction_IRC_TRAMP": {
+        "message": "IRC Tramp"
+    },
     "pidTuningName": {
         "message": "Name"
     },
