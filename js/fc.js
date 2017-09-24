@@ -470,6 +470,9 @@ var FC = {
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
+        if (features === undefined) {
+            features = this.getFeatures();
+        }
         for (var i = 0; i < features.length; i++) {
             if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
                 return true;
