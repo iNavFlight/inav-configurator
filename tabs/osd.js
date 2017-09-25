@@ -265,265 +265,266 @@ OSD.constants = {
     AHISIDEBARHEIGHTPOSITION: 3,
 
     // All display fields, from every version, do not remove elements, only add!
-    ALL_DISPLAY_FIELDS: {
-        MAIN_BATT_VOLTAGE: {
-            name: 'MAIN_BATT_VOLTAGE',
-            default_position: -29,
-            positionable: true,
-            preview: FONT.symbol(SYM.VOLT) + '16.8V'
+    ALL_DISPLAY_GROUPS: [
+        {
+            name: 'osdGroupGeneral',
+            items: [
+                {
+                    name: 'RSSI_VALUE',
+                    id: 0,
+                    preview: FONT.symbol(SYM.RSSI) + '99'
+                },
+                {
+                    name: 'MAIN_BATT_VOLTAGE',
+                    id: 1,
+                    preview: FONT.symbol(SYM.VOLT) + '16.8V'
+                },
+                {
+                    name: 'THROTTLE_POSITION',
+                    id: 9,
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                },
+                {
+                    name: 'CRAFT_NAME',
+                    id: 8,
+                    preview: '[CRAFT_NAME]'
+                },
+                {
+                    name: 'FLYMODE',
+                    id: 7,
+                    preview: 'STAB'
+                },
+                {
+                    name: 'HEADING',
+                    id: 24,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
+                },
+                {
+                    name: 'AIR_SPEED',
+                    id: 27,
+                    min_version: '1.7.3',
+                    enabled: function() {
+                        return SENSOR_CONFIG.pitot != 0;
+                    },
+                    preview: '55' + FONT.symbol(SYM.GPS_SPEED)
+                },
+                {
+                    name: 'RTC_TIME',
+                    id: 29,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.CLOCK) + ' 13:37'
+                },
+            ]
         },
-        RSSI_VALUE: {
-            name: 'RSSI_VALUE',
-            default_position: -59,
-            positionable: true,
-            preview: FONT.symbol(SYM.RSSI) + '99'
+        {
+            name: 'osdGroupAltitude',
+            // TODO: Make this disappear when there's no baro and no GPS.
+            // Requires not drawing these indicators in INAV even when enabled
+            // if there are no sensors to provide their data. Currently they're
+            // always drawn as long as BARO or NAV support is compiled in.
+            items: [
+                {
+                    name: 'ALTITUDE',
+                    id: 15,
+                    preview: function () {
+                        return FONT.symbol(SYM.ALT) + '399.7' + FONT.symbol(OSD.data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
+                    }
+                },
+                {
+                    name: 'VARIO',
+                    id: 25,
+                    min_version: '1.6.0',
+                    preview: '-'
+                },
+                {
+                    name: 'VARIO_NUM',
+                    id: 26,
+                    min_version: '1.6.0',
+                    preview: '-0.5' + FONT.symbol(SYM.VARIO)
+                }
+            ]
         },
-        TIMER: {
-            name: 'TIMER',
-            default_position: -39,
-            positionable: true,
-            preview: FONT.symbol(SYM.ON_M) + ' 11:11'
+        {
+            name: 'osdGroupTimers',
+            items: [
+                {
+                    name: 'ONTIME_FLYTIME',
+                    id: 28,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+                },
+                {
+                    name: 'ONTIME',
+                    id: 5,
+                    preview: FONT.symbol(SYM.ON_M) + '  4:11'
+                },
+                {
+                    name: 'FLYTIME',
+                    id: 6,
+                    preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+                },
+            ]
         },
-        THROTTLE_POSITION: {
-            name: 'THROTTLE_POSITION',
-            default_position: -9,
-            positionable: true,
-            preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+        {
+            name: 'osdGroupAttitude',
+            items: [
+                {
+                    name: 'CROSSHAIRS',
+                    id: 2,
+                    positionable: false
+                },
+                {
+                    name: 'ARTIFICIAL_HORIZON',
+                    id: 3,
+                    positionable: false
+                },
+                {
+                    name: 'HORIZON_SIDEBARS',
+                    id: 4,
+                    positionable: false
+                },
+            ]
         },
-        CPU_LOAD: {
-            name: 'CPU_LOAD',
-            default_position: 26,
-            positionable: true,
-            preview: '15'
+        {
+            name: 'osdGroupCurrentMeter',
+            enabled: function() {
+                return FC.isFeatureEnabled('CURRENT_METER');
+            },
+            items: [
+                {
+                    name: 'CURRENT_DRAW',
+                    id: 11,
+                    preview: FONT.symbol(SYM.AMP) + '42.0'
+                },
+                {
+                    name: 'MAH_DRAWN',
+                    id: 12,
+                    preview: FONT.symbol(SYM.MAH) + '690'
+                },
+                {
+                    name: 'POWER',
+                    id: 19,
+                    min_version: '1.6.0',
+                    preview: '50W'
+                },
+            ]
         },
-        VTX_CHANNEL: {
-            name: 'VTX_CHANNEL',
-            default_position: 1,
-            positionable: true,
-            preview: 'CH:1'
+        {
+            name: 'osdGroupGPS',
+            enabled: function() {
+                return FC.isFeatureEnabled('GPS');
+            },
+            items: [
+                {
+                    name: 'GPS_SPEED',
+                    id: 13,
+                    preview: '40' + FONT.symbol(SYM.GPS_SPEED)
+                },
+                {
+                    name: 'GPS_SATS',
+                    id: 14,
+                    preview: FONT.symbol(SYM.GPS_SAT1) + FONT.symbol(SYM.GPS_SAT2) + '14'
+                },
+                {
+                    name: 'LONGITUDE',
+                    id: 20,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.LON) + '14.76521'
+                },
+                {
+                    name: 'LATITUDE',
+                    id: 21,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.LAT) + '52.98723'
+                },
+                {
+                    name: 'DIRECTION_TO_HOME',
+                    id: 22,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.DIR_TO_HOME)
+                },
+                {
+                    name: 'DISTANCE_TO_HOME',
+                    id: 23,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.DIST_TO_HOME) + '300' +  FONT.symbol(SYM.METRE)
+                },
+            ]
         },
-        VOLTAGE_WARNING: {
-            name: 'VOLTAGE_WARNING',
-            default_position: -80,
-            positionable: true,
-            preview: 'LOW VOLTAGE'
+        {
+            name: 'osdGroupVTX',
+            items: [
+                {
+                    name: 'VTX_CHANNEL',
+                    id: 10,
+                    positionable: true,
+                    preview: 'CH:1'
+                },
+            ]
         },
-        ARMED: {
-            name: 'ARMED',
-            default_position: -107,
-            positionable: true,
-            preview: 'ARMED'
-        },
-        DISARMED: {
-            name: 'DISARMED',
-            default_position: -109,
-            positionable: true,
-            preview: 'DISARMED'
-        },
-        CROSSHAIRS: {
-            name: 'CROSSHAIRS',
-            default_position: -1,
-            positionable: false
-        },
-        ARTIFICIAL_HORIZON: {
-            name: 'ARTIFICIAL_HORIZON',
-            default_position: -1,
-            positionable: false
-        },
-        HORIZON_SIDEBARS: {
-            name: 'HORIZON_SIDEBARS',
-            default_position: -1,
-            positionable: false
-        },
-        CURRENT_DRAW: {
-            name: 'CURRENT_DRAW',
-            default_position: -23,
-            positionable: true,
-            preview: FONT.symbol(SYM.AMP) + '42.0'
-        },
-        MAH_DRAWN: {
-            name: 'MAH_DRAWN',
-            default_position: -18,
-            positionable: true,
-            preview: FONT.symbol(SYM.MAH) + '690'
-        },
-        CRAFT_NAME: {
-            name: 'CRAFT_NAME',
-            default_position: -77,
-            positionable: true,
-            preview: '[CRAFT_NAME]'
-        },
-        ALTITUDE: {
-            name: 'ALTITUDE',
-            default_position: 62,
-            positionable: true,
-            preview: function (osd_data) {
-                return FONT.symbol(SYM.ALT) + '399.7' + FONT.symbol(osd_data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
+        {
+            name: 'osdGroupPIDs',
+            min_version: '1.6.0',
+            items: [
+                {
+                    name: 'ROLL_PIDS',
+                    id: 16,
+                    preview: 'ROL 40 30 23'
+                },
+                {
+                    name: 'PITCH_PIDS',
+                    id: 17,
+                    preview: 'PIT 40 30 23'
+                },
+                {
+                    name: 'YAW_PIDS',
+                    id: 18,
+                    preview: 'YAW 85 45 0'
+                },
+            ]
+        }
+    ]
+};
+
+OSD.get_item = function(item_id) {
+    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
+        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
+        for (var jj = 0; jj < group.items.length; jj++) {
+            if (group.items[jj].id == item_id) {
+                return group.items[jj];
             }
-        },
-        ONTIME: {
-            name: 'ONTIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.ON_M) + '  4:11'
-        },
-        FLYTIME: {
-            name: 'FLYTIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.FLY_M) + '  4:11'
-        },
-        FLYMODE: {
-            name: 'FLYMODE',
-            default_position: -1,
-            positionable: true,
-            preview: 'STAB'
-        },
-        GPS_SPEED: {
-            name: 'GPS_SPEED',
-            default_position: -1,
-            positionable: true,
-            preview: '40' + FONT.symbol(SYM.GPS_SPEED)
-        },
-        GPS_SATS: {
-            name: 'GPS_SATS',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.GPS_SAT1) + FONT.symbol(SYM.GPS_SAT2) + '14'
-        },
-        ROLL_PIDS: {
-            name: 'ROLL_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'ROL 40 30 23'
-        },
-        PITCH_PIDS: {
-            name: 'PITCH_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'PIT 40 30 23'
-        },
-        YAW_PIDS: {
-            name: 'YAW_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'YAW 85 45 0'
-        },
-        POWER: {
-            name: 'POWER',
-            default_position: -1,
-            positionable: true,
-            preview: '50W'
-        },
-        GPS_LON: {
-            name: 'LONGITUDE',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.LON) + '14.76521'
-        },
-        GPS_LAT: {
-            name: 'LATITUDE',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.LAT) + '52.98723'
-        },
-        HOME_DIR: {
-            name: 'DIRECTION_TO_HOME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.DIR_TO_HOME)
-        },
-        HOME_DIST: {
-            name: 'DISTANCE_TO_HOME',
-            default_position: -1,
-            positionable: true,
-            preview:  FONT.symbol(SYM.DIST_TO_HOME) + '300' +  FONT.symbol(SYM.METRE)
-        },
-        HEADING: {
-            name: 'HEADING',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
-        },
-        VARIO: {
-            name: 'VARIO',
-            default_position: -1,
-            positionable: true,
-            preview: '-'
-        },
-        VARIO_NUM: {
-            name: 'VARIO_NUM',
-            default_position: -1,
-            positionable: true,
-            preview: '-0.5' + FONT.symbol(SYM.VARIO)
-        },
-        AIR_SPEED: {
-            name: 'AIR_SPEED',
-            default_position: -1,
-            positionable: true,
-            preview: '55' + FONT.symbol(SYM.GPS_SPEED)
-        },
-        ONTIME_FLYTIME: {
-            name: 'ONTIME_FLYTIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.FLY_M) + '  4:11'
-        },
-        RTC_TIME: {
-            name: 'RTC_TIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.CLOCK) + ' 13:37'
-        },
+        }
     }
+    return null;
 };
 
-// Pick display fields by version, order matters, so these are going in an array... pry could iterate the example map instead
-OSD.chooseFields = function () {
-    var F = OSD.constants.ALL_DISPLAY_FIELDS;
-    OSD.constants.DISPLAY_FIELDS = [
-        F.RSSI_VALUE,
-        F.MAIN_BATT_VOLTAGE,
-        F.CROSSHAIRS,
-        F.ARTIFICIAL_HORIZON,
-        F.HORIZON_SIDEBARS,
-        F.ONTIME,
-        F.FLYTIME,
-        F.FLYMODE,
-        F.CRAFT_NAME,
-        F.THROTTLE_POSITION,
-        F.VTX_CHANNEL,
-        F.CURRENT_DRAW,
-        F.MAH_DRAWN,
-        F.GPS_SPEED,
-        F.GPS_SATS,
-        F.ALTITUDE
-    ];
-
-    if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-        OSD.constants.DISPLAY_FIELDS.push(F.ROLL_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.PITCH_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.YAW_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.POWER);
-
-        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LON);
-        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LAT);
-        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIR);
-        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIST);
-        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);       
-        OSD.constants.DISPLAY_FIELDS.push(F.VARIO);
-        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);        
+OSD.is_item_displayed = function(item, group) {
+    if (FC.getOsdDisabledFields().indexOf(item.name) != -1) {
+        return false;
     }
-
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-        OSD.constants.DISPLAY_FIELDS.push(F.AIR_SPEED);
+    if (!group) {
+        return false;
     }
-
-    if (semver.gte(CONFIG.flightControllerVersion, '1.7.4')) {
-        OSD.constants.DISPLAY_FIELDS.push(F.ONTIME_FLYTIME);
-        OSD.constants.DISPLAY_FIELDS.push(F.RTC_TIME);
+    if (typeof group.enabled === 'function' && group.enabled() === false) {
+        return false;
     }
+    if (item.min_version && !semver.gte(CONFIG.flightControllerVersion, item.min_version)) {
+        return false;
+    }
+    if (typeof item.enabled === 'function' && item.enabled() === false) {
+        return false;
+    }
+    return true;
 };
+
+OSD.get_item_preview = function(item) {
+    var preview = item.preview;
+    if (typeof preview == 'function') {
+        return preview();
+    }
+    return preview;
+}
 
 OSD.updateDisplaySize = function () {
     var video_type = OSD.constants.VIDEO_TYPES[OSD.data.video_system];
@@ -552,7 +553,7 @@ OSD.msp = {
      */
     helpers: {
         unpack: {
-            position: function (bits, c) {
+            position: function (bits) {
                 var display_item = {};
                 // size * y + x
                 display_item.position = FONT.constants.SIZES.LINE * ((bits >> 5) & 0x001F) + (bits & 0x001F);
@@ -578,16 +579,13 @@ OSD.msp = {
         return result;
     },
 
-    encode: function (display_item) {
+    encode: function (item, itemData) {
         var buffer = [];
-        buffer.push8(display_item.index);
-        buffer.push16(this.helpers.pack.position(display_item));
+        buffer.push8(item.id);
+        buffer.push16(this.helpers.pack.position(itemData));
         return buffer;
     },
 
-    /*
-     * Currently only parses MSP_MAX_OSD responses, add a switch on payload.code if more codes are handled
-     */
     decode: function (payload) {
         var view = payload.data;
         var d = OSD.data;
@@ -601,23 +599,11 @@ OSD.msp = {
         d.alarms['time'] = { display_name: 'Minutes', value: view.readU16() };
         d.alarms['alt'] = { display_name: 'Altitude', value: view.readU16() };
 
-        d.display_items = [];
+        d.items = [];
         // start at the offset from the other fields
         while (view.offset < view.byteLength) {
-            var v = null;
-            v = view.readU16();
-
-            var j = d.display_items.length;
-            var c = OSD.constants.DISPLAY_FIELDS[j];
-
-            if (c) {
-                d.display_items.push($.extend({
-                    name: c.name,
-                    index: j,
-                    positionable: c.positionable,
-                    preview: typeof(c.preview) === 'function' ? c.preview(d) : c.preview
-                }, this.helpers.unpack.position(v, c)));
-            }
+            var bits = view.readU16();
+            d.items.push(this.helpers.unpack.position(bits));
         }
         OSD.updateDisplaySize();
     }
@@ -626,25 +612,28 @@ OSD.msp = {
 OSD.GUI = {};
 OSD.GUI.preview = {
     onMouseEnter: function () {
-        if (!$(this).data('field')) {
+        var item = $(this).data('item');
+        if (!item) {
             return;
         }
-        $('.field-' + $(this).data('field').index).addClass('mouseover')
+        $('.field-' + item.id).addClass('mouseover');
     },
 
     onMouseLeave: function () {
-        if (!$(this).data('field')) {
+        var item = $(this).data('item');
+        if (!item) {
             return;
         }
-        $('.field-' + $(this).data('field').index).removeClass('mouseover')
+        $('.field-' + item.id).removeClass('mouseover')
     },
 
     onDragStart: function (e) {
         var ev = e.originalEvent;
+        var item = $(ev.target).data('item');
         //noinspection JSUnresolvedVariable
-        ev.dataTransfer.setData("text/plain", $(ev.target).data('field').index);
+        ev.dataTransfer.setData("text/plain", item.id);
         //noinspection JSUnresolvedVariable
-        ev.dataTransfer.setDragImage($(this).data('field').preview_img, 6, 9);
+        ev.dataTransfer.setDragImage(item.preview_img, 6, 9);
     },
     onDragOver: function (e) {
         var ev = e.originalEvent;
@@ -663,17 +652,17 @@ OSD.GUI.preview = {
 
     onDrop: function (e) {
         var ev = e.originalEvent;
-        var position = $(this).removeAttr('style').data('position');
+        var position = $(this).removeAttr('style').data('position');;
         //noinspection JSUnresolvedVariable
-        var field_id = parseInt(ev.dataTransfer.getData('text'));
-        var display_item = OSD.data.display_items[field_id];
-        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + display_item.preview.length);
+        var item_id = parseInt(ev.dataTransfer.getData('text'));
+        var item = OSD.get_item(item_id);
+        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + item.preview.length);
 
         if (overflows_line < 0) {
             position += overflows_line;
         }
 
-        $('input.' + field_id + '.position').val(position).change();
+        $('input.' + item_id + '.position').val(position).change();
     }
 };
 
@@ -721,7 +710,6 @@ TABS.osd.initialize = function (callback) {
                     var i,
                         type;
 
-                    OSD.chooseFields();
                     if (info.length <= 1) {
                         $('.unsupported').fadeIn();
                         return;
@@ -800,87 +788,105 @@ TABS.osd.initialize = function (callback) {
                     }
 
                     // display fields on/off and position
-                    var $displayFields = $('.display-fields').empty();
-                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
-                        var field = OSD.data.display_items[ii];
-                        // versioning related, if the field doesn't exist at the current flight controller version, just skip it
-                        if (!field.name) {
+                    var $tmpl = $('#osd_group_template').hide();
+                    // Clear previous groups, if any
+                    $('.osd_group').remove();
+                    var itemGroups = {};
+                    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
+                        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
+                        var groupItems = [];
+                        for (var jj = 0; jj < group.items.length; jj++) {
+                            var item = group.items[jj];
+                            if (!OSD.is_item_displayed(item, group)) {
+                                continue;
+                            }
+                            itemGroups[item.id] = group;
+                            groupItems.push(item);
+                        }
+                        if (groupItems.length == 0) {
                             continue;
                         }
-
-                        var checked = field.isVisible ? 'checked' : '';
-                        var $field = $('<div class="display-field field-' + field.index + '"/>');
-                        if (FC.getOsdDisabledFields().indexOf(field.name) != -1) {
-                            $field.hide();
-                        }
-                        var name = field.name;
-                        var nameKey = 'osdElement_' + name;
-                        var nameMessage = chrome.i18n.getMessage(nameKey);
-                        if (nameMessage) {
-                            name = nameMessage;
-                        } else {
-                            name = inflection.titleize(name);
-                        }
-                        var help = chrome.i18n.getMessage(nameKey + '_HELP');
-                        if (help) {
-                            $('<div class="helpicon cf_tip"></div>')
-                                .css('margin-top', '1px')
-                                .attr('title', help)
-                                .appendTo($field)
-                                .jBox('Tooltip', {
-                                    delayOpen: 100,
-                                    delayClose: 100,
-                                    position: {
-                                        x: 'right',
-                                        y: 'center'
-                                    },
-                                    outside: 'x'
-                                });
-                        }
-                        $field.append(
-                            $('<input type="checkbox" name="' + field.name + '" class="togglesmall"></input>')
-                                .data('field', field)
-                                .attr('checked', field.isVisible)
-                                .change(function () {
-                                    var field = $(this).data('field');
-                                    var $position = $(this).parent().find('.position.' + field.name);
-                                    field.isVisible = !field.isVisible;
-
-                                    if (field.isVisible) {
-                                        $position.show();
-                                    } else {
-                                        $position.hide();
-                                    }
-
-                                    MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(field))
-                                        .then(function () {
-                                            updateOsdView();
-                                        });
-                                })
-                        );
-
-                        $field.append('<label for="' + field.name + '" class="char-label">' + name + '</label>');
-                        if (field.positionable && field.isVisible) {
+                        var groupContainer = $tmpl.clone().addClass('osd_group').show();
+                        var groupTitle = chrome.i18n.getMessage(group.name);
+                        groupContainer.find('.spacer_box_title').text(groupTitle);
+                        var $displayFields = groupContainer.find('.display-fields');
+                        for (var jj = 0; jj < groupItems.length; jj++) {
+                            var item = groupItems[jj];
+                            var itemData = OSD.data.items[item.id];
+                            var checked = itemData.isVisible ? 'checked' : '';
+                            var $field = $('<div class="display-field field-' + item.id + '"/>');
+                            var name = item.name;
+                            var nameKey = 'osdElement_' + name;
+                            var nameMessage = chrome.i18n.getMessage(nameKey);
+                            if (nameMessage) {
+                                name = nameMessage;
+                            } else {
+                                name = inflection.titleize(name);
+                            }
+                            var help = chrome.i18n.getMessage(nameKey + '_HELP');
+                            if (help) {
+                                $('<div class="helpicon cf_tip"></div>')
+                                    .css('margin-top', '1px')
+                                    .attr('title', help)
+                                    .appendTo($field)
+                                    .jBox('Tooltip', {
+                                        delayOpen: 100,
+                                        delayClose: 100,
+                                        position: {
+                                            x: 'right',
+                                            y: 'center'
+                                        },
+                                        outside: 'x'
+                                    });
+                            }
                             $field.append(
-                                $('<input type="number" class="' + field.index + ' position"></input>')
-                                    .data('field', field)
-                                    .val(field.position)
-                                    .change($.debounce(250, function (e) {
-                                        var field = $(this).data('field');
-                                        field.position = parseInt($(this).val());
-                                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(field))
+                                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
+                                    .data('item', item)
+                                    .attr('checked', itemData.isVisible)
+                                    .change(function () {
+                                        var item = $(this).data('item');
+                                        var itemData = OSD.data.items[item.id];
+                                        var $position = $(this).parent().find('.position.' + item.name);
+                                        itemData.isVisible = !itemData.isVisible;
+
+                                        if (itemData.isVisible) {
+                                            $position.show();
+                                        } else {
+                                            $position.hide();
+                                        }
+
+                                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
                                             .then(function () {
                                                 updateOsdView();
                                             });
-                                    }))
+                                    })
                             );
+
+                            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
+                            if (item.positionable !== false && itemData.isVisible) {
+                                $field.append(
+                                    $('<input type="number" class="' + item.id + ' position"></input>')
+                                        .data('item', item)
+                                        .val(itemData.position)
+                                        .change($.debounce(250, function (e) {
+                                            var item = $(this).data('item');
+                                            var itemData = OSD.data.items[item.id];
+                                            itemData.position = parseInt($(this).val());
+                                            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
+                                                .then(function () {
+                                                    updateOsdView();
+                                                });
+                                        }))
+                                );
+                            }
+                            $displayFields.append($field);
                         }
-                        $displayFields.append($field);
+                        $tmpl.parent().append(groupContainer);
                     }
                     GUI.switchery();
 
-                    // buffer the preview
-                    OSD.data.preview = [];
+                    // buffer the preview;
+                    OSD.data.preview = [];;
                     OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
                     for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
                         var field = OSD.data.display_items[ii];
@@ -893,32 +899,40 @@ TABS.osd.initialize = function (callback) {
                     // clear the buffer
                     for (i = 0; i < OSD.data.display_size.total; i++) {
                         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
-                    }
-
+                    };
+;
                     // draw all the displayed items and the drag and drop preview images
-                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
-                        var field = OSD.data.display_items[ii];
-                        if (!field.preview || !field.isVisible) {
+                    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+                        var item = OSD.get_item(ii);
+                        if (!item || !OSD.is_item_displayed(item, itemGroups[item.id])) {
                             continue;
                         }
-                        var j = (field.position >= 0) ? field.position : field.position + OSD.data.display_size.total;
+                        var itemData = OSD.data.items[ii];
+                        if (!itemData.isVisible) {
+                            continue;
+                        }
+                        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
                         // create the preview image
-                        field.preview_img = new Image();
+                        item.preview_img = new Image();
                         var canvas = document.createElement('canvas');
                         var ctx = canvas.getContext("2d");
                         // fill the screen buffer
-                        for (i = 0; i < field.preview.length; i++) {
-                            var charCode = field.preview.charCodeAt(i);
-                            OSD.data.preview[j++] = [field, charCode];
+                        var preview = OSD.get_item_preview(item);
+                        if (!preview) {
+                            continue;
+                        }
+                        for (i = 0; i < preview.length; i++) {
+                            var charCode = preview.charCodeAt(i);
+                            OSD.data.preview[j++] = [item, charCode];
                             // draw the preview
                             var img = new Image();
                             img.src = FONT.draw(charCode);
                             ctx.drawImage(img, i * 12, 0);
                         }
-                        field.preview_img.src = canvas.toDataURL('image/png');
+                        item.preview_img.src = canvas.toDataURL('image/png');
                         // Required for NW.js - Otherwise the <img /> will
                         // consume drag/drop events.
-                        field.preview_img.style.pointerEvents = 'none';
+                        item.preview_img.style.pointerEvents = 'none';
                     }
                     var centerishPosition = 225;
 
@@ -955,7 +969,7 @@ TABS.osd.initialize = function (callback) {
                     for (i = 0; i < OSD.data.display_size.total;) {
                         var charCode = OSD.data.preview[i];
                         if (typeof charCode === 'object') {
-                            var field = OSD.data.preview[i][0];
+                            var item = OSD.data.preview[i][0];
                             charCode = OSD.data.preview[i][1];
                         }
                         var $img = $('<div class="char"><img src=' + FONT.draw(charCode) + '></img></div>')
@@ -964,15 +978,15 @@ TABS.osd.initialize = function (callback) {
                             .on('dragover', OSD.GUI.preview.onDragOver)
                             .on('dragleave', OSD.GUI.preview.onDragLeave)
                             .on('drop', OSD.GUI.preview.onDrop)
-                            .data('field', field)
+                            .data('item', item)
                             .data('position', i);
                         // Required for NW.js - Otherwise the <img /> will
                         // consume drag/drop events.
                         $img.find('img').css('pointer-events', 'none');
-                        if (field && field.positionable) {
+                        if (item && item.positionable !== false) {
                             $img
-                                .addClass('field-' + field.index)
-                                .data('field', field)
+                                .addClass('field-' + item.id)
+                                .data('item', item)
                                 .prop('draggable', true)
                                 .on('dragstart', OSD.GUI.preview.onDragStart);
                         }

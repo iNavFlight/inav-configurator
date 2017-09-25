@@ -2140,6 +2140,30 @@
     "osdUnitUKTip": {
         "message": "Use metric units except for the speed, which is displayed in miles per hour."
     },
+    "osdGroupGeneral": {
+        "message": "General"
+    },
+    "osdGroupAltitude": {
+        "message": "Altitude"
+    },
+    "osdGroupTimers": {
+        "message": "Timers"
+    },
+    "osdGroupAttitude": {
+        "message": "Attitude"
+    },
+    "osdGroupCurrentMeter": {
+        "message": "Current Meter"
+    },
+    "osdGroupGPS": {
+        "message": "GPS"
+    },
+    "osdGroupPIDs": {
+        "message": "PIDs"
+    },
+    "osdGroupVTX": {
+        "message": "VTX"
+    },
     "osdElement_ONTIME_FLYTIME": {
         "message": "On Time / Fly Time"
     },
