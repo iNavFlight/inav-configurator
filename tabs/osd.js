@@ -29,7 +29,8 @@ SYM.DIR_TO_HOME = 0x60;
 SYM.DIST_TO_HOME = 0xA0;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
-SYM.VARIO = 0x9F;
+SYM.VARIO_UP_2A = 0xA2;
+SYM.M_S = 0x9F;
 SYM.CLOCK = 0xBC;
 SYM.LAST_CHAR = 188;
 
@@ -335,13 +336,17 @@ OSD.constants = {
                     name: 'VARIO',
                     id: 25,
                     min_version: '1.6.0',
-                    preview: '-'
+                    preview: FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n'
                 },
                 {
                     name: 'VARIO_NUM',
                     id: 26,
                     min_version: '1.6.0',
-                    preview: '-0.5' + FONT.symbol(SYM.VARIO)
+                    preview: '-0.5' + FONT.symbol(SYM.M_S)
                 }
             ]
         },
@@ -656,8 +661,19 @@ OSD.GUI.preview = {
         //noinspection JSUnresolvedVariable
         var item_id = parseInt(ev.dataTransfer.getData('text'));
         var item = OSD.get_item(item_id);
-        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + item.preview.length);
-
+        var preview = OSD.get_item_preview(item);
+        var line_width = 0;
+        var item_width = 0;
+        for (var ii = 0; ii < preview.length; ii++) {
+            if (preview[ii] == '\n') {
+                item_width = Math.max(item_width, line_width);
+                line_width = 0;
+                continue;
+            }
+            line_width++;
+        }
+        item_width = Math.max(item_width, line_width);
+        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + item_width);
         if (overflows_line < 0) {
             position += overflows_line;
         }
@@ -921,13 +937,21 @@ TABS.osd.initialize = function (callback) {
                         if (!preview) {
                             continue;
                         }
+                        var x = 0;
+                        var y = 0;
                         for (i = 0; i < preview.length; i++) {
                             var charCode = preview.charCodeAt(i);
-                            OSD.data.preview[j++] = [item, charCode];
+                            if (charCode == '\n'.charCodeAt(0)) {
+                                x = 0;
+                                y++;
+                                continue;
+                            }
+                            OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
                             // draw the preview
                             var img = new Image();
                             img.src = FONT.draw(charCode);
-                            ctx.drawImage(img, i * 12, 0);
+                            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
+                            x++;
                         }
                         item.preview_img.src = canvas.toDataURL('image/png');
                         // Required for NW.js - Otherwise the <img /> will
