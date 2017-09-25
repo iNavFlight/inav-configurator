@@ -513,6 +513,11 @@ OSD.get_item = function(item_id) {
 };
 
 OSD.is_item_displayed = function(item, group) {
+    if (!OSD.data.items[item.id]) {
+        // FC has no data about this item, so
+        // it doesn't support it.
+        return false;
+    }
     if (FC.getOsdDisabledFields().indexOf(item.name) != -1) {
         return false;
     }
