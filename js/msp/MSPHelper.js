@@ -261,7 +261,7 @@ var mspHelper = (function (gui) {
                 MISC.failsafe_throttle = data.getUint16(offset, true); // 1000-2000
                 offset += 2;
                 MISC.gps_type = data.getUint8(offset++);
-                MISC.gps_baudrate = data.getUint8(offset++);
+                MISC.sensors_baudrate = data.getUint8(offset++);
                 MISC.gps_ubx_sbas = data.getInt8(offset++);
                 MISC.multiwiicurrentoutput = data.getUint8(offset++);
                 MISC.rssi_channel = data.getUint8(offset++);
@@ -507,7 +507,7 @@ var mspHelper = (function (gui) {
                         identifier: data.getUint8(offset),
                         functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 3)],
-                        gps_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
+                        sensors_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
@@ -1133,7 +1133,7 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(MISC.failsafe_throttle));
                 buffer.push(highByte(MISC.failsafe_throttle));
                 buffer.push(MISC.gps_type);
-                buffer.push(MISC.gps_baudrate);
+                buffer.push(MISC.sensors_baudrate);
                 buffer.push(MISC.gps_ubx_sbas);
                 buffer.push(MISC.multiwiicurrentoutput);
                 buffer.push(MISC.rssi_channel);
@@ -1210,7 +1210,7 @@ var mspHelper = (function (gui) {
 
                     var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.gps_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
                 }

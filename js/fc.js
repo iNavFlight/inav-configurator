@@ -218,7 +218,7 @@ var FC = {
             mincommand: 0,
             failsafe_throttle: 0,
             gps_type: 0,
-            gps_baudrate: 0,
+            sensors_baudrate: 0,
             gps_ubx_sbas: 0,
             multiwiicurrentoutput: 0,
             rssi_channel: 0,
