@@ -298,6 +298,12 @@ OSD.constants = {
                     preview: 'STAB'
                 },
                 {
+                    name: 'MESSAGES',
+                    id: 30,
+                    min_version: '1.7.4',
+                    preview: '       SYSTEM MESSAGE       ', // 28 chars, like OSD_MESSAGE_LENGTH on osd.c
+                },
+                {
                     name: 'HEADING',
                     id: 24,
                     min_version: '1.6.0',
