@@ -2182,6 +2182,12 @@
     "osdElement_MESSAGES_HELP": {
         "message": "Shows different system messages like warnings, hardware failures and extended details of the current flight mode (e.g. AUTOTUNE and AUTOTRIM modes and RTH stages)."
     },
+    "osdElement_MAIN_BATT_CELL_VOLTAGE": {
+        "message": "Battery Cell Voltage"
+    },
+    "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
+        "message": "Shows the average cell voltage from the main battery"
+    },
     "osdElement_GPS_SPEED": {
         "message": "GPS Speed"
     },
