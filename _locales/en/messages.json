@@ -2188,6 +2188,12 @@
     "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Shows the average cell voltage from the main battery"
     },
+    "osdElement_THROTTLE_POSITION_AUTO_THR": {
+        "message": "Throttle Position / Auto Throttle"
+    },
+    "osdElement_THROTTLE_POSITION_AUTO_THR_HELP": {
+        "message": "Shows the throttle stick position in flight modes where it controls the throttle output. On navigation modes, it shows the actual throttle value applied to the motors."
+    },
     "osdElement_GPS_SPEED": {
         "message": "GPS Speed"
     },

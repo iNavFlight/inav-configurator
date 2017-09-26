@@ -294,6 +294,12 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
                 },
                 {
+                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    id: 33,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                },
+                {
                     name: 'CRAFT_NAME',
                     id: 8,
                     preview: '[CRAFT_NAME]'
