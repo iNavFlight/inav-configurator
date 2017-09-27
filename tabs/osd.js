@@ -283,9 +283,21 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.VOLT) + '16.8V'
                 },
                 {
+                    name: 'MAIN_BATT_CELL_VOLTAGE',
+                    id: 32,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.VOLT) + '3.90V'
+                },
+                {
                     name: 'THROTTLE_POSITION',
                     id: 9,
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                },
+                {
+                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    id: 33,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
                 },
                 {
                     name: 'CRAFT_NAME',
