@@ -1204,7 +1204,11 @@ TABS.osd.initialize = function (callback) {
             }
         });
 
-        GUI.content_ready(callback);
+        // Update SENSOR_CONFIG, used to detect
+        // OSD_AIR_SPEED
+        mspHelper.loadSensorConfig(function () {
+            GUI.content_ready(callback);
+        });
     });
 };
 
