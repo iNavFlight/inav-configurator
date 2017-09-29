@@ -17,23 +17,27 @@ SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
-SYM.METRE = 0xC;
-SYM.FEET = 0xF;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
 SYM.GPS_HDP2 = 0xBE;
-SYM.GPS_SPEED = 0xA1;
-SYM.ALT = 0xAA;
+SYM.KMH = 161;
+SYM.MPH = 176;
+SYM.ALT_M = 177;
+SYM.ALT_FT = 179;
 SYM.LAT = 0xA6;
 SYM.LON = 0xA7;
 SYM.DIR_TO_HOME = 0x60;
-SYM.DIST_TO_HOME = 0xA0;
+SYM.DIST_KM = 182;
+SYM.DIST_MI = 184;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.VARIO_UP_2A = 0xA2;
 SYM.M_S = 0x9F;
+SYM.FT_S = 153;
 SYM.CLOCK = 0xBC;
+SYM.ZERO_HALF_TRAILING_DOT = 192;
+SYM.ZERO_HALF_LEADING_DOT = 208;
 SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
@@ -229,6 +233,16 @@ FONT.symbol = function (hexVal) {
     return String.fromCharCode(hexVal);
 };
 
+FONT.embed_dot = function(str) {
+    var zero = '0'.charCodeAt(0);
+    var repl = str.replace(/\d.\d/, function(match) {
+        var c1 = match.charCodeAt(0) + SYM.ZERO_HALF_TRAILING_DOT - zero;
+        var c2 = match.charCodeAt(2) + SYM.ZERO_HALF_LEADING_DOT - zero;
+        return FONT.symbol(c1) + FONT.symbol(c2);
+    });
+    return repl;
+}
+
 var OSD = OSD || {};
 
 // parsed fc output and output to fc, used by to OSD.msp.encode
@@ -280,13 +294,13 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_VOLTAGE',
                     id: 1,
-                    preview: FONT.symbol(SYM.VOLT) + '16.8V'
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
                 },
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
                     id: 32,
                     min_version: '1.7.4',
-                    preview: FONT.symbol(SYM.VOLT) + '3.90V'
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
                 },
                 {
                     name: 'THROTTLE_POSITION',
@@ -328,7 +342,7 @@ OSD.constants = {
                     enabled: function() {
                         return SENSOR_CONFIG.pitot != 0;
                     },
-                    preview: '55' + FONT.symbol(SYM.GPS_SPEED)
+                    preview: '55' + FONT.symbol(SYM.KMH)
                 },
                 {
                     name: 'RTC_TIME',
@@ -349,7 +363,11 @@ OSD.constants = {
                     name: 'ALTITUDE',
                     id: 15,
                     preview: function () {
-                        return FONT.symbol(SYM.ALT) + '399.7' + FONT.symbol(OSD.data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ALT_FT) + '118';
+                        }
+                        return FONT.symbol(SYM.ALT_M) + '399'
                     }
                 },
                 {
@@ -366,7 +384,13 @@ OSD.constants = {
                     name: 'VARIO_NUM',
                     id: 26,
                     min_version: '1.6.0',
-                    preview: '-0.5' + FONT.symbol(SYM.M_S)
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                        }
+                        return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
+                    }
                 }
             ]
         },
@@ -377,17 +401,17 @@ OSD.constants = {
                     name: 'ONTIME_FLYTIME',
                     id: 28,
                     min_version: '1.7.4',
-                    preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+                    preview: FONT.symbol(SYM.FLY_M) + '04:11'
                 },
                 {
                     name: 'ONTIME',
                     id: 5,
-                    preview: FONT.symbol(SYM.ON_M) + '  4:11'
+                    preview: FONT.symbol(SYM.ON_M) + '04:11'
                 },
                 {
                     name: 'FLYTIME',
                     id: 6,
-                    preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+                    preview: FONT.symbol(SYM.FLY_M) + '04:11'
                 },
             ]
         },
@@ -420,18 +444,18 @@ OSD.constants = {
                 {
                     name: 'CURRENT_DRAW',
                     id: 11,
-                    preview: FONT.symbol(SYM.AMP) + '42.0'
+                    preview: FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1')
                 },
                 {
                     name: 'MAH_DRAWN',
                     id: 12,
-                    preview: FONT.symbol(SYM.MAH) + '690'
+                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
                 },
                 {
                     name: 'POWER',
                     id: 19,
                     min_version: '1.6.0',
-                    preview: '50W'
+                    preview: 'W50 ' // 3 chars
                 },
             ]
         },
@@ -444,7 +468,14 @@ OSD.constants = {
                 {
                     name: 'GPS_SPEED',
                     id: 13,
-                    preview: '40' + FONT.symbol(SYM.GPS_SPEED)
+                    preview: function(osd_data) {
+                        // 3 chars
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
+                        }
+                        return FONT.embed_dot(' 40') + FONT.symbol(SYM.KMH);
+                    }
                 },
                 {
                     name: 'GPS_SATS',
@@ -455,13 +486,13 @@ OSD.constants = {
                     name: 'LONGITUDE',
                     id: 20,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.LON) + '14.76521'
+                    preview: FONT.symbol(SYM.LON) + FONT.embed_dot('14.7652134  ') // 11 chars
                 },
                 {
                     name: 'LATITUDE',
                     id: 21,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.LAT) + '52.98723'
+                    preview: FONT.symbol(SYM.LAT) + FONT.embed_dot('52.9872367  ') // 11 chars
                 },
                 {
                     name: 'DIRECTION_TO_HOME',
@@ -473,13 +504,19 @@ OSD.constants = {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.DIST_TO_HOME) + '300' +  FONT.symbol(SYM.METRE)
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        }
+                        return FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                    }
                 },
                 {
                     name: 'GPS_HDOP',
                     id: 31,
                     min_version: '1.7.4',
-                    preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + ' 3'
+                    preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + FONT.embed_dot('1.8')
                 },
             ]
         },
