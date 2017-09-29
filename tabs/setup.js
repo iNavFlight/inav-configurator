@@ -17,7 +17,8 @@ TABS.setup.initialize = function (callback) {
 
     loadChainer.setChain([
         mspHelper.loadBfConfig,
-        mspHelper.loadMisc
+        mspHelper.loadMisc,
+        mspHelper.quaryFcStatus
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
