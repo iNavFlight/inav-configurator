@@ -1957,6 +1957,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
     };
 
+    self.queryFcStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
+    };
+
     self.loadMisc = function (callback) {
         MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
     };
