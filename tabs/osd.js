@@ -27,6 +27,7 @@ SYM.ALT_M = 177;
 SYM.ALT_FT = 179;
 SYM.LAT = 0xA6;
 SYM.LON = 0xA7;
+SYM.AIR = 151;
 SYM.DIR_TO_HOME = 0x60;
 SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
@@ -342,7 +343,16 @@ OSD.constants = {
                     enabled: function() {
                         return SENSOR_CONFIG.pitot != 0;
                     },
-                    preview: '55' + FONT.symbol(SYM.KMH)
+                    preview: function(osd_data) {
+                        var speed;
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            speed = ' 35' + FONT.symbol(SYM.MPH);
+                        } else {
+                            speed = ' 55' + FONT.symbol(SYM.KMH);
+                        }
+                        return FONT.symbol(SYM.AIR) + speed;
+                    }
                 },
                 {
                     name: 'RTC_TIME',
