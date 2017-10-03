@@ -29,7 +29,7 @@
     "inflection": "1.12.0",
     "jquery": "2.1.4",
     "jquery-ui-npm": "1.12.0",
-    "nw": "0.24.4-sdk",
+    "nw": "^0.25.4-sdk",
     "nw-builder": "^3.4.1",
     "openlayers": "^4.3.3",
     "run-sequence": "^2.2.0",
