@@ -33,6 +33,11 @@ SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
+SYM.HEADING_N = 24;
+SYM.HEADING_E = 26;
+SYM.HEADING_W = 27;
+SYM.HEADING_DIVIDED_LINE = 28;
+SYM.HEADING_LINE = 29;
 SYM.VARIO_UP_2A = 0xA2;
 SYM.M_S = 0x9F;
 SYM.FT_S = 153;
@@ -335,6 +340,20 @@ OSD.constants = {
                     id: 24,
                     min_version: '1.6.0',
                     preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
+                },
+                {
+                    name: 'HEADING_GRAPH',
+                    id: 34,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.HEADING_W) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_DIVIDED_LINE) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_N) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_DIVIDED_LINE) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_E)
                 },
                 {
                     name: 'AIR_SPEED',
