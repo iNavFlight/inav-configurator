@@ -594,6 +594,10 @@ var mspHelper = (function (gui) {
                     RX_CONFIG.nrf24rx_id = data.getUint32(offset, true);
                     offset += 4;
                 }
+                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    RX_CONFIG.receiver_type = data.getUint8(offset);
+                    offset += 1;
+                }
                 break;
 
             case MSPCodes.MSP_FAILSAFE_CONFIG:
@@ -1169,6 +1173,10 @@ var mspHelper = (function (gui) {
                     buffer.push((RX_CONFIG.nrf24rx_id >> 8) & 0xFF);
                     buffer.push((RX_CONFIG.nrf24rx_id >> 16) & 0xFF);
                     buffer.push((RX_CONFIG.nrf24rx_id >> 24) & 0xFF);
+                }
+                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    // receiver type in RX_CONFIG rather than in BF_CONFIG.features
+                    buffer.push(RX_CONFIG.receiver_type);
                 }
                 break;
 

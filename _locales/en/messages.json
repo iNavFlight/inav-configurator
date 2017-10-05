@@ -458,17 +458,30 @@
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
-    "featureRX_PPM": {
+    "RX_PPM": {
         "message": "PPM RX input"
     },
+    "RX_SERIAL": {
+        "message": "Serial-based receiver (SPEKSAT, SBUS, SUMD)"
+    },
+    "RX_PARALLEL_PWM": {
+        "message": "PWM RX input (one wire per channel)"
+    },
+    "RX_MSP": {
+        "message": "MSP RX input (control via MSP port)"
+    },
+    "RX_NRF24": {
+        "message": "RX SPI based receiver (NRF24L01, RFM22)"
+    },
+    "RX_NONE": {
+        "message": "No receiver"
+    },
+
     "featureVBAT": {
         "message": "Battery voltage monitoring"
     },
     "featureINFLIGHT_ACC_CAL": {
         "message": "In-flight level calibration"
-    },
-    "featureRX_SERIAL": {
-        "message": "Serial-based receiver (SPEKSAT, SBUS, SUMD)"
     },
     "featureMOTOR_STOP": {
         "message": "Don't spin the motors when armed"
@@ -502,12 +515,6 @@
     },
     "feature3D": {
         "message": "3D mode (for use with reversible ESCs)"
-    },
-    "featureRX_PARALLEL_PWM": {
-        "message": "PWM RX input (one wire per channel)"
-    },
-    "featureRX_MSP": {
-        "message": "MSP RX input (control via MSP port)"
     },
     "featureRSSI_ADC": {
         "message": "Analog RSSI input"
@@ -544,12 +551,6 @@
     },
     "featureTRANSPONDERTip": {
         "message": "Configure via the Race Transponder tab after enabling."
-    },
-    "featureRX_NRF24": {
-        "message": "RX SPI based receiver (NRF24L01, RFM22)"
-    },
-    "featureRX_NRF24Tip": {
-        "message": "Remember to set the RX SPI protocol after enabling."
     },
     "featureSOFTSPI": {
         "message": "CPU based SPI"

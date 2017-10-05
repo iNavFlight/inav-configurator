@@ -84,6 +84,40 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // select current mixer configuration
         mixer_list_e.val(BF_CONFIG.mixerConfiguration).change();
 
+        // receiver configuration
+        var rxTypesSelect = $('#rxType');
+        var rxTypes = FC.getRxTypes();
+        for (var ii = 0; ii < rxTypes.length; ii++) {
+            var rxType = rxTypes[ii];
+            var option = $('<option value="' + rxType.name + '" >' + chrome.i18n.getMessage(rxType.name) + '</option>');
+            option.data('rx-type', rxType);
+            if (FC.isRxTypeEnabled(rxType)) {
+                option.prop('selected', true);
+            }
+            option.appendTo(rxTypesSelect);
+        }
+        var rxTypeOptions = $('[data-rx-type]');
+
+        var updateRxOptions = function(animated) {
+            var duration = animated ? 400 : 0;
+            rxTypeOptions.each(function (ii, obj) {
+                var $obj = $(obj);
+                var rxType = $obj.data('rx-type');
+                if (rxType && rxType != rxTypesSelect.val()) {
+                    $obj.slideUp(duration);
+                } else {
+                    $obj.slideDown(duration);
+                }
+            });
+        };
+        updateRxOptions(false);
+
+        rxTypesSelect.change(function () {
+            updateRxOptions(true);
+            var rxType = rxTypesSelect.find(':selected').data('rx-type');
+            FC.setRxTypeEnabled(rxType);
+        });
+
         // generate features
         var features = FC.getFeatures();
 
