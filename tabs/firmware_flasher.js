@@ -28,7 +28,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         localize();
 
         function enable_load_online_button() {
-            $("a.load_remote_file").text(chrome.i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
+            $(".load_remote_file").text(chrome.i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
         }
 
         function parse_hex(str, callback) {
