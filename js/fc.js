@@ -376,7 +376,14 @@ var FC = {
             failsafe_throttle: 0,
             failsafe_kill_switch: 0,
             failsafe_throttle_low_delay: 0,
-            failsafe_procedure: 0
+            failsafe_procedure: 0,
+            failsafe_recovery_delay: 0,
+            failsafe_fw_roll_angle: 0,
+            failsafe_fw_pitch_angle: 0,
+            failsafe_fw_yaw_rate: 0,
+            failsafe_stick_motion_threshold: 0,
+            failsafe_min_distance: 0,
+            failsafe_min_distance_procedure: 0
         };
 
         FW_CONFIG = {
@@ -461,6 +468,14 @@ var FC = {
         if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
             features.push(
                 {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
+            );
+        }
+
+        // Unsure which version these will actually deploy in, guidance welcome. Using 1.7.3 
+        // so it works for the moment. And I'm really not sure how it works anyhow
+        if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
+            features.push(
+                {bit: 30, group: 'rxFailsafeExtended', name: 'FAILSAFE_EXTENDED', haveTip: false, showNameInTip: false}
             );
         }
 
@@ -879,5 +894,13 @@ var FC = {
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
+    },
+    getFailsafeProcedure: function () {
+        return {
+            0: "Land",
+            1: "Drop",
+            2: "RTH", 
+            3: "Do Nothing", 
+        }
     }
 };

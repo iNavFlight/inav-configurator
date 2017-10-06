@@ -617,6 +617,20 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                 offset++;
+                FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
+                offset++;
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -1194,6 +1208,33 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
+                buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
+
+                // API version check needed here?
+                //if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+                // Or
+                // if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                // 
+                // Guidance wanted...
+
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
+
+                buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+                //}
+
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:

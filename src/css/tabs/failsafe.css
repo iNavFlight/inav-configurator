@@ -253,6 +253,12 @@
     height: 90px;
 }
 
+.tab-failsafe .minimumDistance {
+    width: 100px !important;
+    padding-left: 3px;
+    margin-right: 11px;
+}
+
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
 
 }
