@@ -593,8 +593,12 @@ var mspHelper = (function (gui) {
                     offset++;
                     RX_CONFIG.nrf24rx_id = data.getUint32(offset, true);
                     offset += 4;
+                    RX_CONFIG.nrf24rx_channel_count = data.getUint8(offset);
+                    offset += 1;
                 }
                 if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                    offset += 1;
                     RX_CONFIG.receiver_type = data.getUint8(offset);
                     offset += 1;
                 }
@@ -1169,12 +1173,17 @@ var mspHelper = (function (gui) {
                     buffer.push(0);
                     buffer.push(0);
                     buffer.push(RX_CONFIG.nrf24rx_protocol);
+                    // nrf24rx_id - 4 bytes
                     buffer.push(RX_CONFIG.nrf24rx_id & 0xFF);
                     buffer.push((RX_CONFIG.nrf24rx_id >> 8) & 0xFF);
                     buffer.push((RX_CONFIG.nrf24rx_id >> 16) & 0xFF);
                     buffer.push((RX_CONFIG.nrf24rx_id >> 24) & 0xFF);
+
+                    buffer.push(RX_CONFIG.nrf24rx_channel_count);
                 }
                 if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                    buffer.push(0);
                     // receiver type in RX_CONFIG rather than in BF_CONFIG.features
                     buffer.push(RX_CONFIG.receiver_type);
                 }
