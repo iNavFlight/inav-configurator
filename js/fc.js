@@ -378,7 +378,6 @@ var FC = {
             failsafe_throttle_low_delay: 0,
             failsafe_procedure: 0,
             failsafe_recovery_delay: 0,
-
             failsafe_fw_roll_angle: 0,
             failsafe_fw_pitch_angle: 0,
             failsafe_fw_yaw_rate: 0,
@@ -895,5 +894,13 @@ var FC = {
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
+    },
+    getFailsafeProcedure: function () {
+        return [
+            "Land", 
+            "Drop", 
+            "RTH", 
+            "Do Nothing", 
+        ];
     }
 };

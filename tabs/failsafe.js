@@ -75,6 +75,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         // translate to user-selected language
         localize();
 
+        var $failsafeMinDistanceProcedure = $('#failsafe_min_distance_procedure');
+
         // generate labels for assigned aux modes
         var auxAssignment = [],
             i,
@@ -228,12 +230,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         $('input[name="failsafe_delay"]').val(FAILSAFE_CONFIG.failsafe_delay);
 
         // Raw basics; needs a lot of treatment to be better -- SLG
-        alert('failsafe_stick_motion_threshold: ' + FAILSAFE_CONFIG.failsafe_stick_motion_threshold);
-        alert('failsafe_min_distance: ' + FAILSAFE_CONFIG.failsafe_min_distance);
+        //alert('failsafe_stick_motion_threshold: ' + FAILSAFE_CONFIG.failsafe_stick_motion_threshold);
+        //alert('failsafe_min_distance: ' + FAILSAFE_CONFIG.failsafe_min_distance);
 
         $('input[name="failsafe_min_distance"]').val(FAILSAFE_CONFIG.failsafe_min_distance);
-        $('input[name="failsafe_min_distance_procedure"]').val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-
+        //$('input[name="failsafe_min_distance_procedure"]').val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
 
         // set stage 2 failsafe procedure
         $('input[type="radio"].procedure').change(function () {
@@ -284,6 +285,28 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         // set stage 2 kill switch option
         $('input[name="failsafe_kill_switch"]').prop('checked', FAILSAFE_CONFIG.failsafe_kill_switch);
 
+
+
+
+
+
+
+
+        // Alternate, minimum distance failsafe procedure
+        GUI.fillSelect($failsafeMinDistanceProcedure, FC.getFailsafeProcedure(), FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+        $failsafeMinDistanceProcedure.val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+        $failsafeMinDistanceProcedure.change(function () {
+            FAILSAFE_CONFIG.failsafe_min_distance_procedure = $failsafeMinDistanceProcedure.val();
+        });
+
+
+
+
+
+
+
+
+
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
             RX_CONFIG.rx_min_usec = parseInt($('input[name="rx_min_usec"]').val());
@@ -303,7 +326,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             FAILSAFE_CONFIG.failsafe_delay = parseInt($('input[name="failsafe_delay"]').val());
 
             FAILSAFE_CONFIG.failsafe_min_distance = parseInt($('input[name="failsafe_min_distance"]').val());
-            FAILSAFE_CONFIG.failsafe_min_distance_procedure = parseInt($('input[name="failsafe_min_distance_procedure"]').val());
+            //FAILSAFE_CONFIG.failsafe_min_distance_procedure = parseInt($('input[name="failsafe_min_distance_procedure"]').val());
 
 
             if ($('input[id="land"]').is(':checked')) {
