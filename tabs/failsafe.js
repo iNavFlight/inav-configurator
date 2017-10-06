@@ -227,6 +227,14 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         $('input[name="failsafe_throttle_low_delay"]').val(FAILSAFE_CONFIG.failsafe_throttle_low_delay);
         $('input[name="failsafe_delay"]').val(FAILSAFE_CONFIG.failsafe_delay);
 
+        // Raw basics; needs a lot of treatment to be better -- SLG
+        alert('failsafe_stick_motion_threshold: ' + FAILSAFE_CONFIG.failsafe_stick_motion_threshold);
+        alert('failsafe_min_distance: ' + FAILSAFE_CONFIG.failsafe_min_distance);
+
+        $('input[name="failsafe_min_distance"]').val(FAILSAFE_CONFIG.failsafe_min_distance);
+        $('input[name="failsafe_min_distance_procedure"]').val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+
+
         // set stage 2 failsafe procedure
         $('input[type="radio"].procedure').change(function () {
             var element = $(this),
@@ -293,6 +301,10 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             FAILSAFE_CONFIG.failsafe_off_delay = parseInt($('input[name="failsafe_off_delay"]').val());
             FAILSAFE_CONFIG.failsafe_throttle_low_delay = parseInt($('input[name="failsafe_throttle_low_delay"]').val());
             FAILSAFE_CONFIG.failsafe_delay = parseInt($('input[name="failsafe_delay"]').val());
+
+            FAILSAFE_CONFIG.failsafe_min_distance = parseInt($('input[name="failsafe_min_distance"]').val());
+            FAILSAFE_CONFIG.failsafe_min_distance_procedure = parseInt($('input[name="failsafe_min_distance_procedure"]').val());
+
 
             if ($('input[id="land"]').is(':checked')) {
                 FAILSAFE_CONFIG.failsafe_procedure = 0;

@@ -1721,6 +1721,21 @@
     "failsafeKillSwitchHelp": {
         "message": "Set this option to make the failsafe switch, configured in the modes tab, act as a direct kill switch, bypassing the selected failsafe procedure. <strong>Note:</strong> Arming is blocked with the failsafe kill switch in the ON position"
     },
+
+
+
+
+
+    "failsafeMinDistanceItem": {
+        "message": "Failsafe Minimum Distance"
+    },
+    "failsafeMinDistanceProcedureItem": {
+        "message": "Failsafe Minimum Distance Procedure"
+    },
+
+
+
+
     "mainHelpArmed": {
         "message": "Motor Arming"
     },
