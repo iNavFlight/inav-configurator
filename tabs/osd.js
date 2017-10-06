@@ -499,7 +499,7 @@ OSD.constants = {
                     id: 13,
                     preview: function(osd_data) {
                         // 3 chars
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.unit_mode === 0 || OSD.data.unit_mode === 2) {
                             // Imperial
                             return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
                         }
