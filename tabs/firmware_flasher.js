@@ -27,6 +27,10 @@ TABS.firmware_flasher.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        function enable_load_online_button() {
+            $("a.load_remote_file").text(chrome.i18n.getMessage('firmwareFlasherButtonLoadOnline')).removeClass('disabled');
+        }
+
         function parse_hex(str, callback) {
             // parsing hex in different thread
             var worker = new Worker('./build/hex_parser.js');
@@ -255,7 +259,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 $("a.load_remote_file").addClass('disabled');
             }
             else {
-                $("a.load_remote_file").removeClass('disabled');
+                enable_load_online_button();
             }
         });
 
@@ -329,11 +333,14 @@ TABS.firmware_flasher.initialize = function (callback) {
             function failed_to_load() {
                 $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherFailedToLoadOnlineFirmware'));
                 $('a.flash_firmware').addClass('disabled');
+                enable_load_online_button();
             }
 
             var summary = $('select[name="firmware_version"] option:selected').data('summary');
             if (summary) { // undefined while list is loading or while running offline
+                $("a.load_remote_file").text(chrome.i18n.getMessage('firmwareFlasherButtonLoading')).addClass('disabled');
                 $.get(summary.url, function (data) {
+                    enable_load_online_button();
                     process_hex(data, summary);
                 }).fail(failed_to_load);
             } else {
