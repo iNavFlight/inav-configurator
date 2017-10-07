@@ -1,0 +1,1646 @@
+{
+  "looptime": {
+    "type": "uint16_t"
+  },
+  "gyro_sync": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "gyro_sync_denom": {
+    "type": "uint8_t"
+  },
+  "align_gyro": {
+    "type": "uint8_t",
+    "table": {
+      "name": "alignment",
+      "values": [
+        "DEFAULT",
+        "CW0",
+        "CW90",
+        "CW180",
+        "CW270",
+        "CW0FLIP",
+        "CW90FLIP",
+        "CW180FLIP",
+        "CW270FLIP"
+      ]
+    }
+  },
+  "gyro_hardware_lpf": {
+    "type": "uint8_t",
+    "table": {
+      "name": "gyro_lpf",
+      "values": [
+        "256HZ",
+        "188HZ",
+        "98HZ",
+        "42HZ",
+        "20HZ",
+        "10HZ"
+      ]
+    }
+  },
+  "gyro_lpf_hz": {
+    "type": "uint8_t"
+  },
+  "moron_threshold": {
+    "type": "uint8_t"
+  },
+  "gyro_notch1_hz": {
+    "type": "uint16_t"
+  },
+  "gyro_notch1_cutoff": {
+    "type": "uint16_t"
+  },
+  "gyro_notch2_hz": {
+    "type": "uint16_t"
+  },
+  "gyro_notch2_cutoff": {
+    "type": "uint16_t"
+  },
+  "gyro_to_use": {
+    "type": "uint8_t"
+  },
+  "vbat_adc_channel": {
+    "type": "uint8_t"
+  },
+  "rssi_adc_channel": {
+    "type": "uint8_t"
+  },
+  "current_adc_channel": {
+    "type": "uint8_t"
+  },
+  "airspeed_adc_channel": {
+    "type": "uint8_t"
+  },
+  "acc_notch_hz": {
+    "type": "uint8_t"
+  },
+  "acc_notch_cutoff": {
+    "type": "uint8_t"
+  },
+  "align_acc": {
+    "type": "uint8_t",
+    "table": {
+      "name": "alignment",
+      "values": [
+        "DEFAULT",
+        "CW0",
+        "CW90",
+        "CW180",
+        "CW270",
+        "CW0FLIP",
+        "CW90FLIP",
+        "CW180FLIP",
+        "CW270FLIP"
+      ]
+    }
+  },
+  "acc_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "acc_hardware",
+      "values": [
+        "NONE",
+        "AUTO",
+        "ADXL345",
+        "MPU6050",
+        "MMA845x",
+        "BMA280",
+        "LSM303DLHC",
+        "MPU6000",
+        "MPU6500",
+        "MPU9250",
+        "FAKE"
+      ],
+      "enum": "accelerationSensor_e"
+    }
+  },
+  "acc_lpf_hz": {
+    "type": "uint16_t"
+  },
+  "acczero_x": {
+    "type": "int16_t"
+  },
+  "acczero_y": {
+    "type": "int16_t"
+  },
+  "acczero_z": {
+    "type": "int16_t"
+  },
+  "accgain_x": {
+    "type": "int16_t"
+  },
+  "accgain_y": {
+    "type": "int16_t"
+  },
+  "accgain_z": {
+    "type": "int16_t"
+  },
+  "rangefinder_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "rangefinder_hardware",
+      "values": [
+        "NONE",
+        "HCSR04",
+        "SRF10",
+        "HCSR04I2C",
+        "VL53L0X",
+        "UIB"
+      ],
+      "enum": "rangefinderType_e"
+    }
+  },
+  "opflow_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "opflow_hardware",
+      "values": [
+        "NONE",
+        "FAKE"
+      ],
+      "enum": "opticalFlowSensor_e"
+    }
+  },
+  "opflow_scale": {
+    "type": "float"
+  },
+  "align_mag": {
+    "type": "uint8_t",
+    "table": {
+      "name": "alignment",
+      "values": [
+        "DEFAULT",
+        "CW0",
+        "CW90",
+        "CW180",
+        "CW270",
+        "CW0FLIP",
+        "CW90FLIP",
+        "CW180FLIP",
+        "CW270FLIP"
+      ]
+    }
+  },
+  "mag_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "mag_hardware",
+      "values": [
+        "NONE",
+        "AUTO",
+        "HMC5883",
+        "AK8975",
+        "GPSMAG",
+        "MAG3110",
+        "AK8963",
+        "IST8310",
+        "QMC5883",
+        "FAKE"
+      ],
+      "enum": "magSensor_e"
+    }
+  },
+  "mag_declination": {
+    "type": "int16_t"
+  },
+  "magzero_x": {
+    "type": "int16_t"
+  },
+  "magzero_y": {
+    "type": "int16_t"
+  },
+  "magzero_z": {
+    "type": "int16_t"
+  },
+  "mag_calibration_time": {
+    "type": "uint8_t"
+  },
+  "baro_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "baro_hardware",
+      "values": [
+        "NONE",
+        "AUTO",
+        "BMP085",
+        "MS5611",
+        "BMP280",
+        "MS5607",
+        "FAKE"
+      ],
+      "enum": "baroSensor_e"
+    }
+  },
+  "baro_use_median_filter": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "pitot_hardware": {
+    "type": "uint8_t",
+    "table": {
+      "name": "pitot_hardware",
+      "values": [
+        "NONE",
+        "AUTO",
+        "MS4525",
+        "ADC",
+        "VIRTUAL",
+        "FAKE"
+      ],
+      "enum": "pitotSensor_e"
+    }
+  },
+  "pitot_use_median_filter": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "pitot_noise_lpf": {
+    "type": "float"
+  },
+  "pitot_scale": {
+    "type": "float"
+  },
+  "receiver_type": {
+    "type": "uint8_t",
+    "table": {
+      "name": "receiver_type",
+      "values": [
+        "NONE",
+        "PWM",
+        "PPM",
+        "SERIAL",
+        "MSP",
+        "SPI",
+        "UIB"
+      ],
+      "enum": "rxReceiverType_e"
+    }
+  },
+  "mid_rc": {
+    "type": "uint16_t"
+  },
+  "min_check": {
+    "type": "uint16_t"
+  },
+  "max_check": {
+    "type": "uint16_t"
+  },
+  "rssi_channel": {
+    "type": "uint8_t"
+  },
+  "rssi_scale": {
+    "type": "uint8_t"
+  },
+  "rssi_invert": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "rc_smoothing": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "serialrx_provider": {
+    "type": "uint8_t",
+    "table": {
+      "name": "serial_rx",
+      "values": [
+        "SPEK1024",
+        "SPEK2048",
+        "SBUS",
+        "SUMD",
+        "SUMH",
+        "XB-B",
+        "XB-B-RJ01",
+        "IBUS",
+        "JETIEXBUS",
+        "CRSF"
+      ]
+    }
+  },
+  "sbus_inversion": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "rx_spi_protocol": {
+    "type": "uint8_t",
+    "table": {
+      "name": "rx_spi_protocol",
+      "values": [
+        "V202_250K",
+        "V202_1M",
+        "SYMA_X",
+        "SYMA_X5C",
+        "CX10",
+        "CX10A",
+        "H8_3D",
+        "INAV",
+        "ELERES"
+      ],
+      "enum": "rx_spi_protocol_e"
+    }
+  },
+  "rx_spi_id": {
+    "type": "uint32_t"
+  },
+  "rx_spi_rf_channel_count": {
+    "type": "uint8_t"
+  },
+  "spektrum_sat_bind": {
+    "type": "uint8_t"
+  },
+  "rx_min_usec": {
+    "type": "uint16_t"
+  },
+  "rx_max_usec": {
+    "type": "uint16_t"
+  },
+  "serialrx_halfduplex": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "blackbox_rate_num": {
+    "type": "uint8_t"
+  },
+  "blackbox_rate_denom": {
+    "type": "uint8_t"
+  },
+  "blackbox_device": {
+    "type": "uint8_t",
+    "table": {
+      "name": "blackbox_device",
+      "values": [
+        "SERIAL",
+        "SPIFLASH",
+        "SDCARD"
+      ]
+    }
+  },
+  "sdcard_detect_inverted": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "min_throttle": {
+    "type": "uint16_t"
+  },
+  "max_throttle": {
+    "type": "uint16_t"
+  },
+  "min_command": {
+    "type": "uint16_t"
+  },
+  "motor_pwm_rate": {
+    "type": "uint16_t"
+  },
+  "motor_pwm_protocol": {
+    "type": "uint8_t",
+    "table": {
+      "name": "motor_pwm_protocol",
+      "values": [
+        "STANDARD",
+        "ONESHOT125",
+        "ONESHOT42",
+        "MULTISHOT",
+        "BRUSHED"
+      ]
+    }
+  },
+  "failsafe_delay": {
+    "type": "uint8_t"
+  },
+  "failsafe_recovery_delay": {
+    "type": "uint8_t"
+  },
+  "failsafe_off_delay": {
+    "type": "uint8_t"
+  },
+  "failsafe_throttle": {
+    "type": "uint16_t"
+  },
+  "failsafe_throttle_low_delay": {
+    "type": "uint16_t"
+  },
+  "failsafe_procedure": {
+    "type": "uint8_t",
+    "table": {
+      "name": "failsafe_procedure",
+      "values": [
+        "SET-THR",
+        "DROP",
+        "RTH",
+        "NONE"
+      ]
+    }
+  },
+  "failsafe_stick_threshold": {
+    "type": "uint16_t"
+  },
+  "failsafe_fw_roll_angle": {
+    "type": "int16_t"
+  },
+  "failsafe_fw_pitch_angle": {
+    "type": "int16_t"
+  },
+  "failsafe_fw_yaw_rate": {
+    "type": "int16_t"
+  },
+  "failsafe_min_distance": {
+    "type": "uint16_t"
+  },
+  "failsafe_min_distance_procedure": {
+    "type": "uint8_t",
+    "table": {
+      "name": "failsafe_procedure",
+      "values": [
+        "SET-THR",
+        "DROP",
+        "RTH",
+        "NONE"
+      ]
+    }
+  },
+  "align_board_roll": {
+    "type": "int16_t"
+  },
+  "align_board_pitch": {
+    "type": "int16_t"
+  },
+  "align_board_yaw": {
+    "type": "int16_t"
+  },
+  "gimbal_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "gimbal_mode",
+      "values": [
+        "NORMAL",
+        "MIXTILT"
+      ]
+    }
+  },
+  "battery_capacity": {
+    "type": "uint16_t"
+  },
+  "vbat_scale": {
+    "type": "uint8_t"
+  },
+  "vbat_max_cell_voltage": {
+    "type": "uint8_t"
+  },
+  "vbat_min_cell_voltage": {
+    "type": "uint8_t"
+  },
+  "vbat_warning_cell_voltage": {
+    "type": "uint8_t"
+  },
+  "current_meter_scale": {
+    "type": "int16_t"
+  },
+  "current_meter_offset": {
+    "type": "int16_t"
+  },
+  "multiwii_current_meter_output": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "current_meter_type": {
+    "type": "uint8_t",
+    "table": {
+      "name": "current_sensor",
+      "values": [
+        "NONE",
+        "ADC",
+        "VIRTUAL"
+      ],
+      "enum": "currentSensor_e"
+    }
+  },
+  "yaw_motor_direction": {
+    "type": "int8_t"
+  },
+  "yaw_jump_prevention_limit": {
+    "type": "uint16_t"
+  },
+  "3d_deadband_low": {
+    "type": "uint16_t"
+  },
+  "3d_deadband_high": {
+    "type": "uint16_t"
+  },
+  "3d_neutral": {
+    "type": "uint16_t"
+  },
+  "servo_center_pulse": {
+    "type": "uint16_t"
+  },
+  "servo_pwm_rate": {
+    "type": "uint16_t"
+  },
+  "servo_lpf_hz": {
+    "type": "int16_t"
+  },
+  "flaperon_throw_offset": {
+    "type": "uint16_t"
+  },
+  "tri_unarmed_servo": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "rc_expo": {
+    "type": "uint8_t"
+  },
+  "rc_yaw_expo": {
+    "type": "uint8_t"
+  },
+  "thr_mid": {
+    "type": "uint8_t"
+  },
+  "thr_expo": {
+    "type": "uint8_t"
+  },
+  "roll_rate": {
+    "type": "uint8_t"
+  },
+  "pitch_rate": {
+    "type": "uint8_t"
+  },
+  "yaw_rate": {
+    "type": "uint8_t"
+  },
+  "tpa_rate": {
+    "type": "uint8_t"
+  },
+  "tpa_breakpoint": {
+    "type": "uint16_t"
+  },
+  "reboot_character": {
+    "type": "uint8_t"
+  },
+  "imu_dcm_kp": {
+    "type": "uint16_t"
+  },
+  "imu_dcm_ki": {
+    "type": "uint16_t"
+  },
+  "imu_dcm_kp_mag": {
+    "type": "uint16_t"
+  },
+  "imu_dcm_ki_mag": {
+    "type": "uint16_t"
+  },
+  "small_angle": {
+    "type": "uint8_t"
+  },
+  "fixed_wing_auto_arm": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "disarm_kill_switch": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "auto_disarm_delay": {
+    "type": "uint8_t"
+  },
+  "gps_provider": {
+    "type": "uint8_t",
+    "table": {
+      "name": "gps_provider",
+      "values": [
+        "NMEA",
+        "UBLOX",
+        "I2C-NAV",
+        "NAZA",
+        "UBLOX7",
+        "MTK"
+      ],
+      "enum": "gpsProvider_e"
+    }
+  },
+  "gps_sbas_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "gps_sbas_mode",
+      "values": [
+        "AUTO",
+        "EGNOS",
+        "WAAS",
+        "MSAS",
+        "GAGAN",
+        "NONE"
+      ],
+      "enum": "sbasMode_e"
+    }
+  },
+  "gps_dyn_model": {
+    "type": "uint8_t",
+    "table": {
+      "name": "gps_dyn_model",
+      "values": [
+        "PEDESTRIAN",
+        "AIR_1G",
+        "AIR_4G"
+      ],
+      "enum": "gpsDynModel_e"
+    }
+  },
+  "gps_auto_config": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "gps_auto_baud": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "gps_min_sats": {
+    "type": "uint8_t"
+  },
+  "deadband": {
+    "type": "uint8_t"
+  },
+  "yaw_deadband": {
+    "type": "uint8_t"
+  },
+  "pos_hold_deadband": {
+    "type": "uint8_t"
+  },
+  "alt_hold_deadband": {
+    "type": "uint8_t"
+  },
+  "3d_deadband_throttle": {
+    "type": "uint16_t"
+  },
+  "mc_p_pitch": {
+    "type": "uint8_t"
+  },
+  "mc_i_pitch": {
+    "type": "uint8_t"
+  },
+  "mc_d_pitch": {
+    "type": "uint8_t"
+  },
+  "mc_p_roll": {
+    "type": "uint8_t"
+  },
+  "mc_i_roll": {
+    "type": "uint8_t"
+  },
+  "mc_d_roll": {
+    "type": "uint8_t"
+  },
+  "mc_p_yaw": {
+    "type": "uint8_t"
+  },
+  "mc_i_yaw": {
+    "type": "uint8_t"
+  },
+  "mc_d_yaw": {
+    "type": "uint8_t"
+  },
+  "mc_p_level": {
+    "type": "uint8_t"
+  },
+  "mc_i_level": {
+    "type": "uint8_t"
+  },
+  "mc_d_level": {
+    "type": "uint8_t"
+  },
+  "fw_p_pitch": {
+    "type": "uint8_t"
+  },
+  "fw_i_pitch": {
+    "type": "uint8_t"
+  },
+  "fw_ff_pitch": {
+    "type": "uint8_t"
+  },
+  "fw_p_roll": {
+    "type": "uint8_t"
+  },
+  "fw_i_roll": {
+    "type": "uint8_t"
+  },
+  "fw_ff_roll": {
+    "type": "uint8_t"
+  },
+  "fw_p_yaw": {
+    "type": "uint8_t"
+  },
+  "fw_i_yaw": {
+    "type": "uint8_t"
+  },
+  "fw_ff_yaw": {
+    "type": "uint8_t"
+  },
+  "fw_p_level": {
+    "type": "uint8_t"
+  },
+  "fw_i_level": {
+    "type": "uint8_t"
+  },
+  "fw_d_level": {
+    "type": "uint8_t"
+  },
+  "max_angle_inclination_rll": {
+    "type": "int16_t"
+  },
+  "max_angle_inclination_pit": {
+    "type": "int16_t"
+  },
+  "dterm_lpf_hz": {
+    "type": "uint8_t"
+  },
+  "yaw_lpf_hz": {
+    "type": "uint8_t"
+  },
+  "dterm_setpoint_weight": {
+    "type": "float"
+  },
+  "fw_iterm_throw_limit": {
+    "type": "uint16_t"
+  },
+  "fw_reference_airspeed": {
+    "type": "float"
+  },
+  "fw_turn_assist_yaw_gain": {
+    "type": "float"
+  },
+  "dterm_notch_hz": {
+    "type": "uint16_t"
+  },
+  "dterm_notch_cutoff": {
+    "type": "uint16_t"
+  },
+  "pidsum_limit": {
+    "type": "uint16_t"
+  },
+  "yaw_p_limit": {
+    "type": "uint16_t"
+  },
+  "iterm_ignore_threshold": {
+    "type": "uint16_t"
+  },
+  "yaw_iterm_ignore_threshold": {
+    "type": "uint16_t"
+  },
+  "rate_accel_limit_roll_pitch": {
+    "type": "uint32_t"
+  },
+  "rate_accel_limit_yaw": {
+    "type": "uint32_t"
+  },
+  "heading_hold_rate_limit": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_z_p": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_z_i": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_z_d": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_z_p": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_z_i": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_z_d": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_xy_p": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_xy_i": {
+    "type": "uint8_t"
+  },
+  "nav_mc_pos_xy_d": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_xy_p": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_xy_i": {
+    "type": "uint8_t"
+  },
+  "nav_mc_vel_xy_d": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_z_p": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_z_i": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_z_d": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_xy_p": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_xy_i": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pos_xy_d": {
+    "type": "uint8_t"
+  },
+  "fw_autotune_overshoot_time": {
+    "type": "uint16_t"
+  },
+  "fw_autotune_undershoot_time": {
+    "type": "uint16_t"
+  },
+  "fw_autotune_threshold": {
+    "type": "uint8_t"
+  },
+  "fw_autotune_ff_to_p_gain": {
+    "type": "uint8_t"
+  },
+  "fw_autotune_ff_to_i_tc": {
+    "type": "uint16_t"
+  },
+  "inav_auto_mag_decl": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "inav_gravity_cal_tolerance": {
+    "type": "uint8_t"
+  },
+  "inav_use_gps_velned": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "inav_gps_delay": {
+    "type": "uint16_t"
+  },
+  "inav_reset_altitude": {
+    "type": "uint8_t",
+    "table": {
+      "name": "reset_altitude",
+      "values": [
+        "NEVER",
+        "FIRST_ARM",
+        "EACH_ARM"
+      ]
+    }
+  },
+  "inav_max_surface_altitude": {
+    "type": "uint16_t"
+  },
+  "inav_w_z_surface_p": {
+    "type": "float"
+  },
+  "inav_w_z_surface_v": {
+    "type": "float"
+  },
+  "inav_w_z_baro_p": {
+    "type": "float"
+  },
+  "inav_w_z_gps_p": {
+    "type": "float"
+  },
+  "inav_w_z_gps_v": {
+    "type": "float"
+  },
+  "inav_w_xy_gps_p": {
+    "type": "float"
+  },
+  "inav_w_xy_gps_v": {
+    "type": "float"
+  },
+  "inav_w_z_res_v": {
+    "type": "float"
+  },
+  "inav_w_xy_res_v": {
+    "type": "float"
+  },
+  "inav_w_acc_bias": {
+    "type": "float"
+  },
+  "inav_max_eph_epv": {
+    "type": "float"
+  },
+  "inav_baro_epv": {
+    "type": "float"
+  },
+  "nav_disarm_on_landing": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_use_midthr_for_althold": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_extra_arming_safety": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_user_control_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "nav_user_control_mode",
+      "values": [
+        "ATTI",
+        "CRUISE"
+      ]
+    }
+  },
+  "nav_position_timeout": {
+    "type": "uint8_t"
+  },
+  "nav_wp_radius": {
+    "type": "uint16_t"
+  },
+  "nav_wp_safe_distance": {
+    "type": "uint16_t"
+  },
+  "nav_auto_speed": {
+    "type": "uint16_t"
+  },
+  "nav_auto_climb_rate": {
+    "type": "uint16_t"
+  },
+  "nav_manual_speed": {
+    "type": "uint16_t"
+  },
+  "nav_manual_climb_rate": {
+    "type": "uint16_t"
+  },
+  "nav_landing_speed": {
+    "type": "uint16_t"
+  },
+  "nav_land_slowdown_minalt": {
+    "type": "uint16_t"
+  },
+  "nav_land_slowdown_maxalt": {
+    "type": "uint16_t"
+  },
+  "nav_emerg_landing_speed": {
+    "type": "uint16_t"
+  },
+  "nav_min_rth_distance": {
+    "type": "uint16_t"
+  },
+  "nav_rth_climb_first": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_rth_climb_ignore_emerg": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_rth_tail_first": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_rth_allow_landing": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "nav_rth_alt_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "nav_rth_alt_mode",
+      "values": [
+        "CURRENT",
+        "EXTRA",
+        "FIXED",
+        "MAX",
+        "AT_LEAST"
+      ]
+    }
+  },
+  "nav_rth_abort_threshold": {
+    "type": "uint16_t"
+  },
+  "nav_rth_altitude": {
+    "type": "uint16_t"
+  },
+  "nav_mc_bank_angle": {
+    "type": "uint8_t"
+  },
+  "nav_mc_hover_thr": {
+    "type": "uint16_t"
+  },
+  "nav_mc_auto_disarm_delay": {
+    "type": "uint16_t"
+  },
+  "nav_fw_cruise_thr": {
+    "type": "uint16_t"
+  },
+  "nav_fw_min_thr": {
+    "type": "uint16_t"
+  },
+  "nav_fw_max_thr": {
+    "type": "uint16_t"
+  },
+  "nav_fw_bank_angle": {
+    "type": "uint8_t"
+  },
+  "nav_fw_climb_angle": {
+    "type": "uint8_t"
+  },
+  "nav_fw_dive_angle": {
+    "type": "uint8_t"
+  },
+  "nav_fw_pitch2thr": {
+    "type": "uint8_t"
+  },
+  "nav_fw_loiter_radius": {
+    "type": "uint16_t"
+  },
+  "nav_fw_land_dive_angle": {
+    "type": "int8_t"
+  },
+  "nav_fw_launch_velocity": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_accel": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_max_angle": {
+    "type": "uint8_t"
+  },
+  "nav_fw_launch_detect_time": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_thr": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_idle_thr": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_motor_delay": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_spinup_time": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_timeout": {
+    "type": "uint16_t"
+  },
+  "nav_fw_launch_climb_angle": {
+    "type": "uint8_t"
+  },
+  "telemetry_switch": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "telemetry_inversion": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "frsky_default_latitude": {
+    "type": "float"
+  },
+  "frsky_default_longitude": {
+    "type": "float"
+  },
+  "frsky_coordinates_format": {
+    "type": "uint8_t"
+  },
+  "frsky_unit": {
+    "type": "uint8_t",
+    "table": {
+      "name": "frsky_unit",
+      "values": [
+        "METRIC",
+        "IMPERIAL"
+      ],
+      "enum": "frskyUnit_e"
+    }
+  },
+  "frsky_vfas_precision": {
+    "type": "uint8_t"
+  },
+  "frsky_vfas_cell_voltage": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "hott_alarm_sound_interval": {
+    "type": "uint8_t"
+  },
+  "smartport_uart_unidir": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "smartport_fuel_percent": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "ibus_telemetry_type": {
+    "type": "uint8_t"
+  },
+  "ltm_update_rate": {
+    "type": "uint8_t",
+    "table": {
+      "name": "ltm_rates",
+      "values": [
+        "NORMAL",
+        "MEDIUM",
+        "SLOW"
+      ]
+    }
+  },
+  "eleres_freq": {
+    "type": "float"
+  },
+  "eleres_telemetry_en": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "eleres_telemetry_power": {
+    "type": "uint8_t"
+  },
+  "eleres_loc_en": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "eleres_loc_power": {
+    "type": "uint8_t"
+  },
+  "eleres_loc_delay": {
+    "type": "uint16_t"
+  },
+  "eleres_signature": {
+    "type": "uint32_t"
+  },
+  "ledstrip_visual_beeper": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "osd_video_system": {
+    "type": "uint8_t"
+  },
+  "osd_row_shiftdown": {
+    "type": "uint8_t"
+  },
+  "osd_units": {
+    "type": "uint8_t",
+    "table": {
+      "name": "osd_unit",
+      "values": [
+        "IMPERIAL",
+        "METRIC",
+        "UK"
+      ],
+      "enum": "osd_unit_e"
+    }
+  },
+  "osd_rssi_alarm": {
+    "type": "uint8_t"
+  },
+  "osd_cap_alarm": {
+    "type": "uint16_t"
+  },
+  "osd_time_alarm": {
+    "type": "uint16_t"
+  },
+  "osd_alt_alarm": {
+    "type": "uint16_t"
+  },
+  "osd_artificial_horizon_reverse_roll": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "osd_crosshairs_style": {
+    "type": "uint8_t",
+    "table": {
+      "name": "osd_crosshairs_style",
+      "values": [
+        "DEFAULT",
+        "AIRCRAFT"
+      ],
+      "enum": "osd_crosshairs_style_e"
+    }
+  },
+  "osd_left_sidebar_scroll": {
+    "type": "uint8_t",
+    "table": {
+      "name": "osd_sidebar_scroll",
+      "values": [
+        "NONE",
+        "ALTITUDE",
+        "GROUND_SPEED",
+        "HOME_DISTANCE"
+      ],
+      "enum": "osd_sidebar_scroll_e"
+    }
+  },
+  "osd_right_sidebar_scroll": {
+    "type": "uint8_t",
+    "table": {
+      "name": "osd_sidebar_scroll",
+      "values": [
+        "NONE",
+        "ALTITUDE",
+        "GROUND_SPEED",
+        "HOME_DISTANCE"
+      ],
+      "enum": "osd_sidebar_scroll_e"
+    }
+  },
+  "osd_sidebar_scroll_arrows": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "osd_main_voltage_pos": {
+    "type": "uint16_t"
+  },
+  "osd_rssi_pos": {
+    "type": "uint16_t"
+  },
+  "osd_flytimer_pos": {
+    "type": "uint16_t"
+  },
+  "osd_ontime_pos": {
+    "type": "uint16_t"
+  },
+  "osd_flymode_pos": {
+    "type": "uint16_t"
+  },
+  "osd_throttle_pos": {
+    "type": "uint16_t"
+  },
+  "osd_vtx_channel_pos": {
+    "type": "uint16_t"
+  },
+  "osd_crosshairs_pos": {
+    "type": "uint16_t"
+  },
+  "osd_artificial_horizon_pos": {
+    "type": "uint16_t"
+  },
+  "osd_current_draw_pos": {
+    "type": "uint16_t"
+  },
+  "osd_mah_drawn_pos": {
+    "type": "uint16_t"
+  },
+  "osd_craft_name_pos": {
+    "type": "uint16_t"
+  },
+  "osd_gps_speed_pos": {
+    "type": "uint16_t"
+  },
+  "osd_gps_sats_pos": {
+    "type": "uint16_t"
+  },
+  "osd_gps_lon_pos": {
+    "type": "uint16_t"
+  },
+  "osd_gps_lat_pos": {
+    "type": "uint16_t"
+  },
+  "osd_home_dir_pos": {
+    "type": "uint16_t"
+  },
+  "osd_home_dist_pos": {
+    "type": "uint16_t"
+  },
+  "osd_altitude_pos": {
+    "type": "uint16_t"
+  },
+  "osd_vario_pos": {
+    "type": "uint16_t"
+  },
+  "osd_vario_num_pos": {
+    "type": "uint16_t"
+  },
+  "osd_pid_roll_pos": {
+    "type": "uint16_t"
+  },
+  "osd_pid_pitch_pos": {
+    "type": "uint16_t"
+  },
+  "osd_pid_yaw_pos": {
+    "type": "uint16_t"
+  },
+  "osd_power_pos": {
+    "type": "uint16_t"
+  },
+  "osd_air_speed_pos": {
+    "type": "uint16_t"
+  },
+  "osd_ontime_flytime_pos": {
+    "type": "uint16_t"
+  },
+  "osd_rtc_time_pos": {
+    "type": "uint16_t"
+  },
+  "osd_messages_pos": {
+    "type": "uint16_t"
+  },
+  "osd_gps_hdop_pos": {
+    "type": "uint16_t"
+  },
+  "osd_main_cell_voltage_pos": {
+    "type": "uint16_t"
+  },
+  "osd_throttle_auto_thr_pos": {
+    "type": "uint16_t"
+  },
+  "osd_heading_graph_pos": {
+    "type": "uint16_t"
+  },
+  "i2c_speed": {
+    "type": "uint8_t",
+    "table": {
+      "name": "i2c_speed",
+      "values": [
+        "400KHZ",
+        "800KHZ",
+        "100KHZ",
+        "200KHZ"
+      ]
+    }
+  },
+  "cpu_underclock": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "debug_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "debug_modes",
+      "values": [
+        "NONE",
+        "GYRO",
+        "NOTCH",
+        "NAV_LANDING",
+        "FW_ALTITUDE",
+        "RFIND",
+        "RFIND_Q",
+        "PITOT"
+      ]
+    }
+  },
+  "acc_task_frequency": {
+    "type": "uint16_t"
+  },
+  "attitude_task_frequency": {
+    "type": "uint16_t"
+  },
+  "async_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "async_mode",
+      "values": [
+        "NONE",
+        "GYRO",
+        "ALL"
+      ]
+    }
+  },
+  "throttle_tilt_comp_str": {
+    "type": "uint8_t"
+  },
+  "input_filtering_mode": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "mode_range_logic_operator": {
+    "type": "uint8_t",
+    "table": {
+      "name": "aux_operator",
+      "values": [
+        "OR",
+        "AND"
+      ],
+      "enum": "modeActivationOperator_e"
+    }
+  },
+  "stats": {
+    "type": "uint8_t",
+    "table": {
+      "name": "off_on",
+      "values": [
+        "OFF",
+        "ON"
+      ]
+    }
+  },
+  "stats_total_time": {
+    "type": "uint32_t"
+  },
+  "stats_total_dist": {
+    "type": "uint32_t"
+  },
+  "tz_offset": {
+    "type": "int16_t"
+  }
+}

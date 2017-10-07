@@ -140,5 +140,9 @@ var MSPCodes = {
     MSP_BF_CONFIG:             66, // baseflight-specific settings that aren't covered elsewhere
     MSP_SET_BF_CONFIG:         67, // baseflight-specific settings save
     MSP_SET_REBOOT:         68, // reboot settings
-    MSP_BF_BUILD_INFO:          69  // build date as well as some space for future expansion
+    MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
+
+    // INAV specific codes
+    MSPV2_SETTING:          0x1003,
+    MSPV2_SET_SETTING:      0x1004,
 };
