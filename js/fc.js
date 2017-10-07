@@ -347,6 +347,7 @@ var FC = {
         };
 
         RX_CONFIG = {
+            receiver_type: 0,
             serialrx_provider: 0,
             maxcheck: 0,
             midrc: 0,
@@ -354,8 +355,9 @@ var FC = {
             spektrum_sat_bind: 0,
             rx_min_usec: 0,
             rx_max_usec: 0,
-            nrf24rx_protocol: 0,
-            nrf24rx_id: 0
+            spirx_protocol: 0,
+            spirx_id: 0,
+            spirx_channel_count: 0,
         };
 
         POSITION_ESTIMATOR = {
@@ -392,9 +394,7 @@ var FC = {
     },
     getFeatures: function () {
         var features = [
-            {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
@@ -402,8 +402,6 @@ var FC = {
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
-            {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM'},
-            {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP'},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DISPLAY', showNameInTip: true},
@@ -444,7 +442,6 @@ var FC = {
 
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             features.push(
-                {bit: 25, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
                 {bit: 26, group: 'other', name: 'SOFTSPI'}
             );
         }
@@ -604,6 +601,68 @@ var FC = {
             'Disabled'
         ];
     },
+    getRxTypes: function() {
+        // Keep value field in sync with rxReceiverType_e in rx.h
+        var rxTypes = [
+            {
+                name: 'RX_SERIAL',
+                bit: 3,
+                value: 3,
+            },
+            {
+                name: 'RX_PPM',
+                bit: 13,
+                value: 2,
+            },
+            {
+                name: 'RX_PWM',
+                bit: 0,
+                value: 1,
+            },
+        ];
+
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            rxTypes.push({
+                name: 'RX_SPI',
+                bit: 25,
+                value: 5,
+            });
+        }
+
+        rxTypes.push({
+            name: 'RX_MSP',
+            bit: 14,
+            value: 4,
+        });
+
+        rxTypes.push({
+            name: 'RX_NONE',
+            value: 0,
+        });
+
+        return rxTypes;
+    },
+    isRxTypeEnabled: function(rxType) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            return RX_CONFIG.receiver_type == rxType.value;
+        }
+        return bit_check(BF_CONFIG.features, rxType.bit);
+    },
+    setRxTypeEnabled: function(rxType) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            RX_CONFIG.receiver_type = rxType.value;
+        } else {
+            // Clear other rx features before
+            var rxTypes = this.getRxTypes();
+            for (var ii = 0; ii < rxTypes.length; ii++) {
+                BF_CONFIG.features = bit_clear(BF_CONFIG.features, rxTypes[ii].bit);
+            }
+            // Set the feature for this rx type (if any, RX_NONE is set by clearing all)
+            if (rxType.bit !== undefined) {
+                BF_CONFIG.features = bit_set(BF_CONFIG.features, rxType.bit);
+            }
+        }
+    },
     getSerialRxTypes: function () {
         var data = [
             'SPEKTRUM1024',
@@ -623,7 +682,7 @@ var FC = {
 
         return data;
     },
-    getNrf24ProtocolTypes: function () {
+    getSPIProtocolTypes: function () {
         return [
             'V202 250Kbps',
             'V202 1Mbps',
