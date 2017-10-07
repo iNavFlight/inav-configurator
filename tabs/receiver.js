@@ -107,11 +107,9 @@ TABS.receiver.initialize = function (callback) {
         $(window).on('resize', self.resize).resize(); // trigger so labels get correctly aligned on creation
 
         // handle rcmap & rssi aux channel
-        var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
-
         var strBuffer = [];
         for (var i = 0; i < RC_MAP.length; i++) {
-            strBuffer[RC_MAP[i]] = RC_MAP_Letters[i];
+            strBuffer[RC_MAP[i]] = FC.getRcMapLetters()[i];
         }
 
         // reconstruct
@@ -146,7 +144,7 @@ TABS.receiver.initialize = function (callback) {
 
             // check if characters inside are all valid, also check for duplicity
             for (var i = 0; i < val.length; i++) {
-                if (RC_MAP_Letters.indexOf(strBuffer[i]) < 0) {
+                if (FC.getRcMapLetters()[i].indexOf(strBuffer[i]) < 0) {
                     $(this).val(last_valid);
                     return false;
                 }
@@ -273,11 +271,10 @@ TABS.receiver.initialize = function (callback) {
             RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
-            var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
             var strBuffer = $('input[name="rcmap"]').val().split('');
 
             for (var i = 0; i < RC_MAP.length; i++) {
-                RC_MAP[i] = strBuffer.indexOf(RC_MAP_Letters[i]);
+                RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
 
             // catch rssi aux
