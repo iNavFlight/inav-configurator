@@ -165,7 +165,7 @@ var MSP = {
                     this.state = this.decoder_states.CODE_V2_HIGH;
                     break;
                 case this.decoder_states.CODE_V2_HIGH:
-                    this.message_length_expected |= data[i] << 8;
+                    this.code |= data[i] << 8;
                     this.state = this.decoder_states.PAYLOAD_LENGTH_V2_LOW;
                     break;
                 case this.decoder_states.PAYLOAD_LENGTH_JUMBO_LOW:
