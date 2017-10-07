@@ -611,37 +611,35 @@ var FC = {
             },
             {
                 name: 'RX_PPM',
-                bit: 0,
-                value: 1,
-            },
-            {
-                name: 'RX_PARALLEL_PWM',
                 bit: 13,
                 value: 2,
             },
             {
-                name: 'RX_MSP',
-                bit: 14,
-                value: 4,
+                name: 'RX_PWM',
+                bit: 0,
+                value: 1,
             },
         ];
+
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            rxTypes.push(
-                {
-                    name: 'RX_SPI',
-                    bit: 25,
-                    value: 5,
-                },
-            );
+            rxTypes.push({
+                name: 'RX_SPI',
+                bit: 25,
+                value: 5,
+            });
         }
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            rxTypes.push(
-                {
-                    name: 'RX_NONE',
-                    value: 0,
-                },
-            );
-        }
+
+        rxTypes.push({
+            name: 'RX_MSP',
+            bit: 14,
+            value: 4,
+        });
+
+        rxTypes.push({
+            name: 'RX_NONE',
+            value: 0,
+        });
+
         return rxTypes;
     },
     isRxTypeEnabled: function(rxType) {
@@ -659,8 +657,10 @@ var FC = {
             for (var ii = 0; ii < rxTypes.length; ii++) {
                 BF_CONFIG.features = bit_clear(BF_CONFIG.features, rxTypes[ii].bit);
             }
-            // Set the feature for this rx type
-            BF_CONFIG.features = bit_set(BF_CONFIG.features, rxType.bit);
+            // Set the feature for this rx type (if any, RX_NONE is set by clearing all)
+            if (rxType.bit !== undefined) {
+                BF_CONFIG.features = bit_set(BF_CONFIG.features, rxType.bit);
+            }
         }
     },
     getSerialRxTypes: function () {
