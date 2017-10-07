@@ -75,6 +75,12 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         // translate to user-selected language
         localize();
 
+        var $failsafeUseMinimumDistanceCheckbox = $('#failsafe_use_minimum_distance');
+
+        var $failsafeMinDistanceElements = $('#failsafe_min_distance_elements')
+        var $failsafeMinDistance = $('#failsafe_min_distance')
+
+        var $failsafeMinDistanceProcedureElements = $('#failsafe_min_distance_procedure_elements')
         var $failsafeMinDistanceProcedure = $('#failsafe_min_distance_procedure');
 
         // generate labels for assigned aux modes
@@ -211,7 +217,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             isFailsafeEnabled = bit_check(BF_CONFIG.features, 8);
         }
 
-        // fill stage 2 fields
+        // Change Failsafe Procedure Minimum Distance appropriately when checkbox manipulated
         failsafeFeature = $('input[name="failsafe_feature_new"]');
         failsafeFeature.change(function () {
             if ($(this).is(':checked')) {
@@ -228,13 +234,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         $('input[name="failsafe_off_delay"]').val(FAILSAFE_CONFIG.failsafe_off_delay);
         $('input[name="failsafe_throttle_low_delay"]').val(FAILSAFE_CONFIG.failsafe_throttle_low_delay);
         $('input[name="failsafe_delay"]').val(FAILSAFE_CONFIG.failsafe_delay);
-
-        // Raw basics; needs a lot of treatment to be better -- SLG
-        //alert('failsafe_stick_motion_threshold: ' + FAILSAFE_CONFIG.failsafe_stick_motion_threshold);
-        //alert('failsafe_min_distance: ' + FAILSAFE_CONFIG.failsafe_min_distance);
-
         $('input[name="failsafe_min_distance"]').val(FAILSAFE_CONFIG.failsafe_min_distance);
-        //$('input[name="failsafe_min_distance_procedure"]').val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
 
         // set stage 2 failsafe procedure
         $('input[type="radio"].procedure').change(function () {
@@ -285,12 +285,31 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         // set stage 2 kill switch option
         $('input[name="failsafe_kill_switch"]').prop('checked', FAILSAFE_CONFIG.failsafe_kill_switch);
 
+        // Adjust Minimum Distance values when checkbox is checked/unchecked
+        $failsafeUseMinimumDistanceCheckbox.change(function() {
+            if ($(this).is(':checked')) {
+                // 20 meters seems like a reasonable default for a minimum distance
+                $failsafeMinDistance.val(20);
+                $failsafeMinDistanceElements.show();
+                $failsafeMinDistanceProcedureElements.show();
+            } else {
+                // If they uncheck it, clear the distance to 0, which disables this feature
+                $failsafeMinDistance.val(0);
+                $failsafeMinDistanceElements.hide();
+                $failsafeMinDistanceProcedureElements.hide();
+            }
+        })
 
-
-
-
-
-
+        // Set initial state of controls according to data
+        if (FAILSAFE_CONFIG.failsafe_min_distance > 0) {
+            $failsafeUseMinimumDistanceCheckbox.prop('checked', true);
+            $failsafeMinDistanceElements.show();
+            $failsafeMinDistanceProcedureElements.show();
+        } else {
+            $failsafeUseMinimumDistanceCheckbox.prop('checked', false);
+            $failsafeMinDistanceElements.hide();
+            $failsafeMinDistanceProcedureElements.hide();
+        }
 
         // Alternate, minimum distance failsafe procedure
         GUI.fillSelect($failsafeMinDistanceProcedure, FC.getFailsafeProcedure(), FAILSAFE_CONFIG.failsafe_min_distance_procedure);
@@ -298,14 +317,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         $failsafeMinDistanceProcedure.change(function () {
             FAILSAFE_CONFIG.failsafe_min_distance_procedure = $failsafeMinDistanceProcedure.val();
         });
-
-
-
-
-
-
-
-
 
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
