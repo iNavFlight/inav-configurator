@@ -635,14 +635,25 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_acc = parseInt(orientation_acc_e.val());
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
+            var rxTypes = FC.getRxTypes();
+
+            function is_using_rx_type(name) {
+                for (var ii = 0; ii < rxTypes.length; ii++) {
+                    if (rxTypes[ii].name == name) {
+                        return FC.isRxTypeEnabled(rxTypes[ii]);
+                    }
+                }
+                return false;
+            }
+
             // track feature usage
-            if (FC.isFeatureEnabled('RX_SERIAL', features)) {
+            if (is_using_rx_type('RX_SERIAL')) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRxTypes[RX_CONFIG.serialrx_provider]);
             }
 
             // track feature usage
-            if (FC.isFeatureEnabled('RX_NRF24', features)) {
-                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getNrf24ProtocolTypes()[RX_CONFIG.nrf24rx_protocol]);
+            if (is_using_rx_type('RX_SPI')) {
+                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getSPIProtocolTypes()[RX_CONFIG.spirx_protocol]);
             }
 
             if (FC.isFeatureEnabled('GPS', features)) {
