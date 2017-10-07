@@ -470,7 +470,7 @@
     "RX_MSP": {
         "message": "MSP RX input (control via MSP port)"
     },
-    "RX_NRF24": {
+    "RX_SPI": {
         "message": "RX SPI based receiver (NRF24L01, RFM22)"
     },
     "RX_NONE": {
@@ -729,7 +729,7 @@
     "configurationSerialRX": {
         "message": "Serial Receiver Provider"
     },
-    "configurationNrf24Protocol": {
+    "configurationSPIProtocol": {
         "message": "RX SPI protocol"
     },
     "configurationEepromSaved": {

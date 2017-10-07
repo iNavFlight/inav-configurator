@@ -260,16 +260,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        var nrf24Protocol_e = $('#nrf24-protocol');
-        GUI.fillSelect(nrf24Protocol_e, FC.getNrf24ProtocolTypes());
+        var spiProtocol_e = $('#spi-protocol');
+        GUI.fillSelect(spiProtocol_e, FC.getSPIProtocolTypes());
 
-        nrf24Protocol_e.change(function () {
-            RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
-            RX_CONFIG.nrf24rx_id = 0;
+        spiProtocol_e.change(function () {
+            RX_CONFIG.spirx_protocol = parseInt($(this).val());
+            RX_CONFIG.spirx_id = 0;
         });
 
-        // select current nrf24 protocol
-        nrf24Protocol_e.val(RX_CONFIG.nrf24rx_protocol);
+        // select current spi protocol
+        spiProtocol_e.val(RX_CONFIG.spirx_protocol);
 
         // fill board alignment
         $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));

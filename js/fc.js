@@ -355,8 +355,9 @@ var FC = {
             spektrum_sat_bind: 0,
             rx_min_usec: 0,
             rx_max_usec: 0,
-            nrf24rx_protocol: 0,
-            nrf24rx_id: 0
+            spirx_protocol: 0,
+            spirx_id: 0,
+            spirx_channel_count: 0,
         };
 
         POSITION_ESTIMATOR = {
@@ -627,7 +628,7 @@ var FC = {
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             rxTypes.push(
                 {
-                    name: 'RX_NRF24',
+                    name: 'RX_SPI',
                     bit: 25,
                     value: 5,
                 },
@@ -681,7 +682,7 @@ var FC = {
 
         return data;
     },
-    getNrf24ProtocolTypes: function () {
+    getSPIProtocolTypes: function () {
         return [
             'V202 250Kbps',
             'V202 1Mbps',
