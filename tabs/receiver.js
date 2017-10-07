@@ -52,8 +52,7 @@ TABS.receiver.initialize = function (callback) {
                 chrome.i18n.getMessage('controlAxisYaw'),
                 chrome.i18n.getMessage('controlAxisThrottle')
             ],
-            bar_container = $('.tab-receiver .bars'),
-            aux_index = 1;
+            bar_container = $('.tab-receiver .bars');
 
         for (var i = 0; i < RC.active_channels; i++) {
             var name;
