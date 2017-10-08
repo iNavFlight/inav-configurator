@@ -287,6 +287,30 @@ OSD.constants = {
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
 
+    ALL_ALARMS: [
+        {
+            name: 'RSSI',
+            unit: '%',
+        },
+        {
+            name: 'BATT_CAP',
+            unit: 'mah',
+        },
+        {
+            name: 'FLY_MINUTES',
+            unit: 'minutes',
+        },
+        {
+            name: 'MAX_ALTITUDE',
+            unit: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 'ft';
+                }
+                return 'm';
+            },
+        },
+    ],
+
     // All display fields, from every version, do not remove elements, only add!
     ALL_DISPLAY_GROUPS: [
         {
@@ -674,10 +698,10 @@ OSD.msp = {
         var result = [-1, OSD.data.video_system];
         result.push8(OSD.data.unit_mode);
         // watch out, order matters! match the firmware
-        result.push8(OSD.data.alarms.rssi.value);
-        result.push16(OSD.data.alarms.cap.value);
-        result.push16(OSD.data.alarms.time.value);
-        result.push16(OSD.data.alarms.alt.value);
+        result.push8(OSD.data.alarms['RSSI']);
+        result.push16(OSD.data.alarms['BATT_CAP']);
+        result.push16(OSD.data.alarms['FLY_MINUTES']);
+        result.push16(OSD.data.alarms['MAX_ALTITUDE']);
         return result;
     },
 
@@ -696,10 +720,10 @@ OSD.msp = {
 
         d.unit_mode = view.readU8();
         d.alarms = {};
-        d.alarms['rssi'] = { display_name: 'Rssi', value: view.readU8() };
-        d.alarms['cap'] = { display_name: 'Capacity', value: view.readU16() };
-        d.alarms['time'] = { display_name: 'Minutes', value: view.readU16() };
-        d.alarms['alt'] = { display_name: 'Altitude', value: view.readU16() };
+        d.alarms['RSSI'] = view.readU8();
+        d.alarms['BATT_CAP'] = view.readU16();
+        d.alarms['FLY_MINUTES'] = view.readU16();
+        d.alarms['MAX_ALTITUDE'] = view.readU16();
 
         d.items = [];
         // start at the offset from the other fields
@@ -885,12 +909,24 @@ TABS.osd.initialize = function (callback) {
                     // alarms
                     $('.alarms-container').show();
                     var $alarms = $('.alarms').empty();
-                    for (var k in OSD.data.alarms) {
-                        var alarm = OSD.data.alarms[k];
-                        var alarmInput = $('<input name="alarm" type="number" id="' + k + '"/>' + alarm.display_name + '</label>');
-                        alarmInput.val(alarm.value);
+                    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
+                        var alarm = OSD.constants.ALL_ALARMS[kk];
+                        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
+                        var value = OSD.data.alarms[alarm.name];
+                        if (value === undefined) {
+                            continue;
+                        }
+                        if (alarm.unit) {
+                            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
+                            var suffix = chrome.i18n.getMessage(unit) || unit;
+                            label += ' (' + suffix + ')';
+                        }
+                        var alarmInput = $('<input name="alarm" type="number"/>' + label + '</label>');
+                        alarmInput.data('name', alarm.name);
+                        alarmInput.val(value);
                         alarmInput.blur(function (e) {
-                            OSD.data.alarms[$(this)[0].id].value = $(this)[0].value;
+                            var $alarm = $(this);
+                            OSD.data.alarms[$alarm.data('name')] = $alarm.val();
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
                                     updateOsdView();

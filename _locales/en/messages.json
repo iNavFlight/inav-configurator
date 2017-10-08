@@ -2098,6 +2098,18 @@
     "osdUnitUKTip": {
         "message": "Use metric units except for the speed, which is displayed in miles per hour."
     },
+    "osdAlarmRSSI": {
+        "message": "RSSI"
+    },
+    "osdAlarmBATT_CAP": {
+        "message": "Used Battery"
+    },
+    "osdAlarmFLY_MINUTES": {
+        "message": "Fly Time"
+    },
+    "osdAlarmMAX_ALTITUDE": {
+        "message": "Maximum Altitude"
+    },
     "osdGroupGeneral": {
         "message": "General"
     },
