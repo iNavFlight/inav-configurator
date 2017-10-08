@@ -215,7 +215,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             isFailsafeEnabled = bit_check(BF_CONFIG.features, 8);
         }
 
-        // Change Failsafe Procedure Minimum Distance appropriately when checkbox manipulated
+        // fill stage 2 fields
         failsafeFeature = $('input[name="failsafe_feature_new"]');
         failsafeFeature.change(function () {
             if ($(this).is(':checked')) {
