@@ -797,7 +797,7 @@ var FC = {
         }
     },
     getOsdDisabledFields: function () {
-        return ['CRAFT_NAME', 'VTX_CHANNEL']
+        return ['CRAFT_NAME'];
     },
     getAccelerometerNames: function () {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];

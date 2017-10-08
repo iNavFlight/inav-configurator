@@ -2234,6 +2234,12 @@
     "osdElement_RTC_TIME_HELP": {
         "message": "Shows the current time, as retrieved from the GPS or set via the radio."
     },
+    "osdElement_VTX_CHANNEL": {
+        "message": "Video TX Band and Channel"
+    },
+    "osdElement_VTX_CHANNEL_HELP": {
+        "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
+    },
     "portColumnSensors": {
         "message": "Sensors"
     }
