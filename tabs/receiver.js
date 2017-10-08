@@ -119,6 +119,11 @@ TABS.receiver.initialize = function (callback) {
         // set current value
         $rcMap.val(str);
 
+        /*
+         * Send tracking event so we can know if users are using different mappings than EATR
+         */
+        googleAnalytics.sendEvent('Setting', 'RcMappingRead', str);
+
         // validation / filter
         var last_valid = str;
 
@@ -271,7 +276,13 @@ TABS.receiver.initialize = function (callback) {
             RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
-            var strBuffer = $('input[name="rcmap"]').val().split('');
+            var rcMapValue = $('input[name="rcmap"]').val();
+            var strBuffer = rcMapValue.split('');
+
+            /*
+             * Send tracking event so we can know if users are using different mappings than EATR
+             */
+            googleAnalytics.sendEvent('Setting', 'RcMappingSave', rcMapValue);
 
             for (var i = 0; i < RC_MAP.length; i++) {
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
