@@ -896,11 +896,11 @@ var FC = {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
     },
     getFailsafeProcedure: function () {
-        return [
-            "Land", 
-            "Drop", 
-            "RTH", 
-            "Do Nothing", 
-        ];
+        return {
+            0: "Land",
+            1: "Drop",
+            2: "RTH", 
+            3: "Do Nothing", 
+        }
     }
 };

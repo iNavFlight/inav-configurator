@@ -76,10 +76,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         localize();
 
         var $failsafeUseMinimumDistanceCheckbox = $('#failsafe_use_minimum_distance');
-
         var $failsafeMinDistanceElements = $('#failsafe_min_distance_elements')
         var $failsafeMinDistance = $('#failsafe_min_distance')
-
         var $failsafeMinDistanceProcedureElements = $('#failsafe_min_distance_procedure_elements')
         var $failsafeMinDistanceProcedure = $('#failsafe_min_distance_procedure');
 
@@ -335,10 +333,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             FAILSAFE_CONFIG.failsafe_off_delay = parseInt($('input[name="failsafe_off_delay"]').val());
             FAILSAFE_CONFIG.failsafe_throttle_low_delay = parseInt($('input[name="failsafe_throttle_low_delay"]').val());
             FAILSAFE_CONFIG.failsafe_delay = parseInt($('input[name="failsafe_delay"]').val());
-
             FAILSAFE_CONFIG.failsafe_min_distance = parseInt($('input[name="failsafe_min_distance"]').val());
-            //FAILSAFE_CONFIG.failsafe_min_distance_procedure = parseInt($('input[name="failsafe_min_distance_procedure"]').val());
-
 
             if ($('input[id="land"]').is(':checked')) {
                 FAILSAFE_CONFIG.failsafe_procedure = 0;

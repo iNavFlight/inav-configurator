@@ -1721,32 +1721,24 @@
     "failsafeKillSwitchHelp": {
         "message": "Set this option to make the failsafe switch, configured in the modes tab, act as a direct kill switch, bypassing the selected failsafe procedure. <strong>Note:</strong> Arming is blocked with the failsafe kill switch in the ON position"
     },
-
-
-
     "failsafeUseMinimumDistanceItem": {
         "message": "Use alternate Minimum Distance Failsafe Procedure when close to Home"
     },
     "failsafeUseMinimumDistanceHelp": {
         "message": "Set this option if you need an alternate failsafe behavior when the craft is close to Home. For example the author of the feature has a plane that failsafes when the wings detach on landing, when the RTH failsafe behavior normally desired in flight is no longer wanted or needed."
     },
-
     "failsafeMinDistanceItem": {
         "message": "Failsafe Minimum Distance"
     },
     "failsafeMinDistanceHelp": {
         "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in meters away from Home. For example if set to 20 meters, if the craft is at 13 meters the Failsafe Minimum Distance Procedure will be followed. At 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
     },
-
     "failsafeMinDistanceProcedureItem": {
         "message": "Failsafe Minimum Distance Procedure"
     },
     "failsafeMinDistanceProcedureHelp": {
         "message": "This is the failsafe procedure that will be followed when the craft is closer than the Minimum Distance from Home."
-    },    
-
-
-
+    },
     "mainHelpArmed": {
         "message": "Motor Arming"
     },
