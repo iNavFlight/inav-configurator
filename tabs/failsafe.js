@@ -115,7 +115,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 chrome.i18n.getMessage('controlAxisThrottle')
             ],
             fullChannels_e = $('div.activechannellist'),
-            aux_index = 1,
             aux_assignment_index = 0;
 
         for (i = 0; i < RXFAIL_CONFIG.length; i++) {
@@ -137,7 +136,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 fullChannels_e.append('\
                         <div class="number">\
                             <div class="channelauxiliary">\
-                                <span class="channelname">' + chrome.i18n.getMessage("controlAxisAux" + (aux_index++)) + '</span>\
+                                <span class="channelname">' + chrome.i18n.getMessage("radioChannelShort") + (i + 1) + '</span>\
                                 ' + auxAssignment[aux_assignment_index++] + '\
                             </div>\
                             <div class="cf_tip channelsetting" title="' + chrome.i18n.getMessage("failsafeChannelFallbackSettingsHold") + '">\

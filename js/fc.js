@@ -879,5 +879,8 @@ var FC = {
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
+    },
+    getRcMapLetters: function () {
+        return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
     }
 };

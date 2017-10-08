@@ -46,7 +46,7 @@ TABS.servos.initialize = function (callback) {
         var servoCheckbox = '';
         var servoHeader = '';
         for (i = 0; i < RC.active_channels-4; i++) {
-            servoHeader = servoHeader + '<th class="short">A' + (i+1) + '</th>';
+            servoHeader = servoHeader + '<th class="short">CH' + (i+5) + '</th>';
         }
         servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
 

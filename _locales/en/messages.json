@@ -643,7 +643,7 @@
         "message": "Disarm regardless of throttle value"
     },
     "configurationDisarmKillSwitchHelp": {
-        "message": "When arming via AUX channel"
+        "message": "When arming via radio channel"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -935,10 +935,10 @@
         "message": "Examples"
     },
     "adjustmentsExample1": {
-        "message": "Use Slot 1 and a 3POS switch on AUX1 to select between Pitch/Roll P, I and D and another 3POS switch on AUX2 to increase or decrease the value when held up or down."
+        "message": "Use Slot 1 and a 3POS switch on CH5 to select between Pitch/Roll P, I and D and another 3POS switch on CH6 to increase or decrease the value when held up or down."
     },
     "adjustmentsExample2": {
-        "message": "Use Slot 2 and a 3POS switch on AUX4 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
+        "message": "Use Slot 2 and a 3POS switch on CH8 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
     },
     "adjustmentsColumnEnable": {
         "message": "If enabled"
@@ -1552,55 +1552,9 @@
     "controlAxisThrottle": {
         "message": "Throttle"
     },
-    "controlAxisAux1": {
-        "message": "AUX 1"
+    "radioChannelShort": {
+        "message": "CH "
     },
-    "controlAxisAux2": {
-        "message": "AUX 2"
-    },
-    "controlAxisAux3": {
-        "message": "AUX 3"
-    },
-    "controlAxisAux4": {
-        "message": "AUX 4"
-    },
-    "controlAxisAux5": {
-        "message": "AUX 5"
-    },
-    "controlAxisAux6": {
-        "message": "AUX 6"
-    },
-    "controlAxisAux7": {
-        "message": "AUX 7"
-    },
-    "controlAxisAux8": {
-        "message": "AUX 8"
-    },
-    "controlAxisAux9": {
-        "message": "AUX 9"
-    },
-    "controlAxisAux10": {
-        "message": "AUX 10"
-    },
-    "controlAxisAux11": {
-        "message": "AUX 11"
-    },
-    "controlAxisAux12": {
-        "message": "AUX 12"
-    },
-    "controlAxisAux13": {
-        "message": "AUX 13"
-    },
-    "controlAxisAux14": {
-        "message": "AUX 14"
-    },
-    "controlAxisAux15": {
-        "message": "AUX 15"
-    },
-    "controlAxisAux16": {
-        "message": "AUX 16"
-    },
-
     "pidTuningBasic": {
         "message": "Basic/Acro"
     },
@@ -1644,13 +1598,13 @@
         "message": "Failsafe Throttle"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse length, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual AUX channels that have invalid pulses."
+        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse length, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
     },
     "failsafePulsrangeTitle": {
         "message": "Valid Pulse Range Settings"
     },
     "failsafePulsrangeHelp": {
-        "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for AUX channels or entering stage 1 for flightchannels"
+        "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for radio channels or entering stage 1 for flightchannels"
     },
     "failsafeRxMinUsecItem": {
         "message": "Minimum length"
@@ -1662,7 +1616,7 @@
         "message": "Channel Fallback Settings"
     },
     "failsafeChannelFallbackSettingsHelp": {
-        "message": "These settings are applied to invalid individual AUX channels or to all channels when entering stage 1. <strong>Note:</strong> values are saved in steps of 25usec, so small changes disappear"
+        "message": "These settings are applied to invalid individual radio channels or to all channels when entering stage 1. <strong>Note:</strong> values are saved in steps of 25usec, so small changes disappear"
     },
     "failsafeChannelFallbackSettingsAuto": {
         "message": "<strong>Auto</strong> means Roll, Pitch and Yaw to center and Throttle low. <strong>Hold</strong> means maintain the last good value received"

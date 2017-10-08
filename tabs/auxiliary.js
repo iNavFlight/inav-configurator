@@ -61,7 +61,7 @@ TABS.auxiliary.initialize = function (callback) {
         channelOptionTemplate.remove();
         for (var channelIndex = 0; channelIndex < auxChannelCount; channelIndex++) {
             var channelOption = channelOptionTemplate.clone();
-            channelOption.text('AUX ' + (channelIndex + 1));
+            channelOption.text('CH ' + (channelIndex + 5));
             channelOption.val(channelIndex);
             channelList.append(channelOption);
         }
