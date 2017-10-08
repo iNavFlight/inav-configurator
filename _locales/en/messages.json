@@ -2108,7 +2108,13 @@
         "message": "Fly Time"
     },
     "osdAlarmMAX_ALTITUDE": {
-        "message": "Maximum Altitude"
+        "message": "Altitude"
+    },
+    "osdAlarmDIST": {
+        "message": "Distance"
+    },
+    "osdAlarmMAX_NEG_ALTITUDE": {
+        "message": "Negative Altitude"
     },
     "osdGroupGeneral": {
         "message": "General"

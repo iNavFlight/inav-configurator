@@ -309,6 +309,58 @@ OSD.constants = {
                 return 'm';
             },
         },
+        {
+            name: 'DIST',
+            unit: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 'mi';
+                }
+                return 'm';
+            },
+            to_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // meters to miles
+                    return (value / 1609.34).toFixed(2);
+                }
+                return value;
+            },
+            from_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // miles to meters
+                    return Math.round(value * 1609.34);
+                }
+                return value;
+            },
+            step: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 0.01;
+                }
+                return 1;
+            }
+        },
+        {
+            name: 'MAX_NEG_ALTITUDE',
+            unit: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 'ft';
+                }
+                return 'm';
+            },
+            to_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // meters to feet
+                    return Math.round(value * 3.28084)
+                }
+                return value;
+            },
+            from_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // feet to meters
+                    return Math.round(value / 3.28084);
+                }
+                return value;
+            },
+        },
     ],
 
     // All display fields, from every version, do not remove elements, only add!
@@ -702,6 +754,10 @@ OSD.msp = {
         result.push16(OSD.data.alarms['BATT_CAP']);
         result.push16(OSD.data.alarms['FLY_MINUTES']);
         result.push16(OSD.data.alarms['MAX_ALTITUDE']);
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            result.push16(OSD.data.alarms['DIST']);
+            result.push16(OSD.data.alarms['MAX_NEG_ALTITUDE']);
+        }
         return result;
     },
 
@@ -724,6 +780,11 @@ OSD.msp = {
         d.alarms['BATT_CAP'] = view.readU16();
         d.alarms['FLY_MINUTES'] = view.readU16();
         d.alarms['MAX_ALTITUDE'] = view.readU16();
+
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            d.alarms['DIST'] = view.readU16();
+            d.alarms['MAX_NEG_ALTITUDE'] = view.readU16();
+        }
 
         d.items = [];
         // start at the offset from the other fields
@@ -921,12 +982,24 @@ TABS.osd.initialize = function (callback) {
                             var suffix = chrome.i18n.getMessage(unit) || unit;
                             label += ' (' + suffix + ')';
                         }
-                        var alarmInput = $('<input name="alarm" type="number"/>' + label + '</label>');
-                        alarmInput.data('name', alarm.name);
+                        var step = 1;
+                        if (typeof alarm.step === 'function') {
+                            step = alarm.step(OSD.data)
+                        }
+                        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+                        alarmInput.data('alarm', alarm);
+                        if (typeof alarm.to_display === 'function') {
+                            value = alarm.to_display(OSD.data, value);
+                        }
                         alarmInput.val(value);
                         alarmInput.blur(function (e) {
                             var $alarm = $(this);
-                            OSD.data.alarms[$alarm.data('name')] = $alarm.val();
+                            var val = $alarm.val();
+                            var alarm = $alarm.data('alarm');
+                            if (typeof alarm.from_display === 'function') {
+                                val = alarm.from_display(OSD.data, val);
+                            }
+                            OSD.data.alarms[alarm.name] = val;
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
                                     updateOsdView();
