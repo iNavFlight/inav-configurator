@@ -556,7 +556,7 @@ OSD.constants = {
                     name: 'VTX_CHANNEL',
                     id: 10,
                     positionable: true,
-                    preview: 'CH:1'
+                    preview: 'CH:F7'
                 },
             ]
         },
