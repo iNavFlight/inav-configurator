@@ -2104,6 +2104,9 @@
     "osdAlarmBATT_CAP": {
         "message": "Used Battery"
     },
+    "osdAlarmBATT_CAP_HELP": {
+        "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
+    },
     "osdAlarmFLY_MINUTES": {
         "message": "Fly Time"
     },
@@ -2113,8 +2116,14 @@
     "osdAlarmDIST": {
         "message": "Distance"
     },
+    "osdAlarmDIST_HELP": {
+        "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
+    },
     "osdAlarmMAX_NEG_ALTITUDE": {
         "message": "Negative Altitude"
+    },
+    "osdAlarmMAX_NEG_ALTITUDE_HELP": {
+        "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"

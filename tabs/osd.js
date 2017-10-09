@@ -1021,7 +1021,24 @@ TABS.osd.initialize = function (callback) {
                                     updateOsdView();
                                 });
                         });
-                        var $input = $('<label/>').append(alarmInput);
+                        var $input = $('<label/>');
+                        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+                        if (help) {
+                            $('<div class="helpicon cf_tip"></div>')
+                            .css('margin-top', '1px')
+                            .attr('title', help)
+                            .appendTo($input)
+                            .jBox('Tooltip', {
+                                delayOpen: 100,
+                                delayClose: 100,
+                                position: {
+                                    x: 'right',
+                                    y: 'center'
+                                },
+                                outside: 'x'
+                            });
+                        }
+                        $input.append(alarmInput);
                         $alarms.append($input);
                     }
 
