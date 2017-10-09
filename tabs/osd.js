@@ -251,6 +251,42 @@ FONT.embed_dot = function(str) {
 
 var OSD = OSD || {};
 
+// common functions for altitude and negative altitude alarms
+function altitude_alarm_unit(osd_data) {
+    if (OSD.data.unit_mode === 0) {
+        return 'ft';
+    }
+    return 'm';
+}
+
+function altitude_alarm_to_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // meters to feet
+        return Math.round(value * 3.28084)
+    }
+    return value;
+}
+
+function altitude_alarm_from_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // feet to meters
+        return Math.round(value / 3.28084);
+    }
+    return value;
+}
+
+// Used to wrap altitude conversion functions for firmwares up
+// to 1.7.3, since the altitude alarm used either m or feet
+// depending on the OSD display unit used (hence, no conversion)
+function altitude_alarm_display_function(fn) {
+    return function(osd_data, value) {
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            return fn(osd_data, value)
+        }
+        return value;
+    }
+}
+
 // parsed fc output and output to fc, used by to OSD.msp.encode
 OSD.initData = function () {
     OSD.data = {
@@ -302,12 +338,9 @@ OSD.constants = {
         },
         {
             name: 'MAX_ALTITUDE',
-            unit: function(osd_data) {
-                if (OSD.data.unit_mode === 0) {
-                    return 'ft';
-                }
-                return 'm';
-            },
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_display_function(altitude_alarm_to_display),
+            from_display: altitude_alarm_display_function(altitude_alarm_from_display),
         },
         {
             name: 'DIST',
@@ -340,26 +373,9 @@ OSD.constants = {
         },
         {
             name: 'MAX_NEG_ALTITUDE',
-            unit: function(osd_data) {
-                if (OSD.data.unit_mode === 0) {
-                    return 'ft';
-                }
-                return 'm';
-            },
-            to_display: function(osd_data, value) {
-                if (OSD.data.unit_mode === 0) {
-                    // meters to feet
-                    return Math.round(value * 3.28084)
-                }
-                return value;
-            },
-            from_display: function(osd_data, value) {
-                if (OSD.data.unit_mode === 0) {
-                    // feet to meters
-                    return Math.round(value / 3.28084);
-                }
-                return value;
-            },
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_to_display,
+            from_display: altitude_alarm_from_display,
         },
     ],
 
