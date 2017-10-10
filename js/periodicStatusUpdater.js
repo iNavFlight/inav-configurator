@@ -118,6 +118,7 @@ helper.periodicStatusUpdater = (function () {
 
             if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
                 MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
+                MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
             } else {
                 MSP.send_message(MSPCodes.MSP_STATUS, false, false);
             }

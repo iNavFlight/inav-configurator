@@ -82,7 +82,7 @@ var MSPCodes = {
     MSP_ANALOG:             110,
     MSP_RC_TUNING:          111,
     MSP_PID:                112,
-    MSP_BOX:                113,
+    MSP_ACTIVEBOXES:        113,
     MSP_MISC:               114,
     MSP_MOTOR_PINS:         115,
     MSP_BOXNAMES:           116,
