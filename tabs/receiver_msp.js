@@ -14,7 +14,7 @@ var
         aux1: 4,
         aux2: 5,
         aux3: 6,
-        aux4: 7,
+        aux4: 7
     },
     
     // Set reasonable initial stick positions (Mode 2)
@@ -32,7 +32,7 @@ var
     // First the vertical axis, then the horizontal:
     gimbals = [
         ["throttle", "yaw"],
-        ["pitch", "roll"],
+        ["pitch", "roll"]
     ],
     
     gimbalElems,
@@ -115,7 +115,7 @@ function localizeAxisNames() {
     }
     
     for (var sliderIndex = 0; sliderIndex < 4; sliderIndex++) {
-        $(".slider-label", sliderElems.get(sliderIndex)).text(chrome.i18n.getMessage("controlAxisAux" + (sliderIndex + 1)));
+        $(".slider-label", sliderElems.get(sliderIndex)).text(chrome.i18n.getMessage("radioChannelShort") + (sliderIndex + 5));
     }
 }
 
