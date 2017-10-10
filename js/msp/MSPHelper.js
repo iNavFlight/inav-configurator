@@ -95,7 +95,12 @@ var mspHelper = (function (gui) {
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
-                CONFIG.mode = data.getUint32(6, true);
+
+                /* For 1.7.4+ MSP_ACTIVEBOXES should be used to determine active modes */
+                if (semver.lt(CONFIG.flightControllerVersion, "1.7.4")) {
+                    CONFIG.mode = data.getUint32(6, true);
+                }
+
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, true);
 
@@ -108,6 +113,21 @@ var mspHelper = (function (gui) {
                 }
                 gui.updateStatusBar();
                 gui.updateProfileChange();
+                break;
+
+            case MSPCodes.MSP_ACTIVEBOXES:
+                var words = dataHandler.message_length_expected / 4;
+
+                CONFIG.mode = 0;
+                if (words == 1) {
+                    CONFIG.mode = data.getUint32(0, true);
+                }
+                else if (words == 2) {
+                    CONFIG.mode = data.getUint32(0, true) | (data.getUint32(4, true) << 32);
+                }
+                else {
+                    console.log('MSP_ACTIVEBOXES doesn\'t support more than 53 bits at the moment');
+                }
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:
