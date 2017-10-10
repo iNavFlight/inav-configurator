@@ -287,7 +287,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         $failsafeUseMinimumDistanceCheckbox.change(function() {
             if ($(this).is(':checked')) {
                 // 20 meters seems like a reasonable default for a minimum distance
-                $failsafeMinDistance.val(20);
+                $failsafeMinDistance.val(2000);
                 $failsafeMinDistanceElements.show();
                 $failsafeMinDistanceProcedureElements.show();
             } else {

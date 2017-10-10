@@ -471,14 +471,6 @@ var FC = {
             );
         }
 
-        // Unsure which version these will actually deploy in, guidance welcome. Using 1.7.3 
-        // so it works for the moment. And I'm really not sure how it works anyhow
-        if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
-            features.push(
-                {bit: 30, group: 'rxFailsafeExtended', name: 'FAILSAFE_EXTENDED', haveTip: false, showNameInTip: false}
-            );
-        }
-
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {

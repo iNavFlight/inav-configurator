@@ -1210,30 +1210,24 @@ var mspHelper = (function (gui) {
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
                 buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
 
-                // API version check needed here?
-                //if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-                // Or
-                // if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-                // 
-                // Guidance wanted...
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
 
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
 
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
 
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
 
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
 
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
-
-                buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-                //}
+                    buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+                }
 
                 break;
 

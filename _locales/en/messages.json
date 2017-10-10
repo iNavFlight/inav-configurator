@@ -1728,16 +1728,16 @@
         "message": "Set this option if you need an alternate failsafe behavior when the craft is close to Home. For example the author of the feature has a plane that failsafes when the wings detach on landing, when the RTH failsafe behavior normally desired in flight is no longer wanted or needed."
     },
     "failsafeMinDistanceItem": {
-        "message": "Failsafe Minimum Distance"
+        "message": "Failsafe Minimum Distance in centimeters"
     },
     "failsafeMinDistanceHelp": {
-        "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in meters away from Home. For example if set to 20 meters, if the craft is at 13 meters the Failsafe Minimum Distance Procedure will be followed. At 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
+        "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in centimeters away from Home. For example if set to 2000 centimeters (20 meters), and the craft is at 13 meters, the Failsafe Minimum Distance Procedure will be followed. When the craft is at 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
     },
     "failsafeMinDistanceProcedureItem": {
         "message": "Failsafe Minimum Distance Procedure"
     },
     "failsafeMinDistanceProcedureHelp": {
-        "message": "This is the failsafe procedure that will be followed when the craft is closer than the Minimum Distance from Home."
+        "message": "This is the failsafe procedure that will be followed when the craft is closer than the Failsafe Minimum Distance from Home."
     },
     "mainHelpArmed": {
         "message": "Motor Arming"
