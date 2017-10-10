@@ -11,6 +11,10 @@ TABS.modes.initialize = function (callback) {
         googleAnalytics.sendAppView('Modes');
     }
 
+    function get_active_box_data() {
+        MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false, get_box_ids);
+    }
+
     function get_box_ids() {
         MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
     }
@@ -23,7 +27,7 @@ TABS.modes.initialize = function (callback) {
         $('#content').load("./tabs/modes.html", process_html);
     }
 
-    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_box_ids);
+    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_active_box_data);
 
     function process_html() {
         // generate heads according to RC count
