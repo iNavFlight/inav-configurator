@@ -1210,7 +1210,7 @@ var mspHelper = (function (gui) {
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
                 buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
 
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
                     buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
                     buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
 
