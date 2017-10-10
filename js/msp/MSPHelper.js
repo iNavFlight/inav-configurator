@@ -617,20 +617,24 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                 offset++;
-                FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
-                offset++;
-                FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
-                offset += 2;
-                FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
-                offset += 2;
-                FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
-                offset += 2;
-                FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
-                offset += 2;
-                FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
-                offset += 2;
-                FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
-                offset++;
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                    FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
+                    offset++;
+                    FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
+                    offset += 2;
+                }
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+                    FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
+                    offset++;
+                }
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:

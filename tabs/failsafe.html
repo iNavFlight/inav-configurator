@@ -109,9 +109,8 @@
                             <label for="nothing" data-i18n="failsafeProcedureItemSelect4"></label>
                         </div>
                     </div>
-
-                    <!-- Unsure about this requires-v1_7.. should it be another version? 1.8? -->
-                    <div class="requires-v1_7">
+                    <!-- Minimum Failsafe Distance controls -->
+                    <div class="requires-v1_7_4">
                         <div class="checkbox stage2">
                             <div class="numberspacer" >
                                 <input type="checkbox" name="failsafe_use_minimum_distance" class="toggle" id="failsafe_use_minimum_distance" />
@@ -122,7 +121,7 @@
                         </div>
 
                         <div class="number" id="failsafe_min_distance_elements">
-                            <label> <input class="minimumDistance" type="number" name="failsafe_min_distance" id="failsafe_min_distance" min="0" max="6000" /> <span
+                            <label> <input class="minimumDistance" type="number" name="failsafe_min_distance" id="failsafe_min_distance" min="0" max="65000" /> <span
                                     data-i18n="failsafeMinDistanceItem"></span>
                             </label>
                             <div class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceHelp"></div>
@@ -134,7 +133,6 @@
                             <div class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceProcedureHelp"></div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
