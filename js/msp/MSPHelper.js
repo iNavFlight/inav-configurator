@@ -1208,15 +1208,17 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-                buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                    buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                }   
                 if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
                     buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
                     buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
