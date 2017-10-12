@@ -17,6 +17,8 @@ SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
+SYM.MAH_KM_0 = 157;
+SYM.MAH_KM_1 = 158;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -486,6 +488,12 @@ OSD.constants = {
                     min_version: '1.6.0',
                     preview: 'W50 ' // 3 chars
                 },
+                {
+                    name: 'EFFICIENCY',
+                    id: 35,
+                    min_version: '1.7.4',
+                    preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                }
             ]
         },
         {
