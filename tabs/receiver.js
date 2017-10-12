@@ -149,7 +149,7 @@ TABS.receiver.initialize = function (callback) {
 
             // check if characters inside are all valid, also check for duplicity
             for (var i = 0; i < val.length; i++) {
-                if (FC.getRcMapLetters()[i].indexOf(strBuffer[i]) < 0) {
+                if (FC.getRcMapLetters().indexOf(strBuffer[i]) < 0) {
                     $(this).val(last_valid);
                     return false;
                 }
