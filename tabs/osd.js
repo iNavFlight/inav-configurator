@@ -253,6 +253,42 @@ FONT.embed_dot = function(str) {
 
 var OSD = OSD || {};
 
+// common functions for altitude and negative altitude alarms
+function altitude_alarm_unit(osd_data) {
+    if (OSD.data.unit_mode === 0) {
+        return 'ft';
+    }
+    return 'm';
+}
+
+function altitude_alarm_to_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // meters to feet
+        return Math.round(value * 3.28084)
+    }
+    return value;
+}
+
+function altitude_alarm_from_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // feet to meters
+        return Math.round(value / 3.28084);
+    }
+    return value;
+}
+
+// Used to wrap altitude conversion functions for firmwares up
+// to 1.7.3, since the altitude alarm used either m or feet
+// depending on the OSD display unit used (hence, no conversion)
+function altitude_alarm_display_function(fn) {
+    return function(osd_data, value) {
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            return fn(osd_data, value)
+        }
+        return value;
+    }
+}
+
 // parsed fc output and output to fc, used by to OSD.msp.encode
 OSD.initData = function () {
     OSD.data = {
@@ -288,6 +324,62 @@ OSD.constants = {
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
+
+    ALL_ALARMS: [
+        {
+            name: 'RSSI',
+            unit: '%',
+        },
+        {
+            name: 'BATT_CAP',
+            unit: 'mah',
+        },
+        {
+            name: 'FLY_MINUTES',
+            unit: 'minutes',
+        },
+        {
+            name: 'MAX_ALTITUDE',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_display_function(altitude_alarm_to_display),
+            from_display: altitude_alarm_display_function(altitude_alarm_from_display),
+        },
+        {
+            name: 'DIST',
+            unit: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 'mi';
+                }
+                return 'm';
+            },
+            to_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // meters to miles
+                    return (value / 1609.34).toFixed(2);
+                }
+                return value;
+            },
+            from_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // miles to meters
+                    return Math.round(value * 1609.34);
+                }
+                return value;
+            },
+            step: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 0.01;
+                }
+                return 1;
+            }
+        },
+        {
+            name: 'MAX_NEG_ALTITUDE',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_to_display,
+            from_display: altitude_alarm_from_display,
+        },
+    ],
 
     // All display fields, from every version, do not remove elements, only add!
     ALL_DISPLAY_GROUPS: [
@@ -682,10 +774,14 @@ OSD.msp = {
         var result = [-1, OSD.data.video_system];
         result.push8(OSD.data.unit_mode);
         // watch out, order matters! match the firmware
-        result.push8(OSD.data.alarms.rssi.value);
-        result.push16(OSD.data.alarms.cap.value);
-        result.push16(OSD.data.alarms.time.value);
-        result.push16(OSD.data.alarms.alt.value);
+        result.push8(OSD.data.alarms['RSSI']);
+        result.push16(OSD.data.alarms['BATT_CAP']);
+        result.push16(OSD.data.alarms['FLY_MINUTES']);
+        result.push16(OSD.data.alarms['MAX_ALTITUDE']);
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            result.push16(OSD.data.alarms['DIST']);
+            result.push16(OSD.data.alarms['MAX_NEG_ALTITUDE']);
+        }
         return result;
     },
 
@@ -704,10 +800,15 @@ OSD.msp = {
 
         d.unit_mode = view.readU8();
         d.alarms = {};
-        d.alarms['rssi'] = { display_name: 'Rssi', value: view.readU8() };
-        d.alarms['cap'] = { display_name: 'Capacity', value: view.readU16() };
-        d.alarms['time'] = { display_name: 'Minutes', value: view.readU16() };
-        d.alarms['alt'] = { display_name: 'Altitude', value: view.readU16() };
+        d.alarms['RSSI'] = view.readU8();
+        d.alarms['BATT_CAP'] = view.readU16();
+        d.alarms['FLY_MINUTES'] = view.readU16();
+        d.alarms['MAX_ALTITUDE'] = view.readU16();
+
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            d.alarms['DIST'] = view.readU16();
+            d.alarms['MAX_NEG_ALTITUDE'] = view.readU16();
+        }
 
         d.items = [];
         // start at the offset from the other fields
@@ -893,18 +994,59 @@ TABS.osd.initialize = function (callback) {
                     // alarms
                     $('.alarms-container').show();
                     var $alarms = $('.alarms').empty();
-                    for (var k in OSD.data.alarms) {
-                        var alarm = OSD.data.alarms[k];
-                        var alarmInput = $('<input name="alarm" type="number" id="' + k + '"/>' + alarm.display_name + '</label>');
-                        alarmInput.val(alarm.value);
+                    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
+                        var alarm = OSD.constants.ALL_ALARMS[kk];
+                        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
+                        var value = OSD.data.alarms[alarm.name];
+                        if (value === undefined) {
+                            continue;
+                        }
+                        if (alarm.unit) {
+                            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
+                            var suffix = chrome.i18n.getMessage(unit) || unit;
+                            label += ' (' + suffix + ')';
+                        }
+                        var step = 1;
+                        if (typeof alarm.step === 'function') {
+                            step = alarm.step(OSD.data)
+                        }
+                        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+                        alarmInput.data('alarm', alarm);
+                        if (typeof alarm.to_display === 'function') {
+                            value = alarm.to_display(OSD.data, value);
+                        }
+                        alarmInput.val(value);
                         alarmInput.blur(function (e) {
-                            OSD.data.alarms[$(this)[0].id].value = $(this)[0].value;
+                            var $alarm = $(this);
+                            var val = $alarm.val();
+                            var alarm = $alarm.data('alarm');
+                            if (typeof alarm.from_display === 'function') {
+                                val = alarm.from_display(OSD.data, val);
+                            }
+                            OSD.data.alarms[alarm.name] = val;
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
                                     updateOsdView();
                                 });
                         });
-                        var $input = $('<label/>').append(alarmInput);
+                        var $input = $('<label/>');
+                        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+                        if (help) {
+                            $('<div class="helpicon cf_tip"></div>')
+                            .css('margin-top', '1px')
+                            .attr('title', help)
+                            .appendTo($input)
+                            .jBox('Tooltip', {
+                                delayOpen: 100,
+                                delayClose: 100,
+                                position: {
+                                    x: 'right',
+                                    y: 'center'
+                                },
+                                outside: 'x'
+                            });
+                        }
+                        $input.append(alarmInput);
                         $alarms.append($input);
                     }
 
