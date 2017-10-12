@@ -190,6 +190,7 @@ gulp.task('dist-build', ['build'], function() {
         './build/*',
         './src/css/font-awesome/fonts/*',
         './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
+        './resources/*.json',
         './resources/models/*',
         './resources/osd/*.mcm',
         './resources/motor_order/*.svg',

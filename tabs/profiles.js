@@ -44,6 +44,27 @@ presets.defaultValues = {
     FC_CONFIG: {"loopTime": 2000}
 };
 
+presets.settings = {
+    COMMON: {
+
+    },
+    FW: {
+        "small_angle": 180,
+    },
+    MR: {
+    },
+    get: function(mixerType) {
+        var settings = {};
+        $.extend(settings, presets.settings.COMMON);
+        if (mixerType == 'multirotor') {
+            $.extend(settings, presets.settings.MR);
+        } else {
+            $.extend(settings, presets.settings.FW);
+        }
+        return settings;
+    },
+}
+
 /*
  * When defining a preset, following fields are required:
  *
@@ -505,7 +526,17 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
                 window[setting.group][setting.field] = setting.value;
             }
         }
-        saveChainer.execute();
+        var promises = {};
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            var settings = presets.settings.get(currentPreset.type);
+            Object.keys(settings).forEach(function(key, ii) {
+                var value = settings[key];
+                promises[key] = MSP.promise(MSPCodes.MSPV2_SET_SETTING, mspHelper.encodeSetting(key, value));
+            });
+        }
+        Promise.props(promises).then(function () {
+            saveChainer.execute();
+        });
     }
 
     function fillPresetDescription(preset) {

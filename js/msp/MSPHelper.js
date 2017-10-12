@@ -1063,6 +1063,11 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_OSD_CHAR_WRITE:
                 console.log('OSD char uploaded');
                 break;
+            case MSPCodes.MSPV2_SETTING:
+                break;
+            case MSPCodes.MSPV2_SET_SETTING:
+                console.log("Setting set");
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2238,6 +2243,114 @@ var mspHelper = (function (gui) {
         } else {
             callback();
         }
+    };
+
+    self._getSetting = function(name) {
+        if (!this._settings) {
+            var $this = this;
+            $.ajax({
+                url: chrome.extension.getURL('/resources/settings.json'),
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    $this._settings = data;
+                }
+            });
+        }
+        return this._settings[name];
+    };
+
+    self._encodeSettingName = function(name, data) {
+        for (var ii = 0; ii < name.length; ii++) {
+            data.push(name.charCodeAt(ii));
+        }
+        data.push(0);
+    };
+
+    self.getSetting = function(name, callback) {
+        var setting = this._getSetting(name);
+        var data = [];
+        this._encodeSettingName(name, data);
+        MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function(resp) {
+            var value;
+            switch (setting.type) {
+                case "uint8_t":
+                    value = resp.data.getUint8(0);
+                    break;
+                case "int8_t":
+                    value = resp.data.getInt8(0);
+                    break;
+                case "uint16_t":
+                    value = resp.data.getUint16(0, true);
+                    break;
+                case "int16_t":
+                    value = resp.data.getInt16(0, true);
+                    break;
+                case "uint32_t":
+                    value = resp.data.getUint32(0, true);
+                    break;
+                case "float":
+                    var fi32 = resp.data.getUint32(0, true);
+                    var buf = new ArrayBuffer(4);
+                    (new Uint32Array(buf))[0] = fi32;
+                    value = (new Float32Array(buf))[0];
+                    break;
+                default:
+                    throw "Unknown setting type " + setting.type;
+            }
+            if (setting.table) {
+                value = setting.table.values[value];
+            }
+            if (callback) {
+                callback(value, setting);
+            }
+        });
+    };
+
+    self.encodeSetting = function(name, value) {
+        var setting = this._getSetting(name);
+        if (setting.table) {
+            var found = false;
+            for (var ii = 0; ii < setting.table.values.length; ii++) {
+                if (setting.table.values[ii] == value) {
+                    value = ii;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw 'Invalid value "' + value + '" for setting ' + name;
+            }
+        }
+        var data = [];
+        this._encodeSettingName(name, data);
+        switch (setting.type) {
+            case "uint8_t":
+            case "int8_t":
+                data.push8(value);
+                break;
+            case "uint16_t":
+            case "int16_t":
+                data.push16(value);
+                break;
+            case "uint32_t":
+                data.push32(value);
+                break;
+            case "float":
+                var buf = new ArrayBuffer(4);
+                (new Float32Array(buf))[0] = value;
+                var if32 = (new Uint32Array(buf))[0];
+                data.push32(if32);
+                break;
+            default:
+                throw "Unknown setting type " + setting.type;
+        }
+        return data;
+    };
+
+    self.setSetting = function(name, value, callback) {
+        var data = this.encodeSetting(name, value);
+        MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
     };
 
     return self;

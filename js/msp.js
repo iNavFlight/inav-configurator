@@ -283,6 +283,7 @@ var MSP = {
 
         switch (this.protocolVersion) {
             case this.constants.PROTOCOL_V1:
+                // TODO: Error if code is < 255 and MSPv1 is requested
                 length = payloadLength + 6;
                 buffer = new ArrayBuffer(length);
                 view = new Uint8Array(buffer);
