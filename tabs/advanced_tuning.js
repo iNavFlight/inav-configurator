@@ -91,20 +91,16 @@ TABS.advanced_tuning.initialize = function (callback) {
             });
             $rthTailFirst.change();
 
-            $rthAllowLanding.prop("checked", RTH_AND_LAND_CONFIG.rthAllowLanding);
-            $rthAllowLanding.change(function () {
-                if ($(this).is(":checked")) {
-                    RTH_AND_LAND_CONFIG.rthAllowLanding = 1;
-                } else {
-                    RTH_AND_LAND_CONFIG.rthAllowLanding = 0;
-                }
-            });
-            $rthAllowLanding.change();
-
             GUI.fillSelect($rthAltControlMode, FC.getRthAltControlMode(), RTH_AND_LAND_CONFIG.rthAltControlMode);
             $rthAltControlMode.val(RTH_AND_LAND_CONFIG.rthAltControlMode);
             $rthAltControlMode.change(function () {
                 RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
+            });
+            GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
+            console.log("VAL", RTH_AND_LAND_CONFIG.rthAllowLanding);
+            $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
+            $rthAllowLanding.change(function () {
+                RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();
             });
 
             $('.requires-v1_7_1').show();
