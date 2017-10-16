@@ -2051,7 +2051,7 @@
         "message": "Land after RTH"
     },
     "rthAltControlMode": {
-        "message": "RTH Altitide mode"
+        "message": "RTH Altitude mode"
     },
     "rthAbortThreshold": {
         "message": "RTH abort threshold [cm]"
