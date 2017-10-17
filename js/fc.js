@@ -887,6 +887,13 @@ var FC = {
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
     },
+    getRthAllowLanding: function() {
+        var values = ["Never", "Always"];
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            values.push("Only on failsafe");
+        }
+        return values;
+    },
     getFailsafeProcedure: function () {
         return {
             0: "Land",
