@@ -2215,6 +2215,15 @@
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
     },
+    "osdElement_VARIO_HELP": {
+        "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
+    },
+    "osdElement_VARIO_NUM": {
+        "message": "Numeric Vario"
+    },
+    "osdElement_VARIO_NUM_HELP": {
+        "message": "Shows vertical speed using a number"
+    },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
     },
