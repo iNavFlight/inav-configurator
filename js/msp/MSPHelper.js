@@ -2246,18 +2246,28 @@ var mspHelper = (function (gui) {
     };
 
     self._getSetting = function(name) {
-        if (!this._settings) {
-            var $this = this;
-            $.ajax({
-                url: chrome.extension.getURL('/resources/settings.json'),
-                dataType: 'json',
-                async: false,
-                success: function(data) {
-                    $this._settings = data;
-                }
+        var promise;
+        if (this._settings) {
+            promise = Promise.resolve(this._settings);
+        } else {
+            promise = new Promise(function(resolve, reject) {
+                var $this = this;
+                $.ajax({
+                    url: chrome.runtime.getURL('/resources/settings.json'),
+                    dataType: 'json',
+                    error: function(jqXHR, text, error) {
+                        reject(error);
+                    },
+                    success: function(data) {
+                        $this._settings = data;
+                        resolve(data);
+                    }
+                });
             });
         }
-        return this._settings[name];
+        return promise.then(function (data) {
+            return data[name];
+        });
     };
 
     self._encodeSettingName = function(name, data) {
@@ -2268,89 +2278,94 @@ var mspHelper = (function (gui) {
     };
 
     self.getSetting = function(name, callback) {
-        var setting = this._getSetting(name);
-        var data = [];
-        this._encodeSettingName(name, data);
-        MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function(resp) {
-            var value;
-            switch (setting.type) {
-                case "uint8_t":
-                    value = resp.data.getUint8(0);
-                    break;
-                case "int8_t":
-                    value = resp.data.getInt8(0);
-                    break;
-                case "uint16_t":
-                    value = resp.data.getUint16(0, true);
-                    break;
-                case "int16_t":
-                    value = resp.data.getInt16(0, true);
-                    break;
-                case "uint32_t":
-                    value = resp.data.getUint32(0, true);
-                    break;
-                case "float":
-                    var fi32 = resp.data.getUint32(0, true);
-                    var buf = new ArrayBuffer(4);
-                    (new Uint32Array(buf))[0] = fi32;
-                    value = (new Float32Array(buf))[0];
-                    break;
-                default:
-                    throw "Unknown setting type " + setting.type;
-            }
-            if (setting.table) {
-                value = setting.table.values[value];
-            }
-            if (callback) {
-                callback(value, setting);
-            }
+        var $this = this;
+        return this._getSetting(name).then(function (setting) {
+           var data = [];
+            $this._encodeSettingName(name, data);
+            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function(resp) {
+                var value;
+                switch (setting.type) {
+                    case "uint8_t":
+                        value = resp.data.getUint8(0);
+                        break;
+                    case "int8_t":
+                        value = resp.data.getInt8(0);
+                        break;
+                    case "uint16_t":
+                        value = resp.data.getUint16(0, true);
+                        break;
+                    case "int16_t":
+                        value = resp.data.getInt16(0, true);
+                        break;
+                    case "uint32_t":
+                        value = resp.data.getUint32(0, true);
+                        break;
+                    case "float":
+                        var fi32 = resp.data.getUint32(0, true);
+                        var buf = new ArrayBuffer(4);
+                        (new Uint32Array(buf))[0] = fi32;
+                        value = (new Float32Array(buf))[0];
+                        break;
+                    default:
+                        throw "Unknown setting type " + setting.type;
+                }
+                if (setting.table) {
+                    value = setting.table.values[value];
+                }
+                if (callback) {
+                    callback(value, setting);
+                }
+            });
         });
     };
 
     self.encodeSetting = function(name, value) {
-        var setting = this._getSetting(name);
-        if (setting.table) {
-            var found = false;
-            for (var ii = 0; ii < setting.table.values.length; ii++) {
-                if (setting.table.values[ii] == value) {
-                    value = ii;
-                    found = true;
-                    break;
+        var $this = this;
+        return this._getSetting(name).then(function (setting) {
+            if (setting.table) {
+                var found = false;
+                for (var ii = 0; ii < setting.table.values.length; ii++) {
+                    if (setting.table.values[ii] == value) {
+                        value = ii;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw 'Invalid value "' + value + '" for setting ' + name;
                 }
             }
-            if (!found) {
-                throw 'Invalid value "' + value + '" for setting ' + name;
+            var data = [];
+            $this._encodeSettingName(name, data);
+            switch (setting.type) {
+                case "uint8_t":
+                case "int8_t":
+                    data.push8(value);
+                    break;
+                case "uint16_t":
+                case "int16_t":
+                    data.push16(value);
+                    break;
+                case "uint32_t":
+                    data.push32(value);
+                    break;
+                case "float":
+                    var buf = new ArrayBuffer(4);
+                    (new Float32Array(buf))[0] = value;
+                    var if32 = (new Uint32Array(buf))[0];
+                    data.push32(if32);
+                    break;
+                default:
+                    throw "Unknown setting type " + setting.type;
             }
-        }
-        var data = [];
-        this._encodeSettingName(name, data);
-        switch (setting.type) {
-            case "uint8_t":
-            case "int8_t":
-                data.push8(value);
-                break;
-            case "uint16_t":
-            case "int16_t":
-                data.push16(value);
-                break;
-            case "uint32_t":
-                data.push32(value);
-                break;
-            case "float":
-                var buf = new ArrayBuffer(4);
-                (new Float32Array(buf))[0] = value;
-                var if32 = (new Uint32Array(buf))[0];
-                data.push32(if32);
-                break;
-            default:
-                throw "Unknown setting type " + setting.type;
-        }
-        return data;
+            return data;
+        });
     };
 
     self.setSetting = function(name, value, callback) {
-        var data = this.encodeSetting(name, value);
-        MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
+        this.encodeSetting(name, value).then(function (data) {
+            MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
+        });
     };
 
     return self;
