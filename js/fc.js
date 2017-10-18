@@ -642,10 +642,14 @@ var FC = {
             value: 4,
         });
 
-        rxTypes.push({
-            name: 'RX_NONE',
-            value: 0,
-        });
+        // Versions using feature bits don't allow not having an
+        // RX and fallback to RX_PPM.
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            rxTypes.push({
+                name: 'RX_NONE',
+                value: 0,
+            });
+        }
 
         return rxTypes;
     },
