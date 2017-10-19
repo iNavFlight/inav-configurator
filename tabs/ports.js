@@ -40,10 +40,10 @@ TABS.ports.initialize = function (callback) {
         });
     }
 
-    // support configure RunCam Split
+    // support configure RunCam Device
     if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
         functionRules.push({
-            name: 'RUNCAM_SPLIT_CONTROL',
+            name: 'RUNCAM_DEVICE_CONTROL',
             groups: ['peripherals'],
             maxPorts: 1 }
         );
