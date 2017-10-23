@@ -471,7 +471,7 @@ OSD.constants = {
                     name: 'RTC_TIME',
                     id: 29,
                     min_version: '1.7.4',
-                    preview: FONT.symbol(SYM.CLOCK) + ' 13:37'
+                    preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
             ]
         },
