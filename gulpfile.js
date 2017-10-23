@@ -199,8 +199,8 @@ gulp.task('dist-build', ['build'], function() {
         .pipe(gulp.dest(distDir));
 });
 
-gulp.task('dist', function() {
-    return runSequence('clean', 'dist-build');
+gulp.task('dist', function(done) {
+    return runSequence('clean', 'dist-build', done);
 });
 
 // Create app directories in ./apps
