@@ -412,6 +412,16 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_SERVO_CONFIGURATION:
                 console.log('Servo Configuration saved');
                 break;
+            case MSPCodes.MSP_RTC:
+                if (data.length >= 6) {
+                    var seconds = data.getInt32(0, true);
+                    var millis = data.getUint16(4, true);
+                    console.log("RTC received: " + new Date(seconds * 1000 + millis));
+                }
+                break;
+            case MSPCodes.MSP_SET_RTC:
+                console.log('RTC set');
+                break;
             case MSPCodes.MSP_EEPROM_WRITE:
                 console.log('Settings Saved in EEPROM');
                 break;
@@ -2366,6 +2376,34 @@ var mspHelper = (function (gui) {
         this.encodeSetting(name, value).then(function (data) {
             MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
         });
+    };
+
+    self.getRTC = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            MSP.send_message(MSPCodes.MSP_RTC, false, false, function(resp) {
+                var seconds = resp.data.read32();
+                var millis = resp.data.readU16();
+                if (callback) {
+                    callback(seconds, millis);
+                }
+            });
+        } else if (callback) {
+            callback(0, 0);
+        }
+    };
+
+    self.setRTC = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            var now = Date.now();
+            var secs = now / 1000;
+            var millis = now % 1000;
+            var data = [];
+            data.push32(secs);
+            data.push16(millis);
+            MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
+        } else if (callback) {
+            callback();
+        }
     };
 
     return self;
