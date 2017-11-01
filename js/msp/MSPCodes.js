@@ -122,6 +122,9 @@ var MSPCodes = {
     MSP_SERVO_MIX_RULES:    241,
     MSP_SET_SERVO_MIX_RULE: 242,
 
+    MSP_RTC:                246,
+    MSP_SET_RTC:            247,
+
     MSP_EEPROM_WRITE:       250,
 
     MSP_DEBUGMSG:           253,
