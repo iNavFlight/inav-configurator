@@ -2432,6 +2432,18 @@
     "osdElement_RADAR": {
         "message": "Radar"
     },
+    "osdElement_WIND_SPEED_HORIZONTAL": {
+        "message": "Horizontal Wind Speed"
+    },
+    "osdElement_WIND_SPEED_HORIZONTAL_HELP": {
+        "message": "Shows estimated horizontal wind speed and direction."
+    },
+    "osdElement_WIND_SPEED_VERTICAL": {
+        "message": "Vertical Wind Speed"
+    },
+    "osdElement_WIND_SPEED_VERTICAL_HELP": {
+        "message": "Shows estimated vertical wind speed and direction (up or down)."
+    },
     "portColumnSensors": {
         "message": "Sensors"
     },
