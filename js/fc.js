@@ -618,12 +618,12 @@ var FC = {
             },
             {
                 name: 'RX_PPM',
-                bit: 13,
+                bit: 0,
                 value: 2,
             },
             {
                 name: 'RX_PWM',
-                bit: 0,
+                bit: 13,
                 value: 1,
             },
         ];
