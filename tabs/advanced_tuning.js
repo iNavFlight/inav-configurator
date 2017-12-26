@@ -14,7 +14,9 @@ TABS.advanced_tuning.initialize = function (callback) {
 
     loadChainer.setChain([
         mspHelper.loadNavPosholdConfig,
-        mspHelper.loadPositionEstimationConfig
+        mspHelper.loadPositionEstimationConfig,
+        mspHelper.loadRthAndLandConfig,
+        mspHelper.loadFwConfig
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -22,6 +24,8 @@ TABS.advanced_tuning.initialize = function (callback) {
     saveChainer.setChain([
         mspHelper.saveNavPosholdConfig,
         mspHelper.savePositionEstimationConfig,
+        mspHelper.saveRthAndLandConfig,
+        mspHelper.saveFwConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -48,7 +52,61 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         var $userControlMode = $('#user-control-mode'),
             $useMidThrottle = $("#use-mid-throttle"),
-            $useGpsVelned = $('#use_gps_velned');
+            $useGpsVelned = $('#use_gps_velned'),
+            $rthClimbFirst = $('#rth-climb-first'),
+            $rthClimbIgnoreEmergency = $('#rthClimbIgnoreEmergency'),
+            $rthTailFirst = $('#rthTailFirst'),
+            $rthAllowLanding = $('#rthAllowLanding'),
+            $rthAltControlMode = $('#rthAltControlMode');
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+
+            $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
+            $rthClimbFirst.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthClimbFirst = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthClimbFirst = 0;
+                }
+            });
+            $rthClimbFirst.change();
+
+            $rthClimbIgnoreEmergency.prop("checked", RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+            $rthClimbIgnoreEmergency.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 0;
+                }
+            });
+            $rthClimbIgnoreEmergency.change();
+
+            $rthTailFirst.prop("checked", RTH_AND_LAND_CONFIG.rthTailFirst);
+            $rthTailFirst.change(function () {
+                if ($(this).is(":checked")) {
+                    RTH_AND_LAND_CONFIG.rthTailFirst = 1;
+                } else {
+                    RTH_AND_LAND_CONFIG.rthTailFirst = 0;
+                }
+            });
+            $rthTailFirst.change();
+
+            GUI.fillSelect($rthAltControlMode, FC.getRthAltControlMode(), RTH_AND_LAND_CONFIG.rthAltControlMode);
+            $rthAltControlMode.val(RTH_AND_LAND_CONFIG.rthAltControlMode);
+            $rthAltControlMode.change(function () {
+                RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
+            });
+            GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
+            console.log("VAL", RTH_AND_LAND_CONFIG.rthAllowLanding);
+            $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
+            $rthAllowLanding.change(function () {
+                RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();
+            });
+
+            $('.requires-v1_7_1').show();
+        } else {
+            $('.requires-v1_7_1').hide();
+        }
 
         GUI.fillSelect($userControlMode, FC.getUserControlMode(), NAV_POSHOLD.userControlMode);
         $userControlMode.val(NAV_POSHOLD.userControlMode);

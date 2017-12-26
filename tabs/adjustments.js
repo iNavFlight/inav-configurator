@@ -50,7 +50,7 @@ TABS.adjustments.initialize = function (callback) {
         channelOptionTemplate.remove();
         for (var channelIndex = 0; channelIndex < auxChannelCount; channelIndex++) {
             var channelOption = channelOptionTemplate.clone();
-            channelOption.text('AUX ' + (channelIndex + 1));
+            channelOption.text('CH ' + (channelIndex + 5));
             channelOption.val(channelIndex);
             channelList.append(channelOption);
         }
@@ -86,7 +86,7 @@ TABS.adjustments.initialize = function (callback) {
         channelOptionTemplate.remove();
         for (var channelIndex = 0; channelIndex < auxChannelCount; channelIndex++) {
             var channelOption = channelOptionTemplate.clone();
-            channelOption.text('AUX ' + (channelIndex + 1));
+            channelOption.text('CH ' + (channelIndex + 5));
             channelOption.val(channelIndex);
             channelList.append(channelOption);
         }
@@ -117,11 +117,10 @@ TABS.adjustments.initialize = function (callback) {
             connect: true,
             range: channel_range,
             format: wNumb({
-                decimals: 0,
+                decimals: 0
             })
         });
 
-        var elementName =  '#adjustment-' + adjustmentIndex;
         $(newAdjustment).find('.channel-slider').Link('lower').to($(newAdjustment).find('.lowerLimitValue'));
         $(newAdjustment).find('.channel-slider').Link('upper').to($(newAdjustment).find('.upperLimitValue'));
 
@@ -209,7 +208,7 @@ TABS.adjustments.initialize = function (callback) {
                             end: rangeValues[1]
                         },
                         adjustmentFunction: parseInt($(this).find('.functionSelection .function').val()),
-                        auxSwitchChannelIndex: parseInt($(this).find('.functionSwitchChannel .channel').val()),
+                        auxSwitchChannelIndex: parseInt($(this).find('.functionSwitchChannel .channel').val())
                     };
                     ADJUSTMENT_RANGES.push(adjustmentRange);
                 } else {

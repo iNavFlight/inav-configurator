@@ -52,15 +52,14 @@ TABS.receiver.initialize = function (callback) {
                 chrome.i18n.getMessage('controlAxisYaw'),
                 chrome.i18n.getMessage('controlAxisThrottle')
             ],
-            bar_container = $('.tab-receiver .bars'),
-            aux_index = 1;
+            bar_container = $('.tab-receiver .bars');
 
         for (var i = 0; i < RC.active_channels; i++) {
             var name;
             if (i < bar_names.length) {
                 name = bar_names[i];
             } else {
-                name = chrome.i18n.getMessage("controlAxisAux" + (aux_index++));
+                name = chrome.i18n.getMessage("radioChannelShort") + (i + 1);
             }
 
             bar_container.append('\
@@ -108,11 +107,9 @@ TABS.receiver.initialize = function (callback) {
         $(window).on('resize', self.resize).resize(); // trigger so labels get correctly aligned on creation
 
         // handle rcmap & rssi aux channel
-        var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
-
         var strBuffer = [];
         for (var i = 0; i < RC_MAP.length; i++) {
-            strBuffer[RC_MAP[i]] = RC_MAP_Letters[i];
+            strBuffer[RC_MAP[i]] = FC.getRcMapLetters()[i];
         }
 
         // reconstruct
@@ -121,6 +118,11 @@ TABS.receiver.initialize = function (callback) {
 
         // set current value
         $rcMap.val(str);
+
+        /*
+         * Send tracking event so we can know if users are using different mappings than EATR
+         */
+        googleAnalytics.sendEvent('Setting', 'RcMappingRead', str);
 
         // validation / filter
         var last_valid = str;
@@ -147,7 +149,7 @@ TABS.receiver.initialize = function (callback) {
 
             // check if characters inside are all valid, also check for duplicity
             for (var i = 0; i < val.length; i++) {
-                if (RC_MAP_Letters.indexOf(strBuffer[i]) < 0) {
+                if (FC.getRcMapLetters().indexOf(strBuffer[i]) < 0) {
                     $(this).val(last_valid);
                     return false;
                 }
@@ -170,8 +172,8 @@ TABS.receiver.initialize = function (callback) {
         // rssi
         var rssi_channel_e = $('select[name="rssi_channel"]');
         rssi_channel_e.append('<option value="0">Disabled</option>');
-        for (var i = 1; i < RC.active_channels + 1; i++) {
-            rssi_channel_e.append('<option value="' + i + '">' + i + '</option>');
+        for (var i = 5; i < RC.active_channels + 1; i++) {
+            rssi_channel_e.append('<option value="' + i + '">CH' + i + '</option>');
         }
 
         $('select[name="rssi_channel"]').val(MISC.rssi_channel);
@@ -274,11 +276,16 @@ TABS.receiver.initialize = function (callback) {
             RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
-            var RC_MAP_Letters = ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
-            var strBuffer = $('input[name="rcmap"]').val().split('');
+            var rcMapValue = $('input[name="rcmap"]').val();
+            var strBuffer = rcMapValue.split('');
+
+            /*
+             * Send tracking event so we can know if users are using different mappings than EATR
+             */
+            googleAnalytics.sendEvent('Setting', 'RcMappingSave', rcMapValue);
 
             for (var i = 0; i < RC_MAP.length; i++) {
-                RC_MAP[i] = strBuffer.indexOf(RC_MAP_Letters[i]);
+                RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
 
             // catch rssi aux

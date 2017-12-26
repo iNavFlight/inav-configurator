@@ -44,6 +44,27 @@ presets.defaultValues = {
     FC_CONFIG: {"loopTime": 2000}
 };
 
+presets.settings = {
+    COMMON: {
+
+    },
+    FW: {
+        "small_angle": 180,
+    },
+    MR: {
+    },
+    get: function(mixerType) {
+        var settings = {};
+        $.extend(settings, presets.settings.COMMON);
+        if (mixerType == 'multirotor') {
+            $.extend(settings, presets.settings.MR);
+        } else {
+            $.extend(settings, presets.settings.FW);
+        }
+        return settings;
+    },
+}
+
 /*
  * When defining a preset, following fields are required:
  *
@@ -73,7 +94,7 @@ presets.presets = [
     {
         name: '5" Racer',
         description: "210-250 class racer with F3/F4 CPU on 4S battery<br>" +
-            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, no GPS capabilities</span>",
+            "<span>400g-650g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, acro flight optimized</span>",
         features: [
             "Asynchronous processing",
             "OneShot125 at 2kHz",
@@ -111,6 +132,44 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '5" GPS',
+        description: "210-250 class quadcopter with F1/F3/F4 CPU on 3S or 4S battery<br>" +
+            "<span>500g-700g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, GPS optimized</span>",
+        features: [
+            "OneShot125 at 1kHz",
+            "500dps rates",
+            "Dterm and gyro notch filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 0),
+            presets.elementHelper("FC_CONFIG", "loopTime", 2000),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 2),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 1000),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("RC_tuning", "roll_rate", 500),
+            presets.elementHelper("RC_tuning", "pitch_rate", 500),
+            presets.elementHelper("RC_tuning", "yaw_rate", 450),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 200),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 100),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 200),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 100),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 1),
+            presets.elementHelper("PIDs", 0, [43, 40, 20]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [58, 50, 22]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: '10" General Purpose',
         description: "450-600 class general purpose multirotor <br><span>1.0kg - 1.4kg weight, 10 inch propellers, <br>F1, F3 or F4 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
@@ -140,11 +199,11 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 85),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 40),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 18),
-            presets.elementHelper("PIDs", 0, [75, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [75, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0])  //YAW PIDs
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 240),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 36),
+            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [95, 45, 0])  //YAW PIDs
         ],
         type: 'multirotor'
     },
@@ -178,21 +237,20 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 144),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 90),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 72),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 43),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 50),
             presets.elementHelper("INAV_PID_CONFIG", "magHoldRateLimit", 30),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 18),
-            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 9),
-            presets.elementHelper("PIDs", 0, [80, 30, 18]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [80, 30, 18]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 0]),  //YAW PIDs
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitRollPitch", 120),
+            presets.elementHelper("PID_ADVANCED", "axisAccelerationLimitYaw", 18),
+            presets.elementHelper("PIDs", 0, [100, 30, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [100, 30, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [120, 45, 0]),  //YAW PIDs
             presets.elementHelper("PIDs", 7, [10, 7, 75])  //Level PIDs
         ],
         type: 'multirotor'
     },
     {
         name: '280mm Tricopter',
-        description: "280mm class tricopter with F3/F4 CPU<br>" +
-            "<span>Fast digital tail servo</span>",
+        description: "280mm class tricopter with F3/F4 CPU",
         features: [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
@@ -209,7 +267,7 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
-            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 300),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
             presets.elementHelper("RC_tuning", "roll_rate", 700),
@@ -231,8 +289,7 @@ presets.presets = [
     },
     {
         name: '600mm Tricopter',
-        description: "600mm class tricopter with F3/F4 CPU<br>" +
-            "<span>Fast digital tail servo</span>",
+        description: "600mm class tricopter with F3/F4 CPU<br>",
         features: [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
@@ -248,7 +305,7 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
-            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 160),
+            presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
             presets.elementHelper("RC_tuning", "roll_rate", 550),
             presets.elementHelper("RC_tuning", "pitch_rate", 480),
@@ -370,6 +427,15 @@ presets.model = (function () {
 
             }
         }
+        if (mixerType == 'airplane' || mixerType == 'flyingwing') {
+            // Always set MOTOR_STOP and feature AIRMODE for fixed wing
+            window.BF_CONFIG.features |= 1 << 4; // MOTOR_STOP
+            if (semver.gt(CONFIG.flightControllerVersion, '1.7.2')) {
+                // Note that feature_AIRMODE is only supported on
+                // INAV > 1.7.2.
+                window.BF_CONFIG.features |= 1 << 22; // AIRMODE
+            }
+        }
     };
 
     self.extractPresetNames = function (presets) {
@@ -460,8 +526,19 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
                 window[setting.group][setting.field] = setting.value;
             }
         }
-
-        saveChainer.execute();
+        var promises = {};
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            var settings = presets.settings.get(currentPreset.type);
+            Object.keys(settings).forEach(function(key, ii) {
+                var value = settings[key];
+                promises[key] = mspHelper.encodeSetting(key, value).then(function(data) {
+                    return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
+                });
+            });
+        }
+        Promise.props(promises).then(function () {
+            saveChainer.execute();
+        });
     }
 
     function fillPresetDescription(preset) {

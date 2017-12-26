@@ -4,7 +4,23 @@
 var mspHelper = (function (gui) {
     var self = {};
 
-    self.BAUD_RATES = [
+    self.BAUD_RATES_post1_6_3 = [
+        'AUTO',
+        '1200',
+        '2400',
+        '4800',
+        '9600',
+        '19200',
+        '38400',
+        '57600',
+        '115200',
+        '230400',
+        '250000',
+        '460800',
+        '921600'
+    ];
+
+    self.BAUD_RATES_pre1_6_3 = [
         'AUTO',
         '9600',
         '19200',
@@ -25,7 +41,10 @@ var mspHelper = (function (gui) {
         'RX_SERIAL': 6,
         'BLACKBOX': 7,
         'TELEMETRY_MAVLINK': 8,
-        'TELEMETRY_IBUS': 9
+        'TELEMETRY_IBUS': 9,
+        'RUNCAM_DEVICE_CONTROL' : 10,
+        'TBS_SMARTAUDIO': 11,
+        'IRC_TRAMP': 12
     };
 
     /**
@@ -76,7 +95,12 @@ var mspHelper = (function (gui) {
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
-                CONFIG.mode = data.getUint32(6, true);
+
+                /* For 1.7.4+ MSP_ACTIVEBOXES should be used to determine active modes */
+                if (semver.lt(CONFIG.flightControllerVersion, "1.7.4")) {
+                    CONFIG.mode = data.getUint32(6, true);
+                }
+
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, true);
 
@@ -89,6 +113,21 @@ var mspHelper = (function (gui) {
                 }
                 gui.updateStatusBar();
                 gui.updateProfileChange();
+                break;
+
+            case MSPCodes.MSP_ACTIVEBOXES:
+                var words = dataHandler.message_length_expected / 4;
+
+                CONFIG.mode = 0;
+                if (words == 1) {
+                    CONFIG.mode = data.getUint32(0, true);
+                }
+                else if (words == 2) {
+                    CONFIG.mode = data.getUint32(0, true) | (data.getUint32(4, true) << 32);
+                }
+                else {
+                    console.log('MSP_ACTIVEBOXES doesn\'t support more than 53 bits at the moment');
+                }
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:
@@ -242,7 +281,7 @@ var mspHelper = (function (gui) {
                 MISC.failsafe_throttle = data.getUint16(offset, true); // 1000-2000
                 offset += 2;
                 MISC.gps_type = data.getUint8(offset++);
-                MISC.gps_baudrate = data.getUint8(offset++);
+                MISC.sensors_baudrate = data.getUint8(offset++);
                 MISC.gps_ubx_sbas = data.getInt8(offset++);
                 MISC.multiwiicurrentoutput = data.getUint8(offset++);
                 MISC.rssi_channel = data.getUint8(offset++);
@@ -324,8 +363,6 @@ var mspHelper = (function (gui) {
                             'max': data.getInt16(i + 2, true),
                             'middle': data.getInt16(i + 4, true),
                             'rate': data.getInt8(i + 6),
-                            'angleAtMin': data.getInt8(i + 7),
-                            'angleAtMax': data.getInt8(i + 8),
                             'indexOfChannelToForward': data.getInt8(i + 9),
                             'reversedInputSources': data.getUint32(i + 10)
                         };
@@ -374,6 +411,16 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_SET_SERVO_CONFIGURATION:
                 console.log('Servo Configuration saved');
+                break;
+            case MSPCodes.MSP_RTC:
+                if (data.length >= 6) {
+                    var seconds = data.getInt32(0, true);
+                    var millis = data.getUint16(4, true);
+                    console.log("RTC received: " + new Date(seconds * 1000 + millis));
+                }
+                break;
+            case MSPCodes.MSP_SET_RTC:
+                console.log('RTC set');
                 break;
             case MSPCodes.MSP_EEPROM_WRITE:
                 console.log('Settings Saved in EEPROM');
@@ -484,13 +531,15 @@ var mspHelper = (function (gui) {
                 var serialPortCount = data.byteLength / bytesPerPort;
 
                 for (i = 0; i < serialPortCount; i++) {
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+
                     var serialPort = {
                         identifier: data.getUint8(offset),
                         functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
-                        msp_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 3)],
-                        gps_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 4)],
-                        telemetry_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 5)],
-                        blackbox_baudrate: mspHelper.BAUD_RATES[data.getUint8(offset + 6)]
+                        msp_baudrate: BAUD_RATES[data.getUint8(offset + 3)],
+                        sensors_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
+                        telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
+                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
                     offset += bytesPerPort;
@@ -570,10 +619,18 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
                     offset += 4; // 4 null bytes for betaflight compatibility
-                    RX_CONFIG.nrf24rx_protocol = data.getUint8(offset);
+                    RX_CONFIG.spirx_protocol = data.getUint8(offset);
                     offset++;
-                    RX_CONFIG.nrf24rx_id = data.getUint32(offset, true);
+                    RX_CONFIG.spirx_id = data.getUint32(offset, true);
                     offset += 4;
+                    RX_CONFIG.spirx_channel_count = data.getUint8(offset);
+                    offset += 1;
+                }
+                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                    offset += 1;
+                    RX_CONFIG.receiver_type = data.getUint8(offset);
+                    offset += 1;
                 }
                 break;
 
@@ -590,6 +647,24 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                 offset++;
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                    FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
+                    offset++;
+                    FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
+                    offset += 2;
+                }
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+                    FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
+                    offset += 2;
+                    FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
+                    offset++;
+                }
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -937,6 +1012,40 @@ var mspHelper = (function (gui) {
                 console.log('POSITION_ESTIMATOR saved');
                 break;
 
+            case MSPCodes.MSP_RTH_AND_LAND_CONFIG:
+                RTH_AND_LAND_CONFIG.minRthDistance = data.getUint16(0, true);
+                RTH_AND_LAND_CONFIG.rthClimbFirst = data.getUint8(2);
+                RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = data.getUint8(3);
+                RTH_AND_LAND_CONFIG.rthTailFirst = data.getUint8(4);
+                RTH_AND_LAND_CONFIG.rthAllowLanding = data.getUint8(5);
+                RTH_AND_LAND_CONFIG.rthAltControlMode = data.getUint8(6);
+                RTH_AND_LAND_CONFIG.rthAbortThreshold = data.getUint16(7, true);
+                RTH_AND_LAND_CONFIG.rthAltitude = data.getUint16(9, true);
+                RTH_AND_LAND_CONFIG.landDescentRate = data.getUint16(11, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(13, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(15, true);
+                RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(17, true);
+                break;
+
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                console.log('RTH_AND_LAND_CONFIG saved');
+                break;
+
+            case MSPCodes.MSP_FW_CONFIG:
+                FW_CONFIG.cruiseThrottle = data.getUint16(0, true);
+                FW_CONFIG.minThrottle = data.getUint16(2, true);
+                FW_CONFIG.maxThrottle = data.getUint16(4, true);
+                FW_CONFIG.maxBankAngle = data.getUint8(6);
+                FW_CONFIG.maxClimbAngle = data.getUint8(7);
+                FW_CONFIG.maxDiveAngle = data.getUint8(8);
+                FW_CONFIG.pitchToThrottle = data.getUint8(9);
+                FW_CONFIG.loiterRadius = data.getUint16(10, true);
+                break;
+
+            case MSPCodes.MSP_SET_FW_CONFIG:
+                console.log('FW_CONFIG saved');
+                break;
+
             case MSPCodes.MSP_SET_MODE_RANGE:
                 console.log('Mode range saved');
                 break;
@@ -979,6 +1088,11 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_OSD_CHAR_WRITE:
                 console.log('OSD char uploaded');
+                break;
+            case MSPCodes.MSPV2_SETTING:
+                break;
+            case MSPCodes.MSPV2_SET_SETTING:
+                console.log("Setting set");
                 break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
@@ -1096,7 +1210,7 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(MISC.failsafe_throttle));
                 buffer.push(highByte(MISC.failsafe_throttle));
                 buffer.push(MISC.gps_type);
-                buffer.push(MISC.gps_baudrate);
+                buffer.push(MISC.sensors_baudrate);
                 buffer.push(MISC.gps_ubx_sbas);
                 buffer.push(MISC.multiwiicurrentoutput);
                 buffer.push(MISC.rssi_channel);
@@ -1127,11 +1241,16 @@ var mspHelper = (function (gui) {
                     buffer.push(0);
                     buffer.push(0);
                     buffer.push(0);
-                    buffer.push(RX_CONFIG.nrf24rx_protocol);
-                    buffer.push(RX_CONFIG.nrf24rx_id & 0xFF);
-                    buffer.push((RX_CONFIG.nrf24rx_id >> 8) & 0xFF);
-                    buffer.push((RX_CONFIG.nrf24rx_id >> 16) & 0xFF);
-                    buffer.push((RX_CONFIG.nrf24rx_id >> 24) & 0xFF);
+                    buffer.push(RX_CONFIG.spirx_protocol);
+                    // spirx_id - 4 bytes
+                    buffer.push32(RX_CONFIG.spirx_id);
+                    buffer.push(RX_CONFIG.spirx_channel_count);
+                }
+                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                    buffer.push(0);
+                    // receiver type in RX_CONFIG rather than in BF_CONFIG.features
+                    buffer.push(RX_CONFIG.receiver_type);
                 }
                 break;
 
@@ -1144,6 +1263,22 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+                    buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                }   
+                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                    buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+                }
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
@@ -1171,10 +1306,11 @@ var mspHelper = (function (gui) {
                     buffer.push(specificByte(functionMask, 0));
                     buffer.push(specificByte(functionMask, 1));
 
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.msp_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.gps_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(mspHelper.BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+                    buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
                 }
                 break;
 
@@ -1318,6 +1454,56 @@ var mspHelper = (function (gui) {
                 buffer.push(POSITION_ESTIMATOR.use_gps_velned);
                 break;
 
+            case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.minRthDistance));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.minRthDistance));
+
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+                buffer.push(RTH_AND_LAND_CONFIG.rthTailFirst);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAllowLanding);
+                buffer.push(RTH_AND_LAND_CONFIG.rthAltControlMode);
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAbortThreshold));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAltitude));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAltitude));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landDescentRate));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                break;
+
+            case MSPCodes.MSP_SET_FW_CONFIG:
+
+                buffer.push(lowByte(FW_CONFIG.cruiseThrottle));
+                buffer.push(highByte(FW_CONFIG.cruiseThrottle));
+
+                buffer.push(lowByte(FW_CONFIG.minThrottle));
+                buffer.push(highByte(FW_CONFIG.minThrottle));
+
+                buffer.push(lowByte(FW_CONFIG.maxThrottle));
+                buffer.push(highByte(FW_CONFIG.maxThrottle));
+
+                buffer.push(FW_CONFIG.maxBankAngle);
+                buffer.push(FW_CONFIG.maxClimbAngle);
+                buffer.push(FW_CONFIG.maxDiveAngle);
+                buffer.push(FW_CONFIG.pitchToThrottle);
+
+                buffer.push(lowByte(FW_CONFIG.loiterRadius));
+                buffer.push(highByte(FW_CONFIG.loiterRadius));
+
+                break;
+
             case MSPCodes.MSP_SET_FILTER_CONFIG:
                 buffer.push(FILTER_CONFIG.gyroSoftLpfHz);
 
@@ -1457,8 +1643,8 @@ var mspHelper = (function (gui) {
 
             buffer.push(lowByte(servoConfiguration.rate));
 
-            buffer.push(servoConfiguration.angleAtMin);
-            buffer.push(servoConfiguration.angleAtMax);
+            buffer.push(0);
+            buffer.push(0);
 
             var out = servoConfiguration.indexOfChannelToForward;
             if (out == undefined) {
@@ -1536,21 +1722,32 @@ var mspHelper = (function (gui) {
      * of the returned data to the given callback (or null for the data if an error occured).
      */
     self.dataflashRead = function (address, onDataCallback) {
-        MSP.send_message(MSPCodes.MSP_DATAFLASH_READ, [address & 0xFF, (address >> 8) & 0xFF, (address >> 16) & 0xFF, (address >> 24) & 0xFF],
-            false, function (response) {
-                var chunkAddress = response.data.getUint32(0, 1);
+        var buffer = [];
+        buffer.push(address & 0xFF);
+        buffer.push((address >> 8) & 0xFF);
+        buffer.push((address >> 16) & 0xFF);
+        buffer.push((address >> 24) & 0xFF);
 
-                // Verify that the address of the memory returned matches what the caller asked for
-                if (chunkAddress == address) {
-                    /* Strip that address off the front of the reply and deliver it separately so the caller doesn't have to
-                     * figure out the reply format:
-                     */
-                    onDataCallback(address, new DataView(response.data.buffer, response.data.byteOffset + 4, response.data.buffer.byteLength - 4));
-                } else {
-                    // Report error
-                    onDataCallback(address, null);
-                }
-            });
+        // For API > 2.0.0 we support requesting payload size - request 4KiB and let firmware decide what actual size to send
+        if (CONFIG.apiVersion && semver.gte(CONFIG.apiVersion, "2.0.0")) {
+            buffer.push(lowByte(4096));
+            buffer.push(highByte(4096));
+        }
+
+        MSP.send_message(MSPCodes.MSP_DATAFLASH_READ, buffer, false, function (response) {
+            var chunkAddress = response.data.getUint32(0, 1);
+
+            // Verify that the address of the memory returned matches what the caller asked for
+            if (chunkAddress == address) {
+                /* Strip that address off the front of the reply and deliver it separately so the caller doesn't have to
+                 * figure out the reply format:
+                 */
+                onDataCallback(address, new DataView(response.data.buffer, response.data.byteOffset + 4, response.data.buffer.byteLength - 4));
+            } else {
+                // Report error
+                onDataCallback(address, null);
+            }
+        });
     };
 
     self.sendRxFailConfig = function (onCompleteCallback) {
@@ -1888,6 +2085,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
     };
 
+    self.queryFcStatus = function (callback) {
+        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
+    };
+
     self.loadMisc = function (callback) {
         MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
     };
@@ -2080,6 +2281,189 @@ var mspHelper = (function (gui) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
             MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
         } else {
+            callback();
+        }
+    };
+
+    self.loadRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveRthAndLandConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadFwConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveFwConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self._getSetting = function(name) {
+        var promise;
+        if (this._settings) {
+            promise = Promise.resolve(this._settings);
+        } else {
+            promise = new Promise(function(resolve, reject) {
+                var $this = this;
+                $.ajax({
+                    url: chrome.runtime.getURL('/resources/settings.json'),
+                    dataType: 'json',
+                    error: function(jqXHR, text, error) {
+                        reject(error);
+                    },
+                    success: function(data) {
+                        $this._settings = data;
+                        resolve(data);
+                    }
+                });
+            });
+        }
+        return promise.then(function (data) {
+            return data[name];
+        });
+    };
+
+    self._encodeSettingName = function(name, data) {
+        for (var ii = 0; ii < name.length; ii++) {
+            data.push(name.charCodeAt(ii));
+        }
+        data.push(0);
+    };
+
+    self.getSetting = function(name, callback) {
+        var $this = this;
+        return this._getSetting(name).then(function (setting) {
+           var data = [];
+            $this._encodeSettingName(name, data);
+            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function(resp) {
+                var value;
+                switch (setting.type) {
+                    case "uint8_t":
+                        value = resp.data.getUint8(0);
+                        break;
+                    case "int8_t":
+                        value = resp.data.getInt8(0);
+                        break;
+                    case "uint16_t":
+                        value = resp.data.getUint16(0, true);
+                        break;
+                    case "int16_t":
+                        value = resp.data.getInt16(0, true);
+                        break;
+                    case "uint32_t":
+                        value = resp.data.getUint32(0, true);
+                        break;
+                    case "float":
+                        var fi32 = resp.data.getUint32(0, true);
+                        var buf = new ArrayBuffer(4);
+                        (new Uint32Array(buf))[0] = fi32;
+                        value = (new Float32Array(buf))[0];
+                        break;
+                    default:
+                        throw "Unknown setting type " + setting.type;
+                }
+                if (setting.table) {
+                    value = setting.table.values[value];
+                }
+                if (callback) {
+                    callback(value, setting);
+                }
+            });
+        });
+    };
+
+    self.encodeSetting = function(name, value) {
+        var $this = this;
+        return this._getSetting(name).then(function (setting) {
+            if (setting.table) {
+                var found = false;
+                for (var ii = 0; ii < setting.table.values.length; ii++) {
+                    if (setting.table.values[ii] == value) {
+                        value = ii;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw 'Invalid value "' + value + '" for setting ' + name;
+                }
+            }
+            var data = [];
+            $this._encodeSettingName(name, data);
+            switch (setting.type) {
+                case "uint8_t":
+                case "int8_t":
+                    data.push8(value);
+                    break;
+                case "uint16_t":
+                case "int16_t":
+                    data.push16(value);
+                    break;
+                case "uint32_t":
+                    data.push32(value);
+                    break;
+                case "float":
+                    var buf = new ArrayBuffer(4);
+                    (new Float32Array(buf))[0] = value;
+                    var if32 = (new Uint32Array(buf))[0];
+                    data.push32(if32);
+                    break;
+                default:
+                    throw "Unknown setting type " + setting.type;
+            }
+            return data;
+        });
+    };
+
+    self.setSetting = function(name, value, callback) {
+        this.encodeSetting(name, value).then(function (data) {
+            MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
+        });
+    };
+
+    self.getRTC = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            MSP.send_message(MSPCodes.MSP_RTC, false, false, function(resp) {
+                var seconds = resp.data.read32();
+                var millis = resp.data.readU16();
+                if (callback) {
+                    callback(seconds, millis);
+                }
+            });
+        } else if (callback) {
+            callback(0, 0);
+        }
+    };
+
+    self.setRTC = function(callback) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            var now = Date.now();
+            var secs = now / 1000;
+            var millis = now % 1000;
+            var data = [];
+            data.push32(secs);
+            data.push16(millis);
+            MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
+        } else if (callback) {
             callback();
         }
     };

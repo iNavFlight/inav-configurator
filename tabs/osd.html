@@ -13,7 +13,7 @@
         <div class="supported hide">
             <div class="cf_column third_left osd__elements">
                 <div class="spacer_right">
-                    <div class="gui_box grey">
+                    <div id="osd_group_template" class="gui_box grey">
                         <div
                             class="gui_box_titlebar"
                             style="margin-bottom: 0">
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="cf_column twothird">
-                <div class="gui_box grey preview" style="float: left;">
+                <div class="gui_box grey preview" style="float: left; position: fixed;">
                     <div class="gui_box_titlebar image">
                         <div class="spacer_box_title">
                           Preview <span>(drag to change position)</span>
@@ -58,7 +58,10 @@
                             </div>
                         </div>
                         <div class="spacer_box">
-                            <div class="units"></div>
+                            <div class="units">
+                                <div class="helpicon cf_tip"></div>
+                                <select name="unit_mode"></select>
+                            </div>
                         </div>
                     </div>
                     <div class="gui_box grey alarms-container" style="display:none;">

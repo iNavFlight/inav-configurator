@@ -56,6 +56,100 @@
                     </div>
                 </div>
             </div>
+
+            <div class="config-section gui_box grey requires-v1_7_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="rthConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="select">
+                        <select id="rthAltControlMode"></select>
+                        <label for="rthAltControlMode"> <span data-i18n="rthAltControlMode"></span></label>
+                    </div>
+
+                    <div class="number">
+                        <input id="rthAltitude" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.rthAltitude" step="1" min="0" max="65000">
+                        <label for="rthAltitude">
+                            <span data-i18n="rthAltitude"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="rthAltitudeHelp"></div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rth-climb-first" class="toggle" />
+                        <label for="rth-climb-first">
+                            <span data-i18n="rthClimbFirst"></span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rthClimbIgnoreEmergency" class="toggle" />
+                        <label for="rthClimbIgnoreEmergency">
+                            <span data-i18n="rthClimbIgnoreEmergency"></span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" id="rthTailFirst" class="toggle" />
+                        <label for="rthTailFirst">
+                            <span data-i18n="rthTailFirst"></span>
+                        </label>
+                    </div>
+
+                    <div class="select">
+                        <select id="rthAllowLanding"></select>
+                        <label for="rthAllowLanding">
+                            <span data-i18n="rthAllowLanding"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landDescentRate" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landDescentRate" step="1" min="100" max="2000">
+                        <label for="landDescentRate">
+                            <span data-i18n="landDescentRate"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landSlowdownMinAlt" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landSlowdownMinAlt" step="1" min="50" max="1000">
+                        <label for="landSlowdownMinAlt">
+                            <span data-i18n="landSlowdownMinAlt"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="landSlowdownMaxAlt" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.landSlowdownMaxAlt" step="1" min="500" max="4000">
+                        <label for="landSlowdownMaxAlt">
+                            <span data-i18n="landSlowdownMaxAlt"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="rth-min-distance" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.minRthDistance" step="1" min="0" max="5000">
+                        <label for="rth-min-distance">
+                            <span data-i18n="minRthDistance"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="minRthDistanceHelp"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="rthAbortThreshold" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.rthAbortThreshold" step="1" min="0" max="65000">
+                        <label for="rthAbortThreshold">
+                            <span data-i18n="rthAbortThreshold"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="rthAbortThresholdHelp"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="emergencyDescentRate" type="number" data-simple-bind="RTH_AND_LAND_CONFIG.emergencyDescentRate" step="1" min="10" max="2000">
+                        <label for="emergencyDescentRate">
+                            <span data-i18n="emergencyDescentRate"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="rightWrapper">
@@ -116,6 +210,72 @@
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="use_gps_velned_help"></div>
                     </div>
+                </div>
+            </div>
+
+            <div class="config-section gui_box grey requires-v1_7_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="fixedWingConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="number">
+                        <input id="cruiseThrottle" type="number" data-simple-bind="FW_CONFIG.cruiseThrottle" step="1" min="1000" max="2000">
+                        <label for="cruiseThrottle">
+                            <span data-i18n="cruiseThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="minThrottle" type="number" data-simple-bind="FW_CONFIG.minThrottle" step="1" min="1000" max="2000">
+                        <label for="minThrottle">
+                            <span data-i18n="minThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxThrottle" type="number" data-simple-bind="FW_CONFIG.maxThrottle" step="1" min="1000" max="2000">
+                        <label for="maxThrottle">
+                            <span data-i18n="maxThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxBankAngle" type="number" data-simple-bind="FW_CONFIG.maxBankAngle" step="1" min="5" max="80">
+                        <label for="maxBankAngle">
+                            <span data-i18n="maxBankAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxClimbAngle" type="number" data-simple-bind="FW_CONFIG.maxClimbAngle" step="1" min="5" max="80">
+                        <label for="maxClimbAngle">
+                            <span data-i18n="maxClimbAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="maxDiveAngle" type="number" data-simple-bind="FW_CONFIG.maxDiveAngle" step="1" min="5" max="80">
+                        <label for="maxDiveAngle">
+                            <span data-i18n="maxDiveAngle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="pitchToThrottle" type="number" data-simple-bind="FW_CONFIG.pitchToThrottle" step="1" min="0" max="100">
+                        <label for="pitchToThrottle">
+                            <span data-i18n="pitchToThrottle"></span>
+                        </label>
+                    </div>
+
+                    <div class="number">
+                        <input id="loiterRadius" type="number" data-simple-bind="FW_CONFIG.loiterRadius" step="1" min="0" max="10000">
+                        <label for="loiterRadius">
+                            <span data-i18n="loiterRadius"></span>
+                        </label>
+                    </div>
+
+
                 </div>
             </div>
 

@@ -84,6 +84,40 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // select current mixer configuration
         mixer_list_e.val(BF_CONFIG.mixerConfiguration).change();
 
+        // receiver configuration
+        var rxTypesSelect = $('#rxType');
+        var rxTypes = FC.getRxTypes();
+        for (var ii = 0; ii < rxTypes.length; ii++) {
+            var rxType = rxTypes[ii];
+            var option = $('<option value="' + rxType.name + '" >' + chrome.i18n.getMessage(rxType.name) + '</option>');
+            option.data('rx-type', rxType);
+            if (FC.isRxTypeEnabled(rxType)) {
+                option.prop('selected', true);
+            }
+            option.appendTo(rxTypesSelect);
+        }
+        var rxTypeOptions = $('[data-rx-type]');
+
+        var updateRxOptions = function(animated) {
+            var duration = animated ? 400 : 0;
+            rxTypeOptions.each(function (ii, obj) {
+                var $obj = $(obj);
+                var rxType = $obj.data('rx-type');
+                if (rxType && rxType != rxTypesSelect.val()) {
+                    $obj.slideUp(duration);
+                } else {
+                    $obj.slideDown(duration);
+                }
+            });
+        };
+        updateRxOptions(false);
+
+        rxTypesSelect.change(function () {
+            updateRxOptions(true);
+            var rxType = rxTypesSelect.find(':selected').data('rx-type');
+            FC.setRxTypeEnabled(rxType);
+        });
+
         // generate features
         var features = FC.getFeatures();
 
@@ -226,16 +260,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        var nrf24Protocol_e = $('#nrf24-protocol');
-        GUI.fillSelect(nrf24Protocol_e, FC.getNrf24ProtocolTypes());
+        var spiProtocol_e = $('#spi-protocol');
+        GUI.fillSelect(spiProtocol_e, FC.getSPIProtocolTypes());
 
-        nrf24Protocol_e.change(function () {
-            RX_CONFIG.nrf24rx_protocol = parseInt($(this).val());
-            RX_CONFIG.nrf24rx_id = 0;
+        spiProtocol_e.change(function () {
+            RX_CONFIG.spirx_protocol = parseInt($(this).val());
+            RX_CONFIG.spirx_id = 0;
         });
 
-        // select current nrf24 protocol
-        nrf24Protocol_e.val(RX_CONFIG.nrf24rx_protocol);
+        // select current spi protocol
+        spiProtocol_e.val(RX_CONFIG.spirx_protocol);
 
         // fill board alignment
         $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));
@@ -471,7 +505,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             var $sensorAcc = $('#sensor-acc'),
                 $sensorMag = $('#sensor-mag'),
                 $sensorBaro = $('#sensor-baro'),
-                $sensorPitot = $('#sensor-pitot');
+                $sensorPitot = $('#sensor-pitot'),
+                $sensorRangefinder = $('#sensor-rangefinder');
 
             GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
             $sensorAcc.val(SENSOR_CONFIG.accelerometer);
@@ -498,9 +533,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 SENSOR_CONFIG.pitot = $sensorPitot.val();
             });
 
+            GUI.fillSelect($sensorRangefinder, FC.getRangefinderNames());
+            $sensorRangefinder.val(SENSOR_CONFIG.rangefinder);
+            $sensorRangefinder.change(function () {
+                SENSOR_CONFIG.rangefinder = $sensorRangefinder.val();
+            });
+
             $(".requires-v1_5").show();
         } else {
             $(".requires-v1_5").hide();
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.0")) {
+            $(".requires-v1_7").show();
+        } else {
+            $(".requires-v1_7").hide();
         }
 
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
@@ -588,14 +635,25 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_acc = parseInt(orientation_acc_e.val());
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
+            var rxTypes = FC.getRxTypes();
+
+            function is_using_rx_type(name) {
+                for (var ii = 0; ii < rxTypes.length; ii++) {
+                    if (rxTypes[ii].name == name) {
+                        return FC.isRxTypeEnabled(rxTypes[ii]);
+                    }
+                }
+                return false;
+            }
+
             // track feature usage
-            if (FC.isFeatureEnabled('RX_SERIAL', features)) {
+            if (is_using_rx_type('RX_SERIAL')) {
                 googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRxTypes[RX_CONFIG.serialrx_provider]);
             }
 
             // track feature usage
-            if (FC.isFeatureEnabled('RX_NRF24', features)) {
-                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getNrf24ProtocolTypes()[RX_CONFIG.nrf24rx_protocol]);
+            if (is_using_rx_type('RX_SPI')) {
+                googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getSPIProtocolTypes()[RX_CONFIG.spirx_protocol]);
             }
 
             if (FC.isFeatureEnabled('GPS', features)) {
@@ -604,7 +662,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             googleAnalytics.sendEvent('Setting', 'Mixer', mixerList[BF_CONFIG.mixerConfiguration - 1].name);
-            googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('tr').find('label').text());
+            googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('.radio').find('label').text());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
             /*

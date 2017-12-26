@@ -18,6 +18,11 @@ var MSPCodes = {
     MSP_POSITION_ESTIMATION_CONFIG: 16,
     MSP_SET_POSITION_ESTIMATION_CONFIG: 17,
 
+    MSP_RTH_AND_LAND_CONFIG:     21,
+    MSP_SET_RTH_AND_LAND_CONFIG: 22,
+    MSP_FW_CONFIG:              23,
+    MSP_SET_FW_CONFIG:          24,
+
     // MSP commands for Cleanflight original features
     MSP_CHANNEL_FORWARDING:     32,
     MSP_SET_CHANNEL_FORWARDING: 33,
@@ -79,7 +84,7 @@ var MSPCodes = {
     MSP_ANALOG:             110,
     MSP_RC_TUNING:          111,
     MSP_PID:                112,
-    MSP_BOX:                113,
+    MSP_ACTIVEBOXES:        113,
     MSP_MISC:               114,
     MSP_MOTOR_PINS:         115,
     MSP_BOXNAMES:           116,
@@ -119,6 +124,9 @@ var MSPCodes = {
     MSP_SERVO_MIX_RULES:    241,
     MSP_SET_SERVO_MIX_RULE: 242,
 
+    MSP_RTC:                246,
+    MSP_SET_RTC:            247,
+
     MSP_EEPROM_WRITE:       250,
 
     MSP_DEBUGMSG:           253,
@@ -137,5 +145,9 @@ var MSPCodes = {
     MSP_BF_CONFIG:             66, // baseflight-specific settings that aren't covered elsewhere
     MSP_SET_BF_CONFIG:         67, // baseflight-specific settings save
     MSP_SET_REBOOT:         68, // reboot settings
-    MSP_BF_BUILD_INFO:          69  // build date as well as some space for future expansion
+    MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
+
+    // INAV specific codes
+    MSPV2_SETTING:          0x1003,
+    MSPV2_SET_SETTING:      0x1004,
 };

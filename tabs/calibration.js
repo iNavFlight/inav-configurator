@@ -81,6 +81,14 @@ TABS.calibration.initialize = function (callback) {
         }
     }
 
+    function updateSensorData() {
+        var pos = ['X', 'Y', 'Z'];
+        pos.forEach(function(item) {
+            $('[name=accGain'+item+']').val(CALIBRATION_DATA.accGain[item]);
+            $('[name=accZero'+item+']').val(CALIBRATION_DATA.accGain[item]);
+        });
+    }
+
     function processHtml() {
 
         $('#calibrate-start-button').click(function () {
@@ -115,12 +123,12 @@ TABS.calibration.initialize = function (callback) {
                     content: $('#modal-acc-processing')
                 }).open();
 
-                GUI.interval_pause('status_pull');
+                helper.interval.pause('status_pull');
                 MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
                 });
 
-                GUI.timeout_add('acc_calibration_timeout', function () {
+                helper.timeout.add('acc_calibration_timeout', function () {
 
                     updateCalibrationSteps(newStep);
 
@@ -128,7 +136,7 @@ TABS.calibration.initialize = function (callback) {
 
                     modalProcessing.close();
 
-                    GUI.interval_resume('status_pull');
+                    helper.interval.resume('status_pull');
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
 
                     if (newStep === null) {
@@ -159,11 +167,11 @@ TABS.calibration.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        GUI.interval_add('status_pull', function status_pull() {
-            MSP.send_message(MSPCodes.MSP_STATUS);
-
+        helper.interval.add('status_pull', function status_pull() {
             if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, updateSensorData);
+            } else {
+                MSP.send_message(MSPCodes.MSP_STATUS);
             }
         }, 250, true);
         GUI.content_ready(callback);

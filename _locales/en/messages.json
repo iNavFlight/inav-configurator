@@ -84,7 +84,7 @@
         "message": "Receiver"
     },
     "tabMisc": {
-        "message": "Miscelanous"
+        "message": "Miscellaneous"
     },
     "tabModeSelection": {
         "message": "Mode Selection"
@@ -245,7 +245,7 @@
     },
 
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"http://seriouslypro.com/spracingf3\" target=\"_blank\">SPRacingF3</a>, <a href=\"http://www.immersionrc.com/fpv-products/vortex-racing-quad/\" target=\"_blank\">Vortex</a>, <a href=\"https://github.com/TauLabs/TauLabs/wiki/Sparky\" target=\"_blank\">Sparky</a>, <a href=\"http://www.readymaderc.com/store/index.php?main_page=product_info&cPath=76_156&products_id=4221\" target=\"_blank\">DoDo</a>, <a href=\"https://www.openpilot.org/product/coptercontrol/\" target=\"_blank\">CC3D/EVO</a>, <a href=\"http://www.multiwiicopter.com/products/paris-air-hero-32-naze\" target=\"_blank\">Air Hero 32</a>, <a href=\"http://www.readytoflyquads.com/flight-controllers/flip-series\" target=\"_blank\">Flip32/+/Deluxe</a>, <a href=\"http://multirotormania.com/129-dragonfly32\" target=\"_blank\">DragonFly32</a>, <a href=\"http://www.goodluckbuy.com/micro-quadcopter-flight-driver-controller-9dof-9-axis-altitude-sensor-stm32f103.html\" target=\"_blank\">CJMCU Microquad</a>, Chebuzz F3, <a href=\"http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF254044\" target=\"_blank\">STM32F3Discovery</a>, <a href=\"http://www.overskyrc.com/hermit-micro-fpv-brushless-quadcopter-145mm-98g-fully-assembled-p-621.html\" target=\"_blank\">Hermit</a>, <a href=\"http://rcexplorer.se/blog/2015/05/introducing-the-naze32-tricopter-frame/\" target=\"_blank\">Naze32 Tricopter Frame</a>, <a href=\"http://www.2dogrc.com/skyline-32-naze-32-bit-flight-controller-acro-version.html\" target=\"_blank\">Skyline32</a>, <a href=\"http://abusemark.com/store/index.php?main_page=index&cPath=1\" target=\"_blank\">Naze/32/Mini/Pro</a>/<a href=\"http://www.massiverc.com/Shop/en/574-massive-acro-blackbox-flight-control-board.html\" target=\"_blank\">Blackbox</a> etc)<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"http://www.multiwiicopter.com/products/inav-air3-fixed-wing\" target=\"_blank\">Sirius AIR3</a>, <a href=\"http://seriouslypro.com/spracingf3\" target=\"_blank\">SPRacingF3</a>, <a href=\"http://www.immersionrc.com/fpv-products/vortex-racing-quad/\" target=\"_blank\">Vortex</a>, <a href=\"https://github.com/TauLabs/TauLabs/wiki/Sparky\" target=\"_blank\">Sparky</a>, <a href=\"http://www.readymaderc.com/store/index.php?main_page=product_info&cPath=76_156&products_id=4221\" target=\"_blank\">DoDo</a>, <a href=\"https://www.openpilot.org/product/coptercontrol/\" target=\"_blank\">CC3D/EVO</a>, <a href=\"http://www.readytoflyquads.com/flight-controllers/flip-series\" target=\"_blank\">Flip32/+/Deluxe</a>, <a href=\"http://multirotormania.com/129-dragonfly32\" target=\"_blank\">DragonFly32</a>, <a href=\"http://www.goodluckbuy.com/micro-quadcopter-flight-driver-controller-9dof-9-axis-altitude-sensor-stm32f103.html\" target=\"_blank\">CJMCU Microquad</a>, Chebuzz F3, <a href=\"http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF254044\" target=\"_blank\">STM32F3Discovery</a>, <a href=\"http://www.overskyrc.com/hermit-micro-fpv-brushless-quadcopter-145mm-98g-fully-assembled-p-621.html\" target=\"_blank\">Hermit</a>, <a href=\"http://rcexplorer.se/blog/2015/05/introducing-the-naze32-tricopter-frame/\" target=\"_blank\">Naze32 Tricopter Frame</a>, <a href=\"http://www.2dogrc.com/skyline-32-naze-32-bit-flight-controller-acro-version.html\" target=\"_blank\">Skyline32</a>, <a href=\"http://abusemark.com/store/index.php?main_page=index&cPath=1\" target=\"_blank\">Naze/32/Mini/Pro</a>/<a href=\"http://www.massiverc.com/Shop/en/574-massive-acro-blackbox-flight-control-board.html\" target=\"_blank\">Blackbox</a> etc)<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -307,7 +307,12 @@
     "defaultSupport5": {
         "message": "<a href=\"https://gitter.im/iNavFlight/inav\" target=\"_blank\">Join via WebClient</a>"
     },
-
+    "communityRCGroupsSupport": {
+        "message": "RC Groups Support"
+    },
+    "communitySlackSupport": {
+        "message": "Slack Support Live Chat"
+    },
     "initialSetupBackupAndRestoreApiVersion": {
         "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
@@ -456,17 +461,30 @@
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
 
-    "featureRX_PPM": {
+    "RX_PPM": {
         "message": "PPM RX input"
     },
+    "RX_SERIAL": {
+        "message": "Serial-based receiver (SPEKSAT, SBUS, SUMD)"
+    },
+    "RX_PWM": {
+        "message": "PWM RX input (one wire per channel)"
+    },
+    "RX_MSP": {
+        "message": "MSP RX input (control via MSP port)"
+    },
+    "RX_SPI": {
+        "message": "RX SPI based receiver (NRF24L01, RFM22)"
+    },
+    "RX_NONE": {
+        "message": "No receiver"
+    },
+
     "featureVBAT": {
         "message": "Battery voltage monitoring"
     },
     "featureINFLIGHT_ACC_CAL": {
         "message": "In-flight level calibration"
-    },
-    "featureRX_SERIAL": {
-        "message": "Serial-based receiver (SPEKSAT, SBUS, SUMD)"
     },
     "featureMOTOR_STOP": {
         "message": "Don't spin the motors when armed"
@@ -500,12 +518,6 @@
     },
     "feature3D": {
         "message": "3D mode (for use with reversible ESCs)"
-    },
-    "featureRX_PARALLEL_PWM": {
-        "message": "PWM RX input (one wire per channel)"
-    },
-    "featureRX_MSP": {
-        "message": "MSP RX input (control via MSP port)"
     },
     "featureRSSI_ADC": {
         "message": "Analog RSSI input"
@@ -543,12 +555,6 @@
     "featureTRANSPONDERTip": {
         "message": "Configure via the Race Transponder tab after enabling."
     },
-    "featureRX_NRF24": {
-        "message": "NRF24L01 based receiver"
-    },
-    "featureRX_NRF24Tip": {
-        "message": "Remember to set the NRF24 protocol after enabling."
-    },
     "featureSOFTSPI": {
         "message": "CPU based SPI"
     },
@@ -563,6 +569,9 @@
     },
     "featureOSD": {
         "message": "OSD"
+    },
+    "featureAIRMODE": {
+        "message": "Permanently enable AIRMODE"
     },
     "configurationFeatureEnabled": {
         "message": "Enabled"
@@ -637,7 +646,7 @@
         "message": "Disarm regardless of throttle value"
     },
     "configurationDisarmKillSwitchHelp": {
-        "message": "When arming via AUX channel"
+        "message": "When arming via radio channel"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -723,8 +732,8 @@
     "configurationSerialRX": {
         "message": "Serial Receiver Provider"
     },
-    "configurationNrf24Protocol": {
-        "message": "NRF24 protocol"
+    "configurationSPIProtocol": {
+        "message": "RX SPI protocol"
     },
     "configurationEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
@@ -751,8 +760,8 @@
     "portsFunction_MSP": {
         "message": "MSP"
     },
-    "portsFunction_GSP": {
-        "message": "GSP"
+    "portsFunction_GPS": {
+        "message": "GPS"
     },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
@@ -780,6 +789,15 @@
     },
     "portsFunction_BLACKBOX": {
         "message": "Blackbox"
+    },
+    "portsFunction_RUNCAM_DEVICE_CONTROL": {
+        "message": "RunCam Device"
+    },
+    "portsFunction_TBS_SMARTAUDIO": {
+        "message": "TBS SmartAudio"
+    },
+    "portsFunction_IRC_TRAMP": {
+        "message": "IRC Tramp"
     },
     "pidTuningName": {
         "message": "Name"
@@ -920,10 +938,10 @@
         "message": "Examples"
     },
     "adjustmentsExample1": {
-        "message": "Use Slot 1 and a 3POS switch on AUX1 to select between Pitch/Roll P, I and D and another 3POS switch on AUX2 to increase or decrease the value when held up or down."
+        "message": "Use Slot 1 and a 3POS switch on CH5 to select between Pitch/Roll P, I and D and another 3POS switch on CH6 to increase or decrease the value when held up or down."
     },
     "adjustmentsExample2": {
-        "message": "Use Slot 2 and a 3POS switch on AUX4 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
+        "message": "Use Slot 2 and a 3POS switch on CH8 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
     },
     "adjustmentsColumnEnable": {
         "message": "If enabled"
@@ -1130,12 +1148,6 @@
     },
     "servosMax": {
         "message": "MAX"
-    },
-    "servosAngleAtMin": {
-        "message": "Angle at min"
-    },
-    "servosAngleAtMax": {
-        "message": "Angle at max"
     },
     "servosDirectionAndRate": {
         "message": "Direction and rate"
@@ -1469,6 +1481,9 @@
     "firmwareFlasherButtonLoadOnline": {
         "message": "Load Firmware [Online]"
     },
+    "firmwareFlasherButtonLoading": {
+        "message": "Loading..."
+    },
     "firmwareFlasherFlashFirmware": {
         "message": "Flash Firmware"
     },
@@ -1540,55 +1555,9 @@
     "controlAxisThrottle": {
         "message": "Throttle"
     },
-    "controlAxisAux1": {
-        "message": "AUX 1"
+    "radioChannelShort": {
+        "message": "CH "
     },
-    "controlAxisAux2": {
-        "message": "AUX 2"
-    },
-    "controlAxisAux3": {
-        "message": "AUX 3"
-    },
-    "controlAxisAux4": {
-        "message": "AUX 4"
-    },
-    "controlAxisAux5": {
-        "message": "AUX 5"
-    },
-    "controlAxisAux6": {
-        "message": "AUX 6"
-    },
-    "controlAxisAux7": {
-        "message": "AUX 7"
-    },
-    "controlAxisAux8": {
-        "message": "AUX 8"
-    },
-    "controlAxisAux9": {
-        "message": "AUX 9"
-    },
-    "controlAxisAux10": {
-        "message": "AUX 10"
-    },
-    "controlAxisAux11": {
-        "message": "AUX 11"
-    },
-    "controlAxisAux12": {
-        "message": "AUX 12"
-    },
-    "controlAxisAux13": {
-        "message": "AUX 13"
-    },
-    "controlAxisAux14": {
-        "message": "AUX 14"
-    },
-    "controlAxisAux15": {
-        "message": "AUX 15"
-    },
-    "controlAxisAux16": {
-        "message": "AUX 16"
-    },
-
     "pidTuningBasic": {
         "message": "Basic/Acro"
     },
@@ -1632,13 +1601,13 @@
         "message": "Failsafe Throttle"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse length, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual AUX channels that have invalid pulses."
+        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse length, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
     },
     "failsafePulsrangeTitle": {
         "message": "Valid Pulse Range Settings"
     },
     "failsafePulsrangeHelp": {
-        "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for AUX channels or entering stage 1 for flightchannels"
+        "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for radio channels or entering stage 1 for flightchannels"
     },
     "failsafeRxMinUsecItem": {
         "message": "Minimum length"
@@ -1650,7 +1619,7 @@
         "message": "Channel Fallback Settings"
     },
     "failsafeChannelFallbackSettingsHelp": {
-        "message": "These settings are applied to invalid individual AUX channels or to all channels when entering stage 1. <strong>Note:</strong> values are saved in steps of 25usec, so small changes disappear"
+        "message": "These settings are applied to invalid individual radio channels or to all channels when entering stage 1. <strong>Note:</strong> values are saved in steps of 25usec, so small changes disappear"
     },
     "failsafeChannelFallbackSettingsAuto": {
         "message": "<strong>Auto</strong> means Roll, Pitch and Yaw to center and Throttle low. <strong>Hold</strong> means maintain the last good value received"
@@ -1659,16 +1628,16 @@
         "message": "<strong>Hold</strong> means maintain the last good value received. <strong>Set</strong> means the value given here will be used"
     },
     "failsafeStageTwoSettingsTitle": {
-        "message": "Stage 2 - Settings"
+        "message": "Settings"
     },
     "failsafeFeatureItem": {
-        "message": "Failsafe Stage 2 enabled"
+        "message": "Enabled"
     },
     "failsafeFeatureHelp": {
         "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
     },
     "failsafeDelayItem": {
-        "message": "Guard time for stage 2 activation after signal lost [1 = 0.1 sec.]"
+        "message": "Guard time for activation after signal lost [1 = 0.1 sec.]"
     },
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
@@ -1689,7 +1658,7 @@
         "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
     },
     "failsafeSubTitle1": {
-        "message": "Stage 2 - Failsafe Procedure"
+        "message": "Procedure"
     },
     "failsafeProcedureItemSelect1": {
         "message": "Land"
@@ -1700,11 +1669,32 @@
     "failsafeProcedureItemSelect3": {
         "message": "RTH"
     },
+    "failsafeProcedureItemSelect4": {
+        "message": "Do nothing"
+    },
     "failsafeKillSwitchItem": {
-        "message": "Failsafe Kill Switch (setup Failsafe in Modes Tab)"
+        "message": "Failsafe Kill Switch (instantly disarm aircraft on failsafe)"
     },
     "failsafeKillSwitchHelp": {
         "message": "Set this option to make the failsafe switch, configured in the modes tab, act as a direct kill switch, bypassing the selected failsafe procedure. <strong>Note:</strong> Arming is blocked with the failsafe kill switch in the ON position"
+    },
+    "failsafeUseMinimumDistanceItem": {
+        "message": "Use alternate Minimum Distance Failsafe Procedure when close to Home"
+    },
+    "failsafeUseMinimumDistanceHelp": {
+        "message": "Set this option if you need an alternate failsafe behavior when the craft is close to Home. For example the author of the feature has a plane that failsafes when the wings detach on landing, when the RTH failsafe behavior normally desired in flight is no longer wanted or needed."
+    },
+    "failsafeMinDistanceItem": {
+        "message": "Failsafe Minimum Distance in centimeters"
+    },
+    "failsafeMinDistanceHelp": {
+        "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in centimeters away from Home. For example if set to 2000 centimeters (20 meters), and the craft is at 13 meters, the Failsafe Minimum Distance Procedure will be followed. When the craft is at 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
+    },
+    "failsafeMinDistanceProcedureItem": {
+        "message": "Failsafe Minimum Distance Procedure"
+    },
+    "failsafeMinDistanceProcedureHelp": {
+        "message": "This is the failsafe procedure that will be followed when the craft is closer than the Failsafe Minimum Distance from Home."
     },
     "mainHelpArmed": {
         "message": "Motor Arming"
@@ -1867,6 +1857,9 @@
     },
     "sensorPitot": {
         "message": "Pitot tube"
+    },
+    "sensorRangefinder": {
+        "message": "Rangefinder"
     },
     "manualEnablingTemplate": {
         "message": "To enable via CLI use <strong>feature {name}</strong> command"
@@ -2092,6 +2085,227 @@
     },
     "wirelessModeSwitch": {
         "message": "Wireless mode"
+    },
+    "rthConfiguration": {
+        "message": "RTH and Landing Settings"
+    },
+    "minRthDistance": {
+        "message": "Min. RTH distance [cm]"
+    },
+    "minRthDistanceHelp": {
+        "message": "If UAV is within this distance from Home Point, it will execute Land instead of RTH and Land"
+    },
+    "rthClimbFirst": {
+        "message": "Climb before RTH"
+    },
+    "rthClimbIgnoreEmergency": {
+        "message": "Climb regardless of position sensor health"
+    },
+    "rthTailFirst": {
+        "message": "Tail first"
+    },
+    "rthAllowLanding": {
+        "message": "Land after RTH"
+    },
+    "rthAltControlMode": {
+        "message": "RTH Altitude mode"
+    },
+    "rthAbortThreshold": {
+        "message": "RTH abort threshold [cm]"
+    },
+    "rthAbortThresholdHelp": {
+        "message": "RTH sanity checking feature will notice if distance to home is increasing during RTH and once amount of increase exceeds the threshold defined by this parameter, instead of continuing RTH machine will enter emergency landing, self-level and go down safely. Default is 500m which is safe enough for both multirotor machines and airplanes."
+    },
+    "rthAltitude": {
+        "message": "RTH Altitude [cm]"
+    },
+    "rthAltitudeHelp": {
+        "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
+    },
+    "landDescentRate": {
+        "message": "Landing vertical speed [cm/s]"
+    },
+    "landSlowdownMinAlt": {
+        "message": "Min. vertical landing speed at altitude [cm]"
+    },
+    "landSlowdownMaxAlt": {
+        "message": "Vertical landing speed slowdown at altitude [cm]"
+    },
+    "emergencyDescentRate": {
+        "message": "Emergency landing speed [cm/s]"
+    },
+    "cruiseThrottle": {
+        "message": "Cruise throttle"
+    },
+    "minThrottle": {
+        "message": "Min. throttle"
+    },
+    "maxThrottle": {
+        "message": "Max. throttle"
+    },
+    "maxBankAngle": {
+        "message": "Max. bank angle"
+    },
+    "maxClimbAngle": {
+        "message": "Max. climb angle"
+    },
+    "maxDiveAngle": {
+        "message": "Max. dive angle"
+    },
+    "pitchToThrottle": {
+        "message": "Pitch to throttle ratio"
+    },
+    "loiterRadius": {
+        "message": "Loiter radius [cm]"
+    },
+    "fixedWingConfiguration": {
+      "message": "Fixed Wing Settings"
+    },
+    "osdUnitImperial": {
+        "message": "Imperial"
+    },
+    "osdUnitMetric": {
+        "message": "Metric"
+    },
+    "osdUnitUK": {
+        "message": "UK"
+    },
+    "osdUnitUKTip": {
+        "message": "Use metric units except for the speed, which is displayed in miles per hour."
+    },
+    "osdAlarmRSSI": {
+        "message": "RSSI"
+    },
+    "osdAlarmBATT_CAP": {
+        "message": "Used Battery"
+    },
+    "osdAlarmBATT_CAP_HELP": {
+        "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
+    },
+    "osdAlarmFLY_MINUTES": {
+        "message": "Fly Time"
+    },
+    "osdAlarmMAX_ALTITUDE": {
+        "message": "Altitude"
+    },
+    "osdAlarmDIST": {
+        "message": "Distance"
+    },
+    "osdAlarmDIST_HELP": {
+        "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
+    },
+    "osdAlarmMAX_NEG_ALTITUDE": {
+        "message": "Negative Altitude"
+    },
+    "osdAlarmMAX_NEG_ALTITUDE_HELP": {
+        "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
+    },
+    "osdGroupGeneral": {
+        "message": "General"
+    },
+    "osdGroupAltitude": {
+        "message": "Altitude"
+    },
+    "osdGroupTimers": {
+        "message": "Timers"
+    },
+    "osdGroupAttitude": {
+        "message": "Attitude"
+    },
+    "osdGroupCurrentMeter": {
+        "message": "Current Meter"
+    },
+    "osdGroupGPS": {
+        "message": "GPS"
+    },
+    "osdGroupPIDs": {
+        "message": "PIDs"
+    },
+    "osdGroupVTX": {
+        "message": "VTX"
+    },
+    "osdElement_ONTIME_FLYTIME": {
+        "message": "On Time / Fly Time"
+    },
+    "osdElement_RSSI_VALUE": {
+        "message": "RSSI (Signal Strength)"
+    },
+    "osdElement_RSSI_VALUE_HELP": {
+        "message": "Shows the quality of the signal received from the RC radio (the higher the better)."
+    },
+    "osdElement_MAIN_BATT_VOLTAGE": {
+        "message": "Battery Voltage"
+    },
+    "osdElement_MESSAGES": {
+        "message": "System Messages"
+    },
+    "osdElement_MESSAGES_HELP": {
+        "message": "Shows different system messages like warnings, hardware failures and extended details of the current flight mode (e.g. AUTOTUNE and AUTOTRIM modes and RTH stages)."
+    },
+    "osdElement_MAIN_BATT_CELL_VOLTAGE": {
+        "message": "Battery Cell Voltage"
+    },
+    "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
+        "message": "Shows the average cell voltage from the main battery"
+    },
+    "osdElement_THROTTLE_POSITION_AUTO_THR": {
+        "message": "Throttle Position / Auto Throttle"
+    },
+    "osdElement_THROTTLE_POSITION_AUTO_THR_HELP": {
+        "message": "Shows the throttle stick position in flight modes where it controls the throttle output. On navigation modes, it shows the actual throttle value applied to the motors."
+    },
+    "osdElement_GPS_SPEED": {
+        "message": "GPS Speed"
+    },
+    "osdElement_GPS_SPEED_HELP": {
+        "message": "Shows GPS ground speed."
+    },
+    "osdElement_GPS_SATS": {
+        "message": "GPS Satellites"
+    },
+    "osdElement_GPS_SATS_HELP": {
+        "message": "Shows the number of GPS satellites located by the GPS receiver."
+    },
+    "osdElement_GPS_HDOP": {
+        "message": "GPS HDOP"
+    },
+    "osdElement_GPS_HDOP_HELP": {
+        "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
+    },
+    "osdElement_VARIO_HELP": {
+        "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
+    },
+    "osdElement_VARIO_NUM": {
+        "message": "Numeric Vario"
+    },
+    "osdElement_VARIO_NUM_HELP": {
+        "message": "Shows vertical speed using a number"
+    },
+    "osdElement_ROLL_PIDS": {
+        "message": "Roll PIDs"
+    },
+    "osdElement_PITCH_PIDS": {
+        "message": "Pitch PIDs"
+    },
+    "osdElement_YAW_PIDS": {
+        "message": "Yaw PIDs"
+    },
+    "osdElement_ONTIME_FLYTIME_HELP": {
+        "message": "Shows \"On Time\" while unarmed and \"Fly Time\" while armed."
+    },
+    "osdElement_RTC_TIME": {
+        "message": "Time of the Day"
+    },
+    "osdElement_RTC_TIME_HELP": {
+        "message": "Shows the current time, as retrieved from the GPS or set via the radio."
+    },
+    "osdElement_VTX_CHANNEL": {
+        "message": "Video TX Band and Channel"
+    },
+    "osdElement_VTX_CHANNEL_HELP": {
+        "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
+    },
+    "portColumnSensors": {
+        "message": "Sensors"
     }
-
 }

@@ -45,9 +45,13 @@ var CONFIG,
     SENSOR_CONFIG,
     NAV_POSHOLD,
     CALIBRATION_DATA,
-    POSITION_ESTIMATOR;
+    POSITION_ESTIMATOR,
+    RTH_AND_LAND_CONFIG,
+    FW_CONFIG;
 
 var FC = {
+    MAX_SERVO_RATE: 125,
+    MIN_SERVO_RATE: -125,
     isRatesInDps: function () {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
@@ -215,7 +219,7 @@ var FC = {
             mincommand: 0,
             failsafe_throttle: 0,
             gps_type: 0,
-            gps_baudrate: 0,
+            sensors_baudrate: 0,
             gps_ubx_sbas: 0,
             multiwiicurrentoutput: 0,
             rssi_channel: 0,
@@ -299,6 +303,21 @@ var FC = {
             }
         };
 
+        RTH_AND_LAND_CONFIG = {
+             minRthDistance: null,
+             rthClimbFirst: null,
+             rthClimbIgnoreEmergency: null,
+             rthTailFirst: null,
+             rthAllowLanding: null,
+             rthAltControlMode: null,
+             rthAbortThreshold: null,
+             rthAltitude: null,
+             landDescentRate: null,
+             landSlowdownMinAlt: null,
+             landSlowdownMaxAlt: null,
+             emergencyDescentRate: null
+        };
+
         _3D = {
             deadband3d_low: 0,
             deadband3d_high: 0,
@@ -347,6 +366,7 @@ var FC = {
         };
 
         RX_CONFIG = {
+            receiver_type: 0,
             serialrx_provider: 0,
             maxcheck: 0,
             midrc: 0,
@@ -354,8 +374,9 @@ var FC = {
             spektrum_sat_bind: 0,
             rx_min_usec: 0,
             rx_max_usec: 0,
-            nrf24rx_protocol: 0,
-            nrf24rx_id: 0
+            spirx_protocol: 0,
+            spirx_id: 0,
+            spirx_channel_count: 0,
         };
 
         POSITION_ESTIMATOR = {
@@ -374,16 +395,32 @@ var FC = {
             failsafe_throttle: 0,
             failsafe_kill_switch: 0,
             failsafe_throttle_low_delay: 0,
-            failsafe_procedure: 0
+            failsafe_procedure: 0,
+            failsafe_recovery_delay: 0,
+            failsafe_fw_roll_angle: 0,
+            failsafe_fw_pitch_angle: 0,
+            failsafe_fw_yaw_rate: 0,
+            failsafe_stick_motion_threshold: 0,
+            failsafe_min_distance: 0,
+            failsafe_min_distance_procedure: 0
+        };
+
+        FW_CONFIG = {
+            cruiseThrottle: null,
+            minThrottle: null,
+            maxThrottle: null,
+            maxBankAngle: null,
+            maxClimbAngle: null,
+            maxDiveAngle: null,
+            pitchToThrottle: null,
+            loiterRadius: null
         };
 
         RXFAIL_CONFIG = [];
     },
     getFeatures: function () {
         var features = [
-            {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM'},
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
@@ -391,8 +428,6 @@ var FC = {
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
-            {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM'},
-            {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP'},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DISPLAY', showNameInTip: true},
@@ -433,7 +468,6 @@ var FC = {
 
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             features.push(
-                {bit: 25, group: 'rxMode', mode: 'group', name: 'RX_NRF24', haveTip: true},
                 {bit: 26, group: 'other', name: 'SOFTSPI'}
             );
         }
@@ -450,9 +484,18 @@ var FC = {
             );
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
+            features.push(
+                {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
+        if (features === undefined) {
+            features = this.getFeatures();
+        }
         for (var i = 0; i < features.length; i++) {
             if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
                 return true;
@@ -548,12 +591,22 @@ var FC = {
         ];
     },
     getGpsProtocols: function () {
-        return [
+        var data = [
             'NMEA',
             'UBLOX',
             'I2C-NAV',
             'DJI NAZA'
-        ]
+        ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+            data.push('UBLOX7')
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.2")) {
+            data.push('MTK')
+        }
+
+        return data;
     },
     getGpsBaudRates: function () {
         return [
@@ -574,6 +627,72 @@ var FC = {
             'Disabled'
         ];
     },
+    getRxTypes: function() {
+        // Keep value field in sync with rxReceiverType_e in rx.h
+        var rxTypes = [
+            {
+                name: 'RX_SERIAL',
+                bit: 3,
+                value: 3,
+            },
+            {
+                name: 'RX_PPM',
+                bit: 0,
+                value: 2,
+            },
+            {
+                name: 'RX_PWM',
+                bit: 13,
+                value: 1,
+            },
+        ];
+
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
+            rxTypes.push({
+                name: 'RX_SPI',
+                bit: 25,
+                value: 5,
+            });
+        }
+
+        rxTypes.push({
+            name: 'RX_MSP',
+            bit: 14,
+            value: 4,
+        });
+
+        // Versions using feature bits don't allow not having an
+        // RX and fallback to RX_PPM.
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            rxTypes.push({
+                name: 'RX_NONE',
+                value: 0,
+            });
+        }
+
+        return rxTypes;
+    },
+    isRxTypeEnabled: function(rxType) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            return RX_CONFIG.receiver_type == rxType.value;
+        }
+        return bit_check(BF_CONFIG.features, rxType.bit);
+    },
+    setRxTypeEnabled: function(rxType) {
+        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
+            RX_CONFIG.receiver_type = rxType.value;
+        } else {
+            // Clear other rx features before
+            var rxTypes = this.getRxTypes();
+            for (var ii = 0; ii < rxTypes.length; ii++) {
+                BF_CONFIG.features = bit_clear(BF_CONFIG.features, rxTypes[ii].bit);
+            }
+            // Set the feature for this rx type (if any, RX_NONE is set by clearing all)
+            if (rxType.bit !== undefined) {
+                BF_CONFIG.features = bit_set(BF_CONFIG.features, rxType.bit);
+            }
+        }
+    },
     getSerialRxTypes: function () {
         var data = [
             'SPEKTRUM1024',
@@ -593,7 +712,7 @@ var FC = {
 
         return data;
     },
-    getNrf24ProtocolTypes: function () {
+    getSPIProtocolTypes: function () {
         return [
             'V202 250Kbps',
             'V202 1Mbps',
@@ -602,7 +721,9 @@ var FC = {
             'Cheerson CX10',
             'Cheerson CX10A',
             'JJRC H8_3D',
-            'iNav Reference protocol'
+            'iNav Reference protocol',
+            'eLeReS'
+            
         ];
     },
     getSensorAlignments: function () {
@@ -706,7 +827,7 @@ var FC = {
         }
     },
     getOsdDisabledFields: function () {
-        return ['CRAFT_NAME', 'VTX_CHANNEL']
+        return ['CRAFT_NAME'];
     },
     getAccelerometerNames: function () {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
@@ -715,13 +836,23 @@ var FC = {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
     },
     getBarometerNames: function () {
-        return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "FAKE"];
+        }
+        else {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
+        }
     },
     getPitotNames: function () {
-        return ["NONE", "AUTO", "MS4525", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        }
+        else {
+            return ["NONE", "AUTO", "MS4525", "FAKE"];
+        }
     },
     getRangefinderNames: function () {
-        return ["NONE", "AUTO", "HCSR04", "SRF10"];
+        return [ "NONE", "HCSR04", "SRF10"];
     },
     getArmingFlags: function () {
         return {
@@ -756,5 +887,45 @@ var FC = {
             "Attitude",
             "Cruise"
         ]
+    },
+    getPidNames: function () {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            return PID_names;
+        } else {
+            return [
+                'Roll',
+                'Pitch',
+                'Yaw',
+                'Position Z',
+                'Position XY',
+                'Velocity XY',
+                'Surface',
+                'Level',
+                'Heading',
+                'Velocity Z'
+            ];
+        }
+    },
+    getRthAltControlMode: function () {
+        return ["Current", "Extra", "Fixed", "Max", "At Least"];
+    },
+    getRthAllowLanding: function() {
+        var values = ["Never", "Always"];
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            values.push("Only on failsafe");
+        }
+        return values;
+    },
+    getFailsafeProcedure: function () {
+        return {
+            0: "Land",
+            1: "Drop",
+            2: "RTH", 
+            3: "Do Nothing", 
+        }
+    },
+    getRcMapLetters: function () {
+        return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
     }
 };

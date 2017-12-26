@@ -10,15 +10,15 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.handlerFrequency = 100;
     privateScope.balancerFrequency = 20;
 
-    privateScope.loadFilter = new classes.SimpleSmoothFilter(1, 0.9);
-    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.99);
-    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(10, 0.99);
+    privateScope.loadFilter = new classes.SimpleSmoothFilter(1, 0.85);
+    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.95);
+    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(10, 0.95);
 
     /**
      * Target load for MSP queue. When load is above target, throttling might start to appear
      * @type {number}
      */
-    privateScope.targetLoad = 1.5;
+    privateScope.targetLoad = 2;
     privateScope.statusDropFactor = 0.75;
 
     privateScope.currentLoad = 0;
@@ -30,7 +30,7 @@ helper.mspQueue = (function (serial, MSP) {
     privateScope.loadPidController = new classes.PidController();
     privateScope.loadPidController.setTarget(privateScope.targetLoad);
     privateScope.loadPidController.setOutput(0, 99, 0);
-    privateScope.loadPidController.setGains(10, 4, 1);
+    privateScope.loadPidController.setGains(5, 6, 3);
     privateScope.loadPidController.setItermLimit(0, 90);
 
     privateScope.dropRatio = 0;

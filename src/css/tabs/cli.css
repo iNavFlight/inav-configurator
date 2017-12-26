@@ -1,0 +1,59 @@
+.tab-cli {
+    height: 100%;
+}
+
+.tab-cli .content_wrapper {
+    height: calc(100% - 50px);
+}
+
+.tab-cli p {
+    padding: 0;
+    border: 0 dotted silver;
+}
+
+.tab-cli .note {
+    margin-bottom: 20px;
+}
+
+.tab-cli .backdrop {
+    border: 1px solid silver;
+    margin-top: 0;
+    height: calc(100% - 90px); /* - (p, textarea) */
+    background: rgba(0, 0, 0, 0.75) url("../../../images/light-wide-1.svg") no-repeat 50% 80%;
+    background-size: 600px;
+    border-radius: 5px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.80);
+    width: 100%;
+}
+
+.tab-cli .window {
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    font-family: monospace;
+    color: white;
+    box-sizing: border-box;
+    -webkit-user-select: text;
+    float: left;
+}
+
+.tab-cli textarea {
+    -webkit-box-sizing: border-box;
+    width: 100%;
+    margin-top: 8px;
+    height: 22px;
+    line-height: 20px;
+    padding-left: 5px;
+    border: 1px solid silver;
+    resize: none;
+}
+
+.tab-cli #content-watermark {
+    z-index: 0;
+}
+
+.tab-cli .window .wrapper {
+    white-space: pre-wrap;
+}

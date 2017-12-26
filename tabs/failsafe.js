@@ -18,15 +18,27 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_rxfail_config() {
-        MSP.send_message(MSPCodes.MSP_RXFAIL_CONFIG, false, false, get_box_names);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_RXFAIL_CONFIG, false, false, get_box_names);
+        } else {
+            get_box_names();
+        }
     }
 
     function get_box_names() {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
+        } else {
+            get_mode_ranges();
+        }
     }
 
     function get_mode_ranges() {
-        MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
+        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
+        } else {
+            get_box_ids();
+        }
     }
 
     function get_box_ids() {
@@ -52,10 +64,22 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     load_rx_config();
 
     function process_html() {
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            $('.pre-v1_6').hide();
+            $('.requires-v1_6').show();
+        }
+
         var failsafeFeature;
 
         // translate to user-selected language
         localize();
+
+        var $failsafeUseMinimumDistanceCheckbox = $('#failsafe_use_minimum_distance');
+        var $failsafeMinDistanceElements = $('#failsafe_min_distance_elements')
+        var $failsafeMinDistance = $('#failsafe_min_distance')
+        var $failsafeMinDistanceProcedureElements = $('#failsafe_min_distance_procedure_elements')
+        var $failsafeMinDistanceProcedure = $('#failsafe_min_distance_procedure');
 
         // generate labels for assigned aux modes
         var auxAssignment = [],
@@ -83,7 +107,9 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                     continue; // invalid!
                 }
 
-                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + AUX_CONFIG[modeIndex] + "</span>";
+                var modeName = AUX_CONFIG[modeIndex];                      
+                modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
+                auxAssignment[modeRange.auxChannelIndex] += "<span class=\"modename\">" + modeName + "</span>";
             }
         }
 
@@ -95,7 +121,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 chrome.i18n.getMessage('controlAxisThrottle')
             ],
             fullChannels_e = $('div.activechannellist'),
-            aux_index = 1,
             aux_assignment_index = 0;
 
         for (i = 0; i < RXFAIL_CONFIG.length; i++) {
@@ -117,7 +142,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 fullChannels_e.append('\
                         <div class="number">\
                             <div class="channelauxiliary">\
-                                <span class="channelname">' + chrome.i18n.getMessage("controlAxisAux" + (aux_index++)) + '</span>\
+                                <span class="channelname">' + chrome.i18n.getMessage("radioChannelShort") + (i + 1) + '</span>\
                                 ' + auxAssignment[aux_assignment_index++] + '\
                             </div>\
                             <div class="cf_tip channelsetting" title="' + chrome.i18n.getMessage("failsafeChannelFallbackSettingsHold") + '">\
@@ -181,6 +206,14 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             channel_mode_array[i].change();
         }
 
+        var isFailsafeEnabled;
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            isFailsafeEnabled = true;
+        } else {
+            isFailsafeEnabled = bit_check(BF_CONFIG.features, 8);
+        }
+
         // fill stage 2 fields
         failsafeFeature = $('input[name="failsafe_feature_new"]');
         failsafeFeature.change(function () {
@@ -191,13 +224,16 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             }
         });
 
-        failsafeFeature.prop('checked', bit_check(BF_CONFIG.features, 8));
+        failsafeFeature.prop('checked', isFailsafeEnabled);
         failsafeFeature.change();
 
         $('input[name="failsafe_throttle"]').val(FAILSAFE_CONFIG.failsafe_throttle);
         $('input[name="failsafe_off_delay"]').val(FAILSAFE_CONFIG.failsafe_off_delay);
         $('input[name="failsafe_throttle_low_delay"]').val(FAILSAFE_CONFIG.failsafe_throttle_low_delay);
         $('input[name="failsafe_delay"]').val(FAILSAFE_CONFIG.failsafe_delay);
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+            $('input[name="failsafe_min_distance"]').val(FAILSAFE_CONFIG.failsafe_min_distance);
+        }
 
         // set stage 2 failsafe procedure
         $('input[type="radio"].procedure').change(function () {
@@ -238,27 +274,74 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 element.prop('checked', true);
                 element.change();
                 break;
+            case 3:
+                element = $('input[id="nothing"]');
+                element.prop('checked', true);
+                element.change();
+                break;
         }
 
         // set stage 2 kill switch option
         $('input[name="failsafe_kill_switch"]').prop('checked', FAILSAFE_CONFIG.failsafe_kill_switch);
+
+        if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+            // Adjust Minimum Distance values when checkbox is checked/unchecked
+            $failsafeUseMinimumDistanceCheckbox.change(function() {
+                if ($(this).is(':checked')) {
+                    // 20 meters seems like a reasonable default for a minimum distance
+                    $failsafeMinDistance.val(2000);
+                    $failsafeMinDistanceElements.show();
+                    $failsafeMinDistanceProcedureElements.show();
+                } else {
+                    // If they uncheck it, clear the distance to 0, which disables this feature
+                    $failsafeMinDistance.val(0);
+                    $failsafeMinDistanceElements.hide();
+                    $failsafeMinDistanceProcedureElements.hide();
+                }
+            });
+
+            // Set initial state of controls according to data
+            if (FAILSAFE_CONFIG.failsafe_min_distance > 0) {
+                $failsafeUseMinimumDistanceCheckbox.prop('checked', true);
+                $failsafeMinDistanceElements.show();
+                $failsafeMinDistanceProcedureElements.show();
+            } else {
+                $failsafeUseMinimumDistanceCheckbox.prop('checked', false);
+                $failsafeMinDistanceElements.hide();
+                $failsafeMinDistanceProcedureElements.hide();
+            }
+
+            // Alternate, minimum distance failsafe procedure
+            GUI.fillSelect($failsafeMinDistanceProcedure, FC.getFailsafeProcedure(), FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+            $failsafeMinDistanceProcedure.val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
+            $failsafeMinDistanceProcedure.change(function () {
+                FAILSAFE_CONFIG.failsafe_min_distance_procedure = $failsafeMinDistanceProcedure.val();
+            });
+            $('.requires-v1_7_4').show();
+        } else {
+            $('.requires-v1_7_4').hide();
+        }
 
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
             RX_CONFIG.rx_min_usec = parseInt($('input[name="rx_min_usec"]').val());
             RX_CONFIG.rx_max_usec = parseInt($('input[name="rx_max_usec"]').val());
 
-            // get FAILSAFE feature option (>= API 1.15.0)
-            if ($('input[name="failsafe_feature_new"]').is(':checked')) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, 8);
-            } else {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, 8);
+            if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+                if ($('input[name="failsafe_feature_new"]').is(':checked')) {
+                    BF_CONFIG.features = bit_set(BF_CONFIG.features, 8);
+                } else {
+                    BF_CONFIG.features = bit_clear(BF_CONFIG.features, 8);
+                }
             }
 
             FAILSAFE_CONFIG.failsafe_throttle = parseInt($('input[name="failsafe_throttle"]').val());
             FAILSAFE_CONFIG.failsafe_off_delay = parseInt($('input[name="failsafe_off_delay"]').val());
             FAILSAFE_CONFIG.failsafe_throttle_low_delay = parseInt($('input[name="failsafe_throttle_low_delay"]').val());
             FAILSAFE_CONFIG.failsafe_delay = parseInt($('input[name="failsafe_delay"]').val());
+            if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+                FAILSAFE_CONFIG.failsafe_min_distance = parseInt($('input[name="failsafe_min_distance"]').val());
+            }
 
             if ($('input[id="land"]').is(':checked')) {
                 FAILSAFE_CONFIG.failsafe_procedure = 0;
@@ -266,6 +349,8 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 FAILSAFE_CONFIG.failsafe_procedure = 1;
             } else if ($('input[id="rth"]').is(':checked')) {
                 FAILSAFE_CONFIG.failsafe_procedure = 2;
+            } else if ($('input[id="nothing"]').is(':checked')) {
+                FAILSAFE_CONFIG.failsafe_procedure = 3;
             }
 
             FAILSAFE_CONFIG.failsafe_kill_switch = $('input[name="failsafe_kill_switch"]').is(':checked') ? 1 : 0;
@@ -275,7 +360,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             }
 
             function save_rxfail_config() {
-                mspHelper.sendRxFailConfig(save_bf_config);
+                if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
+                    mspHelper.sendRxFailConfig(save_bf_config);
+                } else {
+                    save_bf_config();
+                }
             }
 
             function save_bf_config() {

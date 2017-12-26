@@ -2,7 +2,7 @@
 'use strict';
 
 var SYM = SYM || {};
-SYM.VOLT = 0x06;
+SYM.VOLT = 0x90;
 SYM.RSSI = 0x01;
 SYM.AH_RIGHT = 0x02;
 SYM.AH_LEFT = 0x03;
@@ -15,12 +15,38 @@ SYM.AH_CENTER_LINE_RIGHT = 0x27;
 SYM.AH_CENTER = 0x7E;
 SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
-SYM.LOGO = 0xA0;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
-SYM.METRE = 0xC;
-SYM.FEET = 0xF;
-SYM.GPS_SAT = 0x1F;
+SYM.MAH_KM_0 = 157;
+SYM.MAH_KM_1 = 158;
+SYM.GPS_SAT1 = 0x1E;
+SYM.GPS_SAT2 = 0x1F;
+SYM.GPS_HDP1 = 0xBD;
+SYM.GPS_HDP2 = 0xBE;
+SYM.KMH = 161;
+SYM.MPH = 176;
+SYM.ALT_M = 177;
+SYM.ALT_FT = 179;
+SYM.LAT = 0xA6;
+SYM.LON = 0xA7;
+SYM.AIR = 151;
+SYM.DIR_TO_HOME = 0x60;
+SYM.DIST_KM = 182;
+SYM.DIST_MI = 184;
+SYM.HEADING1 = 0xA9;
+SYM.HEADING2 = 0xA8;
+SYM.HEADING_N = 24;
+SYM.HEADING_E = 26;
+SYM.HEADING_W = 27;
+SYM.HEADING_DIVIDED_LINE = 28;
+SYM.HEADING_LINE = 29;
+SYM.VARIO_UP_2A = 0xA2;
+SYM.M_S = 0x9F;
+SYM.FT_S = 153;
+SYM.CLOCK = 0xBC;
+SYM.ZERO_HALF_TRAILING_DOT = 192;
+SYM.ZERO_HALF_LEADING_DOT = 208;
+SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
 
@@ -205,7 +231,7 @@ FONT.upload = function ($progress) {
 
 FONT.preview = function ($el) {
     $el.empty();
-    for (var i = 0; i < SYM.LOGO; i++) {
+    for (var i = 0; i <= SYM.LAST_CHAR; i++) {
         var url = FONT.data.character_image_urls[i];
         $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img>');
     }
@@ -215,7 +241,53 @@ FONT.symbol = function (hexVal) {
     return String.fromCharCode(hexVal);
 };
 
+FONT.embed_dot = function(str) {
+    var zero = '0'.charCodeAt(0);
+    var repl = str.replace(/\d.\d/, function(match) {
+        var c1 = match.charCodeAt(0) + SYM.ZERO_HALF_TRAILING_DOT - zero;
+        var c2 = match.charCodeAt(2) + SYM.ZERO_HALF_LEADING_DOT - zero;
+        return FONT.symbol(c1) + FONT.symbol(c2);
+    });
+    return repl;
+}
+
 var OSD = OSD || {};
+
+// common functions for altitude and negative altitude alarms
+function altitude_alarm_unit(osd_data) {
+    if (OSD.data.unit_mode === 0) {
+        return 'ft';
+    }
+    return 'm';
+}
+
+function altitude_alarm_to_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // meters to feet
+        return Math.round(value * 3.28084)
+    }
+    return value;
+}
+
+function altitude_alarm_from_display(osd_data, value) {
+    if (OSD.data.unit_mode === 0) {
+        // feet to meters
+        return Math.round(value / 3.28084);
+    }
+    return value;
+}
+
+// Used to wrap altitude conversion functions for firmwares up
+// to 1.7.3, since the altitude alarm used either m or feet
+// depending on the OSD display unit used (hence, no conversion)
+function altitude_alarm_display_function(fn) {
+    return function(osd_data, value) {
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            return fn(osd_data, value)
+        }
+        return value;
+    }
+}
 
 // parsed fc output and output to fc, used by to OSD.msp.encode
 OSD.initData = function () {
@@ -246,246 +318,415 @@ OSD.constants = {
         NTSC: 390
     },
     UNIT_TYPES: [
-        'IMPERIAL',
-        'METRIC'
+        {name: 'osdUnitImperial', value: 0},
+        {name: 'osdUnitMetric', value: 1},
+        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 2, min_version: "1.7.3"},
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
 
-    // All display fields, from every version, do not remove elements, only add!
-    ALL_DISPLAY_FIELDS: {
-        MAIN_BATT_VOLTAGE: {
-            name: 'MAIN_BATT_VOLTAGE',
-            default_position: -29,
-            positionable: true,
-            preview: FONT.symbol(SYM.VOLT) + '16.8'
+    ALL_ALARMS: [
+        {
+            name: 'RSSI',
+            unit: '%',
         },
-        RSSI_VALUE: {
-            name: 'RSSI_VALUE',
-            default_position: -59,
-            positionable: true,
-            preview: FONT.symbol(SYM.RSSI) + '99'
+        {
+            name: 'BATT_CAP',
+            unit: 'mah',
         },
-        TIMER: {
-            name: 'TIMER',
-            default_position: -39,
-            positionable: true,
-            preview: FONT.symbol(SYM.ON_M) + ' 11:11'
+        {
+            name: 'FLY_MINUTES',
+            unit: 'minutes',
         },
-        THROTTLE_POSITION: {
-            name: 'THROTTLE_POSITION',
-            default_position: -9,
-            positionable: true,
-            preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+        {
+            name: 'MAX_ALTITUDE',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_display_function(altitude_alarm_to_display),
+            from_display: altitude_alarm_display_function(altitude_alarm_from_display),
         },
-        CPU_LOAD: {
-            name: 'CPU_LOAD',
-            default_position: 26,
-            positionable: true,
-            preview: '15'
-        },
-        VTX_CHANNEL: {
-            name: 'VTX_CHANNEL',
-            default_position: 1,
-            positionable: true,
-            preview: 'CH:1'
-        },
-        VOLTAGE_WARNING: {
-            name: 'VOLTAGE_WARNING',
-            default_position: -80,
-            positionable: true,
-            preview: 'LOW VOLTAGE'
-        },
-        ARMED: {
-            name: 'ARMED',
-            default_position: -107,
-            positionable: true,
-            preview: 'ARMED'
-        },
-        DISARMED: {
-            name: 'DISARMED',
-            default_position: -109,
-            positionable: true,
-            preview: 'DISARMED'
-        },
-        CROSSHAIRS: {
-            name: 'CROSSHAIRS',
-            default_position: -1,
-            positionable: false
-        },
-        ARTIFICIAL_HORIZON: {
-            name: 'ARTIFICIAL_HORIZON',
-            default_position: -1,
-            positionable: false
-        },
-        HORIZON_SIDEBARS: {
-            name: 'HORIZON_SIDEBARS',
-            default_position: -1,
-            positionable: false
-        },
-        CURRENT_DRAW: {
-            name: 'CURRENT_DRAW',
-            default_position: -23,
-            positionable: true,
-            preview: FONT.symbol(SYM.AMP) + '42.0'
-        },
-        MAH_DRAWN: {
-            name: 'MAH_DRAWN',
-            default_position: -18,
-            positionable: true,
-            preview: FONT.symbol(SYM.MAH) + '690'
-        },
-        CRAFT_NAME: {
-            name: 'CRAFT_NAME',
-            default_position: -77,
-            positionable: true,
-            preview: '[CRAFT_NAME]'
-        },
-        ALTITUDE: {
-            name: 'ALTITUDE',
-            default_position: 62,
-            positionable: true,
-            preview: function (osd_data) {
-                return '399.7' + FONT.symbol(osd_data.unit_mode === 0 ? SYM.FEET : SYM.METRE)
+        {
+            name: 'DIST',
+            unit: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 'mi';
+                }
+                return 'm';
+            },
+            to_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // meters to miles
+                    return (value / 1609.34).toFixed(2);
+                }
+                return value;
+            },
+            from_display: function(osd_data, value) {
+                if (OSD.data.unit_mode === 0) {
+                    // miles to meters
+                    return Math.round(value * 1609.34);
+                }
+                return value;
+            },
+            step: function(osd_data) {
+                if (OSD.data.unit_mode === 0) {
+                    return 0.01;
+                }
+                return 1;
             }
         },
-        ONTIME: {
-            name: 'ONTIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.ON_M) + '  4:11'
+        {
+            name: 'MAX_NEG_ALTITUDE',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_to_display,
+            from_display: altitude_alarm_from_display,
         },
-        FLYTIME: {
-            name: 'FLYTIME',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.FLY_M) + '  4:11'
+    ],
+
+    // All display fields, from every version, do not remove elements, only add!
+    ALL_DISPLAY_GROUPS: [
+        {
+            name: 'osdGroupGeneral',
+            items: [
+                {
+                    name: 'RSSI_VALUE',
+                    id: 0,
+                    preview: FONT.symbol(SYM.RSSI) + '99'
+                },
+                {
+                    name: 'MAIN_BATT_VOLTAGE',
+                    id: 1,
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
+                },
+                {
+                    name: 'MAIN_BATT_CELL_VOLTAGE',
+                    id: 32,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
+                },
+                {
+                    name: 'THROTTLE_POSITION',
+                    id: 9,
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                },
+                {
+                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    id: 33,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                },
+                {
+                    name: 'CRAFT_NAME',
+                    id: 8,
+                    preview: '[CRAFT_NAME]'
+                },
+                {
+                    name: 'FLYMODE',
+                    id: 7,
+                    preview: 'STAB'
+                },
+                {
+                    name: 'MESSAGES',
+                    id: 30,
+                    min_version: '1.7.4',
+                    preview: '       SYSTEM MESSAGE       ', // 28 chars, like OSD_MESSAGE_LENGTH on osd.c
+                },
+                {
+                    name: 'HEADING',
+                    id: 24,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
+                },
+                {
+                    name: 'HEADING_GRAPH',
+                    id: 34,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.HEADING_W) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_DIVIDED_LINE) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_N) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_DIVIDED_LINE) +
+                        FONT.symbol(SYM.HEADING_LINE) +
+                        FONT.symbol(SYM.HEADING_E)
+                },
+                {
+                    name: 'AIR_SPEED',
+                    id: 27,
+                    min_version: '1.7.3',
+                    enabled: function() {
+                        return SENSOR_CONFIG.pitot != 0;
+                    },
+                    preview: function(osd_data) {
+                        var speed;
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            speed = ' 35' + FONT.symbol(SYM.MPH);
+                        } else {
+                            speed = ' 55' + FONT.symbol(SYM.KMH);
+                        }
+                        return FONT.symbol(SYM.AIR) + speed;
+                    }
+                },
+                {
+                    name: 'RTC_TIME',
+                    id: 29,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.CLOCK) + '13:37'
+                },
+            ]
         },
-        FLYMODE: {
-            name: 'FLYMODE',
-            default_position: -1,
-            positionable: true,
-            preview: 'STAB'
+        {
+            name: 'osdGroupAltitude',
+            // TODO: Make this disappear when there's no baro and no GPS.
+            // Requires not drawing these indicators in INAV even when enabled
+            // if there are no sensors to provide their data. Currently they're
+            // always drawn as long as BARO or NAV support is compiled in.
+            items: [
+                {
+                    name: 'ALTITUDE',
+                    id: 15,
+                    preview: function () {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ALT_FT) + '118';
+                        }
+                        return FONT.symbol(SYM.ALT_M) + '399'
+                    }
+                },
+                {
+                    name: 'VARIO',
+                    id: 25,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
+                        FONT.symbol(SYM.VARIO_UP_2A) + '\n'
+                },
+                {
+                    name: 'VARIO_NUM',
+                    id: 26,
+                    min_version: '1.6.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                        }
+                        return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
+                    }
+                }
+            ]
         },
-        GPS_SPEED: {
-            name: 'GPS_SPEED',
-            default_position: -1,
-            positionable: true,
-            preview: '40'
+        {
+            name: 'osdGroupTimers',
+            items: [
+                {
+                    name: 'ONTIME_FLYTIME',
+                    id: 28,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.FLY_M) + '04:11'
+                },
+                {
+                    name: 'ONTIME',
+                    id: 5,
+                    preview: FONT.symbol(SYM.ON_M) + '04:11'
+                },
+                {
+                    name: 'FLYTIME',
+                    id: 6,
+                    preview: FONT.symbol(SYM.FLY_M) + '04:11'
+                },
+            ]
         },
-        GPS_SATS: {
-            name: 'GPS_SATS',
-            default_position: -1,
-            positionable: true,
-            preview: FONT.symbol(SYM.GPS_SAT) + '14'
+        {
+            name: 'osdGroupAttitude',
+            items: [
+                {
+                    name: 'CROSSHAIRS',
+                    id: 2,
+                    positionable: false
+                },
+                {
+                    name: 'ARTIFICIAL_HORIZON',
+                    id: 3,
+                    positionable: false
+                },
+                {
+                    name: 'HORIZON_SIDEBARS',
+                    id: 4,
+                    positionable: false
+                },
+            ]
         },
-        ROLL_PIDS: {
-            name: 'ROLL_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'ROL 40 30 23'
+        {
+            name: 'osdGroupCurrentMeter',
+            enabled: function() {
+                return FC.isFeatureEnabled('CURRENT_METER');
+            },
+            items: [
+                {
+                    name: 'CURRENT_DRAW',
+                    id: 11,
+                    preview: FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1')
+                },
+                {
+                    name: 'MAH_DRAWN',
+                    id: 12,
+                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                },
+                {
+                    name: 'POWER',
+                    id: 19,
+                    min_version: '1.6.0',
+                    preview: 'W50 ' // 3 chars
+                },
+                {
+                    name: 'EFFICIENCY',
+                    id: 35,
+                    min_version: '1.7.4',
+                    preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                }
+            ]
         },
-        PITCH_PIDS: {
-            name: 'PITCH_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'PIT 40 30 23'
+        {
+            name: 'osdGroupGPS',
+            enabled: function() {
+                return FC.isFeatureEnabled('GPS');
+            },
+            items: [
+                {
+                    name: 'GPS_SPEED',
+                    id: 13,
+                    preview: function(osd_data) {
+                        // 3 chars
+                        if (OSD.data.unit_mode === 0 || OSD.data.unit_mode === 2) {
+                            // Imperial
+                            return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
+                        }
+                        return FONT.embed_dot(' 40') + FONT.symbol(SYM.KMH);
+                    }
+                },
+                {
+                    name: 'GPS_SATS',
+                    id: 14,
+                    preview: FONT.symbol(SYM.GPS_SAT1) + FONT.symbol(SYM.GPS_SAT2) + '14'
+                },
+                {
+                    name: 'LONGITUDE',
+                    id: 20,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.LON) + FONT.embed_dot('14.7652134  ') // 11 chars
+                },
+                {
+                    name: 'LATITUDE',
+                    id: 21,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.LAT) + FONT.embed_dot('52.9872367  ') // 11 chars
+                },
+                {
+                    name: 'DIRECTION_TO_HOME',
+                    id: 22,
+                    min_version: '1.6.0',
+                    preview: FONT.symbol(SYM.DIR_TO_HOME)
+                },
+                {
+                    name: 'DISTANCE_TO_HOME',
+                    id: 23,
+                    min_version: '1.6.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        }
+                        return FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                    }
+                },
+                {
+                    name: 'GPS_HDOP',
+                    id: 31,
+                    min_version: '1.7.4',
+                    preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + FONT.embed_dot('1.8')
+                },
+            ]
         },
-        YAW_PIDS: {
-            name: 'YAW_PIDS',
-            default_position: -1,
-            positionable: true,
-            preview: 'YAW 85 45 0'
+        {
+            name: 'osdGroupVTX',
+            items: [
+                {
+                    name: 'VTX_CHANNEL',
+                    id: 10,
+                    positionable: true,
+                    preview: 'CH:F7'
+                },
+            ]
         },
-        POWER: {
-            name: 'POWER',
-            default_position: -1,
-            positionable: true,
-            preview: '50W'
-        },
-        GPS_LON: {
-            name: 'LONGITUDE',
-            default_position: -1,
-            positionable: true,
-            preview: '14.7652'
-        },
-        GPS_LAT: {
-            name: 'LATITUDE',
-            default_position: -1,
-            positionable: true,
-            preview: '52.9872'
-        },
-        HOME_DIR: {
-            name: 'DIRECTION_TO_HOME',
-            default_position: -1,
-            positionable: true,
-            preview: '165'
-        },
-        HOME_DIST: {
-            name: 'DISTANCE_TO_HOME',
-            default_position: -1,
-            positionable: true,
-            preview: '300m'
-        },
-        HEADING: {
-            name: 'HEADING',
-            default_position: -1,
-            positionable: true,
-            preview: '175'
-        },
-        VARIO: {
-            name: 'VARIO',
-            default_position: -1,
-            positionable: true,
-            preview: '-'
-        },
-        VARIO_NUM: {
-            name: 'VARIO_NUM',
-            default_position: -1,
-            positionable: true,
-            preview: '2'
+        {
+            name: 'osdGroupPIDs',
+            min_version: '1.6.0',
+            items: [
+                {
+                    name: 'ROLL_PIDS',
+                    id: 16,
+                    preview: 'ROL 40 30 23'
+                },
+                {
+                    name: 'PITCH_PIDS',
+                    id: 17,
+                    preview: 'PIT 40 30 23'
+                },
+                {
+                    name: 'YAW_PIDS',
+                    id: 18,
+                    preview: 'YAW 85 45 0'
+                },
+            ]
+        }
+    ]
+};
+
+OSD.get_item = function(item_id) {
+    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
+        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
+        for (var jj = 0; jj < group.items.length; jj++) {
+            if (group.items[jj].id == item_id) {
+                return group.items[jj];
+            }
         }
     }
+    return null;
 };
 
-// Pick display fields by version, order matters, so these are going in an array... pry could iterate the example map instead
-OSD.chooseFields = function () {
-    var F = OSD.constants.ALL_DISPLAY_FIELDS;
-    OSD.constants.DISPLAY_FIELDS = [
-        F.RSSI_VALUE,
-        F.MAIN_BATT_VOLTAGE,
-        F.CROSSHAIRS,
-        F.ARTIFICIAL_HORIZON,
-        F.HORIZON_SIDEBARS,
-        F.ONTIME,
-        F.FLYTIME,
-        F.FLYMODE,
-        F.CRAFT_NAME,
-        F.THROTTLE_POSITION,
-        F.VTX_CHANNEL,
-        F.CURRENT_DRAW,
-        F.MAH_DRAWN,
-        F.GPS_SPEED,
-        F.GPS_SATS,
-        F.ALTITUDE
-    ];
-
-    if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-        OSD.constants.DISPLAY_FIELDS.push(F.ROLL_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.PITCH_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.YAW_PIDS);
-        OSD.constants.DISPLAY_FIELDS.push(F.POWER);
-
-        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LON);
-        OSD.constants.DISPLAY_FIELDS.push(F.GPS_LAT);
-        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIR);
-        OSD.constants.DISPLAY_FIELDS.push(F.HOME_DIST);
-        OSD.constants.DISPLAY_FIELDS.push(F.HEADING);
-        OSD.constants.DISPLAY_FIELDS.push(F.VARIO);
-        OSD.constants.DISPLAY_FIELDS.push(F.VARIO_NUM);
+OSD.is_item_displayed = function(item, group) {
+    if (!OSD.data.items[item.id]) {
+        // FC has no data about this item, so
+        // it doesn't support it.
+        return false;
     }
-
+    if (FC.getOsdDisabledFields().indexOf(item.name) != -1) {
+        return false;
+    }
+    if (!group) {
+        return false;
+    }
+    if (typeof group.enabled === 'function' && group.enabled() === false) {
+        return false;
+    }
+    if (item.min_version && !semver.gte(CONFIG.flightControllerVersion, item.min_version)) {
+        return false;
+    }
+    if (typeof item.enabled === 'function' && item.enabled() === false) {
+        return false;
+    }
+    return true;
 };
+
+OSD.get_item_preview = function(item) {
+    var preview = item.preview;
+    if (typeof preview == 'function') {
+        return preview();
+    }
+    return preview;
+}
 
 OSD.updateDisplaySize = function () {
     var video_type = OSD.constants.VIDEO_TYPES[OSD.data.video_system];
@@ -514,7 +755,7 @@ OSD.msp = {
      */
     helpers: {
         unpack: {
-            position: function (bits, c) {
+            position: function (bits) {
                 var display_item = {};
                 // size * y + x
                 display_item.position = FONT.constants.SIZES.LINE * ((bits >> 5) & 0x001F) + (bits & 0x001F);
@@ -533,23 +774,24 @@ OSD.msp = {
         var result = [-1, OSD.data.video_system];
         result.push8(OSD.data.unit_mode);
         // watch out, order matters! match the firmware
-        result.push8(OSD.data.alarms.rssi.value);
-        result.push16(OSD.data.alarms.cap.value);
-        result.push16(OSD.data.alarms.time.value);
-        result.push16(OSD.data.alarms.alt.value);
+        result.push8(OSD.data.alarms['RSSI']);
+        result.push16(OSD.data.alarms['BATT_CAP']);
+        result.push16(OSD.data.alarms['FLY_MINUTES']);
+        result.push16(OSD.data.alarms['MAX_ALTITUDE']);
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            result.push16(OSD.data.alarms['DIST']);
+            result.push16(OSD.data.alarms['MAX_NEG_ALTITUDE']);
+        }
         return result;
     },
 
-    encode: function (display_item) {
+    encode: function (item, itemData) {
         var buffer = [];
-        buffer.push8(display_item.index);
-        buffer.push16(this.helpers.pack.position(display_item));
+        buffer.push8(item.id);
+        buffer.push16(this.helpers.pack.position(itemData));
         return buffer;
     },
 
-    /*
-     * Currently only parses MSP_MAX_OSD responses, add a switch on payload.code if more codes are handled
-     */
     decode: function (payload) {
         var view = payload.data;
         var d = OSD.data;
@@ -558,27 +800,21 @@ OSD.msp = {
 
         d.unit_mode = view.readU8();
         d.alarms = {};
-        d.alarms['rssi'] = { display_name: 'Rssi', value: view.readU8() };
-        d.alarms['cap'] = { display_name: 'Capacity', value: view.readU16() };
-        d.alarms['time'] = { display_name: 'Minutes', value: view.readU16() };
-        d.alarms['alt'] = { display_name: 'Altitude', value: view.readU16() };
+        d.alarms['RSSI'] = view.readU8();
+        d.alarms['BATT_CAP'] = view.readU16();
+        d.alarms['FLY_MINUTES'] = view.readU16();
+        d.alarms['MAX_ALTITUDE'] = view.readU16();
 
-        d.display_items = [];
+        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
+            d.alarms['DIST'] = view.readU16();
+            d.alarms['MAX_NEG_ALTITUDE'] = view.readU16();
+        }
+
+        d.items = [];
         // start at the offset from the other fields
         while (view.offset < view.byteLength) {
-            var v = null;
-            v = view.readU16();
-
-            var j = d.display_items.length;
-            var c = OSD.constants.DISPLAY_FIELDS[j];
-            if (c) {
-                d.display_items.push($.extend({
-                    name: c.name,
-                    index: j,
-                    positionable: c.positionable,
-                    preview: typeof(c.preview) === 'function' ? c.preview(d) : c.preview
-                }, this.helpers.unpack.position(v, c)));
-            }
+            var bits = view.readU16();
+            d.items.push(this.helpers.unpack.position(bits));
         }
         OSD.updateDisplaySize();
     }
@@ -587,25 +823,28 @@ OSD.msp = {
 OSD.GUI = {};
 OSD.GUI.preview = {
     onMouseEnter: function () {
-        if (!$(this).data('field')) {
+        var item = $(this).data('item');
+        if (!item) {
             return;
         }
-        $('.field-' + $(this).data('field').index).addClass('mouseover')
+        $('.field-' + item.id).addClass('mouseover');
     },
 
     onMouseLeave: function () {
-        if (!$(this).data('field')) {
+        var item = $(this).data('item');
+        if (!item) {
             return;
         }
-        $('.field-' + $(this).data('field').index).removeClass('mouseover')
+        $('.field-' + item.id).removeClass('mouseover')
     },
 
     onDragStart: function (e) {
         var ev = e.originalEvent;
+        var item = $(ev.target).data('item');
         //noinspection JSUnresolvedVariable
-        ev.dataTransfer.setData("text/plain", $(ev.target).data('field').index);
+        ev.dataTransfer.setData("text/plain", item.id);
         //noinspection JSUnresolvedVariable
-        ev.dataTransfer.setDragImage($(this).data('field').preview_img, 6, 9);
+        ev.dataTransfer.setDragImage(item.preview_img, 6, 9);
     },
     onDragOver: function (e) {
         var ev = e.originalEvent;
@@ -624,17 +863,28 @@ OSD.GUI.preview = {
 
     onDrop: function (e) {
         var ev = e.originalEvent;
-        var position = $(this).removeAttr('style').data('position');
+        var position = $(this).removeAttr('style').data('position');;
         //noinspection JSUnresolvedVariable
-        var field_id = parseInt(ev.dataTransfer.getData('text'));
-        var display_item = OSD.data.display_items[field_id];
-        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + display_item.preview.length);
-
+        var item_id = parseInt(ev.dataTransfer.getData('text'));
+        var item = OSD.get_item(item_id);
+        var preview = OSD.get_item_preview(item);
+        var line_width = 0;
+        var item_width = 0;
+        for (var ii = 0; ii < preview.length; ii++) {
+            if (preview[ii] == '\n') {
+                item_width = Math.max(item_width, line_width);
+                line_width = 0;
+                continue;
+            }
+            line_width++;
+        }
+        item_width = Math.max(item_width, line_width);
+        var overflows_line = FONT.constants.SIZES.LINE - ((position % FONT.constants.SIZES.LINE) + item_width);
         if (overflows_line < 0) {
             position += overflows_line;
         }
 
-        $('input.' + field_id + '.position').val(position).change();
+        $('input.' + item_id + '.position').val(position).change();
     }
 };
 
@@ -661,6 +911,17 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
+        var $unitMode = $('.units select').empty();
+
+        $unitMode.change(function (e) {
+            var selected = $(this).find(':selected');
+            OSD.data.unit_mode = selected.data('type');
+            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
+                .then(function () {
+                    updateOsdView();
+                });
+        });
+
         // 2 way binding... sorta
         function updateOsdView() {
 
@@ -671,7 +932,6 @@ TABS.osd.initialize = function (callback) {
                     var i,
                         type;
 
-                    OSD.chooseFields();
                     if (info.length <= 1) {
                         $('.unsupported').fadeIn();
                         return;
@@ -704,103 +964,195 @@ TABS.osd.initialize = function (callback) {
 
                     // units
                     $('.units-container').show();
-                    var $unitMode = $('.units').empty();
+                    $unitMode.empty();
+                    var $unitTip = $('.units .cf_tip');
                     for (i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
-                        var $checkbox = $('<label/>')
-                            .append(
-                                $('<input name="unit_mode" type="radio"/>' + OSD.constants.UNIT_TYPES[i] + '</label>'
-                            )
-                            .prop('checked', i === OSD.data.unit_mode)
-                            .data('type', i)
-                        );
-                        $unitMode.append($checkbox);
+                        var unitType = OSD.constants.UNIT_TYPES[i];
+                        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
+                            continue;
+                        }
+                        var name = chrome.i18n.getMessage(unitType.name);
+                        var $option = $('<option>' + name + '</option>');
+                        $option.attr('value', name);
+                        $option.data('type', unitType.value);
+                        var tip = null;
+                        if (unitType.tip) {
+                            tip = chrome.i18n.getMessage(unitType.tip);
+                        }
+                        if (OSD.data.unit_mode === unitType.value) {
+                            $option.prop('selected', true);
+                            if (unitType.tip) {
+                                $unitTip.attr('title', chrome.i18n.getMessage(unitType.tip));
+                                $unitTip.fadeIn();
+                            } else {
+                                $unitTip.fadeOut();
+                            }
+                        }
+                        $unitMode.append($option);
                     }
-                    $unitMode.find(':radio').click(function (e) {
-                        OSD.data.unit_mode = $(this).data('type');
-                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
-                            .then(function () {
-                                updateOsdView();
-                            });
-                    });
 
                     // alarms
                     $('.alarms-container').show();
                     var $alarms = $('.alarms').empty();
-                    for (let k in OSD.data.alarms) {
-                        var alarm = OSD.data.alarms[k];
-                        var alarmInput = $('<input name="alarm" type="number" id="' + k + '"/>' + alarm.display_name + '</label>');
-                        alarmInput.val(alarm.value);
+                    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
+                        var alarm = OSD.constants.ALL_ALARMS[kk];
+                        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
+                        var value = OSD.data.alarms[alarm.name];
+                        if (value === undefined) {
+                            continue;
+                        }
+                        if (alarm.unit) {
+                            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
+                            var suffix = chrome.i18n.getMessage(unit) || unit;
+                            label += ' (' + suffix + ')';
+                        }
+                        var step = 1;
+                        if (typeof alarm.step === 'function') {
+                            step = alarm.step(OSD.data)
+                        }
+                        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+                        alarmInput.data('alarm', alarm);
+                        if (typeof alarm.to_display === 'function') {
+                            value = alarm.to_display(OSD.data, value);
+                        }
+                        alarmInput.val(value);
                         alarmInput.blur(function (e) {
-                            OSD.data.alarms[$(this)[0].id].value = $(this)[0].value;
+                            var $alarm = $(this);
+                            var val = $alarm.val();
+                            var alarm = $alarm.data('alarm');
+                            if (typeof alarm.from_display === 'function') {
+                                val = alarm.from_display(OSD.data, val);
+                            }
+                            OSD.data.alarms[alarm.name] = val;
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
                                     updateOsdView();
                                 });
                         });
-                        var $input = $('<label/>').append(alarmInput);
+                        var $input = $('<label/>');
+                        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+                        if (help) {
+                            $('<div class="helpicon cf_tip"></div>')
+                            .css('margin-top', '1px')
+                            .attr('title', help)
+                            .appendTo($input)
+                            .jBox('Tooltip', {
+                                delayOpen: 100,
+                                delayClose: 100,
+                                position: {
+                                    x: 'right',
+                                    y: 'center'
+                                },
+                                outside: 'x'
+                            });
+                        }
+                        $input.append(alarmInput);
                         $alarms.append($input);
                     }
 
                     // display fields on/off and position
-                    var $displayFields = $('.display-fields').empty();
-                    for (let field of OSD.data.display_items) {
-
-                        // versioning related, if the field doesn't exist at the current flight controller version, just skip it
-                        if (!field.name) {
+                    var $tmpl = $('#osd_group_template').hide();
+                    // Clear previous groups, if any
+                    $('.osd_group').remove();
+                    var itemGroups = {};
+                    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
+                        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
+                        var groupItems = [];
+                        for (var jj = 0; jj < group.items.length; jj++) {
+                            var item = group.items[jj];
+                            if (!OSD.is_item_displayed(item, group)) {
+                                continue;
+                            }
+                            itemGroups[item.id] = group;
+                            groupItems.push(item);
+                        }
+                        if (groupItems.length == 0) {
                             continue;
                         }
-
-                        var checked = field.isVisible ? 'checked' : '';
-                        var $field = $('<div class="display-field field-' + field.index + '"/>');
-                        if (FC.getOsdDisabledFields().indexOf(field.name) != -1) {
-                            $field.hide();
-                        }
-                        $field.append(
-                            $('<input type="checkbox" name="' + field.name + '" class="togglesmall"></input>')
-                                .data('field', field)
-                                .attr('checked', field.isVisible)
-                                .change(function () {
-                                    var field = $(this).data('field');
-                                    var $position = $(this).parent().find('.position.' + field.name);
-                                    field.isVisible = !field.isVisible;
-
-                                    if (field.isVisible) {
-                                        $position.show();
-                                    } else {
-                                        $position.hide();
-                                    }
-
-                                    MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(field))
-                                        .then(function () {
-                                            updateOsdView();
-                                        });
-                                })
-                        );
-
-                        $field.append('<label for="' + field.name + '" class="char-label">' + inflection.titleize(field.name) + '</label>');
-                        if (field.positionable && field.isVisible) {
+                        var groupContainer = $tmpl.clone().addClass('osd_group').show();
+                        var groupTitle = chrome.i18n.getMessage(group.name);
+                        groupContainer.find('.spacer_box_title').text(groupTitle);
+                        var $displayFields = groupContainer.find('.display-fields');
+                        for (var jj = 0; jj < groupItems.length; jj++) {
+                            var item = groupItems[jj];
+                            var itemData = OSD.data.items[item.id];
+                            var checked = itemData.isVisible ? 'checked' : '';
+                            var $field = $('<div class="display-field field-' + item.id + '"/>');
+                            var name = item.name;
+                            var nameKey = 'osdElement_' + name;
+                            var nameMessage = chrome.i18n.getMessage(nameKey);
+                            if (nameMessage) {
+                                name = nameMessage;
+                            } else {
+                                name = inflection.titleize(name);
+                            }
+                            var help = chrome.i18n.getMessage(nameKey + '_HELP');
+                            if (help) {
+                                $('<div class="helpicon cf_tip"></div>')
+                                    .css('margin-top', '1px')
+                                    .attr('title', help)
+                                    .appendTo($field)
+                                    .jBox('Tooltip', {
+                                        delayOpen: 100,
+                                        delayClose: 100,
+                                        position: {
+                                            x: 'right',
+                                            y: 'center'
+                                        },
+                                        outside: 'x'
+                                    });
+                            }
                             $field.append(
-                                $('<input type="number" class="' + field.index + ' position"></input>')
-                                    .data('field', field)
-                                    .val(field.position)
-                                    .change($.debounce(250, function (e) {
-                                        var field = $(this).data('field');
-                                        field.position = parseInt($(this).val());
-                                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(field))
+                                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
+                                    .data('item', item)
+                                    .attr('checked', itemData.isVisible)
+                                    .change(function () {
+                                        var item = $(this).data('item');
+                                        var itemData = OSD.data.items[item.id];
+                                        var $position = $(this).parent().find('.position.' + item.name);
+                                        itemData.isVisible = !itemData.isVisible;
+
+                                        if (itemData.isVisible) {
+                                            $position.show();
+                                        } else {
+                                            $position.hide();
+                                        }
+
+                                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
                                             .then(function () {
                                                 updateOsdView();
                                             });
-                                    }))
+                                    })
                             );
+
+                            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
+                            if (item.positionable !== false && itemData.isVisible) {
+                                $field.append(
+                                    $('<input type="number" class="' + item.id + ' position"></input>')
+                                        .data('item', item)
+                                        .val(itemData.position)
+                                        .change($.debounce(250, function (e) {
+                                            var item = $(this).data('item');
+                                            var itemData = OSD.data.items[item.id];
+                                            itemData.position = parseInt($(this).val());
+                                            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
+                                                .then(function () {
+                                                    updateOsdView();
+                                                });
+                                        }))
+                                );
+                            }
+                            $displayFields.append($field);
                         }
-                        $displayFields.append($field);
+                        $tmpl.parent().append(groupContainer);
                     }
                     GUI.switchery();
 
-                    // buffer the preview
-                    OSD.data.preview = [];
+                    // buffer the preview;
+                    OSD.data.preview = [];;
                     OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-                    for (let field of OSD.data.display_items) {
+                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
+                        var field = OSD.data.display_items[ii];
                         // reset fields that somehow end up off the screen
                         if (field.position > OSD.data.display_size.total) {
                             field.position = 0;
@@ -810,30 +1162,50 @@ TABS.osd.initialize = function (callback) {
                     // clear the buffer
                     for (i = 0; i < OSD.data.display_size.total; i++) {
                         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
-                    }
-
+                    };
+;
                     // draw all the displayed items and the drag and drop preview images
-                    for (let field of OSD.data.display_items) {
-                        if (!field.preview || !field.isVisible) {
+                    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+                        var item = OSD.get_item(ii);
+                        if (!item || !OSD.is_item_displayed(item, itemGroups[item.id])) {
                             continue;
                         }
-                        var j = (field.position >= 0) ? field.position : field.position + OSD.data.display_size.total;
+                        var itemData = OSD.data.items[ii];
+                        if (!itemData.isVisible) {
+                            continue;
+                        }
+                        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
                         // create the preview image
-                        field.preview_img = new Image();
+                        item.preview_img = new Image();
                         var canvas = document.createElement('canvas');
                         var ctx = canvas.getContext("2d");
                         // fill the screen buffer
-                        for (i = 0; i < field.preview.length; i++) {
-                            var charCode = field.preview.charCodeAt(i);
-                            OSD.data.preview[j++] = [field, charCode];
+                        var preview = OSD.get_item_preview(item);
+                        if (!preview) {
+                            continue;
+                        }
+                        var x = 0;
+                        var y = 0;
+                        for (i = 0; i < preview.length; i++) {
+                            var charCode = preview.charCodeAt(i);
+                            if (charCode == '\n'.charCodeAt(0)) {
+                                x = 0;
+                                y++;
+                                continue;
+                            }
+                            OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
                             // draw the preview
                             var img = new Image();
                             img.src = FONT.draw(charCode);
-                            ctx.drawImage(img, i * 12, 0);
+                            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
+                            x++;
                         }
-                        field.preview_img.src = canvas.toDataURL('image/png');
+                        item.preview_img.src = canvas.toDataURL('image/png');
+                        // Required for NW.js - Otherwise the <img /> will
+                        // consume drag/drop events.
+                        item.preview_img.style.pointerEvents = 'none';
                     }
-                    var centerishPosition = 194;
+                    var centerishPosition = 225;
 
                     // artificial horizon
                     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
@@ -868,7 +1240,7 @@ TABS.osd.initialize = function (callback) {
                     for (i = 0; i < OSD.data.display_size.total;) {
                         var charCode = OSD.data.preview[i];
                         if (typeof charCode === 'object') {
-                            var field = OSD.data.preview[i][0];
+                            var item = OSD.data.preview[i][0];
                             charCode = OSD.data.preview[i][1];
                         }
                         var $img = $('<div class="char"><img src=' + FONT.draw(charCode) + '></img></div>')
@@ -877,12 +1249,15 @@ TABS.osd.initialize = function (callback) {
                             .on('dragover', OSD.GUI.preview.onDragOver)
                             .on('dragleave', OSD.GUI.preview.onDragLeave)
                             .on('drop', OSD.GUI.preview.onDrop)
-                            .data('field', field)
+                            .data('item', item)
                             .data('position', i);
-                        if (field && field.positionable) {
+                        // Required for NW.js - Otherwise the <img /> will
+                        // consume drag/drop events.
+                        $img.find('img').css('pointer-events', 'none');
+                        if (item && item.positionable !== false) {
                             $img
-                                .addClass('field-' + field.index)
-                                .data('field', field)
+                                .addClass('field-' + item.id)
+                                .data('item', item)
                                 .prop('draggable', true)
                                 .on('dragstart', OSD.GUI.preview.onDragStart);
                         }
@@ -944,7 +1319,6 @@ TABS.osd.initialize = function (callback) {
                 $('.progressLabel').text('Uploading...');
                 FONT.upload($('.progress').val(0)).then(function () {
                     var msg = 'Uploaded all ' + FONT.data.characters.length + ' characters';
-                    console.log(msg);
                     $('.progressLabel').text(msg);
                 });
             }
@@ -1009,7 +1383,11 @@ TABS.osd.initialize = function (callback) {
             }
         });
 
-        GUI.content_ready(callback);
+        // Update SENSOR_CONFIG, used to detect
+        // OSD_AIR_SPEED
+        mspHelper.loadSensorConfig(function () {
+            GUI.content_ready(callback);
+        });
     });
 };
 

@@ -6,7 +6,51 @@ It runs as an app within Google Chrome and allows you to configure the INAV soft
 
 Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
 
-[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
+## Installation
+
+Depending on target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
+
+### Windows
+
+1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
+1. Download Configurator for Windows platform (win32 or win64 is present)
+1. Extract ZIP archive
+1. Run INAV Configurator app from unpacked folder
+1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run 
+
+### Mac
+
+1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
+1. Download Configurator for Mac platform
+1. Extract ZIP archive
+1. Run INAV Configurator
+1. Configurator is not signed, so you have to allow Mac to run untrusted application. There might be a monit for it during first run 
+
+### ChromeOS
+
+**INAV Configurator** form ChromeOS is available in [Chrome Web Store](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
+
+### Building and running INAV Configurator locally (for development or Linux users)
+
+For local development, **node.js** build system is used.
+
+1. Install node.js
+1. From project folder run `npm install`
+1. To build the JS and CSS files and start the configurator:
+    - With NW.js: Run `npm start`.
+    - With Chrome: Run `./node_modules/gulp/bin/gulp.js`. Then open `chrome://extensions`, enable
+    the `Developer mode`, click on the `Load unpacked extension...` button and select the `inav-configurator` directory.
+
+Other tasks are also defined in `gulpfile.js`. To run a task, use `./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
+
+- **build**: Generate JS and CSS output files used by the configurator from their sources. It must be run whenever changes are made to any `.js` or `.css` files in order to have those changes appear
+in the configurator. If new files are added, they must be included in `gulpfile.js`. See the comments at the top of `gulpfile.js` to learn how to do so. See also the `watch` task.
+- **watch**: Watch JS and CSS sources for changes and run the `build` task whenever they're edited.
+- **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or a NW.js app)
+in the `./dist/` directory.
+- **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
+directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
+for the Windows app.
 
 ## Authors
 
@@ -16,26 +60,6 @@ INAV Configurator was originally a [fork](#credits) of Cleanflight Configurator 
 
 This configurator is the only configurator with support for INAV specific features. It will likely require that you run the latest firmware on the flight controller.
 If you are experiencing any problems please make sure you are running the [latest firmware version](https://github.com/iNavFlight/inav/releases).
-
-## Installation
-
-### Via chrome webstore
-
-1. Visit [Chrome web store](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
-2. Click **+ Free**
-
-Please note - the application will automatically update itself when new versions are released.  Please ensure you maintain configuration backups as described in the INAV documentation.
-
-### Alternative way
-
-1. Clone the repo to any local directory or download it as zip
-2. Start Chromium or Google Chrome and go to tools -> extension
-3. Check the "Developer mode" checkbox
-4. Click on load unpacked extension and point it to the INAV Configurator directory (for example D:/inav-configurator)
-
-## How to use
-
-You can find the INAV Configurator icon in your application tab "Apps"
 
 ## Notes
 
@@ -50,26 +74,21 @@ Make sure Settings -> System -> "User hardware acceleration when available" is c
 
 ## Support
 
-If you need help your please use the multiwii or rcgroups forums or visit the IRC channel before raising issues in the issue trackers.
+GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to setup
+everything, hardware is not working or have any other _support_ problem, please consult:
 
-### Issue trackers
+* [rcgroups main thread](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
+* [Slack channel](https://inavflight.signup.team/)
+
+## Issue trackers
 
 For INAV configurator issues raise them here
 
 https://github.com/iNavFlight/inav-configurator/issues
 
-For Cleanflight firmware issues raise them here
+For INAV firmware issues raise them here
 
 https://github.com/iNavFlight/inav/issues
-
-## Technical details
-
-This branch uses NW.js to pack Crome app into single package with node.js and chromium
-
-```
-npm install nwjs-builder -g
-nwb nwbuild -p win64 --production
-```
 
 ## Developers
 

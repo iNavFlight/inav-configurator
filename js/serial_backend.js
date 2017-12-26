@@ -246,8 +246,13 @@ function onOpen(openInfo) {
 
         FC.resetState();
 
-        // request configuration data
+        // request configuration data. Start with MSPv1 and
+        // upgrade to MSPv2 if possible.
+        MSP.protocolVersion = MSP.constants.PROTOCOL_V1;
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
+            if (CONFIG.apiVersion && semver.gte(CONFIG.apiVersion, "2.0.0")) {
+                MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
+            }
             GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
             if (semver.gte(CONFIG.apiVersion, CONFIGURATOR.apiVersionAccepted)) {
@@ -350,6 +355,7 @@ function onConnect() {
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
 
     helper.interval.add('msp-load-update', function () {
+        $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
         $('#msp-load').text("MSP load: " + helper.mspQueue.getLoad().toFixed(1));
         $('#msp-roundtrip').text("MSP round trip: " + helper.mspQueue.getRoundtrip().toFixed(0));
         $('#hardware-roundtrip').text("HW round trip: " + helper.mspQueue.getHardwareRoundtrip().toFixed(0));
