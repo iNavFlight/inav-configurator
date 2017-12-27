@@ -210,8 +210,8 @@ gulp.task('apps', ['dist'], function(done) {
         buildDir: appsDir,
         platforms: ['win32', 'osx64', 'linux64'],
         flavor: 'normal',
-        // macIcns: './images/inav.icns',
-        // winIco: './images/inav.ico',
+        macIcns: './images/inav.icns',
+        winIco: './images/inav.ico',
     });
     builder.on('log', console.log);
     builder.build(function (err) {
