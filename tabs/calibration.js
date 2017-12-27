@@ -86,11 +86,15 @@ TABS.calibration.initialize = function (callback) {
         pos.forEach(function(item) {
             $('[name=accGain'+item+']').val(CALIBRATION_DATA.accGain[item]);
             $('[name=accZero'+item+']').val(CALIBRATION_DATA.accGain[item]);
+            $('[name=Mag'+item+']').val(CALIBRATION_DATA.magZero[item]);
         });
     }
 
     function processHtml() {
 
+        if (SENSOR_CONFIG.magnetometer === 0) {
+            $('.js-mag-btn, .js-mag-pos').css('pointer-events', 'none').css('opacity', '0.4');
+        }
         $('#calibrate-start-button').click(function () {
             var newStep = TABS.calibration.model.next(),
                 $button = $(this);
