@@ -96,10 +96,10 @@
                         <span data-i18n="MagCalText">text</span>
                         <div class="default_btn">
                             <div id="mag_btn">
-                                <a class="calibratemag js-mag-btn" href="#" data-i18n="MagBtn"></a>
+                                <a class="calibratemag" href="#" data-i18n="MagBtn"></a>
                             </div>
                         </div>
-                        <table class="cf_table js-mag-pos">
+                        <table id="mag-calibrated-data" class="cf_table">
                             <tr>
                                 <td><label for="MagX"><span>X</span></label></td>
                                 <td><input type="number" name="MagX" min="0" max="2000"></td>
@@ -146,5 +146,12 @@
 <div id="modal-acc-processing" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title modal__title--center" data-i18n="accCalibrationProcessing"></h1>
+    </div>
+</div>
+
+<div id="modal-compass-processing" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title modal__title--center" data-i18n="accCalibrationProcessing"></h1>
+        <div id="modal-compass-countdown" class="modal__text"></div>
     </div>
 </div>

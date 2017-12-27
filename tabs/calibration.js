@@ -93,8 +93,45 @@ TABS.calibration.initialize = function (callback) {
     function processHtml() {
 
         if (SENSOR_CONFIG.magnetometer === 0) {
-            $('.js-mag-btn, .js-mag-pos').css('pointer-events', 'none').css('opacity', '0.4');
+            //Comment for test
+            $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }
+
+        $('#mag_btn').on('click', function () {
+            MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('initialSetupMagCalibStarted'));
+            });
+
+            var button = $(this);
+
+            $(button).addClass('disabled');
+
+            modalProcessing = new jBox('Modal', {
+                width: 400,
+                height: 100,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-compass-processing')
+            }).open();
+
+            helper.interval.pause('status_pull');
+
+            var countdown = 30;
+            helper.interval.add('compass_calibration_interval', function () {
+                countdown--;
+                $('#modal-compass-countdown').text(countdown);
+                if (countdown === 0) {
+                    $(button).removeClass('disabled');
+
+                    modalProcessing.close();
+                    GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
+                    helper.interval.resume('status_pull');
+                    helper.interval.remove('compass_calibration_interval');
+                }
+            }, 1000);
+        });
+
         $('#calibrate-start-button').click(function () {
             var newStep = TABS.calibration.model.next(),
                 $button = $(this);
