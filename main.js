@@ -38,11 +38,43 @@ $(document).ready(function () {
             break;
     }
 
+    if (typeof require !== "undefined") {
+        // Load native UI library
+        var gui = require('nw.gui');
+        var win = gui.Window.get();
+        //Get saved size and position
+        chrome.storage.local.get('windowSize', function (result) {
+            if (result.windowSize) {
+                win.height = result.windowSize.height;
+                win.width = result.windowSize.width;
+                win.x = result.windowSize.x;
+                win.y = result.windowSize.y;
+            }
+        });
+
+        win.on('close', function () {
+            //Save window size and position
+            var currentWin = this;
+            chrome.storage.local.set({'windowSize': {height: win.height, width: win.width, x: win.x, y: win.y}}, function () {
+                // Notify that we saved.
+                console.log('Settings saved');
+            });
+            this.hide(); // Pretend to be closed already
+            console.log("We're closing...");
+            this.close(true);
+        });
+    } else {
+        console.log('Not load require');
+    }
+
     chrome.storage.local.get('logopen', function (result) {
         if (result.logopen) {
             $("#showlog").trigger('click');
          }
     });
+
+    //set '1.8.0' for test
+    appUpdater.checkRelease(chrome.runtime.getManifest().version);
 
     // log library versions in console to make version tracking easier
     console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);

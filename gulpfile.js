@@ -97,7 +97,8 @@ sources.js = [
     './js/serial_queue.js',
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
-    './js/peripherals.js'
+    './js/peripherals.js',
+    './js/appUpdater.js'
 ];
 
 sources.mapCss = [
@@ -263,10 +264,48 @@ gulp.task('release-macos', function() {
     return archive.finalize();
 });
 
+gulp.task('release-linux64', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'linux64');
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('linux64', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator');
+    return archive.finalize();
+});
+
+//For build only linux, without install Wine
+//run task `apps` get error
+//Error building NW apps:Error while updating the Windows icon. Wine (winehq.org) must be installed to add custom icons from Mac and Linux.
+gulp.task('release-only-linux', ['dist'], function (done) {
+    var builder = new NwBuilder({
+        files: './dist/**/*',
+        buildDir: appsDir,
+        platforms: ['linux64'],
+        flavor: 'normal',
+    });
+    builder.on('log', console.log);
+    builder.build().then(function(){
+        //Start zip app after complete
+        runSequence('release-linux64');
+    }).catch(function(err){
+        if (err) {
+            console.log("Error building NW apps:" + err);
+            done();
+            return;
+        }
+        // Package apps as .zip files
+        done();
+    });
+});
+
 // Create distributable .zip files in ./apps
 gulp.task('release', function() {
-    // TODO: Linux
-    return runSequence('apps', 'release-macos', 'release-windows');
+    return runSequence('apps', 'release-macos', 'release-windows', 'release-linux64');
 });
 
 gulp.task('watch', function () {
