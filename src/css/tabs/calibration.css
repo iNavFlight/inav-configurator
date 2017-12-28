@@ -1,0 +1,181 @@
+.tab-calibration .content_toolbar {
+    left: 0px;
+    }
+    
+.tab-calibration .tile {
+    float: left;
+    width: calc(33% - 10px);
+    height: 180px;
+    background-color: #ddd;
+    border-radius: 7px;
+    border: solid 1px silver;
+    margin-right: 14px;
+    margin-bottom: 15px;
+    box-shadow: inset 0 0 10px #ccc;
+    background-size: 140px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-position-y: 30px;
+} 
+  
+.tab-calibration .tile:nth-child(4) {
+    margin-right: 0px;
+    margin-left: 1px;
+}
+    
+.tab-calibration .tile:nth-child(7) {
+    margin-right: 0px;
+    margin-left: 1px;
+
+}
+
+.tab-calibration .steptitle {
+    float: left;
+    width: calc(100% - 10px);
+    text-align: center;
+    padding: 5px;
+    background-color: silver;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: white;
+}
+
+.tab-calibration .indicator {
+    float: right;
+    margin-right: 20px;
+    margin-top: 106px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    display: none;
+    background-image: url(../../../images/icons/check.svg);
+    background-size: contain;
+    
+}
+
+.tab-calibration .finished .indicator {
+    display: block;
+    }
+
+.tab-calibration .finished .steptitle {
+    background-color: grey;
+}
+
+.tab-calibration .active .steptitle {
+    background-color: #37a8db;
+}
+
+.tab-calibration .active {
+    border: solid 1px #37a8db;
+    background-color: white;
+    box-shadow: 0 0 10px #ccc;
+
+}
+
+.tab-calibration .finished {
+    background-color: #FFF;
+}
+
+ .tab-calibration .step1 {
+    background-image: url(../../../images/icons/pos1_grey.svg);
+    background-size: 185px;
+    background-position-y: 10px;
+}
+
+ .tab-calibration .step1.active, .tab-calibration .step1.finished {
+    background-image: url(../../../images/icons/pos1.svg);
+}
+
+.tab-calibration .step2 {
+    background-image: url(../../../images/icons/pos2_grey.svg);
+    background-size: 185px;
+    background-position-y: 10px;
+}
+
+ .tab-calibration .step2.active, .tab-calibration .step2.finished {
+    background-image: url(../../../images/icons/pos2.svg);
+}
+
+ .tab-calibration .step3 {
+    background-image: url(../../../images/icons/pos3_grey.svg);
+}
+
+ .tab-calibration .step3.active, .tab-calibration .step3.finished {
+    background-image: url(../../../images/icons/pos3.svg);
+}
+
+ .tab-calibration .step4 {
+    background-image: url(../../../images/icons/pos4_grey.svg);
+}
+
+.tab-calibration .step4.active, .tab-calibration .step4.finished {
+    background-image: url(../../../images/icons/pos4.svg);
+}
+
+.tab-calibration .step5 {
+    background-image: url(../../../images/icons/pos5_grey.svg);
+}
+
+.tab-calibration .step5.active, .tab-calibration .step5.finished {
+    background-image: url(../../../images/icons/pos5.svg);
+}
+
+.tab-calibration .step6 {
+    background-image: url(../../../images/icons/pos6_grey.svg);
+}
+
+ .tab-calibration .step6.active, .tab-calibration .step6.finished {
+    background-image: url(../../../images/icons/pos6.svg);
+}
+
+ .tab-calibration .note {
+    margin-bottom: 20px;
+    width: calc(100% - 20px);
+    margin-top: 5px;
+    padding:5px;
+    min-height: 45px;
+}
+
+#calib_btn {
+    margin-top: 5px;
+    margin-left: 5px;
+    }
+    
+#calib_btn a {
+    height:30px;
+    padding-top: 20px;
+    width: calc(100% - 5px);
+    }
+ 
+.tab-calibration input {
+    width: 57px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    margin-left: 11px;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tab-calibration .spacer_box div input {
+    margin-right: 0px;
+    }
+
+.tab-calibration #mag_btn {
+    margin-top: 10px;
+    }
+
+.tab-calibration #level_btn {
+    margin-top: 10px;
+    }
+
+.tab-calibration .acc tr td {
+    width: 25%;
+    }
+    
+.tab-calibration .acc tr td:nth-child(1){
+    width: 34%;
+    }

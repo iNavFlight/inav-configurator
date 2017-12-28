@@ -866,6 +866,18 @@ li.active .ic_transponder {
     background-image: url("../images/icons/cf_icon_transponder_white.svg");
 }
 
+.ic_calibration {
+    background-image: url(../images/icons/cf_icon_cal_grey.svg);
+}
+
+.ic_calibration:hover {
+    background-image: url(../images/icons/cf_icon_cal_white.svg);
+}
+
+li.active .ic_calibration {
+    background-image: url(../images/icons/cf_icon_cal_white.svg);
+}
+
 /* SPARE Tab-Icons */
 .ic_failsafe {
     background-image: url("../images/icons/cf_icon_failsafe_grey.svg");
@@ -1502,7 +1514,7 @@ dialog {
 /* fixing padding for all Tabs*/
 .tab-setup, .tab-landing, .tab-adjustments, .tab-auxiliary, .tab-cli, .tab-configuration, .tab-failsafe, .tab-onboard_logging,
 .tab-firmware_flasher, .tab-gps, .tab-help, .tab-led-strip, .tab-logging, .tab-modes, .tab-motors, .tab-pid_tuning,
-.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-osd {
+.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-osd, .tab-calibration {
     height: 100%;
     position: relative;
 }
