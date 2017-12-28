@@ -2252,10 +2252,10 @@
         "message": "Sensors"
     },
     "appUpdateNotificationHeader": {
-        "message": "New version aviable!"
+        "message": "New Configurator version available."
     },
     "appUpdateNotificationDescription": {
-        "message": "Visit the website to see the changes <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">GitHub</a>"
+        "message": "Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
     "closeUpdateBtn": {
         "message": "Close"
