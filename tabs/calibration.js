@@ -14,10 +14,19 @@ TABS.calibration.model = (function () {
         if (privateScope.step === null) {
             privateScope.step = 1;
         } else {
-            privateScope.step++;
+            var count = 0;
+            for (var i = 0; i < 6; i++) {
+                if (CALIBRATION_DATA.acc['Pos' + i] === 1) {
+                    count++;
+                }
+            }
+
+            privateScope.step = count;
         }
 
-        if (privateScope.step > 6) {
+        console.log(privateScope.step);
+
+        if (privateScope.step > 5) {
             privateScope.step = null;
         }
 
@@ -62,32 +71,40 @@ TABS.calibration.initialize = function (callback) {
 
     MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
 
-    /**
-     *
-     * @param {int} currentStep
-     */
-    function updateCalibrationSteps(currentStep) {
-        for (var i = 1; i <= 6; i++) {
-            var $element = $('[data-step="' + i + '"]');
+    function updateCalibrationSteps() {
+        for (var i = 0; i < 6; i++) {
+            var $element = $('[data-step="' + (i + 1) + '"]');
 
-            if (currentStep === null) {
+            if (CALIBRATION_DATA.acc['Pos' + i] === 0) {
                 $element.removeClass('finished').removeClass('active');
-            } else if (i < currentStep) {
+            } else {
                 $element.addClass("finished").removeClass('active');
-            } else if (currentStep === i) {
-                $element.addClass('active').removeClass('finished');
             }
-
         }
     }
 
     function updateSensorData() {
         var pos = ['X', 'Y', 'Z'];
-        pos.forEach(function(item) {
-            $('[name=accGain'+item+']').val(CALIBRATION_DATA.accGain[item]);
-            $('[name=accZero'+item+']').val(CALIBRATION_DATA.accGain[item]);
-            $('[name=Mag'+item+']').val(CALIBRATION_DATA.magZero[item]);
+        pos.forEach(function (item) {
+            $('[name=accGain' + item + ']').val(CALIBRATION_DATA.accGain[item]);
+            $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accGain[item]);
+            $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
         });
+        updateCalibrationSteps();
+    }
+
+    function checkFinishAccCalibrate() {
+        if (TABS.calibration.model.next() === null) {
+            modalStop = new jBox('Modal', {
+                width: 400,
+                height: 200,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-acc-calibration-stop')
+            }).open();
+        }
+        updateSensorData();
     }
 
     function processHtml() {
@@ -115,7 +132,7 @@ TABS.calibration.initialize = function (callback) {
                 content: $('#modal-compass-processing')
             }).open();
 
-            helper.interval.pause('status_pull');
+            // helper.interval.pause('status_pull');
 
             var countdown = 30;
             helper.interval.add('compass_calibration_interval', function () {
@@ -126,18 +143,24 @@ TABS.calibration.initialize = function (callback) {
 
                     modalProcessing.close();
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
-                    helper.interval.resume('status_pull');
+                    // helper.interval.resume('status_pull');
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('compass_calibration_interval');
                 }
             }, 1000);
         });
 
         $('#calibrate-start-button').click(function () {
-            var newStep = TABS.calibration.model.next(),
+            var newStep = null,
                 $button = $(this);
 
-            if (newStep === 1) {
-                updateCalibrationSteps(newStep);
+            if (TABS.calibration.model.getStep() === null) {
+                for (var i = 0; i < 6; i++) {
+                    if (CALIBRATION_DATA.acc['Pos' + i] === 1) {
+                        CALIBRATION_DATA.acc['Pos' + i] = 0;
+                    }
+                }
+                updateCalibrationSteps();
                 modalStart = new jBox('Modal', {
                     width: 400,
                     height: 200,
@@ -146,13 +169,14 @@ TABS.calibration.initialize = function (callback) {
                     closeOnEsc: false,
                     content: $('#modal-acc-calibration-start')
                 }).open();
+            } else {
+                newStep = TABS.calibration.model.next();
             }
 
             /*
              * Communication
              */
-            if (newStep > 1 || newStep === null) {
-
+            if (newStep !== null) {
                 $button.addClass('disabled');
 
                 modalProcessing = new jBox('Modal', {
@@ -164,32 +188,22 @@ TABS.calibration.initialize = function (callback) {
                     content: $('#modal-acc-processing')
                 }).open();
 
-                helper.interval.pause('status_pull');
+                // helper.interval.pause('status_pull');
+                console.log('cal ' + newStep);
                 MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
                 });
 
                 helper.timeout.add('acc_calibration_timeout', function () {
 
-                    updateCalibrationSteps(newStep);
+                    // updateCalibrationSteps();
 
                     $button.removeClass('disabled');
 
                     modalProcessing.close();
-
-                    helper.interval.resume('status_pull');
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, checkFinishAccCalibrate);
+                    // helper.interval.resume('status_pull');
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
-
-                    if (newStep === null) {
-                        modalStop = new jBox('Modal', {
-                            width: 400,
-                            height: 200,
-                            animation: false,
-                            closeOnClick: false,
-                            closeOnEsc: false,
-                            content: $('#modal-acc-calibration-stop')
-                        }).open();
-                    }
                 }, 2000);
             }
 
@@ -197,24 +211,25 @@ TABS.calibration.initialize = function (callback) {
 
         $('#modal-start-button').click(function () {
             modalStart.close();
+            TABS.calibration.model.next();
         });
 
         $('#modal-stop-button').click(function () {
             modalStop.close();
         });
 
-        updateCalibrationSteps(TABS.calibration.model.getStep());
+        // updateCalibrationSteps();
 
         // translate to user-selected language
         localize();
-
-        helper.interval.add('status_pull', function status_pull() {
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, updateSensorData);
-            } else {
-                MSP.send_message(MSPCodes.MSP_STATUS);
-            }
-        }, 250, true);
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+        // helper.interval.add('status_pull', function status_pull() {
+        //     if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+        //         // MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+        //     } else {
+        //         MSP.send_message(MSPCodes.MSP_STATUS);
+        //     }
+        // }, 250, true);
         GUI.content_ready(callback);
     }
 };

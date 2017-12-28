@@ -286,6 +286,14 @@ var FC = {
         };
 
         CALIBRATION_DATA = {
+            acc: {
+                Pos0: null,
+                Pos1: null,
+                Pos2: null,
+                Pos3: null,
+                Pos4: null,
+                Pos5: null
+            },
             accZero: {
                 X: null,
                 Y: null,

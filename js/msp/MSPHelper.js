@@ -983,15 +983,23 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_CALIBRATION_DATA:
-                CALIBRATION_DATA.accZero.X = data.getInt16(0, true);
-                CALIBRATION_DATA.accZero.Y = data.getInt16(2, true);
-                CALIBRATION_DATA.accZero.Z = data.getInt16(4, true);
-                CALIBRATION_DATA.accGain.X = data.getInt16(6, true);
-                CALIBRATION_DATA.accGain.Y = data.getInt16(8, true);
-                CALIBRATION_DATA.accGain.Z = data.getInt16(10, true);
-                CALIBRATION_DATA.magZero.X = data.getInt16(12, true);
-                CALIBRATION_DATA.magZero.Y = data.getInt16(14, true);
-                CALIBRATION_DATA.magZero.Z = data.getInt16(16, true);
+                var callibrations = data.getUint8(0);
+                CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
+                CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
+                CALIBRATION_DATA.acc.Pos2 = (1 & (callibrations >> 2));
+                CALIBRATION_DATA.acc.Pos3 = (1 & (callibrations >> 3));
+                CALIBRATION_DATA.acc.Pos4 = (1 & (callibrations >> 4));
+                CALIBRATION_DATA.acc.Pos5 = (1 & (callibrations >> 5));
+
+                CALIBRATION_DATA.accZero.X = data.getInt16(1, true);
+                CALIBRATION_DATA.accZero.Y = data.getInt16(3, true);
+                CALIBRATION_DATA.accZero.Z = data.getInt16(5, true);
+                CALIBRATION_DATA.accGain.X = data.getInt16(7, true);
+                CALIBRATION_DATA.accGain.Y = data.getInt16(9, true);
+                CALIBRATION_DATA.accGain.Z = data.getInt16(11, true);
+                CALIBRATION_DATA.magZero.X = data.getInt16(13, true);
+                CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
+                CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
                 break;
 
             case MSPCodes.MSP_SET_CALIBRATION_DATA:
