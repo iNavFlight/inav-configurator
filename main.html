@@ -8,6 +8,16 @@
 </head>
 <body>
 <div id="main-wrapper">
+    <div id="appUpdateNotification" class="is-hidden">
+        <div class="modal__content">
+            <h1 class="modal__title modal__title" data-i18n="appUpdateNotificationHeader"></h1>
+            <div class="modal__text" data-i18n="appUpdateNotificationDescription"></div>
+        </div>
+        <div class="modal__buttons modal__buttons--upbottom">
+            <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" id="update-notification-download" class="modal__button modal__button--main modal__button--main--inline" data-i18n="downloadUpdatesBtn"></a>
+            <a id="update-notification-close" class="modal__button modal__button--main modal__button--main--inline" data-i18n="closeUpdateBtn"></a>
+        </div>
+    </div>
     <div class="headerbar">
         <div id="logo">
             <div class="logo_text">

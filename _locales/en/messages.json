@@ -2250,5 +2250,17 @@
     },
     "portColumnSensors": {
         "message": "Sensors"
+    },
+    "appUpdateNotificationHeader": {
+        "message": "New version aviable!"
+    },
+    "appUpdateNotificationDescription": {
+        "message": "Visit the website to see the changes <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">GitHub</a>"
+    },
+    "closeUpdateBtn": {
+        "message": "Close"
+    },
+    "downloadUpdatesBtn": {
+        "message": "Download new app"
     }
 }

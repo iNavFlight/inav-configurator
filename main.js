@@ -44,6 +44,9 @@ $(document).ready(function () {
          }
     });
 
+    //set '1.8.0' for test
+    appUpdater.checkRelease(chrome.runtime.getManifest().version);
+
     // log library versions in console to make version tracking easier
     console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);
 

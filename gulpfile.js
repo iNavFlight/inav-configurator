@@ -97,7 +97,8 @@ sources.js = [
     './js/serial_queue.js',
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
-    './js/peripherals.js'
+    './js/peripherals.js',
+    './js/appUpdater.js'
 ];
 
 sources.mapCss = [
