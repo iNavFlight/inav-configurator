@@ -1,0 +1,41 @@
+{
+    "translation_version": {
+        "message": "0"
+    },
+
+    "options_title": {
+        "message": "Настройки приложения"
+    },
+    "options_receive_app_notifications": {
+        "message": "Получать <strong>оповещения</strong> при обновлении приложения"
+    },
+    "options_improve_configurator": {
+        "message": "Отправлять анонимные данные об использовании приложения команде разработчиков"
+    },
+
+    "connect": {
+        "message": "Подключить"
+    },
+    "connecting": {
+        "message": "Подключение"
+    },
+    "disconnect": {
+        "message": "Отключить"
+    },
+    "autoConnect": {
+        "message": "Автоподключение"
+    },
+    "autoConnectEnabled": {
+        "message": "Автоподключение: Включено - Конфигуратор автоматически пытается подключиться при обнаружении нового порта"
+    },
+    "autoConnectDisabled": {
+        "message": "Автоподключение: Выключено - Пользователю необходимо выбрать правильный последовательный порт и нажать кнопку \"Подключить\" самостоятельно"
+    },
+    "deviceRebooting": {
+        "message": "Устройство - <span style=\"color: red\">Перезагрузка</span>"
+    },
+    "deviceReady": {
+        "message": "Устройство - <span style=\"color: #37a8db\">Готово</span>"
+    }
+
+}
