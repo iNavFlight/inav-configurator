@@ -54,35 +54,6 @@ TABS.setup.initialize = function (callback) {
 
         self.initializeInstruments();
 
-        // UI Hooks
-        $('a.calibrateAccel').click(function () {
-            var self = $(this);
-
-            if (!self.hasClass('calibrating')) {
-                self.addClass('calibrating');
-
-                // During this period MCU won't be able to process any serial commands because its locked in a for/while loop
-                // until this operation finishes, sending more commands through data_poll() will result in serial buffer overflow
-                helper.interval.pause('setup_data_pull');
-
-                MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
-                    $('#accel_calib_running').show();
-                    $('#accel_calib_rest').hide();
-                });
-
-                helper.timeout.add('button_reset', function () {
-                    helper.interval.resume('setup_data_pull');
-
-                    GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
-
-                    self.removeClass('calibrating');
-                    $('#accel_calib_running').hide();
-                    $('#accel_calib_rest').show();
-                }, 2000);
-            }
-        });
-
         $('a.calibrateMag').click(function () {
             var self = $(this);
 
