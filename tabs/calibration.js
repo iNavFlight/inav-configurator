@@ -132,8 +132,6 @@ TABS.calibration.initialize = function (callback) {
                 content: $('#modal-compass-processing')
             }).open();
 
-            // helper.interval.pause('status_pull');
-
             var countdown = 30;
             helper.interval.add('compass_calibration_interval', function () {
                 countdown--;
@@ -143,7 +141,6 @@ TABS.calibration.initialize = function (callback) {
 
                     modalProcessing.close();
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
-                    // helper.interval.resume('status_pull');
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('compass_calibration_interval');
                 }
@@ -188,21 +185,15 @@ TABS.calibration.initialize = function (callback) {
                     content: $('#modal-acc-processing')
                 }).open();
 
-                // helper.interval.pause('status_pull');
-                console.log('cal ' + newStep);
                 MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
                 });
 
                 helper.timeout.add('acc_calibration_timeout', function () {
-
-                    // updateCalibrationSteps();
-
                     $button.removeClass('disabled');
 
                     modalProcessing.close();
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, checkFinishAccCalibrate);
-                    // helper.interval.resume('status_pull');
                     GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
                 }, 2000);
             }
@@ -218,18 +209,9 @@ TABS.calibration.initialize = function (callback) {
             modalStop.close();
         });
 
-        // updateCalibrationSteps();
-
         // translate to user-selected language
         localize();
         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-        // helper.interval.add('status_pull', function status_pull() {
-        //     if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-        //         // MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-        //     } else {
-        //         MSP.send_message(MSPCodes.MSP_STATUS);
-        //     }
-        // }, 250, true);
         GUI.content_ready(callback);
     }
 };
