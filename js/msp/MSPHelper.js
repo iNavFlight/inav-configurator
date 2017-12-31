@@ -982,6 +982,30 @@ var mspHelper = (function (gui) {
                 console.log('NAV_POSHOLD saved');
                 break;
 
+            case MSPCodes.MSP_CALIBRATION_DATA:
+                var callibrations = data.getUint8(0);
+                CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
+                CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
+                CALIBRATION_DATA.acc.Pos2 = (1 & (callibrations >> 2));
+                CALIBRATION_DATA.acc.Pos3 = (1 & (callibrations >> 3));
+                CALIBRATION_DATA.acc.Pos4 = (1 & (callibrations >> 4));
+                CALIBRATION_DATA.acc.Pos5 = (1 & (callibrations >> 5));
+
+                CALIBRATION_DATA.accZero.X = data.getInt16(1, true);
+                CALIBRATION_DATA.accZero.Y = data.getInt16(3, true);
+                CALIBRATION_DATA.accZero.Z = data.getInt16(5, true);
+                CALIBRATION_DATA.accGain.X = data.getInt16(7, true);
+                CALIBRATION_DATA.accGain.Y = data.getInt16(9, true);
+                CALIBRATION_DATA.accGain.Z = data.getInt16(11, true);
+                CALIBRATION_DATA.magZero.X = data.getInt16(13, true);
+                CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
+                CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
+                break;
+
+            case MSPCodes.MSP_SET_CALIBRATION_DATA:
+                console.log('Calibration data saved');
+                break;
+
             case MSPCodes.MSP_POSITION_ESTIMATION_CONFIG:
                 POSITION_ESTIMATOR.w_z_baro_p = data.getUint16(0, true) / 100;
                 POSITION_ESTIMATOR.w_z_gps_p = data.getUint16(2, true) / 100;
@@ -1386,6 +1410,36 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
                 buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
+                break;
+
+            case MSPCodes.MSP_SET_CALIBRATION_DATA:
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.X));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.Y));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accZero.Z));
+                buffer.push(highByte(CALIBRATION_DATA.accZero.Z));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.X));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.Y));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.accGain.Z));
+                buffer.push(highByte(CALIBRATION_DATA.accGain.Z));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.X));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.X));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.Y));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.Y));
+
+                buffer.push(lowByte(CALIBRATION_DATA.magZero.Z));
+                buffer.push(highByte(CALIBRATION_DATA.magZero.Z));
                 break;
 
             case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
@@ -2218,6 +2272,22 @@ var mspHelper = (function (gui) {
     self.savePositionEstimationConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
             MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadCalibrationData = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveCalibrationData = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
         } else {
             callback();
         }
