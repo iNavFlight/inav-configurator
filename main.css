@@ -1883,6 +1883,10 @@ select {
     margin: 1em;
 }
 
+.modal__buttons--upbottom {
+    bottom: 22px;
+}
+
 .modal__button {
     padding: 1em;
     text-align: center;
@@ -1916,6 +1920,10 @@ select {
 .modal__button--main:hover {
     background-color: #3394b5;
     transition: all ease 0.2s;
+}
+
+.modal__button--main--inline {
+    display: inline;
 }
 
 .modal__button--disabled {
