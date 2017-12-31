@@ -42,6 +42,13 @@ $(document).ready(function () {
         // Load native UI library
         var gui = require('nw.gui');
         var win = gui.Window.get();
+
+        //Listen to the new window event
+        win.on('new-win-policy', function (frame, url, policy) {
+            gui.Shell.openExternal(url);
+            policy.ignore();
+        });
+
         //Get saved size and position
         chrome.storage.local.get('windowSize', function (result) {
             if (result.windowSize) {
