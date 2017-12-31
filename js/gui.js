@@ -34,6 +34,7 @@ var GUI_control = function () {
         'receiver',
         'sensors',
         'servos',
+        'calibration',
         'setup',
         'osd',
         'profiles',

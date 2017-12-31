@@ -44,6 +44,7 @@ var CONFIG,
     SENSOR_STATUS,
     SENSOR_CONFIG,
     NAV_POSHOLD,
+    CALIBRATION_DATA,
     POSITION_ESTIMATOR,
     RTH_AND_LAND_CONFIG,
     FW_CONFIG;
@@ -282,6 +283,32 @@ var FC = {
             maxBankAngle: null,
             useThrottleMidForAlthold: null,
             hoverThrottle: null
+        };
+
+        CALIBRATION_DATA = {
+            acc: {
+                Pos0: null,
+                Pos1: null,
+                Pos2: null,
+                Pos3: null,
+                Pos4: null,
+                Pos5: null
+            },
+            accZero: {
+                X: null,
+                Y: null,
+                Z: null
+            },
+            accGain: {
+                X: null,
+                Y: null,
+                Z: null
+            },
+            magZero: {
+                X: null,
+                Y: null,
+                Z: null
+            }
         };
 
         RTH_AND_LAND_CONFIG = {

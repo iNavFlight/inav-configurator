@@ -600,7 +600,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        OSD.GUI.jbox = new jBox('Modal', {
+        var modal = new jBox('Modal', {
             width: 600,
             height: 240,
             closeButton: 'title',

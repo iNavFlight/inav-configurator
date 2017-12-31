@@ -68,6 +68,9 @@
     "tabSetup": {
         "message": "Setup"
     },
+    "tabCalibration": {
+        "message": "Calibration"
+    },
     "tabConfiguration": {
         "message": "Configuration"
     },
@@ -1891,6 +1894,42 @@
     "armingCheckFail": {
         "message": "<div class=\"checksfail\"></div>"
     },
+    "calibrationHead1": {
+        "message": "Accelerometer Calibration"
+    },
+    "calibrationHead2": {
+        "message": "Accelerometer Values"
+    },
+    "calibrationHead3": {
+        "message": "Level Calibration"
+    },
+    "calibrationHead4": {
+        "message": "Compass Calibration"
+    },
+    "accZero": {
+        "message": "Acc Zero"
+    },
+    "accGain": {
+        "message": "Acc Gain"
+    },
+    "NoteCalibration": {
+        "message": "Note: If the flightcontroller is mounted in another angle or upside down, do the calibration steps with the flightcontroller pointing as shown in the pictures, not the quad (otherwise calibration won´t work)."
+    },
+    "AccBtn": {
+        "message": "Calibrate Accelerometer"
+    },
+    "MagCalText": {
+        "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
+    },
+    "MagBtn": {
+        "message": "Calibrate Compass"
+    },
+    "LevCalText": {
+        "message": "Please put some Text here…"
+    },
+    "LevBtn": {
+        "message": "Level calibration"
+    },
     "tabPresets": {
         "message": "Presets"
     },
@@ -1914,6 +1953,24 @@
     },
     "presetApplyDescription": {
         "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
+    },
+    "OK": {
+        "message": "OK"
+    },
+    "accCalibrationStartTitle": {
+        "message": "Accelerometer Calibration"
+    },
+    "accCalibrationStartBody": {
+        "message": "Place flight controller in a position showed in image, then press <strong>Calibrate</strong> button again. Repeat for each of 6 position. Keep it stable during calibration."
+    },
+    "accCalibrationStopTitle": {
+        "message": "Calibration finished"
+    },
+    "accCalibrationStopBody": {
+        "message": "Accelerometer calibration finished, check if values have been saved."
+    },
+    "accCalibrationProcessing": {
+        "message": "Processing..."
     },
     "tabAdvancedTuning": {
         "message": "Advanced tuning"
