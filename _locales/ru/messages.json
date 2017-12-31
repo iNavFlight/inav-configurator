@@ -2,7 +2,6 @@
     "translation_version": {
         "message": "0"
     },
-
     "options_title": {
         "message": "Настройки приложения"
     },
@@ -12,7 +11,6 @@
     "options_improve_configurator": {
         "message": "Отправлять анонимные данные об использовании приложения команде разработчиков"
     },
-
     "connect": {
         "message": "Подключить"
     },
@@ -36,6 +34,137 @@
     },
     "deviceReady": {
         "message": "Устройство - <span style=\"color: #37a8db\">Готово</span>"
+    },
+    "initialSetupEepromSaved": {
+        "message": "EEPROM <span style=\"color: #37a8db\">сохранено</span>"
+    },
+    "RX_PPM": {
+        "message": "Вход PPM RX"
+    },
+    "RX_SERIAL": {
+        "message": "Последовательный приемник (SPEKSAT, SBUS, SUMD)"
+    },
+    "RX_PWM": {
+        "message": "Вход PWM RX (один провод на канал)"
+    },
+    "RX_MSP": {
+        "message": "Вход MSP RX (управление через порт MSP)"
+    },
+    "RX_SPI": {
+        "message": "Приемник на основе RX SPI (NRF24L01, RFM22)"
+    },
+    "RX_NONE": {
+        "message": "Нет приемника"
+    },
+    "featureVBAT": {
+        "message": "Мониторинг напряжения батареи"
+    },
+    "featureINFLIGHT_ACC_CAL": {
+        "message": "Калибровка в полете"
+    },
+    "featureMOTOR_STOP": {
+        "message": "Не запускать моторы после арминга"
+    },
+    "featureSOFTSERIAL": {
+        "message": "Включение последовательных портов на базе процессора"
+    },
+    "featureSOFTSERIALTip": {
+        "message": "Настройте порты на вкладке «Порты» после включения."
+    },
+    "featureGPS": {
+        "message": "GPS для навигации и телеметрии"
+    },
+    "featureFAILSAFE": {
+        "message": "Применение настроек failsafe при потере RX-сигнала"
+    },
+    "featureSONAR": {
+        "message": "Сонар"
+    },
+    "featureTELEMETRY": {
+        "message": "Выход телеметрии"
+    },
+    "featureCURRENT_METER": {
+        "message": "Мониторинг тока батареи"
+    },
+    "feature3D": {
+        "message": "3D режим (для ESC с реверсом)"
+    },
+    "featureRSSI_ADC": {
+        "message": "Аналоговый вход RSSI"
+    },
+    "featureLED_STRIP": {
+        "message": "Поддержка многоцветной RGB-светодиодной ленты"
+    },
+    "featureDISPLAY": {
+        "message": "OLED экран"
+    },
+    "featureONESHOT125": {
+        "message": "Поддержка ESC с ONESHOT"
+    },
+    "featureONESHOT125Tip": {
+        "message": "Перед включением отключите аккумуляторную батарею и снимите пропеллеры."
+    },
+    "featurePWM_OUTPUT_ENABLE": {
+        "message": "Включение выходов на сервы и моторы"
+    },
+    "featurePWM_OUTPUT_ENABLETip": {
+        "message": "Включение этой опции требуется, чтобы INAV посылал сигналы на ESC и сервы. Это предосторожность, которая предотвращает повреждение серв сразу после прошивки полетного контроллера."
+    },
+    "featureBLACKBOX": {
+        "message": "Включение черного ящика"
+    },
+    "featureBLACKBOXTip": {
+        "message": "Настройте вкладку BlackBox после включения."
+    },
+    "featureCHANNEL_FORWARDING": {
+        "message": "Перенос aux каналов на сервы"
+    },
+    "featureTRANSPONDER": {
+        "message": "Транспондер"
+    },
+    "featureTRANSPONDERTip": {
+        "message": "Настройте вкладку Race Transponder после включения."
+    },
+    "featureOSD": {
+        "message": "OSD"
+    },
+    "featureAIRMODE": {
+        "message": "Permanently enable AIRMODE"
+    },
+    "configurationFeatureEnabled": {
+        "message": "Включено"
+    },
+    "configurationFeatureDescription": {
+        "message": "Описание"
+    },
+    "configurationReceiver": {
+        "message": "Режим приемника"
+    },
+    "configurationRSSI": {
+        "message": "RSSI (Сила сигнала)"
+    },
+    "configurationAutoDisarmDelay": {
+        "message": "Задержка дизарма [Секунды]"
+    },
+    "configurationAutoDisarmDelayHelp": {
+        "message": "Требуется функция MOTOR_STOP"
+    },
+    "configurationDisarmKillSwitch": {
+        "message": "Disarm независимо от значения стика газа"
+    },
+    "configurationBatteryVoltage": {
+        "message": "Напряжение батареи"
+    },
+    "configurationBatteryCurrent": {
+        "message": "Ток батареи"
+    },
+    "configurationBatteryMinimum": {
+        "message": "Минимальное напряжение ячейки"
+    },
+    "configurationBatteryMaximum": {
+        "message": "Максимальное напряжение ячейки"
+    },
+    "configurationCurrent": {
+        "message": "Датчик тока"
     }
-
 }
