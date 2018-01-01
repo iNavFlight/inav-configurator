@@ -54,27 +54,6 @@ TABS.setup.initialize = function (callback) {
 
         self.initializeInstruments();
 
-        $('a.calibrateMag').click(function () {
-            var self = $(this);
-
-            if (!self.hasClass('calibrating') && !self.hasClass('disabled')) {
-                self.addClass('calibrating');
-
-                MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('initialSetupMagCalibStarted'));
-                    $('#mag_calib_running').show();
-                    $('#mag_calib_rest').hide();
-                });
-
-                helper.timeout.add('button_reset', function () {
-                    GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
-                    self.removeClass('calibrating');
-                    $('#mag_calib_running').hide();
-                    $('#mag_calib_rest').show();
-                }, 30000);
-            }
-        });
-
         $('a.resetSettings').click(function () {
             MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
                 GUI.log(chrome.i18n.getMessage('initialSetupSettingsRestored'));
