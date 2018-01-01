@@ -983,6 +983,10 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_CALIBRATION_DATA:
+                if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
+                    break;
+                }
+
                 var callibrations = data.getUint8(0);
                 CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
                 CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
@@ -2278,7 +2282,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
             MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
         } else {
             callback();
@@ -2286,7 +2290,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
             MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
         } else {
             callback();
