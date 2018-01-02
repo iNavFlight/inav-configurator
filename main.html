@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link type="text/css" rel="stylesheet" href="./build/styles.css" media="all"/>
     <script type="text/javascript" src="./build/script.js"></script>
+    <link type="text/css" rel="stylesheet" href="./build/map.css" media="all"/>
+    <script type="text/javascript" src="./build/map.js"></script>
     <title></title>
 </head>
 <body>
@@ -14,7 +16,8 @@
             <div class="modal__text" data-i18n="appUpdateNotificationDescription"></div>
         </div>
         <div class="modal__buttons modal__buttons--upbottom">
-            <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" id="update-notification-download" class="modal__button modal__button--main modal__button--main--inline" data-i18n="downloadUpdatesBtn"></a>
+            <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" id="update-notification-download"
+               class="modal__button modal__button--main modal__button--main--inline" data-i18n="downloadUpdatesBtn"></a>
             <a id="update-notification-close" class="modal__button modal__button--main modal__button--main--inline" data-i18n="closeUpdateBtn"></a>
         </div>
     </div>
@@ -185,6 +188,7 @@
                 <li class="tab_servos"><a href="#" data-i18n="tabServos" class="tabicon ic_servo" title="Servos"></a>
                 </li>
                 <li class="tab_gps"><a href="#" data-i18n="tabGPS" class="tabicon ic_gps" title="GPS"></a></li>
+                <li class="tab_mission_control"><a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission" title="Mission Control"></a></li>
                 <li class="tab_motors"><a href="#" data-i18n="tabMotorTesting" class="tabicon ic_motor"
                                           title="Motors"></a></li>
                 <li class="tab_osd"><a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a></li>
@@ -199,7 +203,6 @@
                                                    title="Onboard Logging"></a></li>
                 <li class="tab_cli"><a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a></li>
 
-                <!--<li class=""><a href="#" class="tabicon ic_mission">Mission (spare icon)</a></li>-->
                 <!--<li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li>-->
                 <!--<li class=""><a href="#" class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>-->
             </ul>

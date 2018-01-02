@@ -2319,5 +2319,29 @@
     },
     "downloadUpdatesBtn": {
         "message": "Download new app"
+    },
+    "tabMissionControl": {
+        "message": "Mission Control"
+    },
+    "loadMissionButton": {
+        "message": "Load mission"
+    },
+    "saveMissionButton": {
+        "message": "Save mission"
+    },
+    "editPointHead": {
+        "message": "Edit point"
+    },
+    "editPointButtonSave": {
+        "message": "Save"
+    },
+    "editPointButtonRemove": {
+        "message": "Remove"
+    },
+    "removeAllPointButtonSave": {
+        "message": "Remove all points"
+    },
+    "missionTotalInformationHead": {
+        "message": "Total information"
     }
 }

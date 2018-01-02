@@ -1,0 +1,61 @@
+<div class="tab-mission-control toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div id="missionMap"></div>
+    </div>
+    <div class="content_toolbar">
+        <div class="waypoint waypoint-left">
+            <div class="gui_box" style="padding-bottom: 10px">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead">Edit point</div>
+                </div>
+                <div class="spacer">
+                    <input type="hidden" name="pointNumber" value="">
+                    <div class="point">
+                        <label class="point-label" for="pointLat">Lat: </label>
+                        <input id="pointLat" type="text" required>
+                    </div>
+                    <div class="point">
+                        <label class="point-label" for="pointLon">Lon: </label>
+                        <input id="pointLon" type="text" required>
+                    </div>
+                    <div class="point">
+                        <label class="point-label" for="pointAlt">Alt: </label>
+                        <input id="pointAlt" type="text" value="0" required>
+                    </div>
+                    <div>
+                        <div id="savePoint" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                            <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
+                        </div>
+                        <div id="removePoint" class="btn btn-danger save_btn" style="padding-top: 10px; display: inline-block;">
+                            <a class="save" href="#" data-i18n="editPointButtonRemove" style="float: left">Remove</a>
+                        </div>
+                        <div id="removeAllPoints" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                            <a class="save" href="#" data-i18n="removeAllPointButtonSave" style="float: left">Remove all points</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="waypoint waypoint-right">
+            <div class="gui_box" style="padding-bottom: 10px">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
+                </div>
+                <div class="spacer">
+                    <div>
+                        <span>Distance (m):</span>
+                        <span id="missionDistance"></span>
+                    </div>
+                    <div>
+                        <span>Available Points</span>
+                    </div>
+
+                    <div class="btn save_btn">
+                        <a class="save" href="#" data-i18n="loadMissionButton">Load mission</a>
+                        <a class="save" href="#" data-i18n="saveMissionButton">Save mission</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

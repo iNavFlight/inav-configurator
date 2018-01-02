@@ -1,0 +1,65 @@
+.tab-calibration .content_toolbar {
+    height: 100px;
+}
+
+.tab-mission-control .waypoint {
+    padding-left: 19px;
+    padding-right: 19px;
+    padding-bottom: 10px;
+}
+.tab-mission-control .waypoint-left {
+    width: 54%;
+    float: left;
+    padding-right: 5px;
+}
+.tab-mission-control .waypoint-right{
+    width: 40%;
+    float: right;
+}
+
+.tab-mission-control .content_wrapper {
+    height: calc(100% - 150px);
+}
+
+.tab-mission-control .content_toolbar {
+    height: 150px;
+}
+
+.tab-mission-control input {
+    width: 157px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    margin-left: 11px;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tab-mission-control .point {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.tab-mission-control .point-label {
+
+}
+
+@media (max-width: 1236px) {
+    .tab-mission-control .waypoint-left {
+        width: 96%;
+    }
+    .tab-mission-control .waypoint-right{
+        width: 96%;
+        float: left;
+        padding-right: 19px;
+    }
+    .tab-mission-control .content_toolbar {
+        height: 240px;
+    }
+    .tab-mission-control .content_wrapper {
+        height: calc(100% - 240px);
+    }
+}
