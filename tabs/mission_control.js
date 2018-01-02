@@ -16,7 +16,12 @@ TABS.mission_control.initialize = function (callback) {
     load_html();
 
     function process_html() {
-        initMap();
+        if (typeof require !== "undefined") {
+            initMap();
+        } else {
+            $('#missionMap').hide();
+            $('#notLoadMap').show();
+        }
         localize();
 
         GUI.content_ready(callback);
