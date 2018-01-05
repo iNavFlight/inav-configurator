@@ -23,6 +23,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    MISSION_PLANER,
     ANALOG,
     ARMING_CONFIG,
     FC_CONFIG,
@@ -194,6 +195,20 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0
+        };
+
+        MISSION_PLANER = {
+            maxWaypoints: 0,
+            isValidMission: 0,
+            countBusyPoints: 0,
+            bufferPoint: {
+                number: 0,
+                action: 0,
+                lat: 0,
+                lon: 0,
+                alt: 0,
+                endMission: 0
+            }
         };
 
         ANALOG = {

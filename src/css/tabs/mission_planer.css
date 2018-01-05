@@ -5,7 +5,7 @@
 .tab-mission-control .waypoint {
     padding-left: 19px;
     padding-right: 19px;
-    padding-bottom: 10px;
+    /*padding-bottom: 10px;*/
 }
 .tab-mission-control .waypoint-left {
     width: 54%;
@@ -19,6 +19,17 @@
 
 .tab-mission-control .content_wrapper {
     height: calc(100% - 150px);
+}
+
+.tab-mission-control .checksfail {
+    /*float: right;*/
+    margin-top: 3px;
+    height: 15px;
+    width: 15px;
+    background-image:url(../../../images/icons/nopass.svg);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
 }
 
 .tab-mission-control .content_toolbar {

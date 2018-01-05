@@ -12,12 +12,19 @@
                 <div class="spacer">
                     <input type="hidden" name="pointNumber" value="">
                     <div class="point">
+                        <select name="type" id="pointType" disabled>
+                            <option value="1">Home</option>
+                            <option value="1">Waypoint</option>
+                            <option value="4">RTH</option>
+                        </select>
+                    </div>
+                    <div class="point">
                         <label class="point-label" for="pointLat">Lat: </label>
-                        <input id="pointLat" type="text" required>
+                        <input id="pointLat" type="text" value="0.0" required>
                     </div>
                     <div class="point">
                         <label class="point-label" for="pointLon">Lon: </label>
-                        <input id="pointLon" type="text" required>
+                        <input id="pointLon" type="text" value="0.0" required>
                     </div>
                     <div class="point">
                         <label class="point-label" for="pointAlt">Alt: </label>
@@ -27,10 +34,10 @@
                         <div id="savePoint" class="btn save_btn" style="padding-top: 10px; display: inline-block">
                             <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
                         </div>
-                        <div id="removePoint" class="btn btn-danger save_btn" style="padding-top: 10px; display: inline-block;">
+                        <div id="removePoint" class="btn btn-danger" style="padding-top: 10px; display: inline-block;">
                             <a class="save" href="#" data-i18n="editPointButtonRemove" style="float: left">Remove</a>
                         </div>
-                        <div id="removeAllPoints" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                        <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 10px; display: inline-block">
                             <a class="save" href="#" data-i18n="removeAllPointButtonSave" style="float: left">Remove all points</a>
                         </div>
                     </div>
@@ -49,11 +56,16 @@
                     </div>
                     <div>
                         <span>Available Points</span>
+                        <span id="availablePoints">0/0</span>
+                    </div>
+                    <div>
+                        <span>Mission valid</span>
+                        <div id="missionValid" style="display: inline-block"></div>
                     </div>
 
                     <div class="btn save_btn">
-                        <a class="save" href="#" data-i18n="loadMissionButton">Load mission</a>
-                        <a class="save" href="#" data-i18n="saveMissionButton">Save mission</a>
+                        <a id="loadMissionButton" class="save" href="#" data-i18n="loadMissionButton">Load mission</a>
+                        <a id="saveMissionButton" class="save" href="#" data-i18n="saveMissionButton">Save mission</a>
                     </div>
                 </div>
             </div>

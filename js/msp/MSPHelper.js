@@ -1106,6 +1106,12 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_SET_SETTING:
                 console.log("Setting set");
                 break;
+            case MSPCodes.MSP_WP_GETINFO:
+                // Reserved for waypoint capabilities data.getUint8(0);
+                MISSION_PLANER.maxWaypoints = data.getUint8(1);
+                MISSION_PLANER.isValidMission = data.getUint8(2);
+                MISSION_PLANER.countBusyPoints = data.getUint8(3);
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1285,7 +1291,7 @@ var mspHelper = (function (gui) {
                     buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
                     buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
                     buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                }   
+                }
                 if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
                     buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
                     buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
@@ -1586,6 +1592,43 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_CONFIG.opflow);
                 break;
 
+            case MSPCodes.MSP_SET_WP:
+                console.log(MISSION_PLANER.bufferPoint.number);
+                console.log(MISSION_PLANER.bufferPoint.action);
+                console.log(MISSION_PLANER.bufferPoint.lat);
+                console.log(MISSION_PLANER.bufferPoint.lon);
+                console.log(MISSION_PLANER.bufferPoint.alt);
+                console.log(MISSION_PLANER.bufferPoint.endMission);
+                console.log('---');
+
+
+                buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
+                buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 1));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 2));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 3));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 0));    // sbufReadU32(src);      // lon
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 1));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 2));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 3));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 0));    // sbufReadU32(src);      // to set altitude (cm)
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));    // sbufReadU32(src);      // to set altitude (cm)
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));    // sbufReadU32(src);      // to set altitude (cm)
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));    // sbufReadU32(src);      // to set altitude (cm)
+                buffer.push(0); //sbufReadU16(src);       // P1
+                buffer.push(0); //sbufReadU16(src);       // P2
+                buffer.push(0); //sbufReadU16(src);       // P3
+                buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
+                break;
+            case MSPCodes.MSP_WP:
+                buffer.push(MISSION_PLANER.bufferPoint.number);
+
+                break;
+            case MSPCodes.MSP_WP_MISSION_SAVE:
+                buffer.push(0);
+
+                break;
             default:
                 return false;
         }
@@ -2324,6 +2367,14 @@ var mspHelper = (function (gui) {
     self.saveFwConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
             MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.getMissionInfo = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         } else {
             callback();
         }

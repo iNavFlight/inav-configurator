@@ -9,11 +9,22 @@ TABS.mission_control.initialize = function (callback) {
         googleAnalytics.sendAppView('Mission Control');
     }
 
-    function load_html() {
-        $('#content').load("./tabs/mission_control.html", process_html);
+    var loadChainer = new MSPChainerClass();
+    loadChainer.setChain([
+        mspHelper.getMissionInfo
+    ]);
+    loadChainer.setExitPoint(loadHtml);
+    loadChainer.execute();
+
+    function updateTotalInfo() {
+        console.log(MISSION_PLANER.isValidMission);
+        $('#availablePoints').text(MISSION_PLANER.countBusyPoints + '/' + MISSION_PLANER.maxWaypoints);
+        $('#missionValid').html(MISSION_PLANER.isValidMission ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
     }
 
-    load_html();
+    function loadHtml() {
+        $('#content').load("./tabs/mission_control.html", process_html);
+    }
 
     function process_html() {
         if (typeof require !== "undefined") {
@@ -31,6 +42,7 @@ TABS.mission_control.initialize = function (callback) {
     var lines = [];
     var map;
     var selectedMarker;
+    var pointForSend = 0;
 
     function clearEditForm() {
         $('#pointLat').val('');
@@ -89,9 +101,9 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function addMarker(pos) {
+    function addMarker(_pos, _alt) {
         var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(pos),
+            geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
             population: 4000,
             rainfall: 500
@@ -126,7 +138,7 @@ TABS.mission_control.initialize = function (callback) {
             source: vectorSource
         });
 
-        vectorLayer.alt = 0;
+        vectorLayer.alt = _alt;
         vectorLayer.number = markers.length;
 
         markers.push(vectorLayer);
@@ -295,7 +307,7 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointLon').val(coord[1]);
                 $('#pointAlt').val(selectedMarker.alt);
             } else {
-                map.addLayer(addMarker(evt.coordinate));
+                map.addLayer(addMarker(evt.coordinate, 0));
                 repaint();
             }
         });
@@ -353,6 +365,70 @@ TABS.mission_control.initialize = function (callback) {
                 repaint();
             }
         });
+
+        $('#loadMissionButton').on('click', function () {
+            $(this).addClass('disabled');
+            console.log('Start get point');
+            GUI.log('Start get point');
+
+            pointForSend = 0;
+            getNextPoint();
+        });
+
+        $('#saveMissionButton').on('click', function () {
+            $(this).addClass('disabled');
+            GUI.log('Start send point');
+
+            pointForSend = 0;
+            sendNextPoint();
+        });
+
+        updateTotalInfo();
+    }
+
+    function getNextPoint() {
+        if (pointForSend > 0 ) {
+            addMarker(ol.proj.fromLonLat(MISSION_PLANER.bufferPoint.lon,MISSION_PLANER.bufferPoint.lat), MISSION_PLANER.bufferPoint.alt);
+        }
+
+        if (pointForSend >= MISSION_PLANER.countBusyPoints) {
+            GUI.log('End get point');
+            $('#loadMissionButton').removeClass('disabled');
+            return;
+        }
+
+        MISSION_PLANER.bufferPoint.number = pointForSend;
+
+        pointForSend++;
+
+        MSP.send_message(MSPCodes.MSP_WP, mspHelper.crunch(MSPCodes.MSP_WP), false, getNextPoint);
+    }
+
+    function sendNextPoint() {
+        if (pointForSend >= markers.length) {
+            GUI.log('End send point');
+
+            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, false, false);
+
+            $('#saveMissionButton').removeClass('disabled');
+            return;
+        }
+
+        var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
+
+        MISSION_PLANER.bufferPoint.number = pointForSend;
+        MISSION_PLANER.bufferPoint.action = 1;
+        MISSION_PLANER.bufferPoint.lat = geometry.getCoordinates()[0] * 10000000;
+        MISSION_PLANER.bufferPoint.lon = geometry.getCoordinates()[1] * 10000000;
+        MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+
+        pointForSend++;
+        if (pointForSend >= markers.length) {
+            MISSION_PLANER.bufferPoint.endMission = 0xA5;
+        }
+
+        MSP.send_message(MSPCodes.MSP_SET_WP, false, false, sendNextPoint);
     }
 };
 
