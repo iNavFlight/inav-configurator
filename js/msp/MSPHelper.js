@@ -1112,6 +1112,9 @@ var mspHelper = (function (gui) {
                 MISSION_PLANER.isValidMission = data.getUint8(2);
                 MISSION_PLANER.countBusyPoints = data.getUint8(3);
                 break;
+            case MSPCodes.MSP_SET_WP:
+                console.log('Point saved');
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1593,15 +1596,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_SET_WP:
-                console.log(MISSION_PLANER.bufferPoint.number);
-                console.log(MISSION_PLANER.bufferPoint.action);
-                console.log(MISSION_PLANER.bufferPoint.lat);
-                console.log(MISSION_PLANER.bufferPoint.lon);
-                console.log(MISSION_PLANER.bufferPoint.alt);
-                console.log(MISSION_PLANER.bufferPoint.endMission);
-                console.log('---');
-
-
                 buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
                 buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
@@ -1616,17 +1610,21 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));    // sbufReadU32(src);      // to set altitude (cm)
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));    // sbufReadU32(src);      // to set altitude (cm)
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(0); //sbufReadU16(src);       // P1
-                buffer.push(0); //sbufReadU16(src);       // P2
-                buffer.push(0); //sbufReadU16(src);       // P3
+                buffer.push(lowByte(0)); //sbufReadU16(src);       // P1
+                buffer.push(highByte(0));
+                buffer.push(lowByte(0)); //sbufReadU16(src);       // P2
+                buffer.push(highByte(0));
+                buffer.push(lowByte(0)); //sbufReadU16(src);       // P3
+                buffer.push(highByte(0));
                 buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
                 break;
             case MSPCodes.MSP_WP:
+                console.log(MISSION_PLANER.bufferPoint.number);
                 buffer.push(MISSION_PLANER.bufferPoint.number);
 
                 break;
             case MSPCodes.MSP_WP_MISSION_SAVE:
-                buffer.push(0);
+                // buffer.push(0);
 
                 break;
             default:
