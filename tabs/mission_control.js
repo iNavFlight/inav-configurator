@@ -17,7 +17,6 @@ TABS.mission_control.initialize = function (callback) {
     loadChainer.execute();
 
     function updateTotalInfo() {
-        console.log(MISSION_PLANER.isValidMission);
         $('#availablePoints').text(MISSION_PLANER.countBusyPoints + '/' + MISSION_PLANER.maxWaypoints);
         $('#missionValid').html(MISSION_PLANER.isValidMission ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
     }
@@ -383,17 +382,31 @@ TABS.mission_control.initialize = function (callback) {
             sendNextPoint();
         });
 
+        $('#loadEepromMissionButton').on('click', function () {
+
+        });
+        $('#saveEepromMissionButton').on('click', function () {
+            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, false, false);
+        });
+
         updateTotalInfo();
     }
 
     function getNextPoint() {
-        if (pointForSend > 0 ) {
-            addMarker(ol.proj.fromLonLat(MISSION_PLANER.bufferPoint.lon,MISSION_PLANER.bufferPoint.lat), MISSION_PLANER.bufferPoint.alt);
+        if (pointForSend > 0) {
+            // console.log(MISSION_PLANER.bufferPoint.lon);
+            // console.log(MISSION_PLANER.bufferPoint.lat);
+            // console.log(MISSION_PLANER.bufferPoint.alt);
+            // console.log(MISSION_PLANER.bufferPoint.action);
+            map.addLayer(addMarker(ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]), MISSION_PLANER.bufferPoint.alt));
+            // repaint();
         }
 
-        if (pointForSend >= MISSION_PLANER.countBusyPoints) {
+        if (pointForSend > MISSION_PLANER.countBusyPoints) {
             GUI.log('End get point');
             $('#loadMissionButton').removeClass('disabled');
+            repaint();
             return;
         }
 
@@ -408,9 +421,6 @@ TABS.mission_control.initialize = function (callback) {
         if (pointForSend >= markers.length) {
             GUI.log('End send point');
 
-            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, false, false);
-
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, updateTotalInfo);
 
             $('#saveMissionButton').removeClass('disabled');
@@ -418,11 +428,12 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
+        var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
 
         MISSION_PLANER.bufferPoint.number = pointForSend;
         MISSION_PLANER.bufferPoint.action = 1;
-        MISSION_PLANER.bufferPoint.lat = parseInt(geometry.getCoordinates()[0] * 10000000);
-        MISSION_PLANER.bufferPoint.lon = parseInt(geometry.getCoordinates()[1] * 10000000);
+        MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[0] * 10000000);
+        MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[1] * 10000000);
         MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
 
         pointForSend++;

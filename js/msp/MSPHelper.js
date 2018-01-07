@@ -42,7 +42,7 @@ var mspHelper = (function (gui) {
         'BLACKBOX': 7,
         'TELEMETRY_MAVLINK': 8,
         'TELEMETRY_IBUS': 9,
-        'RUNCAM_DEVICE_CONTROL' : 10,
+        'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12
     };
@@ -132,14 +132,14 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_SENSOR_STATUS:
                 SENSOR_STATUS.isHardwareHealthy = data.getUint8(0);
-                SENSOR_STATUS.gyroHwStatus      = data.getUint8(1);
-                SENSOR_STATUS.accHwStatus       = data.getUint8(2);
-                SENSOR_STATUS.magHwStatus       = data.getUint8(3);
-                SENSOR_STATUS.baroHwStatus      = data.getUint8(4);
-                SENSOR_STATUS.gpsHwStatus       = data.getUint8(5);
-                SENSOR_STATUS.rangeHwStatus     = data.getUint8(6);
-                SENSOR_STATUS.speedHwStatus     = data.getUint8(7);
-                SENSOR_STATUS.flowHwStatus      = data.getUint8(8);
+                SENSOR_STATUS.gyroHwStatus = data.getUint8(1);
+                SENSOR_STATUS.accHwStatus = data.getUint8(2);
+                SENSOR_STATUS.magHwStatus = data.getUint8(3);
+                SENSOR_STATUS.baroHwStatus = data.getUint8(4);
+                SENSOR_STATUS.gpsHwStatus = data.getUint8(5);
+                SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
+                SENSOR_STATUS.speedHwStatus = data.getUint8(7);
+                SENSOR_STATUS.flowHwStatus = data.getUint8(8);
                 if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
                     sensor_status_ex(SENSOR_STATUS);
                 }
@@ -339,7 +339,12 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
-                console.log(data);
+                MISSION_PLANER.bufferPoint.number = data.getUint8(0);
+                MISSION_PLANER.bufferPoint.action = data.getUint8(1);
+                MISSION_PLANER.bufferPoint.lon = data.getInt32(2, true) / 10000000;
+                MISSION_PLANER.bufferPoint.lat = data.getInt32(6, true) / 10000000;
+                MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
+
                 break;
             case MSPCodes.MSP_BOXIDS:
                 //noinspection JSUndeclaredVariable
@@ -1596,6 +1601,8 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_SET_WP:
+                console.log(MISSION_PLANER.bufferPoint.lat);
+                console.log(MISSION_PLANER.bufferPoint.lon);
                 buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
                 buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
@@ -1607,9 +1614,9 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 2));
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 3));
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 0));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));    // sbufReadU32(src);      // to set altitude (cm)
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));
+                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));
                 buffer.push(lowByte(0)); //sbufReadU16(src);       // P1
                 buffer.push(highByte(0));
                 buffer.push(lowByte(0)); //sbufReadU16(src);       // P2
@@ -1652,9 +1659,9 @@ var mspHelper = (function (gui) {
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
         var message = [
-                BLACKBOX.blackboxDevice & 0xFF,
-                BLACKBOX.blackboxRateNum & 0xFF,
-                BLACKBOX.blackboxRateDenom & 0xFF
+            BLACKBOX.blackboxDevice & 0xFF,
+            BLACKBOX.blackboxRateNum & 0xFF,
+            BLACKBOX.blackboxRateDenom & 0xFF
         ];
 
         //noinspection JSUnusedLocalSymbols
@@ -2082,7 +2089,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
     };
 
-    self.loadINAVPidConfig = function(callback) {
+    self.loadINAVPidConfig = function (callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
         } else {
@@ -2094,7 +2101,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, callback);
     };
 
-    self.loadAdvancedConfig = function(callback) {
+    self.loadAdvancedConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
             MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
         } else {
@@ -2275,7 +2282,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveRxConfig = function (callback) {
-        if(semver.gte(CONFIG.apiVersion, "1.21.0")) {
+        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, callback);
         } else {
             callback();
@@ -2283,7 +2290,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveSensorConfig = function (callback) {
-        if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
             MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
         } else {
             callback();
@@ -2378,20 +2385,20 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self._getSetting = function(name) {
+    self._getSetting = function (name) {
         var promise;
         if (this._settings) {
             promise = Promise.resolve(this._settings);
         } else {
-            promise = new Promise(function(resolve, reject) {
+            promise = new Promise(function (resolve, reject) {
                 var $this = this;
                 $.ajax({
                     url: chrome.runtime.getURL('/resources/settings.json'),
                     dataType: 'json',
-                    error: function(jqXHR, text, error) {
+                    error: function (jqXHR, text, error) {
                         reject(error);
                     },
-                    success: function(data) {
+                    success: function (data) {
                         $this._settings = data;
                         resolve(data);
                     }
@@ -2403,19 +2410,19 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self._encodeSettingName = function(name, data) {
+    self._encodeSettingName = function (name, data) {
         for (var ii = 0; ii < name.length; ii++) {
             data.push(name.charCodeAt(ii));
         }
         data.push(0);
     };
 
-    self.getSetting = function(name, callback) {
+    self.getSetting = function (name, callback) {
         var $this = this;
         return this._getSetting(name).then(function (setting) {
-           var data = [];
+            var data = [];
             $this._encodeSettingName(name, data);
-            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function(resp) {
+            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function (resp) {
                 var value;
                 switch (setting.type) {
                     case "uint8_t":
@@ -2452,7 +2459,7 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.encodeSetting = function(name, value) {
+    self.encodeSetting = function (name, value) {
         var $this = this;
         return this._getSetting(name).then(function (setting) {
             if (setting.table) {
@@ -2495,15 +2502,15 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.setSetting = function(name, value, callback) {
+    self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
             MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
         });
     };
 
-    self.getRTC = function(callback) {
+    self.getRTC = function (callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            MSP.send_message(MSPCodes.MSP_RTC, false, false, function(resp) {
+            MSP.send_message(MSPCodes.MSP_RTC, false, false, function (resp) {
                 var seconds = resp.data.read32();
                 var millis = resp.data.readU16();
                 if (callback) {
@@ -2515,7 +2522,7 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self.setRTC = function(callback) {
+    self.setRTC = function (callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
             var now = Date.now();
             var secs = now / 1000;

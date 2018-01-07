@@ -2329,6 +2329,12 @@
     "saveMissionButton": {
         "message": "Save mission"
     },
+    "loadEepromMissionButton": {
+        "message": "Load Eeprom mission"
+    },
+    "saveEepromMissionButton": {
+        "message": "Save Eeprom mission"
+    },
     "editPointHead": {
         "message": "Edit point"
     },
