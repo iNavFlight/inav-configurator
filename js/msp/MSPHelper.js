@@ -1633,7 +1633,6 @@ var mspHelper = (function (gui) {
             nextFunction();
         }
 
-
         function send_next_servo_configuration() {
 
             var buffer = [];
@@ -1675,25 +1674,6 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
             MSP.send_message(MSPCodes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
-        }
-
-        //FIXME looks like this is not used and not ever implemented
-        //noinspection JSUnusedLocalSymbols
-        function send_channel_forwarding() {
-
-            var buffer = [];
-
-            for (var i = 0; i < SERVO_CONFIG.length; i++) {
-                var out = SERVO_CONFIG[i].indexOfChannelToForward;
-                if (out == undefined) {
-                    out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-                }
-                buffer.push(out);
-            }
-
-            nextFunction = onCompleteCallback;
-
-            MSP.send_message(MSPCodes.MSP_SET_CHANNEL_FORWARDING, buffer, false, nextFunction);
         }
     };
 
@@ -2478,6 +2458,10 @@ var mspHelper = (function (gui) {
         } else if (callback) {
             callback();
         }
+    };
+
+    self.loadServoConfiguration = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, callback);
     };
 
     return self;

@@ -21,7 +21,7 @@ var MSPChainerClass = function () {
         self.chainIndex++;
         if (self.chain[self.chainIndex]) {
             self.chain[self.chainIndex](self.returnCallback);
-        } else {
+        } else if (self.exitPoint) {
             self.exitPoint();
         }
     };

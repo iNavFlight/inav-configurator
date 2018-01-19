@@ -9,27 +9,28 @@ TABS.servos.initialize = function (callback) {
         googleAnalytics.sendAppView('Servos');
     }
 
-    function get_servo_configurations() {
-        MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, get_servo_mix_rules);
-    }
+    var loadChainer = new MSPChainerClass();
 
-    function get_servo_mix_rules() {
-        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, get_rc_data);
-    }
+    loadChainer.setChain([
+        mspHelper.loadServoConfiguration,
+        mspHelper.loadRcData
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
-    function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, get_boxnames_data);
-    }
+    var saveChainer = new MSPChainerClass();
 
-    function get_boxnames_data() {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, load_html);
-    }
+    saveChainer.setChain([
+        mspHelper.sendServoConfigurations,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(function () {
+        GUI.log(chrome.i18n.getMessage('servosEepromSave'));
+    });
 
     function load_html() {
         $('#content').load("./tabs/servos.html", process_html);
     }
-
-    get_servo_configurations();
 
     function update_ui() {
 
@@ -120,23 +121,8 @@ TABS.servos.initialize = function (callback) {
                 SERVO_CONFIG[info.obj].rate = parseInt($('.direction select', this).val());
             });
 
-            //
-            // send data to FC
-            //
-            //FIXME investigate why the same frame is sent twice
-            mspHelper.sendServoConfigurations(send_servo_mixer_rules);
-
-            function send_servo_mixer_rules() {
-                mspHelper.sendServoConfigurations(save_to_eeprom);
-            }
-
-            function save_to_eeprom() {
-                if (save_configuration_to_eeprom) {
-                    MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('servosEepromSave'));
-                    });
-                }
-            }
+            //Save configuration to FC
+            saveChainer.execute();
 
         }
 
