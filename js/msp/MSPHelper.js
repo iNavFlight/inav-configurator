@@ -350,6 +350,19 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_SERVO_MIX_RULES:
+                SERVO_RULES = [];
+
+                if (data.byteLength % 7 === 0) {
+                    for (i = 0; i < data.byteLength; i += 7) {
+                        SERVO_RULES.push(new ServoMixRule(
+                            data.getInt8(i + 0, true),
+                            data.getInt8(i + 1, true),
+                            data.getInt8(i + 2, true),
+                            data.getInt8(i + 3, true)
+                        ));
+                    }
+                }
+
                 break;
 
             case MSPCodes.MSP_SERVO_CONFIGURATIONS:
@@ -2463,6 +2476,10 @@ var mspHelper = (function (gui) {
     self.loadServoConfiguration = function (callback) {
         MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, callback);
     };
+
+    self.loadServoMixRules = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+    }
 
     return self;
 })(GUI);

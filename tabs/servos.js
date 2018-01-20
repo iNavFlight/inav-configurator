@@ -13,7 +13,8 @@ TABS.servos.initialize = function (callback) {
 
     loadChainer.setChain([
         mspHelper.loadServoConfiguration,
-        mspHelper.loadRcData
+        mspHelper.loadRcData,
+        mspHelper.loadServoMixRules
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
