@@ -1043,22 +1043,22 @@
         "message": "Roll D Adjustment"
     },
     "adjustmentsFunction21": {
-        "message": "Alt P Adjustment"
+        "message": "Manual RC Expo"
     },
     "adjustmentsFunction22": {
-        "message": "Alt I Adjustment"
+        "message": "Manual RC Yaw Expo"
     },
     "adjustmentsFunction23": {
-        "message": "Alt D Adjustment"
+        "message": "Manual Roll Rate"
     },
     "adjustmentsFunction24": {
-        "message": "Vel P Adjustment"
+        "message": "Manual Pitch Rate"
     },
     "adjustmentsFunction25": {
-        "message": "Vel I Adjustment"
+        "message": "Manual Yaw Rate"
     },
     "adjustmentsFunction26": {
-        "message": "Vel D Adjustment"
+        "message": "Alt P Adjustment"
     },
     "adjustmentsFunction27": {
         "message": "MAG P Adjustment"
