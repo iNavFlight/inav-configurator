@@ -1,13 +1,12 @@
-<!--suppress HtmlFormInputWithoutLabel -->
 <div class="tab-servos toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabServos">Servos</div>
         <div class="cf_doc_version_bt">
             <a id="button-documentation" href="" target="_blank"></a>
         </div>
-        <div class="require-support">
+        <div>
             <div class="title" data-i18n="servosChangeDirection"></div>
-            <table class="fields">
+            <table id="servo-config-table" class="fields">
                 <tr class="main">
                     <th width="110px" data-i18n="servosName"></th>
                     <th data-i18n="servosMid"></th>
@@ -23,9 +22,28 @@
                 <input type="checkbox" class="togglemedium" /> <span data-i18n="servosLiveMode"></span>
             </div>
         </div>
-        <div class="note require-upgrade">
-            <div class="note_spacer">
-                <p data-i18n="servosFirmwareUpgradeRequired"></p>
+        <div class="clear-both"></div>
+        <div id="servo-mix-table-wrapper" class="margin-top">
+            <div class="tab_title" data-i18n="servoMixer">Servo mixer</div>
+            <div class="btn default_btn narrow pull-right" style="margin-bottom: 15px">
+                <a href="#" data-role="role-add" data-i18n="servoMixerAdd"></a>
+            </div>
+            <table id="servo-mix-table">
+                <thead>
+                    <tr>
+                        <th style="width: 75px">Servo</th>
+                        <th>Input</th>
+                        <th>Weight</th>
+                        <th>Speed</th>
+                        <th style="width: 75px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div class="btn default_btn narrow pull-right" style="margin-bottom: 15px">
+                <a href="#" data-role="role-add" data-i18n="servoMixerAdd"></a>
             </div>
         </div>
     </div>

@@ -350,6 +350,20 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_SERVO_MIX_RULES:
+                SERVO_RULES.flush();
+
+                if (data.byteLength % 7 === 0) {
+                    for (i = 0; i < data.byteLength; i += 7) {
+                        SERVO_RULES.put(new ServoMixRule(
+                            data.getInt8(i + 0, true),
+                            data.getInt8(i + 1, true),
+                            data.getInt8(i + 2, true),
+                            data.getInt8(i + 3, true)
+                        ));
+                    }
+                }
+                SERVO_RULES.cleanup();
+
                 break;
 
             case MSPCodes.MSP_SERVO_CONFIGURATIONS:
@@ -1633,7 +1647,6 @@ var mspHelper = (function (gui) {
             nextFunction();
         }
 
-
         function send_next_servo_configuration() {
 
             var buffer = [];
@@ -1676,24 +1689,41 @@ var mspHelper = (function (gui) {
             }
             MSP.send_message(MSPCodes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
         }
+    };
 
-        //FIXME looks like this is not used and not ever implemented
-        //noinspection JSUnusedLocalSymbols
-        function send_channel_forwarding() {
+    self.sendServoMixer = function (onCompleteCallback) {
+        var nextFunction = sendMixer,
+            servoIndex = 0;
+
+        if (SERVO_RULES.length == 0) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendMixer() {
 
             var buffer = [];
 
-            for (var i = 0; i < SERVO_CONFIG.length; i++) {
-                var out = SERVO_CONFIG[i].indexOfChannelToForward;
-                if (out == undefined) {
-                    out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-                }
-                buffer.push(out);
+            // send one at a time, with index
+
+            var servoRule = SERVO_RULES.get()[servoIndex];
+            
+            buffer.push(servoIndex);
+            buffer.push(servoRule.getTarget());
+            buffer.push(servoRule.getInput());
+            buffer.push(servoRule.getRate());
+            buffer.push(servoRule.getSpeed());
+            buffer.push(0);
+            buffer.push(0);
+            buffer.push(0);
+
+            // prepare for next iteration
+            servoIndex++;
+            if (servoIndex == 16) { //This is the last rule. Not pretty, but we have to send all rules
+                nextFunction = onCompleteCallback;
             }
-
-            nextFunction = onCompleteCallback;
-
-            MSP.send_message(MSPCodes.MSP_SET_CHANNEL_FORWARDING, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
         }
     };
 
@@ -2479,6 +2509,14 @@ var mspHelper = (function (gui) {
             callback();
         }
     };
+
+    self.loadServoConfiguration = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, callback);
+    };
+
+    self.loadServoMixRules = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+    }
 
     return self;
 })(GUI);
