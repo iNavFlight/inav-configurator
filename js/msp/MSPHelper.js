@@ -1691,6 +1691,42 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.sendServoMixer = function (onCompleteCallback) {
+        var nextFunction = sendMixer,
+            servoIndex = 0;
+
+        if (SERVO_RULES.length == 0) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendMixer() {
+
+            var buffer = [];
+
+            // send one at a time, with index
+
+            var servoRule = SERVO_RULES.get()[servoIndex];
+            
+            buffer.push(servoIndex);
+            buffer.push(servoRule.getTarget());
+            buffer.push(servoRule.getInput());
+            buffer.push(servoRule.getRate());
+            buffer.push(servoRule.getSpeed());
+            buffer.push(0);
+            buffer.push(0);
+            buffer.push(0);
+
+            // prepare for next iteration
+            servoIndex++;
+            if (servoIndex == 16) { //This is the last rule. Not pretty, but we have to send all rules
+                nextFunction = onCompleteCallback;
+            }
+            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+        }
+    };
+
     self.sendModeRanges = function (onCompleteCallback) {
         var nextFunction = send_next_mode_range;
 
