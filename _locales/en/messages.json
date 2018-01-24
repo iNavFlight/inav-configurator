@@ -2315,5 +2315,14 @@
     },
     "downloadUpdatesBtn": {
         "message": "Download new app"
+    },
+    "servoMixer": {
+        "message": "Servo mixer"
+    },
+    "servoMixerDelete": {
+        "message": "Delete"
+    },
+    "servoMixerAdd": {
+        "message": "Add new mixer rule"
     }
 }

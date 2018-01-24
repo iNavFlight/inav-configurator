@@ -350,11 +350,11 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_SERVO_MIX_RULES:
-                SERVO_RULES = [];
+                SERVO_RULES.flush();
 
                 if (data.byteLength % 7 === 0) {
                     for (i = 0; i < data.byteLength; i += 7) {
-                        SERVO_RULES.push(new ServoMixRule(
+                        SERVO_RULES.put(new ServoMixRule(
                             data.getInt8(i + 0, true),
                             data.getInt8(i + 1, true),
                             data.getInt8(i + 2, true),
@@ -362,6 +362,7 @@ var mspHelper = (function (gui) {
                         ));
                     }
                 }
+                SERVO_RULES.cleanup();
 
                 break;
 
