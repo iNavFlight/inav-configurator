@@ -282,6 +282,32 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 break;
+            case MSPCodes.MSPV2_INAV_RATE_PROFILE:
+                // compat
+                RC_tuning.RC_RATE = 100;
+                RC_tuning.roll_pitch_rate = 0;
+
+                // throttle
+                RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.throttle_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
+                RC_tuning.dynamic_THR_breakpoint = data.getUint16(offset, true);
+                offset += 2;
+
+                // stabilized
+                RC_tuning.RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.roll_rate = data.getUint8(offset++) * 10;
+                RC_tuning.pitch_rate = data.getUint8(offset++) * 10;
+                RC_tuning.yaw_rate = data.getUint8(offset++) * 10;
+
+                // manual
+                RC_tuning.manual_RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.manual_RC_YAW_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
+                RC_tuning.manual_roll_rate = data.getUint8(offset++);
+                RC_tuning.manual_pitch_rate = data.getUint8(offset++);
+                RC_tuning.manual_yaw_rate = data.getUint8(offset++);
+                break;
             case MSPCodes.MSP_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 3); i++, needle += 3) {
@@ -1326,6 +1352,28 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
                 buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
                 break;
+            case MSPCodes.MSPV2_INAV_SET_RATE_PROFILE:
+                // throttle
+                buffer.push(Math.round(RC_tuning.throttle_MID * 100));
+                buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
+                buffer.push(RC_tuning.dynamic_THR_PID);
+                buffer.push(lowByte(RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(highByte(RC_tuning.dynamic_THR_breakpoint));
+
+                // stabilized
+                buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
+                buffer.push(Math.round(RC_tuning.RC_YAW_EXPO * 100));
+                buffer.push(Math.round(RC_tuning.roll_rate / 10));
+                buffer.push(Math.round(RC_tuning.pitch_rate / 10));
+                buffer.push(Math.round(RC_tuning.yaw_rate / 10));
+
+                // manual
+                buffer.push(Math.round(RC_tuning.manual_RC_EXPO * 100));
+                buffer.push(Math.round(RC_tuning.manual_RC_YAW_EXPO * 100));
+                buffer.push(RC_tuning.manual_roll_rate);
+                buffer.push(RC_tuning.manual_pitch_rate);
+                buffer.push(RC_tuning.manual_yaw_rate);
+                break;
 
             case MSPCodes.MSP_SET_RX_MAP:
                 for (i = 0; i < RC_MAP.length; i++) {
@@ -2325,6 +2373,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, callback);
     };
 
+    self.loadRateProfileData = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_RATE_PROFILE, false, false, callback);
+    };
+
     self.loadPidData = function (callback) {
         MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
     };
@@ -2451,6 +2503,10 @@ var mspHelper = (function (gui) {
 
     self.saveRcTuningData = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, callback);
+    };
+
+    self.saveRateProfileData = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, callback);
     };
 
     self.savePidAdvanced = function (callback) {

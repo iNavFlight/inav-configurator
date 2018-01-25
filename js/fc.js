@@ -143,7 +143,12 @@ var FC = {
             throttle_MID: 0,
             throttle_EXPO: 0,
             dynamic_THR_breakpoint: 0,
-            RC_YAW_EXPO: 0
+            RC_YAW_EXPO: 0,
+            manual_RC_EXPO: 0,
+            manual_RC_YAW_EXPO: 0,
+            manual_roll_rate: 0,
+            manual_pitch_rate: 0,
+            manual_yaw_rate: 0,
         };
 
         AUX_CONFIG = [];

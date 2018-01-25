@@ -161,6 +161,7 @@ var MSPCodes = {
     MSPV2_INAV_MISC:                    0x2003,
     MSPV2_INAV_SET_MISC:                0x2004,
     MSPV2_INAV_BATTERY_CONFIG:          0x2005,
-    MSPV2_INAV_SET_BATTERY_CONFIG:      0x2006
-
+    MSPV2_INAV_SET_BATTERY_CONFIG:      0x2006,
+    MSPV2_INAV_RATE_PROFILE:            0x2007,
+    MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
 };
