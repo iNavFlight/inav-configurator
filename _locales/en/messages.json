@@ -735,6 +735,15 @@
     "configurationSPIProtocol": {
         "message": "RX SPI protocol"
     },
+    "configurationPersonalization": {
+        "message": "Personalization"
+    },
+    "configurationCraftName": {
+        "message": "Craft Name"
+    },
+    "configurationCraftNameHelp": {
+        "message": "Craft name. Can be displayed by OSD and by compatible RC systems."
+    },
     "configurationEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
