@@ -835,6 +835,15 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "pidTuningManualRollRate": {
+        "message": "Manual ROLL rate"
+    },
+    "pidTuningManualPitchRate": {
+        "message": "Manual PITCH rate"
+    },
+    "pidTuningManualYawRate": {
+        "message": "Manual YAW rate"
+    },
     "magHoldYawRate": {
         "message": "MagHold rate"
     },
