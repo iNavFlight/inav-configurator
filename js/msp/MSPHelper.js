@@ -366,6 +366,25 @@ var mspHelper = (function (gui) {
 
                 break;
 
+            case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
+                MOTOR_RULES.flush();
+
+                if (data.byteLength % 8 === 0) {
+                    for (i = 0; i < data.byteLength; i += 8) {
+                        var rule = new MotorMixRule(0, 0, 0, 0);
+
+                        MOTOR_RULES.put(rule.fromMsp(
+                            data.getUint16(i + 0, true),
+                            data.getUint16(i + 2, true),
+                            data.getUint16(i + 4, true),
+                            data.getUint16(i + 6, true)
+                        ));
+                    }
+                }
+                MOTOR_RULES.cleanup();
+
+                break;
+
             case MSPCodes.MSP_SERVO_CONFIGURATIONS:
                 //noinspection JSUndeclaredVariable
                 SERVO_CONFIG = []; // empty the array as new data is coming in
