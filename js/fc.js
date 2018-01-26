@@ -18,6 +18,7 @@ var CONFIG,
     ADJUSTMENT_RANGES,
     SERVO_CONFIG,
     SERVO_RULES,
+    MOTOR_RULES,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -150,7 +151,8 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = new ServoMixRuleCollection();
+        SERVO_RULES = new ServoMixerRuleCollection();
+        MOTOR_RULES = new MotorMixerRuleCollection();
 
         SERIAL_CONFIG = {
             ports: [],

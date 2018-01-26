@@ -1,7 +1,7 @@
 /*global $, ServoMixRule*/
 'use strict';
 
-var ServoMixRuleCollection = function () {
+var ServoMixerRuleCollection = function () {
 
     var self = {};
     var data = [];
@@ -39,7 +39,7 @@ var ServoMixRuleCollection = function () {
         while (self.hasFreeSlots()) {
             self.put(new ServoMixRule(0, 0, 0, 0));
         }
-    }
+    };
 
     self.hasFreeSlots = function () {
         return data.length < 16;
