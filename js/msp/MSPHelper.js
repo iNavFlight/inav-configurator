@@ -341,8 +341,8 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_WP:
                 MISSION_PLANER.bufferPoint.number = data.getUint8(0);
                 MISSION_PLANER.bufferPoint.action = data.getUint8(1);
-                MISSION_PLANER.bufferPoint.lon = data.getInt32(2, true) / 10000000;
-                MISSION_PLANER.bufferPoint.lat = data.getInt32(6, true) / 10000000;
+                MISSION_PLANER.bufferPoint.lat = data.getInt32(2, true) / 10000000;
+                MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
                 MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
 
                 break;
@@ -1120,6 +1120,14 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_WP:
                 console.log('Point saved');
                 break;
+            case MSPCodes.MSP_WP_MISSION_SAVE:
+                // buffer.push(0);
+                console.log(data);
+
+                break;
+            case MSPCodes.MSP_WP_MISSION_LOAD:
+                console.log('Mission load');
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1601,8 +1609,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_SET_WP:
-                console.log(MISSION_PLANER.bufferPoint.lat);
-                console.log(MISSION_PLANER.bufferPoint.lon);
                 buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
                 buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
@@ -1627,11 +1633,17 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_WP:
                 console.log(MISSION_PLANER.bufferPoint.number);
-                buffer.push(MISSION_PLANER.bufferPoint.number);
+                buffer.push(MISSION_PLANER.bufferPoint.number+1);
 
                 break;
             case MSPCodes.MSP_WP_MISSION_SAVE:
                 // buffer.push(0);
+                console.log(buffer);
+
+                break;
+            case MSPCodes.MSP_WP_MISSION_LOAD:
+                // buffer.push(0);
+                console.log(buffer);
 
                 break;
             default:

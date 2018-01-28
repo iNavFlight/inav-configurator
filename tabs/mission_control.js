@@ -29,7 +29,7 @@ TABS.mission_control.initialize = function (callback) {
         if (typeof require !== "undefined") {
             initMap();
         } else {
-            $('#missionMap').hide();
+            $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
         }
         localize();
@@ -100,7 +100,7 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function addMarker(_pos, _alt) {
+    function addMarker(_pos, _alt, _action) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -139,6 +139,7 @@ TABS.mission_control.initialize = function (callback) {
 
         vectorLayer.alt = _alt;
         vectorLayer.number = markers.length;
+        vectorLayer.action = _action;
 
         markers.push(vectorLayer);
 
@@ -285,7 +286,7 @@ TABS.mission_control.initialize = function (callback) {
             target: document.getElementById('missionMap'),
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
-                zoom: 10
+                zoom: 14
             })
         });
 
@@ -305,8 +306,9 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointLat').val(coord[0]);
                 $('#pointLon').val(coord[1]);
                 $('#pointAlt').val(selectedMarker.alt);
+                $('#pointType').val(selectedMarker.action);
             } else {
-                map.addLayer(addMarker(evt.coordinate, 0));
+                map.addLayer(addMarker(evt.coordinate, 1500, 1));
                 repaint();
             }
         });
@@ -325,25 +327,24 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#removeAllPoints').on('click', function () {
-            for (var i in markers) {
-                map.removeLayer(markers[i]);
+            if (confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
+                removeAllPoints();
             }
-            markers = [];
-            clearEditForm();
-            repaint();
         });
 
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
-                map.removeLayer(selectedMarker);
+
                 var tmp = [];
                 for (var i in markers) {
-                    if (markers[i] !== selectedMarker) {
+                    if (markers[i] !== selectedMarker && typeof markers[i].action !== "undefined") {
                         tmp.push(markers[i]);
                     }
                 }
+                map.removeLayer(selectedMarker);
                 markers = tmp;
                 selectedMarker = null;
+
                 clearEditForm();
                 repaint();
             }
@@ -356,6 +357,7 @@ TABS.mission_control.initialize = function (callback) {
                         var geometry = t.getSource().getFeatures()[0].getGeometry();
                         geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLat').val()), parseFloat($('#pointLon').val())]));
                         t.alt = $('#pointAlt').val();
+                        t.action = $('#pointType').val();
                     }
                 });
 
@@ -366,8 +368,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadMissionButton').on('click', function () {
+            removeAllPoints();
             $(this).addClass('disabled');
-            console.log('Start get point');
             GUI.log('Start get point');
 
             pointForSend = 0;
@@ -383,7 +385,9 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadEepromMissionButton').on('click', function () {
+            GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
 
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, false, getPointsFromEprom);
         });
         $('#saveEepromMissionButton').on('click', function () {
             GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
@@ -393,20 +397,39 @@ TABS.mission_control.initialize = function (callback) {
         updateTotalInfo();
     }
 
+    function removeAllPoints() {
+        for (var i in markers) {
+            map.removeLayer(markers[i]);
+        }
+        markers = [];
+        clearEditForm();
+        repaint();
+    }
+
+    function getPointsFromEprom() {
+        pointForSend = 0;
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getNextPoint);
+    }
+
+
     function getNextPoint() {
+        var coord;
         if (pointForSend > 0) {
             // console.log(MISSION_PLANER.bufferPoint.lon);
             // console.log(MISSION_PLANER.bufferPoint.lat);
             // console.log(MISSION_PLANER.bufferPoint.alt);
             // console.log(MISSION_PLANER.bufferPoint.action);
-            map.addLayer(addMarker(ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]), MISSION_PLANER.bufferPoint.alt));
-            // repaint();
+
+            coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+            map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action));
         }
 
-        if (pointForSend > MISSION_PLANER.countBusyPoints) {
+        if (pointForSend >= MISSION_PLANER.countBusyPoints) {
             GUI.log('End get point');
             $('#loadMissionButton').removeClass('disabled');
+            map.getView().setCenter(coord);
             repaint();
+            updateTotalInfo();
             return;
         }
 
@@ -430,12 +453,11 @@ TABS.mission_control.initialize = function (callback) {
         var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
         var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
 
-        MISSION_PLANER.bufferPoint.number = pointForSend;
-        MISSION_PLANER.bufferPoint.action = 1;
-        MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[0] * 10000000);
-        MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[1] * 10000000);
+        MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+        MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
+        MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
+        MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
         MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-
         pointForSend++;
         if (pointForSend >= markers.length) {
             MISSION_PLANER.bufferPoint.endMission = 0xA5;
