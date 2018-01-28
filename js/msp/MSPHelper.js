@@ -373,12 +373,14 @@ var mspHelper = (function (gui) {
                     for (i = 0; i < data.byteLength; i += 8) {
                         var rule = new MotorMixRule(0, 0, 0, 0);
 
-                        MOTOR_RULES.put(rule.fromMsp(
+                        rule.fromMsp(
                             data.getUint16(i + 0, true),
                             data.getUint16(i + 2, true),
                             data.getUint16(i + 4, true),
                             data.getUint16(i + 6, true)
-                        ));
+                        )
+
+                        MOTOR_RULES.put(rule);
                     }
                 }
                 MOTOR_RULES.cleanup();
@@ -1751,6 +1753,52 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.sendMotorMixer = function (onCompleteCallback) {
+        var nextFunction = sendMixer,
+            servoIndex = 0;
+
+        if (MOTOR_RULES.length == 0) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendMixer() {
+
+            var buffer = [];
+
+            // send one at a time, with index
+
+            var rule = MOTOR_RULES.get()[servoIndex];
+
+            if (rule) {
+
+                buffer.push(servoIndex);
+
+                buffer.push(lowByte(rule.getThrottleForMsp()));
+                buffer.push(highByte(rule.getThrottleForMsp()));
+
+                buffer.push(lowByte(rule.getRollForMsp()));
+                buffer.push(highByte(rule.getRollForMsp()));
+
+                buffer.push(lowByte(rule.getPitchForMsp()));
+                buffer.push(highByte(rule.getPitchForMsp()));
+
+                buffer.push(lowByte(rule.getYawForMsp()));
+                buffer.push(highByte(rule.getYawForMsp()));
+
+                // prepare for next iteration
+                servoIndex++;
+                if (servoIndex == MOTOR_RULES.length) { //This is the last rule. Not pretty, but we have to send all rules
+                    nextFunction = onCompleteCallback;
+                }
+                MSP.send_message(MSPCodes.MSP2_COMMON_SET_MOTOR_MIXER, buffer, false, nextFunction);
+            } else {
+                onCompleteCallback();
+            }
+        }
+    };
+
     self.sendModeRanges = function (onCompleteCallback) {
         var nextFunction = send_next_mode_range;
 
@@ -2540,8 +2588,12 @@ var mspHelper = (function (gui) {
 
     self.loadServoMixRules = function (callback) {
         MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
-    }
-    
+    };
+
+    self.loadMotorMixRules = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
+    };
+
     self.getCraftName = function(callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
             MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {

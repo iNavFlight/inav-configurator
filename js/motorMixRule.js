@@ -1,4 +1,4 @@
-/*global $*/
+/*global $,constrain*/
 'use strict';
 
 var MotorMixRule = function (throttle, roll, pitch, yaw) {
@@ -17,15 +17,23 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getThrottle = function () {
-        return throttle;
+        return constrain(throttle, 0, 1);
     };
+
+    self.getThrottleForMsp = function () {
+        return self.getThrottle() * 1000;
+    }
 
     self.setThrottle = function (data) {
         throttle = data;
     };
 
     self.getRoll = function () {
-        return roll;
+        return constrain(roll, -1, 1);
+    };
+
+    self.getRollForMsp = function () {
+        return (self.getRoll() + 1) * 1000;
     };
 
     self.setRoll = function (data) {
@@ -33,7 +41,11 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getPitch = function () {
-        return pitch;
+        return constrain(pitch, -1, 1);
+    };
+
+    self.getPitchForMsp = function () {
+        return (self.getPitch() + 1) * 1000;
     };
 
     self.setPitch = function (data) {
@@ -41,7 +53,11 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getYaw = function () {
-        return yaw;
+        return constrain(yaw, -1, 1);
+    };
+
+    self.getYawForMsp = function () {
+        return (self.getYaw() + 1) * 1000;
     };
 
     self.setYaw = function (data) {

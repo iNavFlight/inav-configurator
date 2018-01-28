@@ -66,6 +66,7 @@ sources.js = [
     './js/libraries/jbox/jBox.min.js',
     './js/libraries/switchery/switchery.js',
     './js/libraries/jquery.ba-throttle-debounce.js',
+    './js/helpers.js',
     './node_modules/inflection/inflection.min.js',
     './node_modules/bluebird/js/browser/bluebird.min.js',
     './js/injected_methods.js',
