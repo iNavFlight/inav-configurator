@@ -1754,6 +1754,11 @@ var mspHelper = (function (gui) {
     };
 
     self.sendMotorMixer = function (onCompleteCallback) {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
+            onCompleteCallback();
+        }
+
         var nextFunction = sendMixer,
             servoIndex = 0;
 
@@ -2591,7 +2596,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadMotorMixRules = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+            MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
+        } else {
+            onCompleteCallback();
+        }
     };
 
     self.getCraftName = function(callback) {
