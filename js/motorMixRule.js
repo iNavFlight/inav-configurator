@@ -22,7 +22,7 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
 
     self.getThrottleForMsp = function () {
         return self.getThrottle() * 1000;
-    }
+    };
 
     self.setThrottle = function (data) {
         throttle = data;

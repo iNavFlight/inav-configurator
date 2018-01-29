@@ -355,10 +355,10 @@ var mspHelper = (function (gui) {
                 if (data.byteLength % 7 === 0) {
                     for (i = 0; i < data.byteLength; i += 7) {
                         SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i + 0, true),
-                            data.getInt8(i + 1, true),
-                            data.getInt8(i + 2, true),
-                            data.getInt8(i + 3, true)
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt8(i + 2),
+                            data.getInt8(i + 3)
                         ));
                     }
                 }
@@ -374,11 +374,11 @@ var mspHelper = (function (gui) {
                         var rule = new MotorMixRule(0, 0, 0, 0);
 
                         rule.fromMsp(
-                            data.getUint16(i + 0, true),
+                            data.getUint16(i, true),
                             data.getUint16(i + 2, true),
                             data.getUint16(i + 4, true),
                             data.getUint16(i + 6, true)
-                        )
+                        );
 
                         MOTOR_RULES.put(rule);
                     }
@@ -1762,7 +1762,7 @@ var mspHelper = (function (gui) {
         var nextFunction = sendMixer,
             servoIndex = 0;
 
-        if (MOTOR_RULES.length == 0) {
+        if (MOTOR_RULES.length === 0) {
             onCompleteCallback();
         } else {
             nextFunction();
