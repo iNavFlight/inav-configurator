@@ -84,17 +84,17 @@
     float: none;
 }
 
-.btn.save_btn {
+.tab-mission-control .btn.save_btn {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.btn.save_btn a{
+.tab-mission-control .btn.save_btn a{
     margin-top: 5px;
 }
 
-.gui_box{
+.tab-mission-control .gui_box{
     width: 100%;
     clear: both;
     height: 90%;
