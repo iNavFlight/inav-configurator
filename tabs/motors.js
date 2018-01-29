@@ -14,7 +14,7 @@ TABS.motors.initialize = function (callback) {
 
     var $motorsEnableTestMode;
 
-    if (GUI.active_tab != 'motors') {
+    if (GUI.active_tab !== 'motors') {
         GUI.active_tab = 'motors';
         googleAnalytics.sendAppView('Motors');
     }
@@ -328,8 +328,10 @@ TABS.motors.initialize = function (callback) {
             ');
         }
 
-        $('div.sliders input').prop('min', MISC.mincommand);
-        $('div.sliders input').prop('max', MISC.maxthrottle);
+        var $slidersInput = $('div.sliders input');
+
+        $slidersInput.prop('min', MISC.mincommand);
+        $slidersInput.prop('max', MISC.maxthrottle);
         $('div.values li:not(:last)').text(MISC.mincommand);
         
         if(self.feature3DEnabled && self.feature3DSupported) {
@@ -337,10 +339,10 @@ TABS.motors.initialize = function (callback) {
             //Note: values may need to be revisited
             if(_3D.neutral3d > 1575 || _3D.neutral3d < 1425)
                 _3D.neutral3d = 1500;
-                
-            $('div.sliders input').val(_3D.neutral3d);
+
+            $slidersInput.val(_3D.neutral3d);
         } else {
-            $('div.sliders input').val(MISC.mincommand); 
+            $slidersInput.val(MISC.mincommand);
         }
 
         if(self.allowTestMode){ 
@@ -387,22 +389,22 @@ TABS.motors.initialize = function (callback) {
         console.log($motorsEnableTestMode);
         $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
-                $('div.sliders input').slice(0, number_of_valid_outputs).prop('disabled', false);
+                $slidersInput.slice(0, number_of_valid_outputs).prop('disabled', false);
 
                 // unlock master slider
                 $('div.sliders input:last').prop('disabled', false);
             } else {
                 // disable sliders / min max
-                $('div.sliders input').prop('disabled', true);
+                $slidersInput.prop('disabled', true);
 
                 // change all values to default
                 if (self.feature3DEnabled && self.feature3DSupported) {
-                    $('div.sliders input').val(_3D.neutral3d);
+                    $slidersInput.val(_3D.neutral3d);
                 } else {
-                    $('div.sliders input').val(MISC.mincommand);
+                    $slidersInput.val(MISC.mincommand);
                 }
 
-                $('div.sliders input').trigger('input');             
+                $slidersInput.trigger('input');
             }
         });
 
@@ -476,25 +478,30 @@ TABS.motors.initialize = function (callback) {
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
         
         function update_ui() {
-            var previousArmState = self.armed;                                   
-            var block_height = $('div.m-block:first').height();
+            var previousArmState = self.armed,
+                block_height = $('div.m-block:first').height(),
+                data,
+                margin_top,
+                height,
+                color,
+                i;
 
-            for (var i = 0; i < MOTOR_DATA.length; i++) {
-                var data = MOTOR_DATA[i] - MISC.mincommand,
-                    margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height),
-                    height = (data * (block_height / full_block_scale)).clamp(0, block_height),
-                    color = parseInt(data * 0.009);
+            for (i = 0; i < MOTOR_DATA.length; i++) {
+                data = MOTOR_DATA[i] - MISC.mincommand;
+                margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
+                height = (data * (block_height / full_block_scale)).clamp(0, block_height);
+                color = parseInt(data * 0.009);
 
                 $('.motor-' + i + ' .label', motors_wrapper).text(MOTOR_DATA[i]);
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
-            for (var i = 0; i < SERVO_DATA.length; i++) {
-                var data = SERVO_DATA[i] - 1000,
-                    margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height),
-                    height = (data * (block_height / 1000)).clamp(0, block_height),
-                    color = parseInt(data * 0.009);
+            for (i = 0; i < SERVO_DATA.length; i++) {
+                data = SERVO_DATA[i] - 1000;
+                margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
+                height = (data * (block_height / 1000)).clamp(0, block_height);
+                color = parseInt(data * 0.009);
 
                 $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
                 $('.servo-' + i + ' .indicator', servos_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
