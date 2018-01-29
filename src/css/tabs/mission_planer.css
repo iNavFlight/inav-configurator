@@ -17,10 +17,6 @@
     float: right;
 }
 
-.tab-mission-control .content_wrapper {
-    height: calc(100% - 150px);
-}
-
 .tab-mission-control .checksfail {
     /*float: right;*/
     margin-top: 3px;
@@ -32,12 +28,8 @@
     background-repeat:no-repeat;
 }
 
-.tab-mission-control .content_toolbar {
-    height: 150px;
-}
-
 .tab-mission-control input {
-    width: 157px;
+    width: 115px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -52,6 +44,7 @@
 .tab-mission-control .point {
     display: inline-block;
     margin-bottom: 5px;
+    margin-left: 5px;
 }
 
 .tab-mission-control .point-label {
@@ -75,11 +68,11 @@
     }
 }
 
-
 /* Need test! */
 .tab-mission-control .content_toolbar {
     display: flex;
-    height: 150px;
+    /*height: 150px;*/
+    height: auto;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -110,23 +103,13 @@
 .tab-mission-control.toolbar_fixed_bottom{
     height: 100%;
 }
-.tab-mission-control .content_wrapper{
-    height: 100%;
-}
+/*.tab-mission-control .content_wrapper{*/
+    /*height: 100%;*/
+/*}*/
 #missionMap{
     height: 100%;
 }
-.tab-mission-control .content_toolbar{
-    height: auto;
-}
 
-.tab-mission-control input{
-    width: 115px;
-}
-
-.point{
-    margin-left: 5px;
-}
 @media (max-width: 1252px){
     .tab-mission-control .waypoint-left,
     .tab-mission-control .waypoint-right {
