@@ -20,9 +20,8 @@
     font-weight: bold;
 }
 
-.config-section .number input,
-.tab-configuration .number input {
-    width: 65px;
+.config-section input,
+.tab-configuration input {
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -34,8 +33,17 @@
     font-weight: normal;
 }
 
-.tab-configuration .number .disabled {
+.config-section .number input,
+.tab-configuration .number input {
     width: 65px;
+}
+
+.config-section .string input,
+.tab-configuration .string input {
+    width: 130px;
+}
+
+.tab-configuration .disabled {
     background-color: #ececec;
 }
 
@@ -224,6 +232,10 @@ hr {
 
 .config-section .radio label {
     left: 2em;
+}
+
+.config-section .string label {
+    left: 175px;
 }
 
 .config-section .radio input {

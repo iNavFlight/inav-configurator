@@ -1326,6 +1326,15 @@ dialog {
     float: left;
 }
 
+.default_btn.narrow {
+    width: auto;
+    margin-bottom: 0;
+}
+
+.default_btn.narrow a {
+    padding: 5px;
+}
+
 .default_btn a {
     padding: 5px 0 5px 0;
     text-align: center;

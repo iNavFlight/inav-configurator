@@ -90,6 +90,8 @@ sources.js = [
     './js/localization.js',
     './js/boards.js',
     './js/tasks.js',
+    './js/servoMixRule.js',
+    './js/servoMixRuleCollection.js',
     './main.js',
     './tabs/*.js',
     './js/eventFrequencyAnalyzer.js',

@@ -10,6 +10,9 @@ var MSPCodes = {
     MSP_INAV_PID:               6,
     MSP_SET_INAV_PID:           7,
 
+    MSP_NAME:                   10,
+    MSP_SET_NAME:               11,
+
     MSP_NAV_POSHOLD:            12,
     MSP_SET_NAV_POSHOLD:        13,
     MSP_CALIBRATION_DATA:       14,

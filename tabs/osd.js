@@ -421,7 +421,7 @@ OSD.constants = {
                 {
                     name: 'FLYMODE',
                     id: 7,
-                    preview: 'STAB'
+                    preview: 'ACRO'
                 },
                 {
                     name: 'MESSAGES',

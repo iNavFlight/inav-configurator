@@ -10,6 +10,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         googleAnalytics.sendAppView('Configuration');
     }
 
+    var craftName = null;
+    var loadCraftName = function(callback) {
+        mspHelper.getCraftName(function(name) {
+            craftName = name;
+            callback();
+        });
+    };
+
+    var saveCraftName = function(callback) {
+        mspHelper.setCraftName(craftName, callback);
+    };
+
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
@@ -22,7 +34,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig
+        mspHelper.loadSensorConfig,
+        loadCraftName
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -41,6 +54,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
+        saveCraftName,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -597,6 +611,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         });
 
+        // Craft name
+        if (craftName != null) {
+            $('.config-personalization').show();
+            $('input[name="craft_name"]').val(craftName);
+        } else {
+            // craft name not supported by the firmware
+            $('.config-personalization').hide();
+        }
 
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
@@ -634,6 +656,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_gyro = parseInt(orientation_gyro_e.val());
             SENSOR_ALIGNMENT.align_acc = parseInt(orientation_acc_e.val());
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
+
+            craftName = $('input[name="craft_name"]').val();
 
             var rxTypes = FC.getRxTypes();
 

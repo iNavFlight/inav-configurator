@@ -151,7 +151,7 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = [];
+        SERVO_RULES = new ServoMixRuleCollection();
 
         SERIAL_CONFIG = {
             ports: [],
@@ -950,5 +950,27 @@ var FC = {
     },
     getRcMapLetters: function () {
         return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
+    },
+    getServoMixInputNames: function () {
+        return [
+            'Stabilised Roll',
+            'Stabilised Pitch',
+            'Stabilised Yaw',
+            'Stabilised Throttle',
+            'RC Roll',
+            'RC Pitch',
+            'RC Yaw',
+            'RC Throttle',
+            'RC Channel 5',
+            'RC Channel 6',
+            'RC Channel 7',
+            'RC Channel 8',
+            'Gimbal Pitch',
+            'Gimbal Roll',
+            'Flaps'
+        ];
+    },
+    getServoMixInputName: function (input) {
+        return getServoMixInputNames()[input];
     }
 };
