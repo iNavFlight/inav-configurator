@@ -47,7 +47,7 @@ TABS.servos.initialize = function (callback) {
          */
         var rules = SERVO_RULES.get();
         $servoMixTableBody.find("*").remove();
-        for (servoRuleIndex in rules) {
+        for (var servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
                 const servoRule = rules[servoRuleIndex];
 

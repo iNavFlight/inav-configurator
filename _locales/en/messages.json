@@ -1172,7 +1172,6 @@
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
-
     "gpsHead": {
         "message": "GPS"
     },

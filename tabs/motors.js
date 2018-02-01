@@ -19,24 +19,35 @@ TABS.motors.initialize = function (callback) {
         googleAnalytics.sendAppView('Motors');
     }
 
-    function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_3d);
-    }
-    
-    function load_3d() {
-        MSP.send_message(MSPCodes.MSP_3D, false, false, get_motor_data);
-    }
-    
-    function get_motor_data() {
-        update_arm_status();
-        MSP.send_message(MSPCodes.MSP_MOTOR, false, false, load_html);
-    }
+    var loadChainer = new MSPChainerClass();
+
+    loadChainer.setChain([
+        mspHelper.loadMisc,
+        mspHelper.loadBfConfig,
+        mspHelper.load3dConfig,
+        mspHelper.loadMotors,
+        mspHelper.loadMotorMixRules
+
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
+    update_arm_status();
+
+    var saveChainer = new MSPChainerClass();
+
+    saveChainer.setChain([
+        mspHelper.sendMotorMixer,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(function () {
+        GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+        MOTOR_RULES.cleanup();
+        // renderServoMixRules(); //TODO render after save
+    });
 
     function load_html() {
         $('#content').load("./tabs/motors.html", process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_MISC, false, false, load_config);
 
     function update_arm_status() {
         self.armed = bit_check(CONFIG.mode, 0);

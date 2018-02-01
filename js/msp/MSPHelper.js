@@ -177,6 +177,7 @@ var mspHelper = (function (gui) {
 
                     needle += 2;
                 }
+                MOTOR_RULES.setMotorCount(motorCount);
                 break;
             case MSPCodes.MSP_RC:
                 RC.active_channels = dataHandler.message_length_expected / 2;
@@ -2601,6 +2602,10 @@ var mspHelper = (function (gui) {
         } else {
             onCompleteCallback();
         }
+    };
+
+    self.loadMotors = function (callback) {
+        MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
     };
 
     self.getCraftName = function(callback) {

@@ -6,6 +6,16 @@ var MotorMixerRuleCollection = function () {
     var self = {};
     var data = [];
 
+    self.motorCount = 0;
+
+    self.setMotorCount = function (value) {
+        self.motorCount = value;
+    };
+
+    self.getMotorCount = function () {
+        return self.motorCount;
+    };
+
     self.put = function (element) {
         data.push(element);
     };
@@ -42,7 +52,7 @@ var MotorMixerRuleCollection = function () {
     };
 
     self.hasFreeSlots = function () {
-        return data.length < 8;
+        return data.length < self.getMotorCount();
     };
 
     return self;
