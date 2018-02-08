@@ -573,6 +573,9 @@
     "featureAIRMODE": {
         "message": "Permanently enable AIRMODE"
     },
+    "featureFW_LAUNCH": {
+        "message": "Permanently enable Launch Mode for Fixed Wing"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },

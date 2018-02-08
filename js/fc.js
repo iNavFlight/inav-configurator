@@ -498,6 +498,12 @@ var FC = {
             );
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+            features.push(
+                {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false}
+            );
+        }
+
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
