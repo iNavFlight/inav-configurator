@@ -1055,31 +1055,31 @@
         "message": "Roll D Adjustment"
     },
     "adjustmentsFunction21": {
-        "message": "Alt P Adjustment"
+        "message": "RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction22": {
-        "message": "Alt I Adjustment"
+        "message": "Manual RC Expo Adjustment"
     },
     "adjustmentsFunction23": {
-        "message": "Alt D Adjustment"
+        "message": "Manual RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction24": {
-        "message": "Vel P Adjustment"
+        "message": "Manual Pitch & Roll Rate Adjustment"
     },
     "adjustmentsFunction25": {
-        "message": "Vel I Adjustment"
+        "message": "Manual Roll Rate Adjustment"
     },
     "adjustmentsFunction26": {
-        "message": "Vel D Adjustment"
+        "message": "Manual Pitch Rate Adjustment"
     },
     "adjustmentsFunction27": {
-        "message": "MAG P Adjustment"
+        "message": "Manual Yaw Rate Adjustment"
     },
     "adjustmentsFunction28": {
-        "message": "Pos P Adjustment"
+        "message": "Navigation FW Cruise Throttle Adjustment"
     },
     "adjustmentsFunction29": {
-        "message": "Pos I Adjustment"
+        "message": "Navigation FW Pitch To Throttle Adjustment"
     },
     "adjustmentsFunction30": {
         "message": "PosR P Adjustment"
