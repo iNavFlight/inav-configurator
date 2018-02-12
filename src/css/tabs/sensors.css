@@ -167,3 +167,14 @@
 .tab-sensors .legend .item:nth-child(4) {
     fill: #4DA74D;
 }
+
+.tab-sensors a.debug-trace {
+    float: right;
+    margin-right: 1em;
+    font-size: 90%;
+    text-decoration: underline;
+}
+
+.tab-sensors a.debug-trace::hover {
+    text-decoration: underline;
+}

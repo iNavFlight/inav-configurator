@@ -1,0 +1,16 @@
+<html>
+<head>
+<title>Debug Trace</title>
+<script type="text/javascript">
+    window.onload = function() {
+        var output = document.getElementById('debug-trace');
+        setInterval(function() {
+            output.innerText = getDebugTrace();
+        }, 100);
+    }
+</script>
+</head>
+<body>
+    <pre><code id="debug-trace"></code></pre>
+</body>
+</html>
