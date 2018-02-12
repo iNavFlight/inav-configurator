@@ -172,9 +172,8 @@
     float: right;
     margin-right: 1em;
     font-size: 90%;
-    text-decoration: underline;
 }
 
-.tab-sensors a.debug-trace::hover {
+.tab-sensors a.debug-trace:hover {
     text-decoration: underline;
 }
