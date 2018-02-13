@@ -125,6 +125,10 @@ sources.receiverJs = [
     './tabs/receiver_msp.js'
 ];
 
+sources.debugTraceJs = [
+    './js/debug_trace.js'
+];
+
 sources.hexParserJs = [
     './js/workers/hex_parser.js',
 ];
@@ -136,6 +140,7 @@ var output = {
     mapJs: 'map.js',
     receiverCss: 'receiver-msp.css',
     receiverJs: 'receiver-msp.js',
+    debugTraceJs: 'debug-trace.js',
     hexParserJs: 'hex_parser.js',
 };
 

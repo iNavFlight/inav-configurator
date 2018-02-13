@@ -47,6 +47,12 @@ var mspHelper = (function (gui) {
         'IRC_TRAMP': 12
     };
 
+    // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
+    // the newline at the end, so we keep the pending message here until we find a
+    // '\0', then print it. Messages sent by MSP_DEBUGMSG are guaranteed to
+    // always finish with a '\0'.
+    var debugMsgBuffer = '';
+
     /**
      *
      * @param {MSP} dataHandler
@@ -440,6 +446,19 @@ var mspHelper = (function (gui) {
                 console.log('Settings Saved in EEPROM');
                 break;
             case MSPCodes.MSP_DEBUGMSG:
+                for (var ii = 0; ii < data.byteLength; ii++) {
+                    var c = data.readU8();
+                    if (c == 0) {
+                        // End of message
+                        if (debugMsgBuffer.length > 1) {
+                            console.log('[DEBUG] ' + debugMsgBuffer);
+                            DEBUG_TRACE = (DEBUG_TRACE || '') + debugMsgBuffer;
+                        }
+                        debugMsgBuffer = '';
+                        continue;
+                    }
+                    debugMsgBuffer += String.fromCharCode(c);
+                }
                 break;
             case MSPCodes.MSP_DEBUG:
                 for (i = 0; i < 4; i++)
