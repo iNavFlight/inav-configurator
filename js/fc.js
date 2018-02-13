@@ -847,7 +847,7 @@ var FC = {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
     },
     getMagnetometerNames: function () {
-        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
+        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "FAKE"];
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
@@ -866,7 +866,7 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10"];
+        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "UIB"];
     },
     getArmingFlags: function () {
         return {
