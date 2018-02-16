@@ -1082,10 +1082,10 @@
         "message": "Navigation FW Pitch To Throttle Adjustment"
     },
     "adjustmentsFunction30": {
-        "message": "PosR P Adjustment"
+        "message": "Board Roll Alignment Adjustment"
     },
     "adjustmentsFunction31": {
-        "message": "PosR I Adjustment"
+        "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction32": {
         "message": "PosR D Adjustment"
