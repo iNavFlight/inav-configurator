@@ -1107,6 +1107,17 @@ dialog {
     opacity: 0.5;
 }
 
+.content_toolbar .btn-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+}
+
+.content_toolbar .btn-danger a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+
 .toolbar_scroll_bottom .content_wrapper {
     /*  content wrapper in view with toolbar in scroll bottom
       leave 50px space for the toolbar

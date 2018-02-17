@@ -38,7 +38,8 @@ var GUI_control = function () {
         'setup',
         'osd',
         'profiles',
-        'advanced_tuning'
+        'advanced_tuning',
+        'mission_control'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 

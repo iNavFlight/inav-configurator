@@ -2328,6 +2328,45 @@
     "downloadUpdatesBtn": {
         "message": "Download new app"
     },
+    "tabMissionControl": {
+        "message": "Mission Control"
+    },
+    "loadMissionButton": {
+        "message": "Load mission from FC"
+    },
+    "saveMissionButton": {
+        "message": "Save mission to FC"
+    },
+    "loadEepromMissionButton": {
+        "message": "Load Eeprom mission"
+    },
+    "saveEepromMissionButton": {
+        "message": "Save Eeprom mission"
+    },
+    "editPointHead": {
+        "message": "Edit point"
+    },
+    "editPointButtonSave": {
+        "message": "Save"
+    },
+    "editPointButtonRemove": {
+        "message": "Remove"
+    },
+    "removeAllPointButtonSave": {
+        "message": "Remove all points"
+    },
+    "missionTotalInformationHead": {
+        "message": "Total information"
+    },
+    "useOnlyStandalone": {
+        "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
+    },
+    "eeprom_load_ok": {
+        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
+    },
+    "confirm_delete_all_points": {
+        "message": "Do you really want to delete all points?"
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
