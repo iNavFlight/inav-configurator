@@ -153,6 +153,14 @@ var MSPCodes = {
     MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
 
     // INAV specific codes
-    MSPV2_SETTING:          0x1003,
-    MSPV2_SET_SETTING:      0x1004,
+    MSPV2_SETTING:                      0x1003,
+    MSPV2_SET_SETTING:                  0x1004,
+    MSPV2_INAV_STATUS:                  0x2000,
+    MSPV2_INAV_OPTICAL_FLOW:            0x2001,
+    MSPV2_INAV_ANALOG:                  0x2002,
+    MSPV2_INAV_MISC:                    0x2003,
+    MSPV2_INAV_SET_MISC:                0x2004,
+    MSPV2_INAV_BATTERY_CONFIG:          0x2005,
+    MSPV2_INAV_SET_BATTERY_CONFIG:      0x2006
+
 };

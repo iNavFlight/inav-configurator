@@ -28,6 +28,7 @@ var CONFIG,
     ARMING_CONFIG,
     FC_CONFIG,
     MISC,
+    VOLTMETER_CONFIG,
     _3D,
     DATAFLASH,
     SDCARD,
@@ -215,8 +216,12 @@ var FC = {
         ANALOG = {
             voltage: 0,
             mAhdrawn: 0,
+            mWhdrawn: 0,
             rssi: 0,
-            amperage: 0
+            amperage: 0,
+            power: 0,
+            cell_count: 0,
+            battery_percentage: 0
         };
 
         ARMING_CONFIG = {
@@ -244,7 +249,24 @@ var FC = {
             vbatscale: 0,
             vbatmincellvoltage: 0,
             vbatmaxcellvoltage: 0,
-            vbatwarningcellvoltage: 0
+            vbatwarningcellvoltage: 0,
+            battery_capacity: 0,
+            battery_capacity_warning: 0,
+            battery_capacity_critical: 0,
+            battery_capacity_unit: 0
+        };
+
+        BATTERY_CONFIG = {
+            vbatscale: 0,
+            vbatmincellvoltage: 0,
+            vbatmaxcellvoltage: 0,
+            vbatwarningcellvoltage: 0,
+            current_offset: 0,
+            current_scale: 0,
+            capacity: 0,
+            capacity_warning: 0,
+            capacity_critical: 0,
+            capacity_unit: 0
         };
 
         ADVANCED_CONFIG = {

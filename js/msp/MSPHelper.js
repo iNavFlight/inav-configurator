@@ -235,6 +235,22 @@ var mspHelper = (function (gui) {
                 ANALOG.mAhdrawn = data.getUint16(1, true);
                 ANALOG.rssi = data.getUint16(3, true); // 0-1023
                 ANALOG.amperage = data.getInt16(5, true) / 100; // A
+                break;
+            case MSPCodes.MSPV2_INAV_ANALOG:
+                ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                offset += 2;
+                ANALOG.cell_count = data.getUint8(offset++);
+                ANALOG.battery_percentage = data.getUint8(offset++);
+                ANALOG.power = data.getUint16(offset, true);
+                offset += 2;
+                ANALOG.mAhdrawn = data.getUint16(offset, true);
+                offset += 2;
+                ANALOG.mWhdrawn = data.getUint16(offset, true);
+                offset += 2;
+                ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                offset += 2;
+                ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                offset += 2;
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
@@ -298,6 +314,61 @@ var mspHelper = (function (gui) {
                 MISC.vbatmincellvoltage = data.getUint8(offset++) / 10; // 10-50
                 MISC.vbatmaxcellvoltage = data.getUint8(offset++) / 10; // 10-50
                 MISC.vbatwarningcellvoltage = data.getUint8(offset++) / 10; // 10-50
+                break;
+            case MSPCodes.MSPV2_INAV_MISC:
+                MISC.midrc = data.getInt16(offset, true);
+                offset += 2;
+                MISC.minthrottle = data.getUint16(offset, true); // 0-2000
+                offset += 2;
+                MISC.maxthrottle = data.getUint16(offset, true); // 0-2000
+                offset += 2;
+                MISC.mincommand = data.getUint16(offset, true); // 0-2000
+                offset += 2;
+                MISC.failsafe_throttle = data.getUint16(offset, true); // 1000-2000
+                offset += 2;
+                MISC.gps_type = data.getUint8(offset++);
+                MISC.sensors_baudrate = data.getUint8(offset++);
+                MISC.gps_ubx_sbas = data.getInt8(offset++);
+                MISC.rssi_channel = data.getUint8(offset++);
+                MISC.placeholder2 = data.getUint8(offset++);
+                MISC.mag_declination = data.getInt16(offset, 1) / 10; // -18000-18000
+                offset += 2;
+                MISC.vbatscale = data.getUint16(offset, true);
+                offset += 2;
+                MISC.vbatmincellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                MISC.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                MISC.vbatwarningcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                MISC.battery_capacity = data.getUint32(offset, true);
+                offset += 4;
+                MISC.battery_capacity_warning = data.getUint32(offset, true);
+                offset += 4;
+                MISC.battery_capacity_critical = data.getUint32(offset, true);
+                offset += 4;
+                MISC.battery_capacity_unit = data.getUint8(offset++);
+                break;
+            case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
+                BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
+                offset += 2;
+                BATTERY_CONFIG.vbatmincellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                BATTERY_CONFIG.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                BATTERY_CONFIG.vbatwarningcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
+                BATTERY_CONFIG.current_offset = data.getUint16(offset, true);
+                offset += 2;
+                BATTERY_CONFIG.current_scale = data.getUint16(offset, true);
+                offset += 2;
+                BATTERY_CONFIG.capacity = data.getUint32(offset, true);
+                offset += 4;
+                BATTERY_CONFIG.capacity_warning = data.getUint32(offset, true);
+                offset += 4;
+                BATTERY_CONFIG.capacity_critical = data.getUint32(offset, true);
+                offset += 4;
+                BATTERY_CONFIG.capacity_unit = data.getUint8(offset++);
                 break;
             case MSPCodes.MSP_3D:
                 _3D.deadband3d_low = data.getUint16(offset, true);
@@ -1294,6 +1365,62 @@ var mspHelper = (function (gui) {
                 buffer.push(Math.round(MISC.vbatmaxcellvoltage * 10));
                 buffer.push(Math.round(MISC.vbatwarningcellvoltage * 10));
                 break;
+            case MSPCodes.MSPV2_INAV_SET_MISC:
+                buffer.push(lowByte(MISC.midrc));
+                buffer.push(highByte(MISC.midrc));
+                buffer.push(lowByte(MISC.minthrottle));
+                buffer.push(highByte(MISC.minthrottle));
+                buffer.push(lowByte(MISC.maxthrottle));
+                buffer.push(highByte(MISC.maxthrottle));
+                buffer.push(lowByte(MISC.mincommand));
+                buffer.push(highByte(MISC.mincommand));
+                buffer.push(lowByte(MISC.failsafe_throttle));
+                buffer.push(highByte(MISC.failsafe_throttle));
+                buffer.push(MISC.gps_type);
+                buffer.push(MISC.sensors_baudrate);
+                buffer.push(MISC.gps_ubx_sbas);
+                buffer.push(MISC.multiwiicurrentoutput);
+                buffer.push(MISC.rssi_channel);
+                buffer.push(MISC.placeholder2);
+                buffer.push(lowByte(Math.round(MISC.mag_declination * 10)));
+                buffer.push(highByte(Math.round(MISC.mag_declination * 10)));
+                buffer.push(lowByte(MISC.vbatscale));
+                buffer.push(highByte(MISC.vbatscale));
+                buffer.push(lowByte(Math.round(MISC.vbatmincellvoltage * 100)));
+                buffer.push(highByte(Math.round(MISC.vbatmincellvoltage * 100)));
+                buffer.push(lowByte(Math.round(MISC.vbatmaxcellvoltage * 100)));
+                buffer.push(highByte(Math.round(MISC.vbatmaxcellvoltage * 100)));
+                buffer.push(lowByte(Math.round(MISC.vbatwarningcellvoltage * 100)));
+                buffer.push(highByte(Math.round(MISC.vbatwarningcellvoltage * 100)));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(MISC.battery_capacity, byte_index));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(MISC.battery_capacity_warning, byte_index));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(MISC.battery_capacity_critical, byte_index));
+                buffer.push(MISC.battery_capacity_unit);
+                break;
+            case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
+                buffer.push(lowByte(BATTERY_CONFIG.vbatscale));
+                buffer.push(highByte(BATTERY_CONFIG.vbatscale));
+                buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
+                buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
+                buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
+                buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
+                buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
+                buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
+                buffer.push(lowByte(BATTERY_CONFIG.current_offset));
+                buffer.push(highByte(BATTERY_CONFIG.current_offset));
+                buffer.push(lowByte(BATTERY_CONFIG.current_scale));
+                buffer.push(highByte(BATTERY_CONFIG.current_scale));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(BATTERY_CONFIG.capacity, byte_index));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(BATTERY_CONFIG.capacity_warning, byte_index));
+                for (byte_index = 0; byte_index < 4; ++byte_index)
+                    buffer.push(specificByte(BATTERY_CONFIG.capacity_critical, byte_index));
+                buffer.push(BATTERY_CONFIG.capacity_unit);
+                break;
 
             case MSPCodes.MSP_SET_RX_CONFIG:
                 buffer.push(RX_CONFIG.serialrx_provider);
@@ -2219,6 +2346,14 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
     };
 
+    self.loadMiscV2 = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_MISC, false, false, callback);
+    };
+
+    self.loadBatteryConfig = function (callback) {
+	MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
+    };
+
     self.loadArmingConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, callback);
     };
@@ -2329,6 +2464,14 @@ var mspHelper = (function (gui) {
 
     self.saveMisc = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, callback);
+    };
+
+    self.saveMiscV2 = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_SET_MISC, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_MISC), false, callback);
+    };
+
+    self.saveBatteryConfig = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_SET_BATTERY_CONFIG, mspHelper.crunch(MSPCodes.MSPV2_SET_BATTERY_CONFIG), false, callback);
     };
 
     self.save3dConfig = function (callback) {

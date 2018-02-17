@@ -61,18 +61,31 @@ helper.periodicStatusUpdater = (function () {
         }
 
         if (ANALOG != undefined) {
-            var nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
-            if (ANALOG.voltage == 0)
-                nbCells = 1;
+            var nbCells;
+
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                nbCells = ANALOG.cell_count;
+            } else {
+                nbCells = Math.floor(ANALOG.voltage / MISC.vbatmaxcellvoltage) + 1;
+                if (ANALOG.voltage == 0)
+                    nbCells = 1;
+            }
 
             var min = MISC.vbatmincellvoltage * nbCells;
             var max = MISC.vbatmaxcellvoltage * nbCells;
             var warn = MISC.vbatwarningcellvoltage * nbCells;
 
-            $(".battery-status").css({
-                width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
-                display: 'inline-block'
-            });
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                $(".battery-status").css({
+                    width: ANALOG.battery_percentage + "%",
+                    display: 'inline-block'
+                });
+            } else {
+                $(".battery-status").css({
+                    width: ((ANALOG.voltage - min) / (max - min) * 100) + "%",
+                    display: 'inline-block'
+                });
+            }
 
             if (active) {
                 $(".linkicon").css({
@@ -123,7 +136,11 @@ helper.periodicStatusUpdater = (function () {
                 MSP.send_message(MSPCodes.MSP_STATUS, false, false);
             }
 
-            MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                MSP.send_message(MSPCodes.MSPV2_INAV_ANALOG, false, false);
+            } else {
+                MSP.send_message(MSPCodes.MSP_ANALOG, false, false);
+            }
 
             privateScope.updateView();
         }
