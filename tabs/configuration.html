@@ -439,6 +439,38 @@
                     </div>
                 </div>
             </div>
+            <div class="config-section gui_box grey requires-v1_8_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationBatteryCapacity"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="number">
+                        <input type="number" id="battery_capacity" name="battery_capacity" step="1" min="0" max="4294967296" />
+                        <label for="battery_capacity">
+                            <span data-i18n="configurationBatteryCapacityValue"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="battery_capacity_warning" name="battery_capacity_warning" step="1" min="0" max="4294967296" />
+                        <label for="battery_capacity_warning">
+                            <span data-i18n="configurationBatteryCapacityWarning"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="battery_capacity_critical" name="battery_capacity_critical" step="1" min="0" max="4294967296" />
+                        <label for="battery_capacity_critical">
+                            <span data-i18n="configurationBatteryCapacityCritical"></span>
+                        </label>
+                    </div>
+                    <div class="select">
+                        <select id="battery_capacity_unit">
+                            <option value="mAh">mAh</option>
+                            <option value="mWh">mWh</option>
+                        </select>
+                        <label for="battery_capacity_unit"> <span data-i18n="configurationBatteryCapacityUnit"></span></label>
+                    </div>
+                </div>
+            </div>
 
             <div class="config-section gui_box grey other">
                 <div class="gui_box_titlebar">

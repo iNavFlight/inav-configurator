@@ -399,7 +399,7 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 BATTERY_CONFIG.capacity_critical = data.getUint32(offset, true);
                 offset += 4;
-                BATTERY_CONFIG.capacity_unit = data.getUint8(offset++);
+                BATTERY_CONFIG.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSP_3D:
                 _3D.deadband3d_low = data.getUint16(offset, true);
@@ -1449,7 +1449,7 @@ var mspHelper = (function (gui) {
                     buffer.push(specificByte(MISC.battery_capacity_warning, byte_index));
                 for (byte_index = 0; byte_index < 4; ++byte_index)
                     buffer.push(specificByte(MISC.battery_capacity_critical, byte_index));
-                buffer.push(MISC.battery_capacity_unit);
+                buffer.push((MISC.battery_capacity_unit == 'mAh') ? 0 : 1);
                 break;
             case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));

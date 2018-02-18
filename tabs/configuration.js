@@ -332,7 +332,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#voltagescale').attr('max', '255');
         }
 
-        // fill battery
+        // fill battery voltage
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
         $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
@@ -341,6 +341,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
         $('#currentoffset').val(BF_CONFIG.currentoffset);
+
+        // fill battery capacity
+        $('#battery_capacity').val(MISC.battery_capacity);
+        $('#battery_capacity_warning').val(MISC.battery_capacity_warning);
+        $('#battery_capacity_critical').val(MISC.battery_capacity_critical);
+        $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
         var escProtocols = FC.getEscProtocols();
         var servoRates = FC.getServoRates();
@@ -586,6 +592,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_7").hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+            $(".requires-v1_8_1").show();
+        } else {
+            $(".requires-v1_8_1").hide();
+        }
+
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
@@ -662,6 +674,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
             MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
             MISC.vbatscale = parseInt($('#voltagescale').val());
+
+            MISC.battery_capacity = parseInt($('#battery_capacity').val());
+            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val());
+            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val());
+            MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
             BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
