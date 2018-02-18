@@ -221,7 +221,11 @@ var FC = {
             amperage: 0,
             power: 0,
             cell_count: 0,
-            battery_percentage: 0
+            battery_percentage: 0,
+            battery_full_when_plugged_in: false,
+            use_capacity_thresholds: false,
+            battery_remaining_capacity: 0,
+            battery_flags: 0
         };
 
         ARMING_CONFIG = {
@@ -253,7 +257,7 @@ var FC = {
             battery_capacity: 0,
             battery_capacity_warning: 0,
             battery_capacity_critical: 0,
-            battery_capacity_unit: 0
+            battery_capacity_unit: 'mAh'
         };
 
         BATTERY_CONFIG = {
