@@ -15,11 +15,18 @@ TABS.setup.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
-    loadChainer.setChain([
+    var loadChain = [
         mspHelper.loadBfConfig,
-        mspHelper.loadMisc,
         mspHelper.queryFcStatus
-    ]);
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        loadChain.push(mspHelper.loadMiscV2);
+    } else {
+        loadChain.push(mspHelper.loadMisc);
+    }
+
+    loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
@@ -77,7 +84,13 @@ TABS.setup.initialize = function (callback) {
 
         // cached elements
         var bat_voltage_e = $('.bat-voltage'),
+            bat_percent_e = $('.bat-percent'),
+            bat_remaining_e = $('.bat-remain-cap'),
+            bat_cells_e = $('.bat-cells'),
+            bat_thresh_e = $('.bat-thresh'),
+            bat_full_e = $('.bat-full'),
             bat_mah_drawn_e = $('.bat-mah-drawn'),
+            bat_mwh_drawn_e = $('.bat-mwh-drawn'),
             bat_mah_drawing_e = $('.bat-mah-drawing'),
             rssi_e = $('.rssi'),
             gpsFix_e = $('.gpsFixType'),
@@ -133,9 +146,23 @@ TABS.setup.initialize = function (callback) {
         helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
         helper.mspBalancedInterval.add('setup_data_pull_slow', 250, 1, get_slow_data);
 
+        if (semver.lt(CONFIG.flightControllerVersion, '1.8.1')) {
+            $('.requires-v1_8_1').hide();
+        }
+
         helper.interval.add('gui_analog_update', function () {
+                bat_cells_e.text(chrome.i18n.getMessage('initialSetupBatteryDetectedCellsValue', [ANALOG.cell_count]));
                 bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
+                remaining_capacity_wh_decimals = ANALOG.battery_remaining_capacity.toString().length < 5 ? 3 : (7 - ANALOG.battery_remaining_capacity.toString().length);
+                remaining_capacity_value = MISC.battery_capacity_unit == 'mAh' ? ANALOG.battery_remaining_capacity : (ANALOG.battery_remaining_capacity / 1000).toFixed(remaining_capacity_wh_decimals < 0 ? 0 : remaining_capacity_wh_decimals);
+                remaining_capacity_unit = MISC.battery_capacity_unit == 'mAh' ? 'mAh' : 'Wh';
+                bat_remaining_e.text(chrome.i18n.getMessage('initialSetupBatteryRemainingCapacityValue', ((MISC.battery_capacity > 0) && ANALOG.battery_full_when_plugged_in) ? [remaining_capacity_value, remaining_capacity_unit] : ['NA', '']));
+                bat_percent_e.text(chrome.i18n.getMessage('initialSetupBatteryPercentageValue', [ANALOG.battery_percentage]));
+                bat_full_e.text(chrome.i18n.getMessage('initialSetupBatteryFullValue', [ANALOG.battery_full_when_plugged_in]));
+                bat_thresh_e.text(chrome.i18n.getMessage('initialSetupBatteryThresholdsValue', [ANALOG.use_capacity_thresholds]));
                 bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
+                capacity_drawn_decimals = ANALOG.mWhdrawn.toString().length < 5 ? 3 : (7 - ANALOG.mWhdrawn.toString().length);
+                bat_mwh_drawn_e.text(chrome.i18n.getMessage('initialSetup_Wh_drawnValue', [(ANALOG.mWhdrawn / 1000).toFixed(capacity_drawn_decimals < 0 ? 0 : capacity_drawn_decimals)]));
                 bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
                 rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
         }, 100, true);

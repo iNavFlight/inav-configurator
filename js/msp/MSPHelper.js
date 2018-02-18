@@ -251,6 +251,12 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 ANALOG.amperage = data.getInt16(offset, true) / 100; // A
                 offset += 2;
+                var battery_flags = data.getUint8(offset++);
+                ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
+                ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
+                ANALOG.battery_state = (battery_flags & 12) >> 2;
+                ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                offset += 4;
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
@@ -330,7 +336,6 @@ var mspHelper = (function (gui) {
                 MISC.sensors_baudrate = data.getUint8(offset++);
                 MISC.gps_ubx_sbas = data.getInt8(offset++);
                 MISC.rssi_channel = data.getUint8(offset++);
-                MISC.placeholder2 = data.getUint8(offset++);
                 MISC.mag_declination = data.getInt16(offset, 1) / 10; // -18000-18000
                 offset += 2;
                 MISC.vbatscale = data.getUint16(offset, true);
@@ -347,7 +352,7 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 MISC.battery_capacity_critical = data.getUint32(offset, true);
                 offset += 4;
-                MISC.battery_capacity_unit = data.getUint8(offset++);
+                MISC.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
@@ -368,7 +373,7 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 BATTERY_CONFIG.capacity_critical = data.getUint32(offset, true);
                 offset += 4;
-                BATTERY_CONFIG.capacity_unit = data.getUint8(offset++);
+                BATTERY_CONFIG.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSP_3D:
                 _3D.deadband3d_low = data.getUint16(offset, true);
@@ -1379,9 +1384,7 @@ var mspHelper = (function (gui) {
                 buffer.push(MISC.gps_type);
                 buffer.push(MISC.sensors_baudrate);
                 buffer.push(MISC.gps_ubx_sbas);
-                buffer.push(MISC.multiwiicurrentoutput);
                 buffer.push(MISC.rssi_channel);
-                buffer.push(MISC.placeholder2);
                 buffer.push(lowByte(Math.round(MISC.mag_declination * 10)));
                 buffer.push(highByte(Math.round(MISC.mag_declination * 10)));
                 buffer.push(lowByte(MISC.vbatscale));
@@ -1398,7 +1401,7 @@ var mspHelper = (function (gui) {
                     buffer.push(specificByte(MISC.battery_capacity_warning, byte_index));
                 for (byte_index = 0; byte_index < 4; ++byte_index)
                     buffer.push(specificByte(MISC.battery_capacity_critical, byte_index));
-                buffer.push(MISC.battery_capacity_unit);
+                buffer.push((MISC.battery_capacity_unit == 'mAh') ? 0 : 1);
                 break;
             case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));

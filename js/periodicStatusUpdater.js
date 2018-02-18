@@ -97,7 +97,7 @@ helper.periodicStatusUpdater = (function () {
                 });
             }
 
-            if (ANALOG.voltage < warn) {
+            if (((semver.gte(CONFIG.flightControllerVersion, '1.8.1')) && (((ANALOG.use_capacity_thresholds) && (ANALOG.battery_remaining_capacity <= (MISC.battery_capacity_warning - MISC.battery_capacity_critical))) || ((!ANALOG.use_capacity_thresholds) && (ANALOG.voltage < warn))) || (ANALOG.voltage < min)) || ((semver.lt(CONFIG.flightControllerVersion, '1.8.1')) && (ANALOG.voltage < warn))) {
                 $(".battery-status").css('background-color', '#D42133');
             } else {
                 $(".battery-status").css('background-color', '#59AA29');

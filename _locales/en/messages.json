@@ -406,6 +406,42 @@
     "initialSetupBattery": {
         "message": "Battery voltage:"
     },
+    "initialSetupBatteryDetectedCells": {
+        "message": "Battery detected cell count:"
+    },
+    "initialSetupBatteryDetectedCellsValue": {
+        "message": "$1"
+    },
+    "initialSetupBatteryPercentage": {
+        "message": "Battery left:"
+    },
+    "initialSetupBatteryPercentageValue": {
+        "message": "$1 %"
+    },
+    "initialSetupBatteryRemainingCapacity": {
+        "message": "Battery remaining capacity"
+    },
+    "initialSetupBatteryRemainingCapacityValue": {
+        "message": "$1 $2"
+    },
+    "initialSetupBatteryFull": {
+        "message": "Battery full when plugged in"
+    },
+    "initialSetupBatteryFullValue": {
+        "message": "$1"
+    },
+    "initialSetupBatteryThresholds": {
+        "message": "Battery use cap thresholds"
+    },
+    "initialSetupBatteryThresholdsValue": {
+        "message": "$1"
+    },
+    "initialSetup_Wh_drawn": {
+        "message": "Capacity drawn:"
+    },
+    "initialSetup_Wh_drawnValue": {
+        "message": "$1 Wh"
+    },
     "initialSetupBatteryValue": {
         "message": "$1 V"
     },
@@ -692,6 +728,21 @@
     },
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
+    },
+    "configurationBatteryCapacity": {
+        "message": "Battery Capacity"
+    },
+    "configurationBatteryCapacityValue": {
+        "message": "Capacity"
+    },
+    "configurationBatteryCapacityWarning": {
+        "message": "Warning Capacity"
+    },
+    "configurationBatteryCapacityCritical": {
+        "message": "Critical Capacity"
+    },
+    "configurationBatteryCapacityUnit": {
+        "message": "Battery Capacity Unit"
     },
     "configuration3d": {
         "message": "3D"
