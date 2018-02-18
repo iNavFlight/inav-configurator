@@ -341,7 +341,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
         $('#currentoffset').val(BF_CONFIG.currentoffset);
-        $('#multiwiicurrentoutput').prop('checked', MISC.multiwiicurrentoutput);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -683,7 +682,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
             BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
-            MISC.multiwiicurrentoutput = ~~$('#multiwiicurrentoutput').is(':checked'); // ~~ boolean to decimal conversion
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
