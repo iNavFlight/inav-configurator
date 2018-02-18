@@ -17,8 +17,11 @@ SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
+SYM.WH = 0xAB;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
+SYM.WH_KM_0 = 172;
+SYM.WH_KM_1 = 173;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -403,6 +406,12 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
                 },
                 {
+                    name: 'MAIN_BATT_REMAINING_PERCENTAGE',
+                    id: 38,
+                    min_version: '1.8.1',
+                    preview: '100%'
+                },
+                {
                     name: 'THROTTLE_POSITION',
                     id: 9,
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
@@ -575,16 +584,34 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
                 },
                 {
+                    name: 'WH_DRAWN',
+                    id: 36,
+                    min_version: '1.8.1',
+                    preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
+                },
+                {
                     name: 'POWER',
                     id: 19,
                     min_version: '1.6.0',
                     preview: 'W50 ' // 3 chars
                 },
                 {
-                    name: 'EFFICIENCY',
+                    name: 'MAIN_BATT_REMAINING_CAPACITY',
+                    id: 37,
+                    min_version: '1.8.1',
+                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                },
+                {
+                    name: 'EFFICIENCY_MAH',
                     id: 35,
                     min_version: '1.7.4',
                     preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                },
+                {
+                    name: 'EFFICIENCY_WH',
+                    id: 39,
+                    min_version: '1.8.1',
+                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
                 }
             ]
         },

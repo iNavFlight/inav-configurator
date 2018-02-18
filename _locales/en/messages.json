@@ -2253,8 +2253,23 @@
     "osdElement_MAIN_BATT_CELL_VOLTAGE": {
         "message": "Battery Cell Voltage"
     },
+    "osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
+        "message": "Battery Remaining Percentage"
+    },
+    "osdElement_MAIN_BATT_REMAINING_CAPACITY": {
+        "message": "Battery Remaining Capacity"
+    },
     "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Shows the average cell voltage from the main battery"
+    },
+    "osdElement_MAH_DRAWN": {
+        "message": "mAh drawn"
+    },
+    "osdElement_EFFICIENCY_MAH": {
+        "message": "Efficiency mAh/Km"
+    },
+    "osdElement_EFFICIENCY_WH": {
+        "message": "Efficiency Wh/Km"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
