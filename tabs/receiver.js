@@ -38,6 +38,41 @@ TABS.receiver.initialize = function (callback) {
         $('#content').load("./tabs/receiver.html", process_html);
     }
 
+    function drawRollPitchExpo() {
+        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+        var context = pitch_roll_curve.getContext("2d");
+
+        var expoAVal = $('.tunings .rate input[name="expo"]');
+        var expoA = parseFloat(expoAVal.val());
+
+        var expoMVal = $('.tunings .rate input[name="manual_expo"]');
+        var expoM = parseFloat(expoMVal.val());
+
+        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max')) ||
+            expoM <= parseFloat(expoMVal.prop('min')) || expoM >= parseFloat(expoMVal.prop('max'))) {
+            return;
+        }
+
+        var rateHeight = TABS.receiver.rateChartHeight;
+
+        // draw
+        context.clearRect(0, 0, 200, rateHeight);
+
+        context.beginPath();
+        context.moveTo(0, rateHeight);
+        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
+        context.lineWidth = 2;
+        context.strokeStyle = '#37a8db';
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(0, rateHeight);
+        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoM)), 200, 0);
+        context.lineWidth = 2;
+        context.strokeStyle = '#a837db';
+        context.stroke();
+    }
+
     function process_html() {
         // translate to user-selected language
         localize();
@@ -234,53 +269,13 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input').on('input change', function () {
             setTimeout(function () { // let global validation trigger and adjust the values first
-                var expoE = $('.tunings .rate input[name="expo"]'),
-                    expo = parseFloat(expoE.val()),
-                    pitch_roll_curve = $('.pitch_roll_curve canvas').get(0),
-                    context = pitch_roll_curve.getContext("2d");
-
-                // local validation to deal with input event
-                if (expo >= parseFloat(expoE.prop('min')) &&
-                    expo <= parseFloat(expoE.prop('max'))) {
-                    // continue
-                } else {
-                    return;
-                }
-
-                // draw
-                context.clearRect(0, 0, 200, rateHeight);
-                context.beginPath();
-                context.moveTo(0, rateHeight);
-                context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expo)), 200, 0);
-                context.lineWidth = 2;
-                context.strokeStyle = '#37a8db';
-                context.stroke();
+                drawRollPitchExpo();
             }, 0);
         }).trigger('input');
 
         $('.tunings .rate input').on('input change', function () {
             setTimeout(function () { // let global validation trigger and adjust the values first
-                var expoE = $('.tunings .rate input[name="manual_expo"]'),
-                    expo = parseFloat(expoE.val()),
-                    pitch_roll_curve = $('.manual_pitch_roll_curve canvas').get(0),
-                    context = pitch_roll_curve.getContext("2d");
-
-                // local validation to deal with input event
-                if (expo >= parseFloat(expoE.prop('min')) &&
-                    expo <= parseFloat(expoE.prop('max'))) {
-                    // continue
-                } else {
-                    return;
-                }
-
-                // draw
-                context.clearRect(0, 0, 200, rateHeight);
-                context.beginPath();
-                context.moveTo(0, rateHeight);
-                context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expo)), 200, 0);
-                context.lineWidth = 2;
-                context.strokeStyle = '#37a8db';
-                context.stroke();
+                drawRollPitchExpo();
             }, 0);
         }).trigger('input');
 
