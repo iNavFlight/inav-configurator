@@ -1669,7 +1669,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 90px;
+    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
@@ -1761,6 +1761,7 @@ dialog {
 .bottomStatusIcons {
     background-color: #272727;
     height: 31px;
+    margin-left: 5px;
     margin-top: 2px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;

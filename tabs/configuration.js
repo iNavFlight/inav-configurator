@@ -24,9 +24,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     var loadChainer = new MSPChainerClass();
 
-    loadChainer.setChain([
+    var loadChain = [
         mspHelper.loadBfConfig,
-        mspHelper.loadMisc,
         mspHelper.loadArmingConfig,
         mspHelper.loadLoopTime,
         mspHelper.loadRxConfig,
@@ -36,15 +35,22 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadSensorConfig,
         loadCraftName
-    ]);
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        loadChain.push(mspHelper.loadMiscV2);
+    } else {
+        loadChain.push(mspHelper.loadMisc);
+    }
+
+    loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
     var saveChainer = new MSPChainerClass();
 
-    saveChainer.setChain([
+    var saveChain = [
         mspHelper.saveBfConfig,
-        mspHelper.saveMisc,
         mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
@@ -55,8 +61,17 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
         saveCraftName,
-        mspHelper.saveToEeprom
-    ]);
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        saveChain.push(mspHelper.saveMiscV2);
+    } else {
+        saveChain.push(mspHelper.saveMisc);
+    }
+
+    saveChain.push(mspHelper.saveToEeprom);
+
+    saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);
 
     function reboot() {
@@ -308,6 +323,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#midthrottle').val(MISC.midrc);
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
+
+        // Battery thresholds resolution is 100mV and voltage scale max is 255 before 1.8.1
+        if (semver.lt(CONFIG.flightControllerVersion, '1.8.1')) {
+            $('#mincellvoltage').attr('step', '0.1');
+            $('#maxcellvoltage').attr('step', '0.1');
+            $('#warningcellvoltage').attr('step', '0.1');
+            $('#voltagescale').attr('max', '255');
+        }
 
         // fill battery
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
@@ -713,7 +736,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         helper.interval.add('config_load_analog', function () {
-            $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
+            } else {
+                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            }
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
         GUI.content_ready(callback);
