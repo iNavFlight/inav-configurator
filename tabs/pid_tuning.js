@@ -9,14 +9,21 @@ TABS.pid_tuning.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
-    loadChainer.setChain([
+    var loadChain = [
         mspHelper.loadPidNames,
         mspHelper.loadPidData,
-        mspHelper.loadRcTuningData,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig
-    ]);
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        loadChain.push(mspHelper.loadRateProfileData);
+    } else {
+        loadChain.push(mspHelper.loadRcTuningData);
+    }
+
+    loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
@@ -58,6 +65,10 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
         }
 
+        $('.rate-tpa input[name="manual_roll"]').val(RC_tuning.manual_roll_rate);
+        $('.rate-tpa input[name="manual_pitch"]').val(RC_tuning.manual_pitch_rate);
+        $('.rate-tpa input[name="manual_yaw"]').val(RC_tuning.manual_yaw_rate);
+
         $('#tpa').val(RC_tuning.dynamic_THR_PID);
         $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
     }
@@ -80,6 +91,10 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.yaw_rate = parseFloat($('.rate-tpa input[name="yaw"]:visible').val());
         RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
         RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
+
+        RC_tuning.manual_roll_rate = $('.rate-tpa input[name="manual_roll"]:visible').val();
+        RC_tuning.manual_pitch_rate = $('.rate-tpa input[name="manual_pitch"]:visible').val();
+        RC_tuning.manual_yaw_rate = $('.rate-tpa input[name="manual_yaw"]:visible').val();
     }
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
@@ -231,7 +246,11 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function send_rc_tuning_changes() {
-                MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
+                if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                    MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
+                } else {
+                    MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
+                }
             }
 
             function saveINAVPidConfig() {
