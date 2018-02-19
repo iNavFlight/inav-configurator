@@ -273,12 +273,6 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('.tunings .rate input').on('input change', function () {
-            setTimeout(function () { // let global validation trigger and adjust the values first
-                drawRollPitchExpo();
-            }, 0);
-        }).trigger('input');
-
         $('a.refresh').click(function () {
             MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, function () {
                 GUI.log(chrome.i18n.getMessage('receiverDataRefreshed'));
