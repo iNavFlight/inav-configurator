@@ -452,7 +452,7 @@ TABS.sensors.initialize = function (callback) {
                 updateGraphHelperSize(altitudeHelpers);
 
                 if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
+                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer, SENSOR_DATA.vertical_speed]);
                 }
                 else {
                     samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude]);
@@ -460,6 +460,7 @@ TABS.sensors.initialize = function (callback) {
                 drawGraph(altitudeHelpers, altitude_data, samples_altitude_i);
                 raw_data_text_ements.x[3].text(SENSOR_DATA.altitude.toFixed(2));
                 raw_data_text_ements.y[3].text(SENSOR_DATA.barometer.toFixed(2));
+                raw_data_text_ements.z[3].text(SENSOR_DATA.vertical_speed.toFixed(2));
             }
 
             function update_sonar_graphs() {

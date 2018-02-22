@@ -47,6 +47,7 @@
     width: 60px;
     height: 22px;
     font-weight: bold;
+    clear: left;
 }
 
 .tab-sensors .plot_control dd {
