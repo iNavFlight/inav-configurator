@@ -378,7 +378,7 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 MISC.battery_capacity_critical = data.getUint32(offset, true);
                 offset += 4;
-                MISC.battery_capacity_unit = (data.getUint8(offset++) ? 'Wh' : 'mAh');
+                MISC.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
