@@ -547,7 +547,8 @@ var FC = {
 
         if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
             features.push(
-                {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false}
+                {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
+                {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
             );
         }
 

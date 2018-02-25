@@ -519,6 +519,9 @@
     "featureVBAT": {
         "message": "Battery voltage monitoring"
     },
+    "featureTX_PROF_SEL": {
+        "message": "Profile selection with TX stick command"
+    },
     "featureINFLIGHT_ACC_CAL": {
         "message": "In-flight level calibration"
     },
