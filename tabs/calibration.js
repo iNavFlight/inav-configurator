@@ -55,6 +55,7 @@ TABS.calibration.initialize = function (callback) {
     if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
         loadChainer.setChain([
             mspHelper.loadStatus,
+            mspHelper.loadSensorConfig,
             mspHelper.loadCalibrationData
         ]);
         loadChainer.setExitPoint(loadHtml);
