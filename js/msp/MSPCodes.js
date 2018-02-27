@@ -10,6 +10,9 @@ var MSPCodes = {
     MSP_INAV_PID:               6,
     MSP_SET_INAV_PID:           7,
 
+    MSP_NAME:                   10,
+    MSP_SET_NAME:               11,
+
     MSP_NAV_POSHOLD:            12,
     MSP_SET_NAV_POSHOLD:        13,
     MSP_CALIBRATION_DATA:       14,
@@ -17,7 +20,9 @@ var MSPCodes = {
 
     MSP_POSITION_ESTIMATION_CONFIG: 16,
     MSP_SET_POSITION_ESTIMATION_CONFIG: 17,
-
+    MSP_WP_MISSION_LOAD: 18,
+    MSP_WP_MISSION_SAVE: 19,
+    MSP_WP_GETINFO: 20,
     MSP_RTH_AND_LAND_CONFIG:     21,
     MSP_SET_RTH_AND_LAND_CONFIG: 22,
     MSP_FW_CONFIG:              23,
@@ -148,6 +153,15 @@ var MSPCodes = {
     MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
 
     // INAV specific codes
-    MSPV2_SETTING:          0x1003,
-    MSPV2_SET_SETTING:      0x1004,
+    MSPV2_SETTING:                      0x1003,
+    MSPV2_SET_SETTING:                  0x1004,
+    MSPV2_INAV_STATUS:                  0x2000,
+    MSPV2_INAV_OPTICAL_FLOW:            0x2001,
+    MSPV2_INAV_ANALOG:                  0x2002,
+    MSPV2_INAV_MISC:                    0x2003,
+    MSPV2_INAV_SET_MISC:                0x2004,
+    MSPV2_INAV_BATTERY_CONFIG:          0x2005,
+    MSPV2_INAV_SET_BATTERY_CONFIG:      0x2006,
+    MSPV2_INAV_RATE_PROFILE:            0x2007,
+    MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
 };

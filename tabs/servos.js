@@ -9,44 +9,102 @@ TABS.servos.initialize = function (callback) {
         googleAnalytics.sendAppView('Servos');
     }
 
-    function get_servo_configurations() {
-        MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, get_servo_mix_rules);
-    }
+    var loadChainer = new MSPChainerClass();
 
-    function get_servo_mix_rules() {
-        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, get_rc_data);
-    }
+    loadChainer.setChain([
+        mspHelper.loadServoConfiguration,
+        mspHelper.loadRcData,
+        mspHelper.loadBfConfig,
+        mspHelper.loadServoMixRules
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
 
-    function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, get_boxnames_data);
-    }
+    var saveChainer = new MSPChainerClass();
 
-    function get_boxnames_data() {
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, load_html);
-    }
+    saveChainer.setChain([
+        mspHelper.sendServoConfigurations,
+        mspHelper.sendServoMixer,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(function () {
+        GUI.log(chrome.i18n.getMessage('servosEepromSave'));
+        SERVO_RULES.cleanup();
+        renderServoMixRules();
+    });
 
     function load_html() {
         $('#content').load("./tabs/servos.html", process_html);
     }
 
-    get_servo_configurations();
+    function renderServoMixRules() {
+
+        var $servoMixTable = $('#servo-mix-table'),
+            $servoMixTableBody = $servoMixTable.find('tbody');
+
+        /*
+         * Process servo mix table UI
+         */
+        var rules = SERVO_RULES.get();
+        $servoMixTableBody.find("*").remove();
+        for (servoRuleIndex in rules) {
+            if (rules.hasOwnProperty(servoRuleIndex)) {
+                const servoRule = rules[servoRuleIndex];
+
+                $servoMixTableBody.append('\
+                    <tr>\
+                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
+                    <td><select class="mix-rule-input"></select></td>\
+                    <td><input type="number" class="mix-rule-rate" step="1" min="-100" max="100" /></td>\
+                    <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td><span class="btn default_btn narrow"><a href="#" data-role="role-delete" data-i18n="servoMixerDelete"></a></span></td>\
+                    </tr>\
+                ');
+
+                const $row = $servoMixTableBody.find('tr:last');
+
+                GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
+                
+                $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
+                    servoRule.setInput($(this).val());
+                });
+
+                $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
+                    servoRule.setTarget($(this).val());
+                });
+
+                $row.find(".mix-rule-rate").val(servoRule.getRate()).change(function () {
+                    servoRule.setRate($(this).val());
+                });
+
+                $row.find(".mix-rule-speed").val(servoRule.getSpeed()).change(function () {
+                    servoRule.setSpeed($(this).val());
+                });
+                
+                $row.find("[data-role='role-delete']").attr("data-index", servoRuleIndex);
+            }
+
+        }
+        localize();
+    }
 
     function update_ui() {
 
         var i,
-            $tabServos = $(".tab-servos");
+            $tabServos = $(".tab-servos"),
+            $servoConfigTable = $('#servo-config-table'),
+            $servoMixTable = $('#servo-mix-table'),
+            $servoMixTableBody = $servoMixTable.find('tbody');
 
         if (SERVO_CONFIG.length == 0) {
-            $tabServos.removeClass("supported");
+            $tabServos.addClass("is-hidden");
             return;
         }
 
-        $tabServos.addClass("supported");
-
         var servoCheckbox = '';
         var servoHeader = '';
-        for (i = 0; i < RC.active_channels-4; i++) {
-            servoHeader = servoHeader + '<th class="short">CH' + (i+5) + '</th>';
+        for (i = 0; i < RC.active_channels - 4; i++) {
+            servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
         }
         servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
 
@@ -54,18 +112,16 @@ TABS.servos.initialize = function (callback) {
             servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
         }
 
-        $('div.tab-servos table.fields tr.main').append(servoHeader);
+        $servoConfigTable.find('tr.main').append(servoHeader);
 
         function process_servos(name, alternate, obj) {
 
-            $('div.supported_wrapper').show();
-
-            $('div.tab-servos table.fields').append('\
+            $servoConfigTable.append('\
                 <tr> \
                     <td style="text-align: center">' + name + '</td>\
                     <td class="middle"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].middle + '" /></td>\
-                    <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min +'" /></td>\
-                    <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max +'" /></td>\
+                    <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min + '" /></td>\
+                    <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max + '" /></td>\
                     ' + servoCheckbox + '\
                     <td class="direction">\
                     </td>\
@@ -73,13 +129,13 @@ TABS.servos.initialize = function (callback) {
             ');
 
             if (SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
-                $('div.tab-servos table.fields tr:last td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
+                $servoConfigTable.find('tr:last td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
             }
 
             // adding select box and generating options
-            $('div.tab-servos table.fields tr:last td.direction').append('<select class="rate" name="rate"></select>');
+            $servoConfigTable.find('tr:last td.direction').append('<select class="rate" name="rate"></select>');
 
-            var select = $('div.tab-servos table.fields tr:last td.direction select');
+            var select = $servoConfigTable.find('tr:last td.direction select');
 
             for (var i = FC.MAX_SERVO_RATE; i >= FC.MIN_SERVO_RATE; i--) {
                 select.append('<option value="' + i + '">Rate: ' + i + '%</option>');
@@ -88,20 +144,20 @@ TABS.servos.initialize = function (callback) {
             // select current rate
             select.val(SERVO_CONFIG[obj].rate);
 
-            $('div.tab-servos table.fields tr:last').data('info', {'obj': obj});
+            $servoConfigTable.find('tr:last').data('info', { 'obj': obj });
 
             // UI hooks
 
             // only one checkbox for indicating a channel to forward can be selected at a time, perhaps a radio group would be best here.
-            $('div.tab-servos table.fields tr:last td.channel input').click(function () {
-                if($(this).is(':checked')) {
+            $servoConfigTable.find('tr:last td.channel input').click(function () {
+                if ($(this).is(':checked')) {
                     $(this).parent().parent().find('.channel input').not($(this)).prop('checked', false);
                 }
             });
         }
 
         function servos_update(save_configuration_to_eeprom) {
-            $('div.tab-servos table.fields tr:not(".main")').each(function () {
+            $servoConfigTable.find('tr:not(".main")').each(function () {
                 var info = $(this).data('info');
 
 
@@ -113,42 +169,28 @@ TABS.servos.initialize = function (callback) {
 
                 SERVO_CONFIG[info.obj].indexOfChannelToForward = channelIndex;
 
-
                 SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
                 SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
                 SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
                 SERVO_CONFIG[info.obj].rate = parseInt($('.direction select', this).val());
             });
 
-            //
-            // send data to FC
-            //
-            //FIXME investigate why the same frame is sent twice
-            mspHelper.sendServoConfigurations(send_servo_mixer_rules);
-
-            function send_servo_mixer_rules() {
-                mspHelper.sendServoConfigurations(save_to_eeprom);
-            }
-
-            function save_to_eeprom() {
-                if (save_configuration_to_eeprom) {
-                    MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('servosEepromSave'));
-                    });
-                }
-            }
+            //Save configuration to FC
+            SERVO_RULES.cleanup();
+            SERVO_RULES.inflate();
+            saveChainer.execute();
 
         }
 
         // drop previous table
-        $('div.tab-servos table.fields tr:not(:first)').remove();
+        $servoConfigTable.find('tr:not(:first)').remove();
 
         for (var servoIndex = 0; servoIndex < 8; servoIndex++) {
             process_servos('Servo ' + servoIndex, '', servoIndex, false);
         }
 
         // UI hooks for dynamically generated elements
-        $('table.directions select, table.directions input, table.fields select, table.fields input').change(function () {
+        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').change(function () {
             if ($('div.live input').is(':checked')) {
                 // apply small delay as there seems to be some funky update business going wrong
                 helper.timeout.add('servos_update', servos_update, 10);
@@ -159,6 +201,19 @@ TABS.servos.initialize = function (callback) {
             servos_update(true);
         });
 
+        $servoMixTableBody.on('click', "[data-role='role-delete']", function (event) {
+            SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
+            renderServoMixRules();
+        });
+
+        $("[data-role='role-add']").click(function () {
+            if (SERVO_RULES.hasFreeSlots()) {
+                SERVO_RULES.put(new ServoMixRule(0, 0, 0, 0));
+                renderServoMixRules();
+            }
+        });
+
+        renderServoMixRules();
     }
 
     function process_html() {

@@ -176,6 +176,7 @@
     color: white;
     border-right: 1px solid silver;
     font-weight: normal;
+    width: 50%;
 }
 
 .tab-receiver .tunings table th:first-child {

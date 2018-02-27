@@ -9,7 +9,7 @@ var MSPChainerClass = function () {
     self.exitPoint = null;
     self.chainIndex = 0;
 
-    self.setChain = function(chain) {
+    self.setChain = function (chain) {
         self.chain = chain;
     };
 
@@ -21,12 +21,12 @@ var MSPChainerClass = function () {
         self.chainIndex++;
         if (self.chain[self.chainIndex]) {
             self.chain[self.chainIndex](self.returnCallback);
-        } else {
+        } else if (self.exitPoint) {
             self.exitPoint();
         }
     };
 
-    self.execute = function() {
+    self.execute = function () {
         self.chainIndex = 0;
         self.chain[self.chainIndex](self.returnCallback);
     };

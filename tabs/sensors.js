@@ -482,6 +482,26 @@ TABS.sensors.initialize = function (callback) {
             }
         });
 
+        $("a.debug-trace").click(function () {
+            var windowWidth = 500;
+            var windowHeight = 510;
+
+            chrome.app.window.create("/tabs/debug_trace.html", {
+                id: "debug_trace",
+                innerBounds: {
+                    minWidth: windowWidth, minHeight: windowHeight,
+                    width: windowWidth, height: windowHeight,
+                },
+                alwaysOnTop: true
+            }, function (createdWindow) {
+                createdWindow.contentWindow.getDebugTrace = function () { return DEBUG_TRACE || ''; };
+                return true;
+            });
+            return false;
+        });
+
+
+
         GUI.content_ready(callback);
     });
 };

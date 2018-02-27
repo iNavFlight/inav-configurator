@@ -1107,6 +1107,17 @@ dialog {
     opacity: 0.5;
 }
 
+.content_toolbar .btn-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+}
+
+.content_toolbar .btn-danger a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+
 .toolbar_scroll_bottom .content_wrapper {
     /*  content wrapper in view with toolbar in scroll bottom
       leave 50px space for the toolbar
@@ -1313,6 +1324,15 @@ dialog {
     margin-bottom: 10px;
     margin-top: 0;
     float: left;
+}
+
+.default_btn.narrow {
+    width: auto;
+    margin-bottom: 0;
+}
+
+.default_btn.narrow a {
+    padding: 5px;
 }
 
 .default_btn a {
@@ -1649,7 +1669,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 90px;
+    width: 100px;
     float: right;
     margin-right: 20px;
     line-height: 12px;
@@ -1741,6 +1761,7 @@ dialog {
 .bottomStatusIcons {
     background-color: #272727;
     height: 31px;
+    margin-left: 5px;
     margin-top: 2px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;

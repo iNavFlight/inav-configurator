@@ -23,10 +23,12 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    MISSION_PLANER,
     ANALOG,
     ARMING_CONFIG,
     FC_CONFIG,
     MISC,
+    VOLTMETER_CONFIG,
     _3D,
     DATAFLASH,
     SDCARD,
@@ -47,7 +49,8 @@ var CONFIG,
     CALIBRATION_DATA,
     POSITION_ESTIMATOR,
     RTH_AND_LAND_CONFIG,
-    FW_CONFIG;
+    FW_CONFIG,
+    DEBUG_TRACE;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -140,7 +143,12 @@ var FC = {
             throttle_MID: 0,
             throttle_EXPO: 0,
             dynamic_THR_breakpoint: 0,
-            RC_YAW_EXPO: 0
+            RC_YAW_EXPO: 0,
+            manual_RC_EXPO: 0,
+            manual_RC_YAW_EXPO: 0,
+            manual_roll_rate: 0,
+            manual_pitch_rate: 0,
+            manual_yaw_rate: 0,
         };
 
         AUX_CONFIG = [];
@@ -150,7 +158,7 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = [];
+        SERVO_RULES = new ServoMixRuleCollection();
 
         SERIAL_CONFIG = {
             ports: [],
@@ -196,11 +204,33 @@ var FC = {
             packetCount: 0
         };
 
+        MISSION_PLANER = {
+            maxWaypoints: 0,
+            isValidMission: 0,
+            countBusyPoints: 0,
+            bufferPoint: {
+                number: 0,
+                action: 0,
+                lat: 0,
+                lon: 0,
+                alt: 0,
+                endMission: 0
+            }
+        };
+
         ANALOG = {
             voltage: 0,
             mAhdrawn: 0,
+            mWhdrawn: 0,
             rssi: 0,
-            amperage: 0
+            amperage: 0,
+            power: 0,
+            cell_count: 0,
+            battery_percentage: 0,
+            battery_full_when_plugged_in: false,
+            use_capacity_thresholds: false,
+            battery_remaining_capacity: 0,
+            battery_flags: 0
         };
 
         ARMING_CONFIG = {
@@ -228,7 +258,24 @@ var FC = {
             vbatscale: 0,
             vbatmincellvoltage: 0,
             vbatmaxcellvoltage: 0,
-            vbatwarningcellvoltage: 0
+            vbatwarningcellvoltage: 0,
+            battery_capacity: 0,
+            battery_capacity_warning: 0,
+            battery_capacity_critical: 0,
+            battery_capacity_unit: 'mAh'
+        };
+
+        BATTERY_CONFIG = {
+            vbatscale: 0,
+            vbatmincellvoltage: 0,
+            vbatmaxcellvoltage: 0,
+            vbatwarningcellvoltage: 0,
+            current_offset: 0,
+            current_scale: 0,
+            capacity: 0,
+            capacity_warning: 0,
+            capacity_critical: 0,
+            capacity_unit: 0
         };
 
         ADVANCED_CONFIG = {
@@ -495,6 +542,13 @@ var FC = {
         if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
             features.push(
                 {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
+            );
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+            features.push(
+                {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
+                {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
             );
         }
 
@@ -835,13 +889,13 @@ var FC = {
         }
     },
     getOsdDisabledFields: function () {
-        return ['CRAFT_NAME'];
+        return [];
     },
     getAccelerometerNames: function () {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
     },
     getMagnetometerNames: function () {
-        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "FAKE"];
+        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "FAKE"];
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
@@ -860,7 +914,7 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10"];
+        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "UIB"];
     },
     getArmingFlags: function () {
         return {
@@ -935,5 +989,27 @@ var FC = {
     },
     getRcMapLetters: function () {
         return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
+    },
+    getServoMixInputNames: function () {
+        return [
+            'Stabilised Roll',
+            'Stabilised Pitch',
+            'Stabilised Yaw',
+            'Stabilised Throttle',
+            'RC Roll',
+            'RC Pitch',
+            'RC Yaw',
+            'RC Throttle',
+            'RC Channel 5',
+            'RC Channel 6',
+            'RC Channel 7',
+            'RC Channel 8',
+            'Gimbal Pitch',
+            'Gimbal Roll',
+            'Flaps'
+        ];
+    },
+    getServoMixInputName: function (input) {
+        return getServoMixInputNames()[input];
     }
 };

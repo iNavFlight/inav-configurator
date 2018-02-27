@@ -10,11 +10,22 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         googleAnalytics.sendAppView('Configuration');
     }
 
+    var craftName = null;
+    var loadCraftName = function(callback) {
+        mspHelper.getCraftName(function(name) {
+            craftName = name;
+            callback();
+        });
+    };
+
+    var saveCraftName = function(callback) {
+        mspHelper.setCraftName(craftName, callback);
+    };
+
     var loadChainer = new MSPChainerClass();
 
-    loadChainer.setChain([
+    var loadChain = [
         mspHelper.loadBfConfig,
-        mspHelper.loadMisc,
         mspHelper.loadArmingConfig,
         mspHelper.loadLoopTime,
         mspHelper.loadRxConfig,
@@ -22,16 +33,24 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig
-    ]);
+        mspHelper.loadSensorConfig,
+        loadCraftName
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        loadChain.push(mspHelper.loadMiscV2);
+    } else {
+        loadChain.push(mspHelper.loadMisc);
+    }
+
+    loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
     var saveChainer = new MSPChainerClass();
 
-    saveChainer.setChain([
+    var saveChain = [
         mspHelper.saveBfConfig,
-        mspHelper.saveMisc,
         mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
@@ -41,8 +60,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
-        mspHelper.saveToEeprom
-    ]);
+        saveCraftName,
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        saveChain.push(mspHelper.saveMiscV2);
+    } else {
+        saveChain.push(mspHelper.saveMisc);
+    }
+
+    saveChain.push(mspHelper.saveToEeprom);
+
+    saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);
 
     function reboot() {
@@ -295,7 +324,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
 
-        // fill battery
+        // Battery thresholds resolution is 100mV and voltage scale max is 255 before 1.8.1
+        if (semver.lt(CONFIG.flightControllerVersion, '1.8.1')) {
+            $('#mincellvoltage').attr('step', '0.1');
+            $('#maxcellvoltage').attr('step', '0.1');
+            $('#warningcellvoltage').attr('step', '0.1');
+            $('#voltagescale').attr('max', '255');
+        }
+
+        // fill battery voltage
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
         $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
@@ -304,7 +341,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
         $('#currentoffset').val(BF_CONFIG.currentoffset);
-        $('#multiwiicurrentoutput').prop('checked', MISC.multiwiicurrentoutput);
+
+        // fill battery capacity
+        $('#battery_capacity').val(MISC.battery_capacity);
+        $('#battery_capacity_warning').val(MISC.battery_capacity_warning);
+        $('#battery_capacity_critical').val(MISC.battery_capacity_critical);
+        $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
         var escProtocols = FC.getEscProtocols();
         var servoRates = FC.getServoRates();
@@ -550,6 +592,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_7").hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+            $(".requires-v1_8_1").show();
+        } else {
+            $(".requires-v1_8_1").hide();
+        }
+
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
@@ -597,6 +645,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         });
 
+        // Craft name
+        if (craftName != null) {
+            $('.config-personalization').show();
+            $('input[name="craft_name"]').val(craftName);
+        } else {
+            // craft name not supported by the firmware
+            $('.config-personalization').hide();
+        }
 
         $('a.save').click(function () {
             // gather data that doesn't have automatic change event bound
@@ -619,9 +675,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
             MISC.vbatscale = parseInt($('#voltagescale').val());
 
+            MISC.battery_capacity = parseInt($('#battery_capacity').val());
+            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val());
+            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val());
+            MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
+
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
             BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
-            MISC.multiwiicurrentoutput = ~~$('#multiwiicurrentoutput').is(':checked'); // ~~ boolean to decimal conversion
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
@@ -634,6 +694,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_gyro = parseInt(orientation_gyro_e.val());
             SENSOR_ALIGNMENT.align_acc = parseInt(orientation_acc_e.val());
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
+
+            craftName = $('input[name="craft_name"]').val();
 
             var rxTypes = FC.getRxTypes();
 
@@ -689,7 +751,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         helper.interval.add('config_load_analog', function () {
-            $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
+            } else {
+                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
+            }
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
         GUI.content_ready(callback);

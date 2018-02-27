@@ -50,7 +50,16 @@
     background-color: #f9f9f9;
 }
 
-.tab-servos table tr:first-child {
+#servo-mix-table input {
+    width: 75px;
+}
+
+#servo-mix-table .btn {
+    float: none;
+}
+
+#servo-config-table tr:first-child,
+#servo-mix-table thead tr {
     border-left: 1px solid #e4e4e4;
     border-right: 1px solid #e4e4e4;
     background-color: #828885;
@@ -152,22 +161,6 @@
     width: calc(100% - 20px);
     position: absolute;
     bottom: 10px;
-}
-
-.tab-servos .require-support {
-    display: none;
-}
-
-.tab-servos.supported .require-support {
-    display: block;
-}
-
-.tab-servos .require-upgrade {
-    display: block;
-}
-
-.tab-servos.supported .require-upgrade {
-    display: none;
 }
 
 .tab-servos .live span {
