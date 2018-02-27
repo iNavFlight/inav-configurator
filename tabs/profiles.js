@@ -564,7 +564,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     }
 
     function processHtml() {
-
+        var modal;
         var $presetList = $('#presets-list');
 
         var presetsList = presets.model.extractPresetNames(presets.presets);
@@ -590,7 +590,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
 
         $('#execute-button').click(function () {
             applyAndSave();
-            OSD.GUI.jbox.close();
+            modal.close();
 
             googleAnalytics.sendEvent('Presets', 'Applied', currentPreset.name);
         });
@@ -600,7 +600,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
-        var modal = new jBox('Modal', {
+        modal = new jBox('Modal', {
             width: 600,
             height: 240,
             closeButton: 'title',
