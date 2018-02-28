@@ -411,8 +411,11 @@ TABS.mission_control.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getNextPoint);
     }
 
-
     function getNextPoint() {
+        if (MISSION_PLANER.countBusyPoints == 0) {
+            return;
+        }
+
         var coord;
         if (pointForSend > 0) {
             // console.log(MISSION_PLANER.bufferPoint.lon);
