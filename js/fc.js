@@ -214,7 +214,8 @@ var FC = {
                 lat: 0,
                 lon: 0,
                 alt: 0,
-                endMission: 0
+                endMission: 0,
+                p1: 0
             }
         };
 
