@@ -303,8 +303,8 @@ TABS.mission_control.initialize = function (callback) {
                 var geometry = selectedFeature.getGeometry();
                 var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
-                $('#pointLat').val(coord[0]);
-                $('#pointLon').val(coord[1]);
+                $('#pointLon').val(coord[0]);
+                $('#pointLat').val(coord[1]);
                 $('#pointAlt').val(selectedMarker.alt);
                 $('#pointType').val(selectedMarker.action);
             } else {
