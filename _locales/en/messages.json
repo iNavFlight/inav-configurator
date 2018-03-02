@@ -684,12 +684,6 @@
     "configurationAutoDisarmDelayHelp": {
         "message": "Requires MOTOR_STOP feature"
     },
-    "configurationDisarmKillSwitch": {
-        "message": "Disarm regardless of throttle value"
-    },
-    "configurationDisarmKillSwitchHelp": {
-        "message": "When arming via radio channel"
-    },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
     },
