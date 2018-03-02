@@ -360,7 +360,7 @@ TABS.mission_control.initialize = function (callback) {
                 map.getLayers().forEach(function (t) {
                     if (t === selectedMarker) {
                         var geometry = t.getSource().getFeatures()[0].getGeometry();
-                        geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLat').val()), parseFloat($('#pointLon').val())]));
+                        geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLon').val()), parseFloat($('#pointLat').val())]));
                         t.alt = $('#pointAlt').val();
                         t.action = $('#pointType').val();
                         t.speedValue = $('#pointSpeed').val();
