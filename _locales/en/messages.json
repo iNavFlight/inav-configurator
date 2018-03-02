@@ -679,10 +679,10 @@
         "message": "Magnetometer Declination [deg]"
     },
     "configurationAutoDisarmDelay": {
-        "message": "Disarm delay [Seconds]"
+        "message": "Seconds until disarm due to low THR"
     },
     "configurationAutoDisarmDelayHelp": {
-        "message": "Requires MOTOR_STOP feature"
+        "message": "Only used for stick arming (i.e. not using a switch)"
     },
     "configurationDisarmKillSwitch": {
         "message": "Disarm regardless of throttle value"
