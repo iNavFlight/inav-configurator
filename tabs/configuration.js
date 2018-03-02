@@ -344,8 +344,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
-        $('#battery_capacity_warning').val(MISC.battery_capacity_warning);
-        $('#battery_capacity_critical').val(MISC.battery_capacity_critical);
+        $('#battery_capacity_warning').val(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
+        $('#battery_capacity_critical').val(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
         var escProtocols = FC.getEscProtocols();
@@ -676,8 +676,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.vbatscale = parseInt($('#voltagescale').val());
 
             MISC.battery_capacity = parseInt($('#battery_capacity').val());
-            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val());
-            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val());
+            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
+            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
