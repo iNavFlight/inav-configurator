@@ -310,7 +310,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         //fill motor disarm params and FC loop time
         $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-        $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
         $('div.disarm').show();
         if(bit_check(BF_CONFIG.features, 4)) {//MOTOR_STOP
             $('div.disarmdelay').show();
@@ -663,7 +662,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
-            ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
 
             MISC.minthrottle = parseInt($('#minthrottle').val());
             MISC.midrc = parseInt($('#midthrottle').val());
