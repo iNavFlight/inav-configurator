@@ -59,19 +59,21 @@ $(document).ready(function () {
             }
         });
 
+        win.setMinimumSize(1024, 800);
+
         win.on('close', function () {
             //Save window size and position
-            var height = win.height;
-            var width = win.width;
+            // var height = win.height;
+            // var width = win.width;
+            //
+            // if (height < 400) {
+            //     height = 400
+            // }
+            // if (width < 512) {
+            //     width = 512
+            // }
 
-            if (height < 400) {
-                height = 400
-            }
-            if (width < 512) {
-                width = 512
-            }
-
-            chrome.storage.local.set({'windowSize': {height: height, width: width, x: win.x, y: win.y}}, function () {
+            chrome.storage.local.set({'windowSize': {height: win.height, width: win.width, x: win.x, y: win.y}}, function () {
                 // Notify that we saved.
                 console.log('Settings saved');
             });
