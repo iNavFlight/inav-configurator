@@ -112,7 +112,7 @@ TABS.calibration.initialize = function (callback) {
         var pos = ['X', 'Y', 'Z'];
         pos.forEach(function (item) {
             $('[name=accGain' + item + ']').val(CALIBRATION_DATA.accGain[item]);
-            $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accGain[item]);
+            $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accZero[item]);
             $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
         });
         updateCalibrationSteps();
