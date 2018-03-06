@@ -36,6 +36,7 @@ SYM.AIR = 151;
 SYM.DIR_TO_HOME = 0x60;
 SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
+SYM.TRIP_DIST = 0x22;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.HEADING_N = 24;
@@ -666,6 +667,18 @@ OSD.constants = {
                             return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
                         }
                         return FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                    }
+                },
+                {
+                    name: 'TRIP_DIST',
+                    id: 40,
+                    min_version: '1.9.1',
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        }
+                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {

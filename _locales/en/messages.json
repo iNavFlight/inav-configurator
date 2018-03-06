@@ -2358,6 +2358,9 @@
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
     },
+    "osdElement_TRIP_DIST": {
+        "message": "Trip distance"
+    },
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
