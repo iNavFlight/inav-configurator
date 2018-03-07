@@ -230,6 +230,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SONAR:
                 SENSOR_DATA.sonar = data.getInt32(0, true);
                 break;
+            case MSPCodes.MSPV2_INAV_AIR_SPEED:
+                SENSOR_DATA.air_speed = data.getInt32(0, true);
+                break;
             case MSPCodes.MSP_ANALOG:
                 ANALOG.voltage = data.getUint8(0) / 10.0;
                 ANALOG.mAhdrawn = data.getUint16(1, true);

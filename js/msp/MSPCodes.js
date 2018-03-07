@@ -164,4 +164,5 @@ var MSPCodes = {
     MSPV2_INAV_SET_BATTERY_CONFIG:      0x2006,
     MSPV2_INAV_RATE_PROFILE:            0x2007,
     MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
+    MSPV2_INAV_AIR_SPEED:               0x2009,
 };
