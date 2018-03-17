@@ -319,8 +319,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                         $('div.release_info .status').text(summary.status);
                         $('div.release_info .file').text(summary.file).prop('href', summary.url);
 
-                        var formattedNotes = summary.notes.trim('\r').replace(/\r/g, '<br />');
+                        var formattedNotes = marked(summary.notes);
                         $('div.release_info .notes').html(formattedNotes);
+                        // Make links in the release notes open in a new window
+                        $('div.release_info .notes a').each(function () {
+                            $(this).attr('target', '_blank');
+                        });
 
                         $('div.release_info').slideDown();
 
