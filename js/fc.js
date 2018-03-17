@@ -177,6 +177,7 @@ var FC = {
             altitude: 0,
             barometer: 0,
             sonar: 0,
+            air_speed: 0,
             kinematics: [0.0, 0.0, 0.0],
             debug: [0, 0, 0, 0]
         };
@@ -214,7 +215,8 @@ var FC = {
                 lat: 0,
                 lon: 0,
                 alt: 0,
-                endMission: 0
+                endMission: 0,
+                p1: 0
             }
         };
 

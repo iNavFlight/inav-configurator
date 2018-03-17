@@ -310,7 +310,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         //fill motor disarm params and FC loop time
         $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-        $('input[name="disarmkillswitch"]').prop('checked', ARMING_CONFIG.disarm_kill_switch);
         $('div.disarm').show();
         if(bit_check(BF_CONFIG.features, 4)) {//MOTOR_STOP
             $('div.disarmdelay').show();
@@ -344,8 +343,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
-        $('#battery_capacity_warning').val(MISC.battery_capacity_warning);
-        $('#battery_capacity_critical').val(MISC.battery_capacity_critical);
+        $('#battery_capacity_warning').val(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
+        $('#battery_capacity_critical').val(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
         var escProtocols = FC.getEscProtocols();
@@ -663,7 +662,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
-            ARMING_CONFIG.disarm_kill_switch = ~~$('input[name="disarmkillswitch"]').is(':checked'); // ~~ boolean to decimal conversion
 
             MISC.minthrottle = parseInt($('#minthrottle').val());
             MISC.midrc = parseInt($('#midthrottle').val());
@@ -676,8 +674,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.vbatscale = parseInt($('#voltagescale').val());
 
             MISC.battery_capacity = parseInt($('#battery_capacity').val());
-            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val());
-            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val());
+            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
+            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());

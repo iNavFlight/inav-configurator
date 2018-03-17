@@ -679,16 +679,10 @@
         "message": "Magnetometer Declination [deg]"
     },
     "configurationAutoDisarmDelay": {
-        "message": "Disarm delay [Seconds]"
+        "message": "Seconds until disarm due to low THR"
     },
     "configurationAutoDisarmDelayHelp": {
-        "message": "Requires MOTOR_STOP feature"
-    },
-    "configurationDisarmKillSwitch": {
-        "message": "Disarm regardless of throttle value"
-    },
-    "configurationDisarmKillSwitchHelp": {
-        "message": "When arming via radio channel"
+        "message": "Only used for stick arming (i.e. not using a switch)"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -739,10 +733,10 @@
         "message": "Capacity"
     },
     "configurationBatteryCapacityWarning": {
-        "message": "Warning Capacity"
+        "message": "Warning Capacity (%)"
     },
     "configurationBatteryCapacityCritical": {
-        "message": "Critical Capacity"
+        "message": "Critical Capacity (%)"
     },
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
@@ -2364,6 +2358,9 @@
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
     },
+    "osdElement_TRIP_DIST": {
+        "message": "Trip distance"
+    },
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
@@ -2441,6 +2438,9 @@
     },
     "missionTotalInformationHead": {
         "message": "Total information"
+    },
+    "missionRTHsettingsTitle": {
+        "message": "RTH settings"
     },
     "useOnlyStandalone": {
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."

@@ -15,6 +15,7 @@ TABS.sensors.initialize = function (callback) {
             SENSOR_DATA.gyroscope[i] = 0;
             SENSOR_DATA.magnetometer[i] = 0;
             SENSOR_DATA.sonar = 0;
+            SENSOR_DATA.air_speed = 0;
             SENSOR_DATA.altitude = 0;
             SENSOR_DATA.debug[i] = 0;
         }
@@ -172,6 +173,14 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
+    function plot_airspeed(enable) {
+        if (enable) {
+            $('.wrapper.airspeed').show();
+        } else {
+            $('.wrapper.airspeed').hide();
+        }
+    }
+
     function plot_debug(enable) {
         if (enable) {
             $('.wrapper.debug').show();
@@ -191,6 +200,10 @@ TABS.sensors.initialize = function (callback) {
         }
         if (!bit_check(CONFIG.activeSensors, 4)) { // sonar
             checkboxes.eq(4).prop('disabled', true);
+        }
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.9.1") || (!bit_check(CONFIG.activeSensors, 6))) { // airspeed
+            checkboxes.eq(5).prop('disabled', true);
         }
 
         $('.tab-sensors .info .checkboxes input').change(function () {
@@ -214,6 +227,9 @@ TABS.sensors.initialize = function (callback) {
                     plot_sonar(enable);
                     break;
                 case 5:
+                    plot_airspeed(enable);
+                    break;
+                case 6:
                     plot_debug(enable);
                     break;
             }
@@ -248,12 +264,14 @@ TABS.sensors.initialize = function (callback) {
             samples_mag_i = 0,
             samples_altitude_i = 0,
             samples_sonar_i = 0,
+            samples_airspeed_i = 0,
             samples_debug_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
             altitude_data = (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) ? initDataArray(2) : initDataArray(1),
             sonar_data = initDataArray(1),
+            airspeed_data = initDataArray(1),
             debug_data = [
             initDataArray(1),
             initDataArray(1),
@@ -266,6 +284,7 @@ TABS.sensors.initialize = function (callback) {
         var magHelpers = initGraphHelpers('#mag', samples_mag_i, [-1, 1]);
         var altitudeHelpers = initGraphHelpers('#altitude', samples_altitude_i);
         var sonarHelpers = initGraphHelpers('#sonar', samples_sonar_i);
+        var airspeedHelpers = initGraphHelpers('#airspeed', samples_airspeed_i);
         var debugHelpers = [
             initGraphHelpers('#debug1', samples_debug_i),
             initGraphHelpers('#debug2', samples_debug_i),
@@ -304,6 +323,8 @@ TABS.sensors.initialize = function (callback) {
                 $('.tab-sensors select[name="baro_refresh_rate"]').val(result.sensor_settings.rates.baro);
                 $('.tab-sensors select[name="sonar_refresh_rate"]').val(result.sensor_settings.rates.sonar);
 
+                $('.tab-sensors select[name="airspeed_refresh_rate"]').val(result.sensor_settings.rates.airspeed);
+
                 $('.tab-sensors select[name="debug_refresh_rate"]').val(result.sensor_settings.rates.debug);
 
                 // start polling data by triggering refresh rate change event
@@ -318,12 +339,13 @@ TABS.sensors.initialize = function (callback) {
             // if any of the select fields change value, all of the select values are grabbed
             // and timers are re-initialized with the new settings
             var rates = {
-                'gyro':   parseInt($('.tab-sensors select[name="gyro_refresh_rate"]').val(), 10),
-                'accel':  parseInt($('.tab-sensors select[name="accel_refresh_rate"]').val(), 10),
-                'mag':    parseInt($('.tab-sensors select[name="mag_refresh_rate"]').val(), 10),
-                'baro':   parseInt($('.tab-sensors select[name="baro_refresh_rate"]').val(), 10),
-                'sonar':  parseInt($('.tab-sensors select[name="sonar_refresh_rate"]').val(), 10),
-                'debug':  parseInt($('.tab-sensors select[name="debug_refresh_rate"]').val(), 10)
+                'gyro':      parseInt($('.tab-sensors select[name="gyro_refresh_rate"]').val(), 10),
+                'accel':     parseInt($('.tab-sensors select[name="accel_refresh_rate"]').val(), 10),
+                'mag':       parseInt($('.tab-sensors select[name="mag_refresh_rate"]').val(), 10),
+                'baro':      parseInt($('.tab-sensors select[name="baro_refresh_rate"]').val(), 10),
+                'sonar':     parseInt($('.tab-sensors select[name="sonar_refresh_rate"]').val(), 10),
+                'airspeed':  parseInt($('.tab-sensors select[name="airspeed_refresh_rate"]').val(), 10),
+                'debug':     parseInt($('.tab-sensors select[name="debug_refresh_rate"]').val(), 10)
             };
 
             var scales = {
@@ -402,6 +424,21 @@ TABS.sensors.initialize = function (callback) {
             }
 
             if (checkboxes[5]) {
+                helper.interval.add('airspeed_pull', function airspeed_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_airspeed_graphs();
+                        return;
+                    }
+
+                    MSP.send_message(MSPCodes.MSPV2_INAV_AIR_SPEED, false, false, update_airspeed_graphs);
+                }, rates.airspeed, true);
+            }
+
+            if (checkboxes[6]) {
                 helper.interval.add('debug_pull', function debug_data_pull() {
 
                     /*
@@ -470,13 +507,21 @@ TABS.sensors.initialize = function (callback) {
                 raw_data_text_ements.x[4].text(SENSOR_DATA.sonar.toFixed(2));
             }
 
+            function update_airspeed_graphs() {
+                updateGraphHelperSize(airspeedHelpers);
+
+                samples_airspeed_i = addSampleToData(airspeed_data, samples_airspeed_i, [SENSOR_DATA.air_speed]);
+                drawGraph(airspeedHelpers, airspeed_data, samples_airspeed_i);
+                raw_data_text_ements.x[5].text(SENSOR_DATA.air_speed);
+            }
+
             function update_debug_graphs() {
                 for (var i = 0; i < 4; i++) {
                     updateGraphHelperSize(debugHelpers[i]);
 
                     addSampleToData(debug_data[i], samples_debug_i, [SENSOR_DATA.debug[i]]);
                     drawGraph(debugHelpers[i], debug_data[i], samples_debug_i);
-                    raw_data_text_ements.x[5 + i].text(SENSOR_DATA.debug[i]);
+                    raw_data_text_ements.x[6 + i].text(SENSOR_DATA.debug[i]);
                 }
                 samples_debug_i++;
             }

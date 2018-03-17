@@ -47,7 +47,9 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointLat').val('');
         $('#pointLon').val('');
         $('#pointAlt').val('');
-        $('[name=pointNumber]').val('')
+        $('#pointSpeed').val('');
+        $('[name=pointNumber]').val('');
+        $('#MPeditPoint').fadeOut(300);
     }
 
     function repaint() {
@@ -100,7 +102,7 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function addMarker(_pos, _alt, _action) {
+    function addMarker(_pos, _alt, _action, _speed) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -140,6 +142,7 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.alt = _alt;
         vectorLayer.number = markers.length;
         vectorLayer.action = _action;
+        vectorLayer.speedValue = _speed;
 
         markers.push(vectorLayer);
 
@@ -303,10 +306,12 @@ TABS.mission_control.initialize = function (callback) {
                 var geometry = selectedFeature.getGeometry();
                 var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
-                $('#pointLat').val(coord[0]);
-                $('#pointLon').val(coord[1]);
+                $('#pointLon').val(coord[0]);
+                $('#pointLat').val(coord[1]);
                 $('#pointAlt').val(selectedMarker.alt);
                 $('#pointType').val(selectedMarker.action);
+                $('#pointSpeed').val(selectedMarker.speedValue);
+                $('#MPeditPoint').fadeIn(300);
             } else {
                 map.addLayer(addMarker(evt.coordinate, 1500, 1));
                 repaint();
@@ -355,9 +360,10 @@ TABS.mission_control.initialize = function (callback) {
                 map.getLayers().forEach(function (t) {
                     if (t === selectedMarker) {
                         var geometry = t.getSource().getFeatures()[0].getGeometry();
-                        geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLat').val()), parseFloat($('#pointLon').val())]));
+                        geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLon').val()), parseFloat($('#pointLat').val())]));
                         t.alt = $('#pointAlt').val();
                         t.action = $('#pointType').val();
+                        t.speedValue = $('#pointSpeed').val();
                     }
                 });
 
@@ -394,6 +400,14 @@ TABS.mission_control.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, false, false);
         });
 
+        $('#rthEndMission').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#rthSettings').fadeIn(300);
+            } else {
+                $('#rthSettings').fadeOut(300);
+            }
+        });
+
         updateTotalInfo();
     }
 
@@ -422,15 +436,23 @@ TABS.mission_control.initialize = function (callback) {
             // console.log(MISSION_PLANER.bufferPoint.lat);
             // console.log(MISSION_PLANER.bufferPoint.alt);
             // console.log(MISSION_PLANER.bufferPoint.action);
-
-            coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
-            map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action));
+            if (MISSION_PLANER.bufferPoint.action == 4) {
+                $('#rthEndMission').trigger('click');
+                if (MISSION_PLANER.bufferPoint.p1 > 0) {
+                    $('#rthLanding').trigger('click');
+                }
+            } else {
+                coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+                map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action, MISSION_PLANER.bufferPoint.p1));
+                if (pointForSend === 1) {
+                    map.getView().setCenter(coord);
+                }
+            }
         }
 
         if (pointForSend >= MISSION_PLANER.countBusyPoints) {
             GUI.log('End get point');
             $('#loadMissionButton').removeClass('disabled');
-            map.getView().setCenter(coord);
             repaint();
             updateTotalInfo();
             return;
@@ -444,12 +466,22 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function sendNextPoint() {
+        var isRTH = $('#rthEndMission').is(':checked');
+
         if (pointForSend >= markers.length) {
-            GUI.log('End send point');
+            if (isRTH) {
+                MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+                MISSION_PLANER.bufferPoint.action = 4;
+                MISSION_PLANER.bufferPoint.lon = 0;
+                MISSION_PLANER.bufferPoint.lat = 0;
+                MISSION_PLANER.bufferPoint.alt = 0;
+                MISSION_PLANER.bufferPoint.endMission = 0xA5;
+                MISSION_PLANER.bufferPoint.p1 = $('#rthLanding').is(':checked') ? 1 : 0;
+                MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, endSendPoint);
+            } else {
+                endSendPoint();
+            }
 
-            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, updateTotalInfo);
-
-            $('#saveMissionButton').removeClass('disabled');
             return;
         }
 
@@ -461,14 +493,23 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
         MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
         MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+        MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].speedValue;
         pointForSend++;
-        if (pointForSend >= markers.length) {
+        if (pointForSend >= markers.length && !isRTH) {
             MISSION_PLANER.bufferPoint.endMission = 0xA5;
         } else {
             MISSION_PLANER.bufferPoint.endMission = 0;
         }
 
         MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, sendNextPoint);
+    }
+
+    function endSendPoint() {
+        GUI.log('End send point');
+
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, updateTotalInfo);
+
+        $('#saveMissionButton').removeClass('disabled');
     }
 };
 
