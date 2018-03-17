@@ -774,6 +774,10 @@ var FC = {
             data.push('TBS Crossfire');
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
+            data.push('FPort');
+        }
+
         return data;
     },
     getSPIProtocolTypes: function () {
