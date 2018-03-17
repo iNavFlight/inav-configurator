@@ -8,7 +8,27 @@
     <div class="content_wrapper">
         <div class="cf_column fourth" id="missionControls">
             <div class="spacer_right">
-                <div class="gui_box grey">
+                <div id="missionPlanerSettings" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
+                    </div>
+                    <div class="spacer">
+                        <div class="point">
+                            <label class="point-label" for="pointAlt">Alt (cm): </label>
+                            <input id="MPdefaultPointAlt" type="text" value="0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointSpeed">Speed (cm/s): </label>
+                            <input id="MPdefaultPointSpeed" type="text" value="0" required>
+                        </div>
+                        <div>
+                            <div id="saveSettings" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                                <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="missionPalnerTotalInfo" class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
                     </div>

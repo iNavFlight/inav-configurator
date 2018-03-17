@@ -2442,6 +2442,9 @@
     "missionRTHsettingsTitle": {
         "message": "RTH settings"
     },
+    "missionDefaultSettingsHead": {
+        "message": "Default settings"
+    },
     "useOnlyStandalone": {
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
