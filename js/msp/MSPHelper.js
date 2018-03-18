@@ -611,7 +611,7 @@ var mspHelper = (function (gui) {
                 BF_CONFIG.board_align_pitch = data.getInt16(8, true); // -180 - 360
                 BF_CONFIG.board_align_yaw = data.getInt16(10, true); // -180 - 360
                 BF_CONFIG.currentscale = data.getInt16(12, true);
-                BF_CONFIG.currentoffset = data.getUint16(14, true);
+                BF_CONFIG.currentoffset = data.getInt16(14, true);
                 break;
             case MSPCodes.MSP_SET_BF_CONFIG:
                 console.log('BF_CONFIG saved');
