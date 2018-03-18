@@ -27,6 +27,18 @@ TABS.mission_control.initialize = function (callback) {
 
     function process_html() {
         if (typeof require !== "undefined") {
+            chrome.storage.local.get('missionPlanerSettings', function (result) {
+                if (result.missionPlanerSettings) {
+                    $('#MPdefaultPointAlt').val(result.missionPlanerSettings.alt);
+                    $('#MPdefaultPointSpeed').val(result.missionPlanerSettings.speed);
+                } else {
+                    chrome.storage.local.set({'missionPlanerSettings': {speed: 0, alt: 5000}});
+                    $('#MPdefaultPointAlt').val(5000);
+                    $('#MPdefaultPointSpeed').val(0);
+                }
+            });
+
+
             initMap();
         } else {
             $('#missionMap, #missionControls').hide();
@@ -40,7 +52,7 @@ TABS.mission_control.initialize = function (callback) {
     var markers = [];
     var lines = [];
     var map;
-    var selectedMarker;
+    var selectedMarker = null;
     var pointForSend = 0;
 
     function clearEditForm() {
@@ -102,20 +114,13 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function addMarker(_pos, _alt, _action, _speed) {
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(_pos),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
-        });
-
-        var iconStyle = new ol.style.Style({
+    function getPointIcon(isEdit) {
+        return new ol.style.Style({
             image: new ol.style.Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: '../images/icons/cf_icon_position.png'
+                src: '../images/icons/cf_icon_position' + (isEdit ? '_edit' : '') + '.png'
             }))
 //            text: new ol.style.Text({
 //                text: '10',
@@ -128,8 +133,17 @@ TABS.mission_control.initialize = function (callback) {
 //                })
 //            })
         });
+    }
 
-        iconFeature.setStyle(iconStyle);
+    function addMarker(_pos, _alt, _action, _speed) {
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(_pos),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+
+        iconFeature.setStyle(getPointIcon());
 
         var vectorSource = new ol.source.Vector({
             features: [iconFeature]
@@ -150,11 +164,6 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function initMap() {
-        // var center = ol.proj.fromLonLat([e.data.lon, e.data.lat]);
-        //
-        // mapView.setCenter(center);
-        // iconGeometry.setCoordinates(center);
-
         var app = {};
 
         /**
@@ -197,6 +206,38 @@ TABS.mission_control.initialize = function (callback) {
         };
         ol.inherits(app.Drag, ol.interaction.Pointer);
 
+        /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerSettingsControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#MPeditPoint, #missionPalnerTotalInfo').hide();
+                $('#missionPlanerSettings').fadeIn(300);
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-settings ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP Settings';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerSettingsControl, ol.control.Control);
 
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
@@ -241,7 +282,6 @@ TABS.mission_control.initialize = function (callback) {
             repaint();
         };
 
-
         /**
          * @param {ol.MapBrowserEvent} evt Event.
          */
@@ -265,7 +305,6 @@ TABS.mission_control.initialize = function (callback) {
             }
         };
 
-
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `false` to stop the drag sequence.
@@ -280,6 +319,13 @@ TABS.mission_control.initialize = function (callback) {
         var lon = GPS_DATA.lon / 10000000;
 
         map = new ol.Map({
+            controls: ol.control.defaults({
+                attributionOptions: {
+                    collapsible: false
+                }
+            }).extend([
+                new app.PlannerSettingsControl()
+            ]),
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
                 new ol.layer.Tile({
@@ -294,6 +340,16 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         map.on('click', function (evt) {
+            if (selectedMarker != null) {
+                try {
+                    selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon());
+                    selectedMarker = null;
+                    clearEditForm();
+                } catch (e) {
+                    GUI.log(e);
+                }
+            }
+
             var selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
                 function (feature, layer) {
                     return feature;
@@ -306,6 +362,8 @@ TABS.mission_control.initialize = function (callback) {
                 var geometry = selectedFeature.getGeometry();
                 var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
+                selectedFeature.setStyle(getPointIcon(true));
+
                 $('#pointLon').val(coord[0]);
                 $('#pointLat').val(coord[1]);
                 $('#pointAlt').val(selectedMarker.alt);
@@ -313,7 +371,7 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointSpeed').val(selectedMarker.speedValue);
                 $('#MPeditPoint').fadeIn(300);
             } else {
-                map.addLayer(addMarker(evt.coordinate, 1500, 1));
+                map.addLayer(addMarker(evt.coordinate, $('#MPdefaultPointAlt').val(), 1, $('#MPdefaultPointSpeed').val()));
                 repaint();
             }
         });
@@ -367,6 +425,7 @@ TABS.mission_control.initialize = function (callback) {
                     }
                 });
 
+                selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon());
                 selectedMarker = null;
                 clearEditForm();
                 repaint();
@@ -374,7 +433,12 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadMissionButton').on('click', function () {
-            removeAllPoints();
+            if (markers.length) {
+                if (!confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
+                    return;
+                }
+                removeAllPoints();
+            }
             $(this).addClass('disabled');
             GUI.log('Start get point');
 
@@ -391,6 +455,12 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadEepromMissionButton').on('click', function () {
+            if (markers.length) {
+                if (!confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
+                    return;
+                }
+                removeAllPoints();
+            }
             GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
 
             MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, false, getPointsFromEprom);
@@ -405,6 +475,15 @@ TABS.mission_control.initialize = function (callback) {
                 $('#rthSettings').fadeIn(300);
             } else {
                 $('#rthSettings').fadeOut(300);
+            }
+        });
+
+        $('#saveSettings').on('click', function () {
+            chrome.storage.local.set({'missionPlanerSettings': {speed: $('#MPdefaultPointSpeed').val(), alt: $('#MPdefaultPointAlt').val()}});
+            $('#missionPlanerSettings').hide();
+            $('#missionPalnerTotalInfo').fadeIn(300);
+            if (selectedMarker !== null) {
+                $('#MPeditPoint').fadeIn(300);
             }
         });
 
@@ -425,24 +504,32 @@ TABS.mission_control.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getNextPoint);
     }
 
+    function endGetPoint() {
+        GUI.log('End get point');
+        $('#loadMissionButton').removeClass('disabled');
+        repaint();
+        updateTotalInfo();
+    }
+
     function getNextPoint() {
         if (MISSION_PLANER.countBusyPoints == 0) {
+            endGetPoint();
             return;
         }
 
-        var coord;
         if (pointForSend > 0) {
             // console.log(MISSION_PLANER.bufferPoint.lon);
             // console.log(MISSION_PLANER.bufferPoint.lat);
             // console.log(MISSION_PLANER.bufferPoint.alt);
             // console.log(MISSION_PLANER.bufferPoint.action);
             if (MISSION_PLANER.bufferPoint.action == 4) {
-                $('#rthEndMission').trigger('click');
+                $('#rthEndMission').attr('checked', true);
+                $('#rthSettings').fadeIn(300);
                 if (MISSION_PLANER.bufferPoint.p1 > 0) {
-                    $('#rthLanding').trigger('click');
+                    $('#rthLanding').attr('checked', true);
                 }
             } else {
-                coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+                var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
                 map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action, MISSION_PLANER.bufferPoint.p1));
                 if (pointForSend === 1) {
                     map.getView().setCenter(coord);
@@ -451,10 +538,7 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         if (pointForSend >= MISSION_PLANER.countBusyPoints) {
-            GUI.log('End get point');
-            $('#loadMissionButton').removeClass('disabled');
-            repaint();
-            updateTotalInfo();
+            endGetPoint();
             return;
         }
 

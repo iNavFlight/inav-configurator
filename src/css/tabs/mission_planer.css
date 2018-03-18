@@ -118,93 +118,10 @@
     display: inline-block;
 }
 
-/*.tab-calibration .content_toolbar {*/
-    /*height: 100px;*/
-/*}*/
-
-/*.tab-mission-control .waypoint {*/
-    /*padding-left: 19px;*/
-    /*padding-right: 19px;*/
-    /*!*padding-bottom: 10px;*!*/
-/*}*/
-/*.tab-mission-control .waypoint-left {*/
-    /*width: 54%;*/
-    /*float: left;*/
-    /*padding-right: 5px;*/
-/*}*/
-/*.tab-mission-control .waypoint-right{*/
-    /*width: 40%;*/
-    /*float: right;*/
-/*}*/
-
-
-
-/*@media (max-width: 1236px) {*/
-    /*.tab-mission-control .waypoint-left {*/
-        /*width: 96%;*/
-    /*}*/
-    /*.tab-mission-control .waypoint-right{*/
-        /*width: 96%;*/
-        /*float: left;*/
-        /*padding-right: 19px;*/
-    /*}*/
-    /*.tab-mission-control .content_toolbar {*/
-        /*height: 240px;*/
-    /*}*/
-    /*.tab-mission-control .content_wrapper {*/
-        /*height: calc(100% - 240px);*/
-    /*}*/
-/*}*/
-
-/*!* Need test! *!*/
-/*.tab-mission-control .cf_column {*/
-    /*display: flex;*/
-    /*!*height: 150px;*!*/
-    /*height: auto;*/
-    /*flex-direction: row;*/
-    /*justify-content: space-between;*/
-    /*flex-wrap: wrap;*/
-/*}*/
-
-/*.tab-mission-control .waypoint-left,*/
-/*.tab-mission-control .waypoint-right {*/
-    /*width: 47%;*/
-    /*float: none;*/
-/*}*/
-
-/*.tab-mission-control .btn.save_btn {*/
-    /*display: flex;*/
-    /*flex-direction: row;*/
-    /*flex-wrap: wrap;*/
-/*}*/
-
-/*.tab-mission-control .btn.save_btn a{*/
-    /*margin-top: 5px;*/
-/*}*/
-
-/*.tab-mission-control .gui_box{*/
-    /*width: 100%;*/
-    /*clear: both;*/
-    /*height: 90%;*/
-/*}*/
-
-/*.tab-mission-control.toolbar_fixed_bottom{*/
-    /*height: 100%;*/
-/*}*/
-/*!*.tab-mission-control .content_wrapper{*!*/
-    /*!*height: 100%;*!*/
-/*!*}*!*/
-/*#missionMap{*/
-    /*height: 100%;*/
-/*}*/
-
-/*@media (max-width: 1252px){*/
-    /*.tab-mission-control .waypoint-left,*/
-    /*.tab-mission-control .waypoint-right {*/
-        /*width: 100%;*/
-    /*}*/
-    /*.tab-mission-control .waypoint-right{*/
-        /*padding-right: 5px;*/
-        /*margin-top: 5px;*/
-    /*}*/
-/*}*/
+.mission-control-settings {
+    top: 65px;
+    left: .5em;
+}
+.ol-touch .mission-control-settings {
+    top: 80px;
+}
