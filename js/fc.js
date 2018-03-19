@@ -994,7 +994,30 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
+        if (semver.gte(CONFIG.flightControllerVersion, '1.9.1'))
+            return ['A', 'E', 'R', 'T'];
+        else
+            return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
+    },
+    isRcMapValid: function (val) {
+        var strBuffer = val.split(''),
+            duplicityBuffer = [];
+
+        if (val.length != FC.getRcMapLetters().length)
+            return false;
+
+        // check if characters inside are all valid, also check for duplicity
+        for (var i = 0; i < val.length; i++) {
+            if (FC.getRcMapLetters().indexOf(strBuffer[i]) < 0)
+                return false;
+
+            if (duplicityBuffer.indexOf(strBuffer[i]) < 0)
+                duplicityBuffer.push(strBuffer[i]);
+            else
+                return false;
+        }
+
+        return true;
     },
     getServoMixInputNames: function () {
         return [
