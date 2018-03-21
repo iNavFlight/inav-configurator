@@ -2240,6 +2240,12 @@
     "fixedWingConfiguration": {
       "message": "Fixed Wing Settings"
     },
+    "osdLayoutDefault": {
+        "message": "Default Layout"
+    },
+    "osdLayoutAlternative": {
+        "message": "Alternative Layout #$1"
+    },
     "osdUnitImperial": {
         "message": "Imperial"
     },

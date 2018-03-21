@@ -259,14 +259,14 @@ var OSD = OSD || {};
 
 // common functions for altitude and negative altitude alarms
 function altitude_alarm_unit(osd_data) {
-    if (OSD.data.unit_mode === 0) {
+    if (OSD.data.preferences.units === 0) {
         return 'ft';
     }
     return 'm';
 }
 
 function altitude_alarm_to_display(osd_data, value) {
-    if (OSD.data.unit_mode === 0) {
+    if (OSD.data.preferences.units === 0) {
         // meters to feet
         return Math.round(value * 3.28084)
     }
@@ -274,7 +274,7 @@ function altitude_alarm_to_display(osd_data, value) {
 }
 
 function altitude_alarm_from_display(osd_data, value) {
-    if (OSD.data.unit_mode === 0) {
+    if (OSD.data.preferences.units === 0) {
         // feet to meters
         return Math.round(value / 3.28084);
     }
@@ -296,15 +296,34 @@ function altitude_alarm_display_function(fn) {
 // parsed fc output and output to fc, used by to OSD.msp.encode
 OSD.initData = function () {
     OSD.data = {
-        video_system: null,
-        unit_mode: null,
-        alarms: [],
+        supported: false,
+        preferences: {
+            video_system: null,
+            main_voltage_decimals: null,
+            ahi_reverse_roll: null,
+            crosshairs_style: null,
+            left_sidebar_scroll: null,
+            right_sidebar_scroll: null,
+            sidebar_scroll_arrows: null,
+            units: null,
+            stats_energy_unit: null,
+        },
+        alarms: {
+            rssi: null,
+            batt_cap: null,
+            fly_minutes: null,
+            max_altitude: null,
+            dist: null,
+            max_neg_altitude: null,
+        },
+        layouts: [],
+        layout_count: 1,
+        items: [],
+        groups: {},
         display_items: [],
-        last_positions: {},
         preview: []
     };
 };
-OSD.initData();
 
 OSD.constants = {
     VISIBLE: 0x0800,
@@ -332,46 +351,51 @@ OSD.constants = {
     ALL_ALARMS: [
         {
             name: 'RSSI',
+            field: 'rssi',
             unit: '%',
         },
         {
             name: 'BATT_CAP',
+            field: 'batt_cap',
             unit: 'mah',
         },
         {
             name: 'FLY_MINUTES',
+            field: 'fly_minutes',
             unit: 'minutes',
         },
         {
             name: 'MAX_ALTITUDE',
+            field: 'max_altitude',
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_display_function(altitude_alarm_to_display),
             from_display: altitude_alarm_display_function(altitude_alarm_from_display),
         },
         {
             name: 'DIST',
+            field: 'dist',
             unit: function(osd_data) {
-                if (OSD.data.unit_mode === 0) {
+                if (OSD.data.preferences.units === 0) {
                     return 'mi';
                 }
                 return 'm';
             },
             to_display: function(osd_data, value) {
-                if (OSD.data.unit_mode === 0) {
+                if (OSD.data.preferences.units === 0) {
                     // meters to miles
                     return (value / 1609.34).toFixed(2);
                 }
                 return value;
             },
             from_display: function(osd_data, value) {
-                if (OSD.data.unit_mode === 0) {
+                if (OSD.data.preferences.units === 0) {
                     // miles to meters
                     return Math.round(value * 1609.34);
                 }
                 return value;
             },
             step: function(osd_data) {
-                if (OSD.data.unit_mode === 0) {
+                if (OSD.data.preferences.units === 0) {
                     return 0.01;
                 }
                 return 1;
@@ -379,6 +403,7 @@ OSD.constants = {
         },
         {
             name: 'MAX_NEG_ALTITUDE',
+            field: 'mag_neg_altitude',
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
@@ -468,7 +493,7 @@ OSD.constants = {
                     },
                     preview: function(osd_data) {
                         var speed;
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.preferences.units === 0) {
                             // Imperial
                             speed = ' 35' + FONT.symbol(SYM.MPH);
                         } else {
@@ -496,7 +521,7 @@ OSD.constants = {
                     name: 'ALTITUDE',
                     id: 15,
                     preview: function () {
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.preferences.units === 0) {
                             // Imperial
                             return FONT.symbol(SYM.ALT_FT) + '118';
                         }
@@ -518,7 +543,7 @@ OSD.constants = {
                     id: 26,
                     min_version: '1.6.0',
                     preview: function(osd_data) {
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.preferences.units === 0) {
                             // Imperial
                             return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
                         }
@@ -627,7 +652,7 @@ OSD.constants = {
                     id: 13,
                     preview: function(osd_data) {
                         // 3 chars
-                        if (OSD.data.unit_mode === 0 || OSD.data.unit_mode === 2) {
+                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
                             // Imperial
                             return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
                         }
@@ -662,7 +687,7 @@ OSD.constants = {
                     id: 23,
                     min_version: '1.6.0',
                     preview: function(osd_data) {
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.preferences.units === 0) {
                             // Imperial
                             return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
                         }
@@ -674,7 +699,7 @@ OSD.constants = {
                     id: 40,
                     min_version: '1.9.1',
                     preview: function(osd_data) {
-                        if (OSD.data.unit_mode === 0) {
+                        if (OSD.data.preferences.units === 0) {
                             // Imperial
                             return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
                         }
@@ -768,8 +793,51 @@ OSD.get_item_preview = function(item) {
     return preview;
 }
 
+OSD.use_layouts_api = function() {
+    return semver.gte(CONFIG.flightControllerVersion, '2.0.0');
+};
+
+OSD.reload = function(callback) {
+    OSD.initData();
+    var done = function() {
+        OSD.updateDisplaySize();
+        if (callback) {
+            callback();
+        }
+    };
+    if (OSD.use_layouts_api()) {
+        MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
+
+            OSD.msp.decodeLayouts(resp);
+            OSD.updateSelectedLayout(OSD.data.selected_layout || 0);
+
+            MSP.promise(MSPCodes.MSP2_INAV_OSD_ALARMS).then(function (resp) {
+
+                OSD.msp.decodeAlarms(resp);
+
+                MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
+
+                    OSD.data.supported = true;
+                    OSD.msp.decodePreferences(resp);
+                    done();
+                });
+            });
+        });
+    } else {
+        MSP.promise(MSPCodes.MSP_OSD_CONFIG).then(function (data) {
+            OSD.msp.decode(data);
+            done();
+        });
+    }
+};
+
+OSD.updateSelectedLayout = function(new_layout) {
+    OSD.data.selected_layout = new_layout;
+    OSD.data.items = OSD.data.layouts[OSD.data.selected_layout];
+};
+
 OSD.updateDisplaySize = function () {
-    var video_type = OSD.constants.VIDEO_TYPES[OSD.data.video_system];
+    var video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
@@ -781,6 +849,36 @@ OSD.updateDisplaySize = function () {
     };
 };
 
+OSD.saveAlarms = function(callback) {
+    // Before the layouts API was introduced, config and alarms were saved
+    // with the same MSP cmd.
+    if (!OSD.use_layouts_api()) {
+        return OSD.saveConfig(callback);
+    }
+    var data = OSD.msp.encodeAlarms();
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback);
+}
+
+OSD.saveConfig = function(callback) {
+    if (OSD.use_layouts_api()) {
+        return OSD.save_alarms(function () {
+            var data = OSD.msp.encodePreferences();
+            return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
+        });
+    }
+    return MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther()).then(callback);
+};
+
+OSD.saveItem = function(item, callback) {
+    var pos = OSD.data.items[item.id];
+    if (OSD.use_layouts_api()) {
+        var data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
+        console.log('DATA', data);
+        return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
+    }
+    var data = OSD.msp.encodeItem(item.id, pos);
+    return MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, data).then(callback);
+};
 
 //noinspection JSUnusedLocalSymbols
 OSD.msp = {
@@ -810,44 +908,132 @@ OSD.msp = {
         }
     },
 
+    encodeAlarms: function() {
+        var result = [];
+
+        result.push8(OSD.data.alarms.rssi);
+        result.push16(OSD.data.alarms.batt_cap);
+        result.push16(OSD.data.alarms.fly_minutes);
+        result.push16(OSD.data.alarms.max_altitude);
+        result.push16(OSD.data.alarms.dist);
+        result.push16(OSD.data.alarms.max_neg_altitude);
+        return result;
+    },
+
+    decodeAlarms: function(resp) {
+        var alarms = resp.data;
+
+        OSD.data.alarms.rssi = alarms.readU8();
+        OSD.data.alarms.batt_cap = alarms.readU16();
+        OSD.data.alarms.fly_minutes = alarms.readU16();
+        OSD.data.alarms.max_altitude = alarms.readU16();
+        OSD.data.alarms.dist = alarms.readU16();
+        OSD.data.alarms.max_neg_altitude = alarms.readU16();
+    },
+
+    encodePreferences: function() {
+        var result = [];
+        var p = OSD.data.preferences;
+
+        result.push8(p.video_system);
+        result.push8(p.main_voltage_decimals);
+        result.push8(p.ahi_reverse_roll);
+        result.push8(p.crosshairs_style);
+        result.push8(p.left_sidebar_scroll);
+        result.push8(p.right_sidebar_scroll);
+        result.push8(p.sidebar_scroll_arrows);
+        result.push8(p.units);
+        result.push8(p.stats_energy_unit)
+        return result;
+    },
+
+    decodePreferences: function(resp) {
+        var prefs = resp.data;
+        var p = OSD.data.preferences;
+
+        p.video_system = prefs.readU8();
+        p.main_voltage_decimals = prefs.readU8();
+        p.ahi_reverse_roll = prefs.readU8();
+        p.crosshairs_style = prefs.readU8();
+        p.left_sidebar_scroll = prefs.readU8();
+        p.right_sidebar_scroll = prefs.readU8();
+        p.sidebar_scroll_arrows = prefs.readU8();
+        p.units = prefs.readU8();
+        p.stats_energy_unit = prefs.readU8();
+    },
+
+    encodeLayoutItem: function(layout, item, pos) {
+        var result = [];
+
+        result.push8(layout);
+        result.push8(item.id);
+        result.push16(this.helpers.pack.position(pos));
+
+        return result;
+    },
+
+    decodeLayouts: function(resp) {
+        var layouts = resp.data;
+
+        var layout_count = layouts.readU8();
+        var item_count = layouts.readU8();
+
+        for (var ii = 0; ii < layout_count; ii++) {
+            var items = [];
+            for (var jj = 0; jj < item_count; jj++) {
+                var bits = layouts.readU16();
+                items.push(this.helpers.unpack.position(bits));
+            }
+            OSD.data.layouts.push(items);
+        }
+
+        OSD.data.layout_count = layout_count;
+    },
+
     encodeOther: function () {
-        var result = [-1, OSD.data.video_system];
-        result.push8(OSD.data.unit_mode);
+        var result = [-1, OSD.data.preferences.video_system];
+        result.push8(OSD.data.preferences.units);
         // watch out, order matters! match the firmware
-        result.push8(OSD.data.alarms['RSSI']);
-        result.push16(OSD.data.alarms['BATT_CAP']);
-        result.push16(OSD.data.alarms['FLY_MINUTES']);
-        result.push16(OSD.data.alarms['MAX_ALTITUDE']);
-        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            result.push16(OSD.data.alarms['DIST']);
-            result.push16(OSD.data.alarms['MAX_NEG_ALTITUDE']);
+        result.push8(OSD.data.alarms.rssi);
+        result.push16(OSD.data.alarms.batt_cap);
+        result.push16(OSD.data.alarms.fly_minutes);
+        result.push16(OSD.data.alarms.max_altitude);
+        // These might be null, since there weren't supported
+        // until version 1.8
+        if (OSD.data.alarms.dist !== null) {
+            result.push16(OSD.data.alarms.dist);
+        }
+        if (OSD.data.alarms.max_neg_altitude !== null) {
+            result.push16(OSD.data.alarms.max_neg_altitude);
         }
         return result;
     },
 
-    encode: function (item, itemData) {
+    encodeItem: function (id, itemData) {
         var buffer = [];
-        buffer.push8(item.id);
+        buffer.push8(id);
         buffer.push16(this.helpers.pack.position(itemData));
         return buffer;
     },
 
     decode: function (payload) {
+        if (payload.length <= 1) {
+            return;
+        }
         var view = payload.data;
         var d = OSD.data;
-        d.compiled_in = view.readU8();
-        d.video_system = view.readU8();
+        d.supported = view.readU8();
+        d.preferences.video_system = view.readU8();
+        d.preferences.units = view.readU8();
 
-        d.unit_mode = view.readU8();
-        d.alarms = {};
-        d.alarms['RSSI'] = view.readU8();
-        d.alarms['BATT_CAP'] = view.readU16();
-        d.alarms['FLY_MINUTES'] = view.readU16();
-        d.alarms['MAX_ALTITUDE'] = view.readU16();
+        d.alarms.rssi = view.readU8();
+        d.alarms.batt_cap = view.readU16();
+        d.alarms.fly_minutes = view.readU16();
+        d.alarms.max_altitude = view.readU16();
 
         if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            d.alarms['DIST'] = view.readU16();
-            d.alarms['MAX_NEG_ALTITUDE'] = view.readU16();
+            d.alarms.dist = view.readU16();
+            d.alarms.max_neg_altitude = view.readU16();
         }
 
         d.items = [];
@@ -856,8 +1042,7 @@ OSD.msp = {
             var bits = view.readU16();
             d.items.push(this.helpers.unpack.position(bits));
         }
-        OSD.updateDisplaySize();
-    }
+    },
 };
 
 OSD.GUI = {};
@@ -928,7 +1113,7 @@ OSD.GUI.preview = {
     }
 };
 
-var checkAndProcessSymbolPosition = function(pos, charCode) {
+OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     if (typeof OSD.data.preview[pos] === 'object' && OSD.data.preview[pos][0] !== null) {
         // position already in use, always put object item at position
         OSD.data.preview[pos] = [OSD.data.preview[pos][0], charCode, 'red'];
@@ -937,6 +1122,405 @@ var checkAndProcessSymbolPosition = function(pos, charCode) {
         // character types can overwrite character types (e.g. crosshair)
         OSD.data.preview[pos] = charCode;
     }
+};
+
+OSD.GUI.updateVideoMode = function() {
+    // video mode
+    var $videoTypes = $('.video-types').empty();
+    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+
+        $videoTypes.append(
+            $('<label/>')
+            .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                .prop('checked', i === OSD.data.preferences.video_system)
+                .data('type', i)
+            )
+        );
+    }
+
+    $videoTypes.find(':radio').click(function () {
+        OSD.data.preferences.video_system = $(this).data('type');
+        OSD.updateDisplaySize();
+        OSD.GUI.saveConfig();
+    });
+};
+
+OSD.GUI.updateUnits = function() {
+    // units
+    var $unitMode = $('.units select').empty();
+
+    $('.units-container').show();
+    $unitMode.empty();
+    var $unitTip = $('.units .cf_tip');
+    for (var i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
+        var unitType = OSD.constants.UNIT_TYPES[i];
+        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
+            continue;
+        }
+        var name = chrome.i18n.getMessage(unitType.name);
+        var $option = $('<option>' + name + '</option>');
+        $option.attr('value', name);
+        $option.data('type', unitType.value);
+        var tip = null;
+        if (unitType.tip) {
+            tip = chrome.i18n.getMessage(unitType.tip);
+        }
+        if (OSD.data.preferences.units === unitType.value) {
+            $option.prop('selected', true);
+            if (unitType.tip) {
+                $unitTip.attr('title', chrome.i18n.getMessage(unitType.tip));
+                $unitTip.fadeIn();
+            } else {
+                $unitTip.fadeOut();
+            }
+        }
+        $unitMode.append($option);
+    }
+    $unitMode.change(function (e) {
+        var selected = $(this).find(':selected');
+        OSD.data.preferences.units = selected.data('type');
+        OSD.GUI.saveConfig();
+    });
+};
+
+OSD.GUI.updateAlarms = function() {
+    // alarms
+    $('.alarms-container').show();
+    var $alarms = $('.alarms').empty();
+    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
+        var alarm = OSD.constants.ALL_ALARMS[kk];
+        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
+        var value = OSD.data.alarms[alarm.field];
+        if (value === undefined) {
+            continue;
+        }
+        if (alarm.unit) {
+            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
+            var suffix = chrome.i18n.getMessage(unit) || unit;
+            label += ' (' + suffix + ')';
+        }
+        var step = 1;
+        if (typeof alarm.step === 'function') {
+            step = alarm.step(OSD.data)
+        }
+        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+        alarmInput.data('alarm', alarm);
+        if (typeof alarm.to_display === 'function') {
+            value = alarm.to_display(OSD.data, value);
+        }
+        alarmInput.val(value);
+        alarmInput.blur(function (e) {
+            var $alarm = $(this);
+            var val = $alarm.val();
+            var alarm = $alarm.data('alarm');
+            if (typeof alarm.from_display === 'function') {
+                val = alarm.from_display(OSD.data, val);
+            }
+            OSD.data.alarms[alarm.field] = val;
+            // We just need to save the config. The field is already
+            // up to date, since it's where the value was changed
+            // by the user.
+            OSD.save_alarms();
+        });
+        var $input = $('<label/>');
+        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+        if (help) {
+            $('<div class="helpicon cf_tip"></div>')
+                .css('margin-top', '1px')
+                .attr('title', help)
+                .appendTo($input)
+                .jBox('Tooltip', {
+                    delayOpen: 100,
+                    delayClose: 100,
+                    position: {
+                        x: 'right',
+                        y: 'center'
+                    },
+                    outside: 'x'
+                });
+        }
+        $input.append(alarmInput);
+        $alarms.append($input);
+    }
+};
+
+OSD.GUI.updateFields = function() {
+    // display fields on/off and position
+    var $tmpl = $('#osd_group_template').hide();
+    // Clear previous groups, if any
+    $('.osd_group').remove();
+    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
+        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
+        var groupItems = [];
+        for (var jj = 0; jj < group.items.length; jj++) {
+            var item = group.items[jj];
+            if (!OSD.is_item_displayed(item, group)) {
+                continue;
+            }
+            OSD.data.groups[item.id] = group;
+            groupItems.push(item);
+        }
+        if (groupItems.length == 0) {
+            continue;
+        }
+        var groupContainer = $tmpl.clone().addClass('osd_group').show();
+        var groupTitle = chrome.i18n.getMessage(group.name);
+        groupContainer.find('.spacer_box_title').text(groupTitle);
+        var $displayFields = groupContainer.find('.display-fields');
+        for (var jj = 0; jj < groupItems.length; jj++) {
+            var item = groupItems[jj];
+            var itemData = OSD.data.items[item.id];
+            var checked = itemData.isVisible ? 'checked' : '';
+            var $field = $('<div class="display-field field-' + item.id + '"/>');
+            var name = item.name;
+            var nameKey = 'osdElement_' + name;
+            var nameMessage = chrome.i18n.getMessage(nameKey);
+            if (nameMessage) {
+                name = nameMessage;
+            } else {
+                name = inflection.titleize(name);
+            }
+            var help = chrome.i18n.getMessage(nameKey + '_HELP');
+            if (help) {
+                $('<div class="helpicon cf_tip"></div>')
+                    .css('margin-top', '1px')
+                    .attr('title', help)
+                    .appendTo($field)
+                    .jBox('Tooltip', {
+                        delayOpen: 100,
+                        delayClose: 100,
+                        position: {
+                            x: 'right',
+                            y: 'center'
+                        },
+                        outside: 'x'
+                    });
+            }
+            $field.append(
+                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
+                    .data('item', item)
+                    .attr('checked', itemData.isVisible)
+                    .change(function () {
+                        var item = $(this).data('item');
+                        var itemData = OSD.data.items[item.id];
+                        var $position = $(this).parent().find('.position.' + item.name);
+                        itemData.isVisible = !itemData.isVisible;
+
+                        if (itemData.isVisible) {
+                            $position.show();
+                        } else {
+                            $position.hide();
+                        }
+
+                        OSD.GUI.saveItem(item);
+                    })
+            );
+
+            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
+            if (item.positionable !== false) {
+                $field.append(
+                    $('<input type="number" class="' + item.id + ' position"></input>')
+                        .data('item', item)
+                        .val(itemData.position)
+                        .change($.debounce(250, function (e) {
+                            var item = $(this).data('item');
+                            var itemData = OSD.data.items[item.id];
+                            itemData.position = parseInt($(this).val());
+                            OSD.GUI.saveItem(item);
+                        }))
+                );
+            }
+            $displayFields.append($field);
+        }
+        $tmpl.parent().append(groupContainer);
+    }
+    // TODO: If we add more switches somewhere else, this
+    // needs to be called after all of them have been set up
+    GUI.switchery();
+};
+
+OSD.GUI.updatePreviews = function() {
+    // buffer the preview;
+    OSD.data.preview = [];
+    OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
+    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
+        var field = OSD.data.display_items[ii];
+        // reset fields that somehow end up off the screen
+        if (field.position > OSD.data.display_size.total) {
+            field.position = 0;
+        }
+    }
+
+    // clear the buffer
+    for (i = 0; i < OSD.data.display_size.total; i++) {
+        OSD.data.preview.push([null, ' '.charCodeAt(0)]);
+    };
+
+    // draw all the displayed items and the drag and drop preview images
+    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+        var item = OSD.get_item(ii);
+        if (!item || !OSD.is_item_displayed(item, OSD.data.groups[item.id])) {
+            continue;
+        }
+        var itemData = OSD.data.items[ii];
+        if (!itemData.isVisible) {
+            continue;
+        }
+        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
+        // create the preview image
+        item.preview_img = new Image();
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext("2d");
+        // fill the screen buffer
+        var preview = OSD.get_item_preview(item);
+        if (!preview) {
+            continue;
+        }
+        var x = 0;
+        var y = 0;
+        for (i = 0; i < preview.length; i++) {
+            var charCode = preview.charCodeAt(i);
+            if (charCode == '\n'.charCodeAt(0)) {
+                x = 0;
+                y++;
+                continue;
+            }
+            // test if this position already has a character placed
+            if (OSD.data.preview[j+x+(y*OSD.data.display_size.x)][0] !== null) {
+                // if so set background color to red to show user double usage of position
+                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode, 'red'];
+            } else {
+                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
+            }
+            // draw the preview
+            var img = new Image();
+            img.src = FONT.draw(charCode);
+            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
+            x++;
+        }
+        item.preview_img.src = canvas.toDataURL('image/png');
+        // Required for NW.js - Otherwise the <img /> will
+        // consume drag/drop events.
+        item.preview_img.style.pointerEvents = 'none';
+    }
+    var centerishPosition = 225;
+
+    // artificial horizon
+    if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
+        for (i = 0; i < 9; i++) {
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+        }
+    }
+
+    // crosshairs
+    if ($('input[name="CROSSHAIRS"]').prop('checked')) {
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
+    }
+
+    // sidebars
+    if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
+        var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
+        var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
+        for (i = -hudheight; i <= hudheight; i++) {
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+        }
+        // AH level indicators
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
+    }
+
+    // render
+    var $preview = $('.display-layout .preview').empty();
+    var $row = $('<div class="row"/>');
+    for (i = 0; i < OSD.data.display_size.total;) {
+        var charCode = OSD.data.preview[i];
+        var colorStyle = '';
+
+        if (typeof charCode === 'object') {
+            var item = OSD.data.preview[i][0];
+            charCode = OSD.data.preview[i][1];
+            if (OSD.data.preview[i][2] !== undefined) {
+                // if third field is set it contains a background color
+                colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+            }
+        }
+        var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
+            .on('mouseenter', OSD.GUI.preview.onMouseEnter)
+            .on('mouseleave', OSD.GUI.preview.onMouseLeave)
+            .on('dragover', OSD.GUI.preview.onDragOver)
+            .on('dragleave', OSD.GUI.preview.onDragLeave)
+            .on('drop', OSD.GUI.preview.onDrop)
+            .data('item', item)
+            .data('position', i);
+        // Required for NW.js - Otherwise the <img /> will
+        // consume drag/drop events.
+        $img.find('img').css('pointer-events', 'none');
+        if (item && item.positionable !== false) {
+            $img.addClass('field-' + item.id)
+                .data('item', item)
+                .prop('draggable', true)
+                .on('dragstart', OSD.GUI.preview.onDragStart);
+        }
+
+        $row.append($img);
+        if (++i % OSD.data.display_size.x == 0) {
+            $preview.append($row);
+            $row = $('<div class="row"/>');
+        }
+    }
+};
+
+OSD.GUI.updateAll = function() {
+    if (!OSD.data.supported) {
+        $('.unsupported').fadeIn();
+        return;
+    }
+    var layouts = $('.osd_layouts');
+    if (OSD.data.layout_count > 1) {
+        layouts.empty();
+        for (var ii = 0; ii < OSD.data.layout_count; ii++) {
+            var name = ii > 0 ? chrome.i18n.getMessage('osdLayoutAlternative', [ii]) : chrome.i18n.getMessage('osdLayoutDefault');
+            var opt = $('<option/>').val(ii).text(name).appendTo(layouts);
+        }
+        layouts.val(OSD.data.selected_layout);
+        layouts.show();
+        layouts.on('change', function() {
+            OSD.updateSelectedLayout(parseInt(layouts.val()));
+            OSD.GUI.updateFields();
+            OSD.GUI.updatePreviews();
+        });
+    } else {
+        layouts.hide();
+        layouts.off('change');
+    }
+    $('.supported').fadeIn();
+    OSD.GUI.updateVideoMode();
+    OSD.GUI.updateUnits();
+    OSD.GUI.updateAlarms();
+    OSD.GUI.updateFields();
+    OSD.GUI.updatePreviews();
+};
+
+OSD.GUI.update = function() {
+    OSD.reload(function() {
+        OSD.GUI.updateAll();
+    });
+};
+
+OSD.GUI.saveItem = function(item) {
+    OSD.saveItem(item, function() {
+        OSD.GUI.updatePreviews();
+    });
+};
+
+OSD.GUI.saveConfig = function() {
+    OSD.saveConfig(function() {
+        OSD.GUI.updatePreviews();
+        OSD.GUI.updateAlarms();
+    });
 };
 
 TABS.osd = {};
@@ -961,384 +1545,6 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
-        var $unitMode = $('.units select').empty();
-
-        $unitMode.change(function (e) {
-            var selected = $(this).find(':selected');
-            OSD.data.unit_mode = selected.data('type');
-            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
-                .then(function () {
-                    updateOsdView();
-                });
-        });
-
-        // 2 way binding... sorta
-        function updateOsdView() {
-
-            // ask for the OSD config data
-            MSP.promise(MSPCodes.MSP_OSD_CONFIG)
-                .then(function (info) {
-
-                    var i,
-                        type;
-
-                    if (info.length <= 1) {
-                        $('.unsupported').fadeIn();
-                        return;
-                    }
-
-                    $('.supported').fadeIn();
-                    OSD.msp.decode(info);
-
-                    // video mode
-                    var $videoTypes = $('.video-types').empty();
-                    for (i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
-
-                        $videoTypes.append(
-                            $('<label/>')
-                                .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                                    .prop('checked', i === OSD.data.video_system)
-                                    .data('type', i)
-                            )
-                        );
-
-                    }
-
-                    $videoTypes.find(':radio').click(function () {
-                        OSD.data.video_system = $(this).data('type');
-                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
-                            .then(function () {
-                                updateOsdView();
-                            });
-                    });
-
-                    // units
-                    $('.units-container').show();
-                    $unitMode.empty();
-                    var $unitTip = $('.units .cf_tip');
-                    for (i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
-                        var unitType = OSD.constants.UNIT_TYPES[i];
-                        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
-                            continue;
-                        }
-                        var name = chrome.i18n.getMessage(unitType.name);
-                        var $option = $('<option>' + name + '</option>');
-                        $option.attr('value', name);
-                        $option.data('type', unitType.value);
-                        var tip = null;
-                        if (unitType.tip) {
-                            tip = chrome.i18n.getMessage(unitType.tip);
-                        }
-                        if (OSD.data.unit_mode === unitType.value) {
-                            $option.prop('selected', true);
-                            if (unitType.tip) {
-                                $unitTip.attr('title', chrome.i18n.getMessage(unitType.tip));
-                                $unitTip.fadeIn();
-                            } else {
-                                $unitTip.fadeOut();
-                            }
-                        }
-                        $unitMode.append($option);
-                    }
-
-                    // alarms
-                    $('.alarms-container').show();
-                    var $alarms = $('.alarms').empty();
-                    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
-                        var alarm = OSD.constants.ALL_ALARMS[kk];
-                        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
-                        var value = OSD.data.alarms[alarm.name];
-                        if (value === undefined) {
-                            continue;
-                        }
-                        if (alarm.unit) {
-                            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
-                            var suffix = chrome.i18n.getMessage(unit) || unit;
-                            label += ' (' + suffix + ')';
-                        }
-                        var step = 1;
-                        if (typeof alarm.step === 'function') {
-                            step = alarm.step(OSD.data)
-                        }
-                        var $input = $('<label/>');
-                        var tooltip, help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
-                        if (help) {
-                            tooltip = $('<div class="helpicon cf_tip"></div>');
-                            tooltip
-                            .css('margin-top', '1px')
-                            .attr('title', help)
-                            .appendTo($input)
-                            .jBox('Tooltip', {
-                                delayOpen: 100,
-                                delayClose: 100,
-                                position: {
-                                    x: 'right',
-                                    y: 'center'
-                                },
-                                outside: 'x'
-                            });
-                        }
-                        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
-                        alarmInput.data('alarm', alarm);
-                        if (typeof alarm.to_display === 'function') {
-                            value = alarm.to_display(OSD.data, value);
-                        }
-                        alarmInput.val(value);
-                        alarmInput.blur(function (e) {
-                            var $alarm = $(this);
-                            var val = $alarm.val();
-                            var alarm = $alarm.data('alarm');
-                            if (typeof alarm.from_display === 'function') {
-                                val = alarm.from_display(OSD.data, val);
-                            }
-                            OSD.data.alarms[alarm.name] = val;
-                            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
-                                .then(function () {
-                                    tooltip.close();
-                                    updateOsdView();
-                                });
-                        });
-                        $input.append(alarmInput);
-                        $alarms.append($input);
-                    }
-
-                    // display fields on/off and position
-                    var $tmpl = $('#osd_group_template').hide();
-                    // Clear previous groups, if any
-                    $('.osd_group').remove();
-                    var itemGroups = {};
-                    for (var ii = 0; ii < OSD.constants.ALL_DISPLAY_GROUPS.length; ii++) {
-                        var group = OSD.constants.ALL_DISPLAY_GROUPS[ii];
-                        var groupItems = [];
-                        for (var jj = 0; jj < group.items.length; jj++) {
-                            var item = group.items[jj];
-                            if (!OSD.is_item_displayed(item, group)) {
-                                continue;
-                            }
-                            itemGroups[item.id] = group;
-                            groupItems.push(item);
-                        }
-                        if (groupItems.length == 0) {
-                            continue;
-                        }
-                        var groupContainer = $tmpl.clone().addClass('osd_group').show();
-                        var groupTitle = chrome.i18n.getMessage(group.name);
-                        groupContainer.find('.spacer_box_title').text(groupTitle);
-                        var $displayFields = groupContainer.find('.display-fields');
-                        for (var jj = 0; jj < groupItems.length; jj++) {
-                            var item = groupItems[jj];
-                            var itemData = OSD.data.items[item.id];
-                            var checked = itemData.isVisible ? 'checked' : '';
-                            var $field = $('<div class="display-field field-' + item.id + '"/>');
-                            var name = item.name;
-                            var nameKey = 'osdElement_' + name;
-                            var nameMessage = chrome.i18n.getMessage(nameKey);
-                            if (nameMessage) {
-                                name = nameMessage;
-                            } else {
-                                name = inflection.titleize(name);
-                            }
-                            var help = chrome.i18n.getMessage(nameKey + '_HELP');
-                            if (help) {
-                                $('<div class="helpicon cf_tip"></div>')
-                                    .css('margin-top', '1px')
-                                    .attr('title', help)
-                                    .appendTo($field)
-                                    .jBox('Tooltip', {
-                                        delayOpen: 100,
-                                        delayClose: 100,
-                                        position: {
-                                            x: 'right',
-                                            y: 'center'
-                                        },
-                                        outside: 'x'
-                                    });
-                            }
-                            $field.append(
-                                $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
-                                    .data('item', item)
-                                    .attr('checked', itemData.isVisible)
-                                    .change(function () {
-                                        var item = $(this).data('item');
-                                        var itemData = OSD.data.items[item.id];
-                                        var $position = $(this).parent().find('.position.' + item.name);
-                                        itemData.isVisible = !itemData.isVisible;
-
-                                        if (itemData.isVisible) {
-                                            $position.show();
-                                        } else {
-                                            $position.hide();
-                                        }
-
-                                        MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
-                                            .then(function () {
-                                                updateOsdView();
-                                            });
-                                    })
-                            );
-
-                            $field.append('<label for="' + item.name + '" class="char-label">' + name + '</label>');
-                            if (item.positionable !== false && itemData.isVisible) {
-                                $field.append(
-                                    $('<input type="number" class="' + item.id + ' position"></input>')
-                                        .data('item', item)
-                                        .val(itemData.position)
-                                        .change($.debounce(250, function (e) {
-                                            var item = $(this).data('item');
-                                            var itemData = OSD.data.items[item.id];
-                                            itemData.position = parseInt($(this).val());
-                                            MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encode(item, itemData))
-                                                .then(function () {
-                                                    updateOsdView();
-                                                });
-                                        }))
-                                );
-                            }
-                            $displayFields.append($field);
-                        }
-                        $tmpl.parent().append(groupContainer);
-                    }
-                    GUI.switchery();
-
-                    // buffer the preview;
-                    OSD.data.preview = [];;
-                    OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-                    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
-                        var field = OSD.data.display_items[ii];
-                        // reset fields that somehow end up off the screen
-                        if (field.position > OSD.data.display_size.total) {
-                            field.position = 0;
-                        }
-                    }
-
-                    // clear the buffer
-                    for (i = 0; i < OSD.data.display_size.total; i++) {
-                        OSD.data.preview.push([null, ' '.charCodeAt(0)]);
-                    };
-                    // draw all the displayed items and the drag and drop preview images
-                    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-                        var item = OSD.get_item(ii);
-                        if (!item || !OSD.is_item_displayed(item, itemGroups[item.id])) {
-                            continue;
-                        }
-                        var itemData = OSD.data.items[ii];
-                        if (!itemData.isVisible) {
-                            continue;
-                        }
-                        var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
-                        // create the preview image
-                        item.preview_img = new Image();
-                        var canvas = document.createElement('canvas');
-                        var ctx = canvas.getContext("2d");
-                        // fill the screen buffer
-                        var preview = OSD.get_item_preview(item);
-                        if (!preview) {
-                            continue;
-                        }
-                        var x = 0;
-                        var y = 0;
-                        for (i = 0; i < preview.length; i++) {
-                            var charCode = preview.charCodeAt(i);
-                            if (charCode == '\n'.charCodeAt(0)) {
-                                x = 0;
-                                y++;
-                                continue;
-                            }
-                            // test if this position already has a character placed
-                            if (OSD.data.preview[j+x+(y*OSD.data.display_size.x)][0] !== null) {
-                                // if so set background color to red to show user double usage of position
-                                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode, 'red'];
-                            } else {
-                                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
-                            }
-                            // draw the preview
-                            var img = new Image();
-                            img.src = FONT.draw(charCode);
-                            ctx.drawImage(img, x*FONT.constants.SIZES.CHAR_WIDTH, y*FONT.constants.SIZES.CHAR_HEIGHT);
-                            x++;
-                        }
-                        item.preview_img.src = canvas.toDataURL('image/png');
-                        // Required for NW.js - Otherwise the <img /> will
-                        // consume drag/drop events.
-                        item.preview_img.style.pointerEvents = 'none';
-                    }
-
-                    var centerishPosition = 224;
-
-                    // AHI is one line up with NTSC (less lines) compared to PAL
-                    if (OSD.constants.VIDEO_TYPES[OSD.data.video_system] == 'NTSC')
-                      centerishPosition -= OSD.data.display_size.x;
-
-                    // artificial horizon
-                    if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-                        for (i = 0; i < 9; i++) {
-                            checkAndProcessSymbolPosition(centerishPosition - 4 + i, SYM.AH_BAR9_0 + 4);
-                        }
-                    }
-
-                    // crosshairs
-                    if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-                        checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
-                        checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
-                        checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
-                    }
-
-                    // sidebars
-                    if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
-                        var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
-                        var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-                        for (i = -hudheight; i <= hudheight; i++) {
-                            checkAndProcessSymbolPosition(centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-                            checkAndProcessSymbolPosition(centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-                        }
-                        // AH level indicators
-                        checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
-                        checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
-                    }
-
-                    // render
-                    var $preview = $('.display-layout .preview').empty();
-                    var $row = $('<div class="row"/>');
-                    for (i = 0; i < OSD.data.display_size.total;) {
-                        var charCode = OSD.data.preview[i];
-                        var colorStyle = '';
-
-                        if (typeof charCode === 'object') {
-                            var item = OSD.data.preview[i][0];
-                            charCode = OSD.data.preview[i][1];
-                            if (OSD.data.preview[i][2] !== undefined) {
-                                // if third field is set it contains a background color
-                                colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
-                            }
-                        }
-
-                        var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
-                            .on('mouseenter', OSD.GUI.preview.onMouseEnter)
-                            .on('mouseleave', OSD.GUI.preview.onMouseLeave)
-                            .on('dragover', OSD.GUI.preview.onDragOver)
-                            .on('dragleave', OSD.GUI.preview.onDragLeave)
-                            .on('drop', OSD.GUI.preview.onDrop)
-                            .data('item', item)
-                            .data('position', i);
-                        // Required for NW.js - Otherwise the <img /> will
-                        // consume drag/drop events.
-                        $img.find('img').css('pointer-events', 'none');
-                        if (item && item.positionable !== false) {
-                            $img
-                                .addClass('field-' + item.id)
-                                .data('item', item)
-                                .prop('draggable', true)
-                                .on('dragstart', OSD.GUI.preview.onDragStart);
-                        }
-
-                        $row.append($img);
-                        if (++i % OSD.data.display_size.x == 0) {
-                            $preview.append($row);
-                            $row = $('<div class="row"/>');
-                        }
-                    }
-                });
-        }
 
         $('a.save').click(function () {
             var self = this;
@@ -1367,7 +1573,7 @@ TABS.osd.initialize = function (callback) {
             $.get('/resources/osd/' + $(this).data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
                 FONT.preview($preview);
-                updateOsdView();
+                OSD.GUI.update();
             });
         });
 
@@ -1378,7 +1584,7 @@ TABS.osd.initialize = function (callback) {
             $fontPicker.removeClass('active');
             FONT.openFontFile().then(function () {
                 FONT.preview($preview);
-                updateOsdView();
+                OSD.GUI.update();
             });
         });
 
