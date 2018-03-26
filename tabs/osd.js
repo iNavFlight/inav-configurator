@@ -1050,6 +1050,24 @@ TABS.osd.initialize = function (callback) {
                         if (typeof alarm.step === 'function') {
                             step = alarm.step(OSD.data)
                         }
+                        var $input = $('<label/>');
+                        var tooltip, help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+                        if (help) {
+                            tooltip = $('<div class="helpicon cf_tip"></div>');
+                            tooltip
+                            .css('margin-top', '1px')
+                            .attr('title', help)
+                            .appendTo($input)
+                            .jBox('Tooltip', {
+                                delayOpen: 100,
+                                delayClose: 100,
+                                position: {
+                                    x: 'right',
+                                    y: 'center'
+                                },
+                                outside: 'x'
+                            });
+                        }
                         var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
                         alarmInput.data('alarm', alarm);
                         if (typeof alarm.to_display === 'function') {
@@ -1066,26 +1084,10 @@ TABS.osd.initialize = function (callback) {
                             OSD.data.alarms[alarm.name] = val;
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
+                                    tooltip.close();
                                     updateOsdView();
                                 });
                         });
-                        var $input = $('<label/>');
-                        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
-                        if (help) {
-                            $('<div class="helpicon cf_tip"></div>')
-                            .css('margin-top', '1px')
-                            .attr('title', help)
-                            .appendTo($input)
-                            .jBox('Tooltip', {
-                                delayOpen: 100,
-                                delayClose: 100,
-                                position: {
-                                    x: 'right',
-                                    y: 'center'
-                                },
-                                outside: 'x'
-                            });
-                        }
                         $input.append(alarmInput);
                         $alarms.append($input);
                     }
