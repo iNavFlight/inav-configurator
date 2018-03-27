@@ -59,9 +59,20 @@ $(document).ready(function () {
             }
         });
 
+        win.setMinimumSize(1024, 800);
+
         win.on('close', function () {
             //Save window size and position
-            var currentWin = this;
+            // var height = win.height;
+            // var width = win.width;
+            //
+            // if (height < 400) {
+            //     height = 400
+            // }
+            // if (width < 512) {
+            //     width = 512
+            // }
+
             chrome.storage.local.set({'windowSize': {height: win.height, width: win.width, x: win.x, y: win.y}}, function () {
                 // Notify that we saved.
                 console.log('Settings saved');
@@ -188,6 +199,9 @@ $(document).ready(function () {
                         break;
                     case 'gps':
                         TABS.gps.initialize(content_ready);
+                        break;
+                    case 'mission_control':
+                        TABS.mission_control.initialize(content_ready);
                         break;
                     case 'motors':
                         TABS.motors.initialize(content_ready);

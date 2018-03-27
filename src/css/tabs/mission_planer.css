@@ -1,0 +1,127 @@
+.tab-mission-control .btn a {
+    /*  common styles for content toolbar buttons */
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-right: 20px;*/
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    /*float: right;*/
+    font-family: 'open_sansbold', Arial, serif;
+    font-size: 12px;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0 9px;
+    line-height: 28px;
+    margin: 5px;
+    float: left;
+    width: 130px;
+    text-align: center;
+}
+
+.tab-mission-control .btn a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn a:active {
+    background-color: #37a8db;
+    transition: all ease 0.0s;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
+}
+
+.tab-mission-control .btn a.disabled {
+    cursor: default;
+    color: #fff;
+    background-color: #AFAFAF;
+    border: 1px solid #AFAFAF;
+    pointer-events: none;
+    text-shadow: none;
+    opacity: 0.5;
+}
+
+.tab-mission-control .btn-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+}
+
+.tab-mission-control .btn-danger a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .checksfail {
+    /*float: right;*/
+    margin-top: 3px;
+    height: 15px;
+    width: 15px;
+    background-image:url(../../../images/icons/nopass.svg);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+.tab-mission-control .content_wrapper {
+    display: flex;
+    /*height: 150px;*/
+    height: 90%;
+    /*width: 75%;*/
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.tab-mission-control {
+    height: 100%;
+}
+
+#missionMap {
+    height: 100%;
+}
+
+.tab-mission-control input {
+    width: 115px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tab-mission-control select {
+    width: 118px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tab-mission-control .point {
+    display: block;
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+.tab-mission-control .point-label {
+    width: 60px;
+    display: inline-block;
+}
+
+.mission-control-settings {
+    top: 65px;
+    left: .5em;
+}
+.ol-touch .mission-control-settings {
+    top: 80px;
+}

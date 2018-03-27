@@ -1,0 +1,119 @@
+<div class="tab-mission-control">
+    <div style="padding-top: 20px;padding-left: 20px; padding-right: 20px;position: relative;">
+        <div class="tab_title" data-i18n="tabMissionControl">Mission planer</div>
+        <div class="cf_doc_version_bt">
+            <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
+        </div>
+    </div>
+    <div class="content_wrapper">
+        <div class="cf_column fourth" id="missionControls">
+            <div class="spacer_right">
+                <div id="missionPlanerSettings" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
+                    </div>
+                    <div class="spacer">
+                        <div class="point">
+                            <label class="point-label" for="pointAlt">Alt (cm): </label>
+                            <input id="MPdefaultPointAlt" type="text" value="0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointSpeed">Speed (cm/s): </label>
+                            <input id="MPdefaultPointSpeed" type="text" value="0" required>
+                        </div>
+                        <div>
+                            <div id="saveSettings" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                                <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="missionPalnerTotalInfo" class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
+                    </div>
+                    <div class="spacer">
+                        <div style="padding-bottom: 2px;">
+                            <span>Distance (m):</span>
+                            <span id="missionDistance"></span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span>Available Points</span>
+                            <span id="availablePoints">0/0</span>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <span>Mission valid</span>
+                            <div id="missionValid" style="display: inline-block"></div>
+                        </div>
+                        <br>
+                        <div style="display: flex;">
+                            <input type="checkbox" style="width: 18px;margin-left: 5px;" id="rthEndMission">
+                            <label for="rthEndMission" style="padding: 2px;">RTH at the end of the mission</label>
+                        </div>
+                        <div id="rthSettings" style="display: none">
+                            <div style="display: flex">
+                                <input type="checkbox" id="rthLanding" style="width: 18px;margin-left: 5px;">
+                                <label for="rthLanding" style="padding: 2px">Landing</label>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="btn save_btn">
+                            <a id="loadMissionButton" class="save" href="#" data-i18n="loadMissionButton">Load mission from FC</a>
+                            <a id="saveMissionButton" class="save" href="#" data-i18n="saveMissionButton">Save mission to FC</a>
+                            <a id="loadEepromMissionButton" class="save" href="#" data-i18n="loadEepromMissionButton">Load Eeprom mission</a>
+                            <a id="saveEepromMissionButton" class="save" href="#" data-i18n="saveEepromMissionButton">Save Eeprom mission</a>
+                        </div>
+                        <hr>
+                        <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 10px; display: inline-block">
+                            <a class="save" href="#" data-i18n="removeAllPointButtonSave" style="float: left">Remove all points</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="gui_box grey" id="MPeditPoint" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead">Edit point</div>
+                    </div>
+                    <div class="spacer">
+                        <input type="hidden" name="pointNumber" value="">
+                        <div class="point">
+                            <label class="point-label" for="pointType">Type: </label>
+                            <select name="type" id="pointType">
+                                <!--<option value="1">Home</option>-->
+                                <option value="1">Waypoint</option>
+                                <!--<option value="4">RTH</option>-->
+                            </select>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointLat">Lat: </label>
+                            <input id="pointLat" type="text" value="0.0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointLon">Lon: </label>
+                            <input id="pointLon" type="text" value="0.0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointAlt">Alt (cm): </label>
+                            <input id="pointAlt" type="text" value="0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="pointSpeed">Speed (cm/s): </label>
+                            <input id="pointSpeed" type="text" value="0" required>
+                        </div>
+                        <div>
+                            <div id="savePoint" class="btn save_btn" style="padding-top: 10px; display: inline-block">
+                                <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
+                            </div>
+                            <div id="removePoint" class="btn btn-danger" style="padding-top: 10px; display: inline-block;">
+                                <a class="save" href="#" data-i18n="editPointButtonRemove" style="float: left">Remove</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cf_column threefourth_left">
+            <div id="missionMap"></div>
+            <div id="notLoadMap" data-i18n="useOnlyStandalone" style="display: none;"></div>
+        </div>
+    </div>
+</div>

@@ -313,6 +313,9 @@
     "communitySlackSupport": {
         "message": "Slack Support Live Chat"
     },
+    "communityTelegramSupport": {
+        "message": "Telegram Channel"
+    },
     "initialSetupBackupAndRestoreApiVersion": {
         "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
@@ -406,6 +409,42 @@
     "initialSetupBattery": {
         "message": "Battery voltage:"
     },
+    "initialSetupBatteryDetectedCells": {
+        "message": "Battery detected cell count:"
+    },
+    "initialSetupBatteryDetectedCellsValue": {
+        "message": "$1"
+    },
+    "initialSetupBatteryPercentage": {
+        "message": "Battery left:"
+    },
+    "initialSetupBatteryPercentageValue": {
+        "message": "$1 %"
+    },
+    "initialSetupBatteryRemainingCapacity": {
+        "message": "Battery remaining capacity"
+    },
+    "initialSetupBatteryRemainingCapacityValue": {
+        "message": "$1 $2"
+    },
+    "initialSetupBatteryFull": {
+        "message": "Battery full when plugged in"
+    },
+    "initialSetupBatteryFullValue": {
+        "message": "$1"
+    },
+    "initialSetupBatteryThresholds": {
+        "message": "Battery use cap thresholds"
+    },
+    "initialSetupBatteryThresholdsValue": {
+        "message": "$1"
+    },
+    "initialSetup_Wh_drawn": {
+        "message": "Capacity drawn:"
+    },
+    "initialSetup_Wh_drawnValue": {
+        "message": "$1 Wh"
+    },
     "initialSetupBatteryValue": {
         "message": "$1 V"
     },
@@ -482,6 +521,9 @@
 
     "featureVBAT": {
         "message": "Battery voltage monitoring"
+    },
+    "featureTX_PROF_SEL": {
+        "message": "Profile selection with TX stick command"
     },
     "featureINFLIGHT_ACC_CAL": {
         "message": "In-flight level calibration"
@@ -573,6 +615,9 @@
     "featureAIRMODE": {
         "message": "Permanently enable AIRMODE"
     },
+    "featureFW_LAUNCH": {
+        "message": "Permanently enable Launch Mode for Fixed Wing"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
@@ -637,16 +682,10 @@
         "message": "Magnetometer Declination [deg]"
     },
     "configurationAutoDisarmDelay": {
-        "message": "Disarm delay [Seconds]"
+        "message": "Seconds until disarm due to low THR"
     },
     "configurationAutoDisarmDelayHelp": {
-        "message": "Requires MOTOR_STOP feature"
-    },
-    "configurationDisarmKillSwitch": {
-        "message": "Disarm regardless of throttle value"
-    },
-    "configurationDisarmKillSwitchHelp": {
-        "message": "When arming via radio channel"
+        "message": "Only used for stick arming (i.e. not using a switch)"
     },
     "configurationThrottleMinimum": {
         "message": "Minimum Throttle"
@@ -689,6 +728,21 @@
     },
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
+    },
+    "configurationBatteryCapacity": {
+        "message": "Battery Capacity"
+    },
+    "configurationBatteryCapacityValue": {
+        "message": "Capacity"
+    },
+    "configurationBatteryCapacityWarning": {
+        "message": "Warning Capacity (%)"
+    },
+    "configurationBatteryCapacityCritical": {
+        "message": "Critical Capacity (%)"
+    },
+    "configurationBatteryCapacityUnit": {
+        "message": "Battery Capacity Unit"
     },
     "configuration3d": {
         "message": "3D"
@@ -832,6 +886,15 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "pidTuningManualRollRate": {
+        "message": "Manual ROLL rate"
+    },
+    "pidTuningManualPitchRate": {
+        "message": "Manual PITCH rate"
+    },
+    "pidTuningManualYawRate": {
+        "message": "Manual YAW rate"
+    },
     "magHoldYawRate": {
         "message": "MagHold rate"
     },
@@ -890,8 +953,14 @@
     "receiverRcExpo": {
         "message": "RC Expo"
     },
-	"receiverRcYawExpo": {
+    "receiverRcYawExpo": {
         "message": "RC Yaw Expo"
+    },
+    "receiverManualRcExpo": {
+        "message": "Manual RC Expo"
+    },
+    "receiverManualRcYawExpo": {
+        "message": "Manual RC Yaw Expo"
     },
     "receiverChannelMap": {
         "message": "Channel Map"
@@ -1052,37 +1121,37 @@
         "message": "Roll D Adjustment"
     },
     "adjustmentsFunction21": {
-        "message": "Alt P Adjustment"
+        "message": "RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction22": {
-        "message": "Alt I Adjustment"
+        "message": "Manual RC Expo Adjustment"
     },
     "adjustmentsFunction23": {
-        "message": "Alt D Adjustment"
+        "message": "Manual RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction24": {
-        "message": "Vel P Adjustment"
+        "message": "Manual Pitch & Roll Rate Adjustment"
     },
     "adjustmentsFunction25": {
-        "message": "Vel I Adjustment"
+        "message": "Manual Roll Rate Adjustment"
     },
     "adjustmentsFunction26": {
-        "message": "Vel D Adjustment"
+        "message": "Manual Pitch Rate Adjustment"
     },
     "adjustmentsFunction27": {
-        "message": "MAG P Adjustment"
+        "message": "Manual Yaw Rate Adjustment"
     },
     "adjustmentsFunction28": {
-        "message": "Pos P Adjustment"
+        "message": "Navigation FW Cruise Throttle Adjustment"
     },
     "adjustmentsFunction29": {
-        "message": "Pos I Adjustment"
+        "message": "Navigation FW Pitch To Throttle Adjustment"
     },
     "adjustmentsFunction30": {
-        "message": "PosR P Adjustment"
+        "message": "Board Roll Alignment Adjustment"
     },
     "adjustmentsFunction31": {
-        "message": "PosR I Adjustment"
+        "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction32": {
         "message": "PosR D Adjustment"
@@ -2249,8 +2318,23 @@
     "osdElement_MAIN_BATT_CELL_VOLTAGE": {
         "message": "Battery Cell Voltage"
     },
+    "osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
+        "message": "Battery Remaining Percentage"
+    },
+    "osdElement_MAIN_BATT_REMAINING_CAPACITY": {
+        "message": "Battery Remaining Capacity"
+    },
     "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Shows the average cell voltage from the main battery"
+    },
+    "osdElement_MAH_DRAWN": {
+        "message": "mAh drawn"
+    },
+    "osdElement_EFFICIENCY_MAH": {
+        "message": "Efficiency mAh/Km"
+    },
+    "osdElement_EFFICIENCY_WH": {
+        "message": "Efficiency Wh/Km"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
@@ -2275,6 +2359,9 @@
     },
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
+    },
+    "osdElement_TRIP_DIST": {
+        "message": "Trip distance"
     },
     "osdElement_VARIO_HELP": {
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
@@ -2323,6 +2410,51 @@
     },
     "downloadUpdatesBtn": {
         "message": "Download new app"
+    },
+    "tabMissionControl": {
+        "message": "Mission Control"
+    },
+    "loadMissionButton": {
+        "message": "Load mission from FC"
+    },
+    "saveMissionButton": {
+        "message": "Save mission to FC"
+    },
+    "loadEepromMissionButton": {
+        "message": "Load Eeprom mission"
+    },
+    "saveEepromMissionButton": {
+        "message": "Save Eeprom mission"
+    },
+    "editPointHead": {
+        "message": "Edit point"
+    },
+    "editPointButtonSave": {
+        "message": "Save"
+    },
+    "editPointButtonRemove": {
+        "message": "Remove"
+    },
+    "removeAllPointButtonSave": {
+        "message": "Remove all points"
+    },
+    "missionTotalInformationHead": {
+        "message": "Total information"
+    },
+    "missionRTHsettingsTitle": {
+        "message": "RTH settings"
+    },
+    "missionDefaultSettingsHead": {
+        "message": "Default settings"
+    },
+    "useOnlyStandalone": {
+        "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
+    },
+    "eeprom_load_ok": {
+        "message": "EEPROM <span style=\"color: #37a8db\">loaded</span>"
+    },
+    "confirm_delete_all_points": {
+        "message": "Do you really want to delete all points?"
     },
     "servoMixer": {
         "message": "Servo mixer"

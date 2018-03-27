@@ -17,8 +17,11 @@ SYM.AH_BAR9_0 = 0x80;
 SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
+SYM.WH = 0xAB;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
+SYM.WH_KM_0 = 172;
+SYM.WH_KM_1 = 173;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -33,6 +36,7 @@ SYM.AIR = 151;
 SYM.DIR_TO_HOME = 0x60;
 SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
+SYM.TRIP_DIST = 0x22;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
 SYM.HEADING_N = 24;
@@ -403,6 +407,12 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
                 },
                 {
+                    name: 'MAIN_BATT_REMAINING_PERCENTAGE',
+                    id: 38,
+                    min_version: '1.8.1',
+                    preview: '100%'
+                },
+                {
                     name: 'THROTTLE_POSITION',
                     id: 9,
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
@@ -575,16 +585,34 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
                 },
                 {
+                    name: 'WH_DRAWN',
+                    id: 36,
+                    min_version: '1.8.1',
+                    preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
+                },
+                {
                     name: 'POWER',
                     id: 19,
                     min_version: '1.6.0',
                     preview: 'W50 ' // 3 chars
                 },
                 {
-                    name: 'EFFICIENCY',
+                    name: 'MAIN_BATT_REMAINING_CAPACITY',
+                    id: 37,
+                    min_version: '1.8.1',
+                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                },
+                {
+                    name: 'EFFICIENCY_MAH',
                     id: 35,
                     min_version: '1.7.4',
                     preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                },
+                {
+                    name: 'EFFICIENCY_WH',
+                    id: 39,
+                    min_version: '1.8.1',
+                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
                 }
             ]
         },
@@ -639,6 +667,18 @@ OSD.constants = {
                             return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
                         }
                         return FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                    }
+                },
+                {
+                    name: 'TRIP_DIST',
+                    id: 40,
+                    min_version: '1.9.1',
+                    preview: function(osd_data) {
+                        if (OSD.data.unit_mode === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        }
+                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {
@@ -1010,6 +1050,24 @@ TABS.osd.initialize = function (callback) {
                         if (typeof alarm.step === 'function') {
                             step = alarm.step(OSD.data)
                         }
+                        var $input = $('<label/>');
+                        var tooltip, help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
+                        if (help) {
+                            tooltip = $('<div class="helpicon cf_tip"></div>');
+                            tooltip
+                            .css('margin-top', '1px')
+                            .attr('title', help)
+                            .appendTo($input)
+                            .jBox('Tooltip', {
+                                delayOpen: 100,
+                                delayClose: 100,
+                                position: {
+                                    x: 'right',
+                                    y: 'center'
+                                },
+                                outside: 'x'
+                            });
+                        }
                         var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
                         alarmInput.data('alarm', alarm);
                         if (typeof alarm.to_display === 'function') {
@@ -1026,26 +1084,10 @@ TABS.osd.initialize = function (callback) {
                             OSD.data.alarms[alarm.name] = val;
                             MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther())
                                 .then(function () {
+                                    tooltip.close();
                                     updateOsdView();
                                 });
                         });
-                        var $input = $('<label/>');
-                        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
-                        if (help) {
-                            $('<div class="helpicon cf_tip"></div>')
-                            .css('margin-top', '1px')
-                            .attr('title', help)
-                            .appendTo($input)
-                            .jBox('Tooltip', {
-                                delayOpen: 100,
-                                delayClose: 100,
-                                position: {
-                                    x: 'right',
-                                    y: 'center'
-                                },
-                                outside: 'x'
-                            });
-                        }
                         $input.append(alarmInput);
                         $alarms.append($input);
                     }

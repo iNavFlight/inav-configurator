@@ -16,14 +16,21 @@ TABS.receiver.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
-    loadChainer.setChain([
-        mspHelper.loadRcTuningData,
+    var loadChain = [
         mspHelper.loadMisc,
         mspHelper.loadRcData,
         mspHelper.loadRcMap,
         mspHelper.loadBfConfig,
         mspHelper.loadRcDeadband
-    ]);
+    ];
+
+    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+        loadChain.push(mspHelper.loadRateProfileData);
+    } else {
+        loadChain.push(mspHelper.loadRcTuningData);
+    }
+
+    loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
@@ -31,9 +38,52 @@ TABS.receiver.initialize = function (callback) {
         $('#content').load("./tabs/receiver.html", process_html);
     }
 
+    function drawRollPitchExpo() {
+        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+        var context = pitch_roll_curve.getContext("2d");
+
+        var expoAVal = $('.tunings .rate input[name="expo"]');
+        var expoA = parseFloat(expoAVal.val());
+
+        var expoMVal = $('.tunings .rate input[name="manual_expo"]');
+        var expoM = parseFloat(expoMVal.val());
+
+        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max')) ||
+            expoM <= parseFloat(expoMVal.prop('min')) || expoM >= parseFloat(expoMVal.prop('max'))) {
+            return;
+        }
+
+        var rateHeight = TABS.receiver.rateChartHeight;
+
+        // draw
+        context.clearRect(0, 0, 200, rateHeight);
+
+        context.beginPath();
+        context.moveTo(0, rateHeight);
+        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
+        context.lineWidth = 2;
+        context.strokeStyle = '#37a8db';
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(0, rateHeight);
+        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoM)), 200, 0);
+        context.lineWidth = 2;
+        context.strokeStyle = '#a837db';
+        context.stroke();
+    }
+
     function process_html() {
         // translate to user-selected language
         localize();
+
+        if (semver.lt(CONFIG.flightControllerVersion, '1.9.1')) {
+            rcmap_options = $('select[name="rcmap_helper"] option');
+            for (i = 0; i < rcmap_options.length; ++i) {
+                option = rcmap_options[i];
+                option.setAttribute("value", option.getAttribute("value") + "5678");
+            }
+        }
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
@@ -41,6 +91,9 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
         $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
+
+        $('.tunings .rate input[name="manual_expo"]').val(RC_tuning.manual_RC_EXPO.toFixed(2));
+        $('.tunings .yaw_rate input[name="manual_yaw_expo"]').val(RC_tuning.manual_RC_YAW_EXPO.toFixed(2));
 
         $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
         $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
@@ -107,9 +160,9 @@ TABS.receiver.initialize = function (callback) {
         $(window).on('resize', self.resize).resize(); // trigger so labels get correctly aligned on creation
 
         // handle rcmap & rssi aux channel
-        var strBuffer = [];
+        var strBuffer = [], rcMapLetters = FC.getRcMapLetters();
         for (var i = 0; i < RC_MAP.length; i++) {
-            strBuffer[RC_MAP[i]] = FC.getRcMapLetters()[i];
+            strBuffer[RC_MAP[i]] = rcMapLetters[i];
         }
 
         // reconstruct
@@ -138,29 +191,12 @@ TABS.receiver.initialize = function (callback) {
         });
 
         $rcMap.focusout(function () {
-            var val = $(this).val(),
-                strBuffer = val.split(''),
-                duplicityBuffer = [];
-
-            if (val.length != 8) {
+            if (!FC.isRcMapValid($(this).val()))
                 $(this).val(last_valid);
-                return false;
-            }
+        });
 
-            // check if characters inside are all valid, also check for duplicity
-            for (var i = 0; i < val.length; i++) {
-                if (FC.getRcMapLetters().indexOf(strBuffer[i]) < 0) {
-                    $(this).val(last_valid);
-                    return false;
-                }
-
-                if (duplicityBuffer.indexOf(strBuffer[i]) < 0) {
-                    duplicityBuffer.push(strBuffer[i]);
-                } else {
-                    $(this).val(last_valid);
-                    return false;
-                }
-            }
+        $rcMap.on('input change', function() {
+            $(this).css("color", FC.isRcMapValid($(this).val()) ? "" : "#FF0000");
         });
 
         // handle helper
@@ -224,27 +260,7 @@ TABS.receiver.initialize = function (callback) {
 
         $('.tunings .rate input').on('input change', function () {
             setTimeout(function () { // let global validation trigger and adjust the values first
-                var expoE = $('.tunings .rate input[name="expo"]'),
-                    expo = parseFloat(expoE.val()),
-                    pitch_roll_curve = $('.pitch_roll_curve canvas').get(0),
-                    context = pitch_roll_curve.getContext("2d");
-
-                // local validation to deal with input event
-                if (expo >= parseFloat(expoE.prop('min')) &&
-                    expo <= parseFloat(expoE.prop('max'))) {
-                    // continue
-                } else {
-                    return;
-                }
-
-                // draw
-                context.clearRect(0, 0, 200, rateHeight);
-                context.beginPath();
-                context.moveTo(0, rateHeight);
-                context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expo)), 200, 0);
-                context.lineWidth = 2;
-                context.strokeStyle = '#37a8db';
-                context.stroke();
+                drawRollPitchExpo();
             }, 0);
         }).trigger('input');
 
@@ -271,6 +287,9 @@ TABS.receiver.initialize = function (callback) {
 
             RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
             RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
+
+            RC_tuning.manual_RC_EXPO = parseFloat($('.tunings .rate input[name="manual_expo"]').val());
+            RC_tuning.manual_RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="manual_yaw_expo"]').val());
 
             RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
             RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
@@ -309,7 +328,11 @@ TABS.receiver.initialize = function (callback) {
                 });
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, save_rc_map);
+            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
+                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
+            } else {
+                MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, save_rc_map);
+            }
         });
 
         $("a.sticks").click(function () {
