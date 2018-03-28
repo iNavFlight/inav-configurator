@@ -1294,6 +1294,19 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_WP_MISSION_LOAD:
                 console.log('Mission load');
                 break;
+
+            case MSPCodes.MSP2_INAV_MIXER:
+                MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
+                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
+                MIXER_CONFIG.platformType = data.getInt8(3);
+                MIXER_CONFIG.hasFlaps = data.getInt8(4)
+                MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MIXER:
+                console.log('Mixer config saved');
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1888,6 +1901,17 @@ var mspHelper = (function (gui) {
                 console.log(buffer);
 
                 break;
+
+            case MSPCodes.MSP2_INAV_SET_MIXER:
+                buffer.push(MIXER_CONFIG.yawMotorDirection);
+                buffer.push(lowByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(highByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(MIXER_CONFIG.platformType);
+                buffer.push(MIXER_CONFIG.hasFlaps);
+                buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
+                buffer.push(highByte(MIXER_CONFIG.appliedMixerPreset));
+                break;
+
             default:
                 return false;
         }
@@ -2893,7 +2917,7 @@ var mspHelper = (function (gui) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
             MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
         } else {
-            onCompleteCallback();
+            callback();
         }
     };
 
@@ -2933,6 +2957,21 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadMixerConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveMixerConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_MIXER, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MIXER), false, callback);
+        } else {
+            callback();
+        }
+    };
 
     return self;
 })(GUI);

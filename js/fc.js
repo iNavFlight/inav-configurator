@@ -51,7 +51,8 @@ var CONFIG,
     POSITION_ESTIMATOR,
     RTH_AND_LAND_CONFIG,
     FW_CONFIG,
-    DEBUG_TRACE;
+    DEBUG_TRACE,
+    MIXER_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -161,6 +162,14 @@ var FC = {
         SERVO_CONFIG = [];
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
+
+        MIXER_CONFIG = {
+            yawMotorDirection: 0,
+            yawJumpPreventionLimit: 0,
+            platformType: -1,
+            hasFlaps: false,
+            appliedMixerPreset: -1
+        },
 
         SERIAL_CONFIG = {
             ports: [],
@@ -793,7 +802,6 @@ var FC = {
             'JJRC H8_3D',
             'iNav Reference protocol',
             'eLeReS'
-            
         ];
     },
     getSensorAlignments: function () {

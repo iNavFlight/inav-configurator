@@ -17,7 +17,8 @@ TABS.setup.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadBfConfig,
-        mspHelper.queryFcStatus
+        mspHelper.queryFcStatus,
+        mspHelper.loadMixerConfig
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
