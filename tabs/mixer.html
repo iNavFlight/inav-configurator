@@ -1,0 +1,43 @@
+<div class="tab-configuration tab-mixer toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabMixer">Mixer</div>
+        <div class="leftWrapper">
+            <div class="platform-type gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="platformConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="select">
+                        <select id="platform-type"></select>
+                        <label for="platform-type">
+                            <span data-i18n="platformType"></span>
+                        </label>
+                    </div>
+                    <div class="select">
+                        <div class="mixerPreview half">
+                            <img src="./resources/motor_order/custom.svg" />
+                        </div>
+                        <div class="half" style="width: calc(50% - 10px); margin-left: 10px;">
+                            <select id="mixer-preset"></select>
+                        </div>
+                    </div>
+                    <div id="has-flaps-wrapper" class="checkbox">
+                        <input type="checkbox" id="has-flaps" class="toggle" />
+                        <label for="has-flaps">
+                            <span data-i18n="platformHasFlaps"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rightWrapper">
+
+        </div>
+    </div>
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a id="save-button" class="save disabled" href="#" data-i18n="presetsButtonApply"></a>
+        </div>
+    </div>
+</div>

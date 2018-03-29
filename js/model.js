@@ -61,23 +61,6 @@ const mixerList = [
         ]
     },            // 1
     {
-        id: 2,
-        name: 'Quad +',
-        model: 'quad_x',
-        image: 'quad_p',
-        hasCustomServoMixer: false,
-        enabled: true,
-        legacy: true,
-        platform: PLATFORM_MULTIROTOR,
-        motorMixer: [
-            new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
-            new MotorMixRule(1.0, -1.0, 0.0, 1.0),          // RIGHT
-            new MotorMixRule(1.0, 1.0, 0.0, 1.0),          // LEFT
-            new MotorMixRule(1.0, 0.0, -1.0, -1.0)          // FRONT
-        ],
-        servoMixer: []
-    },               // 2
-    {
         id: 3,
         name: 'Quad X',
         model: 'quad_x',
@@ -94,6 +77,23 @@ const mixerList = [
         ],
         servoMixer: []
     },               // 3
+    {
+        id: 2,
+        name: 'Quad +',
+        model: 'quad_x',
+        image: 'quad_p',
+        hasCustomServoMixer: false,
+        enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
+            new MotorMixRule(1.0, -1.0, 0.0, 1.0),          // RIGHT
+            new MotorMixRule(1.0, 1.0, 0.0, 1.0),          // LEFT
+            new MotorMixRule(1.0, 0.0, -1.0, -1.0)          // FRONT
+        ],
+        servoMixer: []
+    },               // 2
     {
         id: 4,
         name: 'Bicopter',
@@ -448,6 +448,51 @@ const mixerList = [
     }      // 25
 ];
 
+const platformList = [
+    {
+        id: 0,
+        name: "Multirotor",
+        enabled: true,
+        flapsPossible: false
+    },
+    {
+        id: 1,
+        name: "Airplane",
+        enabled: true,
+        flapsPossible: true
+    },
+    {
+        id: 2,
+        name: "Helicopter",
+        enabled: false,
+        flapsPossible: false
+    },
+    {
+        id: 3,
+        name: "Tricopter",
+        enabled: true,
+        flapsPossible: false
+    },
+    {
+        id: 4,
+        name: "Rover",
+        enabled: false,
+        flapsPossible: false
+    },
+    {
+        id: 5,
+        name: "Boat",
+        enabled: false,
+        flapsPossible: false
+    },
+    {
+        id: 6,
+        name: "Other",
+        enabled: false,
+        flapsPossible: false
+    }
+];
+
 var helper = helper || {};
 
 helper.mixer = (function (mixerList) {
@@ -507,3 +552,35 @@ helper.mixer = (function (mixerList) {
 
     return publicScope;
 })(mixerList);
+
+helper.platform = (function (platforms) {
+    let publicScope = {},
+        privateScope = {};
+
+    publicScope.getList = function () {
+        let retVal = [];
+        for (const i in platforms) {
+            if (platforms.hasOwnProperty(i)) {
+                let element = platforms[i];
+                if (element.enabled) {
+                    retVal.push(element);
+                }
+            }
+        }
+        return retVal;
+    };
+
+    publicScope.getById = function (id) {
+        for (const i in platforms) {
+            if (platforms.hasOwnProperty(i)) {
+                let element = platforms[i];
+                if (element.id === id) {
+                    return element;
+                }
+            }
+        }
+        return false;
+    }
+
+    return publicScope;
+})(platformList);

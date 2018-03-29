@@ -1241,6 +1241,9 @@
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
+    "mixerSaved": {
+        "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
+    },
     "gpsHead": {
         "message": "GPS"
     },
@@ -2003,6 +2006,9 @@
     "LevBtn": {
         "message": "Level calibration"
     },
+    "tabMixer": {
+        "message": "Mixer"
+    },
     "tabPresets": {
         "message": "Presets"
     },
@@ -2464,5 +2470,17 @@
     },
     "servoMixerAdd": {
         "message": "Add new mixer rule"
+    },
+    "platformType": {
+        "message": "Platform type"
+    },
+    "platformConfiguration": {
+        "message": "Platform configuration"
+    },
+    "platformHasFlaps": {
+        "message": "Has flaps"
+    },
+    "mixerPreset": {
+        "message": "Mixer preset"
     }
 }
