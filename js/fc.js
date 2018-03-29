@@ -60,6 +60,9 @@ var FC = {
     isRatesInDps: function () {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
+    isNewMixer: function () {
+        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "1.9.1"));
+    },
     resetState: function () {
         SENSOR_STATUS = {
             isHardwareHealthy: 0,

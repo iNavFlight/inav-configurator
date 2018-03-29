@@ -758,6 +758,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
+
+        /*
+         * Hide mixer section
+         */
+        if (FC.isNewMixer()) {
+            $('.mixer').addClass("is-hidden");
+        }
+
         GUI.content_ready(callback);
     }
 };
