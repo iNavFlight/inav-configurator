@@ -95,19 +95,21 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     function process_html() {
 
-        var i;
+        let i,
+            mixer_list_e = $('select.mixerList'),
+            legacyMixers = helper.mixer.getLegacyList();
 
-        var mixer_list_e = $('select.mixerList');
-        for (i = 0; i < mixerList.length; i++) {
-            mixer_list_e.append('<option value="' + (i + 1) + '">' + mixerList[i].name + '</option>');
+        for (i in legacyMixers) {
+            if (legacyMixers.hasOwnProperty(i)) {
+                mixer_list_e.append('<option value="' + legacyMixers[i].id + '">' + legacyMixers[i].name + '</option>');
+            }
         }
 
         mixer_list_e.change(function () {
-            var val = parseInt($(this).val(), 10);
+            BF_CONFIG.mixerConfiguration = parseInt($(this).val(), 10);
 
-            BF_CONFIG.mixerConfiguration = val;
-
-            $('.mixerPreview img').attr('src', './resources/motor_order/' + mixerList[val - 1].image + '.svg');
+            $('.mixerPreview img').attr('src', './resources/motor_order/'
+                + helper.mixer.getById(BF_CONFIG.mixerConfiguration).image + '.svg');
         });
 
         // select current mixer configuration
@@ -721,7 +723,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
 
-            googleAnalytics.sendEvent('Setting', 'Mixer', mixerList[BF_CONFIG.mixerConfiguration - 1].name);
+            googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('.radio').find('label').text());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 

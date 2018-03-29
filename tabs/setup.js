@@ -240,7 +240,7 @@ TABS.setup.initialize3D = function () {
 //
     // load the model including materials
     if (useWebGlRenderer) {
-        model_file = mixerList[BF_CONFIG.mixerConfiguration - 1].model;
+        model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
     } else {
         model_file = 'fallback'
     }

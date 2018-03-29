@@ -31,14 +31,26 @@ const INPUT_STABILIZED_ROLL = 0,
     INPUT_GIMBAL_ROLL = 13,
     INPUT_FEATURE_FLAPS = 14;
 
+const
+    PLATFORM_MULTIROTOR     = 0,
+    PLATFORM_AIRPLANE       = 1,
+    PLATFORM_HELICOPTER     = 2,
+    PLATFORM_TRICOPTER      = 3,
+    PLATFORM_ROVER          = 4,
+    PLATFORM_BOAT           = 5,
+    PLATFORM_OTHER          = 6;
+
 // generate mixer
 const mixerList = [
     {
+        id: 1,
         name: 'Tricopter',
         model: 'tricopter',
         image: 'tri',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_TRICOPTER,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.333333, 0.0),     // REAR
             new MotorMixRule(1.0, -1.0, -0.666667, 0.0),   // RIGHT
@@ -49,11 +61,14 @@ const mixerList = [
         ]
     },            // 1
     {
+        id: 2,
         name: 'Quad +',
         model: 'quad_x',
         image: 'quad_p',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
             new MotorMixRule(1.0, -1.0, 0.0, 1.0),          // RIGHT
@@ -63,11 +78,14 @@ const mixerList = [
         servoMixer: []
     },               // 2
     {
+        id: 3,
         name: 'Quad X',
         model: 'quad_x',
         image: 'quad_x',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -1.0, 1.0, -1.0),          // REAR_R
             new MotorMixRule(1.0, -1.0, -1.0, 1.0),          // FRONT_R
@@ -77,29 +95,38 @@ const mixerList = [
         servoMixer: []
     },               // 3
     {
+        id: 4,
         name: 'Bicopter',
         model: 'custom',
         image: 'bicopter',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
     },           // 4
     {
+        id: 5,
         name: 'Gimbal',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_OTHER,
         motorMixer: [],
         servoMixer: []
     },               // 5
     {
+        id: 6,
         name: 'Y6',
         model: 'y6',
         image: 'y6',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.333333, 1.0),     // REAR
             new MotorMixRule(1.0, -1.0, -0.666667, -1.0),     // RIGHT
@@ -111,11 +138,14 @@ const mixerList = [
         servoMixer: []
     },                           // 6
     {
+        id: 7,
         name: 'Hex +',
         model: 'hex_plus',
         image: 'hex_p',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -0.866025, 0.5, 1.0),     // REAR_R
             new MotorMixRule(1.0, -0.866025, -0.5, -1.0),     // FRONT_R
@@ -127,11 +157,14 @@ const mixerList = [
         servoMixer: []
     },               // 7
     {
+        id: 8,
         name: 'Flying Wing',
         model: 'custom',
         image: 'flying_wing',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -144,11 +177,14 @@ const mixerList = [
         ]
     },     // 8
     {
+        id: 9,
         name: 'Y4',
         model: 'y4',
         image: 'y4',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR_TOP CW
             new MotorMixRule(1.0, -1.0, -1.0, 0.0),          // FRONT_R CCW
@@ -158,11 +194,14 @@ const mixerList = [
         servoMixer: []
     },                           // 9
     {
+        id: 10,
         name: 'Hex X',
         model: 'hex_x',
         image: 'hex_x',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -0.5, 0.866025, 1.0),     // REAR_R
             new MotorMixRule(1.0, -0.5, -0.866025, 1.0),     // FRONT_R
@@ -174,11 +213,14 @@ const mixerList = [
         servoMixer: []
     },                  // 10
     {
+        id: 11,
         name: 'Octo X8',
         model: 'custom',
         image: 'octo_x8',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -1.0, 1.0, -1.0),          // REAR_R
             new MotorMixRule(1.0, -1.0, -1.0, 1.0),          // FRONT_R
@@ -192,11 +234,14 @@ const mixerList = [
         servoMixer: []
     },             // 11
     {
+        id: 12,
         name: 'Octo Flat +',
         model: 'custom',
         image: 'octo_flat_p',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 0.707107, -0.707107, 1.0),    // FRONT_L
             new MotorMixRule(1.0, -0.707107, -0.707107, 1.0),    // FRONT_R
@@ -210,11 +255,14 @@ const mixerList = [
         servoMixer: []
     },     // 12
     {
+        id: 13,
         name: 'Octo Flat X',
         model: 'custom',
         image: 'octo_flat_x',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 1.0, -0.414178, 1.0),      // MIDFRONT_L
             new MotorMixRule(1.0, -0.414178, -1.0, 1.0),      // FRONT_R
@@ -228,11 +276,14 @@ const mixerList = [
         servoMixer: []
     },     // 13
     {
+        id: 14,
         name: 'Airplane',
         model: 'custom',
         image: 'airplane',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -247,29 +298,38 @@ const mixerList = [
         ]
     },           // 14
     {
+        id: 15,
         name: 'Heli 120',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_HELICOPTER,
         motorMixer: [],
         servoMixer: []
     },             // 15
     {
+        id: 16,
         name: 'Heli 90',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_HELICOPTER,
         motorMixer: [],
         servoMixer: []
     },              // 16
     {
+        id: 17,
         name: 'V-tail Quad',
         model: 'quad_vtail',
         image: 'vtail_quad',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -0.58, 0.58, 1.0),        // REAR_R
             new MotorMixRule(1.0, -0.46, -0.39, -0.5),       // FRONT_R
@@ -279,11 +339,14 @@ const mixerList = [
         servoMixer: []
     },  // 17
     {
+        id: 18,
         name: 'Hex H',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -1.0, 1.0, -1.0),     // REAR_R
             new MotorMixRule(1.0, -1.0, -1.0, 1.0),     // FRONT_R
@@ -295,38 +358,50 @@ const mixerList = [
         servoMixer: []
     },                // 18
     {
+        id: 19,
         name: 'PPM to SERVO',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_OTHER,
         motorMixer: [],
         servoMixer: []
     },         // 19
     {
+        id: 20,
         name: 'Dualcopter',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
     },           // 20
     {
+        id: 21,
         name: 'Singlecopter',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: false,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
     },         // 21
     {
+        id: 22,
         name: 'A-tail Quad',
         model: 'quad_atail',
         image: 'atail_quad',
         hasCustomServoMixer: false,
         enabled: true,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.0, 1.0),          // REAR_R
             new MotorMixRule(1.0, -1.0, -1.0, 0.0),        // FRONT_R
@@ -336,30 +411,99 @@ const mixerList = [
         servoMixer: []
     },  // 22
     {
+        id: 23,
         name: 'Custom',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: true,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
     },               // 23
     {
+        id: 24,
         name: 'Custom Airplane',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: true,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
         motorMixer: [],
         servoMixer: []
     },      // 24
     {
+        id: 25,
         name: 'Custom Tricopter',
         model: 'custom',
         image: 'custom',
         hasCustomServoMixer: true,
         enabled: false,
+        legacy: true,
+        platform: PLATFORM_TRICOPTER,
         motorMixer: [],
         servoMixer: []
     }      // 25
 ];
+
+var helper = helper || {};
+
+helper.mixer = (function (mixerList) {
+    let publicScope = {},
+        privateScope = {};
+
+    publicScope.getLegacyList = function () {
+        let retVal = [];
+        for (const i in mixerList) {
+            if (mixerList.hasOwnProperty(i)) {
+                let element = mixerList[i];
+                if (element.legacy) {
+                    retVal.push(element);
+                }
+            }
+        }
+        return retVal;
+    };
+
+    publicScope.getList = function () {
+        let retVal = [];
+        for (const i in mixerList) {
+            if (mixerList.hasOwnProperty(i)) {
+                let element = mixerList[i];
+                if (element.enabled) {
+                    retVal.push(element);
+                }
+            }
+        }
+        return retVal;
+    };
+
+    publicScope.getById = function (id) {
+        for (const i in mixerList) {
+            if (mixerList.hasOwnProperty(i)) {
+                let element = mixerList[i];
+                if (element.id === id) {
+                    return element;
+                }
+            }
+        }
+        return false;
+    }
+
+    publicScope.getByPlatform = function (platform) {
+        let retVal = [];
+        for (const i in mixerList) {
+            if (mixerList.hasOwnProperty(i)) {
+                let element = mixerList[i];
+                if (element.platform === platform && element.enabled) {
+                    retVal.push(element);
+                }
+            }
+        }
+        return retVal;
+    };
+
+    return publicScope;
+})(mixerList);

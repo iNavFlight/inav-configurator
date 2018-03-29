@@ -172,9 +172,10 @@ TABS.motors.initialize = function (callback) {
     }
 
     function update_model(val) {
-        $('.mixerPreview img').attr('src', './resources/motor_order/' + mixerList[val - 1].image + '.svg');
+        $('.mixerPreview img').attr('src', './resources/motor_order/'
+            + helper.mixer.getById(val).image + '.svg');
     }
-    
+
     function process_html() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
