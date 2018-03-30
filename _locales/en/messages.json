@@ -2482,5 +2482,23 @@
     },
     "mixerPreset": {
         "message": "Mixer preset"
+    },
+    "mixerLoadPresetRules": {
+        "message": "Load mixer"
+    },
+    "mixerLoadAndApplyPresetRules": {
+        "message": "Load and apply"
+    },
+    "mixerApplyModalTitle" : {
+        "message": "Confirm"
+    },
+    "mixerButtonSaveAndReboot": {
+        "message": "Save and reboot"
+    },
+    "mixerApplyDescription": {
+        "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
+    },
+    "motorMixer": {
+        "message": "Motor Mixer"
     }
 }

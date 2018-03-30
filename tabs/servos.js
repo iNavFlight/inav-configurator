@@ -11,40 +11,23 @@ TABS.servos.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
-    if (BF_CONFIG.mixerConfiguration == 23 || BF_CONFIG.mixerConfiguration == 24 || BF_CONFIG.mixerConfiguration == 25) {
-        loadChainer.setChain([
-            mspHelper.loadServoConfiguration,
-            mspHelper.loadRcData,
-            mspHelper.loadBfConfig,
-            mspHelper.loadServoMixRules
-        ]);
-    }
-    else {
-        loadChainer.setChain([
-            mspHelper.loadServoConfiguration,
-            mspHelper.loadRcData,
-            mspHelper.loadBfConfig
-        ]);
-    }
+    loadChainer.setChain([
+        mspHelper.loadServoConfiguration,
+        mspHelper.loadRcData,
+        mspHelper.loadBfConfig,
+        mspHelper.loadServoMixRules
+    ]);
 
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
     var saveChainer = new MSPChainerClass();
 
-    if (BF_CONFIG.mixerConfiguration == 23 || BF_CONFIG.mixerConfiguration == 24 || BF_CONFIG.mixerConfiguration == 25) {
-        saveChainer.setChain([
-            mspHelper.sendServoConfigurations,
-            mspHelper.sendServoMixer,
-            mspHelper.saveToEeprom
-        ]);
-    }
-    else {
-        saveChainer.setChain([
-            mspHelper.sendServoConfigurations,
-            mspHelper.saveToEeprom
-        ]);
-    }
+    saveChainer.setChain([
+        mspHelper.sendServoConfigurations,
+        mspHelper.sendServoMixer,
+        mspHelper.saveToEeprom
+    ]);
 
     saveChainer.setExitPoint(function () {
         GUI.log(chrome.i18n.getMessage('servosEepromSave'));

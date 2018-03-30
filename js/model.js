@@ -550,6 +550,26 @@ helper.mixer = (function (mixerList) {
         return retVal;
     };
 
+    publicScope.loadServoRules = function (mixer) {
+        SERVO_RULES.flush();
+
+        for (const i in mixer.servoMixer) {
+            if (mixer.servoMixer.hasOwnProperty(i)) {
+                SERVO_RULES.put(mixer.servoMixer[i]);
+            }
+        }
+    }
+
+    publicScope.loadMotorRules = function (mixer) {
+        MOTOR_RULES.flush();
+
+        for (const i in mixer.motorMixer) {
+            if (mixer.motorMixer.hasOwnProperty(i)) {
+                MOTOR_RULES.put(mixer.motorMixer[i]);
+            }
+        }
+    }
+
     return publicScope;
 })(mixerList);
 

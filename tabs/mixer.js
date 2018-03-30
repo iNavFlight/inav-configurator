@@ -17,7 +17,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     loadChainer.setChain([
         mspHelper.loadBfConfig,
         mspHelper.loadMixerConfig,
-        mspHelper.loadMotors
+        mspHelper.loadMotors,
+        mspHelper.loadServoMixRules,
+        mspHelper.loadMotorMixRules
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -35,6 +37,98 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function loadHtml() {
         $('#content').load("./tabs/mixer.html", processHtml);
+    }
+
+    function renderServoMixRules() {
+
+        var $servoMixTable = $('#servo-mix-table'),
+            $servoMixTableBody = $servoMixTable.find('tbody');
+
+        /*
+         * Process servo mix table UI
+         */
+        var rules = SERVO_RULES.get();
+        $servoMixTableBody.find("*").remove();
+        for (var servoRuleIndex in rules) {
+            if (rules.hasOwnProperty(servoRuleIndex)) {
+                const servoRule = rules[servoRuleIndex];
+
+                $servoMixTableBody.append('\
+                    <tr>\
+                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
+                    <td><select class="mix-rule-input"></select></td>\
+                    <td><input type="number" class="mix-rule-rate" step="1" min="-100" max="100" /></td>\
+                    <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td><span class="btn default_btn narrow red"><a href="#" data-role="role-delete" data-i18n="servoMixerDelete"></a></span></td>\
+                    </tr>\
+                ');
+
+                const $row = $servoMixTableBody.find('tr:last');
+
+                GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
+                
+                $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
+                    servoRule.setInput($(this).val());
+                });
+
+                $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
+                    servoRule.setTarget($(this).val());
+                });
+
+                $row.find(".mix-rule-rate").val(servoRule.getRate()).change(function () {
+                    servoRule.setRate($(this).val());
+                });
+
+                $row.find(".mix-rule-speed").val(servoRule.getSpeed()).change(function () {
+                    servoRule.setSpeed($(this).val());
+                });
+                
+                $row.find("[data-role='role-delete']").attr("data-index", servoRuleIndex);
+            }
+
+        }
+        localize();
+    }
+
+    function renderMotorMixRules() {
+
+        var $table = $('#motor-mix-table'),
+            $tableBody = $table.find('tbody');
+
+        /*
+         * Process servo mix table UI
+         */
+        var rules = MOTOR_RULES.get();
+        $tableBody.find("*").remove();
+        let index = 0;
+        for (const i in rules) {
+            if (rules.hasOwnProperty(i)) {
+                const rule = rules[i];
+                index++;
+
+                $tableBody.append('\
+                    <tr>\
+                    <td><span class="mix-rule-motor"></span></td>\
+                    <td><input type="number" class="mix-rule-throttle" step="0.001" min="0" max="1" /></td>\
+                    <td><input type="number" class="mix-rule-roll" step="0.001" min="-1" max="1" /></td>\
+                    <td><input type="number" class="mix-rule-pitch" step="0.001" min="-1" max="1" /></td>\
+                    <td><input type="number" class="mix-rule-yaw" step="0.001" min="-1" max="1" /></td>\
+                    <td><span class="btn default_btn narrow red"><a href="#" data-role="role-delete" data-i18n="servoMixerDelete"></a></span></td>\
+                    </tr>\
+                ');
+
+                const $row = $tableBody.find('tr:last');
+
+                $row.find('.mix-rule-motor').html(index);
+                $row.find('.mix-rule-throttle').val(rule.getThrottle());
+                $row.find('.mix-rule-roll').val(rule.getRoll());
+                $row.find('.mix-rule-pitch').val(rule.getPitch());
+                $row.find('.mix-rule-yaw').val(rule.getYaw());
+                $row.find("[data-role='role-delete']").attr("data-index", i);
+            }
+
+        }
+        localize();
     }
 
     function processHtml() {
@@ -55,7 +149,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             platforms = helper.platform.getList(),
             $hasFlapsWrapper = $('#has-flaps-wrapper'),
             $hasFlaps = $('#has-flaps'),
-            $mixerPreset = $('#mixer-preset');
+            $mixerPreset = $('#mixer-preset'),
+            modal;
 
         $platformSelect.find("*").remove();
 
@@ -95,6 +190,23 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         } else {
             $mixerPreset.change();
         }
+
+        modal = new jBox('Modal', {
+            width: 480,
+            height: 240,
+            closeButton: 'title',
+            animation: false,
+            attach: $('#load-and-apply-mixer-button'),
+            title: chrome.i18n.getMessage("mixerApplyModalTitle"),
+            content: $('#mixerApplyContent')
+        });
+
+        $('#load-mixer-button').click(function () {
+            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadMotorRules(currentMixerPreset);
+            renderServoMixRules();
+            renderMotorMixRules();
+        });
 
         localize();
         GUI.content_ready(callback);

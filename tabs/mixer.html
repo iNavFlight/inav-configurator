@@ -13,12 +13,20 @@
                             <span data-i18n="platformType"></span>
                         </label>
                     </div>
-                    <div class="select">
+                    <div class="select position-relative">
                         <div class="mixerPreview half">
                             <img src="./resources/motor_order/custom.svg" />
                         </div>
                         <div class="half" style="width: calc(50% - 10px); margin-left: 10px;">
                             <select id="mixer-preset"></select>
+                        </div>
+                        <div class="mixer-load-button">
+                            <div class="btn default_btn narrow red">
+                                <a id="load-and-apply-mixer-button" href="#" data-i18n="mixerLoadAndApplyPresetRules"></a>
+                            </div>
+                            <div class="btn default_btn narrow">
+                                <a id="load-mixer-button" href="#" data-i18n="mixerLoadPresetRules"></a>
+                            </div>
                         </div>
                     </div>
                     <div id="has-flaps-wrapper" class="checkbox">
@@ -29,10 +37,69 @@
                     </div>
                 </div>
             </div>
+
+            <div class="motor-mixer gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="servoMixer"></div>
+                </div>
+                <div class="spacer_box">
+                    <table id="servo-mix-table" class="mixer-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 75px">Servo</th>
+                                <th>Input</th>
+                                <th>Weight</th>
+                                <th>Speed</th>
+                                <th style="width: 75px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        
+                        </tbody>
+                    </table>
+                    <div class="btn default_btn narrow pull-right green" style="margin-bottom: 15px">
+                        <a href="#" data-role="role-servo-add" data-i18n="servoMixerAdd"></a>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="rightWrapper">
-
+            <div class="motor-mixer gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="motorMixer"></div>
+                </div>
+                <div class="spacer_box">
+                    <table id="motor-mix-table" class="mixer-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 75px">Motor</th>
+                                <th>Throttle</th>
+                                <th>Roll</th>
+                                <th>Pitch</th>
+                                <th>Yaw</th>
+                                <th style="width: 75px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        
+                        </tbody>
+                    </table>
+                    <div class="btn default_btn narrow pull-right green" style="margin-bottom: 15px">
+                        <a href="#" data-role="role-motor-add" data-i18n="servoMixerAdd"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="mixerApplyContent" class="is-hidden">
+        <div class="modal__content">
+            <h1 class="modal__title modal__title--warning" data-i18n="presetsApplyHeader"></h1>
+            <div class="modal__text" data-i18n="mixerApplyDescription"></div>
+        </div>
+        <div class="modal__buttons">
+            <a id="execute-button" class="modal__button modal__button--main" data-i18n="mixerButtonSaveAndReboot"></a>
         </div>
     </div>
     <div class="content_toolbar">
