@@ -555,7 +555,15 @@ helper.mixer = (function (mixerList) {
 
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
-                SERVO_RULES.put(mixer.servoMixer[i]);
+                const r = mixer.servoMixer[i];
+                SERVO_RULES.put(
+                    new ServoMixRule(
+                        r.getTarget(),
+                        r.getInput(),
+                        r.getRate(),
+                        r.getSpeed()
+                    )
+                );
             }
         }
     }
@@ -565,7 +573,15 @@ helper.mixer = (function (mixerList) {
 
         for (const i in mixer.motorMixer) {
             if (mixer.motorMixer.hasOwnProperty(i)) {
-                MOTOR_RULES.put(mixer.motorMixer[i]);
+                const r = mixer.motorMixer[i];
+                MOTOR_RULES.put(
+                    new MotorMixRule(
+                        r.getThrottle(),
+                        r.getRoll(),
+                        r.getPitch(),
+                        r.getYaw()
+                    )
+                );
             }
         }
     }
