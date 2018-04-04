@@ -9,7 +9,7 @@ TABS.servos.initialize = function (callback) {
         googleAnalytics.sendAppView('Servos');
     }
 
-    var loadChainer = new MSPChainerClass();
+    let loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
         mspHelper.loadServoConfiguration,
@@ -21,7 +21,7 @@ TABS.servos.initialize = function (callback) {
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
-    var saveChainer = new MSPChainerClass();
+    let saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
         mspHelper.sendServoConfigurations,
@@ -41,15 +41,15 @@ TABS.servos.initialize = function (callback) {
 
     function renderServoMixRules() {
 
-        var $servoMixTable = $('#servo-mix-table'),
+        let $servoMixTable = $('#servo-mix-table'),
             $servoMixTableBody = $servoMixTable.find('tbody');
 
         /*
          * Process servo mix table UI
          */
-        var rules = SERVO_RULES.get();
+        let rules = SERVO_RULES.get();
         $servoMixTableBody.find("*").remove();
-        for (var servoRuleIndex in rules) {
+        for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
                 const servoRule = rules[servoRuleIndex];
 
@@ -92,7 +92,7 @@ TABS.servos.initialize = function (callback) {
 
     function update_ui() {
 
-        var i,
+        let i,
             $tabServos = $(".tab-servos"),
             $servoConfigTable = $('#servo-config-table'),
             $servoMixTable = $('#servo-mix-table'),
@@ -103,8 +103,9 @@ TABS.servos.initialize = function (callback) {
             return;
         }
 
-        var servoCheckbox = '';
-        var servoHeader = '';
+        let servoCheckbox = '',
+            servoHeader = '';
+
         for (i = 0; i < RC.active_channels - 4; i++) {
             servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
         }
@@ -187,7 +188,7 @@ TABS.servos.initialize = function (callback) {
         // drop previous table
         $servoConfigTable.find('tr:not(:first)').remove();
 
-        for (var servoIndex = 0; servoIndex < 8; servoIndex++) {
+        for (let servoIndex = 0; servoIndex < 8; servoIndex++) {
             process_servos('Servo ' + servoIndex, '', servoIndex, false);
         }
 

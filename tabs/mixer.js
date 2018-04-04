@@ -47,9 +47,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         /*
          * Process servo mix table UI
          */
-        var rules = SERVO_RULES.get();
+        let rules = SERVO_RULES.get();
         $servoMixTableBody.find("*").remove();
-        for (var servoRuleIndex in rules) {
+        for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
                 const servoRule = rules[servoRuleIndex];
 
