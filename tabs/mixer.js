@@ -1,3 +1,4 @@
+/*global $*/
 'use strict';
 
 TABS.mixer = {};
@@ -218,6 +219,20 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+        });
+
+        $("[data-role='role-servo-add']").click(function () {
+            if (SERVO_RULES.hasFreeSlots()) {
+                SERVO_RULES.put(new ServoMixRule(0, 0, 100, 0));
+                renderServoMixRules();
+            }
+        });
+
+        $("[data-role='role-motor-add']").click(function () {
+            if (MOTOR_RULES.hasFreeSlots()) {
+                MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
+                renderMotorMixRules();
+            }
         });
 
         localize();
