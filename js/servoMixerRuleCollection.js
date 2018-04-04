@@ -3,8 +3,21 @@
 
 var ServoMixerRuleCollection = function () {
 
-    var self = {};
-    var data = [];
+    let self = {},
+        data = [],
+        maxServoCount = 8;
+
+    self.setServoCount = function (value) {
+        maxServoCount = value;
+    };
+
+    self.getServoCount = function () {
+        return maxServoCount;
+    }
+
+    self.getServoRulesCount = function () {
+        return self.getServoCount() * 2;
+    }
 
     self.put = function (element) {
         data.push(element);
@@ -42,7 +55,7 @@ var ServoMixerRuleCollection = function () {
     };
 
     self.hasFreeSlots = function () {
-        return data.length < 16;
+        return data.length < self.getServoRulesCount();
     };
 
     return self;

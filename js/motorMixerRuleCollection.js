@@ -3,17 +3,16 @@
 
 var MotorMixerRuleCollection = function () {
 
-    var self = {};
-    var data = [];
-
-    self.motorCount = 0;
+    let self = {},
+        data = [],
+        maxMotorCount = 8;
 
     self.setMotorCount = function (value) {
-        self.motorCount = value;
+        maxMotorCount = value;
     };
 
     self.getMotorCount = function () {
-        return self.motorCount;
+        return maxMotorCount;
     };
 
     self.put = function (element) {

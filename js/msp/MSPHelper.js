@@ -183,7 +183,6 @@ var mspHelper = (function (gui) {
 
                     needle += 2;
                 }
-                MOTOR_RULES.setMotorCount(motorCount);
                 break;
             case MSPCodes.MSP_RC:
                 RC.active_channels = dataHandler.message_length_expected / 2;
@@ -1299,8 +1298,12 @@ var mspHelper = (function (gui) {
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
                 MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
                 MIXER_CONFIG.platformType = data.getInt8(3);
-                MIXER_CONFIG.hasFlaps = data.getInt8(4)
+                MIXER_CONFIG.hasFlaps = data.getInt8(4);
                 MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
+                MIXER_CONFIG.numberOfMotors = data.getInt8(7);
+                MIXER_CONFIG.numberOfServos = data.getInt8(8);
+                MOTOR_RULES.setMotorCount(MIXER_CONFIG.numberOfMotors);
+                SERVO_RULES.setServoCount(MIXER_CONFIG.numberOfServos);
                 break;
 
             case MSPCodes.MSP2_INAV_SET_MIXER:

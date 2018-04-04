@@ -171,7 +171,9 @@ var FC = {
             yawJumpPreventionLimit: 0,
             platformType: -1,
             hasFlaps: false,
-            appliedMixerPreset: -1
+            appliedMixerPreset: -1,
+            numberOfMotors: 0,
+            numberOfServos: 0
         },
 
         SERIAL_CONFIG = {
