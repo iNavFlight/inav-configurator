@@ -2512,5 +2512,8 @@
     },
     "speed": {
         "message": "Speed"
+    },
+    "mixerPresetTitle": {
+        "message": "Mixer preset"
     }
 }
