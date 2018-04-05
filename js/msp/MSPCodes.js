@@ -169,6 +169,7 @@ var MSPCodes = {
     MSPV2_INAV_RATE_PROFILE:            0x2007,
     MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
     MSPV2_INAV_AIR_SPEED:               0x2009,
+    MSPV2_INAV_OUTPUT_MAPPING:          0x200A,
 
     MSP2_INAV_MIXER:                    0x2010,
     MSP2_INAV_SET_MIXER:                0x2011,
