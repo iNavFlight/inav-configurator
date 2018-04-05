@@ -2500,5 +2500,17 @@
     },
     "motorMixer": {
         "message": "Motor Mixer"
+    },
+    "servo": {
+        "message": "Servo"
+    },
+    "input": {
+        "message": "Input"
+    },
+    "weight": {
+        "message": "Weight"
+    },
+    "speed": {
+        "message": "Speed"
     }
 }

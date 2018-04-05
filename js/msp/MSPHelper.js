@@ -483,6 +483,10 @@ var mspHelper = (function (gui) {
 
                 break;
 
+            case MSPCodes.MSP_SET_SERVO_MIX_RULE: 
+                console.log("Servo mix saved");
+                break;
+
             case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
                 MOTOR_RULES.flush();
 
@@ -502,6 +506,10 @@ var mspHelper = (function (gui) {
                 }
                 MOTOR_RULES.cleanup();
 
+                break;
+
+            case MSPCodes.MSP2_COMMON_SET_MOTOR_MIXER:
+                console.log("motor mixer saved");
                 break;
 
             case MSPCodes.MSP_SERVO_CONFIGURATIONS:
@@ -2035,7 +2043,7 @@ var mspHelper = (function (gui) {
 
             // prepare for next iteration
             servoIndex++;
-            if (servoIndex == 16) { //This is the last rule. Not pretty, but we have to send all rules
+            if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
                 nextFunction = onCompleteCallback;
             }
             MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
@@ -2083,7 +2091,7 @@ var mspHelper = (function (gui) {
 
                 // prepare for next iteration
                 servoIndex++;
-                if (servoIndex == MOTOR_RULES.length) { //This is the last rule. Not pretty, but we have to send all rules
+                if (servoIndex == MOTOR_RULES.getMotorCount()) { //This is the last rule. Not pretty, but we have to send all rules
                     nextFunction = onCompleteCallback;
                 }
                 MSP.send_message(MSPCodes.MSP2_COMMON_SET_MOTOR_MIXER, buffer, false, nextFunction);

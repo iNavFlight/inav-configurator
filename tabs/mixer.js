@@ -1,4 +1,4 @@
-/*global $*/
+/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG*/
 'use strict';
 
 TABS.mixer = {};
@@ -20,7 +20,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     loadChainer.setChain([
-        mspHelper.loadBfConfig,
         mspHelper.loadMixerConfig,
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
@@ -30,15 +29,27 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     loadChainer.execute();
 
     saveChainer.setChain([
-        mspHelper.saveBfConfig,
         mspHelper.saveMixerConfig,
+        mspHelper.sendServoMixer,
+        mspHelper.sendMotorMixer,
         mspHelper.saveToEeprom
     ]);
-    saveChainer.setExitPoint(function () {
-        GUI.log(chrome.i18n.getMessage('mixerSaved'));
-        SERVO_RULES.cleanup();
-        MOTOR_RULES.cleanup();
-    });
+    saveChainer.setExitPoint(reboot);
+
+    function reboot() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+
+        GUI.tab_switch_cleanup(function() {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+        });
+    }
+
+    function reinitialize() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.handleReconnect($('.tab_mixer a'));
+    }
 
     function loadHtml() {
         $('#content').load("./tabs/mixer.html", processHtml);
@@ -118,15 +129,31 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const $row = $motorMixTableBody.find('tr:last');
 
                 $row.find('.mix-rule-motor').html(index);
-                $row.find('.mix-rule-throttle').val(rule.getThrottle());
-                $row.find('.mix-rule-roll').val(rule.getRoll());
-                $row.find('.mix-rule-pitch').val(rule.getPitch());
-                $row.find('.mix-rule-yaw').val(rule.getYaw());
+                $row.find('.mix-rule-throttle').val(rule.getThrottle()).change(function () {
+                    rule.setThrottle($(this).val());
+                });
+                $row.find('.mix-rule-roll').val(rule.getRoll()).change(function () {
+                    rule.setRoll($(this).val());
+                });
+                $row.find('.mix-rule-pitch').val(rule.getPitch()).change(function () {
+                    rule.setPitch($(this).val());
+                });
+                $row.find('.mix-rule-yaw').val(rule.getYaw()).change(function () {
+                    rule.setYaw($(this).val());
+                });
                 $row.find("[data-role='role-motor-delete']").attr("data-index", i);
             }
 
         }
         localize();
+    }
+
+    function saveAndReboot() {
+        SERVO_RULES.cleanup();
+        SERVO_RULES.inflate();
+        MOTOR_RULES.cleanup();
+        MOTOR_RULES.inflate();
+        saveChainer.execute();
     }
 
     function processHtml() {
@@ -182,7 +209,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $platformSelect.val(MIXER_CONFIG.platformType).change();
 
         $mixerPreset.change(function () {
-            currentMixerPreset = helper.mixer.getById(parseInt($mixerPreset.val(), 10));
+            const presetId = parseInt($mixerPreset.val(), 10);
+            currentMixerPreset = helper.mixer.getById(presetId);
+            
+            MIXER_CONFIG.appliedMixerPreset = presetId;
 
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
@@ -234,6 +264,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 renderMotorMixRules();
             }
         });
+
+        $('#save-button').click(saveAndReboot);
+
+        renderServoMixRules();
+        renderMotorMixRules();
 
         localize();
         GUI.content_ready(callback);
