@@ -234,6 +234,15 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerApplyContent')
         });
 
+        $('#execute-button').click(function () {
+            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadMotorRules(currentMixerPreset);
+            renderServoMixRules();
+            renderMotorMixRules();
+            modal.close();
+            saveAndReboot();
+        });
+
         $('#load-mixer-button').click(function () {
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
