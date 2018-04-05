@@ -54,5 +54,9 @@ var MotorMixerRuleCollection = function () {
         return data.length < self.getMotorCount();
     };
 
+    self.getNumberOfConfiguredMotors = function () {
+        return data.length;
+    };
+
     return self;
 };

@@ -26,8 +26,9 @@ TABS.motors.initialize = function (callback) {
         mspHelper.loadBfConfig,
         mspHelper.load3dConfig,
         mspHelper.loadMotors,
-        mspHelper.loadMotorMixRules
-
+        mspHelper.loadMotorMixRules,
+        mspHelper.loadServoMixRules,
+        mspHelper.loadMixerConfig
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -42,7 +43,6 @@ TABS.motors.initialize = function (callback) {
     saveChainer.setExitPoint(function () {
         GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
         MOTOR_RULES.cleanup();
-        // renderServoMixRules(); //TODO render after save
     });
 
     function load_html() {
@@ -179,8 +179,6 @@ TABS.motors.initialize = function (callback) {
     function process_html() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
-        localize();
-
         self.feature3DEnabled = bit_check(BF_CONFIG.features, 12);
 
         if (self.feature3DEnabled && !self.feature3DSupported) {
@@ -190,7 +188,7 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
-        update_model(BF_CONFIG.mixerConfiguration);
+        update_model(MIXER_CONFIG.appliedMixerPreset);
 
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();
@@ -307,12 +305,14 @@ TABS.motors.initialize = function (callback) {
             accel_offset_established = false;
         });
 
-        var number_of_valid_outputs = (MOTOR_DATA.indexOf(0) > -1) ? MOTOR_DATA.indexOf(0) : 8;
+        let motors_wrapper = $('.motors .bar-wrapper'),
+            servos_wrapper = $('.servos .bar-wrapper'),
+            $motorTitles = $('.motor-titles'),
+            $motorSliders = $('.motor-sliders'),
+            $motorValues = $('.motor-values');
 
-        var motors_wrapper = $('.motors .bar-wrapper'),
-            servos_wrapper = $('.servos .bar-wrapper');
-
-        for (var i = 0; i < 8; i++) {
+        for (let i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
+            const motorNumber = i + 1;
             motors_wrapper.append('\
                 <div class="m-block motor-' + i + '">\
                     <div class="meter-bar">\
@@ -325,7 +325,15 @@ TABS.motors.initialize = function (callback) {
                     </div>\
                 </div>\
             ');
+            $motorTitles.append('<li title="Motor - ' + motorNumber + '">' + motorNumber + '</li>');
+            $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled"/></div>');
+            $motorValues.append('<li>1000</li>');
+        }
 
+        $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
+        $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
+
+        for (let i = 0; i < SERVO_RULES.getServoCount(); i++) {
             servos_wrapper.append('\
                 <div class="m-block servo-' + (7 - i) + '">\
                     <div class="meter-bar">\
@@ -395,13 +403,13 @@ TABS.motors.initialize = function (callback) {
             var val = $(this).val();
 
             $('div.sliders input:not(:disabled, :last)').val(val);
-            $('div.values li:not(:last)').slice(0, number_of_valid_outputs).text(val);
+            $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).text(val);
             $('div.sliders input:not(:last):first').trigger('input');
         });
         console.log($motorsEnableTestMode);
         $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
-                $slidersInput.slice(0, number_of_valid_outputs).prop('disabled', false);
+                $slidersInput.slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);
 
                 // unlock master slider
                 $('div.sliders input:last').prop('disabled', false);
@@ -423,7 +431,7 @@ TABS.motors.initialize = function (callback) {
         // check if motors are already spinning
         var motors_running = false;
 
-        for (var i = 0; i < number_of_valid_outputs; i++) {
+        for (var i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
             if( !self.feature3DEnabled ){
                 if (MOTOR_DATA[i] > MISC.mincommand) {
                     motors_running = true;
@@ -539,6 +547,8 @@ TABS.motors.initialize = function (callback) {
 
         // enable Status and Motor data pulling
         helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 75, true);
+
+        localize();
 
         GUI.content_ready(callback);
     }
