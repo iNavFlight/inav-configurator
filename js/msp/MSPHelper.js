@@ -2546,7 +2546,12 @@ var mspHelper = (function (gui) {
     };
 
     self.loadOutputMapping = function (callback) {
-        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '1.9.1'))
+            MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
+        else {
+            OUTPUT_MAPPING = [];
+            return false;
+        }
     };
 
     self.loadBatteryConfig = function (callback) {
