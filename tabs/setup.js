@@ -1,4 +1,4 @@
-/*global chrome*/
+/*global $,chrome,FC,helper,mspHelper,MIXER_CONFIG,BF_CONFIG*/
 'use strict';
 
 TABS.setup = {
@@ -240,7 +240,11 @@ TABS.setup.initialize3D = function () {
 //
     // load the model including materials
     if (useWebGlRenderer) {
-        model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
+        if (FC.isNewMixer()) {
+            model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+        } else {
+            model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
+        }
     } else {
         model_file = 'fallback'
     }

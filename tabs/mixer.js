@@ -158,6 +158,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function processHtml() {
 
+        if (!FC.isNewMixer()) {
+            $('#mixer-hidden-content').removeClass("is-hidden");
+            $('#mixer-main-content').remove();
+        }
+
         $servoMixTable = $('#servo-mix-table');
         $servoMixTableBody = $servoMixTable.find('tbody');
         $motorMixTable = $('#motor-mix-table');
@@ -184,7 +189,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $platformSelect.find("*").remove();
 
-        for (i in platforms) {
+        for (let i in platforms) {
             if (platforms.hasOwnProperty(i)) {
                 let p = platforms[i];
                 $platformSelect.append('<option value="' + p.id + '">' + p.name + '</option>');

@@ -2515,5 +2515,8 @@
     },
     "mixerPresetTitle": {
         "message": "Mixer preset"
+    },
+    "fcFirmwareUpdateRequired": {
+        "message": "Flight Controller firmware has to be updated to latest version to use this function"
     }
 }
