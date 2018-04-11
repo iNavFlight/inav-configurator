@@ -119,9 +119,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <tr>\
                     <td><span class="mix-rule-motor"></span></td>\
                     <td><input type="number" class="mix-rule-throttle" step="0.001" min="0" max="1" /></td>\
-                    <td><input type="number" class="mix-rule-roll" step="0.001" min="-1" max="1" /></td>\
-                    <td><input type="number" class="mix-rule-pitch" step="0.001" min="-1" max="1" /></td>\
-                    <td><input type="number" class="mix-rule-yaw" step="0.001" min="-1" max="1" /></td>\
+                    <td><input type="number" class="mix-rule-roll" step="0.001" min="-2" max="2" /></td>\
+                    <td><input type="number" class="mix-rule-pitch" step="0.001" min="-2" max="2" /></td>\
+                    <td><input type="number" class="mix-rule-yaw" step="0.001" min="-2" max="2" /></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-motor-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
                 ');

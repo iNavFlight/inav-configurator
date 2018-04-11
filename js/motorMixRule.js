@@ -7,9 +7,9 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
 
     self.fromMsp = function (mspThrottle, mspRoll, mspPitch, mspYaw) {
         throttle = mspThrottle / 1000;
-        roll = (mspRoll / 1000) - 1;
-        pitch = (mspPitch / 1000) - 1;
-        yaw = (mspYaw / 1000) - 1;
+        roll = (mspRoll / 1000) - 2;
+        pitch = (mspPitch / 1000) - 2;
+        yaw = (mspYaw / 1000) - 2;
     };
 
     self.isUsed = function () {
@@ -29,11 +29,11 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getRoll = function () {
-        return constrain(parseFloat(roll, 10), -1, 1);
+        return constrain(parseFloat(roll, 10), -2, 2);
     };
 
     self.getRollForMsp = function () {
-        return (self.getRoll() + 1) * 1000;
+        return (self.getRoll() + 2) * 1000;
     };
 
     self.setRoll = function (data) {
@@ -41,11 +41,11 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getPitch = function () {
-        return constrain(parseFloat(pitch, 10), -1, 1);
+        return constrain(parseFloat(pitch, 10), -2, 2);
     };
 
     self.getPitchForMsp = function () {
-        return (self.getPitch() + 1) * 1000;
+        return (self.getPitch() + 2) * 1000;
     };
 
     self.setPitch = function (data) {
@@ -53,11 +53,11 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
     };
 
     self.getYaw = function () {
-        return constrain(parseFloat(yaw, 10), -1, 1);
+        return constrain(parseFloat(yaw, 10), -2, 2);
     };
 
     self.getYawForMsp = function () {
-        return (self.getYaw() + 1) * 1000;
+        return (self.getYaw() + 2) * 1000;
     };
 
     self.setYaw = function (data) {
