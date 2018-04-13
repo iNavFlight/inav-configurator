@@ -13,28 +13,28 @@ presets.elementHelper = function (group, field, value) {
 presets.defaultValues = {
     PIDs: {
         mr: [
-            [40, 30, 23],
-            [40, 30, 23],
-            [85, 45, 0],
-            [50, 0, 0],
-            [65, 120, 10],
-            [180, 15, 100],
-            [0, 0, 0],
-            [20, 15, 75],
-            [60, 0, 0],
-            [100, 50, 10]
+            [40, 30, 23],   //PID_ROLL
+            [40, 30, 23],   //PID_PITCH
+            [85, 45, 0],    //PID_YAW
+            [50, 0, 0],     //PID_POS_Z
+            [65, 120, 10],  //PID_POS_XY
+            [40, 15, 100],  //PID_VEL_XY
+            [0, 0, 0],      //PID_SURFACE
+            [20, 15, 75],   //PID_LEVEL
+            [60, 0, 0],     //PID_HEADING
+            [100, 50, 10]   //PID_VEL_Z
         ],
         fw: [
-            [25, 35, 10],
-            [20, 35, 10],
-            [50, 45, 0],
-            [50, 0, 0],
-            [75, 5, 8],
-            [0, 0, 0],
-            [0, 0, 0],
-            [20, 15, 75],
-            [60, 0, 0],
-            [0, 0, 0]
+            [5, 7, 50],     //PID_ROLL
+            [5, 7, 50],     //PID_PITCH
+            [6, 10, 60],    //PID_YAW
+            [50, 0, 0],     //PID_POS_Z
+            [75, 5, 8],     //PID_POS_XY
+            [0, 0, 0],      //PID_VEL_XY
+            [0, 0, 0],      //PID_SURFACE
+            [20, 5, 75],    //PID_LEVEL
+            [60, 0, 0],     //PID_HEADING
+            [0, 0, 0]       //PID_VEL_Z
         ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
