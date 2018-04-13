@@ -2518,5 +2518,8 @@
     },
     "fcFirmwareUpdateRequired": {
         "message": "Flight Controller firmware has to be updated to latest version to use this function"
+    },
+    "mixerNotConfigured": {
+        "message": "Mixer not configured. Use <u>Mixer</u> tab to set it up!"
     }
 }

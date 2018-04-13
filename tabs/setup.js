@@ -235,13 +235,18 @@ TABS.setup.initialize3D = function () {
     renderer.setSize(wrapper.width()*2, wrapper.height()*2);
 
 
-//    // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
+    // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
     modelWrapper = new THREE.Object3D();
-//
+
     // load the model including materials
     if (useWebGlRenderer) {
         if (FC.isNewMixer()) {
-            model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+            if (MIXER_CONFIG.appliedMixerPreset === -1) {
+                model_file = 'custom';
+                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            } else {
+                model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+            }
         } else {
             model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
         }
