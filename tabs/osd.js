@@ -928,6 +928,16 @@ OSD.GUI.preview = {
     }
 };
 
+var checkAndProcessSymbolPosition = function(pos, charCode) {
+    if (typeof OSD.data.preview[pos] === 'object' && OSD.data.preview[pos][0] !== null) {
+        // position already in use, always put object item at position
+        OSD.data.preview[pos] = [OSD.data.preview[pos][0], charCode, 'red'];
+    } else {
+        // position not used by an object type, put character at position
+        // character types can overwrite character types (e.g. crosshair)
+        OSD.data.preview[pos] = charCode;
+    }
+};
 
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
@@ -1205,7 +1215,6 @@ TABS.osd.initialize = function (callback) {
                     for (i = 0; i < OSD.data.display_size.total; i++) {
                         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
                     };
-;
                     // draw all the displayed items and the drag and drop preview images
                     for (var ii = 0; ii < OSD.data.items.length; ii++) {
                         var item = OSD.get_item(ii);
@@ -1235,7 +1244,13 @@ TABS.osd.initialize = function (callback) {
                                 y++;
                                 continue;
                             }
-                            OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
+                            // test if this position already has a character placed
+                            if (OSD.data.preview[j+x+(y*OSD.data.display_size.x)][0] !== null) {
+                                // if so set background color to red to show user double usage of position
+                                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode, 'red'];
+                            } else {
+                                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
+                            }
                             // draw the preview
                             var img = new Image();
                             img.src = FONT.draw(charCode);
@@ -1252,15 +1267,15 @@ TABS.osd.initialize = function (callback) {
                     // artificial horizon
                     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
                         for (i = 0; i < 9; i++) {
-                            OSD.data.preview[centerishPosition - 4 + i] = SYM.AH_BAR9_0 + 4;
+                            checkAndProcessSymbolPosition(centerishPosition - 4 + i, SYM.AH_BAR9_0 + 4);
                         }
                     }
 
                     // crosshairs
                     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-                        OSD.data.preview[centerishPosition - 1] = SYM.AH_CENTER_LINE;
-                        OSD.data.preview[centerishPosition + 1] = SYM.AH_CENTER_LINE_RIGHT;
-                        OSD.data.preview[centerishPosition] = SYM.AH_CENTER;
+                        checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
+                        checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+                        checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
                     }
 
                     // sidebars
@@ -1268,12 +1283,12 @@ TABS.osd.initialize = function (callback) {
                         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
                         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
                         for (i = -hudheight; i <= hudheight; i++) {
-                            OSD.data.preview[centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE)] = SYM.AH_DECORATION;
-                            OSD.data.preview[centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE)] = SYM.AH_DECORATION;
+                            checkAndProcessSymbolPosition(centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+                            checkAndProcessSymbolPosition(centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
                         }
                         // AH level indicators
-                        OSD.data.preview[centerishPosition - hudwidth + 1] = SYM.AH_LEFT;
-                        OSD.data.preview[centerishPosition + hudwidth - 1] = SYM.AH_RIGHT;
+                        checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
+                        checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
                     }
 
                     // render
@@ -1281,11 +1296,18 @@ TABS.osd.initialize = function (callback) {
                     var $row = $('<div class="row"/>');
                     for (i = 0; i < OSD.data.display_size.total;) {
                         var charCode = OSD.data.preview[i];
+                        var colorStyle = '';
+
                         if (typeof charCode === 'object') {
                             var item = OSD.data.preview[i][0];
                             charCode = OSD.data.preview[i][1];
+                            if (OSD.data.preview[i][2] !== undefined) {
+                                // if third field is set it contains a background color
+                                colorStyle = 'style="background-color: ' + OSD.data.preview[i][2] + ';"';
+                            }
                         }
-                        var $img = $('<div class="char"><img src=' + FONT.draw(charCode) + '></img></div>')
+
+                        var $img = $('<div class="char"' + colorStyle + '><img src=' + FONT.draw(charCode) + '></img></div>')
                             .on('mouseenter', OSD.GUI.preview.onMouseEnter)
                             .on('mouseleave', OSD.GUI.preview.onMouseLeave)
                             .on('dragover', OSD.GUI.preview.onDragOver)
