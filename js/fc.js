@@ -61,7 +61,7 @@ var FC = {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
     },
     isNewMixer: function () {
-        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "1.9.1"));
+        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
     resetState: function () {
         SENSOR_STATUS = {
