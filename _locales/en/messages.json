@@ -1241,7 +1241,9 @@
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
-
+    "mixerSaved": {
+        "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
+    },
     "gpsHead": {
         "message": "GPS"
     },
@@ -2004,6 +2006,9 @@
     "LevBtn": {
         "message": "Level calibration"
     },
+    "tabMixer": {
+        "message": "Mixer"
+    },
     "tabPresets": {
         "message": "Presets"
     },
@@ -2465,6 +2470,57 @@
     },
     "servoMixerAdd": {
         "message": "Add new mixer rule"
+    },
+    "platformType": {
+        "message": "Platform type"
+    },
+    "platformConfiguration": {
+        "message": "Platform configuration"
+    },
+    "platformHasFlaps": {
+        "message": "Has flaps"
+    },
+    "mixerPreset": {
+        "message": "Mixer preset"
+    },
+    "mixerLoadPresetRules": {
+        "message": "Load mixer"
+    },
+    "mixerLoadAndApplyPresetRules": {
+        "message": "Load and apply"
+    },
+    "mixerApplyModalTitle" : {
+        "message": "Confirm"
+    },
+    "mixerButtonSaveAndReboot": {
+        "message": "Save and reboot"
+    },
+    "mixerApplyDescription": {
+        "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
+    },
+    "motorMixer": {
+        "message": "Motor Mixer"
+    },
+    "servo": {
+        "message": "Servo"
+    },
+    "input": {
+        "message": "Input"
+    },
+    "weight": {
+        "message": "Weight"
+    },
+    "speed": {
+        "message": "Speed"
+    },
+    "mixerPresetTitle": {
+        "message": "Mixer preset"
+    },
+    "fcFirmwareUpdateRequired": {
+        "message": "Flight Controller firmware has to be updated to latest version to use this function"
+    },
+    "mixerNotConfigured": {
+        "message": "Mixer not configured. Use <u>Mixer</u> tab to set it up!"
     },
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"

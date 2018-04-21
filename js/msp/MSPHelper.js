@@ -472,15 +472,44 @@ var mspHelper = (function (gui) {
                 if (data.byteLength % 7 === 0) {
                     for (i = 0; i < data.byteLength; i += 7) {
                         SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i + 0, true),
-                            data.getInt8(i + 1, true),
-                            data.getInt8(i + 2, true),
-                            data.getInt8(i + 3, true)
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt8(i + 2),
+                            data.getInt8(i + 3)
                         ));
                     }
                 }
                 SERVO_RULES.cleanup();
 
+                break;
+
+            case MSPCodes.MSP_SET_SERVO_MIX_RULE: 
+                console.log("Servo mix saved");
+                break;
+
+            case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
+                MOTOR_RULES.flush();
+
+                if (data.byteLength % 8 === 0) {
+                    for (i = 0; i < data.byteLength; i += 8) {
+                        var rule = new MotorMixRule(0, 0, 0, 0);
+
+                        rule.fromMsp(
+                            data.getUint16(i, true),
+                            data.getUint16(i + 2, true),
+                            data.getUint16(i + 4, true),
+                            data.getUint16(i + 6, true)
+                        );
+
+                        MOTOR_RULES.put(rule);
+                    }
+                }
+                MOTOR_RULES.cleanup();
+
+                break;
+
+            case MSPCodes.MSP2_COMMON_SET_MOTOR_MIXER:
+                console.log("motor mixer saved");
                 break;
 
             case MSPCodes.MSP_SERVO_CONFIGURATIONS:
@@ -1272,6 +1301,23 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_WP_MISSION_LOAD:
                 console.log('Mission load');
                 break;
+
+            case MSPCodes.MSP2_INAV_MIXER:
+                MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
+                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
+                MIXER_CONFIG.platformType = data.getInt8(3);
+                MIXER_CONFIG.hasFlaps = data.getInt8(4);
+                MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
+                MIXER_CONFIG.numberOfMotors = data.getInt8(7);
+                MIXER_CONFIG.numberOfServos = data.getInt8(8);
+                MOTOR_RULES.setMotorCount(MIXER_CONFIG.numberOfMotors);
+                SERVO_RULES.setServoCount(MIXER_CONFIG.numberOfServos);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MIXER:
+                console.log('Mixer config saved');
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1866,6 +1912,17 @@ var mspHelper = (function (gui) {
                 console.log(buffer);
 
                 break;
+
+            case MSPCodes.MSP2_INAV_SET_MIXER:
+                buffer.push(MIXER_CONFIG.yawMotorDirection);
+                buffer.push(lowByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(highByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(MIXER_CONFIG.platformType);
+                buffer.push(MIXER_CONFIG.hasFlaps);
+                buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
+                buffer.push(highByte(MIXER_CONFIG.appliedMixerPreset));
+                break;
+
             default:
                 return false;
         }
@@ -1986,10 +2043,61 @@ var mspHelper = (function (gui) {
 
             // prepare for next iteration
             servoIndex++;
-            if (servoIndex == 16) { //This is the last rule. Not pretty, but we have to send all rules
+            if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
                 nextFunction = onCompleteCallback;
             }
             MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+        }
+    };
+
+    self.sendMotorMixer = function (onCompleteCallback) {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
+            onCompleteCallback();
+        }
+
+        var nextFunction = sendMixer,
+            servoIndex = 0;
+
+        if (MOTOR_RULES.length === 0) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendMixer() {
+
+            var buffer = [];
+
+            // send one at a time, with index
+
+            var rule = MOTOR_RULES.get()[servoIndex];
+
+            if (rule) {
+
+                buffer.push(servoIndex);
+
+                buffer.push(lowByte(rule.getThrottleForMsp()));
+                buffer.push(highByte(rule.getThrottleForMsp()));
+
+                buffer.push(lowByte(rule.getRollForMsp()));
+                buffer.push(highByte(rule.getRollForMsp()));
+
+                buffer.push(lowByte(rule.getPitchForMsp()));
+                buffer.push(highByte(rule.getPitchForMsp()));
+
+                buffer.push(lowByte(rule.getYawForMsp()));
+                buffer.push(highByte(rule.getYawForMsp()));
+
+                // prepare for next iteration
+                servoIndex++;
+                if (servoIndex == MOTOR_RULES.getMotorCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                    nextFunction = onCompleteCallback;
+                }
+                MSP.send_message(MSPCodes.MSP2_COMMON_SET_MOTOR_MIXER, buffer, false, nextFunction);
+            } else {
+                onCompleteCallback();
+            }
         }
     };
 
@@ -2814,8 +2922,20 @@ var mspHelper = (function (gui) {
 
     self.loadServoMixRules = function (callback) {
         MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
-    }
-    
+    };
+
+    self.loadMotorMixRules = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+            MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadMotors = function (callback) {
+        MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
+    };
+
     self.getCraftName = function(callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
             MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
@@ -2848,6 +2968,21 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadMixerConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveMixerConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_MIXER, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MIXER), false, callback);
+        } else {
+            callback();
+        }
+    };
 
     return self;
 })(GUI);

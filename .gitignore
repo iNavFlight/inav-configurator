@@ -13,3 +13,5 @@ inav-configurator.iml
 /dist
 # Path where the NW.js apps get built
 /apps
+/.vscode/
+.eslintrc.json

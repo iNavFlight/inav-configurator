@@ -14,29 +14,40 @@ TABS.motors.initialize = function (callback) {
 
     var $motorsEnableTestMode;
 
-    if (GUI.active_tab != 'motors') {
+    if (GUI.active_tab !== 'motors') {
         GUI.active_tab = 'motors';
         googleAnalytics.sendAppView('Motors');
     }
 
-    function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_3d);
-    }
-    
-    function load_3d() {
-        MSP.send_message(MSPCodes.MSP_3D, false, false, get_motor_data);
-    }
-    
-    function get_motor_data() {
-        update_arm_status();
-        MSP.send_message(MSPCodes.MSP_MOTOR, false, false, load_html);
-    }
+    var loadChainer = new MSPChainerClass();
+
+    loadChainer.setChain([
+        mspHelper.loadMisc,
+        mspHelper.loadBfConfig,
+        mspHelper.load3dConfig,
+        mspHelper.loadMotors,
+        mspHelper.loadMotorMixRules,
+        mspHelper.loadServoMixRules,
+        mspHelper.loadMixerConfig
+    ]);
+    loadChainer.setExitPoint(load_html);
+    loadChainer.execute();
+    update_arm_status();
+
+    var saveChainer = new MSPChainerClass();
+
+    saveChainer.setChain([
+        mspHelper.sendMotorMixer,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(function () {
+        GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+        MOTOR_RULES.cleanup();
+    });
 
     function load_html() {
         $('#content').load("./tabs/motors.html", process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_MISC, false, false, load_config);
 
     function update_arm_status() {
         self.armed = bit_check(CONFIG.mode, 0);
@@ -161,13 +172,12 @@ TABS.motors.initialize = function (callback) {
     }
 
     function update_model(val) {
-        $('.mixerPreview img').attr('src', './resources/motor_order/' + mixerList[val - 1].image + '.svg');
+        $('.mixerPreview img').attr('src', './resources/motor_order/'
+            + helper.mixer.getById(val).image + '.svg');
     }
-    
+
     function process_html() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
-
-        localize();
 
         self.feature3DEnabled = bit_check(BF_CONFIG.features, 12);
 
@@ -177,9 +187,13 @@ TABS.motors.initialize = function (callback) {
 
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
-        
-        update_model(BF_CONFIG.mixerConfiguration);
-        
+
+        if (FC.isNewMixer()) {
+            update_model(MIXER_CONFIG.appliedMixerPreset);;
+        } else {
+            update_model(BF_CONFIG.mixerConfiguration);
+        }
+
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();
 
@@ -295,12 +309,14 @@ TABS.motors.initialize = function (callback) {
             accel_offset_established = false;
         });
 
-        var number_of_valid_outputs = (MOTOR_DATA.indexOf(0) > -1) ? MOTOR_DATA.indexOf(0) : 8;
+        let motors_wrapper = $('.motors .bar-wrapper'),
+            servos_wrapper = $('.servos .bar-wrapper'),
+            $motorTitles = $('.motor-titles'),
+            $motorSliders = $('.motor-sliders'),
+            $motorValues = $('.motor-values');
 
-        var motors_wrapper = $('.motors .bar-wrapper'),
-            servos_wrapper = $('.servos .bar-wrapper');
-
-        for (var i = 0; i < 8; i++) {
+        for (let i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
+            const motorNumber = i + 1;
             motors_wrapper.append('\
                 <div class="m-block motor-' + i + '">\
                     <div class="meter-bar">\
@@ -313,7 +329,15 @@ TABS.motors.initialize = function (callback) {
                     </div>\
                 </div>\
             ');
+            $motorTitles.append('<li title="Motor - ' + motorNumber + '">' + motorNumber + '</li>');
+            $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled"/></div>');
+            $motorValues.append('<li>1000</li>');
+        }
 
+        $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
+        $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
+
+        for (let i = 0; i < SERVO_RULES.getServoCount(); i++) {
             servos_wrapper.append('\
                 <div class="m-block servo-' + (7 - i) + '">\
                     <div class="meter-bar">\
@@ -328,8 +352,10 @@ TABS.motors.initialize = function (callback) {
             ');
         }
 
-        $('div.sliders input').prop('min', MISC.mincommand);
-        $('div.sliders input').prop('max', MISC.maxthrottle);
+        var $slidersInput = $('div.sliders input');
+
+        $slidersInput.prop('min', MISC.mincommand);
+        $slidersInput.prop('max', MISC.maxthrottle);
         $('div.values li:not(:last)').text(MISC.mincommand);
         
         if(self.feature3DEnabled && self.feature3DSupported) {
@@ -337,10 +363,10 @@ TABS.motors.initialize = function (callback) {
             //Note: values may need to be revisited
             if(_3D.neutral3d > 1575 || _3D.neutral3d < 1425)
                 _3D.neutral3d = 1500;
-                
-            $('div.sliders input').val(_3D.neutral3d);
+
+            $slidersInput.val(_3D.neutral3d);
         } else {
-            $('div.sliders input').val(MISC.mincommand); 
+            $slidersInput.val(MISC.mincommand);
         }
 
         if(self.allowTestMode){ 
@@ -381,35 +407,35 @@ TABS.motors.initialize = function (callback) {
             var val = $(this).val();
 
             $('div.sliders input:not(:disabled, :last)').val(val);
-            $('div.values li:not(:last)').slice(0, number_of_valid_outputs).text(val);
+            $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).text(val);
             $('div.sliders input:not(:last):first').trigger('input');
         });
         console.log($motorsEnableTestMode);
         $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
-                $('div.sliders input').slice(0, number_of_valid_outputs).prop('disabled', false);
+                $slidersInput.slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);
 
                 // unlock master slider
                 $('div.sliders input:last').prop('disabled', false);
             } else {
                 // disable sliders / min max
-                $('div.sliders input').prop('disabled', true);
+                $slidersInput.prop('disabled', true);
 
                 // change all values to default
                 if (self.feature3DEnabled && self.feature3DSupported) {
-                    $('div.sliders input').val(_3D.neutral3d);
+                    $slidersInput.val(_3D.neutral3d);
                 } else {
-                    $('div.sliders input').val(MISC.mincommand);
+                    $slidersInput.val(MISC.mincommand);
                 }
 
-                $('div.sliders input').trigger('input');             
+                $slidersInput.trigger('input');
             }
         });
 
         // check if motors are already spinning
         var motors_running = false;
 
-        for (var i = 0; i < number_of_valid_outputs; i++) {
+        for (var i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
             if( !self.feature3DEnabled ){
                 if (MOTOR_DATA[i] > MISC.mincommand) {
                     motors_running = true;
@@ -476,25 +502,30 @@ TABS.motors.initialize = function (callback) {
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
         
         function update_ui() {
-            var previousArmState = self.armed;                                   
-            var block_height = $('div.m-block:first').height();
+            var previousArmState = self.armed,
+                block_height = $('div.m-block:first').height(),
+                data,
+                margin_top,
+                height,
+                color,
+                i;
 
-            for (var i = 0; i < MOTOR_DATA.length; i++) {
-                var data = MOTOR_DATA[i] - MISC.mincommand,
-                    margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height),
-                    height = (data * (block_height / full_block_scale)).clamp(0, block_height),
-                    color = parseInt(data * 0.009);
+            for (i = 0; i < MOTOR_DATA.length; i++) {
+                data = MOTOR_DATA[i] - MISC.mincommand;
+                margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
+                height = (data * (block_height / full_block_scale)).clamp(0, block_height);
+                color = parseInt(data * 0.009);
 
                 $('.motor-' + i + ' .label', motors_wrapper).text(MOTOR_DATA[i]);
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
-            for (var i = 0; i < SERVO_DATA.length; i++) {
-                var data = SERVO_DATA[i] - 1000,
-                    margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height),
-                    height = (data * (block_height / 1000)).clamp(0, block_height),
-                    color = parseInt(data * 0.009);
+            for (i = 0; i < SERVO_DATA.length; i++) {
+                data = SERVO_DATA[i] - 1000;
+                margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
+                height = (data * (block_height / 1000)).clamp(0, block_height);
+                color = parseInt(data * 0.009);
 
                 $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
                 $('.servo-' + i + ' .indicator', servos_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
@@ -520,6 +551,8 @@ TABS.motors.initialize = function (callback) {
 
         // enable Status and Motor data pulling
         helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 75, true);
+
+        localize();
 
         GUI.content_ready(callback);
     }

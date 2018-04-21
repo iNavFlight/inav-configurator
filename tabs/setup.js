@@ -1,4 +1,4 @@
-/*global chrome*/
+/*global $,chrome,FC,helper,mspHelper,MIXER_CONFIG,BF_CONFIG*/
 'use strict';
 
 TABS.setup = {
@@ -17,7 +17,8 @@ TABS.setup.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadBfConfig,
-        mspHelper.queryFcStatus
+        mspHelper.queryFcStatus,
+        mspHelper.loadMixerConfig
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
@@ -236,12 +237,21 @@ TABS.setup.initialize3D = function () {
     renderer.setSize(wrapper.width()*2, wrapper.height()*2);
 
 
-//    // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
+    // modelWrapper adds an extra axis of rotation to avoid gimbal lock with the euler angles
     modelWrapper = new THREE.Object3D();
-//
+
     // load the model including materials
     if (useWebGlRenderer) {
-        model_file = mixerList[BF_CONFIG.mixerConfiguration - 1].model;
+        if (FC.isNewMixer()) {
+            if (MIXER_CONFIG.appliedMixerPreset === -1) {
+                model_file = 'custom';
+                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            } else {
+                model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+            }
+        } else {
+            model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
+        }
     } else {
         model_file = 'fallback'
     }

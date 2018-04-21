@@ -1,10 +1,23 @@
 /*global $, ServoMixRule*/
 'use strict';
 
-var ServoMixRuleCollection = function () {
+var ServoMixerRuleCollection = function () {
 
-    var self = {};
-    var data = [];
+    let self = {},
+        data = [],
+        maxServoCount = 8;
+
+    self.setServoCount = function (value) {
+        maxServoCount = value;
+    };
+
+    self.getServoCount = function () {
+        return maxServoCount;
+    }
+
+    self.getServoRulesCount = function () {
+        return self.getServoCount() * 2;
+    }
 
     self.put = function (element) {
         data.push(element);
@@ -39,10 +52,10 @@ var ServoMixRuleCollection = function () {
         while (self.hasFreeSlots()) {
             self.put(new ServoMixRule(0, 0, 0, 0));
         }
-    }
+    };
 
     self.hasFreeSlots = function () {
-        return data.length < 16;
+        return data.length < self.getServoRulesCount();
     };
 
     return self;

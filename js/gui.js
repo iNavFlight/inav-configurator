@@ -39,7 +39,8 @@ var GUI_control = function () {
         'osd',
         'profiles',
         'advanced_tuning',
-        'mission_control'
+        'mission_control',
+        'mixer'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 

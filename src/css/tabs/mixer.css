@@ -1,0 +1,43 @@
+.mixer-load-button {
+    position: absolute;
+    right: 0;
+    bottom: 1em;
+}
+
+.mixer-load-button > div {
+    margin-left: 1em;
+}
+
+.mixer-table {
+    width: 100%;
+}
+
+.mixer-table thead {
+    display: table-header-group !important;
+}
+
+.mixer-table input {
+    width: 75px;
+}
+
+.mixer-table .btn {
+    float: none;
+}
+
+/* .mixer-table tbody tr:first-child, */
+.mixer-table thead tr {
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+    background-color: #828885;
+    color: #FFF;
+}
+
+.mixer-table td,
+.mixer-table th {
+    padding: 2px;
+    height: 2.5em;
+}
+
+.mixer-table tr:nth-child(even) td {
+    background-color: #ebe7e7;
+}

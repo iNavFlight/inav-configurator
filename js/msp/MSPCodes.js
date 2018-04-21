@@ -155,6 +155,10 @@ var MSPCodes = {
     // INAV specific codes
     MSPV2_SETTING:                      0x1003,
     MSPV2_SET_SETTING:                  0x1004,
+
+    MSP2_COMMON_MOTOR_MIXER:            0x1005,
+    MSP2_COMMON_SET_MOTOR_MIXER:        0x1006,
+
     MSPV2_INAV_STATUS:                  0x2000,
     MSPV2_INAV_OPTICAL_FLOW:            0x2001,
     MSPV2_INAV_ANALOG:                  0x2002,
@@ -165,4 +169,7 @@ var MSPCodes = {
     MSPV2_INAV_RATE_PROFILE:            0x2007,
     MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
     MSPV2_INAV_AIR_SPEED:               0x2009,
+
+    MSP2_INAV_MIXER:                    0x2010,
+    MSP2_INAV_SET_MIXER:                0x2011
 };

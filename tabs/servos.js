@@ -9,107 +9,35 @@ TABS.servos.initialize = function (callback) {
         googleAnalytics.sendAppView('Servos');
     }
 
-    var loadChainer = new MSPChainerClass();
+    let loadChainer = new MSPChainerClass();
 
-    if (BF_CONFIG.mixerConfiguration == 23 || BF_CONFIG.mixerConfiguration == 24 || BF_CONFIG.mixerConfiguration == 25) {
-        loadChainer.setChain([
-            mspHelper.loadServoConfiguration,
-            mspHelper.loadRcData,
-            mspHelper.loadBfConfig,
-            mspHelper.loadServoMixRules
-        ]);
-    }
-    else {
-        loadChainer.setChain([
-            mspHelper.loadServoConfiguration,
-            mspHelper.loadRcData,
-            mspHelper.loadBfConfig
-        ]);
-    }
+    loadChainer.setChain([
+        mspHelper.loadServoConfiguration,
+        mspHelper.loadRcData,
+        mspHelper.loadBfConfig,
+    ]);
 
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
-    var saveChainer = new MSPChainerClass();
+    let saveChainer = new MSPChainerClass();
 
-    if (BF_CONFIG.mixerConfiguration == 23 || BF_CONFIG.mixerConfiguration == 24 || BF_CONFIG.mixerConfiguration == 25) {
-        saveChainer.setChain([
-            mspHelper.sendServoConfigurations,
-            mspHelper.sendServoMixer,
-            mspHelper.saveToEeprom
-        ]);
-    }
-    else {
-        saveChainer.setChain([
-            mspHelper.sendServoConfigurations,
-            mspHelper.saveToEeprom
-        ]);
-    }
+    saveChainer.setChain([
+        mspHelper.sendServoConfigurations,
+        mspHelper.saveToEeprom
+    ]);
 
     saveChainer.setExitPoint(function () {
         GUI.log(chrome.i18n.getMessage('servosEepromSave'));
-        SERVO_RULES.cleanup();
-        renderServoMixRules();
     });
 
     function load_html() {
         $('#content').load("./tabs/servos.html", process_html);
     }
 
-    function renderServoMixRules() {
-
-        var $servoMixTable = $('#servo-mix-table'),
-            $servoMixTableBody = $servoMixTable.find('tbody');
-
-        /*
-         * Process servo mix table UI
-         */
-        var rules = SERVO_RULES.get();
-        $servoMixTableBody.find("*").remove();
-        for (servoRuleIndex in rules) {
-            if (rules.hasOwnProperty(servoRuleIndex)) {
-                const servoRule = rules[servoRuleIndex];
-
-                $servoMixTableBody.append('\
-                    <tr>\
-                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
-                    <td><select class="mix-rule-input"></select></td>\
-                    <td><input type="number" class="mix-rule-rate" step="1" min="-100" max="100" /></td>\
-                    <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
-                    <td><span class="btn default_btn narrow"><a href="#" data-role="role-delete" data-i18n="servoMixerDelete"></a></span></td>\
-                    </tr>\
-                ');
-
-                const $row = $servoMixTableBody.find('tr:last');
-
-                GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
-                
-                $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
-                    servoRule.setInput($(this).val());
-                });
-
-                $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
-                    servoRule.setTarget($(this).val());
-                });
-
-                $row.find(".mix-rule-rate").val(servoRule.getRate()).change(function () {
-                    servoRule.setRate($(this).val());
-                });
-
-                $row.find(".mix-rule-speed").val(servoRule.getSpeed()).change(function () {
-                    servoRule.setSpeed($(this).val());
-                });
-                
-                $row.find("[data-role='role-delete']").attr("data-index", servoRuleIndex);
-            }
-
-        }
-        localize();
-    }
-
     function update_ui() {
 
-        var i,
+        let i,
             $tabServos = $(".tab-servos"),
             $servoConfigTable = $('#servo-config-table'),
             $servoMixTable = $('#servo-mix-table'),
@@ -120,8 +48,9 @@ TABS.servos.initialize = function (callback) {
             return;
         }
 
-        var servoCheckbox = '';
-        var servoHeader = '';
+        let servoCheckbox = '',
+            servoHeader = '';
+
         for (i = 0; i < RC.active_channels - 4; i++) {
             servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
         }
@@ -195,16 +124,13 @@ TABS.servos.initialize = function (callback) {
             });
 
             //Save configuration to FC
-            SERVO_RULES.cleanup();
-            SERVO_RULES.inflate();
             saveChainer.execute();
-
         }
 
         // drop previous table
         $servoConfigTable.find('tr:not(:first)').remove();
 
-        for (var servoIndex = 0; servoIndex < 8; servoIndex++) {
+        for (let servoIndex = 0; servoIndex < 8; servoIndex++) {
             process_servos('Servo ' + servoIndex, '', servoIndex, false);
         }
 
@@ -220,19 +146,6 @@ TABS.servos.initialize = function (callback) {
             servos_update(true);
         });
 
-        $servoMixTableBody.on('click', "[data-role='role-delete']", function (event) {
-            SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
-            renderServoMixRules();
-        });
-
-        $("[data-role='role-add']").click(function () {
-            if (SERVO_RULES.hasFreeSlots()) {
-                SERVO_RULES.put(new ServoMixRule(0, 0, 0, 0));
-                renderServoMixRules();
-            }
-        });
-
-        renderServoMixRules();
     }
 
     function process_html() {

@@ -18,6 +18,7 @@ var CONFIG,
     ADJUSTMENT_RANGES,
     SERVO_CONFIG,
     SERVO_RULES,
+    MOTOR_RULES,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -28,7 +29,6 @@ var CONFIG,
     ARMING_CONFIG,
     FC_CONFIG,
     MISC,
-    VOLTMETER_CONFIG,
     _3D,
     DATAFLASH,
     SDCARD,
@@ -50,13 +50,18 @@ var CONFIG,
     POSITION_ESTIMATOR,
     RTH_AND_LAND_CONFIG,
     FW_CONFIG,
-    DEBUG_TRACE;
+    DEBUG_TRACE,
+    MIXER_CONFIG,
+    BATTERY_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: -125,
     isRatesInDps: function () {
         return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
+    },
+    isNewMixer: function () {
+        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -158,7 +163,18 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = new ServoMixRuleCollection();
+        SERVO_RULES = new ServoMixerRuleCollection();
+        MOTOR_RULES = new MotorMixerRuleCollection();
+
+        MIXER_CONFIG = {
+            yawMotorDirection: 0,
+            yawJumpPreventionLimit: 0,
+            platformType: -1,
+            hasFlaps: false,
+            appliedMixerPreset: -1,
+            numberOfMotors: 0,
+            numberOfServos: 0
+        },
 
         SERIAL_CONFIG = {
             ports: [],
@@ -791,7 +807,6 @@ var FC = {
             'JJRC H8_3D',
             'iNav Reference protocol',
             'eLeReS'
-            
         ];
     },
     getSensorAlignments: function () {
