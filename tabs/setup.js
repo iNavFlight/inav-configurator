@@ -63,13 +63,15 @@ TABS.setup.initialize = function (callback) {
         self.initializeInstruments();
 
         $('a.resetSettings').click(function () {
-            MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupSettingsRestored'));
-
-                GUI.tab_switch_cleanup(function () {
-                    TABS.setup.initialize();
+            if (confirm(chrome.i18n.getMessage('confirm_reset_settings'))) {
+                MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
+                    GUI.log(chrome.i18n.getMessage('initialSetupSettingsRestored'));
+    
+                    GUI.tab_switch_cleanup(function () {
+                        TABS.setup.initialize();
+                    });
                 });
-            });
+            }
         });
 
         // display current yaw fix value (important during tab re-initialization)
