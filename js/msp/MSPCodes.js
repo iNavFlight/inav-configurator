@@ -171,5 +171,12 @@ var MSPCodes = {
     MSPV2_INAV_AIR_SPEED:               0x2009,
 
     MSP2_INAV_MIXER:                    0x2010,
-    MSP2_INAV_SET_MIXER:                0x2011
+    MSP2_INAV_SET_MIXER:                0x2011,
+
+    MSP2_INAV_OSD_LAYOUTS:              0x2012,
+    MSP2_INAV_OSD_SET_LAYOUT_ITEM:      0x2013,
+    MSP2_INAV_OSD_ALARMS:               0x2014,
+    MSP2_INAV_OSD_SET_ALARMS:           0x2015,
+    MSP2_INAV_OSD_PREFERENCES:          0x2016,
+    MSP2_INAV_OSD_SET_PREFERENCES:      0x2017,
 };

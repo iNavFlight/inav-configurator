@@ -1296,12 +1296,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_WP_MISSION_SAVE:
                 // buffer.push(0);
                 console.log(data);
-
                 break;
             case MSPCodes.MSP_WP_MISSION_LOAD:
                 console.log('Mission load');
                 break;
-
             case MSPCodes.MSP2_INAV_MIXER:
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
                 MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
@@ -1313,9 +1311,22 @@ var mspHelper = (function (gui) {
                 MOTOR_RULES.setMotorCount(MIXER_CONFIG.numberOfMotors);
                 SERVO_RULES.setServoCount(MIXER_CONFIG.numberOfServos);
                 break;
-
             case MSPCodes.MSP2_INAV_SET_MIXER:
                 console.log('Mixer config saved');
+            case MSPCodes.MSP2_INAV_OSD_LAYOUTS:
+                break;
+            case MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM:
+                console.log('OSD layout item saved');
+                break;
+            case MSPCodes.MSP2_INAV_OSD_ALARMS:
+                break;
+            case MSPCodes.MSP2_INAV_OSD_SET_ALARMS:
+                console.log('OSD alarms saved');
+                break;
+            case MSPCodes.MSP2_INAV_OSD_PREFERENCES:
+                break;
+            case MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES:
+                console.log('OSD preferences saved');
                 break;
 
             default:

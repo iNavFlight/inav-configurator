@@ -456,3 +456,8 @@ button {
 .osd__elements {
     margin-bottom: 3em;
 }
+
+.osd_layouts {
+    display: block;
+    margin-bottom: 1em;
+}
