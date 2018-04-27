@@ -18,6 +18,7 @@ SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
 SYM.WH = 0xAB;
+SYM.WATT = 0xAE;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
 SYM.WH_KM_0 = 172;
@@ -619,7 +620,7 @@ OSD.constants = {
                     name: 'POWER',
                     id: 19,
                     min_version: '1.6.0',
-                    preview: 'W50 ' // 3 chars
+                    preview: FONT.symbol(SYM.WATT) + '50 ' // 3 chars
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
