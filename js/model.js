@@ -445,7 +445,29 @@ const mixerList = [
         platform: PLATFORM_TRICOPTER,
         motorMixer: [],
         servoMixer: []
-    }      // 25
+    },      // 25
+    {
+        id: 26,
+        name: 'Airplane with differential thrust',
+        model: 'custom',
+        image: 'airplane',
+        hasCustomServoMixer: false,
+        enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.3),
+            new MotorMixRule(1.0, 0.0, 0.0, -0.3)
+        ],
+        servoMixer: [
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
+            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
+            new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0)
+        ]
+    }   
 ];
 
 const platformList = [
