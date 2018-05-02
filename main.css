@@ -939,6 +939,18 @@ li.active .ic_mission {
     background-image: url("../images/icons/cf_icon_mission_white.svg");
 }
 
+.ic_mixer {
+    background-image: url("../images/icons/cf_icon_mixer_grey.svg");
+}
+
+.ic_mixer:hover {
+    background-image: url("../images/icons/cf_icon_mixer_white.svg");
+}
+
+li.active .ic_mixer {
+    background-image: url("../images/icons/cf_icon_mixer_white.svg");
+}
+
 #content {
     margin-top: 0;
     padding: 0;
