@@ -71,9 +71,9 @@ var serial = {
                             }
                             break;
 
-                        case 'break':
-                            // This occurs on F1 boards with old firmware during reboot
+                        case 'break': // This occurs on F1 boards with old firmware during reboot
                         case 'overrun':
+                        case 'frame_error': //Got disconnected
                             // wait 50 ms and attempt recovery
                             self.error = info.error;
                             setTimeout(function() {
