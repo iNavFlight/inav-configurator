@@ -724,7 +724,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
-            googleAnalytics.sendEvent('Setting', 'ReceiverMode', $("input[name='rxMode']:checked").closest('.radio').find('label').text());
+            googleAnalytics.sendEvent('Setting', 'ReceiverMode', $('#rxType').val());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
             /*
