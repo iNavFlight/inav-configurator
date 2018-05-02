@@ -699,22 +699,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             var rxTypes = FC.getRxTypes();
 
-            function is_using_rx_type(name) {
-                for (var ii = 0; ii < rxTypes.length; ii++) {
-                    if (rxTypes[ii].name == name) {
-                        return FC.isRxTypeEnabled(rxTypes[ii]);
-                    }
-                }
-                return false;
+            // track feature usage
+            if ($('#rxType').val() == 'RX_SERIAL') {
+                googleAnalytics.sendEvent('Setting', 'SerialRxProvider', $('#serial-rx-protocol').find(':selected').text());
             }
 
             // track feature usage
-            if (is_using_rx_type('RX_SERIAL')) {
-                googleAnalytics.sendEvent('Setting', 'SerialRxProvider', serialRxTypes[RX_CONFIG.serialrx_provider]);
-            }
-
-            // track feature usage
-            if (is_using_rx_type('RX_SPI')) {
+            if ($('#rxType').val() == 'RX_SPI') {
                 googleAnalytics.sendEvent('Setting', 'nrf24Protocol', FC.getSPIProtocolTypes()[RX_CONFIG.spirx_protocol]);
             }
 
