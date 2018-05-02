@@ -1,4 +1,4 @@
-/*global chrome*/
+/*global chrome,GUI,FC_CONFIG*/
 'use strict';
 
 TABS.configuration = {};
@@ -713,8 +713,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-
-            googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
+            if (!FC.isNewMixer()) {
+                googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
+            }
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $('#rxType').val());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 

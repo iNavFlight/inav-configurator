@@ -1,4 +1,4 @@
-/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG*/
+/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics*/
 'use strict';
 
 TABS.mixer = {};
@@ -149,6 +149,16 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function saveAndReboot() {
+
+        /*
+         * Send tracking
+         */
+        googleAnalytics.sendEvent('Mixer', 'Platform type', helper.platform.getList()[MIXER_CONFIG.platformType].name);
+        googleAnalytics.sendEvent('Mixer', 'Mixer preset',  helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).name);
+
+        /*
+         * Send mixer rules
+         */
         SERVO_RULES.cleanup();
         SERVO_RULES.inflate();
         MOTOR_RULES.cleanup();
