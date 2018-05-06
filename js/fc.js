@@ -435,7 +435,8 @@ var FC = {
         SENSOR_ALIGNMENT = {
             align_gyro: 0,
             align_acc: 0,
-            align_mag: 0
+            align_mag: 0,
+            align_opflow: 0
         };
 
         RX_CONFIG = {
