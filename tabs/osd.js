@@ -51,6 +51,11 @@ SYM.FT_S = 153;
 SYM.CLOCK = 0xBC;
 SYM.ZERO_HALF_TRAILING_DOT = 192;
 SYM.ZERO_HALF_LEADING_DOT = 208;
+SYM.ROLL_LEFT = 0xCC;
+SYM.ROLL_LEVEL = 0xCD;
+SYM.ROLL_RIGHT = 0xCE;
+SYM.PITCH_UP = 0xCF;
+SYM.PITCH_DOWN = 0xDF;
 SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
@@ -591,6 +596,18 @@ OSD.constants = {
                     name: 'HORIZON_SIDEBARS',
                     id: 4,
                     positionable: false
+                },
+                {
+                    name: 'PITCH_ANGLE',
+                    id: 41,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.PITCH_UP) + '2'
+                },
+                {
+                    name: 'ROLL_ANGLE',
+                    id: 42,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.ROLL_LEFT) + '5'
                 },
             ]
         },
