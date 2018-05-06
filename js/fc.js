@@ -494,6 +494,16 @@ var FC = {
 
         OUTPUT_MAPPING = [];
     },
+    getOutputUsages: function() {
+        return {
+            'ANY':      (0),
+            'MC_MOTOR': (1<<2),
+            'MC_SERVO': (1<<3),
+            'FW_MOTOR': (1<<5),
+            'FW_SERVO': (1<<6),
+            'LED':      (1<<24)
+        };
+    },
     getFeatures: function () {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},

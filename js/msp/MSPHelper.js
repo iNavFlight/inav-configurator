@@ -1330,21 +1330,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING = [];
-                output_usage_values = [
-                    { usage: 'MC_MOTOR', value: (1<<2) },
-                    { usage: 'MC_SERVO', value: (1<<3) },
-                    { usage: 'FW_MOTOR', value: (1<<5) },
-                    { usage: 'FW_SERVO', value: (1<<6) }
-                ];
-                for (i = 0; i < data.byteLength; ++i) {
-                    output_usage_value = data.getUint8(i);
-                    output_usage = [];
-                    for (usage_value_index = 0; usage_value_index < output_usage_values.length; ++usage_value_index) {
-                        if (output_usage_value & output_usage_values[usage_value_index].value)
-                            output_usage.push(output_usage_values[usage_value_index].usage)
-                    }
-                    OUTPUT_MAPPING.push(output_usage);
-                }
+                for (i = 0; i < data.byteLength; ++i)
+                    OUTPUT_MAPPING.push(data.getUint8(i));
                 break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
