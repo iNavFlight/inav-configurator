@@ -549,7 +549,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $sensorMag = $('#sensor-mag'),
                 $sensorBaro = $('#sensor-baro'),
                 $sensorPitot = $('#sensor-pitot'),
-                $sensorRangefinder = $('#sensor-rangefinder');
+                $sensorRangefinder = $('#sensor-rangefinder'),
+                $sensorOpflow = $('#sensor-opflow');
 
             GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
             $sensorAcc.val(SENSOR_CONFIG.accelerometer);
@@ -582,6 +583,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 SENSOR_CONFIG.rangefinder = $sensorRangefinder.val();
             });
 
+            GUI.fillSelect($sensorOpflow, FC.getOpticalFlowNames());
+            $sensorOpflow.val(SENSOR_CONFIG.opflow);
+            $sensorOpflow.change(function () {
+                SENSOR_CONFIG.opflow = $sensorOpflow.val();
+            });
+
             $(".requires-v1_5").show();
         } else {
             $(".requires-v1_5").hide();
@@ -597,6 +604,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v1_8_1").show();
         } else {
             $(".requires-v1_8_1").hide();
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            $(".requires-v2_0").show();
+        } else {
+            $(".requires-v2_0").hide();
         }
 
         $('#3ddeadbandlow').val(_3D.deadband3d_low);

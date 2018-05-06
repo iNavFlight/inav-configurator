@@ -1937,6 +1937,9 @@
     "sensorRangefinder": {
         "message": "Rangefinder"
     },
+    "sensorOpflow": {
+        "message": "Optical flow"
+    },
     "manualEnablingTemplate": {
         "message": "To enable via CLI use <strong>feature {name}</strong> command"
     },
