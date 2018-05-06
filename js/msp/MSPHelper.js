@@ -369,6 +369,10 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 MISC.vbatscale = data.getUint16(offset, true);
                 offset += 2;
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    MISC.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
+                    offset += 2;
+                }
                 MISC.vbatmincellvoltage = data.getUint16(offset, true) / 100;
                 offset += 2;
                 MISC.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
@@ -386,6 +390,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
                 offset += 2;
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    BATTERY_CONFIG.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
+                    offset += 2;
+                }
                 BATTERY_CONFIG.vbatmincellvoltage = data.getUint16(offset, true) / 100;
                 offset += 2;
                 BATTERY_CONFIG.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
@@ -1498,6 +1506,10 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(Math.round(MISC.mag_declination * 10)));
                 buffer.push(lowByte(MISC.vbatscale));
                 buffer.push(highByte(MISC.vbatscale));
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(lowByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
+                    buffer.push(highByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
+                }
                 buffer.push(lowByte(Math.round(MISC.vbatmincellvoltage * 100)));
                 buffer.push(highByte(Math.round(MISC.vbatmincellvoltage * 100)));
                 buffer.push(lowByte(Math.round(MISC.vbatmaxcellvoltage * 100)));
@@ -1515,6 +1527,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));
                 buffer.push(highByte(BATTERY_CONFIG.vbatscale));
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
+                    buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
+                }
                 buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
                 buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
                 buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmaxcellvoltage * 100)));

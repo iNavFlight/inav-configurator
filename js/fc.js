@@ -274,6 +274,7 @@ var FC = {
             placeholder2: 0,
             mag_declination: 0, // not checked
             vbatscale: 0,
+            vbatdetectcellvoltage: 0,
             vbatmincellvoltage: 0,
             vbatmaxcellvoltage: 0,
             vbatwarningcellvoltage: 0,
@@ -285,6 +286,7 @@ var FC = {
 
         BATTERY_CONFIG = {
             vbatscale: 0,
+            vbatdetectcellvoltage: 0,
             vbatmincellvoltage: 0,
             vbatmaxcellvoltage: 0,
             vbatwarningcellvoltage: 0,
