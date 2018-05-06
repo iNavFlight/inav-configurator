@@ -37,6 +37,7 @@ SYM.AIR = 151;
 SYM.DIR_TO_HOME = 0x60;
 SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
+SYM.HOME = 191;
 SYM.TRIP_DIST = 0x22;
 SYM.HEADING1 = 0xA9;
 SYM.HEADING2 = 0xA8;
@@ -690,9 +691,9 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
                         }
-                        return FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {
