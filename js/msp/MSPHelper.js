@@ -266,17 +266,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_RC_TUNING:
                 RC_tuning.RC_RATE = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                if (FC.isRatesInDps()) {
-                    RC_tuning.roll_pitch_rate = 0;
-                    RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) * 10));
-                    RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) * 10));
-                    RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) * 10));
-                } else {
-                    RC_tuning.roll_pitch_rate = 0;
-                    RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                    RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                    RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                }
+                RC_tuning.roll_pitch_rate = 0;
+                RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) * 10));
+                RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) * 10));
+                RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) * 10));
 
                 RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
@@ -1407,16 +1400,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RC_TUNING:
                 buffer.push(Math.round(RC_tuning.RC_RATE * 100));
                 buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
-                if (FC.isRatesInDps()) {
-                    buffer.push(Math.round(RC_tuning.roll_rate / 10));
-                    buffer.push(Math.round(RC_tuning.pitch_rate / 10));
-                    buffer.push(Math.round(RC_tuning.yaw_rate / 10));
-                } else {
-                    buffer.push(Math.round(RC_tuning.roll_rate * 100));
-                    buffer.push(Math.round(RC_tuning.pitch_rate * 100));
-                    buffer.push(Math.round(RC_tuning.yaw_rate * 100));
-                }
-
+                buffer.push(Math.round(RC_tuning.roll_rate / 10));
+                buffer.push(Math.round(RC_tuning.pitch_rate / 10));
+                buffer.push(Math.round(RC_tuning.yaw_rate / 10));
                 buffer.push(RC_tuning.dynamic_THR_PID);
                 buffer.push(Math.round(RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));

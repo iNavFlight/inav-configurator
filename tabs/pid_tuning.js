@@ -55,15 +55,9 @@ TABS.pid_tuning.initialize = function (callback) {
         // Fill in data from RC_tuning object
         $('.rate-tpa input[name="roll-pitch"]').val(RC_tuning.roll_pitch_rate.toFixed(2));
 
-        if (FC.isRatesInDps()) {
-            $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate);
-            $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate);
-            $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate);
-        } else {
-            $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate.toFixed(2));
-            $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate.toFixed(2));
-            $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate.toFixed(2));
-        }
+        $('.rate-tpa input[name="roll"]').val(RC_tuning.roll_rate);
+        $('.rate-tpa input[name="pitch"]').val(RC_tuning.pitch_rate);
+        $('.rate-tpa input[name="yaw"]').val(RC_tuning.yaw_rate);
 
         $('.rate-tpa input[name="manual_roll"]').val(RC_tuning.manual_roll_rate);
         $('.rate-tpa input[name="manual_pitch"]').val(RC_tuning.manual_pitch_rate);
@@ -138,13 +132,6 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         pid_and_rc_to_form();
-
-        if (FC.isRatesInDps()) {
-           $('.rate-tpa--no-dps').hide();
-        } else {
-            $('.rate-tpa .roll-pitch').hide();
-            $('.rate-tpa--inav').hide();
-        }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             var $magHoldYawRate                 = $("#magHoldYawRate"),
