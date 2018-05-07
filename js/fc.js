@@ -519,12 +519,6 @@ var FC = {
             );
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
-            features.push(
-                {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true}
-            );
-        }
-
         if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
             features.push(
                 {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
@@ -548,11 +542,9 @@ var FC = {
             );
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.3.0')) {
-            features.push(
-                {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
-            );
-        }
+        features.push(
+            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
+        );
 
         if (semver.gte(CONFIG.flightControllerVersion, '1.5.0')) {
             features.push(

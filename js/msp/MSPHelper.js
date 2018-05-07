@@ -2465,11 +2465,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadINAVPidConfig = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
     };
 
     self.loadLoopTime = function (callback) {
@@ -2477,11 +2473,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadAdvancedConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
     };
 
     self.loadFilterConfig = function (callback) {
@@ -2601,11 +2593,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveINAVPidConfig = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
     };
 
     self.saveLooptimeConfig = function (callback) {
@@ -2613,11 +2601,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveAdvancedConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
     };
 
     self.saveFilterConfig = function (callback) {

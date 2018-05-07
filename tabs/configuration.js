@@ -372,55 +372,52 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-
-            var $escProtocol = $('#esc-protocol');
-            var $escRate = $('#esc-rate');
-            for (i in escProtocols) {
-                if (escProtocols.hasOwnProperty(i)) {
-                    var protocolData = escProtocols[i];
-                    $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
-                }
+        var $escProtocol = $('#esc-protocol');
+        var $escRate = $('#esc-rate');
+        for (i in escProtocols) {
+            if (escProtocols.hasOwnProperty(i)) {
+                var protocolData = escProtocols[i];
+                $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
             }
-
-            buildMotorRates();
-            $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
-            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-
-            $escProtocol.change(function () {
-                ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
-                buildMotorRates();
-                ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
-                $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-            });
-
-            $escRate.change(function () {
-                ADVANCED_CONFIG.motorPwmRate = $(this).val();
-            });
-
-            $("#esc-protocols").show();
-
-            var $servoRate = $('#servo-rate');
-
-            for (i in servoRates) {
-                if (servoRates.hasOwnProperty(i)) {
-                    $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
-                }
-            }
-            /*
-             *  If rate from FC is not on the list, add a new entry
-             */
-            if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
-                $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
-            }
-
-            $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
-            $servoRate.change(function () {
-                ADVANCED_CONFIG.servoPwmRate = $(this).val();
-            });
-
-            $('#servo-rate-container').show();
         }
+
+        buildMotorRates();
+        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+
+        $escProtocol.change(function () {
+            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+            buildMotorRates();
+            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
+            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+        });
+
+        $escRate.change(function () {
+            ADVANCED_CONFIG.motorPwmRate = $(this).val();
+        });
+
+        $("#esc-protocols").show();
+
+        var $servoRate = $('#servo-rate');
+
+        for (i in servoRates) {
+            if (servoRates.hasOwnProperty(i)) {
+                $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
+            }
+        }
+        /*
+            *  If rate from FC is not on the list, add a new entry
+            */
+        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
+            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
+        }
+
+        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
+        $servoRate.change(function () {
+            ADVANCED_CONFIG.servoPwmRate = $(this).val();
+        });
+
+        $('#servo-rate-container').show();
 
         var $looptime = $("#looptime");
 
