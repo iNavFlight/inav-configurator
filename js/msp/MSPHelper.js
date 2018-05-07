@@ -2477,19 +2477,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadFilterConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
     };
 
     self.loadPidAdvanced = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
     };
 
     self.loadRcTuningData = function (callback) {
@@ -2605,11 +2597,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveFilterConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
     };
 
     self.savePidData = function (callback) {
@@ -2625,11 +2613,7 @@ var mspHelper = (function (gui) {
     };
 
     self.savePidAdvanced = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
     };
 
     self.saveBfConfig = function (callback) {

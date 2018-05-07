@@ -421,125 +421,111 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         var $looptime = $("#looptime");
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            $(".requires-v1_4").show();
+        var $gyroLpf = $("#gyro-lpf"),
+            $gyroSync = $("#gyro-sync-checkbox"),
+            $asyncMode = $('#async-mode'),
+            $gyroFrequency = $('#gyro-frequency'),
+            $accelerometerFrequency = $('#accelerometer-frequency'),
+            $attitudeFrequency = $('#attitude-frequency');
 
-            var $gyroLpf = $("#gyro-lpf"),
-                $gyroSync = $("#gyro-sync-checkbox"),
-                $asyncMode = $('#async-mode'),
-                $gyroFrequency = $('#gyro-frequency'),
-                $accelerometerFrequency = $('#accelerometer-frequency'),
-                $attitudeFrequency = $('#attitude-frequency');
+        var values = FC.getGyroLpfValues();
 
-            var values = FC.getGyroLpfValues();
-
-            for (i in values) {
-                if (values.hasOwnProperty(i)) {
-                    //noinspection JSUnfilteredForInLoop
-                    $gyroLpf.append('<option value="' + i + '">' + values[i].label + '</option>');
-                }
+        for (i in values) {
+            if (values.hasOwnProperty(i)) {
+                //noinspection JSUnfilteredForInLoop
+                $gyroLpf.append('<option value="' + i + '">' + values[i].label + '</option>');
             }
-
-            $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
-            $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
-
-            $gyroLpf.change(function () {
-                INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
-
-                GUI.fillSelect(
-                    $looptime,
-                    FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
-                    FC_CONFIG.loopTime,
-                    'Hz'
-                );
-                $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
-                $looptime.change();
-
-                GUI.fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
-                $gyroFrequency.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
-                $gyroFrequency.change();
-            });
-
-            $gyroLpf.change();
-
-            $looptime.val(FC_CONFIG.loopTime);
-            $looptime.change(function () {
-                FC_CONFIG.loopTime = $(this).val();
-
-                if (INAV_PID_CONFIG.asynchronousMode == 0) {
-                    //All task running together
-                    ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
-                }
-            });
-            $looptime.change();
-
-            $gyroFrequency.val(ADVANCED_CONFIG.gyroSyncDenominator * FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
-            $gyroFrequency.change(function () {
-                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor($gyroFrequency.val() / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
-            });
-
-            $gyroSync.change(function () {
-                if ($(this).is(":checked")) {
-                    ADVANCED_CONFIG.gyroSync = 1;
-                } else {
-                    ADVANCED_CONFIG.gyroSync = 0;
-                }
-            });
-
-            $gyroSync.change();
-
-            /*
-             * Async mode select
-             */
-            GUI.fillSelect($asyncMode, FC.getAsyncModes());
-            $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
-            $asyncMode.change(function () {
-                INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
-
-                if (INAV_PID_CONFIG.asynchronousMode == 0) {
-                    $('#gyro-sync-wrapper').show();
-                    $('#gyro-frequency-wrapper').hide();
-                    $('#accelerometer-frequency-wrapper').hide();
-                    $('#attitude-frequency-wrapper').hide();
-                } else if (INAV_PID_CONFIG.asynchronousMode == 1) {
-                    $('#gyro-sync-wrapper').hide();
-                    $('#gyro-frequency-wrapper').show();
-                    $('#accelerometer-frequency-wrapper').hide();
-                    $('#attitude-frequency-wrapper').hide();
-                    ADVANCED_CONFIG.gyroSync = 1;
-                } else {
-                    $('#gyro-sync-wrapper').hide();
-                    $('#gyro-frequency-wrapper').show();
-                    $('#accelerometer-frequency-wrapper').show();
-                    $('#attitude-frequency-wrapper').show();
-                    ADVANCED_CONFIG.gyroSync = 1;
-                }
-            });
-            $asyncMode.change();
-
-            GUI.fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
-            $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
-            $accelerometerFrequency.change(function () {
-                INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
-            });
-
-            GUI.fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
-            $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
-            $attitudeFrequency.change(function () {
-                INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
-            });
-
-        } else {
-            GUI.fillSelect($looptime, FC.getLooptimes()[125].looptimes, FC_CONFIG.loopTime, 'Hz');
-
-            $looptime.val(FC_CONFIG.loopTime);
-            $looptime.change(function () {
-                FC_CONFIG.loopTime = $(this).val();
-            });
-
-            $(".requires-v1_4").hide();
         }
 
+        $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
+        $gyroSync.prop("checked", ADVANCED_CONFIG.gyroSync);
+
+        $gyroLpf.change(function () {
+            INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
+
+            GUI.fillSelect(
+                $looptime,
+                FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
+                FC_CONFIG.loopTime,
+                'Hz'
+            );
+            $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
+            $looptime.change();
+
+            GUI.fillSelect($gyroFrequency, FC.getGyroFrequencies()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes);
+            $gyroFrequency.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
+            $gyroFrequency.change();
+        });
+
+        $gyroLpf.change();
+
+        $looptime.val(FC_CONFIG.loopTime);
+        $looptime.change(function () {
+            FC_CONFIG.loopTime = $(this).val();
+
+            if (INAV_PID_CONFIG.asynchronousMode == 0) {
+                //All task running together
+                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
+            }
+        });
+        $looptime.change();
+
+        $gyroFrequency.val(ADVANCED_CONFIG.gyroSyncDenominator * FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
+        $gyroFrequency.change(function () {
+            ADVANCED_CONFIG.gyroSyncDenominator = Math.floor($gyroFrequency.val() / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
+        });
+
+        $gyroSync.change(function () {
+            if ($(this).is(":checked")) {
+                ADVANCED_CONFIG.gyroSync = 1;
+            } else {
+                ADVANCED_CONFIG.gyroSync = 0;
+            }
+        });
+
+        $gyroSync.change();
+
+        /*
+            * Async mode select
+            */
+        GUI.fillSelect($asyncMode, FC.getAsyncModes());
+        $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
+        $asyncMode.change(function () {
+            INAV_PID_CONFIG.asynchronousMode = $asyncMode.val();
+
+            if (INAV_PID_CONFIG.asynchronousMode == 0) {
+                $('#gyro-sync-wrapper').show();
+                $('#gyro-frequency-wrapper').hide();
+                $('#accelerometer-frequency-wrapper').hide();
+                $('#attitude-frequency-wrapper').hide();
+            } else if (INAV_PID_CONFIG.asynchronousMode == 1) {
+                $('#gyro-sync-wrapper').hide();
+                $('#gyro-frequency-wrapper').show();
+                $('#accelerometer-frequency-wrapper').hide();
+                $('#attitude-frequency-wrapper').hide();
+                ADVANCED_CONFIG.gyroSync = 1;
+            } else {
+                $('#gyro-sync-wrapper').hide();
+                $('#gyro-frequency-wrapper').show();
+                $('#accelerometer-frequency-wrapper').show();
+                $('#attitude-frequency-wrapper').show();
+                ADVANCED_CONFIG.gyroSync = 1;
+            }
+        });
+        $asyncMode.change();
+
+        GUI.fillSelect($accelerometerFrequency, FC.getAccelerometerTaskFrequencies(), INAV_PID_CONFIG.accelerometerTaskFrequency, 'Hz');
+        $accelerometerFrequency.val(INAV_PID_CONFIG.accelerometerTaskFrequency);
+        $accelerometerFrequency.change(function () {
+            INAV_PID_CONFIG.accelerometerTaskFrequency = $accelerometerFrequency.val();
+        });
+
+        GUI.fillSelect($attitudeFrequency, FC.getAttitudeTaskFrequencies(), INAV_PID_CONFIG.attitudeTaskFrequency, 'Hz');
+        $attitudeFrequency.val(INAV_PID_CONFIG.attitudeTaskFrequency);
+        $attitudeFrequency.change(function () {
+            INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
+        });
+    
         if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
 
             var $sensorAcc = $('#sensor-acc'),

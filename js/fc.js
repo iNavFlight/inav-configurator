@@ -519,14 +519,10 @@ var FC = {
             );
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            features.push(
-                {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
-            );
-        } else {
-            $('.features.esc-priority').parent().hide();
-        }
-
+        features.push(
+            {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
+        );
+    
         /*
          * Transponder disabled until not implemented in firmware
          */
