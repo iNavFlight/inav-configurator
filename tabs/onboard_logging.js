@@ -1,3 +1,4 @@
+/*global MSP,MSPCodes*/
 'use strict';
 
 var
@@ -19,13 +20,9 @@ TABS.onboard_logging.initialize = function (callback) {
     if (CONFIGURATOR.connectionValid) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
-                if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-                    MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-                        MSP.send_message(MSPCodes.MSP_BLACKBOX_CONFIG, false, false, load_html);
-                    });
-                } else {
-                    load_html();
-                }
+                MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
+                    MSP.send_message(MSPCodes.MSP_BLACKBOX_CONFIG, false, false, load_html);
+                });
             });
         });
     }

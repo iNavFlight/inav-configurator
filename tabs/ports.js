@@ -17,28 +17,24 @@ TABS.ports.initialize = function (callback) {
          {name: 'BLACKBOX',             groups: ['peripherals'], sharableWith: ['msp'], notSharableWith: ['telemetry'], maxPorts: 1}
     ];
 
-    if (semver.gte(CONFIG.flightControllerVersion, "1.2.0")) {
-        functionRules.push({
-            name: 'TELEMETRY_MAVLINK',
-            groups: ['telemetry'],
-            sharableWith: ['msp'],
-            notSharableWith: ['blackbox'],
-            maxPorts: 1
-        });
-    }
+    functionRules.push({
+        name: 'TELEMETRY_MAVLINK',
+        groups: ['telemetry'],
+        sharableWith: ['msp'],
+        notSharableWith: ['blackbox'],
+        maxPorts: 1
+    });
 
     /*
      * Support for FlySky iBus Telemetry
      */
-    if (semver.gte(CONFIG.flightControllerVersion, "1.2.1")) {
-        functionRules.push({
-            name: 'TELEMETRY_IBUS',
-            groups: ['telemetry'],
-            sharableWith: ['msp'],
-            notSharableWith: ['blackbox'],
-            maxPorts: 1
-        });
-    }
+    functionRules.push({
+        name: 'TELEMETRY_IBUS',
+        groups: ['telemetry'],
+        sharableWith: ['msp'],
+        notSharableWith: ['blackbox'],
+        maxPorts: 1
+    });
 
     // support configure RunCam Device
     if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
