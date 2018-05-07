@@ -551,6 +551,9 @@ var mspHelper = (function (gui) {
                 SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
                 SENSOR_ALIGNMENT.align_acc = data.getUint8(offset++);
                 SENSOR_ALIGNMENT.align_mag = data.getUint8(offset++);
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    SENSOR_ALIGNMENT.align_opflow = data.getUint8(offset++);
+                }
                 break;
             case MSPCodes.MSP_SET_RAW_RC:
                 break;
@@ -1668,6 +1671,9 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_ALIGNMENT.align_gyro);
                 buffer.push(SENSOR_ALIGNMENT.align_acc);
                 buffer.push(SENSOR_ALIGNMENT.align_mag);
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(SENSOR_ALIGNMENT.align_opflow);
+                }
                 break;
 
             case MSPCodes.MSP_SET_ADVANCED_CONFIG:

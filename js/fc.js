@@ -437,7 +437,8 @@ var FC = {
         SENSOR_ALIGNMENT = {
             align_gyro: 0,
             align_acc: 0,
-            align_mag: 0
+            align_mag: 0,
+            align_opflow: 0
         };
 
         RX_CONFIG = {
@@ -937,7 +938,10 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "UIB"];
+        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "MSP", "UIB"];
+    },
+    getOpticalFlowNames: function () {
+        return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
     },
     getArmingFlags: function () {
         return {
