@@ -507,9 +507,14 @@ var FC = {
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DISPLAY', showNameInTip: true},
-            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
-            {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
+            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true}
         ];
+
+        if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
+            features.push(
+                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
+            );
+        }
 
         if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
             features.push(

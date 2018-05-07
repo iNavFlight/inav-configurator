@@ -2027,3 +2027,7 @@ select {
 .position-relative {
     position: relative;
 }
+
+.text-center {
+    text-align: center;
+}

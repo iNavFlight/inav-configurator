@@ -50,22 +50,6 @@
     background-color: #f9f9f9;
 }
 
-.tab-servos table td:nth-child(2) {
-    width: 140px;
-}
-
-.tab-servos table td:nth-child(3) {
-    width: 140px;
-}
-
-.tab-servos table td:nth-child(4) {
-    width: 140px;
-}
-
-.tab-servos table td:nth-child(19) {
-    width: 110px;
-}
-
 .tab-servos table .main {
     font-weight: bold;
     text-align: center;

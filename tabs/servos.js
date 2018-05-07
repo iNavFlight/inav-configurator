@@ -51,63 +51,66 @@ TABS.servos.initialize = function (callback) {
         let servoCheckbox = '',
             servoHeader = '';
 
-        for (i = 0; i < RC.active_channels - 4; i++) {
-            servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
-        }
-        servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
+        if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
+            for (i = 0; i < RC.active_channels - 4; i++) {
+                servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
+            }
+            servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
 
-        for (i = 0; i < RC.active_channels; i++) {
-            servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
-        }
+            for (i = 0; i < RC.active_channels; i++) {
+                servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
+            }
 
-        $servoConfigTable.find('tr.main').append(servoHeader);
+            $servoConfigTable.find('tr.main').append(servoHeader);
+        } else {
+            $servoConfigTable.find('tr.main').html('\
+                <th width="110px" data-i18n="servosName"></th>\
+                    <th data-i18n="servosMid"></th>\
+                    <th data-i18n="servosMin"></th>\
+                    <th data-i18n="servosMax"></th>\
+                    <th data-i18n="servosDirectionAndRate"></th>\
+                ');
+        }
 
         function process_servos(name, alternate, obj) {
 
             $servoConfigTable.append('\
                 <tr> \
-                    <td style="text-align: center">' + name + '</td>\
+                    <td class="text-center">' + name + '</td>\
                     <td class="middle"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].middle + '" /></td>\
                     <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min + '" /></td>\
                     <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max + '" /></td>\
                     ' + servoCheckbox + '\
-                    <td class="direction">\
+                    <td class="text-center direction">\
                     </td>\
                 </tr> \
             ');
 
+            //This routine is pre 2.0 only
             if (SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
                 $servoConfigTable.find('tr:last td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
             }
 
             // adding select box and generating options
-            $servoConfigTable.find('tr:last td.direction').append('<select class="rate" name="rate"></select>');
-
-            var select = $servoConfigTable.find('tr:last td.direction select');
-
-            for (var i = FC.MAX_SERVO_RATE; i >= FC.MIN_SERVO_RATE; i--) {
-                select.append('<option value="' + i + '">Rate: ' + i + '%</option>');
-            }
-
-            // select current rate
-            select.val(SERVO_CONFIG[obj].rate);
+            $servoConfigTable.find('tr:last td.direction').append(
+                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + SERVO_CONFIG[obj].rate + '" />'
+            );
 
             $servoConfigTable.find('tr:last').data('info', { 'obj': obj });
 
-            // UI hooks
-
-            // only one checkbox for indicating a channel to forward can be selected at a time, perhaps a radio group would be best here.
-            $servoConfigTable.find('tr:last td.channel input').click(function () {
-                if ($(this).is(':checked')) {
-                    $(this).parent().parent().find('.channel input').not($(this)).prop('checked', false);
-                }
-            });
+            if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
+                // only one checkbox for indicating a channel to forward can be selected at a time, perhaps a radio group would be best here.
+                $servoConfigTable.find('tr:last td.channel input').click(function () {
+                    if ($(this).is(':checked')) {
+                        $(this).parent().parent().find('.channel input').not($(this)).prop('checked', false);
+                    }
+                });
+            }
         }
 
         function servos_update(save_configuration_to_eeprom) {
             $servoConfigTable.find('tr:not(".main")').each(function () {
                 var info = $(this).data('info');
-
 
                 var selection = $('.channel input', this);
                 var channelIndex = parseInt(selection.index(selection.filter(':checked')));
@@ -120,7 +123,7 @@ TABS.servos.initialize = function (callback) {
                 SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
                 SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
                 SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
-                SERVO_CONFIG[info.obj].rate = parseInt($('.direction select', this).val());
+                SERVO_CONFIG[info.obj].rate = parseInt($('.rate-input', this).val());
             });
 
             //Save configuration to FC
