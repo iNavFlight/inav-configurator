@@ -2525,7 +2525,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadOutputMapping = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, '1.9.1'))
+        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
             MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
         else {
             OUTPUT_MAPPING = [];
