@@ -52,7 +52,8 @@ var CONFIG,
     FW_CONFIG,
     DEBUG_TRACE,
     MIXER_CONFIG,
-    BATTERY_CONFIG;
+    BATTERY_CONFIG,
+    OUTPUT_MAPPING;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -490,6 +491,18 @@ var FC = {
         };
 
         RXFAIL_CONFIG = [];
+
+        OUTPUT_MAPPING = [];
+    },
+    getOutputUsages: function() {
+        return {
+            'ANY':      (0),
+            'MC_MOTOR': (1<<2),
+            'MC_SERVO': (1<<3),
+            'FW_MOTOR': (1<<5),
+            'FW_SERVO': (1<<6),
+            'LED':      (1<<24)
+        };
     },
     getFeatures: function () {
         var features = [

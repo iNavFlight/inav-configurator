@@ -1332,7 +1332,11 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES:
                 console.log('OSD preferences saved');
                 break;
-
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
+                OUTPUT_MAPPING = [];
+                for (i = 0; i < data.byteLength; ++i)
+                    OUTPUT_MAPPING.push(data.getUint8(i));
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2518,6 +2522,15 @@ var mspHelper = (function (gui) {
 
     self.loadMiscV2 = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_MISC, false, false, callback);
+    };
+
+    self.loadOutputMapping = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, '1.9.1'))
+            MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
+        else {
+            OUTPUT_MAPPING = [];
+            return false;
+        }
     };
 
     self.loadBatteryConfig = function (callback) {
