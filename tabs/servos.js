@@ -55,7 +55,7 @@ TABS.servos.initialize = function (callback) {
             for (i = 0; i < RC.active_channels - 4; i++) {
                 servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
             }
-            servoHeader = servoHeader + '<th data-i18n="servosDirectionAndRate"></th>';
+            servoHeader = servoHeader + '<th data-i18n="servosRate"></th><th data-i18n="servosReverse"></th>';
 
             for (i = 0; i < RC.active_channels; i++) {
                 servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
@@ -68,7 +68,8 @@ TABS.servos.initialize = function (callback) {
                     <th data-i18n="servosMid"></th>\
                     <th data-i18n="servosMin"></th>\
                     <th data-i18n="servosMax"></th>\
-                    <th data-i18n="servosDirectionAndRate"></th>\
+                    <th data-i18n="servosRate"></th>\
+                    <th data-i18n="servosReverse"></th>\
                 ');
         }
 
@@ -81,7 +82,8 @@ TABS.servos.initialize = function (callback) {
                     <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min + '" /></td>\
                     <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max + '" /></td>\
                     ' + servoCheckbox + '\
-                    <td class="text-center direction">\
+                    <td class="text-center rate">\
+                    <td class="text-center reverse">\
                     </td>\
                 </tr> \
             ');
@@ -92,8 +94,12 @@ TABS.servos.initialize = function (callback) {
             }
 
             // adding select box and generating options
-            $servoConfigTable.find('tr:last td.direction').append(
-                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + SERVO_CONFIG[obj].rate + '" />'
+            $servoConfigTable.find('tr:last td.rate').append(
+                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(SERVO_CONFIG[obj].rate) + '" />'
+            );
+
+            $servoConfigTable.find('tr:last td.reverse').append(
+                '<input type="checkbox" class="reverse-input togglemedium" ' + (SERVO_CONFIG[obj].rate < 0 ? ' checked ' :  '') + '/>'
             );
 
             $servoConfigTable.find('tr:last').data('info', { 'obj': obj });
@@ -123,7 +129,11 @@ TABS.servos.initialize = function (callback) {
                 SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
                 SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
                 SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
-                SERVO_CONFIG[info.obj].rate = parseInt($('.rate-input', this).val());
+                var rate = parseInt($('.rate-input', this).val());
+                if ($('.reverse-input', this).is(':checked')) {
+                    rate = -rate;
+                }
+                SERVO_CONFIG[info.obj].rate = rate;
             });
 
             //Save configuration to FC

@@ -1223,8 +1223,11 @@
     "servosMax": {
         "message": "MAX"
     },
-    "servosDirectionAndRate": {
-        "message": "Direction and rate"
+    "servosReverse": {
+        "message": "Reverse"
+    },
+    "servosRate": {
+        "message": "Rate (%)"
     },
     "servosLiveMode": {
         "message": "Enable Live mode"
@@ -1234,9 +1237,6 @@
     },
     "servosNormal": {
         "message": "Normal"
-    },
-    "servosReverse": {
-        "message": "Reverse"
     },
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
