@@ -2,11 +2,7 @@
 
 var CONFIGURATOR = {
      // all versions are specified and compared using semantic versioning http://semver.org/
-    'apiVersionAccepted': '1.2.1',
-    'backupRestoreMinApiVersionAccepted': '1.5.0',
-
-    'backupFileMinVersionAccepted': '0.55.0', // chrome.runtime.getManifest().version is stored as string, so does this one
-
+    'firmwareVersionAccepted': '1.6.0',
     'connectionValid': false,
     'connectionValidCliOnly': false,
     'cliActive': false,

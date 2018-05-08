@@ -57,9 +57,6 @@ var CONFIG,
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: -125,
-    isRatesInDps: function () {
-        return true;
-    },
     isNewMixer: function () {
         return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
