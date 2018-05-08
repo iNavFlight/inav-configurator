@@ -64,11 +64,7 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 15;
-
-        if (semver.gte(CONFIG.flightControllerVersion, '1.4.0')) {
-           availableFunctionCount = 21;
-        }
+        var availableFunctionCount = 21;
 
         if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
            availableFunctionCount = 32;

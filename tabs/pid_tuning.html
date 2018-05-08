@@ -185,7 +185,7 @@
                                     <input type="number" name="manual_yaw" class="rate-tpa_input" step="1" min="0" max="100" /> %
                                 </td>
                             </tr>
-                            <tr class="requires-v1_4">
+                            <tr>
                                 <th data-i18n="magHoldYawRate"></th>
                                 <td >
                                     <input type="number" id="magHoldYawRate" class="rate-tpa_input" step="5" min="10" max="250" /> degrees per second
@@ -194,32 +194,12 @@
                             </tr>
                         </tbody>
                     </table>
-                    <table class="rate-tpa rate-tpa--no-dps cf">
-                        <thead>
-                            <tr>
-                                <th class="roll-pitch" data-i18n="pidTuningRollPitchRate"></th>
-                                <th class="roll" data-i18n="pidTuningRollRate"></th>
-                                <th class="pitch" data-i18n="pidTuningPitchRate"></th>
-                                <th data-i18n="pidTuningYawRate"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="roll-pitch"><input type="number" name="roll-pitch" step="0.01" min="0"
-                                    max="1.00" /></td>
-                                <td class="roll"><input type="number"
-                                    name="roll" step="0.01" min="0" max="1.00" /></td>
-                                <td class="pitch"><input type="number" name="pitch" step="0.01" min="0" max="1.00" /></td>
-                                <td><input type="number" name="yaw" step="0.01" min="0" max="2.55" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </form>
         <div class="clear-both"></div>
-        <div class="tab_title requires-v1_4" data-i18n="tabFiltering" style="margin-top: 1em;"></div>
-        <div class="cf_column half requires-v1_4">
+        <div class="tab_title" data-i18n="tabFiltering" style="margin-top: 1em;"></div>
+        <div class="cf_column half">
             <table class="rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>
@@ -269,7 +249,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="cf_column half requires-v1_4">
+        <div class="cf_column half">
             <table class="spacer_left rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>
@@ -304,9 +284,9 @@
             </table>
         </div>
 
-        <div class="clear-both requires-v1_4"></div>
-        <div class="tab_title requires-v1_4" data-i18n="tabMisc" style="margin-top: 1em;"></div>
-        <div class="cf_column half requires-v1_4">
+        <div class="clear-both"></div>
+        <div class="tab_title" data-i18n="tabMisc" style="margin-top: 1em;"></div>
+        <div class="cf_column half">
             <table class="rate-tpa rate-tpa--misc">
                 <tr>
                     <th data-i18n="yawJumpPreventionLimit"></th>
@@ -338,7 +318,7 @@
                 </tr>
             </table>
         </div>
-        <div class="cf_column half requires-v1_4">
+        <div class="cf_column half">
             <table class="spacer_left rate-tpa rate-tpa--filtering">
                 <tbody>
                     <tr>

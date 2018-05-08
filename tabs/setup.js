@@ -39,7 +39,7 @@ TABS.setup.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.4.0') && !FC.isMotorOutputEnabled()) {
+        if (!FC.isMotorOutputEnabled()) {
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 

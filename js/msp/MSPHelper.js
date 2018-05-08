@@ -266,17 +266,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_RC_TUNING:
                 RC_tuning.RC_RATE = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
                 RC_tuning.RC_EXPO = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                if (FC.isRatesInDps()) {
-                    RC_tuning.roll_pitch_rate = 0;
-                    RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) * 10));
-                    RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) * 10));
-                    RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) * 10));
-                } else {
-                    RC_tuning.roll_pitch_rate = 0;
-                    RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                    RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                    RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
-                }
+                RC_tuning.roll_pitch_rate = 0;
+                RC_tuning.roll_rate = parseFloat((data.getUint8(offset++) * 10));
+                RC_tuning.pitch_rate = parseFloat((data.getUint8(offset++) * 10));
+                RC_tuning.yaw_rate = parseFloat((data.getUint8(offset++) * 10));
 
                 RC_tuning.dynamic_THR_PID = parseInt(data.getUint8(offset++));
                 RC_tuning.throttle_MID = parseFloat((data.getUint8(offset++) / 100).toFixed(2));
@@ -1407,16 +1400,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RC_TUNING:
                 buffer.push(Math.round(RC_tuning.RC_RATE * 100));
                 buffer.push(Math.round(RC_tuning.RC_EXPO * 100));
-                if (FC.isRatesInDps()) {
-                    buffer.push(Math.round(RC_tuning.roll_rate / 10));
-                    buffer.push(Math.round(RC_tuning.pitch_rate / 10));
-                    buffer.push(Math.round(RC_tuning.yaw_rate / 10));
-                } else {
-                    buffer.push(Math.round(RC_tuning.roll_rate * 100));
-                    buffer.push(Math.round(RC_tuning.pitch_rate * 100));
-                    buffer.push(Math.round(RC_tuning.yaw_rate * 100));
-                }
-
+                buffer.push(Math.round(RC_tuning.roll_rate / 10));
+                buffer.push(Math.round(RC_tuning.pitch_rate / 10));
+                buffer.push(Math.round(RC_tuning.yaw_rate / 10));
                 buffer.push(RC_tuning.dynamic_THR_PID);
                 buffer.push(Math.round(RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(RC_tuning.throttle_EXPO * 100));
@@ -2479,11 +2465,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadINAVPidConfig = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
     };
 
     self.loadLoopTime = function (callback) {
@@ -2491,27 +2473,15 @@ var mspHelper = (function (gui) {
     };
 
     self.loadAdvancedConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
     };
 
     self.loadFilterConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_FILTER_CONFIG, false, false, callback);
     };
 
     self.loadPidAdvanced = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_PID_ADVANCED, false, false, callback);
     };
 
     self.loadRcTuningData = function (callback) {
@@ -2615,11 +2585,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveINAVPidConfig = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
     };
 
     self.saveLooptimeConfig = function (callback) {
@@ -2627,19 +2593,11 @@ var mspHelper = (function (gui) {
     };
 
     self.saveAdvancedConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.3.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_ADVANCED_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ADVANCED_CONFIG), false, callback);
     };
 
     self.saveFilterConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, callback);
     };
 
     self.savePidData = function (callback) {
@@ -2655,11 +2613,7 @@ var mspHelper = (function (gui) {
     };
 
     self.savePidAdvanced = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
     };
 
     self.saveBfConfig = function (callback) {

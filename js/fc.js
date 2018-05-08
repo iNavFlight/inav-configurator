@@ -57,9 +57,6 @@ var CONFIG,
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: -125,
-    isRatesInDps: function () {
-        return !!(typeof CONFIG != "undefined" && CONFIG.flightControllerIdentifier == "INAV" && semver.gt(CONFIG.flightControllerVersion, "1.1.0"));
-    },
     isNewMixer: function () {
         return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
@@ -519,20 +516,10 @@ var FC = {
             );
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.3.0")) {
-            features.push(
-                {bit: 18, group: 'esc', name: 'ONESHOT125', haveTip: true}
-            );
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.4.0")) {
-            features.push(
-                {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
-            );
-        } else {
-            $('.features.esc-priority').parent().hide();
-        }
-
+        features.push(
+            {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
+        );
+    
         /*
          * Transponder disabled until not implemented in firmware
          */
@@ -548,11 +535,9 @@ var FC = {
             );
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.3.0')) {
-            features.push(
-                {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
-            );
-        }
+        features.push(
+            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
+        );
 
         if (semver.gte(CONFIG.flightControllerVersion, '1.5.0')) {
             features.push(

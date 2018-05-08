@@ -255,7 +255,7 @@ function onOpen(openInfo) {
             }
             GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
-            if (semver.gte(CONFIG.apiVersion, CONFIGURATOR.apiVersionAccepted)) {
+            if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
 
                 MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
 
@@ -312,7 +312,7 @@ function onOpen(openInfo) {
                     });
                 });
             } else {
-                GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.apiVersionAccepted]));
+                GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.firmwareVersionAccepted]));
                 CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
                 GUI.allowedTabs = ['cli'];
                 onConnect();
