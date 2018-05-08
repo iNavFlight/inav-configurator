@@ -207,6 +207,51 @@ $(document).ready(function () {
     PortHandler.initialize();
 });
 
+function onValidFirmware()
+{
+    MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
+
+        googleAnalytics.sendEvent('Firmware', 'Using', CONFIG.buildInfo);
+        GUI.log(chrome.i18n.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
+
+        MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
+
+            googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
+            GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
+
+            MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
+
+                GUI.log(chrome.i18n.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
+
+                // continue as usually
+                CONFIGURATOR.connectionValid = true;
+                GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
+                onConnect();
+
+                $('#tabs ul.mode-connected .tab_setup a').click();
+            });
+        });
+    });
+}
+
+function onInvalidFirmwareVariant()
+{
+    GUI.log(chrome.i18n.getMessage('firmwareVariantNotSupported'));
+    CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
+    GUI.allowedTabs = ['cli'];
+    onConnect();
+    $('#tabs .tab_cli a').click();
+}
+
+function onInvalidFirmwareVersion()
+{
+    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.firmwareVersionAccepted]));
+    CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
+    GUI.allowedTabs = ['cli'];
+    onConnect();
+    $('#tabs .tab_cli a').click();
+}
+
 function onOpen(openInfo) {
     if (openInfo) {
         // update connected_to
@@ -255,69 +300,23 @@ function onOpen(openInfo) {
             }
             GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
-            if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
+            MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
 
-                MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
+                googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
+                GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
 
+                if (CONFIG.flightControllerIdentifier == 'INAV') {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
-
-                        googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
-                        GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
-
-                        if (CONFIG.flightControllerIdentifier == 'INAV') {
-
-                            MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
-
-                                googleAnalytics.sendEvent('Firmware', 'Using', CONFIG.buildInfo);
-                                GUI.log(chrome.i18n.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
-
-                                MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
-
-                                    googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
-                                    GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
-
-                                    MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
-                                        GUI.log(chrome.i18n.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
-
-                                        // continue as usually
-                                        CONFIGURATOR.connectionValid = true;
-                                        GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
-                                        //TODO here we can remove led_strip tab from NAZE and CC3D at least!
-
-                                        if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
-                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('osd'), 1);
-                                        }
-
-                                        /*
-                                         * Remove Presets on older than 1.6
-                                         */
-                                        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
-                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('profiles'), 1);
-                                            GUI.allowedTabs.splice(GUI.allowedTabs.indexOf('advanced_tuning'), 1);
-                                        }
-
-                                        onConnect();
-
-                                        $('#tabs ul.mode-connected .tab_setup a').click();
-                                    });
-                                });
-                            });
+                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
+                            onValidFirmware();
                         } else  {
-                            GUI.log(chrome.i18n.getMessage('firmwareVariantNotSupported'));
-                            CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
-                            GUI.allowedTabs = ['cli'];
-                            onConnect();
-                            $('#tabs .tab_cli a').click();
+                            onInvalidFirmwareVersion();
                         }
                     });
-                });
-            } else {
-                GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.firmwareVersionAccepted]));
-                CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
-                GUI.allowedTabs = ['cli'];
-                onConnect();
-                $('#tabs .tab_cli a').click();
-            }
+                } else {
+                    onInvalidFirmwareVariant();
+                }
+            });
         });
     } else {
         console.log('Failed to open serial port');
