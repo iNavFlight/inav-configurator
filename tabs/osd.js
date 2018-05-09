@@ -34,9 +34,13 @@ SYM.ALT_FT = 179;
 SYM.LAT = 0xA6;
 SYM.LON = 0xA7;
 SYM.AIR = 151;
+SYM.DIRECTION = 114;
 SYM.DIR_TO_HOME = 0x60;
+SYM.SCALE = 175;
 SYM.DIST_KM = 182;
 SYM.DIST_MI = 184;
+SYM.M = 185;
+SYM.MI = 187;
 SYM.HOME = 191;
 SYM.TRIP_DIST = 0x22;
 SYM.HEADING1 = 0xA9;
@@ -734,6 +738,21 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupMapsAndRadars',
+            items: [
+                {
+                    name: 'MAP_NORTH',
+                    id: 43,
+                    positionable: false,
+                },
+                {
+                    name: 'MAP_TAKEOFF',
+                    id: 44,
+                    positionable: false,
+                },
+            ],
+        },
+        {
             name: 'osdGroupVTX',
             items: [
                 {
@@ -880,7 +899,7 @@ OSD.saveAlarms = function(callback) {
 
 OSD.saveConfig = function(callback) {
     if (OSD.use_layouts_api()) {
-        return OSD.save_alarms(function () {
+        return OSD.saveAlarms(function () {
             var data = OSD.msp.encodePreferences();
             return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
         });
@@ -892,7 +911,6 @@ OSD.saveItem = function(item, callback) {
     var pos = OSD.data.items[item.id];
     if (OSD.use_layouts_api()) {
         var data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-        console.log('DATA', data);
         return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
     }
     var data = OSD.msp.encodeItem(item.id, pos);
@@ -1239,7 +1257,7 @@ OSD.GUI.updateAlarms = function() {
             // We just need to save the config. The field is already
             // up to date, since it's where the value was changed
             // by the user.
-            OSD.save_alarms();
+            OSD.saveAlarms();
         });
         var $input = $('<label/>');
         var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
@@ -1283,8 +1301,25 @@ OSD.GUI.updateFields = function() {
             continue;
         }
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
+        var groupTitleContainer = groupContainer.find('.spacer_box_title');
         var groupTitle = chrome.i18n.getMessage(group.name);
-        groupContainer.find('.spacer_box_title').text(groupTitle);
+        groupTitleContainer.text(groupTitle);
+        var groupHelp = chrome.i18n.getMessage(group.name + '_HELP');
+        if (groupHelp) {
+            $('<div class="helpicon cf_tip"></div>')
+                .css('margin-top', '1px')
+                .attr('title', groupHelp)
+                .appendTo(groupTitleContainer)
+                .jBox('Tooltip', {
+                    delayOpen: 100,
+                    delayClose: 100,
+                    position: {
+                        x: 'right',
+                        y: 'center'
+                    },
+                    outside: 'x'
+                });
+        }
         var $displayFields = groupContainer.find('.display-fields');
         for (var jj = 0; jj < groupItems.length; jj++) {
             var item = groupItems[jj];
@@ -1356,6 +1391,26 @@ OSD.GUI.updateFields = function() {
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
+};
+
+OSD.GUI.updateMapPreview = function(centerishPosition, name, symbol) {
+    if ($('input[name="' + name + '"]').prop('checked')) {
+        var mapInitialX = OSD.data.display_size.x - 2;
+        OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
+        OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, symbol.charCodeAt(0));
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.HOME);
+        var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
+        OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
+        var scale;
+        if (OSD.data.preferences.units === 0) {
+            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+        } else {
+            scale = "100" + FONT.symbol(SYM.M);
+        }
+        for (var ii = 0; ii < scale.length; ii++) {
+            OSD.GUI.checkAndProcessSymbolPosition(scalePos + ii + 1, scale.charCodeAt(ii));
+        }
+    }
 };
 
 OSD.GUI.updatePreviews = function() {
@@ -1450,6 +1505,9 @@ OSD.GUI.updatePreviews = function() {
         OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
         OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
+
+    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_NORTH', 'N');
+    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_TAKEOFF', 'T');
 
     // render
     var $preview = $('.display-layout .preview').empty();

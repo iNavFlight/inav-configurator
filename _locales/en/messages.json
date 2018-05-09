@@ -2312,6 +2312,12 @@
     "osdGroupVTX": {
         "message": "VTX"
     },
+    "osdGroupMapsAndRadars": {
+        "message": "Maps and Radars"
+    },
+    "osdGroupMapsAndRadars_HELP": {
+        "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
+    },
     "osdElement_ONTIME_FLYTIME": {
         "message": "On Time / Fly Time"
     },
@@ -2410,6 +2416,12 @@
     },
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
+    },
+    "osdElement_MAP_NORTH": {
+        "message": "Map (North pointing up)"
+    },
+    "osdElement_MAP_TAKEOFF": {
+        "message": "Map (takeoff direction pointing up)"
     },
     "portColumnSensors": {
         "message": "Sensors"
