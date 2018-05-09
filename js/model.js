@@ -473,7 +473,7 @@ const mixerList = [
         image: 'airplane',
         hasCustomServoMixer: false,
         enabled: true,
-        legacy: true,
+        legacy: false,
         platform: PLATFORM_AIRPLANE,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
@@ -487,7 +487,29 @@ const mixerList = [
             new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0)
         ]
-    }   
+    },
+    {
+        id: 28,
+        name: 'Airplane V-tail (Mini Talon and similar)',
+        model: 'custom',
+        image: 'custom',
+        hasCustomServoMixer: false,
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  -100, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  -100, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, 100, 0),
+            new ServoMixRule(5, INPUT_STABILIZED_PITCH, -100, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -100, 0),
+            new ServoMixRule(5, INPUT_STABILIZED_YAW,   -100, 0)
+        ]
+    }          
 ];
 
 const platformList = [
