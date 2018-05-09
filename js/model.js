@@ -177,6 +177,26 @@ const mixerList = [
         ]
     },     // 8
     {
+        id: 27,
+        name: 'Flying Wing with differential thrust',
+        model: 'custom',
+        image: 'flying_wing',
+        hasCustomServoMixer: false,
+        enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.1),
+            new MotorMixRule(1.0, 0.0, 0.0, -0.1)
+        ],
+        servoMixer: [
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0)
+        ]
+    },     // 27
+    {
         id: 9,
         name: 'Y4',
         model: 'y4',
