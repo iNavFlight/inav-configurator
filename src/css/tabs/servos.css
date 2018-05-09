@@ -57,7 +57,7 @@
 }
 
 .tab-servos table .channel {
-    width: 40px;
+    width: 22px;
     text-align: center;
 }
 
@@ -139,5 +139,5 @@
 } 
 
 .tab-servos .short {
-    width: 40px;
+    width: 32px;
 } 
