@@ -508,7 +508,6 @@ var FC = {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
             {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
-            {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
@@ -522,7 +521,8 @@ var FC = {
 
         if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
             features.push(
-                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true}
+                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true},
+                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
             );
         }
 
