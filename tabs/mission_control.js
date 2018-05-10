@@ -463,11 +463,11 @@ TABS.mission_control.initialize = function (callback) {
             }
             GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
 
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, false, getPointsFromEprom);
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getPointsFromEprom);
         });
         $('#saveEepromMissionButton').on('click', function () {
             GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, false, false);
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
         });
 
         $('#rthEndMission').on('change', function () {
