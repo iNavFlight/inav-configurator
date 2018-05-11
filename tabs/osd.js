@@ -1477,7 +1477,12 @@ OSD.GUI.updatePreviews = function() {
         // consume drag/drop events.
         item.preview_img.style.pointerEvents = 'none';
     }
-    var centerishPosition = 225;
+
+    var centerishPosition = 224;
+
+    // AHI is one line up with NTSC (less lines) compared to PAL
+    if (OSD.constants.VIDEO_TYPES[OSD.data.video_system] == 'NTSC')
+      centerishPosition -= OSD.data.display_size.x;
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
