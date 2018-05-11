@@ -750,6 +750,12 @@ OSD.constants = {
                     id: 44,
                     positionable: false,
                 },
+                {
+                    name: 'RADAR',
+                    id: 45,
+                    min_version: '2.0.0',
+                    positionable: false,
+                },
             ],
         },
         {
@@ -1393,12 +1399,14 @@ OSD.GUI.updateFields = function() {
     GUI.switchery();
 };
 
-OSD.GUI.updateMapPreview = function(centerishPosition, name, symbol) {
+OSD.GUI.updateMapPreview = function(centerishPosition, name, directionSymbol, centerSymbol) {
     if ($('input[name="' + name + '"]').prop('checked')) {
         var mapInitialX = OSD.data.display_size.x - 2;
-        OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
-        OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, symbol.charCodeAt(0));
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.HOME);
+        if (directionSymbol) {
+            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
+            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
+        }
+        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, centerSymbol);
         var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
         OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
         var scale;
@@ -1506,8 +1514,9 @@ OSD.GUI.updatePreviews = function() {
         OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
-    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_NORTH', 'N');
-    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_TAKEOFF', 'T');
+    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_NORTH', 'N', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerishPosition, 'RADAR', null, SYM.DIR_TO_HOME);
 
     // render
     var $preview = $('.display-layout .preview').empty();
