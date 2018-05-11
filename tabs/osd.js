@@ -743,11 +743,13 @@ OSD.constants = {
                 {
                     name: 'MAP_NORTH',
                     id: 43,
+                    min_version: '2.0.0',
                     positionable: false,
                 },
                 {
                     name: 'MAP_TAKEOFF',
                     id: 44,
+                    min_version: '2.0.0',
                     positionable: false,
                 },
             ],
