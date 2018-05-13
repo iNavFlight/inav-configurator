@@ -40,7 +40,7 @@ presets.defaultValues = {
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
     RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
-    FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0},
+    FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0, "accNotchHz": 0, "accNotchCutoff": 0, "gyroStage2LowpassHz": 0},
     FC_CONFIG: {"loopTime": 2000}
 };
 
@@ -162,12 +162,7 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 750),
             presets.elementHelper("RC_tuning", "yaw_rate", 750),
             presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
-            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 0),
-            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 1),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 1),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 1),
+            presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 220),
             presets.elementHelper("PIDs", 0, [32, 45, 23]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [38, 54, 25]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [75, 45, 0])  //YAW PIDs
