@@ -133,6 +133,48 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '5" Performance',
+        description: "210-220 class racer with F4/F7 CPU on 4S battery<br>" +
+            "<span>450g-600g weight, 2300KV - 2600KV motors, 5 inch triblade propellers, MPU6000 or MPU6050 gyro.</span>" + 
+            "<strong>This preset uses agressive filter tuning. Check motor temperature! Do not use bended propellers or motors</strong>",
+        features: [
+            "8kHz / 4kHz / 4kHz",
+            "Multishot",
+            "750dps rates",
+            "RC FIR2 stage 2 gyro filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
+            presets.elementHelper("FC_CONFIG", "loopTime", 250),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 3),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 4000),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 100),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 95),
+            presets.elementHelper("RC_tuning", "roll_rate", 750),
+            presets.elementHelper("RC_tuning", "pitch_rate", 750),
+            presets.elementHelper("RC_tuning", "yaw_rate", 750),
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 0),
+            presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 1),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 1),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 1),
+            presets.elementHelper("PIDs", 0, [32, 45, 23]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [38, 54, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [75, 45, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: '5" GPS',
         description: "210-250 class quadcopter with F3/F4/F7 CPU on 3S or 4S battery<br>" +
             "<span>500g-700g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, GPS optimized</span>",
