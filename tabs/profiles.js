@@ -126,8 +126,8 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
-            presets.elementHelper("PIDs", 0, [36, 35, 20]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [48, 45, 22]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 0, [36, 40, 20]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [48, 50, 22]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
         ],
         type: 'multirotor'
