@@ -98,7 +98,7 @@ presets.presets = [
         features: [
             "Asynchronous processing",
             "OneShot125 at 2kHz",
-            "800dps rates",
+            "750dps rates",
             "Dterm and gyro notch filter",
             "Increased LPF cutoff frequencies",
             "Improved PID defaults"
@@ -116,9 +116,10 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 90),
-            presets.elementHelper("RC_tuning", "roll_rate", 800),
-            presets.elementHelper("RC_tuning", "pitch_rate", 800),
-            presets.elementHelper("RC_tuning", "yaw_rate", 650),
+            presets.elementHelper("RC_tuning", "roll_rate", 750),
+            presets.elementHelper("RC_tuning", "pitch_rate", 750),
+            presets.elementHelper("RC_tuning", "yaw_rate", 750),
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
