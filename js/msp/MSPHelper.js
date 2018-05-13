@@ -1092,6 +1092,12 @@ var mspHelper = (function (gui) {
                 FILTER_CONFIG.gyroNotchHz2 = data.getUint16(13, true);
                 FILTER_CONFIG.gyroNotchCutoff2 = data.getUint16(15, true);
 
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    FILTER_CONFIG.accNotchHz = data.getUint16(17, true);
+                    FILTER_CONFIG.accNotchCutoff = data.getUint16(19, true);
+                    FILTER_CONFIG.gyroStage2LowpassHz = data.getUint16(21, true);
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
@@ -1853,6 +1859,18 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff2));
                 buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff2));
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(lowByte(FILTER_CONFIG.accNotchHz));
+                    buffer.push(highByte(FILTER_CONFIG.accNotchHz));
+
+                    buffer.push(lowByte(FILTER_CONFIG.accNotchCutoff));
+                    buffer.push(highByte(FILTER_CONFIG.accNotchCutoff));
+
+                    buffer.push(lowByte(FILTER_CONFIG.gyroStage2LowpassHz));
+                    buffer.push(highByte(FILTER_CONFIG.gyroStage2LowpassHz));
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_PID_ADVANCED:

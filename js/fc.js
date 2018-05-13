@@ -315,7 +315,10 @@ var FC = {
             dtermNotchHz: null,
             dtermNotchCutoff: null,
             gyroNotchHz2: null,
-            gyroNotchCutoff2: null
+            gyroNotchCutoff2: null,
+            accNotchHz: null,
+            accNotchCutoff: null,
+            gyroStage2LowpassHz: null
         };
 
         PID_ADVANCED = {
