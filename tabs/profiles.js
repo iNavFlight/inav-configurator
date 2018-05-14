@@ -40,7 +40,7 @@ presets.defaultValues = {
     ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
     RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
-    FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0},
+    FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0, "accNotchHz": 0, "accNotchCutoff": 0, "gyroStage2LowpassHz": 0},
     FC_CONFIG: {"loopTime": 2000}
 };
 
@@ -98,7 +98,7 @@ presets.presets = [
         features: [
             "Asynchronous processing",
             "OneShot125 at 2kHz",
-            "800dps rates",
+            "750dps rates",
             "Dterm and gyro notch filter",
             "Increased LPF cutoff frequencies",
             "Improved PID defaults"
@@ -116,18 +116,56 @@ presets.presets = [
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 90),
-            presets.elementHelper("RC_tuning", "roll_rate", 800),
-            presets.elementHelper("RC_tuning", "pitch_rate", 800),
-            presets.elementHelper("RC_tuning", "yaw_rate", 650),
+            presets.elementHelper("RC_tuning", "roll_rate", 750),
+            presets.elementHelper("RC_tuning", "pitch_rate", 750),
+            presets.elementHelper("RC_tuning", "yaw_rate", 750),
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 260),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 160),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 400),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
-            presets.elementHelper("PIDs", 0, [36, 35, 20]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [48, 45, 22]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 0, [36, 40, 20]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [48, 50, 22]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
+        name: '5" Performance',
+        description: "210-220 class racer with F4/F7 CPU on 4S battery<br>" +
+            "<span>450g-600g weight, 2300KV - 2600KV motors, 5 inch triblade propellers, MPU6000 or MPU6050 gyro.</span>" + 
+            "<strong>This preset uses agressive filter tuning. Check motor temperature! Do not use bended propellers or motors</strong>",
+        features: [
+            "8kHz / 4kHz / 4kHz",
+            "Multishot",
+            "750dps rates",
+            "RC FIR2 stage 2 gyro filter",
+            "Increased LPF cutoff frequencies",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
+            presets.elementHelper("FC_CONFIG", "loopTime", 250),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 3),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 4000),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 100),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 95),
+            presets.elementHelper("RC_tuning", "roll_rate", 750),
+            presets.elementHelper("RC_tuning", "pitch_rate", 750),
+            presets.elementHelper("RC_tuning", "yaw_rate", 750),
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 220),
+            presets.elementHelper("PIDs", 0, [32, 45, 23]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [38, 54, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [75, 45, 0])  //YAW PIDs
         ],
         type: 'multirotor'
     },
