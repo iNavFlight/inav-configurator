@@ -2423,6 +2423,9 @@
     "osdElement_MAP_TAKEOFF": {
         "message": "Map (takeoff direction pointing up)"
     },
+    "osdElement_RADAR": {
+        "message": "Radar"
+    },
     "portColumnSensors": {
         "message": "Sensors"
     },
