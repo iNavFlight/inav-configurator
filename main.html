@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link type="text/css" rel="stylesheet" href="./build/styles.css" media="all"/>
     <script type="text/javascript" src="./build/script.js"></script>
     <link type="text/css" rel="stylesheet" href="./build/map.css" media="all"/>
@@ -9,100 +10,85 @@
     <title></title>
 </head>
 <body>
-<div id="main-wrapper">
-    <div id="appUpdateNotification" class="is-hidden">
-        <div class="modal__content">
-            <h1 class="modal__title modal__title" data-i18n="appUpdateNotificationHeader"></h1>
-            <div class="modal__text" data-i18n="appUpdateNotificationDescription"></div>
-        </div>
-        <div class="modal__buttons modal__buttons--upbottom">
-            <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" id="update-notification-download"
-               class="modal__button modal__button--main modal__button--main--inline" data-i18n="downloadUpdatesBtn"></a>
-            <a id="update-notification-close" class="modal__button modal__button--main modal__button--main--inline" data-i18n="closeUpdateBtn"></a>
-        </div>
-    </div>
-    <div class="headerbar">
-        <div id="logo">
-            <div class="logo_text">
-                CONFIGURATOR
-                <div class="version"></div>
-            </div>
-        </div>
-        <a id="options" href="#" data-i18n_title="options_title"></a>
-
-        <div id="port-picker">
-            <div class="connect_controls" id="connectbutton">
-                <div class="connect_b">
-                    <a class="connect" href="#"></a>
+    <div id="top-container">
+        <nav class="navbar navbar-expand-md navbar-dark">
+            <div id="logo">
+                <div class="logo_text">
+                    CONFIGURATOR
+                    <div class="version"></div>
                 </div>
-                <a class="connect_state" data-i18n="connect"></a>
             </div>
-            <div id="portsinput">
-                <div class="portsinput__row">
-                    <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
-                        <label for="port-override">Port: </label>
-                        <input id="port-override" type="text" value="/dev/rfcomm0"/>
+            <div id="port-picker">
+                <div class="connect_controls" id="connectbutton">
+                    <div class="connect_b">
+                        <a class="connect" href="#"></a>
                     </div>
-                    <div class="dropdown dropdown-dark portsinput__top-element">
-                        <!--suppress HtmlFormInputWithoutLabel -->
-                        <select class="dropdown-select" id="port" title="Port">
-                            <option value="manual">Manual</option>
-                            <!-- port list gets generated here -->
-                        </select>
-                    </div>
-                    <div class="dropdown dropdown-dark portsinput__top-element">
-                        <!--suppress HtmlFormInputWithoutLabel -->
-                        <select class="dropdown-select" id="baud" title="Baud Rate">
-                            <option value="115200" selected="selected">115200</option>
-                            <option value="57600">57600</option>
-                            <option value="38400">38400</option>
-                            <option value="28800">28800</option>
-                            <option value="19200">19200</option>
-                            <option value="14400">14400</option>
-                            <option value="9600">9600</option>
-                            <option value="4800">4800</option>
-                            <option value="2400">2400</option>
-                            <option value="1200">1200</option>
-                        </select>
-                    </div>
+                    <a class="connect_state" data-i18n="connect"></a>
                 </div>
-                <div class="portsinput__row">
-                    <div class="portsinput__top-element portsinput__top-element--inline">
-                        <label for="wireless-mode">
-                            <span class="" data-i18n="wirelessModeSwitch"></span>
-                        </label>
-                        <input id="wireless-mode" class=" togglesmall" type="checkbox"/>
+                <div id="portsinput">
+                    <div class="portsinput__row">
+                        <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
+                            <label for="port-override">Port: </label>
+                            <input id="port-override" type="text" value="/dev/rfcomm0"/>
+                        </div>
+                        <div class="dropdown dropdown-dark portsinput__top-element">
+                            <!--suppress HtmlFormInputWithoutLabel -->
+                            <select class="dropdown-select" id="port" title="Port">
+                                <option value="manual">Manual</option>
+                                <!-- port list gets generated here -->
+                            </select>
+                        </div>
+                        <div class="dropdown dropdown-dark portsinput__top-element">
+                            <!--suppress HtmlFormInputWithoutLabel -->
+                            <select class="dropdown-select" id="baud" title="Baud Rate">
+                                <option value="115200" selected="selected">115200</option>
+                                <option value="57600">57600</option>
+                                <option value="38400">38400</option>
+                                <option value="28800">28800</option>
+                                <option value="19200">19200</option>
+                                <option value="14400">14400</option>
+                                <option value="9600">9600</option>
+                                <option value="4800">4800</option>
+                                <option value="2400">2400</option>
+                                <option value="1200">1200</option>
+                            </select>
+                        </div>
                     </div>
-
-                    <div class="portsinput__top-element portsinput__top-element--inline">
-                        <label for="auto-connect">
-                            <span class="auto_connect" data-i18n="autoConnect"></span>
-                        </label>
-                        <input id="auto-connect" class="auto_connect togglesmall" type="checkbox"/>
+                    <div class="portsinput__row">
+                        <div class="portsinput__top-element portsinput__top-element--inline">
+                            <label for="wireless-mode">
+                                <span class="" data-i18n="wirelessModeSwitch"></span>
+                            </label>
+                            <input id="wireless-mode" class=" togglesmall" type="checkbox"/>
+                        </div>
+                        <div class="portsinput__top-element portsinput__top-element--inline">
+                            <label for="auto-connect">
+                                <span class="auto_connect" data-i18n="autoConnect"></span>
+                            </label>
+                            <input id="auto-connect" class="auto_connect togglesmall" type="checkbox"/>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="header-wrapper">
             <div id="dataflash_wrapper_global">
                 <div class="noflash_global" align="center">No dataflash <br>chip found</div>
-                <ul class="dataflash-contents_global">
-                    <li class="dataflash-free_global">
-                        <div class="legend">Dataflash: free space</div>
-                    </li>
-                </ul>
-                <div id="profile_change">
-                    <div class="dropdown dropdown-dark">
-                        <form name="profile-change" id="profile-change">
-                            <!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="dropdown-select" id="profilechange">
-                                <option value="0">Profile 1</option>
-                                <option value="1">Profile 2</option>
-                                <option value="2">Profile 3</option>
-                            </select>
-                        </form>
+                    <ul class="dataflash-contents_global">
+                        <li class="dataflash-free_global">
+                            <div class="legend">Dataflash: free space</div>
+                        </li>
+                    </ul>
+                    <div id="profile_change">
+                        <div class="dropdown dropdown-dark">
+                            <form name="profile-change" id="profile-change">
+                                <!--suppress HtmlFormInputWithoutLabel -->
+                                <select class="dropdown-select" id="profilechange">
+                                    <option value="0">Profile 1</option>
+                                    <option value="1">Profile 2</option>
+                                    <option value="2">Profile 3</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
-                </div>
             </div>
             <div id="sensor-status" class="sensor_state mode-connected">
                 <ul>
@@ -145,16 +131,16 @@
                     <div class="linkicon cf_tip" data-i18n_title="mainHelpLink"></div>
                 </div>
             </div>
+        </nav>
+        <div id="log">
+            <div class="logswitch">
+                <a href="#" id="showlog">Show Log</a>
+            </div>
+            <div id="scrollicon"></div>
+            <div class="wrapper"></div>
         </div>
     </div>
-    <div class="clear-both"></div>
-    <div id="log">
-        <div class="logswitch">
-            <a href="#" id="showlog">Show Log</a>
-        </div>
-        <div id="scrollicon"></div>
-        <div class="wrapper"></div>
-    </div>
+    <div class="container-fluid">
     <div class="tab_container">
         <div id="tabs">
             <ul class="mode-disconnected">
@@ -210,7 +196,8 @@
         </div>
         <div class="clear-both"></div>
     </div>
-    <div id="content"></div>
+        <div id="content"></div>
+    </div> <!-- .container -->
     <div id="status-bar">
         <div>
             <span data-i18n="statusbar_packet_error"></span> <span class="packet-error">0</span>

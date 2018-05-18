@@ -1,57 +1,50 @@
 /* general layout */
 .tab-landing {
-    min-height: 100%;
-    overflow: hidden;
-}
-
-.tab-landing .content_wrapper {
-    padding: 0;
-    min-height: 100%;
-    height: 100%;
-    overflow-y: auto;
     background-color: #104156;
 }
 
 .tab-landing .content_top {
-    height: 140px;
+    min-height: 140px;
     background: white url(/images/map_bg.svg);
-    padding: 20px;
+    padding: 0 30px;
+}
+
+.tab-landing .content_top img {
+    width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: block;
 }
 
 .tab-landing .community {
     text-align: center;
-    margin: 15px 0px;
 }
 
 .tab-landing .community a {
-    display: block;
-}
-
-.tab-landing .community ul span {
     color: white;
-    position: absolute;
-    padding: 10px;
-}
-
-.tab-landing .community ul {
     font-size: 20px;
-    text-align: center;
-    width: 400px;
     height: 45px;
+    margin-top: 10px;
     display: inline-block;
-    position: relative;
 }
 
-.tab-landing .community ul i {
+.tab-landing .community a i {
     font-size: 35px;
     color: white;
-    margin-left: -200px;
-    margin-top: 5px;
+    position: relative;
+    top: 6px;
+    left: -3px;
 }
 
 .tab-landing .content_mid {
     background-color: #37a8db;
-    overflow: hidden;
+}
+
+.tab-landing .content_mid  > div div, .tab-landing .content_mid  > div h2 {
+    margin: 15px;
 }
 
 .tab-landing .content_mid a {
@@ -84,25 +77,13 @@
 .sponsors .title {
     text-transform: uppercase;
     font-size: 10px;
-}
-
-.sponsors {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
     color: silver;
 }
 
-.sponsors ul {
-    margin-top: 5px;
-}
-
-.sponsors li {
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.sponsors li a {
+.sponsors a {
     border-radius: 3px;
     padding: 2px 4px;
     font-size: 75px;
@@ -110,9 +91,16 @@
     color: white;
     font-weight: normal;
     font-family: 'open_sanslight', Arial,serif;
+    display: block;
+    text-align: center;
 }
 
-.sponsors li a:hover {
+.sponsors a img {
+    max-width: 90%;
+    height: auto;
+}
+
+.sponsors a:hover {
     background-color: rgba(255, 255, 255, 0.30);
     color: #fff;
 }
@@ -126,18 +114,7 @@
 	color: #c2efff;
 }
 
-.text3 {
-	color: black;
-}
-
 /* text columns */
-.tab-landing .content_mid .column .wrap {
-    padding: 0 15px;
-}
-
-.tab-landing .content_mid .column .wrap2 {
-    padding: 10px;
-}
 
 .tab-landing .content_mid h2 {
     margin-bottom: 5px;
@@ -148,22 +125,8 @@
 .tab-landing .content_mid h3 {
     font-size: 12px;
     margin-bottom: 5px;
-}
-
-.tab-landing .content_mid .text1 .wrap {
-    margin-left: 0;
-}
-
-.tab-landing .content_mid .text1 {
-    width: 37%;
-}
-
-.tab-landing .content_mid .text2 {
-    width: 40%;
-}
-
-.tab-landing .content_mid .text2 ul {
-    margin-top: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .tab-landing .content_mid .text2 li {
@@ -171,11 +134,7 @@
     border-top: 1px dotted silver;
 }
 
-.tab-landing .content_mid .text3 {
-    width: 23%;
-}
-
-.tab-landing .content_mid .text3 .wrap2 {
+.tab-landing .content_mid .donations {
     border: 1px solid silver;
     border-radius: 5px;
     background: white;
@@ -184,9 +143,11 @@
     margin-top: 5px;
     min-height: 187px;
     font-size: 11px;
+    padding: 5px;
+    color: #303030;
 }
 
-.tab-landing .content_mid .text3 .donate {
+.tab-landing .content_mid .donations .donate {
     margin-top: 10px;
     text-align: center;
 }
@@ -223,7 +184,7 @@
 #changelog .button a {
     display: block;
     padding: 5px 10px;
-    width: 70px;
+    width: 80px;
     text-align: center;
     color: white;
 }

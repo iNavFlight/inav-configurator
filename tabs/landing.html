@@ -1,59 +1,82 @@
 <div class="tab-landing">
-    <div class="content_wrapper">
-        <div class="content_top">
-            <div class="logowrapper" align="center">
-                <img src="../images/cf_logo_white.svg" />
-                <div class="" i18n="defaultWelcomeIntro" align="center"></div>
-            </div>
+    <div class="row content_top">
+        <div class="col-12">
+            <img src="../images/cf_logo_white.svg" />
+            <div class="" i18n="defaultWelcomeIntro" align="center"></div>
         </div>
-        <div class="community">
-            <ul class="communityTelegramSupport"><a href="https://t.me/INAVFlight" target="_blank"><i class="fa fa-telegram" aria-hidden="true"></i><span i18n="communityTelegramSupport"></span></a></ul>
-            <ul class="communitySlackSupport"><a href="https://inavflight.signup.team/" target="_blank"><i class="fa fa-slack" aria-hidden="true"></i><span i18n="communitySlackSupport"></span></a></ul>
-            <ul class="communityRCGroupsSupport"><a href="https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-%28navigation-rewrite%29-project" target="_blank"><i class="fa fa-users" aria-hidden="true"></i><span i18n="communityRCGroupsSupport"></span></a></ul>
+    </div>
+    <div class="row justify-content-center community">
+        <div class="col-md-6 communityTelegramSupport">
+            <a href="https://t.me/INAVFlight" target="_blank">
+                <i class="fa fa-telegram" aria-hidden="true"></i>
+                <span i18n="communityTelegramSupport"></span>
+            </a>
         </div>
-        <div class="content_mid">
-            <div class="column third_left text1">
-                <div class="wrap">
-                    <h2>Hardware</h2>
-                    <div i18n="defaultWelcomeText"></div>
+        <div class="col-md-6 communitySlackSupport">
+            <a href="https://inavflight.signup.team/" target="_blank">
+                <i class="fa fa-slack" aria-hidden="true"></i>
+                <span i18n="communitySlackSupport"></span>
+            </a>
+        </div>
+        <div class="col-md-6 communityRCGroupsSupport">
+            <a href="https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-%28navigation-rewrite%29-project" target="_blank">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                <span i18n="communityRCGroupsSupport"></span>
+            </a>
+        </div>
+    </div>
+    <div class="row content_mid text1">
+        <div class="col-md-4">
+            <h2>Hardware</h2>
+            <div i18n="defaultWelcomeText"></div>
+        </div>
+        <div class="col-md-4">
+            <h2 i18n="defaultContributingHead"></h2>
+            <div i18n="defaultContributingText"></div>
+        </div>
+        <div class="col-md-4">
+            <div class="donations">
+                <h3 i18n="defaultDonateHead"></h3>
+                <div i18n="defaultDonateText"></div>
+                <div class="donate">
+                    <a href="https://www.paypal.me/KonstantinSharlaimov"
+                        target="_blank" title="Donate"><img src="./images/btn-paypal.png" alt="Paypal"
+                        height="30" /></a>
+                </div>
+                <div class="donate">
+                    <a href="https://www.patreon.com/inavflight"
+                        target="_blank" title="Support on Patreon"><img src="./images/btn-patreon.png" alt="Patreon"
+                        height="30" /></a>
+                </div>
+                <div class="donate">
+                    <a href="https://money.yandex.ru/to/410013985315067"
+                        target="_blank" title="Поддержать через Яндекс.Деньги"><img src="./images/btn-yandex.png" alt="Яндекс.Деньги"
+                        height="55" /></a>
                 </div>
             </div>
-            <div class="column third_center text2">
-                <div class="wrap">
-                    <h2 i18n="defaultContributingHead"></h2>
-                    <div i18n="defaultContributingText"></div>
-                </div>
-            </div>
-            <div class="column third_right text3">
-                <div class="wrap2">
-                    <h3 i18n="defaultDonateHead"></h3>
-                    <div i18n="defaultDonateText"></div>
-                    <div class="donate">
-                        <a href="https://www.paypal.me/KonstantinSharlaimov"
-                            target="_blank" title="Donate"><img src="./images/btn-paypal.png" alt="Paypal"
-                            height="30" /></a>
-                    </div>
-                    <div class="donate">
-                        <a href="https://www.patreon.com/inavflight"
-                            target="_blank" title="Support on Patreon"><img src="./images/btn-patreon.png" alt="Patreon"
-                            height="30" /></a>
-                    </div>
-                    <div class="donate">
-                        <a href="https://money.yandex.ru/to/410013985315067"
-                            target="_blank" title="Поддержать через Яндекс.Деньги"><img src="./images/btn-yandex.png" alt="Яндекс.Деньги"
-                            height="55" /></a>
-                    </div>
-                </div>
-            </div>
         </div>
-        <div class="content_foot">
-            <div class="sponsors">
-                <div class="title" i18n="defaultSponsorsHead"></div>
-                <ul>
-                    <li><a href="http://shop.myairbot.com" title="shop.myairbot.com" target="_blank"><img src="./images/partner/airbot.png" alt="Airbot" height="75" /></a></li>
-                    <li><a href="http://www.carbonbird.com" title="www.CarbonBird.com" target="_blank"><img src="./images/partner/carbonbird.png" alt="CarbonBird.com" height="75" /></a></li>
-                    <li><a href="http://www.adpm.pro" title="www.adpm.pro" target="_blank"><img src="./images/partner/adpm.png" alt="ADPM Drones Srl" height="75" /></a></li>
-                </ul>
+    </div>
+    <div class="content_foot">
+        <div class="sponsors">
+            <div class="row">
+                <div class="col-12 title" i18n="defaultSponsorsHead"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="http://shop.myairbot.com" title="shop.myairbot.com" target="_blank">
+                        <img src="./images/partner/airbot.png" alt="Airbot" height="75" />
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="http://www.carbonbird.com" title="www.CarbonBird.com" target="_blank">
+                        <img src="./images/partner/carbonbird.png" alt="CarbonBird.com" height="75" />
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="http://www.adpm.pro" title="www.adpm.pro" target="_blank">
+                        <img src="./images/partner/adpm.png" alt="ADPM Drones Srl" height="75" />
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -63,8 +86,9 @@
         </div>
         <div class="wrapper">
             <div class="title" i18n="defaultChangelogHead"></div>
-            <div class="log">
+                <div class="log">
                 <!-- changelog content will be loaded here -->
+                </div>
             </div>
         </div>
     </div>

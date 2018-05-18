@@ -40,6 +40,7 @@ var runSequence = require('run-sequence');
 var sources = {};
 
 sources.css = [
+    './node_modules/bootstrap/dist/css/bootstrap.css',
     './main.css',
     './js/libraries/jquery.nouislider.min.css',
     './js/libraries/jquery.nouislider.pips.min.css',
@@ -49,7 +50,8 @@ sources.css = [
     './src/css/font-awesome/css/font-awesome.css',
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
-    './js/libraries/jbox/jBox.css'
+    './js/libraries/jbox/jBox.css',
+//    './src/css/small_screen.css'
 ];
 
 sources.js = [

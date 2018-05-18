@@ -15,6 +15,18 @@ $(document).ready(function () {
     // translate to user-selected language
     localize();
 
+    var win = $(window);
+    var container = $('.container-fluid');
+    var topContainer = $('#top-container');
+    var statusBar = $('#status-bar');
+    var resizeContainer = function() {
+        var winHeight = typeof win.height === 'function' ? win.height() : win.height;
+        var containerHeight = winHeight - topContainer.height() - statusBar.height();
+        container.height(containerHeight);
+    };
+    resizeContainer();
+    win.on('resize', resizeContainer);
+
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
@@ -59,7 +71,7 @@ $(document).ready(function () {
             }
         });
 
-        win.setMinimumSize(1024, 800);
+        win.setMinimumSize(320, 800);
 
         win.on('close', function () {
             //Save window size and position
@@ -382,8 +394,6 @@ $(document).ready(function () {
             command_log.scrollTop($('div.wrapper', command_log).height());
         });
         $log.removeClass('active');
-        $("#content").removeClass('logopen');
-        $(".tab_container").removeClass('logopen');
         $("#scrollicon").removeClass('active');
         chrome.storage.local.set({'logopen': false});
 
@@ -391,13 +401,21 @@ $(document).ready(function () {
     }else{
         $log.animate({height: 111}, 200);
         $log.addClass('active');
-        $("#content").addClass('logopen');
-        $(".tab_container").addClass('logopen');
         $("#scrollicon").addClass('active');
         chrome.storage.local.set({'logopen': true});
 
         state = true;
     }
+    var interval;
+    var count = 0;
+    interval = setInterval(function() {
+        count++;
+        if (count > 30) {
+            clearInterval(interval);
+            return;
+        }
+        resizeContainer();
+    }, 10);
     $(this).text(state ? 'Hide Log' : 'Show Log');
     $(this).data('state', state);
 
