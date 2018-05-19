@@ -273,7 +273,7 @@ var MSP = {
         }
     },
 
-    send_message: function (code, data, callback_sent, callback_msp) {
+    send_message: function (code, data, callback_sent, callback_msp, protocolVersion) {
         var payloadLength = data && data.length ? data.length : 0;
         var length;
         var buffer;
@@ -281,7 +281,11 @@ var MSP = {
         var checksum;
         var ii;
 
-        switch (this.protocolVersion) {
+        if (!protocolVersion) {
+            protocolVersion = this.protocolVersion;
+        }
+
+        switch (protocolVersion) {
             case this.constants.PROTOCOL_V1:
                 // TODO: Error if code is < 255 and MSPv1 is requested
                 length = payloadLength + 6;
@@ -322,7 +326,7 @@ var MSP = {
                 view[length-1] = checksum;
                 break;
             default:
-                throw "Invalid MSP protocol version " + this.protocolVersion;
+                throw "Invalid MSP protocol version " + protocolVersion;
 
         }
 
@@ -354,12 +358,12 @@ var MSP = {
         }
         return crc;
     },
-    promise: function(code, data) {
+    promise: function(code, data, protocolVersion) {
         var self = this;
         return new Promise(function(resolve) {
             self.send_message(code, data, false, function(data) {
                 resolve(data);
-            });
+            }, protocolVersion);
         });
     },
     callbacks_cleanup: function () {
