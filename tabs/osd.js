@@ -414,7 +414,7 @@ OSD.constants = {
         },
         {
             name: 'MAX_NEG_ALTITUDE',
-            field: 'mag_neg_altitude',
+            field: 'max_neg_altitude',
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
@@ -957,7 +957,6 @@ OSD.msp = {
         var result = [];
 
         result.push8(OSD.data.alarms.rssi);
-        result.push16(OSD.data.alarms.batt_cap);
         result.push16(OSD.data.alarms.fly_minutes);
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
@@ -969,7 +968,6 @@ OSD.msp = {
         var alarms = resp.data;
 
         OSD.data.alarms.rssi = alarms.readU8();
-        OSD.data.alarms.batt_cap = alarms.readU16();
         OSD.data.alarms.fly_minutes = alarms.readU16();
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
@@ -1234,11 +1232,11 @@ OSD.GUI.updateAlarms = function() {
     var $alarms = $('.alarms').empty();
     for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
         var alarm = OSD.constants.ALL_ALARMS[kk];
-        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
         var value = OSD.data.alarms[alarm.field];
-        if (value === undefined) {
+        if (value === undefined || value === null) {
             continue;
         }
+        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
         if (alarm.unit) {
             var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
             var suffix = chrome.i18n.getMessage(unit) || unit;
