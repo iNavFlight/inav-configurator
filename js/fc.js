@@ -762,6 +762,15 @@ var FC = {
         return rxTypes;
     },
     isRxTypeEnabled: function(rxType) {
+        if (typeof rxType === 'string') {
+            var types = this.getRxTypes();
+            for (var ii = 0; ii < types.length; ii++) {
+                if (types[ii].name == rxType) {
+                    rxType = types[ii];
+                    break;
+                }
+            }
+        }
         if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
             return RX_CONFIG.receiver_type == rxType.value;
         }
