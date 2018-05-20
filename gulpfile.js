@@ -116,10 +116,10 @@ sources.mapJs = [
 ];
 
 sources.receiverCss = [
+    './src/css/tabs/receiver_msp.css',
     './css/opensans_webfontkit/fonts.css',
     './js/libraries/jquery.nouislider.min.css',
     './js/libraries/jquery.nouislider.pips.min.css',
-    './tabs/receiver_msp.css'
 ];
 
 sources.receiverJs = [

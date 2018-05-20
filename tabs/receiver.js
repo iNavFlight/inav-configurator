@@ -20,7 +20,7 @@ TABS.receiver.initialize = function (callback) {
         mspHelper.loadMisc,
         mspHelper.loadRcData,
         mspHelper.loadRcMap,
-        mspHelper.loadBfConfig,
+        mspHelper.loadRxConfig,
         mspHelper.loadRcDeadband
     ];
 
@@ -337,8 +337,8 @@ TABS.receiver.initialize = function (callback) {
 
         $("a.sticks").click(function () {
             var
-                windowWidth = 370,
-                windowHeight = 510;
+                windowWidth = 420,
+                windowHeight = Math.min(window.innerHeight, 720);
 
             chrome.app.window.create("/tabs/receiver_msp.html", {
                 id: "receiver_msp",
@@ -362,7 +362,7 @@ TABS.receiver.initialize = function (callback) {
         });
 
         // Only show the MSP control sticks if the MSP Rx feature is enabled
-        $(".sticks_btn").toggle(bit_check(BF_CONFIG.features, 14 /* RX_MSP */));
+        $(".sticks_btn").toggle(FC.isRxTypeEnabled('RX_MSP'));
 
         var plot_update_rate = parseInt($(this).val(), 10);
 

@@ -11,10 +11,14 @@ var
         pitch: 1,
         yaw: 3,
         throttle: 2,
-        aux1: 4,
-        aux2: 5,
-        aux3: 6,
-        aux4: 7
+        ch5: 4,
+        ch6: 5,
+        ch7: 6,
+        ch8: 7,
+        ch9: 8,
+        ch10: 9,
+        ch11: 10,
+        ch12: 11,
     },
     
     // Set reasonable initial stick positions (Mode 2)
@@ -23,10 +27,14 @@ var
         pitch: CHANNEL_MID_VALUE,
         roll: CHANNEL_MID_VALUE,
         yaw: CHANNEL_MID_VALUE,
-        aux1: CHANNEL_MIN_VALUE,
-        aux2: CHANNEL_MIN_VALUE,
-        aux3: CHANNEL_MIN_VALUE,
-        aux4: CHANNEL_MIN_VALUE
+        ch5: CHANNEL_MIN_VALUE,
+        ch6: CHANNEL_MIN_VALUE,
+        ch7: CHANNEL_MIN_VALUE,
+        ch8: CHANNEL_MIN_VALUE,
+        ch9: CHANNEL_MIN_VALUE,
+        ch10: CHANNEL_MIN_VALUE,
+        ch11: CHANNEL_MIN_VALUE,
+        ch12: CHANNEL_MIN_VALUE,
     },
     
     // First the vertical axis, then the horizontal:
@@ -42,7 +50,7 @@ var
 
 function transmitChannels() {
     var 
-        channelValues = [0, 0, 0, 0, 0, 0, 0, 0];
+        channelValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     if (!enableTX) {
         return;
@@ -114,7 +122,7 @@ function localizeAxisNames() {
         $(".gimbal-label-horz", gimbal).text(chrome.i18n.getMessage("controlAxis" + gimbals[gimbalIndex][1]));
     }
     
-    for (var sliderIndex = 0; sliderIndex < 4; sliderIndex++) {
+    for (var sliderIndex = 0; sliderIndex < 8; sliderIndex++) {
         $(".slider-label", sliderElems.get(sliderIndex)).text(chrome.i18n.getMessage("radioChannelShort") + (sliderIndex + 5));
     }
 }
@@ -148,7 +156,7 @@ $(document).ready(function() {
     
     $(".slider", sliderElems).each(function(sliderIndex) {
         var 
-            initialValue = stickValues["aux" + (sliderIndex + 1)];
+            initialValue = stickValues["ch" + (sliderIndex + 5)];
         
         $(this)
             .noUiSlider({
@@ -160,7 +168,7 @@ $(document).ready(function() {
             }).on('slide change set', function(e, value) {
                 value = Math.round(parseFloat(value));
                 
-                stickValues["aux" + (sliderIndex + 1)] = value;
+                stickValues["ch" + (sliderIndex + 5)] = value;
                 
                 $(".tooltip", this).text(value);
             });
