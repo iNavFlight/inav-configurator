@@ -481,7 +481,43 @@ const mixerList = [
             new ServoMixRule(4, INPUT_STABILIZED_YAW,   -100, 0),
             new ServoMixRule(5, INPUT_STABILIZED_YAW,   -100, 0)
         ]
-    }          
+    },
+    {
+        id: 29,
+        name: 'Skyhunter Nano (no rudder)',
+        model: 'custom',
+        image: 'custom',
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  -100, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_ROLL,  -100, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_PITCH,  -100, 0),
+        ]
+    },
+    {
+        id: 30,
+        name: 'Nano Talon V-tail',
+        model: 'custom',
+        image: 'custom',
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(2, INPUT_STABILIZED_ROLL, -100, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, -85, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, 85, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,  -75, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,  -75, 0),
+        ]
+    }            
 ];
 
 const platformList = [
