@@ -504,7 +504,7 @@ OSD.constants = {
                     },
                     preview: function(osd_data) {
                         var speed;
-                        if (OSD.data.preferences.units === 0) {
+                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
                             // Imperial
                             speed = ' 35' + FONT.symbol(SYM.MPH);
                         } else {
