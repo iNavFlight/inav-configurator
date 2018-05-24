@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-FONTS = default bold large
+FONTS = default bold large clarity
 CHARMAPS = $(addsuffix .mcm, $(FONTS))
 PREVIEWS = $(addsuffix .png, $(FONTS))
 
