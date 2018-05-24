@@ -42,6 +42,8 @@ TABS.servos.initialize = function (callback) {
 
         let i,
             $tabServos = $(".tab-servos"),
+            $servoEmptyTableInfo = $('#servoEmptyTableInfo'),
+            $servoConfigTableContainer = $('#servo-config-table-container'),
             $servoConfigTable = $('#servo-config-table'),
             $servoMixTable = $('#servo-mix-table'),
             $servoMixTableBody = $servoMixTable.find('tbody');
@@ -56,7 +58,7 @@ TABS.servos.initialize = function (callback) {
 
         if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
 
-            $('.requires-v2_0').hide();
+            $servoEmptyTableInfo.hide();
 
             for (i = 0; i < RC.active_channels - 4; i++) {
                 servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
@@ -182,6 +184,14 @@ TABS.servos.initialize = function (callback) {
 
         for (let servoIndex = 0; servoIndex < 8; servoIndex++) {
             process_servos('Servo ' + servoIndex, '', servoIndex);
+        }
+        if (usedServoIndex == 0) {
+            // No servos configured
+            $servoEmptyTableInfo.show();
+            $servoConfigTableContainer.hide();
+        } else {
+            $servoEmptyTableInfo.hide();
+            $servoConfigTableContainer.show();
         }
 
         // UI hooks for dynamically generated elements

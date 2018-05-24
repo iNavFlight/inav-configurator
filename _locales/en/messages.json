@@ -1241,6 +1241,9 @@
     "servosNormal": {
         "message": "Normal"
     },
+    "servoEmptyTableInfo": {
+        "message": "No servos configured. Add them using the Mixer tab."
+    },
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
     },
@@ -2551,8 +2554,5 @@
     },
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
-    },
-    "servoTableInfo": {
-        "message": "This table shows only servos configured using servo mixer"
     }
 }
