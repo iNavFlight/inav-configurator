@@ -58,5 +58,19 @@ var ServoMixerRuleCollection = function () {
         return data.length < self.getServoRulesCount();
     };
 
+    self.isServoConfigured = function(servoId) {
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                let rule = data[ruleIndex];
+
+                if (rule.getTarget() == servoId && rule.isUsed()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     return self;
 };

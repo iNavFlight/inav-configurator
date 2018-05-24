@@ -1053,6 +1053,11 @@ dialog {
     font-family: 'open_sansregular', Arial, serif;
 }
 
+.note--big {
+    font-size: 1.15em;
+    padding: 0.6em;
+}
+
 .note_spacer {
     padding: 5px 7px 5px 7px;
 }
