@@ -1,4 +1,4 @@
-/*global fc*/
+/*global fc,mspHelper,TABS*/
 'use strict';
 
 TABS.servos = {};
@@ -12,6 +12,7 @@ TABS.servos.initialize = function (callback) {
     let loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
+        mspHelper.loadServoMixRules,
         mspHelper.loadServoConfiguration,
         mspHelper.loadRcData,
         mspHelper.loadBfConfig,
