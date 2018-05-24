@@ -1,4 +1,4 @@
-/*global fc,mspHelper,TABS*/
+/*global $,fc,mspHelper,TABS*/
 'use strict';
 
 TABS.servos = {};
@@ -14,6 +14,8 @@ TABS.servos.initialize = function (callback) {
     loadChainer.setChain([
         mspHelper.loadServoMixRules,
         mspHelper.loadServoConfiguration,
+        mspHelper.loadOutputMapping,
+        mspHelper.loadMixerConfig,
         mspHelper.loadRcData,
         mspHelper.loadBfConfig,
     ]);
@@ -74,6 +76,7 @@ TABS.servos.initialize = function (callback) {
                     <th data-i18n="servosMax"></th>\
                     <th data-i18n="servosRate"></th>\
                     <th data-i18n="servosReverse"></th>\
+                    <th data-i18n="servoOutput"></th>\
                 ');
         }
 
@@ -118,9 +121,30 @@ TABS.servos.initialize = function (callback) {
                     }
                 });
             } else {
+
+                $currentRow.append('<td class="text-center output"></td>');
+
+                let output,
+                    outputString;
+
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+                } else {
+                    output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+                }
+
+                if (output === null) {
+                    outputString = "-";
+                } else {
+                    outputString = "S" + output;
+                }
+
+                $currentRow.find('.output').html(outputString);
                 //For 2.0 and above hide a row when servo is not configured
                 if (!SERVO_RULES.isServoConfigured(obj)) {
-                    $servoConfigTable.find('tr:last').hide();
+                    $currentRow.hide();
+                } else {
+                    usedServoIndex++;
                 }
             }
         }
@@ -154,8 +178,10 @@ TABS.servos.initialize = function (callback) {
         // drop previous table
         $servoConfigTable.find('tr:not(:first)').remove();
 
+        let usedServoIndex = 0;
+
         for (let servoIndex = 0; servoIndex < 8; servoIndex++) {
-            process_servos('Servo ' + servoIndex, '', servoIndex, false);
+            process_servos('Servo ' + servoIndex, '', servoIndex);
         }
 
         // UI hooks for dynamically generated elements

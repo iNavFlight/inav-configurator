@@ -84,6 +84,7 @@ sources.js = [
     './js/serial.js',
     './js/servoMixRule.js',
     './js/motorMixRule.js',
+    './js/outputMapping.js',
     './js/model.js',
     './js/serial_backend.js',
     './js/data_storage.js',

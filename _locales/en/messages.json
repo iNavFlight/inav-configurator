@@ -1226,6 +1226,9 @@
     "servosReverse": {
         "message": "Reverse"
     },
+    "servoOutput": {
+        "message": "Output"
+    },
     "servosRate": {
         "message": "Rate (%)"
     },

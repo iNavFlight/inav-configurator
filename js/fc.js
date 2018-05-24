@@ -495,7 +495,7 @@ var FC = {
 
         RXFAIL_CONFIG = [];
 
-        OUTPUT_MAPPING = [];
+        OUTPUT_MAPPING = new OutputMappingCollection();
     },
     getOutputUsages: function() {
         return {
