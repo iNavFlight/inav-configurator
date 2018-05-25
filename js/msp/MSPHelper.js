@@ -1339,9 +1339,9 @@ var mspHelper = (function (gui) {
                 console.log('OSD preferences saved');
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
-                OUTPUT_MAPPING = [];
+                OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.push(data.getUint8(i));
+                    OUTPUT_MAPPING.put(data.getUint8(i));
                 break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
@@ -2546,7 +2546,7 @@ var mspHelper = (function (gui) {
         if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
             MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
         else {
-            OUTPUT_MAPPING = [];
+            OUTPUT_MAPPING.flush();
             return false;
         }
     };

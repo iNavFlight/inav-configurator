@@ -1,4 +1,4 @@
-/*global $, ServoMixRule*/
+/*global ServoMixRule*/
 'use strict';
 
 var ServoMixerRuleCollection = function () {
