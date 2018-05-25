@@ -210,10 +210,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
 
+            var $platformSelectParent = $platformSelect.parent('.select');
+
             if (currentPlatform.flapsPossible) {
                 $hasFlapsWrapper.removeClass('is-hidden');
+                $platformSelectParent.removeClass('no-bottom-border');
             } else {
                 $hasFlapsWrapper.addClass('is-hidden');
+                $platformSelectParent.addClass('no-bottom-border');
             }
 
             fillMixerPreset();
