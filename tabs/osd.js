@@ -236,7 +236,9 @@ FONT.msp = {
 FONT.upload = function ($progress) {
     return Promise.mapSeries(FONT.data.characters, function (data, i) {
         $progress.val((i / FONT.data.characters.length) * 100);
-        return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(i));
+        // Force usage of V1 protocol to workaround the 64 byte write bug
+        // on F3 when the configurator is running on macOS
+        return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(i), MSP.constants.PROTOCOL_V1);
     })
         .then(function () {
             OSD.GUI.jbox.close();
