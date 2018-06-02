@@ -24,6 +24,23 @@ let OutputMappingCollection = function () {
         data.push(element);
     };
 
+    self.getOutputCount = function () {
+        let retVal = 0;
+
+        for (let i = 0; i < data.length; i++) {
+            if (
+                bit_check(data[i], TIM_USE_MC_MOTOR) ||
+                bit_check(data[i], TIM_USE_MC_SERVO) ||
+                bit_check(data[i], TIM_USE_FW_MOTOR) ||
+                bit_check(data[i], TIM_USE_FW_SERVO)
+            ) {
+                retVal++;
+            };
+        }
+
+        return retVal;
+    }
+
     function getFirstOutputOffset() {
         for (let i = 0; i < data.length; i++) {
             if (
