@@ -23,7 +23,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMixerConfig,
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
-        mspHelper.loadMotorMixRules
+        mspHelper.loadMotorMixRules,
+        mspHelper.loadOutputMapping
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -53,6 +54,58 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function loadHtml() {
         $('#content').load("./tabs/mixer.html", processHtml);
+    }
+
+    function renderOutputTable() {
+        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+            $outputRow = $('#output-row'),
+            $functionRow = $('#function-row');
+
+        $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
+        $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
+
+        for (let i = 1; i <= outputCount; i++) {
+            $outputRow.append('<td>S' + i + '</td>');
+            $functionRow.append('<td id="function-' + i +'">-</td>');
+        }
+
+        $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
+
+    }
+
+    function renderOutputMapping() {
+        let motorRules = MOTOR_RULES.get(),
+            servoRules = SERVO_RULES.get(),
+            output;
+
+        for (let index in motorRules) {
+            if (motorRules.hasOwnProperty(index) && motorRules[index].isUsed()) {
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    output = OUTPUT_MAPPING.getMrMotorOutput(index);
+                } else {
+                    output = OUTPUT_MAPPING.getFwMotorOutput(index);
+                }
+                if (output !== null) {
+                    $('#function-' + output).html("Motor " + index);
+                }
+            }
+        }
+
+        let usedServoIndex = 0;
+        for (let i = 0; i < MIXER_CONFIG.numberOfServos; i++) {
+            if (SERVO_RULES.isServoConfigured(i)) {
+                console.log(i, usedServoIndex);
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+                } else {
+                    output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+                }
+                if (output !== null) {
+                    $('#function-' + output).html("Servo " + i);
+                }
+                usedServoIndex++;
+            }
+        }
     }
 
     function renderServoMixRules() {
@@ -258,6 +311,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();
+            renderOutputMapping();
             modal.close();
             saveAndReboot();
         });
@@ -267,22 +321,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();
+            renderOutputMapping();
         });
 
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {
             SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
             renderServoMixRules();
+            renderOutputMapping();
         });
 
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+            renderOutputMapping();
         });
 
         $("[data-role='role-servo-add']").click(function () {
             if (SERVO_RULES.hasFreeSlots()) {
                 SERVO_RULES.put(new ServoMixRule(0, 0, 100, 0));
                 renderServoMixRules();
+                renderOutputMapping();
             }
         });
 
@@ -290,6 +348,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             if (MOTOR_RULES.hasFreeSlots()) {
                 MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
+                renderOutputMapping();
             }
         });
 
@@ -297,6 +356,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         renderServoMixRules();
         renderMotorMixRules();
+
+        renderOutputTable();
+        renderOutputMapping();
 
         localize();
         GUI.content_ready(callback);
