@@ -86,7 +86,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     output = OUTPUT_MAPPING.getFwMotorOutput(index);
                 }
                 if (output !== null) {
-                    $('#function-' + output).html("Motor " + index);
+                    $('#function-' + output).html("Motor " + (index + 1));
                 }
             }
         }
