@@ -121,7 +121,7 @@ TABS.modes.initialize = function (callback) {
 
         function update_ui() {
             for (var i = 0; i < AUX_CONFIG.length; i++) {
-                if (bit_check(CONFIG.mode, i)) {
+                if (FC.isModeBitSet(i)) {
                     $('td.name').eq(i).addClass('on').removeClass('off');
                 } else {
                     $('td.name').eq(i).removeClass('on').removeClass('off');
