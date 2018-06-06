@@ -958,7 +958,7 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "MSP", "UIB"];
+        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
