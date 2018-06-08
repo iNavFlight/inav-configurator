@@ -78,8 +78,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             servoRules = SERVO_RULES.get(),
             output;
 
-        for (let index in motorRules) {
-            if (motorRules.hasOwnProperty(index) && motorRules[index].isUsed()) {
+        for (var index = 0; index < motorRules.length; index++) {
+            if (motorRules[index].isUsed()) {
                 if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
                     output = OUTPUT_MAPPING.getMrMotorOutput(index);
                 } else {
