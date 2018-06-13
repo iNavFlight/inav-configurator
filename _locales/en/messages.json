@@ -2336,6 +2336,12 @@
     "osdElement_MAIN_BATT_VOLTAGE": {
         "message": "Battery Voltage"
     },
+    "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
+        "message": "Sag Compensated Battery Voltage"
+    },
+    "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
+        "message": "Calculated voltage the battery should be at without load (simulates ideal battery)"
+    },
     "osdElement_MESSAGES": {
         "message": "System Messages"
     },
@@ -2344,6 +2350,12 @@
     },
     "osdElement_MAIN_BATT_CELL_VOLTAGE": {
         "message": "Battery Cell Voltage"
+    },
+    "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
+        "message": "Sag Compensated Battery Cell Voltage"
+    },
+    "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
+        "message": "Calculated average cell voltage the battery should be at without load (simulates ideal battery)"
     },
     "osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
         "message": "Battery Remaining Percentage"
