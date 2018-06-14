@@ -364,8 +364,6 @@ TABS.receiver.initialize = function (callback) {
         // Only show the MSP control sticks if the MSP Rx feature is enabled
         $(".sticks_btn").toggle(FC.isRxTypeEnabled('RX_MSP'));
 
-        var plot_update_rate = parseInt($(this).val(), 10);
-
         function get_rc_data() {
 
             /*
@@ -379,26 +377,6 @@ TABS.receiver.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
-        // setup plot
-        var RX_plot_data = new Array(RC.active_channels);
-        for (var i = 0; i < RX_plot_data.length; i++) {
-            RX_plot_data[i] = [];
-        }
-
-        var samples = 0,
-            svg = d3.select("svg"),
-            RX_plot_e = $('#RX_plot'),
-            margin = {top: 20, right: 0, bottom: 10, left: 40},
-            width, height, widthScale, heightScale;
-
-        function update_receiver_plot_size() {
-            width = RX_plot_e.width() - margin.left - margin.right;
-            height = RX_plot_e.height() - margin.top - margin.bottom;
-
-            widthScale.range([0, width]);
-            heightScale.range([height, 0]);
-        }
-
         function update_ui() {
             var i;
 
@@ -408,76 +386,6 @@ TABS.receiver.initialize = function (callback) {
                 meter_label_array[i].text(RC.channels[i]);
             }
 
-            // push latest data to the main array
-            for (i = 0; i < RC.active_channels; i++) {
-                RX_plot_data[i].push([samples, RC.channels[i]]);
-            }
-
-            // Remove old data from array
-            while (RX_plot_data[0].length > 300) {
-                for (i = 0; i < RX_plot_data.length; i++) {
-                    RX_plot_data[i].shift();
-                }
-            }
-
-            // update required parts of the plot
-            widthScale = d3.scale.linear().
-                domain([(samples - 299), samples]);
-
-            heightScale = d3.scale.linear().
-                domain([800, 2200]);
-
-            update_receiver_plot_size();
-
-            var xGrid = d3.svg.axis().
-                scale(widthScale).
-                orient("bottom").
-                tickSize(-height, 0, 0).
-                tickFormat("");
-
-            var yGrid = d3.svg.axis().
-                scale(heightScale).
-                orient("left").
-                tickSize(-width, 0, 0).
-                tickFormat("");
-
-            var xAxis = d3.svg.axis().
-                scale(widthScale).
-                orient("bottom").
-                tickFormat(function (d) {
-                    return d;
-                });
-
-            var yAxis = d3.svg.axis().
-                scale(heightScale).
-                orient("left").
-                tickFormat(function (d) {
-                    return d;
-                });
-
-            var line = d3.svg.line().
-                x(function (d) {
-                    return widthScale(d[0]);
-                }).
-                y(function (d) {
-                    return heightScale(d[1]);
-                });
-
-            svg.select(".x.grid").call(xGrid);
-            svg.select(".y.grid").call(yGrid);
-            svg.select(".x.axis").call(xAxis);
-            svg.select(".y.axis").call(yAxis);
-
-            var data = svg.select("g.data"),
-                lines = data.selectAll("path").data(RX_plot_data, function (d, i) {
-                    return i;
-                });
-
-            lines.enter().append("path").attr("class", "line");
-
-            lines.attr('d', line);
-
-            samples++;
         }
 
         helper.mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
