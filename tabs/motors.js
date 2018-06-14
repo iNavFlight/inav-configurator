@@ -50,7 +50,7 @@ TABS.motors.initialize = function (callback) {
     }
 
     function update_arm_status() {
-        self.armed = bit_check(CONFIG.mode, 0);
+        self.armed = FC.isModeEnabled('ARM');
     }
 
     function initSensorData() {

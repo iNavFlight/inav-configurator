@@ -124,16 +124,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_ACTIVEBOXES:
                 var words = dataHandler.message_length_expected / 4;
 
-                CONFIG.mode = 0;
-                if (words == 1) {
-                    CONFIG.mode = data.getUint32(0, true);
-                }
-                else if (words == 2) {
-                    CONFIG.mode = data.getUint32(0, true) | (data.getUint32(4, true) << 32);
-                }
-                else {
-                    console.log('MSP_ACTIVEBOXES doesn\'t support more than 53 bits at the moment');
-                }
+                CONFIG.mode = [];
+                for (i = 0; i < words; ++i)
+                    CONFIG.mode.push(data.getUint32(i * 4, true));
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:

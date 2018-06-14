@@ -95,7 +95,7 @@ var FC = {
             cycleTime: 0,
             i2cError: 0,
             activeSensors: 0,
-            mode: 0,
+            mode: [],
             profile: 0,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
@@ -1081,5 +1081,18 @@ var FC = {
     },
     getServoMixInputName: function (input) {
         return getServoMixInputNames()[input];
+    },
+    getModeId: function (name) {
+        for (var i = 0; i < AUX_CONFIG.length; i++) {
+            if (AUX_CONFIG[i] == name)
+                return i;
+        }
+        return -1;
+    },
+    isModeBitSet: function (i) {
+        return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
+    },
+    isModeEnabled: function (name) {
+        return FC.isModeBitSet(FC.getModeId(name));
     }
 };
