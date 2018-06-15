@@ -202,6 +202,7 @@ GUI_control.prototype.updateStatusBar = function() {
 
 GUI_control.prototype.updateProfileChange = function() {
     $('#profilechange').val(CONFIG.profile);
+    $('#batteryprofilechange').val(CONFIG.battery_profile);
 };
 
 GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {

@@ -56,7 +56,7 @@
                         <label for="sensor-rangefinder"> <span data-i18n="sensorRangefinder"></span></label>
                     </div>
 
-                    <div class="select requires-v2_0">
+                    <div class="select requires-v2_0_0">
                         <select id="sensor-opflow"></select>
                         <label for="sensor-opflow"> <span data-i18n="sensorOpflow"></span></label>
                     </div>
@@ -378,6 +378,26 @@
                     <div class="features batteryVoltage"></div>
                     <!--list of generated features goes here-->
 
+                    <div class="select requires-v2_0_0">
+                        <select id="voltagesource" class="voltagesource">
+                            <option value="0">Raw</option>
+                            <option value="1">Sag compensated</option>
+                        </select>
+                        <label for="voltagesource">
+                            <span data-i18n="configurationVoltageSource"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
+                    </div>
+                    <div class="number requires-v2_0_0">
+                        <input type="number" id="cells" name="cells" step="1" min="0" max="8" />
+                        <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
+                    </div>
+                    <div class="number requires-v2_0_0">
+                        <input type="number" id="celldetectvoltage" name="celldetectvoltage" step="0.01" min="1" max="5" />
+                        <label for="celldetectvoltage"><span data-i18n="configurationBatteryCellDetectVoltage"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellDetectVoltageHelp"></div>
+                    </div>
                     <div class="number">
                         <input type="number" id="mincellvoltage" name="mincellvoltage" step="0.01" min="1" max="5" />
                         <label for="mincellvoltage"><span data-i18n="configurationBatteryMinimum"></span></label>
