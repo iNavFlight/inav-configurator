@@ -441,10 +441,22 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
                 },
                 {
+                    name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
+                    id: 49,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
+                },
+                {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
                     id: 32,
                     min_version: '1.7.4',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
+                },
+                {
+                    name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
+                    id: 50,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18V')
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
