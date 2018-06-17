@@ -1336,6 +1336,11 @@ var mspHelper = (function (gui) {
                 for (i = 0; i < data.byteLength; ++i)
                     OUTPUT_MAPPING.put(data.getUint8(i));
                 break;
+            case MSPCodes.MSP2_INAV_OSD_GET_CUSTOM_STRING:
+                break;
+            case MSPCodes.MSP2_INAV_OSD_SET_CUSTOM_STRING:
+                console.log("Custom string set.")
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2966,6 +2971,25 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.getOsdCustomString = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_OSD_GET_CUSTOM_STRING, false, false, function(resp) {
+                var customString = "";
+                for (var ii = 0; ii < resp.data.byteLength; ii++) {
+                    var c = resp.data.readU8();
+                    if (c != 0) {
+                        customString += String.fromCharCode(c);
+                    }
+                }
+                if (callback) {
+                    callback(customString);
+                }
+            });
+        } else if (callback) {
+            callback(null);
+        }
+    };
+    
     self.setCraftName = function(name, callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
             var data = [];
@@ -2979,6 +3003,19 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.setOsdCustomString = function(customString, callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            var data = [];
+            name = customString || "";
+            for (var ii = 0; ii < name.length; ii++) {
+                data.push(name.charCodeAt(ii));
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_OSD_SET_CUSTOM_STRING, data, false, callback);
+        } else if (callback) {
+            callback();
+        }
+    };
+    
     self.loadMixerConfig = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
             MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);

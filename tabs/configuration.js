@@ -22,6 +22,18 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.setCraftName(craftName, callback);
     };
 
+    var osdCustomString = null;
+    var loadOsdCustomString = function(callback) {
+        mspHelper.getOsdCustomString(function(customString) {
+            osdCustomString = customString;
+            callback();
+        });
+    };
+
+    var saveOsdCustomString = function(callback) {
+        mspHelper.setOsdCustomString(osdCustomString, callback);
+    };
+
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
@@ -34,7 +46,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadSensorConfig,
-        loadCraftName
+        loadCraftName,
+        loadOsdCustomString
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
@@ -61,6 +74,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
         saveCraftName,
+        saveOsdCustomString
     ];
 
     if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
@@ -646,6 +660,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         if (craftName != null) {
             $('.config-personalization').show();
             $('input[name="craft_name"]').val(craftName);
+            if (osdCustomString != null) {
+                $('input[name="osd_custom_string"]').val(osdCustomString);
+            }
+            else {
+                $('.config-osd-custom-string').hide();
+            }
         } else {
             // craft name not supported by the firmware
             $('.config-personalization').hide();
@@ -692,6 +712,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             craftName = $('input[name="craft_name"]').val();
+            osdCustomString = $('input[name="osd_custom_string"]').val();
 
             var rxTypes = FC.getRxTypes();
 

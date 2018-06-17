@@ -481,6 +481,11 @@ OSD.constants = {
                     preview: '[CRAFT_NAME]'
                 },
                 {
+                    name: 'CUSTOM_STRING',
+                    id: 77,
+                    preview: '[CS]'
+                },
+                {
                     name: 'FLYMODE',
                     id: 7,
                     preview: 'ACRO'

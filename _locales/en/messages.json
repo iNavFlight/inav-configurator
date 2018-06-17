@@ -795,8 +795,14 @@
     "configurationCraftName": {
         "message": "Craft Name"
     },
+    "configurationOsdCustomString": {
+        "message": "OSD Custom String"
+    },
     "configurationCraftNameHelp": {
         "message": "Craft name. Can be displayed by OSD and by compatible RC systems."
+    },
+    "configurationOsdCustomStringHelp" : {
+        "message": "A string with user-defined meaning which can be displayed by the OSD."
     },
     "configurationEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
