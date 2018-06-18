@@ -458,6 +458,28 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Flying Wing S800 Sky Shadow",
+        description: "Flying wing on multirotor racer parts with 3S/4S battery and FPV equipment",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [6, 6, 49]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [6, 9, 52]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 40),
+            presets.elementHelper("RC_tuning", "roll_rate", 280),
+            presets.elementHelper("RC_tuning", "pitch_rate", 140),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1600)
+        ],
+        type: 'flyingwing'
     }
 ];
 
