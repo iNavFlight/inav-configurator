@@ -465,6 +465,24 @@ OSD.constants = {
                     preview: '100%'
                 },
                 {
+                    name: 'REMAINING_FLIGHT_TIME',
+                    id: 51,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.FLY_M) + '10:35'
+                },
+                {
+                    name: 'REMAINING_FLIGHT_DISTANCE',
+                    id: 52,
+                    min_version: '2.0.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        }
+                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                    }
+                },
+                {
                     name: 'THROTTLE_POSITION',
                     id: 9,
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'

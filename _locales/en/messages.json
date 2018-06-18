@@ -2363,6 +2363,12 @@
     "osdElement_MAIN_BATT_REMAINING_CAPACITY": {
         "message": "Battery Remaining Capacity"
     },
+    "osdElement_REMAINING_FLIGHT_TIME_HELP": {
+        "message": "Estimated remaining flight time before the aircraft needs to go back home based on remaining battery energy, average power and distance to home (Fixed wing only, please read the documentation)"
+    },
+    "osdElement_REMAINING_FLIGHT_DISTANCE_HELP": {
+        "message": "Estimated remaining flight travel distance before the aircraft needs to go back home based on remaining battery energy, average power and distance to home (Fixed wing only, please read the documentation)"
+    },
     "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Shows the average cell voltage from the main battery"
     },
