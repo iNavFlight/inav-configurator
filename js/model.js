@@ -514,8 +514,8 @@ const mixerList = [
             new ServoMixRule(2, INPUT_STABILIZED_ROLL, -100, 0),
             new ServoMixRule(3, INPUT_STABILIZED_PITCH, -85, 0),
             new ServoMixRule(4, INPUT_STABILIZED_PITCH, 85, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_YAW,  -75, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,  -75, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,  75, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,  75, 0),
         ]
     }            
 ];
