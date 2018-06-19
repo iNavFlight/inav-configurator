@@ -833,7 +833,13 @@ OSD.constants = {
                     name: 'VTX_CHANNEL',
                     id: 10,
                     positionable: true,
-                    preview: 'CH:F7'
+                    preview: function(osd_data) {
+                        var preview = 'CH:F7';
+                        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
+                            preview += ':1';
+                        }
+                        return preview;
+                    },
                 },
             ]
         },
