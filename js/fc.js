@@ -39,6 +39,7 @@ var CONFIG,
     RX_CONFIG,
     FAILSAFE_CONFIG,
     RXFAIL_CONFIG,
+    VTX_CONFIG,
     ADVANCED_CONFIG,
     INAV_PID_CONFIG,
     PID_ADVANCED,
@@ -294,6 +295,15 @@ var FC = {
             capacity_warning: 0,
             capacity_critical: 0,
             capacity_unit: 0
+        };
+
+        VTX_CONFIG = {
+            device_type: VTXDEV_UNKNOWN,
+            band: 0,
+            channel: 1,
+            power: 0,
+            pitmode: 0,
+            low_power_disarm: 0,
         };
 
         ADVANCED_CONFIG = {

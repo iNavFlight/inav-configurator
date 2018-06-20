@@ -34,6 +34,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadSensorConfig,
+        mspHelper.loadVTXConfig,
         loadCraftName
     ];
 
@@ -60,6 +61,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
+        mspHelper.saveVTXConfig,
         saveCraftName,
     ];
 
@@ -269,6 +271,79 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
 
+        // VTX
+        var config_vtx = $('.config-vtx');
+        if (VTX_CONFIG.device_type != VTXDEV_UNKNOWN) {
+
+            var vtx_band = $('#vtx_band');
+            vtx_band.empty();
+            var vtx_no_band_note = $('#vtx_no_band');
+            if (VTX_CONFIG.band < VTX_BAND_MIN || VTX_CONFIG.band > VTX_BAND_MAX) {
+                var noBandName = chrome.i18n.getMessage("configurationNoBand");
+                $('<option value="0">' + noBandName + '</option>').appendTo(vtx_band);
+                vtx_no_band_note.show();
+            } else {
+                vtx_no_band_note.hide();
+            }
+            for (var ii = 0; ii < VTX_BANDS.length; ii++) {
+                var band_name = VTX_BANDS[ii].name;
+                var option = $('<option value="' + VTX_BANDS[ii].code + '">' + band_name + '</option>');
+                if (VTX_BANDS[ii].code == VTX_CONFIG.band) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_band);
+            }
+            vtx_band.change(function () {
+                VTX_CONFIG.band = parseInt($(this).val());
+            });
+
+            var vtx_channel = $('#vtx_channel');
+            vtx_channel.empty();
+            for (var ii = VTX_CHANNEL_MIN; ii <= VTX_CHANNEL_MAX; ii++) {
+                var option = $('<option value="' + ii + '">' + ii + '</option>');
+                if (ii == VTX_CONFIG.channel) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_channel);
+            }
+            vtx_channel.change(function () {
+                VTX_CONFIG.channel = parseInt($(this).val());
+            });
+
+            var vtx_power = $('#vtx_power');
+            vtx_power.empty();
+            for (var ii = VTX_POWER_MIN; ii <= VTX_POWER_MAX; ii++) {
+                var option = $('<option value="' + ii + '">' + ii + '</option>');
+                if (ii == VTX_CONFIG.power) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_power);
+            }
+            vtx_power.change(function () {
+                VTX_CONFIG.power = parseInt($(this).val());
+            });
+
+            var vtx_low_power_disarm = $('#vtx_low_power_disarm');
+            vtx_low_power_disarm.empty();
+            for (var ii = VTX_LOW_POWER_DISARM_MIN; ii <= VTX_LOW_POWER_DISARM_MAX; ii++) {
+                var name = chrome.i18n.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
+                if (!name) {
+                    name = ii;
+                }
+                var option = $('<option value="' + ii + '">' + name + '</option>');
+                if (ii == VTX_CONFIG.low_power_disarm) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_low_power_disarm);
+            }
+            vtx_low_power_disarm.change(function () {
+                VTX_CONFIG.low_power_disarm = parseInt($(this).val());
+            });
+
+            config_vtx.show();
+        } else {
+            config_vtx.hide();
+        }
 
         // generate serial RX
         var serialRxTypes = FC.getSerialRxTypes();

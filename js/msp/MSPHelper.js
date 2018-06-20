@@ -1052,7 +1052,18 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
                 console.log("Transponder config saved");
                 break;
-
+            case MSPCodes.MSP_VTX_CONFIG:
+                VTX_CONFIG.device_type = data.getUint8(offset++);
+                if (VTX_CONFIG.device_type != VTXDEV_UNKNOWN) {
+                    VTX_CONFIG.band = data.getUint8(offset++);
+                    VTX_CONFIG.channel = data.getUint8(offset++);
+                    VTX_CONFIG.power = data.getUint8(offset++);
+                    VTX_CONFIG.pitmode = data.getUint8(offset++);
+                    // Ignore wether the VTX is ready for now
+                    offset++;
+                    VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+                }
+                break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
                 ADVANCED_CONFIG.gyroSyncDenominator = data.getUint8(offset);
                 offset++;
@@ -1067,6 +1078,10 @@ var mspHelper = (function (gui) {
                 ADVANCED_CONFIG.servoPwmRate = data.getUint16(offset, true);
                 offset += 2;
                 ADVANCED_CONFIG.gyroSync = data.getUint8(offset);
+                break;
+
+            case MSPCodes.MSP_SET_VTX_CONFIG:
+                console.log("VTX config saved");
                 break;
 
             case MSPCodes.MSP_SET_ADVANCED_CONFIG:
@@ -1392,6 +1407,18 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(BF_CONFIG.currentscale));
                 buffer.push(lowByte(BF_CONFIG.currentoffset));
                 buffer.push(highByte(BF_CONFIG.currentoffset));
+                break;
+            case MSPCodes.MSP_SET_VTX_CONFIG:
+                if (VTX_CONFIG.band > 0) {
+                    buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
+                } else {
+                    // This tells the firmware to ignore this value.
+                    buffer.push16(VTX_MAX_FREQUENCY_MHZ + 1);
+                }
+                buffer.push(VTX_CONFIG.power);
+                // Don't enable PIT mode
+                buffer.push(0);
+                buffer.push(VTX_CONFIG.low_power_disarm);
                 break;
             case MSPCodes.MSP_SET_PID:
                 for (i = 0; i < PIDs.length; i++) {
@@ -2994,6 +3021,22 @@ var mspHelper = (function (gui) {
             callback();
         }
     };
+
+    self.loadVTXConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP_VTX_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveVTXConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    }
 
     return self;
 })(GUI);
