@@ -534,6 +534,18 @@
     "featureSERVO_TILT": {
         "message": "Servo gimbal"
     },
+    "featureBAT_PROFILE_AUTOSWITCH": {
+        "message": "Automatic battery profile selection"
+    },
+    "featureBAT_PROFILE_AUTOSWITCHTip": {
+        "message": "Automatically select battery profile based on battery voltage when the battery is plugged in"
+    },
+    "featureTHR_VBAT_COMP": {
+        "message": "Throttle voltage compensation"
+    },
+    "featureTHR_VBAT_COMPTip": {
+        "message": "Automatically compensate for the voltage drop when the battery is discharging to keep the thrust constant relative to throttle"
+    },
     "featureSOFTSERIAL": {
         "message": "Enable CPU based serial ports"
     },
