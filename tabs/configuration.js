@@ -334,6 +334,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         // fill battery voltage
+        $('#voltagesource').val(MISC.voltage_source);
+        $('#cells').val(MISC.battery_cells);
+        $('#celldetectvoltage').val(MISC.vbatdetectcellvoltage);
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
         $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
@@ -601,9 +604,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $(".requires-v2_0").show();
+            $(".requires-v2_0_0").show();
         } else {
-            $(".requires-v2_0").hide();
+            $(".requires-v2_0_0").hide();
         }
 
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
@@ -677,6 +680,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.maxthrottle = parseInt($('#maxthrottle').val());
             MISC.mincommand = parseInt($('#mincommand').val());
 
+            MISC.battery_cells = parseInt($('#cells').val());
+            MISC.voltage_source = parseInt($('#voltagesource').val());
+            MISC.vbatdetectcellvoltage = parseFloat($('#celldetectvoltage').val());
             MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
             MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
             MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());

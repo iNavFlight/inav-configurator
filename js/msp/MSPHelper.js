@@ -121,6 +121,24 @@ var mspHelper = (function (gui) {
                 gui.updateProfileChange();
                 break;
 
+            case MSPCodes.MSPV2_INAV_STATUS:
+                CONFIG.cycleTime = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.i2cError = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.activeSensors = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.cpuload = data.getUint16(offset, true);
+                offset += 2;
+                profile_byte = data.getUint8(offset++)
+                CONFIG.profile = profile_byte & 0x0F;
+                CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
+                CONFIG.armingFlags = data.getUint32(offset, true);
+                offset += 4;
+                gui.updateStatusBar();
+                gui.updateProfileChange();
+                break;
+
             case MSPCodes.MSP_ACTIVEBOXES:
                 var words = dataHandler.message_length_expected / 4;
 
@@ -356,6 +374,8 @@ var mspHelper = (function (gui) {
                 MISC.vbatscale = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    MISC.voltage_source = data.getUint8(offset++);
+                    MISC.battery_cells = data.getUint8(offset++);
                     MISC.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
                     offset += 2;
                 }
@@ -377,6 +397,8 @@ var mspHelper = (function (gui) {
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    BATTERY_CONFIG.voltage_source = data.getUint8(offset++);
+                    BATTERY_CONFIG.battery_cells = data.getUint8(offset++);
                     BATTERY_CONFIG.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
                     offset += 2;
                 }
@@ -1499,6 +1521,8 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(MISC.vbatscale));
                 buffer.push(highByte(MISC.vbatscale));
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(MISC.voltage_source);
+                    buffer.push(MISC.battery_cells);
                     buffer.push(lowByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
                     buffer.push(highByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
                 }
@@ -1520,6 +1544,8 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));
                 buffer.push(highByte(BATTERY_CONFIG.vbatscale));
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(BATTERY_CONFIG.voltage_source);
+                    buffer.push(BATTERY_CONFIG.battery_cells);
                     buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
                     buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
                 }
@@ -2524,7 +2550,10 @@ var mspHelper = (function (gui) {
     };
 
     self.queryFcStatus = function (callback) {
-        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
+            MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+        else
+            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
     };
 
     self.loadMisc = function (callback) {

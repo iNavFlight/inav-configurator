@@ -717,6 +717,24 @@
     "configurationBatteryCurrent": {
         "message": "Battery Current"
     },
+    "configurationVoltageSource": {
+        "message": "Voltage source to use for alarms and telemetry"
+    },
+    "configurationVoltageSourceHelp": {
+        "message": "Raw voltage is the voltage read directly from the battery. Sag compensated voltage is the calculated voltage the battery should be at without load (simulates ideal battery and should remove false alarms provoked by high loads)"
+    },
+    "configurationBatteryCells": {
+        "message": "Number of cells (0 = auto)"
+    },
+    "configurationBatteryCellsHelp": {
+        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible"
+    },
+    "configurationBatteryCellDetectVoltage": {
+        "message": "Maximum cell voltage for cell count detection"
+    },
+    "configurationBatteryCellDetectVoltageHelp": {
+        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate"
+    },
     "configurationBatteryMinimum": {
         "message": "Minimum Cell Voltage"
     },
@@ -930,6 +948,9 @@
     },
     "pidTuningLoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "loadedBatteryProfile": {
+        "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"

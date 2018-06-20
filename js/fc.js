@@ -97,6 +97,7 @@ var FC = {
             activeSensors: 0,
             mode: [],
             profile: 0,
+            battery_profile: 0,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
             armingFlags: 0
@@ -271,6 +272,7 @@ var FC = {
             rssi_channel: 0,
             placeholder2: 0,
             mag_declination: 0, // not checked
+            battery_cells: 0,
             vbatscale: 0,
             vbatdetectcellvoltage: 0,
             vbatmincellvoltage: 0,

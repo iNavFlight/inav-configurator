@@ -1609,7 +1609,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 125px;
+    width: 269px;
     float: right;
     margin-right: 10px;
     line-height: 12px;
@@ -1627,7 +1627,16 @@ dialog {
 #profile_change {
     color: white;
     margin-top: 16px;
-    width: 125px;
+    width: 130px;
+    float: left;
+    margin-right: 0;
+    line-height: 12px;
+}
+
+#battery_profile_change {
+    color: white;
+    margin-top: 16px;
+    width: 130px;
     float: right;
     margin-right: 0;
     line-height: 12px;
