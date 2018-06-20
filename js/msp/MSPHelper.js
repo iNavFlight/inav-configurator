@@ -373,6 +373,9 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 MISC.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
+            case MSPV2_INAV_SET_MISC:
+                console.log('MISC Configuration saved (MSPv2)');
+                break;
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
                 offset += 2;
