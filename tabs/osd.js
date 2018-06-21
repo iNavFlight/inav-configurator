@@ -1433,6 +1433,12 @@ OSD.GUI.updateFields = function() {
                         itemData.isVisible = !itemData.isVisible;
 
                         if (itemData.isVisible) {
+                            // Ensure the element is inside the viewport, at least partially.
+                            // In that case move it to the very first row/col, otherwise there's
+                            // no way to reposition items that are outside the viewport.
+                            if (itemData.position >= OSD.data.preview.length) {
+                                itemData.position = 0;
+                            }
                             $position.show();
                         } else {
                             $position.hide();
@@ -1533,12 +1539,18 @@ OSD.GUI.updatePreviews = function() {
                 y++;
                 continue;
             }
+            var previewPos = j + x + (y * OSD.data.display_size.x);
+            if (previewPos >= OSD.data.preview.length) {
+                // Character is outside the viewport
+                x++;
+                continue;
+            }
             // test if this position already has a character placed
-            if (OSD.data.preview[j+x+(y*OSD.data.display_size.x)][0] !== null) {
+            if (OSD.data.preview[previewPos][0] !== null) {
                 // if so set background color to red to show user double usage of position
-                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode, 'red'];
+                OSD.data.preview[previewPos] = [item, charCode, 'red'];
             } else {
-                OSD.data.preview[j+x+(y*OSD.data.display_size.x)] = [item, charCode];
+                OSD.data.preview[previewPos] = [item, charCode];
             }
             // draw the preview
             var img = new Image();
