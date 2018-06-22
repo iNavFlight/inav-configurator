@@ -66,6 +66,8 @@ var MSPCodes = {
     MSP_SET_OSD_CONFIG:         85,
     MSP_OSD_CHAR_READ:          86,
     MSP_OSD_CHAR_WRITE:         87,
+    MSP_VTX_CONFIG:             88,
+    MSP_SET_VTX_CONFIG:         89,
     MSP_ADVANCED_CONFIG:        90,
     MSP_SET_ADVANCED_CONFIG:    91,
     MSP_FILTER_CONFIG:          92,

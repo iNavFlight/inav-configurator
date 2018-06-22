@@ -834,7 +834,42 @@
     "configurationButtonSave": {
         "message": "Save and Reboot"
     },
-
+    "configurationVTX": {
+        "message": "VTX"
+    },
+    "configurationVTXBand": {
+        "message": "Band"
+    },
+    "configurationNoBand": {
+        "message": "None"
+    },
+    "configurationVTXNoBandHelp": {
+        "message": "VTX frequency has been set manually. Selecting a band will overwrite the configured frequency."
+    },
+    "configurationVTXChannel": {
+        "message": "Channel"
+    },
+    "configurationVTXPower": {
+        "message": "Power Level"
+    },
+    "configurationVTXPowerHelp": {
+        "message": "VTX power level. The exact power in mw (or dBm) will depend on the specific hardware. Check your VTX manual."
+    },
+    "configurationVTXLowerPowerDisarm": {
+        "message": "Use low power while the craft is disarmed"
+    },
+    "configurationVTXLowerPowerDisarmHelp": {
+        "message": "Enabling this option will make the VTX use its lowest power while the craft is disarmed. Use 'Until first arm' to make it use the lowest power only until you arm for the first time."
+    },
+    "configurationVTXLowPowerDisarmValue_0": {
+        "message": "Disabled"
+    },
+    "configurationVTXLowPowerDisarmValue_1": {
+        "message": "Always"
+    },
+    "configurationVTXLowPowerDisarmValue_2": {
+        "message": "Until first arm"
+    },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
