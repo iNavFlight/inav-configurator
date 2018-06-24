@@ -2,6 +2,7 @@
 'use strict';
 
 var SYM = SYM || {};
+SYM.MILLIOHM = 0x00;
 SYM.VOLT = 0x90;
 SYM.RSSI = 0x01;
 SYM.AH_RIGHT = 0x02;
@@ -46,7 +47,7 @@ SYM.MI = 187;
 SYM.HOME = 191;
 SYM.TRIP_DIST = 0x22;
 SYM.HEADING1 = 0xA9;
-SYM.HEADING2 = 0xA8;
+SYM.DEGREES = 0xA8;
 SYM.HEADING_N = 24;
 SYM.HEADING_E = 26;
 SYM.HEADING_W = 27;
@@ -443,7 +444,7 @@ OSD.constants = {
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
-                    id: 49,
+                    id: 76,
                     min_version: '2.0.0',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
                 },
@@ -455,9 +456,15 @@ OSD.constants = {
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
-                    id: 50,
+                    id: 77,
                     min_version: '2.0.0',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18V')
+                },
+                {
+                    name: 'POWER_SUPPLY_IMPEDANCE',
+                    id: 78,
+                    min_version: '2.0.0',
+                    preview: ' 23' + FONT.symbol(SYM.MILLIOHM)
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
@@ -467,13 +474,13 @@ OSD.constants = {
                 },
                 {
                     name: 'REMAINING_FLIGHT_TIME',
-                    id: 51,
+                    id: 48,
                     min_version: '2.0.0',
                     preview: FONT.symbol(SYM.FLY_M) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
-                    id: 52,
+                    id: 49,
                     min_version: '2.0.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
@@ -514,7 +521,7 @@ OSD.constants = {
                     name: 'HEADING',
                     id: 24,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.HEADING2)
+                    preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.DEGREES)
                 },
                 {
                     name: 'HEADING_GRAPH',
@@ -741,6 +748,12 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.DIR_TO_HOME)
                 },
                 {
+                    name: 'HOME_HEADING_ERROR',
+                    id: 50,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.HOME) + FONT.symbol(SYM.HEADING) + ' -10' + FONT.symbol(SYM.DEGREES)
+                },
+                {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
                     min_version: '1.6.0',
@@ -772,7 +785,7 @@ OSD.constants = {
                 },
                 {
                     name: 'WIND_SPEED_HORIZONTAL',
-                    id: 47,
+                    id: 46,
                     min_version: '2.0.0',
                     preview: function(osd_data) {
                         // 6 chars
@@ -788,7 +801,7 @@ OSD.constants = {
                 },
                 {
                     name: 'WIND_SPEED_VERTICAL',
-                    id: 48,
+                    id: 47,
                     min_version: '2.0.0',
                     preview: function(osd_data) {
                         // 6 chars
@@ -801,6 +814,18 @@ OSD.constants = {
                         }
                         return p;
                     }
+                },
+                {
+                    name: 'CRUISE_HEADING_ERROR',
+                    id: 51,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.HEADING) + '  5' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'CRUISE_HEADING_ADJUSTMENT',
+                    id: 52,
+                    min_version: '2.0.0',
+                    preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
                 },
             ]
         },
@@ -862,6 +887,174 @@ OSD.constants = {
                     name: 'YAW_PIDS',
                     id: 18,
                     preview: 'YAW 85 45 0'
+                },
+                {
+                    name: 'LEVEL_PIDS',
+                    id: 56,
+                    min_version: '2.0.0',
+                    preview: 'LEV  20  15  80'
+                },
+                {
+                    name: 'POS_XY_PIDS',
+                    id: 57,
+                    min_version: '2.0.0',
+                    preview: 'PXY  20  15  80'
+                },
+                {
+                    name: 'POS_Z_PIDS',
+                    id: 58,
+                    min_version: '2.0.0',
+                    preview: 'PZ   20  15  80'
+                },
+                {
+                    name: 'VEL_XY_PIDS',
+                    id: 59,
+                    min_version: '2.0.0',
+                    preview: 'VXY  20  15  80'
+                },
+                {
+                    name: 'VEL_Z_PIDS',
+                    id: 60,
+                    min_version: '2.0.0',
+                    preview: 'VZ   20  15  80'
+                },
+                {
+                    name: 'HEADING_P',
+                    id: 61,
+                    min_version: '2.0.0',
+                    preview: 'HP  20'
+                },
+                {
+                    name: 'BOARD_ALIGNMENT_ROLL',
+                    id: 62,
+                    min_version: '2.0.0',
+                    preview: 'AR    0'
+                },
+                {
+                    name: 'BOARD_ALIGNMENT_PITCH',
+                    id: 63,
+                    min_version: '2.0.0',
+                    preview: 'AP   ' + FONT.embed_dot('1.0')
+                },
+                {
+                    name: 'THROTTLE_EXPO',
+                    id: 66,
+                    min_version: '2.0.0',
+                    preview: 'TEX   0'
+                },
+                {
+                    name: 'STABILIZED_RC_EXPO',
+                    id: 64,
+                    min_version: '2.0.0',
+                    preview: 'EXP  20'
+                },
+                {
+                    name: 'STABILIZED_RC_YAW_EXPO',
+                    id: 65,
+                    min_version: '2.0.0',
+                    preview: 'YEX  20'
+                },
+                {
+                    name: 'STABILIZED_PITCH_RATE',
+                    id: 67,
+                    min_version: '2.0.0',
+                    preview: 'SPR  20'
+                },
+                {
+                    name: 'STABILIZED_ROLL_RATE',
+                    id: 68,
+                    min_version: '2.0.0',
+                    preview: 'SRR  20'
+                },
+                {
+                    name: 'STABILIZED_YAW_RATE',
+                    id: 69,
+                    min_version: '2.0.0',
+                    preview: 'SYR  20'
+                },
+                {
+                    name: 'MANUAL_RC_EXPO',
+                    id: 70,
+                    min_version: '2.0.0',
+                    preview: 'MEX  20'
+                },
+                {
+                    name: 'MANUAL_RC_YAW_EXPO',
+                    id: 71,
+                    min_version: '2.0.0',
+                    preview: 'MYX  20'
+                },
+                {
+                    name: 'MANUAL_PITCH_RATE',
+                    id: 72,
+                    min_version: '2.0.0',
+                    preview: 'MPR  20'
+                },
+                {
+                    name: 'MANUAL_ROLL_RATE',
+                    id: 73,
+                    min_version: '2.0.0',
+                    preview: 'MRR  20'
+                },
+                {
+                    name: 'MANUAL_YAW_RATE',
+                    id: 74,
+                    min_version: '2.0.0',
+                    preview: 'MYR  20'
+                },
+                {
+                    name: 'NAV_FW_CRUISE_THROTTLE',
+                    id: 75,
+                    min_version: '2.0.0',
+                    preview: 'CRS 1500'
+                },
+                {
+                    name: 'NAV_FW_PITCH_TO_THROTTLE',
+                    id: 76,
+                    min_version: '2.0.0',
+                    preview: 'P2T  10'
+                },
+                {
+                    name: 'FW_MIN_THROTTLE_DOWN_PITCH_ANGLE',
+                    id: 77,
+                    min_version: '2.0.0',
+                    preview: '0TP  ' + FONT.embed_dot('4.5')
+                },
+            ]
+        },
+        {
+            name: 'osdGroupPIDOutputs',
+            min_version: '2.0.0',
+            items: [
+                {
+                    name: 'FW_ALT_PID_OUTPUTS',
+                    id: 79,
+                    preview: 'PZO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                },
+                {
+                    name: 'FW_POS_PID_OUTPUTS',
+                    id: 80,
+                    preview: 'PXYO ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                },
+                {
+                    name: 'MC_VEL_X_PID_OUTPUTS',
+                    id: 81,
+                    preview: 'VXO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                },
+                {
+                    name: 'MC_VEL_Y_PID_OUTPUTS',
+                    id: 82,
+                    preview: 'VYO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                },
+                {
+                    name: 'MC_VEL_Z_PID_OUTPUTS',
+                    id: 83,
+                    preview: 'VZO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                },
+                {
+                    name: 'MC_POS_XYZ_P_OUTPUTS',
+                    id: 84,
+                    preview: 'POSO ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0')
                 },
             ]
         }
