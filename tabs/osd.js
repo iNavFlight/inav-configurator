@@ -332,7 +332,8 @@ OSD.initData = function () {
             max_neg_altitude: null,
         },
         layouts: [],
-        layout_count: 1,
+        layout_count: 1, // This needs to be 1 for compatibility with < 2.0
+        item_count: 0,
         items: [],
         groups: {},
         display_items: [],
@@ -926,18 +927,27 @@ OSD.reload = function(callback) {
     if (OSD.use_layouts_api()) {
         MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
 
-            OSD.msp.decodeLayouts(resp);
-            OSD.updateSelectedLayout(OSD.data.selected_layout || 0);
+            OSD.msp.decodeLayoutCounts(resp);
+            // Get data for all layouts
+            var ids = Array.apply(null, {length: OSD.data.layout_count}).map(Number.call, Number);
+            var layouts = Promise.mapSeries(ids, function (layoutIndex, ii) {
+                var data = [];
+                data.push8(layoutIndex);
+                return MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS, data).then(function (resp) {
+                    OSD.msp.decodeLayout(layoutIndex, resp);
+                });
+            });
+            layouts.then(function () {
+                OSD.updateSelectedLayout(OSD.data.selected_layout || 0);
 
-            MSP.promise(MSPCodes.MSP2_INAV_OSD_ALARMS).then(function (resp) {
+                MSP.promise(MSPCodes.MSP2_INAV_OSD_ALARMS).then(function (resp) {
+                    OSD.msp.decodeAlarms(resp);
 
-                OSD.msp.decodeAlarms(resp);
-
-                MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
-
-                    OSD.data.supported = true;
-                    OSD.msp.decodePreferences(resp);
-                    done();
+                    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
+                        OSD.data.supported = true;
+                        OSD.msp.decodePreferences(resp);
+                        done();
+                    });
                 });
             });
         });
@@ -1087,22 +1097,19 @@ OSD.msp = {
         return result;
     },
 
-    decodeLayouts: function(resp) {
-        var layouts = resp.data;
+    decodeLayoutCounts: function(resp) {
+        OSD.data.layout_count = resp.data.readU8();
+        OSD.data.item_count = resp.data.readU8();
+    },
 
-        var layout_count = layouts.readU8();
-        var item_count = layouts.readU8();
+    decodeLayout: function(layoutIndex, resp) {
+        var items = [];
 
-        for (var ii = 0; ii < layout_count; ii++) {
-            var items = [];
-            for (var jj = 0; jj < item_count; jj++) {
-                var bits = layouts.readU16();
-                items.push(this.helpers.unpack.position(bits));
-            }
-            OSD.data.layouts.push(items);
+        for (var ii = 0; ii < OSD.data.item_count; ii++) {
+            var bits = resp.data.readU16();
+            items.push(this.helpers.unpack.position(bits));
         }
-
-        OSD.data.layout_count = layout_count;
+        OSD.data.layouts[layoutIndex] = items;
     },
 
     encodeOther: function () {
