@@ -2381,7 +2381,10 @@
         "message": "GPS"
     },
     "osdGroupPIDs": {
-        "message": "PIDs"
+        "message": "RC Adjustable Values"
+    },
+    "osdGroupPIDOutputs": {
+        "message": "PID controllers outputs"
     },
     "osdGroupVTX": {
         "message": "VTX"
@@ -2529,6 +2532,39 @@
     },
     "osdElement_WIND_SPEED_VERTICAL_HELP": {
         "message": "Shows estimated vertical wind speed and direction (up or down)."
+    },
+    "osdElement_LEVEL_PIDS": {
+        "message": "Level PIDs"
+    },
+    "osdElement_POS_XY_PIDS": {
+        "message": "Position XY PIDs"
+    },
+    "osdElement_POS_Z_PIDS": {
+        "message": "Position Z PIDs"
+    },
+    "osdElement_VEL_XY_PIDS": {
+        "message": "Velocity XY PIDs"
+    },
+    "osdElement_VEL_Z_PIDS": {
+        "message": "Velocity Z PIDs"
+    },
+    "osdElement_FW_ALT_PID_OUTPUTS": {
+        "message": "FW Altitude PID controller outputs"
+    },
+    "osdElement_FW_POS_PID_OUTPUTS": {
+        "message": "FW Position PID controller outputs"
+    },
+    "osdElement_MC_VEL_X_PID_OUTPUTS": {
+        "message": "MC Velocity X PID controller outputs"
+    },
+    "osdElement_MC_VEL_Y_PID_OUTPUTS": {
+        "message": "MC Velocity Y PID controller outputs"
+    },
+    "osdElement_MC_VEL_Z_PID_OUTPUTS": {
+        "message": "MC Velocity Z PID controller outputs"
+    },
+    "osdElement_MC_POS_XYZ_P_OUTPUTS": {
+        "message": "MC Position XYZ P controllers outputs"
     },
     "portColumnSensors": {
         "message": "Sensors"
