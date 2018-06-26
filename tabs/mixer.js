@@ -94,7 +94,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         let usedServoIndex = 0;
         for (let i = 0; i < MIXER_CONFIG.numberOfServos; i++) {
             if (SERVO_RULES.isServoConfigured(i)) {
-                console.log(i, usedServoIndex);
                 if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
                     output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
                 } else {
@@ -206,7 +205,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         /*
          * Send tracking
          */
-        googleAnalytics.sendEvent('Mixer', 'Platform type', helper.platform.getList()[MIXER_CONFIG.platformType].name);
+        googleAnalytics.sendEvent('Mixer', 'Platform type', helper.platform.getById(MIXER_CONFIG.platformType).name);
         googleAnalytics.sendEvent('Mixer', 'Mixer preset',  helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).name);
 
         /*
