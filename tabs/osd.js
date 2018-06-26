@@ -648,13 +648,13 @@ OSD.constants = {
                     name: 'PITCH_ANGLE',
                     id: 41,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.PITCH_UP) + '2'
+                    preview: FONT.symbol(SYM.PITCH_UP) + ' 2'
                 },
                 {
                     name: 'ROLL_ANGLE',
                     id: 42,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.ROLL_LEFT) + '5'
+                    preview: FONT.symbol(SYM.ROLL_LEFT) + ' 5'
                 },
             ]
         },
