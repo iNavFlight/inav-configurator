@@ -46,7 +46,7 @@ SYM.M = 185;
 SYM.MI = 187;
 SYM.HOME = 191;
 SYM.TRIP_DIST = 0x22;
-SYM.HEADING1 = 0xA9;
+SYM.HEADING = 0xA9;
 SYM.DEGREES = 0xA8;
 SYM.HEADING_N = 24;
 SYM.HEADING_E = 26;
@@ -444,7 +444,7 @@ OSD.constants = {
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
-                    id: 76,
+                    id: 53,
                     min_version: '2.0.0',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
                 },
@@ -456,13 +456,13 @@ OSD.constants = {
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
-                    id: 77,
+                    id: 54,
                     min_version: '2.0.0',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18V')
                 },
                 {
                     name: 'POWER_SUPPLY_IMPEDANCE',
-                    id: 78,
+                    id: 55,
                     min_version: '2.0.0',
                     preview: ' 23' + FONT.symbol(SYM.MILLIOHM)
                 },
@@ -521,7 +521,7 @@ OSD.constants = {
                     name: 'HEADING',
                     id: 24,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.HEADING1) + '175' + FONT.symbol(SYM.DEGREES)
+                    preview: FONT.symbol(SYM.HEADING) + '175' + FONT.symbol(SYM.DEGREES)
                 },
                 {
                     name: 'HEADING_GRAPH',
@@ -876,17 +876,17 @@ OSD.constants = {
                 {
                     name: 'ROLL_PIDS',
                     id: 16,
-                    preview: 'ROL 40 30 23'
+                    preview: 'ROL  40  30  23'
                 },
                 {
                     name: 'PITCH_PIDS',
                     id: 17,
-                    preview: 'PIT 40 30 23'
+                    preview: 'PIT  40  30  23'
                 },
                 {
                     name: 'YAW_PIDS',
                     id: 18,
-                    preview: 'YAW 85 45 0'
+                    preview: 'YAW  85  45   0'
                 },
                 {
                     name: 'LEVEL_PIDS',
