@@ -44,6 +44,20 @@ TABS.firmware_flasher.initialize = function (callback) {
             worker.postMessage(str);
         }
 
+        function parseFilename(filename) {
+            //var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
+            var targetFromFilenameExpression = /inav_([\d.]+(?:-rc\d+)?)?_?([^.]+)\.(.*)/;
+            var match = targetFromFilenameExpression.exec(filename);
+
+            if (!match) {
+                return null;
+            }
+
+            return {
+                target: match[2].replace("_", " "),
+                format: match[3],
+            };
+        }
 
         $('input.show_development_releases').click(function(){
             buildBoardOptions();
@@ -63,15 +77,13 @@ TABS.firmware_flasher.initialize = function (callback) {
             var unsortedTargets = [];
             TABS.firmware_flasher.releasesData.forEach(function(release){
                 release.assets.forEach(function(asset){
-                    var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
-                    var match = targetFromFilenameExpression.exec(asset.name);
+                    var result = parseFilename(asset.name);
 
-                    if ((!showDevReleases && release.prerelease) || !match) {
+                    if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
-                    var target = match[2].replace("_", " ");
-                    if($.inArray(target, unsortedTargets) == -1) {
-                        unsortedTargets.push(target);
+                    if($.inArray(result.target, unsortedTargets) == -1) {
+                        unsortedTargets.push(result.target);
                     }
                 });
                 sortedTargets = unsortedTargets.sort();
@@ -87,17 +99,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                 var version = matchVersionFromTag[1];
 
                 release.assets.forEach(function(asset){
-                    var targetFromFilenameExpression = /inav_([\d.]+)?_?([^.]+)\.(.*)/;
-                    var match = targetFromFilenameExpression.exec(asset.name);
-
-                    if ((!showDevReleases && release.prerelease) || !match) {
+                    var result = parseFilename(asset.name);
+                    if ((!showDevReleases && release.prerelease) || !result) {
                         return;
                     }
 
-                    var target = match[2].replace("_", " ");
-                    var format = match[3];
-
-                    if (format != 'hex') {
+                    if (result.format != 'hex') {
                         return;
                     }
 
@@ -116,12 +123,12 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
-                        "target"    : target,
+                        "target"    : result.target,
                         "date"      : formattedDate,
                         "notes"     : release.body,
                         "status"    : release.prerelease ? "release-candidate" : "stable"
                     };
-                    releases[target].push(descriptor);
+                    releases[result.target].push(descriptor);
                 });
             });
             var selectTargets = [];
