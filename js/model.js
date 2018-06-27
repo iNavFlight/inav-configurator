@@ -622,12 +622,15 @@ helper.mixer = (function (mixerList) {
         return retVal;
     };
 
-    publicScope.loadServoRules = function (mixer) {
+    publicScope.loadServoRules = function (mixer, withFlaps) {
         SERVO_RULES.flush();
 
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
+                if (!withFlaps && r.getInput() == INPUT_FEATURE_FLAPS) {
+                    continue;
+                }
                 SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),
