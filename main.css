@@ -131,7 +131,6 @@ input[type="number"]::-webkit-inner-spin-button {
 .logo_text {
     position: absolute;
     height: 20px;
-    width: 125px;
     left: 0;
     top: 65px;
     color: #949494;
@@ -140,6 +139,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .logo_text .version {
     float: right;
+    margin-left: 1em;
 }
 
 #port-picker {
