@@ -10,6 +10,7 @@
 
 .mixer-table {
     width: 100%;
+    text-align: center;
 }
 
 .mixer-table thead {
@@ -17,6 +18,11 @@
 }
 
 .mixer-table input {
+    width: 80%;
+    margin: 0 5px;
+}
+
+.mixer-table .delete {
     width: 75px;
 }
 
@@ -74,4 +80,8 @@
 
 .output-table #function-row td {
     background-color: #ebe7e7;
+}
+
+.mixer_btn_add {
+    margin: 15px 0 10px;
 }
