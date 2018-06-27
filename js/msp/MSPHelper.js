@@ -2599,7 +2599,7 @@ var mspHelper = (function (gui) {
             MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
         else {
             OUTPUT_MAPPING.flush();
-            return false;
+            callback();
         }
     };
 
