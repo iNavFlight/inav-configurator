@@ -406,7 +406,7 @@
     "initialSetupInfoHead": {
         "message": "Info"
     },
-    "initialSetupBattery": {
+    "initialSetupBatteryVoltage": {
         "message": "Battery voltage:"
     },
     "initialSetupBatteryDetectedCells": {
@@ -445,19 +445,25 @@
     "initialSetup_Wh_drawnValue": {
         "message": "$1 Wh"
     },
-    "initialSetupBatteryValue": {
+    "initialSetupBatteryVoltageValue": {
         "message": "$1 V"
     },
     "initialSetupDrawn": {
         "message": "Capacity drawn:"
     },
-    "initialSetupDrawing": {
+    "initialSetupCurrentDraw": {
         "message": "Current draw:"
+    },
+    "initialSetupPowerDraw": {
+        "message": "Power draw:"
+    },
+    "initialSetupPowerDrawValue": {
+        "message": "$1 W"
     },
     "initialSetupBatteryMahValue": {
         "message": "$1 mAh"
     },
-    "initialSetupBatteryAValue": {
+    "initialSetupCurrentDrawValue": {
         "message": "$1 A"
     },
     "initialSetupRSSI": {
