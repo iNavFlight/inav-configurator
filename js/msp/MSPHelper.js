@@ -251,26 +251,49 @@ var mspHelper = (function (gui) {
                 ANALOG.amperage = data.getInt16(5, true) / 100; // A
                 break;
             case MSPCodes.MSPV2_INAV_ANALOG:
-                ANALOG.voltage = data.getUint16(offset, true) / 100.0;
-                offset += 2;
-                ANALOG.cell_count = data.getUint8(offset++);
-                ANALOG.battery_percentage = data.getUint8(offset++);
-                ANALOG.power = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.mAhdrawn = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.mWhdrawn = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.rssi = data.getUint16(offset, true); // 0-1023
-                offset += 2;
-                ANALOG.amperage = data.getInt16(offset, true) / 100; // A
-                offset += 2;
-                var battery_flags = data.getUint8(offset++);
-                ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
-                ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
-                ANALOG.battery_state = (battery_flags & 12) >> 2;
-                ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
-                offset += 4;
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    var tmp = data.getUint8(offset++);
+                    ANALOG.battery_full_when_plugged_in = (tmp & 1 ? true : false);
+                    ANALOG.use_capacity_thresholds = ((tmp & 2) >> 1 ? true : false);
+                    ANALOG.battery_state = (tmp & 12) >> 2;
+                    ANALOG.cell_count = (tmp & 0xF0) >> 4;
+                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                    offset += 2;
+                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                    offset += 2;
+                    ANALOG.power = data.getInt32(offset, true) / 100.0;
+                    offset += 4;
+                    ANALOG.mAhdrawn = data.getInt32(offset, true);
+                    offset += 4;
+                    ANALOG.mWhdrawn = data.getInt32(offset, true);
+                    offset += 4;
+                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                    offset += 4;
+                    ANALOG.battery_percentage = data.getUint8(offset++);
+                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                    offset += 2;
+                } else {
+                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                    offset += 2;
+                    ANALOG.cell_count = data.getUint8(offset++);
+                    ANALOG.battery_percentage = data.getUint8(offset++);
+                    ANALOG.power = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.mAhdrawn = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.mWhdrawn = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                    offset += 2;
+                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                    offset += 2;
+                    var battery_flags = data.getUint8(offset++);
+                    ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
+                    ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
+                    ANALOG.battery_state = (battery_flags & 12) >> 2;
+                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                    offset += 4;
+                }
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
