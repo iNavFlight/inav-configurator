@@ -396,7 +396,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // fill throttle
         $('#minthrottle').val(MISC.minthrottle);
-        $('#midthrottle').val(MISC.midrc);
+        // midrc was removed in 2.0, but the firmware still excepts
+        // the MSP frame with it for backwards compatibility, so we
+        // just hide it from the UI.
+        var midThrottleWrapper = $('.midthrottle_wrapper');
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+            $('#midthrottle').val(MISC.midrc);
+            midThrottleWrapper.show();
+        } else {
+            midThrottleWrapper.hide();
+        }
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
 
