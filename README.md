@@ -6,6 +6,10 @@ It runs as an app within Google Chrome and allows you to configure the INAV soft
 
 Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
 
+## INAV Configurator start minimized, what should I do?
+
+You have to remove `C:\Users%Your_UserNname%\AppData\Local\inav-configurator` folder and all its content.
+
 ## Installation
 
 Depending on target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
