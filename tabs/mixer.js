@@ -306,7 +306,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#execute-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadServoRules(currentMixerPreset, $hasFlaps.prop('checked'));
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();
@@ -316,7 +316,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#load-mixer-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadServoRules(currentMixerPreset, $hasFlaps.prop('checked'));
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();
