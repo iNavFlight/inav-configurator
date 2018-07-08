@@ -1798,12 +1798,6 @@
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
     },
-    "failsafeThrottleLowItem": {
-        "message": "Failsafe Throttle Low Delay [1 = 0.1 sec.]"
-    },
-    "failsafeThrottleLowHelp": {
-        "message": "Just disarm the craft instead of executing the selected failsafe procedure when the throttle was low for this amount of time"
-    },
     "failsafeThrottleItem": {
         "message": "Throttle value used while landing"
     },
