@@ -161,6 +161,9 @@ var MSPCodes = {
     MSP2_COMMON_MOTOR_MIXER:            0x1005,
     MSP2_COMMON_SET_MOTOR_MIXER:        0x1006,
 
+    MSP2_COMMON_SETTING_INFO:           0x1007,
+    MSP2_COMMON_PG_LIST:                0x1008,
+
     MSPV2_INAV_STATUS:                  0x2000,
     MSPV2_INAV_OPTICAL_FLOW:            0x2001,
     MSPV2_INAV_ANALOG:                  0x2002,

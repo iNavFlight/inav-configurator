@@ -1347,6 +1347,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_SETTING:
                 break;
+            case MSPCodes.MSP2_COMMON_SETTING_INFO:
+                break;
             case MSPCodes.MSPV2_SET_SETTING:
                 console.log("Setting set");
                 break;
@@ -2859,12 +2861,66 @@ var mspHelper = (function (gui) {
     };
 
     self._getSetting = function (name) {
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+            return self._getLegacySetting(name);
+        }
+        if (SETTINGS[name]) {
+            return Promise.resolve(SETTINGS[name]);
+        }
+        var data = [];
+        self._encodeSettingReference(name, null, data);
+        return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(function (result) {
+            const MODE_LOOKUP = 1 << 6;
+            var settingTypes = {
+                0: "uint8_t",
+                1: "int8_t",
+                2: "uint16_t",
+                3: "int16_t",
+                4: "uint32_t",
+                5: "float",
+                6: "string",
+            };
+            var setting = {};
+            // Discard PG ID
+            result.data.readU16();
+
+            var type = result.data.readU8();
+            setting.type = settingTypes[type];
+            if (!setting.type) {
+                console.log("Unknown setting type " + type + " for setting '" + name + "'");
+                return null;
+            }
+            // Discard section
+            result.data.readU8();
+            setting.mode = result.data.readU8();
+            setting.min = result.data.read32();
+            setting.max = result.data.readU32();
+
+            setting.index = result.data.readU16();
+
+            // Discard profile info
+            result.data.readU8();
+            result.data.readU8();
+
+            if (setting.mode == MODE_LOOKUP) {
+                var values = [];
+                for (var ii = setting.min; ii <= setting.max; ii++) {
+                    values.push(result.data.readString());
+                }
+                setting.table = {values: values};
+            }
+            SETTINGS[name] = setting;
+            return setting;
+        });
+    }
+
+
+    self._getLegacySetting = function (name) {
         var promise;
-        if (this._settings) {
-            promise = Promise.resolve(this._settings);
+        if (SETTINGS) {
+            promise = Promise.resolve(SETTINGS);
         } else {
             promise = new Promise(function (resolve, reject) {
-                var $this = this;
                 $.ajax({
                     url: chrome.runtime.getURL('/resources/settings.json'),
                     dataType: 'json',
@@ -2872,7 +2928,7 @@ var mspHelper = (function (gui) {
                         reject(error);
                     },
                     success: function (data) {
-                        $this._settings = data;
+                        SETTINGS = data;
                         resolve(data);
                     }
                 });
@@ -2883,19 +2939,24 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self._encodeSettingName = function (name, data) {
-        for (var ii = 0; ii < name.length; ii++) {
-            data.push(name.charCodeAt(ii));
+    self._encodeSettingReference = function (name, index, data) {
+        if (Number.isInteger(index)) {
+            data.push8(0);
+            data.push16(index);
+        } else {
+            for (var ii = 0; ii < name.length; ii++) {
+                data.push(name.charCodeAt(ii));
+            }
+            data.push(0);
         }
-        data.push(0);
     };
 
-    self.getSetting = function (name, callback) {
+    self.getSetting = function (name) {
         var $this = this;
         return this._getSetting(name).then(function (setting) {
             var data = [];
-            $this._encodeSettingName(name, data);
-            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function (resp) {
+            $this._encodeSettingReference(name, setting.index, data);
+            return MSP.promise(MSPCodes.MSPV2_SETTING, data).then(function (resp) {
                 var value;
                 switch (setting.type) {
                     case "uint8_t":
@@ -2925,15 +2986,12 @@ var mspHelper = (function (gui) {
                 if (setting.table) {
                     value = setting.table.values[value];
                 }
-                if (callback) {
-                    callback(value, setting);
-                }
+                return {setting: setting, value: value};
             });
         });
     };
 
     self.encodeSetting = function (name, value) {
-        var $this = this;
         return this._getSetting(name).then(function (setting) {
             if (setting.table) {
                 var found = false;
@@ -2949,7 +3007,7 @@ var mspHelper = (function (gui) {
                 }
             }
             var data = [];
-            $this._encodeSettingName(name, data);
+            self._encodeSettingReference(name, setting.index, data);
             switch (setting.type) {
                 case "uint8_t":
                 case "int8_t":
@@ -2975,9 +3033,38 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.setSetting = function (name, value, callback) {
+    self.setSetting = function (name, value) {
         this.encodeSetting(name, value).then(function (data) {
-            MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
+            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
+        });
+    };
+
+    self.configureSettingInputs = function() {
+        var inputs = [];
+        $('input[data-setting!=""][data-setting]').each(function() {
+            inputs.push($(this));
+        });
+        return Promise.mapSeries(inputs, function (input, ii) {
+            var settingName = input.data("setting");
+            return self.getSetting(settingName).then(function (s) {
+                var multiplier = parseFloat(input.data('setting-multiplier') || 1);
+                input.attr("step", 1 / multiplier);
+                input.attr("min", s.setting.min / multiplier);
+                input.attr("max", s.setting.max / multiplier);
+                input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
+            });
+        });
+    };
+
+    self.saveSettingsInputs = function() {
+        var inputs = [];
+        $('input[data-setting!=""][data-setting]').each(function() {
+            inputs.push($(this));
+        });
+        return Promise.mapSeries(inputs, function (input, ii) {
+            var settingName = input.data("setting");
+            var multiplier = parseFloat(input.data('setting-multiplier') || 1);
+            return self.setSetting(settingName, parseFloat(input.val()) * multiplier);
         });
     };
 
@@ -3032,13 +3119,7 @@ var mspHelper = (function (gui) {
     self.getCraftName = function(callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
             MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
-                var name = "";
-                for (var ii = 0; ii < resp.data.byteLength; ii++) {
-                    var c = resp.data.readU8();
-                    if (c != 0) {
-                        name += String.fromCharCode(c);
-                    }
-                }
+                var name = resp.data.readString();
                 if (callback) {
                     callback(name);
                 }
@@ -3091,6 +3172,31 @@ var mspHelper = (function (gui) {
         } else {
             callback();
         }
+    };
+
+    self.loadParameterGroups = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {
+                var groups = [];
+                while (resp.data.offset < resp.data.byteLength) {
+                    var id = resp.data.readU16();
+                    var start = resp.data.readU16();
+                    var end = resp.data.readU16();
+                    groups.push({id: id, start: start, end: end});
+                }
+                if (callback) {
+                    callback(groups);
+                }
+            });
+        } else if (callback) {
+            callback();
+        }
+    };
+
+    self.processHtml = function(callback) {
+        return function() {
+            self.configureSettingInputs().then(callback);
+        };
     }
 
     return self;

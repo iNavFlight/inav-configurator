@@ -33,7 +33,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/pid_tuning.html", process_html);
+        $('#content').load("./tabs/pid_tuning.html", mspHelper.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {
@@ -243,7 +243,11 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveFilterConfig() {
-                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, save_to_eeprom);
+                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, saveSettings);
+            }
+
+            function saveSettings() {
+                mspHelper.saveSettingsInputs().then(save_to_eeprom);
             }
 
             function save_to_eeprom() {
