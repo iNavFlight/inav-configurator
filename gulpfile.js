@@ -119,7 +119,7 @@ sources.mapJs = [
 
 sources.receiverCss = [
     './src/css/tabs/receiver_msp.css',
-    './css/opensans_webfontkit/fonts.css',
+    './src/css/opensans_webfontkit/fonts.css',
     './js/libraries/jquery.nouislider.min.css',
     './js/libraries/jquery.nouislider.pips.min.css',
 ];
@@ -184,15 +184,15 @@ var buildJsTasks = [];
     }
 })();
 
-gulp.task('build-all-js', buildJsTasks);
-gulp.task('build-all-css', buildCssTasks);
-gulp.task('build', ['build-all-css', 'build-all-js']);
+gulp.task('build-all-js', gulp.parallel(buildJsTasks))
+gulp.task('build-all-css', gulp.parallel(buildCssTasks));
+gulp.task('build', gulp.parallel('build-all-css', 'build-all-js'));
 
 gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
 
 // Real work for dist task. Done in another task to call it via
 // run-sequence.
-gulp.task('dist-build', ['build'], function() {
+gulp.task('dist-build', gulp.series('build'), function() {
     var distSources = [
         './package.json', // For NW.js
         './manifest.json', // For Chrome app
@@ -218,7 +218,7 @@ gulp.task('dist', function(done) {
 });
 
 // Create app directories in ./apps
-gulp.task('apps', ['dist'], function(done) {
+gulp.task('apps', gulp.series('dist'), function(done) {
     var builder = new NwBuilder({
         files: './dist/**/*',
         buildDir: appsDir,
@@ -294,7 +294,7 @@ gulp.task('release-linux64', function() {
 //For build only linux, without install Wine
 //run task `apps` get error
 //Error building NW apps:Error while updating the Windows icon. Wine (winehq.org) must be installed to add custom icons from Mac and Linux.
-gulp.task('release-only-linux', ['dist'], function (done) {
+gulp.task('release-only-linux', gulp.series('dist'), function (done) {
     var builder = new NwBuilder({
         files: './dist/**/*',
         buildDir: appsDir,
@@ -323,8 +323,8 @@ gulp.task('release', function() {
 
 gulp.task('watch', function () {
     for(var k in output) {
-        gulp.watch(sources[k], [get_task_name(k)]);
+        gulp.watch(sources[k], gulp.series(get_task_name(k)));
     }
 });
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series('build'));
