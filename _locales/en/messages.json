@@ -957,6 +957,18 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "pidTuningMaxRollAngle": {
+        "message": "Max. ROLL angle"
+    },
+    "pidTuningMaxRollAngleHelp": {
+        "message": "Maximum ROLL angle in ANGLE mode. This also constrains the maximum bank in navigation modes."
+    },
+    "pidTuningMaxPitchAngle": {
+        "message": "Max. PITCH angle"
+    },
+    "pidTuningMaxPitchAngleHelp": {
+        "message": "Maximum PITCH angle in ANGLE mode. This also constrains the maximum climb and dive in navigation modes."
+    },
     "pidTuningManualRollRate": {
         "message": "Manual ROLL rate"
     },
@@ -2176,8 +2188,8 @@
     "dtermNotchCutoffHelp": {
         "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
     },
-    "positionHoldConfiguration": {
-        "message": "Basic Navigation Settings"
+    "multiRotorNavigationConfiguration": {
+        "message": "Multirotor Navigation Settings"
     },
     "userControlMode": {
         "message": "User Control Mode"
@@ -2195,7 +2207,10 @@
         "message": "Max. ALTHOLD climb rate [cm/s]"
     },
     "posholdMaxBankAngle": {
-        "message": "Multirotor max. banking angle [deg]"
+        "message": "Multirotor max. banking angle [degrees]"
+    },
+    "posholdMaxBankAngleHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "posholdHoverThrottle": {
         "message": "Hover throttle"
@@ -2300,22 +2315,34 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle"
+        "message": "Max. bank angle [degrees]"
+    },
+    "maxBankAngleHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle"
+        "message": "Max. climb angle [degrees]"
+    },
+    "maxClimbAngleHelp": {
+        "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "maxDiveAngle": {
-        "message": "Max. dive angle"
+        "message": "Max. dive angle [degrees]"
+    },
+    "maxDiveAngleHelp": {
+        "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "pitchToThrottle": {
         "message": "Pitch to throttle ratio"
     },
+    "pitchToThrottleHelp": {
+        "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
+    },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
-    "fixedWingConfiguration": {
-      "message": "Fixed Wing Settings"
+    "fixedWingNavigationConfiguration": {
+      "message": "Fixed Wing Navigation Settings"
     },
     "osdLayoutDefault": {
         "message": "Default Layout"

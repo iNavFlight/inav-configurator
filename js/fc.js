@@ -54,7 +54,8 @@ var CONFIG,
     DEBUG_TRACE,
     MIXER_CONFIG,
     BATTERY_CONFIG,
-    OUTPUT_MAPPING;
+    OUTPUT_MAPPING,
+    SETTINGS;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -508,6 +509,8 @@ var FC = {
         RXFAIL_CONFIG = [];
 
         OUTPUT_MAPPING = new OutputMappingCollection();
+
+        SETTINGS = {};
     },
     getOutputUsages: function() {
         return {

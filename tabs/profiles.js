@@ -622,9 +622,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             var settings = presets.settings.get(currentPreset.type);
             Object.keys(settings).forEach(function(key, ii) {
                 var value = settings[key];
-                promises[key] = mspHelper.encodeSetting(key, value).then(function(data) {
-                    return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
-                });
+                promises[key] = mspHelper.setSetting(name, value);
             });
         }
         Promise.props(promises).then(function () {

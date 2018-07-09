@@ -97,7 +97,6 @@ TABS.advanced_tuning.initialize = function (callback) {
                 RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
             });
             GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
-            console.log("VAL", RTH_AND_LAND_CONFIG.rthAllowLanding);
             $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
             $rthAllowLanding.change(function () {
                 RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();
