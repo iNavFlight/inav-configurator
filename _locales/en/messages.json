@@ -2593,6 +2593,9 @@
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ P controllers outputs"
     },
+    "osdSettingMainVoltageDecimals": {
+        "message": "Main Voltage Decimals"
+    },
     "portColumnSensors": {
         "message": "Sensors"
     },
@@ -2689,6 +2692,9 @@
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
     },
+    "settings": {
+        "message": "Settings"
+    },
     "motorMixer": {
         "message": "Motor Mixer"
     },
@@ -2724,5 +2730,23 @@
     },
     "mappingTableTitle": {
         "message": "Output Mapping"
+    },
+    "NONE": {
+        "message": "None"
+    },
+    "DEFAULT": {
+        "message": "Default"
+    },
+    "AIRCRAFT": {
+        "message": "Aircraft"
+    },
+    "ALTITUDE": {
+        "message": "Altitude"
+    },
+    "GROUND_SPEED": {
+        "message": "Ground Speed"
+    },
+    "HOME_DISTANCE": {
+        "message": "Distance to Home"
     }
 }
