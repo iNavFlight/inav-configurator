@@ -59,6 +59,11 @@ SYM.FT_S = 153;
 SYM.CLOCK = 0xBC;
 SYM.ZERO_HALF_TRAILING_DOT = 192;
 SYM.ZERO_HALF_LEADING_DOT = 208;
+SYM.AH_AIRCRAFT0 = 218;
+SYM.AH_AIRCRAFT1 = 219;
+SYM.AH_AIRCRAFT2 = 220;
+SYM.AH_AIRCRAFT3 = 221;
+SYM.AH_AIRCRAFT4 = 222;
 SYM.ROLL_LEFT = 0xCC;
 SYM.ROLL_LEVEL = 0xCD;
 SYM.ROLL_RIGHT = 0xCE;
@@ -309,6 +314,15 @@ function altitude_alarm_display_function(fn) {
     }
 }
 
+function osdMainBatteryPreview() {
+    var s = '16.8';
+    if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
+        s += '3';
+    }
+    s += 'V';
+    return FONT.symbol(SYM.VOLT) + FONT.embed_dot(s);
+}
+
 // parsed fc output and output to fc, used by to OSD.msp.encode
 OSD.initData = function () {
     OSD.data = {
@@ -440,13 +454,13 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_VOLTAGE',
                     id: 1,
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
+                    preview: osdMainBatteryPreview,
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
                     id: 53,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('16.8V')
+                    preview: osdMainBatteryPreview,
                 },
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
@@ -648,13 +662,17 @@ OSD.constants = {
                     name: 'PITCH_ANGLE',
                     id: 41,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.PITCH_UP) + ' 2'
+                    preview: function () {
+                        return FONT.symbol(SYM.PITCH_UP) + FONT.embed_dot(' 1.5');
+                    },
                 },
                 {
                     name: 'ROLL_ANGLE',
                     id: 42,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.ROLL_LEFT) + ' 5'
+                    preview: function () {
+                        return FONT.symbol(SYM.ROLL_LEFT) + FONT.embed_dot('31.4');
+                    },
                 },
             ]
         },
@@ -1462,11 +1480,9 @@ OSD.GUI.updateVideoMode = function() {
 
 OSD.GUI.updateUnits = function() {
     // units
-    var $unitMode = $('.units select').empty();
-
-    $('.units-container').show();
-    $unitMode.empty();
+    var $unitMode = $('#unit_mode').empty();
     var $unitTip = $('.units .cf_tip');
+
     for (var i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
         var unitType = OSD.constants.UNIT_TYPES[i];
         if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
@@ -1476,32 +1492,37 @@ OSD.GUI.updateUnits = function() {
         var $option = $('<option>' + name + '</option>');
         $option.attr('value', name);
         $option.data('type', unitType.value);
-        var tip = null;
-        if (unitType.tip) {
-            tip = chrome.i18n.getMessage(unitType.tip);
-        }
         if (OSD.data.preferences.units === unitType.value) {
             $option.prop('selected', true);
-            if (unitType.tip) {
-                $unitTip.attr('title', chrome.i18n.getMessage(unitType.tip));
-                $unitTip.fadeIn();
-            } else {
-                $unitTip.fadeOut();
-            }
         }
         $unitMode.append($option);
     }
+    function updateUnitHelp() {
+        var unitType = OSD.constants.UNIT_TYPES[OSD.data.preferences.units];
+        var tip;
+        if (unitType.tip) {
+            tip = chrome.i18n.getMessage(unitType.tip);
+        }
+        if (tip) {
+            $unitTip.attr('title', tip);
+            $unitTip.fadeIn();
+        } else {
+            $unitTip.fadeOut();
+        }
+    }
+    updateUnitHelp();
     $unitMode.change(function (e) {
         var selected = $(this).find(':selected');
         OSD.data.preferences.units = selected.data('type');
         OSD.GUI.saveConfig();
+        updateUnitHelp();
     });
 };
 
 OSD.GUI.updateAlarms = function() {
     // alarms
     $('.alarms-container').show();
-    var $alarms = $('.alarms').empty();
+    var $alarms = $('.alarms-container .settings').empty();
     for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
         var alarm = OSD.constants.ALL_ALARMS[kk];
         var value = OSD.data.alarms[alarm.field];
@@ -1785,9 +1806,19 @@ OSD.GUI.updatePreviews = function() {
 
     // crosshairs
     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
+        if (Settings.getInputValue('osd_crosshairs_style') == 1) {
+            // AIRCRAFT style
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 2, SYM.AH_AIRCRAFT4);
+        } else {
+            // DEFAULT or unknown style
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
+        }
     }
 
     // sidebars
@@ -1910,7 +1941,7 @@ TABS.osd.initialize = function (callback) {
         GUI.active_tab = 'osd';
     }
 
-    $('#content').load("./tabs/osd.html", function () {
+    $('#content').load("./tabs/osd.html", Settings.processHtml(function () {
         // translate to user-selected language
         localize();
 
@@ -2038,12 +2069,25 @@ TABS.osd.initialize = function (callback) {
             }
         });
 
+        $('.update_preview').on('change', function () {
+            if (OSD.data) {
+                // Force an OSD redraw by saving any element
+                // with a small delay, to make sure the setting
+                // change is performance before the OSD starts
+                // the full redraw.
+                // This will also update all previews
+                setTimeout(function() {
+                    OSD.GUI.saveItem({id: 0});
+                }, 100);
+            }
+        });
+
         // Update SENSOR_CONFIG, used to detect
         // OSD_AIR_SPEED
         mspHelper.loadSensorConfig(function () {
             GUI.content_ready(callback);
         });
-    });
+    }));
 };
 
 TABS.osd.cleanup = function (callback) {

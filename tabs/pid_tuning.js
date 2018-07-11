@@ -33,7 +33,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/pid_tuning.html", mspHelper.processHtml(process_html));
+        $('#content').load("./tabs/pid_tuning.html", Settings.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {
@@ -247,7 +247,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveSettings() {
-                mspHelper.saveSettingsInputs().then(save_to_eeprom);
+                Settings.saveInputs().then(save_to_eeprom);
             }
 
             function save_to_eeprom() {

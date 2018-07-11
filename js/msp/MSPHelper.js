@@ -2983,9 +2983,6 @@ var mspHelper = (function (gui) {
                     default:
                         throw "Unknown setting type " + setting.type;
                 }
-                if (setting.table) {
-                    value = setting.table.values[value];
-                }
                 return {setting: setting, value: value};
             });
         });
@@ -2993,7 +2990,7 @@ var mspHelper = (function (gui) {
 
     self.encodeSetting = function (name, value) {
         return this._getSetting(name).then(function (setting) {
-            if (setting.table) {
+            if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
                     if (setting.table.values[ii] == value) {
@@ -3036,35 +3033,6 @@ var mspHelper = (function (gui) {
     self.setSetting = function (name, value) {
         this.encodeSetting(name, value).then(function (data) {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
-        });
-    };
-
-    self.configureSettingInputs = function() {
-        var inputs = [];
-        $('input[data-setting!=""][data-setting]').each(function() {
-            inputs.push($(this));
-        });
-        return Promise.mapSeries(inputs, function (input, ii) {
-            var settingName = input.data("setting");
-            return self.getSetting(settingName).then(function (s) {
-                var multiplier = parseFloat(input.data('setting-multiplier') || 1);
-                input.attr("step", 1 / multiplier);
-                input.attr("min", s.setting.min / multiplier);
-                input.attr("max", s.setting.max / multiplier);
-                input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
-            });
-        });
-    };
-
-    self.saveSettingsInputs = function() {
-        var inputs = [];
-        $('input[data-setting!=""][data-setting]').each(function() {
-            inputs.push($(this));
-        });
-        return Promise.mapSeries(inputs, function (input, ii) {
-            var settingName = input.data("setting");
-            var multiplier = parseFloat(input.data('setting-multiplier') || 1);
-            return self.setSetting(settingName, parseFloat(input.val()) * multiplier);
         });
     };
 
@@ -3192,12 +3160,6 @@ var mspHelper = (function (gui) {
             callback();
         }
     };
-
-    self.processHtml = function(callback) {
-        return function() {
-            self.configureSettingInputs().then(callback);
-        };
-    }
 
     return self;
 })(GUI);

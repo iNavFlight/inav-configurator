@@ -421,7 +421,7 @@ button {
     border-bottom-right-radius: 3px;
 }
 
-.tab-osd .alarms label {
+.tab-osd .settings label {
     display: block;
     width: 100%;
     border-bottom: 1px solid #ddd;
@@ -429,12 +429,12 @@ button {
     padding-bottom: 5px
 }
 
-.tab-osd .alarms label:last-child {
+.tab-osd .settings label:last-child {
     border-bottom: none;
     padding-bottom: 0;
 }
 
-.tab-osd .alarms input {
+.tab-osd .settings input {
     width: 55px;
     padding-left: 3px;
     height: 18px;
@@ -445,6 +445,15 @@ button {
     margin-right: 11px;
     font-size: 11px;
     font-weight: normal;
+}
+
+.tab-osd .settings select {
+    width: 61px;
+    margin-right: 11px;
+}
+
+.tab-osd .settings .switchery {
+    margin-right: 25px;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
