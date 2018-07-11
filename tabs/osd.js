@@ -268,7 +268,7 @@ FONT.symbol = function (hexVal) {
 
 FONT.embed_dot = function(str) {
     var zero = '0'.charCodeAt(0);
-    var repl = str.replace(/\d.\d/, function(match) {
+    var repl = str.replace(/\d\.\d/, function(match) {
         var c1 = match.charCodeAt(0) + SYM.ZERO_HALF_TRAILING_DOT - zero;
         var c2 = match.charCodeAt(2) + SYM.ZERO_HALF_LEADING_DOT - zero;
         return FONT.symbol(c1) + FONT.symbol(c2);
@@ -321,6 +321,20 @@ function osdMainBatteryPreview() {
     }
     s += 'V';
     return FONT.symbol(SYM.VOLT) + FONT.embed_dot(s);
+}
+
+function osdCoordinatePreview(symbol, coordinate) {
+    return function() {
+        var digits = Settings.getInputValue('osd_coordinate_digits');
+        if (!digits) {
+            // Setting doesn't exist in the FC. Use 11, which
+            // will make it look close to how it looked before 2.0
+            digits = 11;
+        }
+        var integerLength = ('' + parseInt(coordinate)).length;
+        console.log(coordinate.toFixed(digits - integerLength));
+        return FONT.symbol(symbol) + FONT.embed_dot(coordinate.toFixed(digits - integerLength));
+    }
 }
 
 // parsed fc output and output to fc, used by to OSD.msp.encode
@@ -751,13 +765,13 @@ OSD.constants = {
                     name: 'LONGITUDE',
                     id: 20,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.LON) + FONT.embed_dot('14.7652134  ') // 11 chars
+                    preview: osdCoordinatePreview(SYM.LON, -114.7652134),
                 },
                 {
                     name: 'LATITUDE',
                     id: 21,
                     min_version: '1.6.0',
-                    preview: FONT.symbol(SYM.LAT) + FONT.embed_dot('52.9872367  ') // 11 chars
+                    preview: osdCoordinatePreview(SYM.LAT, 52.9872367),
                 },
                 {
                     name: 'DIRECTION_TO_HOME',
@@ -1838,7 +1852,6 @@ OSD.GUI.updatePreviews = function() {
     if (OSD.data.display_size.y % 2 == 0) {
         mapCenter += OSD.data.display_size.x / 2;
     }
-    console.log(OSD.data.display_size.x * OSD.data.display_size.y, mapCenter);
     OSD.GUI.updateMapPreview(mapCenter, 'MAP_NORTH', 'N', SYM.HOME);
     OSD.GUI.updateMapPreview(mapCenter, 'MAP_TAKEOFF', 'T', SYM.HOME);
     OSD.GUI.updateMapPreview(mapCenter, 'RADAR', null, SYM.DIR_TO_HOME);

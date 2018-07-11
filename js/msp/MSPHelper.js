@@ -2954,6 +2954,10 @@ var mspHelper = (function (gui) {
     self.getSetting = function (name) {
         var $this = this;
         return this._getSetting(name).then(function (setting) {
+            if (!setting) {
+                // Setting not available in the FC
+                return null;
+            }
             var data = [];
             $this._encodeSettingReference(name, setting.index, data);
             return MSP.promise(MSPCodes.MSPV2_SETTING, data).then(function (resp) {
