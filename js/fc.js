@@ -301,7 +301,7 @@ var FC = {
         };
 
         VTX_CONFIG = {
-            device_type: VTXDEV_UNKNOWN,
+            device_type: VTX.DEV_UNKNOWN,
             band: 0,
             channel: 1,
             power: 0,
