@@ -1102,7 +1102,7 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_VTX_CONFIG:
                 VTX_CONFIG.device_type = data.getUint8(offset++);
-                if (VTX_CONFIG.device_type != VTXDEV_UNKNOWN) {
+                if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
                     VTX_CONFIG.band = data.getUint8(offset++);
                     VTX_CONFIG.channel = data.getUint8(offset++);
                     VTX_CONFIG.power = data.getUint8(offset++);
@@ -1463,7 +1463,7 @@ var mspHelper = (function (gui) {
                     buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
                 } else {
                     // This tells the firmware to ignore this value.
-                    buffer.push16(VTX_MAX_FREQUENCY_MHZ + 1);
+                    buffer.push16(VTX.MAX_FREQUENCY_MHZ + 1);
                 }
                 buffer.push(VTX_CONFIG.power);
                 // Don't enable PIT mode
