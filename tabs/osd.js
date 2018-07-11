@@ -1677,14 +1677,14 @@ OSD.GUI.updateFields = function() {
     GUI.switchery();
 };
 
-OSD.GUI.updateMapPreview = function(centerishPosition, name, directionSymbol, centerSymbol) {
+OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
     if ($('input[name="' + name + '"]').prop('checked')) {
         var mapInitialX = OSD.data.display_size.x - 2;
         if (directionSymbol) {
             OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
             OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
         }
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, centerSymbol);
+        OSD.GUI.checkAndProcessSymbolPosition(mapCenter, centerSymbol);
         var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
         OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
         var scale;
@@ -1803,9 +1803,14 @@ OSD.GUI.updatePreviews = function() {
         OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
-    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_NORTH', 'N', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerishPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
-    OSD.GUI.updateMapPreview(centerishPosition, 'RADAR', null, SYM.DIR_TO_HOME);
+    var mapCenter = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
+    if (OSD.data.display_size.y % 2 == 0) {
+        mapCenter += OSD.data.display_size.x / 2;
+    }
+    console.log(OSD.data.display_size.x * OSD.data.display_size.y, mapCenter);
+    OSD.GUI.updateMapPreview(mapCenter, 'MAP_NORTH', 'N', SYM.HOME);
+    OSD.GUI.updateMapPreview(mapCenter, 'MAP_TAKEOFF', 'T', SYM.HOME);
+    OSD.GUI.updateMapPreview(mapCenter, 'RADAR', null, SYM.DIR_TO_HOME);
 
     // render
     var $preview = $('.display-layout .preview').empty();
