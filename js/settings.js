@@ -11,6 +11,20 @@ var Settings = (function () {
         return Promise.mapSeries(inputs, function (input, ii) {
             var settingName = input.data('setting');
             return mspHelper.getSetting(settingName).then(function (s) {
+                // Check if the input declares a parent
+                // to be hidden in case of the setting not being available.
+                // Otherwise, default to hiding its parent
+                var parent = input.parents('.setting-container:first');
+                if (parent.length == 0) {
+                    parent = input.parent();
+                }
+                if (!s) {
+                    // Setting doesn't exist.
+                    input.val(null);
+                    parent.hide();
+                    return;
+                }
+                parent.show();
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
