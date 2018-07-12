@@ -332,7 +332,6 @@ function osdCoordinatePreview(symbol, coordinate) {
             digits = 11;
         }
         var integerLength = ('' + parseInt(coordinate)).length;
-        console.log(coordinate.toFixed(digits - integerLength));
         return FONT.symbol(symbol) + FONT.embed_dot(coordinate.toFixed(digits - integerLength));
     }
 }
