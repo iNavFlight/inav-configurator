@@ -10,6 +10,8 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 You have to remove `C:\Users%Your_UserNname%\AppData\Local\inav-configurator` folder and all its content.
 
+[https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
+
 ## Installation
 
 Depending on target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
