@@ -339,6 +339,17 @@ TABS.mission_control.initialize = function (callback) {
             })
         });
 
+        // Set the attribute link to open on an external browser window, so
+        // it doesn't interfere with the configurator.
+        var interval;
+        interval = setInterval(function() {
+            var anchor = $('.ol-attribution a');
+            if (anchor.length) {
+                anchor.attr('target', '_blank');
+                clearInterval(interval);
+            }
+        }, 100);
+
         map.on('click', function (evt) {
             if (selectedMarker != null) {
                 try {
