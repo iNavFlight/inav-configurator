@@ -258,6 +258,16 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         }
 
+        $hasFlaps.prop("checked", MIXER_CONFIG.hasFlaps);
+        $hasFlaps.change(function () {
+            if ($(this).is(":checked")) {
+                MIXER_CONFIG.hasFlaps = 1;
+            } else {
+                MIXER_CONFIG.hasFlaps = 0;
+            }
+        });
+        $hasFlaps.change();
+
         $platformSelect.change(function () {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
