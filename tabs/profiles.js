@@ -208,33 +208,36 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: '7" GPS',
-        description: "Quadcopter using 7\" propellers with F3/F4/F7 CPU on 4S battery<br>" +
-            "<span>GPS optimized, long range scout</span>",
+        name: '7" Endurance',
+        description: "Quadcopter using 7\" propellers with F4/F7 CPU on 4S battery<br>" +
+            "<span>long range scout with full GPS capabilities</span>",
         features: [
             "OneShot125 at 2kHz",
             "600dps rates",
+            "Improved filtering",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
             presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
-            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
-            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
+            presets.elementHelper("FC_CONFIG", "loopTime", 250),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 1000),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 60),
-            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 60),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 75),
+            presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 175),
             presets.elementHelper("RC_tuning", "roll_rate", 600),
             presets.elementHelper("RC_tuning", "pitch_rate", 600),
             presets.elementHelper("RC_tuning", "yaw_rate", 500),
-            presets.elementHelper("PIDs", 0, [21, 33, 27]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [22, 33, 29]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [61, 45, 0])  //YAW PIDs
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("PIDs", 0, [40, 28, 35]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [45, 28, 40]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [61, 45, 15])  //YAW PIDs
         ],
         type: 'multirotor'
     },
