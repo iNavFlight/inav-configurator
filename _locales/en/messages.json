@@ -2056,6 +2056,9 @@
     "BLOCKED_HARDWARE_FAILURE": {
         "message": "Hardware health"
     },
+    "BLOCKED_INVALID_SETTING": {
+        "message": "Settings validated"
+    },
     "armingCheckPass": {
         "message": "<div class=\"checkspass\"></div>"
     },

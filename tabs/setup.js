@@ -176,7 +176,7 @@ TABS.setup.initialize = function (callback) {
             var flagNames = FC.getArmingFlags();
             for (var bit in flagNames) {
                 if (flagNames.hasOwnProperty(bit)) {
-                    if (bit_check(CONFIG.armingFlags & 0xff00, bit)) {
+                    if (bit_check(CONFIG.armingFlags, bit)) {
                         $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckFail'));
                     }
                     else {
