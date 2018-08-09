@@ -9,18 +9,18 @@
             <div class="note spacebottom">
                 <div class="note_spacer">
                     <p data-i18n="portsHelp"></p>
-                    <p data-i18n="portsMSPHelp"></p>
                 </div>
             </div>
             <table class="ports spacebottom">
                 <thead>
                     <tr>
-                        <td>Identifier</td>
-                        <td>Data</td>
-                        <td>Telemetry</td>
-                        <td>RX</td>
+                        <td data-i18n="portColumnIdentifier"></td>
+                        <td data-i18n="portColumnMSP">MSP</td>
+                        <td data-i18n="portColumnTelemetry"></td>
+                        <td data-i18n="portColumnSerialRX"></td>
                         <td data-i18n="portColumnSensors"></td>
-                        <td class='peripherls-column'>Peripherals</td>
+                        <td data-i18n="portColumnPeripherals" class="peripherls-column"></td>
+                        <td data-i18n="portColumnOptions"></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,20 +49,36 @@
                 <td class="identifierCell">
                     <p class="identifier"></p>
                 </td>
-                <td class="functionsCell-data"><select class="msp_baudrate">
+                <td class="functionsCell-msp">
+                    <input type="checkbox" value="MSP" class="togglemedium msp_enabled" />
+                    <select class="msp_baudrate">
                         <!-- list generated here -->
-                </select></td>
-                <td class="functionsCell-telemetry"><select class="telemetry_baudrate">
+                    </select>
+                </td>
+                <td class="functionsCell-telemetry">
+                    <select class="telemetry_baudrate">
                         <!-- list generated here -->
-                </select></td>
-                <td class="functionsCell-rx"></td>
-                <td class="functionsCell-sensors"><select class="sensors_baudrate">
+                    </select>
+                </td>
+                <td class="functionsCell-rx">
+                    <input type="checkbox" value="RX_SERIAL" class="togglemedium rx_serial_enabled" />
+                </td>
+                <td class="functionsCell-sensors">
+                    <select class="sensors_baudrate">
                         <!-- list generated here -->
-                </select></td>
-                <td class="functionsCell-peripherals"><select class="blackbox_baudrate">
+                    </select>
+                </td>
+                <td class="functionsCell-peripherals">
+                    <select class="peripheral_baudrate">
                         <!-- list generated here -->
-                </select></td>
+                    </select>
+                </td>
+                <td class="functionsCell-options">
+                    <a class="options" href="#"></a>
+                </td>
             </tr>
         </tbody>
     </table>
+</div>
+<div id="tab-ports-options-modal">
 </div>

@@ -90,6 +90,29 @@
     border-right: 0px;
 }
 
+.tab-ports .functionsCell-options a {
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    padding: 1px 5px;
+}
+
+#tab-ports-options-modal .port-option {
+    margin: 15px 15px 0;
+}
+
+#tab-ports-options-modal .port-option span {
+    display: inline-block;
+    width: 150px;
+}
+
+#tab-ports-options-modal .port-option select {
+    font-size: 100%;
+    display: inline-block;
+    width: 100px;
+}
+
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-ports table thead tr:first-child {
         font-size: 12px;

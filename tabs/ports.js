@@ -99,7 +99,7 @@ TABS.ports.initialize = function (callback) {
         '115200'
     ];
 
-    var blackboxBaudRates = [
+    var peripheralBaudRates = [
         '19200',
         '38400',
         '57600',
@@ -108,7 +108,40 @@ TABS.ports.initialize = function (callback) {
         '250000'
     ];
 
-    var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
+    var portOptions = [
+        {
+            title: 'portOptionsSerialInversion',
+            entries: [
+                {
+                    title: 'portOptionNotInverted',
+                    abbr: 'portOptionNotInvertedAbbr',
+                    bit: 0,
+                },
+                {
+                    title: 'portOptionInverted',
+                    abbr: 'portOptionInvertedAbbr',
+                    bit: 1,
+                },
+            ]
+        },
+        {
+            title: 'portOptionsFullHalfDuplex',
+            entries: [
+                {
+                    title: 'portOptionFullDuplex',
+                    abbr: 'portOptionFullDuplexAbbr',
+                    bit: 2,
+                },
+                {
+                    title: 'portOptionHalfDuplex',
+                    abbr: 'portOptionHalfDuplexAbbr',
+                    bit: 3,
+                },
+            ]
+        },
+    ];
+
+    var columns = ['telemetry', 'sensors', 'peripherals'];
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
@@ -128,6 +161,101 @@ TABS.ports.initialize = function (callback) {
     }
 
     function update_ui() {
+
+        function getPortName(serialPort) {
+            return portIdentifierToNameMapping[serialPort.identifier];
+        }
+
+        function updatePortOptionsDescription(serialPort, element) {
+            var titles = [];
+            var abbrs = [];
+            for (var ii = 0; ii < portOptions.length; ii++) {
+                for (var jj = 0; jj < portOptions[ii].entries.length; jj++) {
+                    var opt = portOptions[ii].entries[jj];
+                    if (serialPort.options & (1 << opt.bit)) {
+                        titles.push(chrome.i18n.getMessage(opt.title));
+                        abbrs.push(chrome.i18n.getMessage(opt.abbr));
+                        break;
+                    }
+                }
+            }
+            var text;
+            var title;
+            if (abbrs.length > 0) {
+                text = abbrs.join(', ');
+                title = titles.join(', ');
+            } else {
+                text = chrome.i18n.getMessage('portOptionAuto');
+                title = '';
+            }
+            element.text(text);
+            element.attr('title', title);
+        }
+
+        function updatePortOptionsSelect(serialPort, selects) {
+            selects.find('option').prop('selected', false);
+            selects.find('option:first').prop('selected', true);
+            selects.find('option').each(function() {
+                var bit = $(this).data('bit');
+                if (bit !== undefined) {
+                    if (serialPort.options & (1 << bit)) {
+                        $(this).prop('selected', true);
+                    }
+                }
+            });
+        }
+
+        var portOptionsContent = $('#tab-ports-options-modal');
+        for (var ii = 0; ii < portOptions.length; ii++) {
+            var option = $('<h3>').addClass('port-option');
+            $('<span>').text(chrome.i18n.getMessage(portOptions[ii].title)).appendTo(option);
+            var select = $('<select>').appendTo(option);
+            $('<option>').text(chrome.i18n.getMessage('portOptionAuto')).appendTo(select);
+            for (var jj = 0; jj < portOptions[ii].entries.length; jj++) {
+                var opt = portOptions[ii].entries[jj];
+                $('<option>').text(chrome.i18n.getMessage(opt.title)).data('bit', opt.bit).appendTo(select);
+            }
+            option.appendTo(portOptionsContent);
+        }
+        var portOptionsSelects = portOptionsContent.find('select');
+
+        function showPortOptions(serialPort, portIndex) {
+            return function() {
+                var anchor = $(this);
+                updatePortOptionsSelect(serialPort, portOptionsSelects);
+                portOptionsSelects.prop('disabled', serialPort.options == 0 && portIndex == 0);
+                portOptionsSelects.on('change', function() {
+                    var mask = 0;
+                    var set = 0;
+                    var select = $(this);
+                    select.find('option').each(function() {
+                        var option = $(this);
+                        var bit = option.data('bit');
+                        if (bit !== undefined) {
+                            mask |= 1 << bit;
+                            if (option.prop('selected')) {
+                                set |= 1 << bit;
+                            }
+                        }
+                        serialPort.options &= ~mask;
+                        serialPort.options |= set;
+                    });
+                    updatePortOptionsDescription(serialPort, anchor);
+                });
+                var jbox = new jBox('Modal', {
+                    width: 280,
+                    height: 100,
+                    closeButton: 'title',
+                    animation: false,
+                    title: chrome.i18n.getMessage('portOptionsTitle', [getPortName(serialPort)]),
+                    content: portOptionsContent,
+                    onClose: function() {
+                        portOptionsSelects.off('change')
+                    }
+                });
+                jbox.open();
+            }
+        }
 
         $(".tab-ports").addClass("supported");
 
@@ -164,9 +292,9 @@ TABS.ports.initialize = function (callback) {
             $elements.append('<option value="' + telemetryBaudRates[i] + '">' + telemetryBaudRates[i] + '</option>');
         }
 
-        $elements = $('select.blackbox_baudrate');
-        for (i = 0; i < blackboxBaudRates.length; i++) {
-            $elements.append('<option value="' + blackboxBaudRates[i] + '">' + blackboxBaudRates[i] + '</option>');
+        $elements = $('select.peripheral_baudrate');
+        for (i = 0; i < peripheralBaudRates.length; i++) {
+            $elements.append('<option value="' + peripheralBaudRates[i] + '">' + peripheralBaudRates[i] + '</option>');
         }
 
         var ports_e = $('.tab-ports .ports');
@@ -181,13 +309,27 @@ TABS.ports.initialize = function (callback) {
             port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
             port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
             port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
-            port_configuration_e.find('select.blackbox_baudrate').val(serialPort.blackbox_baudrate);
+            port_configuration_e.find('select.peripheral_baudrate').val(serialPort.peripheral_baudrate);
 
-            port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+            port_configuration_e.find('.identifier').text(getPortName(serialPort));
 
             port_configuration_e.data('index', portIndex);
             port_configuration_e.data('port', serialPort);
 
+            var optionsAnchor = port_configuration_e.find('.options');
+            optionsAnchor.click(showPortOptions(serialPort, portIndex));
+            updatePortOptionsDescription(serialPort, optionsAnchor);
+
+            if (serialPort.functions.indexOf('MSP') >= 0) {
+                port_configuration_e.find('.msp_enabled').prop('checked', true);
+                if (portIndex == 0) {
+                    port_configuration_e.find('.msp_enabled').prop('disabled', true);
+                }
+            }
+
+            if (serialPort.functions.indexOf('RX_SERIAL') >= 0) {
+                port_configuration_e.find('.rx_serial_enabled').prop('checked', true);
+            }
 
             for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
                 var column = columns[columnIndex];
@@ -202,33 +344,20 @@ TABS.ports.initialize = function (callback) {
                         continue;
                     }
 
-                    var select_e;
-                    if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
-                        var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                        functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+                    var selectElementName = 'function-' + column;
+                    var selectElementSelector = 'select[name=' + selectElementName + ']';
+                    var select_e = functions_e.find(selectElementSelector);
 
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            var checkbox_e = functions_e.find('#' + checkboxId);
-                            checkbox_e.prop("checked", true);
-                        }
-
-                    } else {
-
-                        var selectElementName = 'function-' + column;
-                        var selectElementSelector = 'select[name=' + selectElementName + ']';
+                    if (select_e.size() == 0) {
+                        functions_e.prepend('<span class="function"><select name="' + selectElementName + '" /></span>');
                         select_e = functions_e.find(selectElementSelector);
+                        var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
+                        select_e.append('<option value="">' + disabledText + '</option>');
+                    }
+                    select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
 
-                        if (select_e.size() == 0) {
-                            functions_e.prepend('<span class="function"><select name="' + selectElementName + '" /></span>');
-                            select_e = functions_e.find(selectElementSelector);
-                            var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
-                            select_e.append('<option value="">' + disabledText + '</option>');
-                        }
-                        select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
-
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            select_e.val(functionName);
-                        }
+                    if (serialPort.functions.indexOf(functionName) >= 0) {
+                        select_e.val(functionName);
                     }
                 }
             }
@@ -287,8 +416,9 @@ TABS.ports.initialize = function (callback) {
                 msp_baudrate: $(portConfiguration_e).find('.msp_baudrate').val(),
                 telemetry_baudrate: $(portConfiguration_e).find('.telemetry_baudrate').val(),
                 sensors_baudrate: $(portConfiguration_e).find('.sensors_baudrate').val(),
-                blackbox_baudrate: $(portConfiguration_e).find('.blackbox_baudrate').val(),
-                identifier: oldSerialPort.identifier
+                peripheral_baudrate: $(portConfiguration_e).find('.peripheral_baudrate').val(),
+                identifier: oldSerialPort.identifier,
+                options: oldSerialPort.options,
             };
             SERIAL_CONFIG.ports.push(serialPort);
         });

@@ -746,18 +746,26 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_CF_SERIAL_CONFIG:
                 SERIAL_CONFIG.ports = [];
                 var bytesPerPort = 1 + 2 + 4;
+                if (semver.gt(CONFIG.flightControllerVersion, "2.0.0")) {
+                    bytesPerPort += 1;
+                }
                 var serialPortCount = data.byteLength / bytesPerPort;
 
                 for (i = 0; i < serialPortCount; i++) {
                     var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
 
+                    var options = 0;
+                    if (semver.gt(CONFIG.flightControllerVersion, "2.0.0")) {
+                        options = data.getUint8(offset + 7);
+                    }
                     var serialPort = {
                         identifier: data.getUint8(offset),
                         functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 3)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
-                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
+                        peripheral_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
+                        options: options,
                     };
 
                     offset += bytesPerPort;
@@ -1710,7 +1718,10 @@ var mspHelper = (function (gui) {
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.peripheral_baudrate));
+                    if (semver.gt(CONFIG.flightControllerVersion, "2.0.0")) {
+                        buffer.push(serialPort.options);
+                    }
                 }
                 break;
 

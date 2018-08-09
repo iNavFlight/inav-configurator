@@ -880,10 +880,7 @@
         "message": "Until first arm"
     },
     "portsHelp": {
-        "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
-    },
-    "portsMSPHelp": {
-        "message": "<strong>Note:</strong> Do <span style=\"color: red\">NOT</span> disable MSP on the first serial port unless you know what you are doing.  You may have to reflash and erase your configuration if you do."
+        "message": "<strong>Note:</strong> Not all combinations are valid. When the flight controller firmware detects a problem, it might change the serial port configuration."
     },
     "portsFirmwareUpgradeRequired": {
         "message": "Firmware upgrade <span style=\"color: red\">required</span>.  Serial port configurations of firmware &lt; 1.8.0 is not supported."
@@ -2602,8 +2599,62 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
     },
+    "portColumnIdentifier": {
+        "message": "Port"
+    },
+    "portColumnMSP": {
+        "message": "MSP"
+    },
+    "portColumnTelemetry": {
+        "message": "Telemetry"
+    },
+    "portColumnSerialRX": {
+        "message": "Serial RX"
+    },
     "portColumnSensors": {
         "message": "Sensors"
+    },
+    "portColumnPeripherals": {
+        "message": "Peripherals"
+    },
+    "portColumnOptions": {
+        "message": "Options"
+    },
+    "portOptionsTitle": {
+        "message":  "$1 Options"
+    },
+    "portOptionsSerialInversion": {
+        "message": "Serial Inversion:"
+    },
+    "portOptionAuto": {
+        "message": "Auto"
+    },
+    "portOptionNotInverted": {
+        "message": "Not Inverted"
+    },
+    "portOptionNotInvertedAbbr": {
+        "message": "NI"
+    },
+    "portOptionInverted": {
+        "message": "Inverted"
+    },
+    "portOptionInvertedAbbr": {
+        "message": "I"
+    },
+    "portOptionsFullHalfDuplex": {
+        "message": "Full/Half Duplex:"
+    },
+    "portOptionFullDuplex": {
+        "message": "Full Duplex"
+    },
+    "portOptionFullDuplexAbbr": {
+        "message": "FD"
+    },
+    "portOptionHalfDuplex": {
+        "message": "Half Duplex"
+    },
+    "portOptionHalfDuplexAbbr": {
+        "message": "HD"
     },
     "appUpdateNotificationHeader": {
         "message": "New Configurator version available."
