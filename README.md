@@ -12,6 +12,8 @@ You have to remove `C:\Users%Your_UserNname%\AppData\Local\inav-configurator` fo
 
 [https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
 
+Alternatively, on Windows with PowerShell you can use `post_install_cleanup.ps1` script that will do the cleaning. (thank you James Cherrill)
+
 ## Installation
 
 Depending on target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
