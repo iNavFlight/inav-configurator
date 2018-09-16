@@ -953,7 +953,10 @@ var FC = {
         return [];
     },
     getAccelerometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
+        }
+        else if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "FAKE"];
         }
         else {
