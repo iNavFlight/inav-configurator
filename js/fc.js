@@ -540,7 +540,7 @@ var FC = {
         if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
             features.push(
                 {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true},
-                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
+                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true}
             );
         }
 
@@ -597,7 +597,7 @@ var FC = {
         if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
             features.push(
                 {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-                {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
+                {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
             );
         }
 
