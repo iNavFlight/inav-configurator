@@ -2802,5 +2802,8 @@
     },
     "brakingBankAngleTip": {
         "message": "Max bank angle allowed during braking phase"
+    },
+    "multirotorBrakingConfiguration": {
+        "message": "Multirotor braking mode configuration"
     }
 }
