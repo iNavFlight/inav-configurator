@@ -61,6 +61,13 @@ TABS.advanced_tuning.initialize = function (callback) {
             $rthAllowLanding = $('#rthAllowLanding'),
             $rthAltControlMode = $('#rthAltControlMode');
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+
+            $('.requires-v2_1').show();
+        } else {
+            $('.requires-v2_1').hide();
+        }
+
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
 
             $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
