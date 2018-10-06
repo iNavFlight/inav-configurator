@@ -55,7 +55,8 @@ var CONFIG,
     MIXER_CONFIG,
     BATTERY_CONFIG,
     OUTPUT_MAPPING,
-    SETTINGS;
+    SETTINGS,
+    BRAKING_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -505,6 +506,17 @@ var FC = {
             pitchToThrottle: null,
             loiterRadius: null
         };
+
+        BRAKING_CONFIG = {
+            speedThreshold: null,
+            disengageSpeed: null,
+            timeout: null,
+            boostFactor: null,
+            boostTimeout: null,
+            boostSpeedThreshold: null,
+            boostDisengageSpeed: null,
+            bankAngle: null
+        }
 
         RXFAIL_CONFIG = [];
 
