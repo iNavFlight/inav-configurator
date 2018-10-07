@@ -1401,6 +1401,22 @@ var mspHelper = (function (gui) {
                 for (i = 0; i < data.byteLength; ++i)
                     OUTPUT_MAPPING.put(data.getUint8(i));
                 break;
+
+            case MSPCodes.MSP2_INAV_MC_BRAKING:
+                BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
+                BRAKING_CONFIG.disengageSpeed = data.getUint16(2, true);
+                BRAKING_CONFIG.timeout = data.getUint16(4, true);
+                BRAKING_CONFIG.boostFactor = data.getInt8(6);
+                BRAKING_CONFIG.boostTimeout = data.getUint16(7, true);
+                BRAKING_CONFIG.boostSpeedThreshold = data.getUint16(9, true);
+                BRAKING_CONFIG.boostDisengageSpeed = data.getUint16(11, true);
+                BRAKING_CONFIG.bankAngle = data.getInt8(13);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
+                console.log('Braking config saved');
+                break;
+            
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2036,6 +2052,26 @@ var mspHelper = (function (gui) {
                 buffer.push(MIXER_CONFIG.hasFlaps);
                 buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
                 buffer.push(highByte(MIXER_CONFIG.appliedMixerPreset));
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
+                buffer.push(lowByte(BRAKING_CONFIG.speedThreshold));
+                buffer.push(highByte(BRAKING_CONFIG.speedThreshold));
+                buffer.push(lowByte(BRAKING_CONFIG.disengageSpeed));
+                buffer.push(highByte(BRAKING_CONFIG.disengageSpeed));
+                buffer.push(lowByte(BRAKING_CONFIG.timeout));
+                buffer.push(highByte(BRAKING_CONFIG.timeout));
+
+                buffer.push(BRAKING_CONFIG.boostFactor);
+
+                buffer.push(lowByte(BRAKING_CONFIG.boostTimeout));
+                buffer.push(highByte(BRAKING_CONFIG.boostTimeout));
+                buffer.push(lowByte(BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(highByte(BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(lowByte(BRAKING_CONFIG.boostDisengageSpeed));
+                buffer.push(highByte(BRAKING_CONFIG.boostDisengageSpeed));
+
+                buffer.push(BRAKING_CONFIG.bankAngle);
                 break;
 
             default:
@@ -3141,6 +3177,22 @@ var mspHelper = (function (gui) {
     self.saveVTXConfig = function(callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadBrakingConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
+        } else {
+            callback();
+        }
+    }
+
+    self.saveBrakingConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
         } else {
             callback();
         }

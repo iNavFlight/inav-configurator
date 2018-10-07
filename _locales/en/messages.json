@@ -2754,5 +2754,56 @@
     },
     "HOME_DISTANCE": {
         "message": "Distance to Home"
+    },
+    "brakingSpeedThreshold": {
+        "message": "Min. speed threshold [cm/s]"
+    },
+    "brakingSpeedThresholdTip": {
+        "message": "Braking will be enabled only if actual speed if higher than threshold"
+    },
+    "brakingDisengageSpeed": {
+        "message": "Braking disengage speed [cm/s]"
+    },
+    "brakingDisengageSpeedTip": {
+        "message": "Braking will end when speed goes below this value"
+    },
+    "brakingTimeout": {
+        "message": "Max. braking length [ms]"
+    },
+    "brakingTimeoutTip": {
+        "message": "Safety measure. This is the longest period of time braking can be active."
+    },
+    "brakingBoostFactor": {
+        "message": "Boost factor [%]"
+    },
+    "brakingBoostFactorTip": {
+        "message": "Defines for strong braking boost will be. 100% means navigation engine is allowed to double banking speed and acceleration than normal"
+    },
+    "brakingBoostTimeout": {
+        "message": "Max. braking boost length [ms]"
+    },
+    "brakingBoostTimeoutTip": {
+        "message": "Safety measure. This is the longest period of time braking boost can be active."
+    },
+    "brakingBoostSpeedThreshold": {
+        "message": "Boost min. speed threshold [cm/s]"
+    },
+    "brakingBoostSpeedThresholdTip": {
+        "message": "Braking boost will be enabled only if actual speed if higher than threshold"
+    },
+    "brakingBoostDisengageSpeed": {
+        "message": "Braking boost disengage speed [cm/s]"
+    },
+    "brakingBoostDisengageSpeedTip": {
+        "message": "Braking boost will end when speed goes below this value"
+    },
+    "brakingBankAngle": {
+        "message": "Max. bank angle [degrees]"
+    },
+    "brakingBankAngleTip": {
+        "message": "Max bank angle allowed during braking phase"
+    },
+    "multirotorBrakingConfiguration": {
+        "message": "Multirotor braking mode configuration"
     }
 }

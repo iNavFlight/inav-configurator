@@ -284,6 +284,79 @@
                 </div>
             </div>
 
+            <div class="config-section gui_box grey requires-v2_1">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="multirotorBrakingConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="number">
+                        <input id="brakingSpeedThreshold" type="number" data-simple-bind="BRAKING_CONFIG.speedThreshold" step="1" min="0" max="1000">
+                        <label for="brakingSpeedThreshold">
+                            <span data-i18n="brakingSpeedThreshold"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingSpeedThresholdTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingDisengageSpeed" type="number" data-simple-bind="BRAKING_CONFIG.disengageSpeed" step="1" min="0" max="1000">
+                        <label for="brakingDisengageSpeed">
+                            <span data-i18n="brakingDisengageSpeed"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingDisengageSpeedTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingTimeout" type="number" data-simple-bind="BRAKING_CONFIG.timeout" step="1" min="100" max="5000">
+                        <label for="brakingTimeout">
+                            <span data-i18n="brakingTimeout"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingTimeoutTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingBoostFactor" type="number" data-simple-bind="BRAKING_CONFIG.boostFactor" step="1" min="0" max="200">
+                        <label for="brakingBoostFactor">
+                            <span data-i18n="brakingBoostFactor"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingBoostFactorTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingBoostTimeout" type="number" data-simple-bind="BRAKING_CONFIG.boostTimeout" step="1" min="0" max="5000">
+                        <label for="brakingBoostTimeout">
+                            <span data-i18n="brakingBoostTimeout"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingBoostTimeoutTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingBoostSpeedThreshold" type="number" data-simple-bind="BRAKING_CONFIG.boostSpeedThreshold" step="1" min="100" max="1000">
+                        <label for="brakingBoostSpeedThreshold">
+                            <span data-i18n="brakingBoostSpeedThreshold"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingBoostSpeedThresholdTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingBoostDisengageSpeed" type="number" data-simple-bind="BRAKING_CONFIG.boostDisengageSpeed" step="1" min="100" max="1000">
+                        <label for="brakingBoostDisengageSpeed">
+                            <span data-i18n="brakingBoostDisengageSpeed"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingBoostDisengageSpeedTip"></div>
+                    </div>
+
+                    <div class="number">
+                        <input id="brakingBankAngle" type="number" data-simple-bind="BRAKING_CONFIG.bankAngle" step="1" min="15" max="60">
+                        <label for="brakingBankAngle">
+                            <span data-i18n="brakingBankAngle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="brakingBankAngleTip"></div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
         <div class="clear-both"></div>

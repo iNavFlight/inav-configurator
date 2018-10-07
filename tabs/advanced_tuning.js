@@ -16,7 +16,8 @@ TABS.advanced_tuning.initialize = function (callback) {
         mspHelper.loadNavPosholdConfig,
         mspHelper.loadPositionEstimationConfig,
         mspHelper.loadRthAndLandConfig,
-        mspHelper.loadFwConfig
+        mspHelper.loadFwConfig,
+        mspHelper.loadBrakingConfig
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -26,6 +27,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         mspHelper.savePositionEstimationConfig,
         mspHelper.saveRthAndLandConfig,
         mspHelper.saveFwConfig,
+        mspHelper.saveBrakingConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -58,6 +60,13 @@ TABS.advanced_tuning.initialize = function (callback) {
             $rthTailFirst = $('#rthTailFirst'),
             $rthAllowLanding = $('#rthAllowLanding'),
             $rthAltControlMode = $('#rthAltControlMode');
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+
+            $('.requires-v2_1').show();
+        } else {
+            $('.requires-v2_1').hide();
+        }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
 
