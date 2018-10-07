@@ -1097,21 +1097,29 @@ var FC = {
     },
     getServoMixInputNames: function () {
         return [
-            'Stabilised Roll',
-            'Stabilised Pitch',
-            'Stabilised Yaw',
-            'Stabilised Throttle',
-            'RC Roll',
-            'RC Pitch',
-            'RC Yaw',
-            'RC Throttle',
-            'RC Channel 5',
-            'RC Channel 6',
-            'RC Channel 7',
-            'RC Channel 8',
-            'Gimbal Pitch',
-            'Gimbal Roll',
-            'Flaps'
+            'Stabilised Roll',      // 0
+            'Stabilised Pitch',     // 1
+            'Stabilised Yaw',       // 2
+            'Stabilised Throttle',  // 3
+            'RC Roll',              // 4
+            'RC Pitch',             // 5
+            'RC Yaw',               // 6
+            'RC Throttle',          // 7
+            'RC Channel 5',         // 8
+            'RC Channel 6',         // 9
+            'RC Channel 7',         // 10
+            'RC Channel 8',         // 11
+            'Gimbal Pitch',         // 12
+            'Gimbal Roll',          // 13
+            'Flaps',                // 14
+            'RC Channel 9',         // 15
+            'RC Channel 10',        // 16
+            'RC Channel 11',        // 17
+            'RC Channel 12',        // 18
+            'RC Channel 13',        // 19
+            'RC Channel 14',        // 20
+            'RC Channel 15',        // 21
+            'RC Channel 16',        // 22
         ];
     },
     getServoMixInputName: function (input) {
