@@ -756,6 +756,18 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: '3D_SPEED',
+                    id: 85,
+                    preview: function(osd_data) {
+                        // 3 chars
+                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
+                            // Imperial
+                            return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH);
+                        }
+                        return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH);
+                    }
+                },
+                {
                     name: 'GPS_SATS',
                     id: 14,
                     preview: FONT.symbol(SYM.GPS_SAT1) + FONT.symbol(SYM.GPS_SAT2) + '14'

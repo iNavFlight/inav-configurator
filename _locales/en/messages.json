@@ -2497,6 +2497,12 @@
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
     },
+    "osdElement_3D_SPEED": {
+        "message": "3D Speed"
+    },   
+    "osdElement_3D_SPEED_HELP": {
+        "message": "Shows 3D speed considering both horizontal and vertical speed."
+    },
     "osdElement_GPS_SATS": {
         "message": "GPS Satellites"
     },
