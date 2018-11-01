@@ -545,7 +545,7 @@ var FC = {
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
-            {bit: 17, group: 'other', name: 'DISPLAY', showNameInTip: true},
+            {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true}
         ];
 
