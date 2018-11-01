@@ -588,7 +588,7 @@
     "featureLED_STRIP": {
         "message": "Multi-color RGB LED strip support"
     },
-    "featureDISPLAY": {
+    "featureDASHBOARD": {
         "message": "OLED Screen Display"
     },
     "featureONESHOT125": {
