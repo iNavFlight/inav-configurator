@@ -2599,6 +2599,12 @@
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ P controllers outputs"
     },
+    "osdElement_GYRO_TEMPERATURE": {
+        "message": "Temperature"
+    },
+    "osdElement_GYRO_TEMPERATURE_HELP": {
+        "message": "Temperature of the FC's gyroscope."
+    },
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
     },
