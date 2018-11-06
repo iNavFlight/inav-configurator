@@ -591,17 +591,16 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
                 {
-                    name: 'GYRO_TEMPERATURE',
+                    name: 'TEMPERATURE',
                     id: 85,
                     min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
                             return '90' + FONT.symbol(SYM.TEMP_F);
-                        } else {
-                            // Metric, UK
-                            return '32' + FONT.symbol(SYM.TEMP_C);
                         }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
             ]
