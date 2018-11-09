@@ -318,6 +318,18 @@ TABS.mission_control.initialize = function (callback) {
         var lat = GPS_DATA.lat / 10000000;
         var lon = GPS_DATA.lon / 10000000;
 
+        let mapLayer;
+
+        if (globalSettings.mapProviderType == 'bing') {
+            mapLayer = new ol.source.BingMaps({
+                key: globalSettings.mapApiKey,
+                imagerySet: 'AerialWithLabels',
+                maxZoom: 19
+            });
+        } else {
+            mapLayer = new ol.source.OSM();
+        }
+
         map = new ol.Map({
             controls: ol.control.defaults({
                 attributionOptions: {
@@ -329,7 +341,7 @@ TABS.mission_control.initialize = function (callback) {
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
                 new ol.layer.Tile({
-                    source: new ol.source.OSM()
+                    source: mapLayer
                 })
             ],
             target: document.getElementById('missionMap'),

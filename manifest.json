@@ -22,12 +22,13 @@
     "pages": ["tabs/map.html"]
     },
          
-        "permissions": [
+    "permissions": [
         "https://www.google-analytics.com/",
         "https://maps.googleapis.com/*",    
         "https://*.github.com/",
         "https://*.githubusercontent.com/",
         "https://*.amazonaws.com/",
+        "https://dev.virtualearth.net/",
         "serial",
         "usb",
         "storage",

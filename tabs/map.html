@@ -4,7 +4,6 @@
     <title>Asynchronous Loading</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-
     <link type="text/css" rel="stylesheet" href="../build/map.css" media="all"/>
     <script type="text/javascript" src="../build/map.js"></script>
 
@@ -43,11 +42,34 @@
             zoom: 15
         });
 
+        let globalSettings = {
+            mapProviderType: null,
+            mapApiKey: null
+        };
+
+        chrome.storage.local.get('map_provider_type', function (result) {
+            if (typeof result.map_provider_type === 'undefined') {
+                result.map_provider_type = 'osm';
+            }
+            globalSettings.mapProviderType = result.map_provider_type;
+        });
+        chrome.storage.local.get('map_api_key', function (result) {
+            if (typeof result.map_api_key === 'undefined') {
+                result.map_api_key = '';
+            }
+            globalSettings.mapApiKey = result.map_api_key;
+        });
+        console.log(globalSettings);
         var mapHandler = new ol.Map({
             target: 'map-canvas',
             layers: [
                 new ol.layer.Tile({
-                    source: new ol.source.OSM()
+                    // source: new ol.source.OSM()
+                    source: new ol.source.BingMaps({
+                        key: globalSettings.mapApiKey,
+                        imagerySet: 'AerialWithLabels',
+                        maxZoom: 19
+                    })
                 })
             ],
             view: mapView
