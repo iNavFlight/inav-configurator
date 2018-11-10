@@ -34,10 +34,10 @@
     margin-top: 30%;
 }
 
-.tab-gps #loadmap {
+/* .tab-gps #loadmap {
     margin-top: 0;
     display: none;
-}
+} */
 
 .tab-gps #connect a {
     font-weight: bold;
@@ -95,7 +95,7 @@
     border-top-right-radius: 0;
 }
 
-.tab-gps iframe {
+#gps-map {
     height: 400px;
     width: 100%;
     float: left;
@@ -118,7 +118,7 @@ progress[value]::-webkit-progress-value {
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
 
-    .tab-gps iframe {
+    #gps-map {
         height: 347px;
         width: 100%;
         float: left;
