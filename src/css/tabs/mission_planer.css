@@ -66,9 +66,7 @@
 
 .tab-mission-control .content_wrapper {
     display: flex;
-    /*height: 150px;*/
     height: 90%;
-    /*width: 75%;*/
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;

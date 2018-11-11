@@ -11,9 +11,27 @@ googleAnalyticsService.getConfig().addCallback(function (config) {
 
 chrome.storage = chrome.storage || {};
 
+let globalSettings = {
+    mapProviderType: null,
+    mapApiKey: null
+};
+
 $(document).ready(function () {
     // translate to user-selected language
     localize();
+
+    chrome.storage.local.get('map_provider_type', function (result) {
+        if (typeof result.map_provider_type === 'undefined') {
+            result.map_provider_type = 'osm';
+        }
+        globalSettings.mapProviderType = result.map_provider_type;
+    });
+    chrome.storage.local.get('map_api_key', function (result) {
+        if (typeof result.map_api_key === 'undefined') {
+            result.map_api_key = '';
+        }
+        globalSettings.mapApiKey = result.map_api_key;
+    });
 
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
@@ -280,6 +298,22 @@ $(document).ready(function () {
                     var check = $(this).is(':checked');
                     googleAnalytics.sendEvent('Settings', 'GoogleAnalytics', check);
                     googleAnalyticsConfig.setTrackingPermitted(check);
+                });
+
+                $('#map-provider-type').val(globalSettings.mapProviderType);
+                $('#map-api-key').val(globalSettings.mapApiKey);
+                
+                $('#map-provider-type').change(function () {
+                    chrome.storage.local.set({
+                        'map_provider_type': $(this).val()
+                    });
+                    globalSettings.mapProviderType = $(this).val();
+                });
+                $('#map-api-key').change(function () {
+                    chrome.storage.local.set({
+                        'map_api_key': $(this).val()
+                    });
+                    globalSettings.mapApiKey = $(this).val();
                 });
 
                 function close_and_cleanup(e) {

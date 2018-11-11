@@ -48,7 +48,8 @@ sources.css = [
     './src/css/font-awesome/css/font-awesome.css',
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
-    './js/libraries/jbox/jBox.css'
+    './js/libraries/jbox/jBox.css',
+    './node_modules/openlayers/dist/ol.css'
 ];
 
 sources.js = [
@@ -106,14 +107,7 @@ sources.js = [
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
-    './js/appUpdater.js'
-];
-
-sources.mapCss = [
-    './node_modules/openlayers/dist/ol.css'
-];
-
-sources.mapJs = [
+    './js/appUpdater.js',
     './node_modules/openlayers/dist/ol.js'
 ];
 
@@ -142,8 +136,6 @@ sources.hexParserJs = [
 var output = {
     css: 'styles.css',
     js: 'script.js',
-    mapCss: 'map.css',
-    mapJs: 'map.js',
     receiverCss: 'receiver-msp.css',
     receiverJs: 'receiver-msp.js',
     debugTraceJs: 'debug-trace.js',

@@ -2805,5 +2805,11 @@
     },
     "multirotorBrakingConfiguration": {
         "message": "Multirotor braking mode configuration"
+    },
+    "mapProvider": {
+        "message": "Map Provider"
+    },
+    "mapApiKey": {
+        "message": "Map API key"
     }
 }
