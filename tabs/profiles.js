@@ -483,6 +483,28 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1600)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Ritewing Mini Drak",
+        description: "Amazig looking and flying airplane with 8x6 propeller, 2216 1400KV motor, powered with 4S LiPo. AUW above 1200g",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [7, 7, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [5, 9, 56]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
+            presets.elementHelper("RC_tuning", "roll_rate", 260),
+            presets.elementHelper("RC_tuning", "pitch_rate", 140),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1550)
+        ],
+        type: 'flyingwing'
     }
 ];
 
