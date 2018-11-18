@@ -592,7 +592,7 @@ OSD.constants = {
                 },
                 {
                     name: 'TEMPERATURE',
-                    id: 85,
+                    id: 86,
                     min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
