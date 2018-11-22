@@ -318,6 +318,18 @@ TABS.mission_control.initialize = function (callback) {
         var lat = GPS_DATA.lat / 10000000;
         var lon = GPS_DATA.lon / 10000000;
 
+        let mapLayer;
+
+        if (globalSettings.mapProviderType == 'bing') {
+            mapLayer = new ol.source.BingMaps({
+                key: globalSettings.mapApiKey,
+                imagerySet: 'AerialWithLabels',
+                maxZoom: 19
+            });
+        } else {
+            mapLayer = new ol.source.OSM();
+        }
+
         map = new ol.Map({
             controls: ol.control.defaults({
                 attributionOptions: {
@@ -329,7 +341,7 @@ TABS.mission_control.initialize = function (callback) {
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
                 new ol.layer.Tile({
-                    source: new ol.source.OSM()
+                    source: mapLayer
                 })
             ],
             target: document.getElementById('missionMap'),
@@ -338,6 +350,17 @@ TABS.mission_control.initialize = function (callback) {
                 zoom: 14
             })
         });
+
+        // Set the attribute link to open on an external browser window, so
+        // it doesn't interfere with the configurator.
+        var interval;
+        interval = setInterval(function() {
+            var anchor = $('.ol-attribution a');
+            if (anchor.length) {
+                anchor.attr('target', '_blank');
+                clearInterval(interval);
+            }
+        }, 100);
 
         map.on('click', function (evt) {
             if (selectedMarker != null) {

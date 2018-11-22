@@ -66,6 +66,8 @@ var MSPCodes = {
     MSP_SET_OSD_CONFIG:         85,
     MSP_OSD_CHAR_READ:          86,
     MSP_OSD_CHAR_WRITE:         87,
+    MSP_VTX_CONFIG:             88,
+    MSP_SET_VTX_CONFIG:         89,
     MSP_ADVANCED_CONFIG:        90,
     MSP_SET_ADVANCED_CONFIG:    91,
     MSP_FILTER_CONFIG:          92,
@@ -159,6 +161,9 @@ var MSPCodes = {
     MSP2_COMMON_MOTOR_MIXER:            0x1005,
     MSP2_COMMON_SET_MOTOR_MIXER:        0x1006,
 
+    MSP2_COMMON_SETTING_INFO:           0x1007,
+    MSP2_COMMON_PG_LIST:                0x1008,
+
     MSPV2_INAV_STATUS:                  0x2000,
     MSPV2_INAV_OPTICAL_FLOW:            0x2001,
     MSPV2_INAV_ANALOG:                  0x2002,
@@ -180,4 +185,9 @@ var MSPCodes = {
     MSP2_INAV_OSD_SET_ALARMS:           0x2015,
     MSP2_INAV_OSD_PREFERENCES:          0x2016,
     MSP2_INAV_OSD_SET_PREFERENCES:      0x2017,
+
+    MSP2_INAV_MC_BRAKING:               0x200B,
+    MSP2_INAV_SET_MC_BRAKING:           0x200C,
+
+    MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018
 };

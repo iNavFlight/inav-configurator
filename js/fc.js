@@ -39,6 +39,7 @@ var CONFIG,
     RX_CONFIG,
     FAILSAFE_CONFIG,
     RXFAIL_CONFIG,
+    VTX_CONFIG,
     ADVANCED_CONFIG,
     INAV_PID_CONFIG,
     PID_ADVANCED,
@@ -53,7 +54,9 @@ var CONFIG,
     DEBUG_TRACE,
     MIXER_CONFIG,
     BATTERY_CONFIG,
-    OUTPUT_MAPPING;
+    OUTPUT_MAPPING,
+    SETTINGS,
+    BRAKING_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -95,8 +98,9 @@ var FC = {
             cycleTime: 0,
             i2cError: 0,
             activeSensors: 0,
-            mode: 0,
+            mode: [],
             profile: 0,
+            battery_profile: 0,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
             armingFlags: 0
@@ -271,6 +275,7 @@ var FC = {
             rssi_channel: 0,
             placeholder2: 0,
             mag_declination: 0, // not checked
+            battery_cells: 0,
             vbatscale: 0,
             vbatdetectcellvoltage: 0,
             vbatmincellvoltage: 0,
@@ -294,6 +299,15 @@ var FC = {
             capacity_warning: 0,
             capacity_critical: 0,
             capacity_unit: 0
+        };
+
+        VTX_CONFIG = {
+            device_type: VTX.DEV_UNKNOWN,
+            band: 0,
+            channel: 1,
+            power: 0,
+            pitmode: 0,
+            low_power_disarm: 0,
         };
 
         ADVANCED_CONFIG = {
@@ -493,9 +507,22 @@ var FC = {
             loiterRadius: null
         };
 
+        BRAKING_CONFIG = {
+            speedThreshold: null,
+            disengageSpeed: null,
+            timeout: null,
+            boostFactor: null,
+            boostTimeout: null,
+            boostSpeedThreshold: null,
+            boostDisengageSpeed: null,
+            bankAngle: null
+        }
+
         RXFAIL_CONFIG = [];
 
-        OUTPUT_MAPPING = [];
+        OUTPUT_MAPPING = new OutputMappingCollection();
+
+        SETTINGS = {};
     },
     getOutputUsages: function() {
         return {
@@ -518,14 +545,14 @@ var FC = {
             {bit: 12, group: 'other', name: '3D', showNameInTip: true},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
-            {bit: 17, group: 'other', name: 'DISPLAY', showNameInTip: true},
+            {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true}
         ];
 
         if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
             features.push(
                 {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true},
-                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true},
+                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true}
             );
         }
 
@@ -576,6 +603,13 @@ var FC = {
             features.push(
                 {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
                 {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
+            );
+        }
+
+        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
+            features.push(
+                {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
+                {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
             );
         }
 
@@ -939,7 +973,7 @@ var FC = {
         }
     },
     getMagnetometerNames: function () {
-        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "FAKE"];
+        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
@@ -958,7 +992,7 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "HCSR04I2C", "VL53L0X", "MSP", "UIB"];
+        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
@@ -976,7 +1010,8 @@ var FC = {
             12: "BLOCKED_COMPASS_NOT_CALIBRATED",
             13: "BLOCKED_ACCELEROMETER_NOT_CALIBRATED",
             14: null,
-            15: "BLOCKED_HARDWARE_FAILURE"
+            15: "BLOCKED_HARDWARE_FAILURE",
+            26: "BLOCKED_INVALID_SETTING",
         }
     },
     getArmingBlockingFlags: function() {
@@ -1062,24 +1097,45 @@ var FC = {
     },
     getServoMixInputNames: function () {
         return [
-            'Stabilised Roll',
-            'Stabilised Pitch',
-            'Stabilised Yaw',
-            'Stabilised Throttle',
-            'RC Roll',
-            'RC Pitch',
-            'RC Yaw',
-            'RC Throttle',
-            'RC Channel 5',
-            'RC Channel 6',
-            'RC Channel 7',
-            'RC Channel 8',
-            'Gimbal Pitch',
-            'Gimbal Roll',
-            'Flaps'
+            'Stabilised Roll',      // 0
+            'Stabilised Pitch',     // 1
+            'Stabilised Yaw',       // 2
+            'Stabilised Throttle',  // 3
+            'RC Roll',              // 4
+            'RC Pitch',             // 5
+            'RC Yaw',               // 6
+            'RC Throttle',          // 7
+            'RC Channel 5',         // 8
+            'RC Channel 6',         // 9
+            'RC Channel 7',         // 10
+            'RC Channel 8',         // 11
+            'Gimbal Pitch',         // 12
+            'Gimbal Roll',          // 13
+            'Flaps',                // 14
+            'RC Channel 9',         // 15
+            'RC Channel 10',        // 16
+            'RC Channel 11',        // 17
+            'RC Channel 12',        // 18
+            'RC Channel 13',        // 19
+            'RC Channel 14',        // 20
+            'RC Channel 15',        // 21
+            'RC Channel 16',        // 22
         ];
     },
     getServoMixInputName: function (input) {
         return getServoMixInputNames()[input];
+    },
+    getModeId: function (name) {
+        for (var i = 0; i < AUX_CONFIG.length; i++) {
+            if (AUX_CONFIG[i] == name)
+                return i;
+        }
+        return -1;
+    },
+    isModeBitSet: function (i) {
+        return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
+    },
+    isModeEnabled: function (name) {
+        return FC.isModeBitSet(FC.getModeId(name));
     }
 };

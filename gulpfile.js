@@ -3,6 +3,7 @@
 var child_process = require('child_process');
 var fs = require('fs');
 var path = require('path');
+var minimist = require('minimist');
 
 var archiver = require('archiver');
 var del = require('del');
@@ -10,8 +11,6 @@ var NwBuilder = require('nw-builder');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var runSequence = require('run-sequence');
-
 
 // Each key in the *sources* variable must be an array of
 // the source files that will be combined into a single
@@ -49,7 +48,8 @@ sources.css = [
     './src/css/font-awesome/css/font-awesome.css',
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
-    './js/libraries/jbox/jBox.css'
+    './js/libraries/jbox/jBox.css',
+    './node_modules/openlayers/dist/ol.css'
 ];
 
 sources.js = [
@@ -84,6 +84,8 @@ sources.js = [
     './js/serial.js',
     './js/servoMixRule.js',
     './js/motorMixRule.js',
+    './js/settings.js',
+    './js/outputMapping.js',
     './js/model.js',
     './js/serial_backend.js',
     './js/data_storage.js',
@@ -96,6 +98,7 @@ sources.js = [
     './js/tasks.js',
     './js/servoMixerRuleCollection.js',
     './js/motorMixerRuleCollection.js',
+    './js/vtx.js',
     './main.js',
     './tabs/*.js',
     './js/eventFrequencyAnalyzer.js',
@@ -104,20 +107,13 @@ sources.js = [
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
-    './js/appUpdater.js'
-];
-
-sources.mapCss = [
-    './node_modules/openlayers/dist/ol.css'
-];
-
-sources.mapJs = [
+    './js/appUpdater.js',
     './node_modules/openlayers/dist/ol.js'
 ];
 
 sources.receiverCss = [
     './src/css/tabs/receiver_msp.css',
-    './css/opensans_webfontkit/fonts.css',
+    './src/css/opensans_webfontkit/fonts.css',
     './js/libraries/jquery.nouislider.min.css',
     './js/libraries/jquery.nouislider.pips.min.css',
 ];
@@ -140,8 +136,6 @@ sources.hexParserJs = [
 var output = {
     css: 'styles.css',
     js: 'script.js',
-    mapCss: 'map.css',
-    mapJs: 'map.js',
     receiverCss: 'receiver-msp.css',
     receiverJs: 'receiver-msp.js',
     debugTraceJs: 'debug-trace.js',
@@ -155,6 +149,18 @@ var appsDir = './apps/';
 
 function get_task_name(key) {
     return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
+}
+
+function getPlatforms() {
+    var defaultPlatforms = ['win32', 'osx64', 'linux32', 'linux64'];
+    var argv = minimist(process.argv.slice(2));
+    if (argv.platform) {
+        if (defaultPlatforms.indexOf(argv.platform) < 0) {
+            throw "Invalid platform '" + argv.platform + "'. Available ones are: " + defaultPlatforms;
+        }
+        return [argv.platform];
+    }
+    return defaultPlatforms;
 }
 
 // Define build tasks dynamically based on the sources
@@ -182,15 +188,15 @@ var buildJsTasks = [];
     }
 })();
 
-gulp.task('build-all-js', buildJsTasks);
-gulp.task('build-all-css', buildCssTasks);
-gulp.task('build', ['build-all-css', 'build-all-js']);
+gulp.task('build-all-js', gulp.parallel(buildJsTasks))
+gulp.task('build-all-css', gulp.parallel(buildCssTasks));
+gulp.task('build', gulp.parallel('build-all-css', 'build-all-js'));
 
 gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
 
 // Real work for dist task. Done in another task to call it via
 // run-sequence.
-gulp.task('dist-build', ['build'], function() {
+gulp.task('dist-build', gulp.series('build', function() {
     var distSources = [
         './package.json', // For NW.js
         './manifest.json', // For Chrome app
@@ -209,18 +215,16 @@ gulp.task('dist-build', ['build'], function() {
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(distDir));
-});
+}));
 
-gulp.task('dist', function(done) {
-    return runSequence('clean', 'dist-build', done);
-});
+gulp.task('dist',  gulp.series('clean', 'dist-build'));
 
 // Create app directories in ./apps
-gulp.task('apps', ['dist'], function(done) {
+gulp.task('apps', gulp.series('dist', function(done) {
     var builder = new NwBuilder({
         files: './dist/**/*',
         buildDir: appsDir,
-        platforms: ['win32', 'osx64', 'linux64'],
+        platforms: getPlatforms(),
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
@@ -235,14 +239,14 @@ gulp.task('apps', ['dist'], function(done) {
         // Package apps as .zip files
         done();
     });
-});
+}));
 
 function get_release_filename(platform, ext) {
     var pkg = require('./package.json');
     return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
 }
 
-gulp.task('release-windows', function() {
+gulp.task('release-win32', function() {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'win32');
     var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
@@ -256,7 +260,7 @@ gulp.task('release-windows', function() {
     return archive.finalize();
 });
 
-gulp.task('release-macos', function() {
+gulp.task('release-osx64', function() {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
     // Check if we want to sign the .app bundle
@@ -275,54 +279,33 @@ gulp.task('release-macos', function() {
     return archive.finalize();
 });
 
-gulp.task('release-linux64', function() {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'linux64');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('linux64', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
-});
+function releaseLinux(bits) {
+    return function() {
+        var dirname = 'linux' + bits;
+        var pkg = require('./package.json');
+        var src = path.join(appsDir, pkg.name, dirname);
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'zip')));
+        var archive = archiver('zip', {
+            zlib: { level: 9 }
+        });
+        archive.on('warning', function(err) { throw err; });
+        archive.on('error', function(err) { throw err; });
+        archive.pipe(output);
+        archive.directory(src, 'INAV Configurator');
+        return archive.finalize();
+    }
+}
 
-//For build only linux, without install Wine
-//run task `apps` get error
-//Error building NW apps:Error while updating the Windows icon. Wine (winehq.org) must be installed to add custom icons from Mac and Linux.
-gulp.task('release-only-linux', ['dist'], function (done) {
-    var builder = new NwBuilder({
-        files: './dist/**/*',
-        buildDir: appsDir,
-        platforms: ['linux64'],
-        flavor: 'normal',
-    });
-    builder.on('log', console.log);
-    builder.build().then(function(){
-        //Start zip app after complete
-        runSequence('release-linux64');
-    }).catch(function(err){
-        if (err) {
-            console.log("Error building NW apps:" + err);
-            done();
-            return;
-        }
-        // Package apps as .zip files
-        done();
-    });
-});
+gulp.task('release-linux32', releaseLinux(32));
+gulp.task('release-linux64', releaseLinux(64));
 
 // Create distributable .zip files in ./apps
-gulp.task('release', function() {
-    return runSequence('apps', 'release-macos', 'release-windows', 'release-linux64');
-});
+gulp.task('release', gulp.series('apps',  getPlatforms().map(function(v) { return 'release-' + v; })));
 
 gulp.task('watch', function () {
     for(var k in output) {
-        gulp.watch(sources[k], [get_task_name(k)]);
+        gulp.watch(sources[k], gulp.series(get_task_name(k)));
     }
 });
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series('build'));

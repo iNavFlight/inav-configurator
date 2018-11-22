@@ -37,28 +37,22 @@ helper.periodicStatusUpdater = (function () {
 
         var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(serial.bitrate) * 3);
 
-        for (var i = 0; i < AUX_CONFIG.length; i++) {
-            if (AUX_CONFIG[i] == 'ARM') {
-                if (bit_check(CONFIG.mode, i))
-                    $(".armedicon").css({
-                        'background-image': 'url("../images/icons/cf_icon_armed_active.svg")'
-                    });
-                else
-                    $(".armedicon").css({
-                        'background-image': 'url("../images/icons/cf_icon_armed_grey.svg")'
-                    });
-            }
-            if (AUX_CONFIG[i] == 'FAILSAFE') {
-                if (bit_check(CONFIG.mode, i))
-                    $(".failsafeicon").css({
-                        'background-image': 'url("../images/icons/cf_icon_failsafe_active.svg")'
-                    });
-                else
-                    $(".failsafeicon").css({
-                        'background-image': 'url("../images/icons/cf_icon_failsafe_grey.svg")'
-                    });
-            }
-        }
+        if (FC.isModeEnabled('ARM'))
+            $(".armedicon").css({
+                'background-image': 'url("../images/icons/cf_icon_armed_active.svg")'
+            });
+        else
+            $(".armedicon").css({
+                'background-image': 'url("../images/icons/cf_icon_armed_grey.svg")'
+            });
+        if (FC.isModeEnabled('FAILSAFE'))
+            $(".failsafeicon").css({
+                'background-image': 'url("../images/icons/cf_icon_failsafe_active.svg")'
+            });
+        else
+            $(".failsafeicon").css({
+                'background-image': 'url("../images/icons/cf_icon_failsafe_grey.svg")'
+            });
 
         if (ANALOG != undefined) {
             var nbCells;
@@ -129,7 +123,12 @@ helper.periodicStatusUpdater = (function () {
                 MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
             }
 
-            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
+            if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
+            } else {
+                MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false);
+            }
+
             MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
 
             if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {

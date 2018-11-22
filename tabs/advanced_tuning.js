@@ -16,7 +16,8 @@ TABS.advanced_tuning.initialize = function (callback) {
         mspHelper.loadNavPosholdConfig,
         mspHelper.loadPositionEstimationConfig,
         mspHelper.loadRthAndLandConfig,
-        mspHelper.loadFwConfig
+        mspHelper.loadFwConfig,
+        mspHelper.loadBrakingConfig
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -26,6 +27,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         mspHelper.savePositionEstimationConfig,
         mspHelper.saveRthAndLandConfig,
         mspHelper.saveFwConfig,
+        mspHelper.saveBrakingConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
@@ -58,6 +60,13 @@ TABS.advanced_tuning.initialize = function (callback) {
             $rthTailFirst = $('#rthTailFirst'),
             $rthAllowLanding = $('#rthAllowLanding'),
             $rthAltControlMode = $('#rthAltControlMode');
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+
+            $('.requires-v2_1').show();
+        } else {
+            $('.requires-v2_1').hide();
+        }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
 
@@ -97,7 +106,6 @@ TABS.advanced_tuning.initialize = function (callback) {
                 RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
             });
             GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
-            console.log("VAL", RTH_AND_LAND_CONFIG.rthAllowLanding);
             $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
             $rthAllowLanding.change(function () {
                 RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();

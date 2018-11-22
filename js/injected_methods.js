@@ -90,3 +90,15 @@ DataView.prototype.read32 = function() {
         return null;
     }
 };
+
+DataView.prototype.readString = function() {
+    var s = "";
+    while (this.byteLength > this.offset) {
+        var c = this.readU8();
+        if (!c) {
+            break;
+        }
+        s += String.fromCharCode(c);
+    }
+    return s;
+};

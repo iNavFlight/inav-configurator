@@ -93,7 +93,13 @@ hr {
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
 .tab-configuration .radio:last-child,
-.tab-configuration .checkbox:last-child {
+.tab-configuration .checkbox:last-child,
+.config-section .number.no-bottom-border,
+.config-section .select.no-bottom-border,
+.tab-configuration .number.no-bottom-border,
+.tab-configuration .select.no-bottom-border,
+.tab-configuration .radio.no-bottom-border,
+.tab-configuration .checkbox.no-bottom-border {
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;

@@ -28,7 +28,7 @@ presets.defaultValues = {
             [5, 7, 50],     //PID_ROLL
             [5, 7, 50],     //PID_PITCH
             [6, 10, 60],    //PID_YAW
-            [50, 0, 0],     //PID_POS_Z
+            [40, 5, 10],    //PID_POS_Z
             [75, 5, 8],     //PID_POS_XY
             [0, 0, 0],      //PID_VEL_XY
             [0, 0, 0],      //PID_SURFACE
@@ -37,7 +37,7 @@ presets.defaultValues = {
             [0, 0, 0]       //PID_VEL_Z
         ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
-    ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 0},
+    ADVANCED_CONFIG: {"gyroSyncDenominator": 2, "pidProcessDenom": 1, "useUnsyncedPwm": 1, "motorPwmProtocol": 0, "motorPwmRate": 400, "servoPwmRate": 50, "gyroSync": 1},
     RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
     FILTER_CONFIG: {"gyroSoftLpfHz": 60, "dtermLpfHz": 40, "yawLpfHz": 30, "gyroNotchHz1": 0, "gyroNotchCutoff1": 0, "dtermNotchHz": 0, "dtermNotchCutoff": 0, "gyroNotchHz2": 0, "gyroNotchCutoff2": 0, "accNotchHz": 0, "accNotchCutoff": 0, "gyroStage2LowpassHz": 0},
@@ -208,33 +208,36 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: '7" GPS',
-        description: "Quadcopter using 7\" propellers with F3/F4/F7 CPU on 4S battery<br>" +
-            "<span>GPS optimized, long range scout</span>",
+        name: '7" Endurance',
+        description: "Quadcopter using 7\" propellers with F4/F7 CPU on 4S battery<br>" +
+            "<span>long range scout with full GPS capabilities</span>",
         features: [
             "OneShot125 at 2kHz",
             "600dps rates",
+            "Improved filtering",
             "Improved PID defaults"
         ],
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
             presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
-            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
-            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
+            presets.elementHelper("FC_CONFIG", "loopTime", 250),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 1000),
             presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
+            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 60),
-            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 60),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 75),
+            presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 175),
             presets.elementHelper("RC_tuning", "roll_rate", 600),
             presets.elementHelper("RC_tuning", "pitch_rate", 600),
             presets.elementHelper("RC_tuning", "yaw_rate", 500),
-            presets.elementHelper("PIDs", 0, [21, 33, 27]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [22, 33, 29]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [61, 45, 0])  //YAW PIDs
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("PIDs", 0, [40, 28, 35]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [45, 28, 40]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [85, 45, 15])  //YAW PIDs
         ],
         type: 'multirotor'
     },
@@ -458,6 +461,50 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Flying Wing S800 Sky Shadow",
+        description: "Flying wing on multirotor racer parts with 3S/4S battery and FPV equipment",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [6, 6, 49]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [6, 9, 52]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 40),
+            presets.elementHelper("RC_tuning", "roll_rate", 280),
+            presets.elementHelper("RC_tuning", "pitch_rate", 140),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1600)
+        ],
+        type: 'flyingwing'
+    },
+    {
+        name: "Ritewing Mini Drak",
+        description: "Amazig looking and flying airplane with 8x6 propeller, 2216 1400KV motor, powered with 4S LiPo. AUW above 1200g",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("PIDs", 0, [7, 7, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [5, 9, 56]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
+            presets.elementHelper("RC_tuning", "roll_rate", 260),
+            presets.elementHelper("RC_tuning", "pitch_rate", 140),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1550)
+        ],
+        type: 'flyingwing'
     }
 ];
 
@@ -600,9 +647,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             var settings = presets.settings.get(currentPreset.type);
             Object.keys(settings).forEach(function(key, ii) {
                 var value = settings[key];
-                promises[key] = mspHelper.encodeSetting(key, value).then(function(data) {
-                    return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
-                });
+                promises[key] = mspHelper.setSetting(name, value);
             });
         }
         Promise.props(promises).then(function () {

@@ -34,6 +34,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadSensorConfig,
+        mspHelper.loadVTXConfig,
         loadCraftName
     ];
 
@@ -60,6 +61,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
+        mspHelper.saveVTXConfig,
         saveCraftName,
     ];
 
@@ -269,6 +271,81 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
 
+        // VTX
+        var config_vtx = $('.config-vtx');
+        if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
+
+            var vtx_band = $('#vtx_band');
+            vtx_band.empty();
+            var vtx_no_band_note = $('#vtx_no_band');
+            if (VTX_CONFIG.band < VTX.BAND_MIN || VTX_CONFIG.band > VTX.BAND_MAX) {
+                var noBandName = chrome.i18n.getMessage("configurationNoBand");
+                $('<option value="0">' + noBandName + '</option>').appendTo(vtx_band);
+                vtx_no_band_note.show();
+            } else {
+                vtx_no_band_note.hide();
+            }
+            for (var ii = 0; ii < VTX.BANDS.length; ii++) {
+                var band_name = VTX.BANDS[ii].name;
+                var option = $('<option value="' + VTX.BANDS[ii].code + '">' + band_name + '</option>');
+                if (VTX.BANDS[ii].code == VTX_CONFIG.band) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_band);
+            }
+            vtx_band.change(function () {
+                VTX_CONFIG.band = parseInt($(this).val());
+            });
+
+            var vtx_channel = $('#vtx_channel');
+            vtx_channel.empty();
+            for (var ii = VTX.CHANNEL_MIN; ii <= VTX.CHANNEL_MAX; ii++) {
+                var option = $('<option value="' + ii + '">' + ii + '</option>');
+                if (ii == VTX_CONFIG.channel) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_channel);
+            }
+            vtx_channel.change(function () {
+                VTX_CONFIG.channel = parseInt($(this).val());
+            });
+
+            var vtx_power = $('#vtx_power');
+            vtx_power.empty();
+            var minPower = VTX.getMinPower(VTX_CONFIG.device_type);
+            var maxPower = VTX.getMaxPower(VTX_CONFIG.device_type);
+            for (var ii = minPower; ii <= maxPower; ii++) {
+                var option = $('<option value="' + ii + '">' + ii + '</option>');
+                if (ii == VTX_CONFIG.power) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_power);
+            }
+            vtx_power.change(function () {
+                VTX_CONFIG.power = parseInt($(this).val());
+            });
+
+            var vtx_low_power_disarm = $('#vtx_low_power_disarm');
+            vtx_low_power_disarm.empty();
+            for (var ii = VTX.LOW_POWER_DISARM_MIN; ii <= VTX.LOW_POWER_DISARM_MAX; ii++) {
+                var name = chrome.i18n.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
+                if (!name) {
+                    name = ii;
+                }
+                var option = $('<option value="' + ii + '">' + name + '</option>');
+                if (ii == VTX_CONFIG.low_power_disarm) {
+                    option.prop('selected', true);
+                }
+                option.appendTo(vtx_low_power_disarm);
+            }
+            vtx_low_power_disarm.change(function () {
+                VTX_CONFIG.low_power_disarm = parseInt($(this).val());
+            });
+
+            config_vtx.show();
+        } else {
+            config_vtx.hide();
+        }
 
         // generate serial RX
         var serialRxTypes = FC.getSerialRxTypes();
@@ -321,7 +398,16 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // fill throttle
         $('#minthrottle').val(MISC.minthrottle);
-        $('#midthrottle').val(MISC.midrc);
+        // midrc was removed in 2.0, but the firmware still excepts
+        // the MSP frame with it for backwards compatibility, so we
+        // just hide it from the UI.
+        var midThrottleWrapper = $('.midthrottle_wrapper');
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+            $('#midthrottle').val(MISC.midrc);
+            midThrottleWrapper.show();
+        } else {
+            midThrottleWrapper.hide();
+        }
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
 
@@ -334,14 +420,28 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         // fill battery voltage
+        $('#voltagesource').val(MISC.voltage_source);
+        $('#cells').val(MISC.battery_cells);
+        $('#celldetectvoltage').val(MISC.vbatdetectcellvoltage);
         $('#mincellvoltage').val(MISC.vbatmincellvoltage);
         $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
         $('#voltagescale').val(MISC.vbatscale);
 
+        // adjust current offset input attributes
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+            var current_offset_input = $('#currentoffset');
+            current_offset_input.attr('step', '1');
+            current_offset_input.attr('min', '-3300');
+            current_offset_input.attr('max', '3300');
+        }
+
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
-        $('#currentoffset').val(BF_CONFIG.currentoffset);
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
+            $('#currentoffset').val(BF_CONFIG.currentoffset);
+        else
+            $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -590,9 +690,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $(".requires-v2_0").show();
+            $(".requires-v2_0_0").show();
         } else {
-            $(".requires-v2_0").hide();
+            $(".requires-v2_0_0").hide();
         }
 
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
@@ -666,6 +766,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.maxthrottle = parseInt($('#maxthrottle').val());
             MISC.mincommand = parseInt($('#mincommand').val());
 
+            MISC.battery_cells = parseInt($('#cells').val());
+            MISC.voltage_source = parseInt($('#voltagesource').val());
+            MISC.vbatdetectcellvoltage = parseFloat($('#celldetectvoltage').val());
             MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
             MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
             MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
@@ -677,7 +780,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-            BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
+
+            if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
+                BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
+            else
+                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());

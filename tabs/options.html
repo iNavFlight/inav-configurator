@@ -1,6 +1,17 @@
-<div class="notifications">
-    <label><input type="checkbox" /><span i18n="options_receive_app_notifications"></span></label>
+<div class="notifications options_container options_container__checkbox">
+    <label><input type="checkbox" /><span data-i18n="options_receive_app_notifications"></span></label>
 </div>
-<div class="statistics">
-    <label><input type="checkbox" /><span i18n="options_improve_configurator"></span></label>
+<div class="statistics options_container options_container__checkbox">
+    <label><input type="checkbox" /><span data-i18n="options_improve_configurator"></span></label>
+</div>
+<div class="options_container">
+    <label for="map-provider-type" data-i18n="mapProvider"></label>
+    <select id="map-provider-type">
+        <option value="osm">OpenStreetMap</option>
+        <option value="bing">Bing Maps</option>
+    </select>
+</div>
+<div class="options_container">
+    <label for="map-api-key" data-i18n="mapApiKey"></label>
+    <input type="password" id="map-api-key" style="border: solid 1px black"/>
 </div>

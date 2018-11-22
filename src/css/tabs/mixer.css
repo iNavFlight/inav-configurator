@@ -10,6 +10,7 @@
 
 .mixer-table {
     width: 100%;
+    text-align: center;
 }
 
 .mixer-table thead {
@@ -17,6 +18,11 @@
 }
 
 .mixer-table input {
+    width: 80%;
+    margin: 0 5px;
+}
+
+.mixer-table .delete {
     width: 75px;
 }
 
@@ -40,4 +46,42 @@
 
 .mixer-table tr:nth-child(even) td {
     background-color: #ebe7e7;
+}
+
+.tab-mixer .rightWrapper {
+    margin-bottom: 0 !important;
+}
+
+.output-table {
+    width: 100%;
+    border-spacing: 1px;
+    border-collapse: separate;
+}
+
+.output-table th {
+    background-color: #828885;
+    color: #fff;
+    text-align: left;
+    padding-left: 1em;
+}
+
+.output-table td {
+    text-align: center;
+    padding: 2px;
+}
+
+.output-table td, .output-table th {
+    height: 2.2em;
+}
+
+.output-table #output-row td {
+    font-weight: bold;
+}
+
+.output-table #function-row td {
+    background-color: #ebe7e7;
+}
+
+.mixer_btn_add {
+    margin: 15px 0 10px;
 }

@@ -316,6 +316,9 @@
     "communityTelegramSupport": {
         "message": "Telegram Channel"
     },
+    "communityFacebookSupport": {
+        "message": "Facebook Group"
+    },
     "initialSetupBackupAndRestoreApiVersion": {
         "message": "<span style=\"color: red\">Backup and restore functionality disabled.</span>  You have firmware with API version <span style=\"color: red\">$1</span>, backup and restore requires <span style=\"color: #37a8db\">$2</span>.  Please backup your settings via the CLI, see INAV documentation for procedure."
     },
@@ -406,7 +409,7 @@
     "initialSetupInfoHead": {
         "message": "Info"
     },
-    "initialSetupBattery": {
+    "initialSetupBatteryVoltage": {
         "message": "Battery voltage:"
     },
     "initialSetupBatteryDetectedCells": {
@@ -445,19 +448,25 @@
     "initialSetup_Wh_drawnValue": {
         "message": "$1 Wh"
     },
-    "initialSetupBatteryValue": {
+    "initialSetupBatteryVoltageValue": {
         "message": "$1 V"
     },
     "initialSetupDrawn": {
         "message": "Capacity drawn:"
     },
-    "initialSetupDrawing": {
+    "initialSetupCurrentDraw": {
         "message": "Current draw:"
+    },
+    "initialSetupPowerDraw": {
+        "message": "Power draw:"
+    },
+    "initialSetupPowerDrawValue": {
+        "message": "$1 W"
     },
     "initialSetupBatteryMahValue": {
         "message": "$1 mAh"
     },
-    "initialSetupBatteryAValue": {
+    "initialSetupCurrentDrawValue": {
         "message": "$1 A"
     },
     "initialSetupRSSI": {
@@ -534,6 +543,18 @@
     "featureSERVO_TILT": {
         "message": "Servo gimbal"
     },
+    "featureBAT_PROFILE_AUTOSWITCH": {
+        "message": "Automatic battery profile selection"
+    },
+    "featureBAT_PROFILE_AUTOSWITCHTip": {
+        "message": "Automatically select battery profile based on battery voltage when the battery is plugged in"
+    },
+    "featureTHR_VBAT_COMP": {
+        "message": "Throttle voltage compensation"
+    },
+    "featureTHR_VBAT_COMPTip": {
+        "message": "Automatically compensate for the voltage drop when the battery is discharging to keep the thrust constant relative to throttle"
+    },
     "featureSOFTSERIAL": {
         "message": "Enable CPU based serial ports"
     },
@@ -567,7 +588,7 @@
     "featureLED_STRIP": {
         "message": "Multi-color RGB LED strip support"
     },
-    "featureDISPLAY": {
+    "featureDASHBOARD": {
         "message": "OLED Screen Display"
     },
     "featureONESHOT125": {
@@ -705,6 +726,24 @@
     "configurationBatteryCurrent": {
         "message": "Battery Current"
     },
+    "configurationVoltageSource": {
+        "message": "Voltage source to use for alarms and telemetry"
+    },
+    "configurationVoltageSourceHelp": {
+        "message": "Raw voltage is the voltage read directly from the battery. Sag compensated voltage is the calculated voltage the battery should be at without load (simulates ideal battery and should remove false alarms provoked by high loads)"
+    },
+    "configurationBatteryCells": {
+        "message": "Number of cells (0 = auto)"
+    },
+    "configurationBatteryCellsHelp": {
+        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible"
+    },
+    "configurationBatteryCellDetectVoltage": {
+        "message": "Maximum cell voltage for cell count detection"
+    },
+    "configurationBatteryCellDetectVoltageHelp": {
+        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate"
+    },
     "configurationBatteryMinimum": {
         "message": "Minimum Cell Voltage"
     },
@@ -804,7 +843,42 @@
     "configurationButtonSave": {
         "message": "Save and Reboot"
     },
-
+    "configurationVTX": {
+        "message": "VTX"
+    },
+    "configurationVTXBand": {
+        "message": "Band"
+    },
+    "configurationNoBand": {
+        "message": "None"
+    },
+    "configurationVTXNoBandHelp": {
+        "message": "VTX frequency has been set manually. Selecting a band will overwrite the configured frequency."
+    },
+    "configurationVTXChannel": {
+        "message": "Channel"
+    },
+    "configurationVTXPower": {
+        "message": "Power Level"
+    },
+    "configurationVTXPowerHelp": {
+        "message": "VTX power level. The exact power in mw (or dBm) will depend on the specific hardware. Check your VTX manual."
+    },
+    "configurationVTXLowerPowerDisarm": {
+        "message": "Use low power while the craft is disarmed"
+    },
+    "configurationVTXLowerPowerDisarmHelp": {
+        "message": "Enabling this option will make the VTX use its lowest power while the craft is disarmed. Use 'Until first arm' to make it use the lowest power only until you arm for the first time."
+    },
+    "configurationVTXLowPowerDisarmValue_0": {
+        "message": "Disabled"
+    },
+    "configurationVTXLowPowerDisarmValue_1": {
+        "message": "Always"
+    },
+    "configurationVTXLowPowerDisarmValue_2": {
+        "message": "Until first arm"
+    },
     "portsHelp": {
         "message": "<strong>Note:</strong> not all combinations are valid.  When the flight controller firmware detects this the serial port configuration will be reset."
     },
@@ -886,6 +960,18 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "pidTuningMaxRollAngle": {
+        "message": "Max. ROLL angle"
+    },
+    "pidTuningMaxRollAngleHelp": {
+        "message": "Maximum ROLL angle in ANGLE mode. This also constrains the maximum bank in navigation modes."
+    },
+    "pidTuningMaxPitchAngle": {
+        "message": "Max. PITCH angle"
+    },
+    "pidTuningMaxPitchAngleHelp": {
+        "message": "Maximum PITCH angle in ANGLE mode. This also constrains the maximum climb and dive in navigation modes."
+    },
     "pidTuningManualRollRate": {
         "message": "Manual ROLL rate"
     },
@@ -918,6 +1004,9 @@
     },
     "pidTuningLoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "loadedBatteryProfile": {
+        "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "pidTuningDataRefreshed": {
         "message": "PID data <strong>refreshed</strong>"
@@ -1226,6 +1315,9 @@
     "servosReverse": {
         "message": "Reverse"
     },
+    "servoOutput": {
+        "message": "Output"
+    },
     "servosRate": {
         "message": "Rate (%)"
     },
@@ -1237,6 +1329,9 @@
     },
     "servosNormal": {
         "message": "Normal"
+    },
+    "servoEmptyTableInfo": {
+        "message": "No servos configured. Add them using the Mixer tab."
     },
     "servosEepromSave": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
@@ -1718,12 +1813,6 @@
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
     },
-    "failsafeThrottleLowItem": {
-        "message": "Failsafe Throttle Low Delay [1 = 0.1 sec.]"
-    },
-    "failsafeThrottleLowHelp": {
-        "message": "Just disarm the craft instead of executing the selected failsafe procedure when the throttle was low for this amount of time"
-    },
     "failsafeThrottleItem": {
         "message": "Throttle value used while landing"
     },
@@ -1967,6 +2056,9 @@
     "BLOCKED_HARDWARE_FAILURE": {
         "message": "Hardware health"
     },
+    "BLOCKED_INVALID_SETTING": {
+        "message": "Settings validated"
+    },
     "armingCheckPass": {
         "message": "<div class=\"checkspass\"></div>"
     },
@@ -2102,8 +2194,8 @@
     "dtermNotchCutoffHelp": {
         "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
     },
-    "positionHoldConfiguration": {
-        "message": "Basic Navigation Settings"
+    "multiRotorNavigationConfiguration": {
+        "message": "Multirotor Navigation Settings"
     },
     "userControlMode": {
         "message": "User Control Mode"
@@ -2121,7 +2213,10 @@
         "message": "Max. ALTHOLD climb rate [cm/s]"
     },
     "posholdMaxBankAngle": {
-        "message": "Multirotor max. banking angle [deg]"
+        "message": "Multirotor max. banking angle [degrees]"
+    },
+    "posholdMaxBankAngleHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "posholdHoverThrottle": {
         "message": "Hover throttle"
@@ -2226,22 +2321,34 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle"
+        "message": "Max. bank angle [degrees]"
+    },
+    "maxBankAngleHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle"
+        "message": "Max. climb angle [degrees]"
+    },
+    "maxClimbAngleHelp": {
+        "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "maxDiveAngle": {
-        "message": "Max. dive angle"
+        "message": "Max. dive angle [degrees]"
+    },
+    "maxDiveAngleHelp": {
+        "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "pitchToThrottle": {
         "message": "Pitch to throttle ratio"
     },
+    "pitchToThrottleHelp": {
+        "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
+    },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
-    "fixedWingConfiguration": {
-      "message": "Fixed Wing Settings"
+    "fixedWingNavigationConfiguration": {
+      "message": "Fixed Wing Navigation Settings"
     },
     "osdLayoutDefault": {
         "message": "Default Layout"
@@ -2307,7 +2414,10 @@
         "message": "GPS"
     },
     "osdGroupPIDs": {
-        "message": "PIDs"
+        "message": "RC Adjustable Values"
+    },
+    "osdGroupPIDOutputs": {
+        "message": "PID controllers outputs"
     },
     "osdGroupVTX": {
         "message": "VTX"
@@ -2330,6 +2440,12 @@
     "osdElement_MAIN_BATT_VOLTAGE": {
         "message": "Battery Voltage"
     },
+    "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
+        "message": "Sag Compensated Battery Voltage"
+    },
+    "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
+        "message": "Calculated voltage the battery should be at without load (simulates ideal battery)"
+    },
     "osdElement_MESSAGES": {
         "message": "System Messages"
     },
@@ -2339,11 +2455,23 @@
     "osdElement_MAIN_BATT_CELL_VOLTAGE": {
         "message": "Battery Cell Voltage"
     },
+    "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
+        "message": "Sag Compensated Battery Cell Voltage"
+    },
+    "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
+        "message": "Calculated average cell voltage the battery should be at without load (simulates ideal battery)"
+    },
     "osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
         "message": "Battery Remaining Percentage"
     },
     "osdElement_MAIN_BATT_REMAINING_CAPACITY": {
         "message": "Battery Remaining Capacity"
+    },
+    "osdElement_REMAINING_FLIGHT_TIME_HELP": {
+        "message": "Estimated remaining flight time before the aircraft needs to go back home based on remaining battery energy, average power and distance to home (Fixed wing only, please read the documentation)"
+    },
+    "osdElement_REMAINING_FLIGHT_DISTANCE_HELP": {
+        "message": "Estimated remaining flight travel distance before the aircraft needs to go back home based on remaining battery energy, average power and distance to home (Fixed wing only, please read the documentation)"
     },
     "osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Shows the average cell voltage from the main battery"
@@ -2368,6 +2496,12 @@
     },
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
+    },
+    "osdElement_3D_SPEED": {
+        "message": "3D Speed"
+    },   
+    "osdElement_3D_SPEED_HELP": {
+        "message": "Shows 3D speed considering both horizontal and vertical speed."
     },
     "osdElement_GPS_SATS": {
         "message": "GPS Satellites"
@@ -2425,6 +2559,54 @@
     },
     "osdElement_RADAR": {
         "message": "Radar"
+    },
+    "osdElement_WIND_SPEED_HORIZONTAL": {
+        "message": "Horizontal Wind Speed"
+    },
+    "osdElement_WIND_SPEED_HORIZONTAL_HELP": {
+        "message": "Shows estimated horizontal wind speed and direction."
+    },
+    "osdElement_WIND_SPEED_VERTICAL": {
+        "message": "Vertical Wind Speed"
+    },
+    "osdElement_WIND_SPEED_VERTICAL_HELP": {
+        "message": "Shows estimated vertical wind speed and direction (up or down)."
+    },
+    "osdElement_LEVEL_PIDS": {
+        "message": "Level PIDs"
+    },
+    "osdElement_POS_XY_PIDS": {
+        "message": "Position XY PIDs"
+    },
+    "osdElement_POS_Z_PIDS": {
+        "message": "Position Z PIDs"
+    },
+    "osdElement_VEL_XY_PIDS": {
+        "message": "Velocity XY PIDs"
+    },
+    "osdElement_VEL_Z_PIDS": {
+        "message": "Velocity Z PIDs"
+    },
+    "osdElement_FW_ALT_PID_OUTPUTS": {
+        "message": "FW Altitude PID controller outputs"
+    },
+    "osdElement_FW_POS_PID_OUTPUTS": {
+        "message": "FW Position PID controller outputs"
+    },
+    "osdElement_MC_VEL_X_PID_OUTPUTS": {
+        "message": "MC Velocity X PID controller outputs"
+    },
+    "osdElement_MC_VEL_Y_PID_OUTPUTS": {
+        "message": "MC Velocity Y PID controller outputs"
+    },
+    "osdElement_MC_VEL_Z_PID_OUTPUTS": {
+        "message": "MC Velocity Z PID controller outputs"
+    },
+    "osdElement_MC_POS_XYZ_P_OUTPUTS": {
+        "message": "MC Position XYZ P controllers outputs"
+    },
+    "osdSettingMainVoltageDecimals": {
+        "message": "Main Voltage Decimals"
     },
     "portColumnSensors": {
         "message": "Sensors"
@@ -2522,6 +2704,9 @@
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
     },
+    "settings": {
+        "message": "Settings"
+    },
     "motorMixer": {
         "message": "Motor Mixer"
     },
@@ -2548,5 +2733,89 @@
     },
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
+    },
+    "mappingTableOutput": {
+        "message": "Output"
+    },
+    "mappingTableFunction": {
+        "message": "Function"
+    },
+    "mappingTableTitle": {
+        "message": "Output Mapping"
+    },
+    "NONE": {
+        "message": "None"
+    },
+    "DEFAULT": {
+        "message": "Default"
+    },
+    "AIRCRAFT": {
+        "message": "Aircraft"
+    },
+    "ALTITUDE": {
+        "message": "Altitude"
+    },
+    "GROUND_SPEED": {
+        "message": "Ground Speed"
+    },
+    "HOME_DISTANCE": {
+        "message": "Distance to Home"
+    },
+    "brakingSpeedThreshold": {
+        "message": "Min. speed threshold [cm/s]"
+    },
+    "brakingSpeedThresholdTip": {
+        "message": "Braking will be enabled only if actual speed if higher than threshold"
+    },
+    "brakingDisengageSpeed": {
+        "message": "Braking disengage speed [cm/s]"
+    },
+    "brakingDisengageSpeedTip": {
+        "message": "Braking will end when speed goes below this value"
+    },
+    "brakingTimeout": {
+        "message": "Max. braking length [ms]"
+    },
+    "brakingTimeoutTip": {
+        "message": "Safety measure. This is the longest period of time braking can be active."
+    },
+    "brakingBoostFactor": {
+        "message": "Boost factor [%]"
+    },
+    "brakingBoostFactorTip": {
+        "message": "Defines for strong braking boost will be. 100% means navigation engine is allowed to double banking speed and acceleration than normal"
+    },
+    "brakingBoostTimeout": {
+        "message": "Max. braking boost length [ms]"
+    },
+    "brakingBoostTimeoutTip": {
+        "message": "Safety measure. This is the longest period of time braking boost can be active."
+    },
+    "brakingBoostSpeedThreshold": {
+        "message": "Boost min. speed threshold [cm/s]"
+    },
+    "brakingBoostSpeedThresholdTip": {
+        "message": "Braking boost will be enabled only if actual speed if higher than threshold"
+    },
+    "brakingBoostDisengageSpeed": {
+        "message": "Braking boost disengage speed [cm/s]"
+    },
+    "brakingBoostDisengageSpeedTip": {
+        "message": "Braking boost will end when speed goes below this value"
+    },
+    "brakingBankAngle": {
+        "message": "Max. bank angle [degrees]"
+    },
+    "brakingBankAngleTip": {
+        "message": "Max bank angle allowed during braking phase"
+    },
+    "multirotorBrakingConfiguration": {
+        "message": "Multirotor braking mode configuration"
+    },
+    "mapProvider": {
+        "message": "Map Provider"
+    },
+    "mapApiKey": {
+        "message": "Map API key"
     }
 }

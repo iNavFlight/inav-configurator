@@ -93,8 +93,9 @@ TABS.setup.initialize = function (callback) {
             bat_thresh_e = $('.bat-thresh'),
             bat_full_e = $('.bat-full'),
             bat_mah_drawn_e = $('.bat-mah-drawn'),
-            bat_mwh_drawn_e = $('.bat-mwh-drawn'),
-            bat_mah_drawing_e = $('.bat-mah-drawing'),
+            bat_wh_drawn_e = $('.bat-mwh-drawn'),
+            bat_current_draw_e = $('.bat-current-draw'),
+            bat_power_draw_e = $('.bat-power-draw'),
             rssi_e = $('.rssi'),
             gpsFix_e = $('.gpsFixType'),
             gpsSats_e = $('.gpsSats'),
@@ -155,7 +156,7 @@ TABS.setup.initialize = function (callback) {
 
         helper.interval.add('gui_analog_update', function () {
                 bat_cells_e.text(chrome.i18n.getMessage('initialSetupBatteryDetectedCellsValue', [ANALOG.cell_count]));
-                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryValue', [ANALOG.voltage]));
+                bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryVoltageValue', [ANALOG.voltage]));
                 remaining_capacity_wh_decimals = ANALOG.battery_remaining_capacity.toString().length < 5 ? 3 : (7 - ANALOG.battery_remaining_capacity.toString().length);
                 remaining_capacity_value = MISC.battery_capacity_unit == 'mAh' ? ANALOG.battery_remaining_capacity : (ANALOG.battery_remaining_capacity / 1000).toFixed(remaining_capacity_wh_decimals < 0 ? 0 : remaining_capacity_wh_decimals);
                 remaining_capacity_unit = MISC.battery_capacity_unit == 'mAh' ? 'mAh' : 'Wh';
@@ -165,8 +166,9 @@ TABS.setup.initialize = function (callback) {
                 bat_thresh_e.text(chrome.i18n.getMessage('initialSetupBatteryThresholdsValue', [ANALOG.use_capacity_thresholds]));
                 bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
                 capacity_drawn_decimals = ANALOG.mWhdrawn.toString().length < 5 ? 3 : (7 - ANALOG.mWhdrawn.toString().length);
-                bat_mwh_drawn_e.text(chrome.i18n.getMessage('initialSetup_Wh_drawnValue', [(ANALOG.mWhdrawn / 1000).toFixed(capacity_drawn_decimals < 0 ? 0 : capacity_drawn_decimals)]));
-                bat_mah_drawing_e.text(chrome.i18n.getMessage('initialSetupBatteryAValue', [ANALOG.amperage.toFixed(2)]));
+                bat_wh_drawn_e.text(chrome.i18n.getMessage('initialSetup_Wh_drawnValue', [(ANALOG.mWhdrawn / 1000).toFixed(capacity_drawn_decimals < 0 ? 0 : capacity_drawn_decimals)]));
+                bat_current_draw_e.text(chrome.i18n.getMessage('initialSetupCurrentDrawValue', [ANALOG.amperage.toFixed(2)]));
+                bat_power_draw_e.text(chrome.i18n.getMessage('initialSetupPowerDrawValue', [ANALOG.power.toFixed(2)]));
                 rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
         }, 100, true);
 
@@ -174,7 +176,7 @@ TABS.setup.initialize = function (callback) {
             var flagNames = FC.getArmingFlags();
             for (var bit in flagNames) {
                 if (flagNames.hasOwnProperty(bit)) {
-                    if (bit_check(CONFIG.armingFlags & 0xff00, bit)) {
+                    if (bit_check(CONFIG.armingFlags, bit)) {
                         $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckFail'));
                     }
                     else {

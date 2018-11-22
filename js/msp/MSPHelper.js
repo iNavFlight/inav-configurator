@@ -121,19 +121,30 @@ var mspHelper = (function (gui) {
                 gui.updateProfileChange();
                 break;
 
+            case MSPCodes.MSPV2_INAV_STATUS:
+                CONFIG.cycleTime = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.i2cError = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.activeSensors = data.getUint16(offset, true);
+                offset += 2;
+                CONFIG.cpuload = data.getUint16(offset, true);
+                offset += 2;
+                profile_byte = data.getUint8(offset++)
+                CONFIG.profile = profile_byte & 0x0F;
+                CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
+                CONFIG.armingFlags = data.getUint32(offset, true);
+                offset += 4;
+                gui.updateStatusBar();
+                gui.updateProfileChange();
+                break;
+
             case MSPCodes.MSP_ACTIVEBOXES:
                 var words = dataHandler.message_length_expected / 4;
 
-                CONFIG.mode = 0;
-                if (words == 1) {
-                    CONFIG.mode = data.getUint32(0, true);
-                }
-                else if (words == 2) {
-                    CONFIG.mode = data.getUint32(0, true) | (data.getUint32(4, true) << 32);
-                }
-                else {
-                    console.log('MSP_ACTIVEBOXES doesn\'t support more than 53 bits at the moment');
-                }
+                CONFIG.mode = [];
+                for (i = 0; i < words; ++i)
+                    CONFIG.mode.push(data.getUint32(i * 4, true));
                 break;
 
             case MSPCodes.MSP_SENSOR_STATUS:
@@ -240,26 +251,49 @@ var mspHelper = (function (gui) {
                 ANALOG.amperage = data.getInt16(5, true) / 100; // A
                 break;
             case MSPCodes.MSPV2_INAV_ANALOG:
-                ANALOG.voltage = data.getUint16(offset, true) / 100.0;
-                offset += 2;
-                ANALOG.cell_count = data.getUint8(offset++);
-                ANALOG.battery_percentage = data.getUint8(offset++);
-                ANALOG.power = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.mAhdrawn = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.mWhdrawn = data.getUint16(offset, true);
-                offset += 2;
-                ANALOG.rssi = data.getUint16(offset, true); // 0-1023
-                offset += 2;
-                ANALOG.amperage = data.getInt16(offset, true) / 100; // A
-                offset += 2;
-                var battery_flags = data.getUint8(offset++);
-                ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
-                ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
-                ANALOG.battery_state = (battery_flags & 12) >> 2;
-                ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
-                offset += 4;
+                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    var tmp = data.getUint8(offset++);
+                    ANALOG.battery_full_when_plugged_in = (tmp & 1 ? true : false);
+                    ANALOG.use_capacity_thresholds = ((tmp & 2) >> 1 ? true : false);
+                    ANALOG.battery_state = (tmp & 12) >> 2;
+                    ANALOG.cell_count = (tmp & 0xF0) >> 4;
+                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                    offset += 2;
+                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                    offset += 2;
+                    ANALOG.power = data.getInt32(offset, true) / 100.0;
+                    offset += 4;
+                    ANALOG.mAhdrawn = data.getInt32(offset, true);
+                    offset += 4;
+                    ANALOG.mWhdrawn = data.getInt32(offset, true);
+                    offset += 4;
+                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                    offset += 4;
+                    ANALOG.battery_percentage = data.getUint8(offset++);
+                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                    offset += 2;
+                } else {
+                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                    offset += 2;
+                    ANALOG.cell_count = data.getUint8(offset++);
+                    ANALOG.battery_percentage = data.getUint8(offset++);
+                    ANALOG.power = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.mAhdrawn = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.mWhdrawn = data.getUint16(offset, true);
+                    offset += 2;
+                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                    offset += 2;
+                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                    offset += 2;
+                    var battery_flags = data.getUint8(offset++);
+                    ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
+                    ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
+                    ANALOG.battery_state = (battery_flags & 12) >> 2;
+                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                    offset += 4;
+                }
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
@@ -363,6 +397,8 @@ var mspHelper = (function (gui) {
                 MISC.vbatscale = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    MISC.voltage_source = data.getUint8(offset++);
+                    MISC.battery_cells = data.getUint8(offset++);
                     MISC.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
                     offset += 2;
                 }
@@ -380,10 +416,15 @@ var mspHelper = (function (gui) {
                 offset += 4;
                 MISC.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
+            case MSPCodes.MSPV2_INAV_SET_MISC:
+                console.log('MISC INAV Configuration saved');
+                break;
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
                 offset += 2;
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    BATTERY_CONFIG.voltage_source = data.getUint8(offset++);
+                    BATTERY_CONFIG.battery_cells = data.getUint8(offset++);
                     BATTERY_CONFIG.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
                     offset += 2;
                 }
@@ -1059,7 +1100,18 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
                 console.log("Transponder config saved");
                 break;
-
+            case MSPCodes.MSP_VTX_CONFIG:
+                VTX_CONFIG.device_type = data.getUint8(offset++);
+                if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
+                    VTX_CONFIG.band = data.getUint8(offset++);
+                    VTX_CONFIG.channel = data.getUint8(offset++);
+                    VTX_CONFIG.power = data.getUint8(offset++);
+                    VTX_CONFIG.pitmode = data.getUint8(offset++);
+                    // Ignore wether the VTX is ready for now
+                    offset++;
+                    VTX_CONFIG.low_power_disarm = data.getUint8(offset++);
+                }
+                break;
             case MSPCodes.MSP_ADVANCED_CONFIG:
                 ADVANCED_CONFIG.gyroSyncDenominator = data.getUint8(offset);
                 offset++;
@@ -1074,6 +1126,10 @@ var mspHelper = (function (gui) {
                 ADVANCED_CONFIG.servoPwmRate = data.getUint16(offset, true);
                 offset += 2;
                 ADVANCED_CONFIG.gyroSync = data.getUint8(offset);
+                break;
+
+            case MSPCodes.MSP_SET_VTX_CONFIG:
+                console.log("VTX config saved");
                 break;
 
             case MSPCodes.MSP_SET_ADVANCED_CONFIG:
@@ -1291,6 +1347,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_SETTING:
                 break;
+            case MSPCodes.MSP2_COMMON_SETTING_INFO:
+                break;
             case MSPCodes.MSPV2_SET_SETTING:
                 console.log("Setting set");
                 break;
@@ -1339,10 +1397,26 @@ var mspHelper = (function (gui) {
                 console.log('OSD preferences saved');
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
-                OUTPUT_MAPPING = [];
+                OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.push(data.getUint8(i));
+                    OUTPUT_MAPPING.put(data.getUint8(i));
                 break;
+
+            case MSPCodes.MSP2_INAV_MC_BRAKING:
+                BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
+                BRAKING_CONFIG.disengageSpeed = data.getUint16(2, true);
+                BRAKING_CONFIG.timeout = data.getUint16(4, true);
+                BRAKING_CONFIG.boostFactor = data.getInt8(6);
+                BRAKING_CONFIG.boostTimeout = data.getUint16(7, true);
+                BRAKING_CONFIG.boostSpeedThreshold = data.getUint16(9, true);
+                BRAKING_CONFIG.boostDisengageSpeed = data.getUint16(11, true);
+                BRAKING_CONFIG.bankAngle = data.getInt8(13);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
+                console.log('Braking config saved');
+                break;
+            
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -1399,6 +1473,18 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(BF_CONFIG.currentscale));
                 buffer.push(lowByte(BF_CONFIG.currentoffset));
                 buffer.push(highByte(BF_CONFIG.currentoffset));
+                break;
+            case MSPCodes.MSP_SET_VTX_CONFIG:
+                if (VTX_CONFIG.band > 0) {
+                    buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
+                } else {
+                    // This tells the firmware to ignore this value.
+                    buffer.push16(VTX.MAX_FREQUENCY_MHZ + 1);
+                }
+                buffer.push(VTX_CONFIG.power);
+                // Don't enable PIT mode
+                buffer.push(0);
+                buffer.push(VTX_CONFIG.low_power_disarm);
                 break;
             case MSPCodes.MSP_SET_PID:
                 for (i = 0; i < PIDs.length; i++) {
@@ -1506,6 +1592,8 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(MISC.vbatscale));
                 buffer.push(highByte(MISC.vbatscale));
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(MISC.voltage_source);
+                    buffer.push(MISC.battery_cells);
                     buffer.push(lowByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
                     buffer.push(highByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
                 }
@@ -1527,6 +1615,8 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));
                 buffer.push(highByte(BATTERY_CONFIG.vbatscale));
                 if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+                    buffer.push(BATTERY_CONFIG.voltage_source);
+                    buffer.push(BATTERY_CONFIG.battery_cells);
                     buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
                     buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
                 }
@@ -1962,6 +2052,26 @@ var mspHelper = (function (gui) {
                 buffer.push(MIXER_CONFIG.hasFlaps);
                 buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
                 buffer.push(highByte(MIXER_CONFIG.appliedMixerPreset));
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
+                buffer.push(lowByte(BRAKING_CONFIG.speedThreshold));
+                buffer.push(highByte(BRAKING_CONFIG.speedThreshold));
+                buffer.push(lowByte(BRAKING_CONFIG.disengageSpeed));
+                buffer.push(highByte(BRAKING_CONFIG.disengageSpeed));
+                buffer.push(lowByte(BRAKING_CONFIG.timeout));
+                buffer.push(highByte(BRAKING_CONFIG.timeout));
+
+                buffer.push(BRAKING_CONFIG.boostFactor);
+
+                buffer.push(lowByte(BRAKING_CONFIG.boostTimeout));
+                buffer.push(highByte(BRAKING_CONFIG.boostTimeout));
+                buffer.push(lowByte(BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(highByte(BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(lowByte(BRAKING_CONFIG.boostDisengageSpeed));
+                buffer.push(highByte(BRAKING_CONFIG.boostDisengageSpeed));
+
+                buffer.push(BRAKING_CONFIG.bankAngle);
                 break;
 
             default:
@@ -2531,7 +2641,10 @@ var mspHelper = (function (gui) {
     };
 
     self.queryFcStatus = function (callback) {
-        MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
+            MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
+        else
+            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
     };
 
     self.loadMisc = function (callback) {
@@ -2546,8 +2659,8 @@ var mspHelper = (function (gui) {
         if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
             MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
         else {
-            OUTPUT_MAPPING = [];
-            return false;
+            OUTPUT_MAPPING.flush();
+            callback();
         }
     };
 
@@ -2784,12 +2897,66 @@ var mspHelper = (function (gui) {
     };
 
     self._getSetting = function (name) {
+        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+            return self._getLegacySetting(name);
+        }
+        if (SETTINGS[name]) {
+            return Promise.resolve(SETTINGS[name]);
+        }
+        var data = [];
+        self._encodeSettingReference(name, null, data);
+        return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(function (result) {
+            const MODE_LOOKUP = 1 << 6;
+            var settingTypes = {
+                0: "uint8_t",
+                1: "int8_t",
+                2: "uint16_t",
+                3: "int16_t",
+                4: "uint32_t",
+                5: "float",
+                6: "string",
+            };
+            var setting = {};
+            // Discard PG ID
+            result.data.readU16();
+
+            var type = result.data.readU8();
+            setting.type = settingTypes[type];
+            if (!setting.type) {
+                console.log("Unknown setting type " + type + " for setting '" + name + "'");
+                return null;
+            }
+            // Discard section
+            result.data.readU8();
+            setting.mode = result.data.readU8();
+            setting.min = result.data.read32();
+            setting.max = result.data.readU32();
+
+            setting.index = result.data.readU16();
+
+            // Discard profile info
+            result.data.readU8();
+            result.data.readU8();
+
+            if (setting.mode == MODE_LOOKUP) {
+                var values = [];
+                for (var ii = setting.min; ii <= setting.max; ii++) {
+                    values.push(result.data.readString());
+                }
+                setting.table = {values: values};
+            }
+            SETTINGS[name] = setting;
+            return setting;
+        });
+    }
+
+
+    self._getLegacySetting = function (name) {
         var promise;
-        if (this._settings) {
-            promise = Promise.resolve(this._settings);
+        if (SETTINGS) {
+            promise = Promise.resolve(SETTINGS);
         } else {
             promise = new Promise(function (resolve, reject) {
-                var $this = this;
                 $.ajax({
                     url: chrome.runtime.getURL('/resources/settings.json'),
                     dataType: 'json',
@@ -2797,7 +2964,7 @@ var mspHelper = (function (gui) {
                         reject(error);
                     },
                     success: function (data) {
-                        $this._settings = data;
+                        SETTINGS = data;
                         resolve(data);
                     }
                 });
@@ -2808,19 +2975,28 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self._encodeSettingName = function (name, data) {
-        for (var ii = 0; ii < name.length; ii++) {
-            data.push(name.charCodeAt(ii));
+    self._encodeSettingReference = function (name, index, data) {
+        if (Number.isInteger(index)) {
+            data.push8(0);
+            data.push16(index);
+        } else {
+            for (var ii = 0; ii < name.length; ii++) {
+                data.push(name.charCodeAt(ii));
+            }
+            data.push(0);
         }
-        data.push(0);
     };
 
-    self.getSetting = function (name, callback) {
+    self.getSetting = function (name) {
         var $this = this;
         return this._getSetting(name).then(function (setting) {
+            if (!setting) {
+                // Setting not available in the FC
+                return null;
+            }
             var data = [];
-            $this._encodeSettingName(name, data);
-            MSP.send_message(MSPCodes.MSPV2_SETTING, data, false, function (resp) {
+            $this._encodeSettingReference(name, setting.index, data);
+            return MSP.promise(MSPCodes.MSPV2_SETTING, data).then(function (resp) {
                 var value;
                 switch (setting.type) {
                     case "uint8_t":
@@ -2847,20 +3023,14 @@ var mspHelper = (function (gui) {
                     default:
                         throw "Unknown setting type " + setting.type;
                 }
-                if (setting.table) {
-                    value = setting.table.values[value];
-                }
-                if (callback) {
-                    callback(value, setting);
-                }
+                return {setting: setting, value: value};
             });
         });
     };
 
     self.encodeSetting = function (name, value) {
-        var $this = this;
         return this._getSetting(name).then(function (setting) {
-            if (setting.table) {
+            if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
                     if (setting.table.values[ii] == value) {
@@ -2874,7 +3044,7 @@ var mspHelper = (function (gui) {
                 }
             }
             var data = [];
-            $this._encodeSettingName(name, data);
+            self._encodeSettingReference(name, setting.index, data);
             switch (setting.type) {
                 case "uint8_t":
                 case "int8_t":
@@ -2900,9 +3070,9 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.setSetting = function (name, value, callback) {
+    self.setSetting = function (name, value) {
         this.encodeSetting(name, value).then(function (data) {
-            MSP.send_message(MSPCodes.MSPV2_SET_SETTING, data, false, callback);
+            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
         });
     };
 
@@ -2957,13 +3127,7 @@ var mspHelper = (function (gui) {
     self.getCraftName = function(callback) {
         if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
             MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
-                var name = "";
-                for (var ii = 0; ii < resp.data.byteLength; ii++) {
-                    var c = resp.data.readU8();
-                    if (c != 0) {
-                        name += String.fromCharCode(c);
-                    }
-                }
+                var name = resp.data.readString();
                 if (callback) {
                     callback(name);
                 }
@@ -2998,6 +3162,57 @@ var mspHelper = (function (gui) {
         if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
             MSP.send_message(MSPCodes.MSP2_INAV_SET_MIXER, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MIXER), false, callback);
         } else {
+            callback();
+        }
+    };
+
+    self.loadVTXConfig = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP_VTX_CONFIG, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.saveVTXConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadBrakingConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
+        } else {
+            callback();
+        }
+    }
+
+    self.saveBrakingConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadParameterGroups = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {
+                var groups = [];
+                while (resp.data.offset < resp.data.byteLength) {
+                    var id = resp.data.readU16();
+                    var start = resp.data.readU16();
+                    var end = resp.data.readU16();
+                    groups.push({id: id, start: start, end: end});
+                }
+                if (callback) {
+                    callback(groups);
+                }
+            });
+        } else if (callback) {
             callback();
         }
     };

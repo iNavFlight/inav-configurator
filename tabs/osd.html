@@ -54,15 +54,35 @@
                             <div class="video-types"></div>
                         </div>
                     </div>
-                    <div class="gui_box grey units-container" style="display:none;">
+                    <div class="gui_box grey settings-container">
                         <div class="gui_box_titlebar">
-                            <div class="spacer_box_title">Units
+                            <div class="spacer_box_title" data-i18n="settings">
                             </div>
                         </div>
                         <div class="spacer_box">
-                            <div class="units">
-                                <div class="helpicon cf_tip"></div>
-                                <select name="unit_mode"></select>
+                            <div class="settings">
+                                <label class="units">
+                                    <select id="unit_mode" name="unit_mode"></select> Units
+                                    <div class="helpicon cf_tip" style="margin-top: 2px"></div>
+                                </label>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select> Voltage Decimals
+                                </label>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select> Coordinate Digits
+                                </label>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select> Crosshairs Style
+                                </label>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select> Left Sidebar Scroll
+                                </label>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select> Right Sidebar Scroll
+                                </label>
+                                <label>
+                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_sidebar_scroll_arrows" data-live="true"> Sidebar Scroll Arrows
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -73,26 +93,7 @@
                             </div>
                         </div>
                         <div class="spacer_box">
-                            <div class="alarms"></div>
-                        </div>
-                    </div>
-                    <div class="gui_box grey" style="display:none;">
-                        <div class="gui_box_titlebar">
-                            <div class="spacer_box_title">VTX
-                                Settings
-                            </div>
-                        </div>
-                        <div class="spacer_box">
-                            <div class="vtx-settings"></div>
-                        </div>
-                    </div>
-                    <div class="gui_box grey" style="display:none;">
-                        <div class="gui_box_titlebar">
-                            <div class="spacer_box_title">Craft Name
-                            </div>
-                        </div>
-                        <div class="spacer_box">
-                            <div class="callsign"></div>
+                            <div class="settings"></div>
                         </div>
                     </div>
                 </div>
@@ -103,6 +104,8 @@
                     <div class="content_wrapper font-preview"></div>
                     <div class="fontbuttons">
                         <button data-font-file="default">Default</button>
+                        <button data-font-file="vision">Vision</button>
+                        <button data-font-file="clarity">Clarity</button>
                         <button data-font-file="bold">Bold</button>
                         <button data-font-file="large">Large</button>
                         <button class="load_font_file">Open Font File</button>

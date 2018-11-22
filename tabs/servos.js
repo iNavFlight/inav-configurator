@@ -1,4 +1,4 @@
-/*global fc*/
+/*global $,fc,mspHelper,TABS*/
 'use strict';
 
 TABS.servos = {};
@@ -12,7 +12,10 @@ TABS.servos.initialize = function (callback) {
     let loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
+        mspHelper.loadServoMixRules,
         mspHelper.loadServoConfiguration,
+        mspHelper.loadOutputMapping,
+        mspHelper.loadMixerConfig,
         mspHelper.loadRcData,
         mspHelper.loadBfConfig,
     ]);
@@ -39,6 +42,8 @@ TABS.servos.initialize = function (callback) {
 
         let i,
             $tabServos = $(".tab-servos"),
+            $servoEmptyTableInfo = $('#servoEmptyTableInfo'),
+            $servoConfigTableContainer = $('#servo-config-table-container'),
             $servoConfigTable = $('#servo-config-table'),
             $servoMixTable = $('#servo-mix-table'),
             $servoMixTableBody = $servoMixTable.find('tbody');
@@ -52,6 +57,9 @@ TABS.servos.initialize = function (callback) {
             servoHeader = '';
 
         if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
+
+            $servoEmptyTableInfo.hide();
+
             for (i = 0; i < RC.active_channels - 4; i++) {
                 servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
             }
@@ -70,6 +78,7 @@ TABS.servos.initialize = function (callback) {
                     <th data-i18n="servosMax"></th>\
                     <th data-i18n="servosRate"></th>\
                     <th data-i18n="servosReverse"></th>\
+                    <th data-i18n="servoOutput"></th>\
                 ');
         }
 
@@ -88,29 +97,57 @@ TABS.servos.initialize = function (callback) {
                 </tr> \
             ');
 
+            let $currentRow = $servoConfigTable.find('tr:last');
+
             //This routine is pre 2.0 only
             if (SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
-                $servoConfigTable.find('tr:last td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
+                $currentRow.find('td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
             }
 
             // adding select box and generating options
-            $servoConfigTable.find('tr:last td.rate').append(
+            $currentRow.find('td.rate').append(
                 '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(SERVO_CONFIG[obj].rate) + '" />'
             );
 
-            $servoConfigTable.find('tr:last td.reverse').append(
+            $currentRow.find('td.reverse').append(
                 '<input type="checkbox" class="reverse-input togglemedium" ' + (SERVO_CONFIG[obj].rate < 0 ? ' checked ' :  '') + '/>'
             );
 
-            $servoConfigTable.find('tr:last').data('info', { 'obj': obj });
+            $currentRow.data('info', { 'obj': obj });
 
             if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
                 // only one checkbox for indicating a channel to forward can be selected at a time, perhaps a radio group would be best here.
-                $servoConfigTable.find('tr:last td.channel input').click(function () {
+                $currentRow.find('td.channel input').click(function () {
                     if ($(this).is(':checked')) {
                         $(this).parent().parent().find('.channel input').not($(this)).prop('checked', false);
                     }
                 });
+            } else {
+
+                $currentRow.append('<td class="text-center output"></td>');
+
+                let output,
+                    outputString;
+
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+                } else {
+                    output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+                }
+
+                if (output === null) {
+                    outputString = "-";
+                } else {
+                    outputString = "S" + output;
+                }
+
+                $currentRow.find('.output').html(outputString);
+                //For 2.0 and above hide a row when servo is not configured
+                if (!SERVO_RULES.isServoConfigured(obj)) {
+                    $currentRow.hide();
+                } else {
+                    usedServoIndex++;
+                }
             }
         }
 
@@ -143,8 +180,18 @@ TABS.servos.initialize = function (callback) {
         // drop previous table
         $servoConfigTable.find('tr:not(:first)').remove();
 
+        let usedServoIndex = 0;
+
         for (let servoIndex = 0; servoIndex < 8; servoIndex++) {
-            process_servos('Servo ' + servoIndex, '', servoIndex, false);
+            process_servos('Servo ' + servoIndex, '', servoIndex);
+        }
+        if (usedServoIndex == 0) {
+            // No servos configured
+            $servoEmptyTableInfo.show();
+            $servoConfigTableContainer.hide();
+        } else {
+            $servoEmptyTableInfo.hide();
+            $servoConfigTableContainer.show();
         }
 
         // UI hooks for dynamically generated elements

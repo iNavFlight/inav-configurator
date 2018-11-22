@@ -285,7 +285,7 @@ TABS.auxiliary.initialize = function (callback) {
                     continue;
                 }
 
-                if (bit_check(CONFIG.mode, i)) {
+                if (FC.isModeBitSet(i)) {
                     $('.mode .name').eq(i).data('modeElement').addClass('on').removeClass('off');
                 } else {
                     $('.mode .name').eq(i).data('modeElement').removeClass('on').addClass('off');

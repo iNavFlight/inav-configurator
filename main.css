@@ -131,7 +131,6 @@ input[type="number"]::-webkit-inner-spin-button {
 .logo_text {
     position: absolute;
     height: 20px;
-    width: 125px;
     left: 0;
     top: 65px;
     color: #949494;
@@ -140,6 +139,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .logo_text .version {
     float: right;
+    margin-left: 1em;
 }
 
 #port-picker {
@@ -477,10 +477,14 @@ input[type="number"]::-webkit-inner-spin-button {
     z-index: 10000;
 }
 
-#options-window input {
+.options_container__checkbox input {
     float: left;
     margin-top: 3px;
     margin-right: 5px;
+}
+
+.options_container label {
+    margin-right: 1em;
 }
 
 /* Log setup*/
@@ -1053,6 +1057,11 @@ dialog {
     font-family: 'open_sansregular', Arial, serif;
 }
 
+.note--big {
+    font-size: 1.15em;
+    padding: 0.6em;
+}
+
 .note_spacer {
     padding: 5px 7px 5px 7px;
 }
@@ -1604,7 +1613,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 125px;
+    width: 269px;
     float: right;
     margin-right: 10px;
     line-height: 12px;
@@ -1622,7 +1631,16 @@ dialog {
 #profile_change {
     color: white;
     margin-top: 16px;
-    width: 125px;
+    width: 130px;
+    float: left;
+    margin-right: 0;
+    line-height: 12px;
+}
+
+#battery_profile_change {
+    color: white;
+    margin-top: 16px;
+    width: 130px;
     float: right;
     margin-right: 0;
     line-height: 12px;

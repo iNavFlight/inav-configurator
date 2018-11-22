@@ -2,7 +2,7 @@
     /* A generous padding around the window edges ensures that we continue to receive mousemove events (since 
      * cursor stays in the window for longer)
      */
-    padding: 25px 25px 0;
+    padding: 15px 15px 0;
     text-align: center;
 }
 
