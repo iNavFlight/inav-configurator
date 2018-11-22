@@ -760,6 +760,7 @@ OSD.constants = {
                 {
                     name: '3D_SPEED',
                     id: 85,
+                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         // 3 chars
                         if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
