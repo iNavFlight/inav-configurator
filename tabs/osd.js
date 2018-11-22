@@ -31,7 +31,9 @@ SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
 SYM.GPS_HDP2 = 0xBE;
 SYM.KMH = 161;
+SYM.KMH_3D = 0x89;
 SYM.MPH = 176;
+SYM.MPH_3D = 0x8A;
 SYM.ALT_M = 177;
 SYM.ALT_FT = 179;
 SYM.LAT = 0xA6;
@@ -762,9 +764,9 @@ OSD.constants = {
                         // 3 chars
                         if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
                             // Imperial
-                            return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH);
+                            return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
                         }
-                        return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH);
+                        return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
                     }
                 },
                 {
