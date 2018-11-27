@@ -2817,5 +2817,11 @@
     },
     "mapApiKey": {
         "message": "Map API key"
-    }
+    },
+    "proxyURL": {
+        "message": "MapProxy URL"
+    },
+    "proxyLayer": {
+        "message": "MapProxy Layer"
+    }    
 }
