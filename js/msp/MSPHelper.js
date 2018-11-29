@@ -525,7 +525,7 @@ var mspHelper = (function (gui) {
 
                 break;
 
-            case MSPCodes.MSP_SET_SERVO_MIX_RULE: 
+            case MSPCodes.MSP_SET_SERVO_MIX_RULE:
                 console.log("Servo mix saved");
                 break;
 
@@ -1341,6 +1341,11 @@ var mspHelper = (function (gui) {
                 console.log('OSD char uploaded');
                 break;
             case MSPCodes.MSP_NAME:
+                CONFIG.name = '';
+                var char;
+                while ((char = data.readU8()) !== null) {
+                    CONFIG.name += String.fromCharCode(char);
+                }
                 break;
             case MSPCodes.MSP_SET_NAME:
                 console.log("Craft name set");
@@ -1416,7 +1421,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
                 console.log('Braking config saved');
                 break;
-            
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2182,7 +2187,7 @@ var mspHelper = (function (gui) {
             // send one at a time, with index
 
             var servoRule = SERVO_RULES.get()[servoIndex];
-            
+
             buffer.push(servoIndex);
             buffer.push(servoRule.getTarget());
             buffer.push(servoRule.getInput());

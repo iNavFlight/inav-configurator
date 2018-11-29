@@ -103,7 +103,8 @@ var FC = {
             battery_profile: 0,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
-            armingFlags: 0
+            armingFlags: 0,
+            name: ''
         };
 
         BF_CONFIG = {
@@ -567,7 +568,7 @@ var FC = {
         features.push(
             {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
         );
-    
+
         /*
          * Transponder disabled until not implemented in firmware
          */
@@ -1065,8 +1066,8 @@ var FC = {
         return {
             0: "Land",
             1: "Drop",
-            2: "RTH", 
-            3: "Do Nothing", 
+            2: "RTH",
+            3: "Do Nothing",
         }
     },
     getRcMapLetters: function () {

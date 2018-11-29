@@ -1441,6 +1441,21 @@
     "cliReboot": {
         "message": "CLI reboot detected"
     },
+    "cliSaveToFileBtn": {
+        "message": "Save to File"
+    },
+    "cliSaveToFileFailed": {
+        "message": "Failed to save CLI output to file"
+    },
+    "cliSaveToFileAborted": {
+        "message": "Saving CLI output to file was aborted"
+    },
+    "cliSaveToFileCompleted": {
+        "message": "CLI output successfully saved to file"
+    },
+    "cliClearOutputHistoryBtn": {
+        "message": "Clear output history"
+    },
 
     "loggingNote": {
         "message": "Data will be logged in this tab <span style=\"color: red\">only</span>, leaving the tab will <span style=\"color: red\">cancel</span> logging and application will return to its normal <strong>\"configurator\"</strong> state.<br /> You are free to select the global update period, data will be written into the log file every <strong>1</strong> second for performance reasons."
