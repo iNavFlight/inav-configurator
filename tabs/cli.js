@@ -49,6 +49,10 @@ TABS.cli.initialize = function (callback) {
         googleAnalytics.sendAppView('CLI');
     }
 
+    // Flush MSP queue as well as all MSP registered callbacks
+    helper.mspQueue.flush();
+    MSP.callbacks_cleanup();
+
     self.outputHistory = "";
     self.cliBuffer = "";
 
@@ -297,23 +301,7 @@ TABS.cli.read = function (readInfo) {
             CONFIGURATOR.cliValid = false;
             GUI.log(chrome.i18n.getMessage('cliReboot'));
             GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-
-            if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
-                $('a.connect').click();
-                helper.timeout.add('start_connection', function start_connection() {
-                    $('a.connect').click();
-                }, 2500);
-            } else {
-
-                helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                    MSP.send_message(MSPCodes.MSP_STATUS, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('deviceReady'));
-                        if (!GUI.tab_switch_in_progress) {
-                            $('#tabs ul.mode-connected .tab_setup a').click();
-                        }
-                    });
-                }, 1500); // 1500 ms seems to be just the right amount of delay to prevent data request timeouts
-            }
+            GUI.handleReconnect();
         }
 
     }
