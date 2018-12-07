@@ -649,6 +649,10 @@ var mspHelper = (function (gui) {
                 for (i = 0; i < 4; i++)
                     SENSOR_DATA.debug[i] = data.getInt16((2 * i), 1);
                 break;
+            case MSPCodes.MSP2_INAV_DEBUG:
+                for (i = 0; i < 8; i++)
+                    SENSOR_DATA.debug[i] = data.getInt32((4 * i), 1);
+                break;
             case MSPCodes.MSP_SET_MOTOR:
                 console.log('Motor Speeds Updated');
                 break;

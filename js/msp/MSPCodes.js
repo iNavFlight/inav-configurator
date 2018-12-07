@@ -189,5 +189,7 @@ var MSPCodes = {
     MSP2_INAV_MC_BRAKING:               0x200B,
     MSP2_INAV_SET_MC_BRAKING:           0x200C,
 
-    MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018
+    MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018,
+
+    MSP2_INAV_DEBUG:                    0x2019
 };
