@@ -2605,6 +2605,12 @@
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ P controllers outputs"
     },
+    "osdElement_TEMPERATURE": {
+        "message": "Temperature"
+    },
+    "osdElement_TEMPERATURE_HELP": {
+        "message": "Temperature of the FC, obtained from the most accurate available source."
+    },
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
     },

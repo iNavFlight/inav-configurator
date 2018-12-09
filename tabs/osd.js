@@ -71,6 +71,8 @@ SYM.ROLL_LEVEL = 0xCD;
 SYM.ROLL_RIGHT = 0xCE;
 SYM.PITCH_UP = 0xCF;
 SYM.PITCH_DOWN = 0xDF;
+SYM.TEMP_C = 0x0E;
+SYM.TEMP_F = 0x0D;
 SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
@@ -589,6 +591,19 @@ OSD.constants = {
                     id: 29,
                     min_version: '1.7.4',
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
+                },
+                {
+                    name: 'TEMPERATURE',
+                    id: 86,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
                 },
             ]
         },
