@@ -306,7 +306,12 @@ function onOpen(openInfo) {
                         googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
                         if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
-                            onValidFirmware();
+                            mspHelper.getCraftName(function(name) {
+                                if (name) {
+                                    CONFIG.name = name;
+                                }
+                                onValidFirmware();
+                            });
                         } else  {
                             onInvalidFirmwareVersion();
                         }

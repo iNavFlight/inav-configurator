@@ -12,10 +12,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     var craftName = null;
     var loadCraftName = function(callback) {
-        mspHelper.getCraftName(function(name) {
-            craftName = name;
+        if (!CONFIG.name || CONFIG.name.trim() === '') {
+            mspHelper.getCraftName(function(name) {
+                craftName = name;
+                callback();
+            });
+        } else {
             callback();
-        });
+        }
     };
 
     var saveCraftName = function(callback) {
@@ -625,7 +629,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $attitudeFrequency.change(function () {
             INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
         });
-    
+
         if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
 
             var $sensorAcc = $('#sensor-acc'),
