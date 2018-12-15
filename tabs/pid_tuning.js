@@ -207,6 +207,12 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.requires-v1_6').hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            $('.requires-v2_1').show();
+        } else {
+            $('.requires-v2_1').hide();
+        }
+
         GUI.simpleBind();
 
         // UI Hooks

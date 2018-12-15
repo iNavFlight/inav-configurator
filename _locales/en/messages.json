@@ -2838,5 +2838,17 @@
     },
     "mapApiKey": {
         "message": "Map API key"
+    },
+    "accNotchHz": {
+        "message": "Acc. notch filter freq."
+    },
+    "accNotchHzHelp": {
+        "message": "Allow to set a single notch filter for accelerometer readout. Should be configured in the same way as gyro notch if accelerometer records a noise spike above acc. LPF filter"
+    },
+    "accNotchCutoff": {
+        "message": "Acc. notch filter cutoff freq."
+    },
+    "accNotchCutoffHelp": {
+        "message": "Should be kept below acc. notch filter frequency"
     }
 }
