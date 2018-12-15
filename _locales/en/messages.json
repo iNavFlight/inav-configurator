@@ -2838,5 +2838,23 @@
     },
     "mapApiKey": {
         "message": "Map API key"
+    },
+    "accNotchHz": {
+        "message": "Acc. notch filter freq."
+    },
+    "accNotchHzHelp": {
+        "message": "Allow to set a single notch filter for accelerometer readout. Should be configured in the same way as gyro notch if accelerometer records a noise spike above acc. LPF filter"
+    },
+    "accNotchCutoff": {
+        "message": "Acc. notch filter cutoff freq."
+    },
+    "accNotchCutoffHelp": {
+        "message": "Should be kept below acc. notch filter frequency"
+    },
+    "gyroStage2LpfCutoffFrequency": {
+        "message": "Gyro Stage 2 LPF cutoff frequency"
+    },
+    "gyroStage2LpfCutoffFrequencyHelp": {
+        "message": "Second stage gyro low pass filter that is an equivalent of Betaflight not-Kalman stage2 filter. It has to be setup above first stage gyro LPF. For 5 and 6-inch miniquads, this usually means above 150Hz. 7-inch quads above 125Hz."
     }
 }
