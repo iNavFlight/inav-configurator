@@ -2028,10 +2028,16 @@ TABS.osd.initialize = function (callback) {
                 FONT.preview($preview);
                 OSD.GUI.update();
             });
+            chrome.storage.local.set({'osd_font': $(this).data('font-file')});
         });
 
-        // load the first font when we change tabs
-        $fontPicker.first().click();
+        // load the last selected font when we change tabs
+        chrome.storage.local.get('osd_font', function (result) {
+            if (result.osd_font != undefined)
+                $('.fontbuttons button[data-font-file="' + result.osd_font + '"]').click()
+            else
+                $fontPicker.first().click();
+        });
 
         $('button.load_font_file').click(function () {
             $fontPicker.removeClass('active');
