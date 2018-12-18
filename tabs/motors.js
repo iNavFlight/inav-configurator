@@ -375,7 +375,7 @@ TABS.motors.initialize = function (callback) {
            buffer_delay = false;
            $('div.sliders input:not(.master)').on('input', function () {
             
-               var index = $(this).index(),
+               var index = $('div.sliders input:not(.master)').index(this),
                buffer = [],
                i;
 
