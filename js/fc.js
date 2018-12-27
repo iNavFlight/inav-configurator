@@ -923,6 +923,34 @@ var FC = {
                     16000: "16kHz",
                     32000: "32kHz"
                 }
+            },
+            5: {
+                name: "DSHOT150",
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
+            },
+            6: {
+                name: "DSHOT300",
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz"
+                }
+            },
+            7: {
+                name: "DSHOT600",
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
+            },
+            8: {
+                name: "DSHOT1200",
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
             }
         };
     },

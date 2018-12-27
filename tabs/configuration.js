@@ -11,9 +11,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     var craftName = null;
-    var loadCraftName = function(callback) {
+    var loadCraftName = function (callback) {
         if (!CONFIG.name || CONFIG.name.trim() === '') {
-            mspHelper.getCraftName(function(name) {
+            mspHelper.getCraftName(function (name) {
                 craftName = name;
                 callback();
             });
@@ -22,7 +22,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
     };
 
-    var saveCraftName = function(callback) {
+    var saveCraftName = function (callback) {
         mspHelper.setCraftName(craftName, callback);
     };
 
@@ -84,7 +84,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //noinspection JSUnresolvedVariable
         GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
 
-        GUI.tab_switch_cleanup(function() {
+        GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
     }
@@ -114,8 +114,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mixer_list_e.change(function () {
             BF_CONFIG.mixerConfiguration = parseInt($(this).val(), 10);
 
-            $('.mixerPreview img').attr('src', './resources/motor_order/'
-                + helper.mixer.getById(BF_CONFIG.mixerConfiguration).image + '.svg');
+            $('.mixerPreview img').attr('src', './resources/motor_order/' +
+                helper.mixer.getById(BF_CONFIG.mixerConfiguration).image + '.svg');
         });
 
         // select current mixer configuration
@@ -135,7 +135,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
         var rxTypeOptions = $('[data-rx-type]');
 
-        var updateRxOptions = function(animated) {
+        var updateRxOptions = function (animated) {
             var duration = animated ? 400 : 0;
             rxTypeOptions.each(function (ii, obj) {
                 var $obj = $(obj);
@@ -180,29 +180,29 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             if (features[i].mode === 'group') {
 
-                row_e = $('<div class="radio">'
-                    + '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"'
-                    + ' value="' + features[i].bit + '"'
-                    + ' id="feature-' + features[i].bit + '" '
-                    + '>'
-                    + '<label for="feature-' + features[i].bit + '">'
-                    + '<span data-i18n="feature' + features[i].name + '"></span>'
-                    + '</label>'
-                    + feature_tip_html
-                    + '</div>');
+                row_e = $('<div class="radio">' +
+                    '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"' +
+                    ' value="' + features[i].bit + '"' +
+                    ' id="feature-' + features[i].bit + '" ' +
+                    '>' +
+                    '<label for="feature-' + features[i].bit + '">' +
+                    '<span data-i18n="feature' + features[i].name + '"></span>' +
+                    '</label>' +
+                    feature_tip_html +
+                    '</div>');
 
                 radioGroups.push(features[i].group);
             } else {
 
-                row_e = $('<div class="checkbox">'
-                    + '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"'
-                    + ' id="feature-' + features[i].bit + '" '
-                    + '>'
-                    + '<label for="feature-' + features[i].bit + '">'
-                    + '<span data-i18n="feature' + features[i].name + '"></span>'
-                    + '</label>'
-                    + feature_tip_html
-                    + '</div>');
+                row_e = $('<div class="checkbox">' +
+                    '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
+                    ' id="feature-' + features[i].bit + '" ' +
+                    '>' +
+                    '<label for="feature-' + features[i].bit + '">' +
+                    '<span data-i18n="feature' + features[i].name + '"></span>' +
+                    '</label>' +
+                    feature_tip_html +
+                    '</div>');
 
                 var feature_e = row_e.find('input.feature');
 
@@ -225,7 +225,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             var controls_e = $('input[name="' + group + '"].feature');
 
 
-            controls_e.each(function() {
+            controls_e.each(function () {
                 var bit = parseInt($(this).attr('value'));
                 var state = bit_check(BF_CONFIG.features, bit);
 
@@ -241,9 +241,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var orientation_mag_e = $('select.magalign');
 
         for (i = 0; i < alignments.length; i++) {
-            orientation_gyro_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
-            orientation_acc_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
-            orientation_mag_e.append('<option value="' + (i+1) + '">'+ alignments[i] + '</option>');
+            orientation_gyro_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
+            orientation_acc_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
+            orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
         orientation_gyro_e.val(SENSOR_ALIGNMENT.align_gyro);
         orientation_acc_e.val(SENSOR_ALIGNMENT.align_acc);
@@ -394,7 +394,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         //fill motor disarm params and FC loop time
         $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
         $('div.disarm').show();
-        if(bit_check(BF_CONFIG.features, 4)) {//MOTOR_STOP
+        if (bit_check(BF_CONFIG.features, 4)) { //MOTOR_STOP
             $('div.disarmdelay').show();
         } else {
             $('div.disarmdelay').hide();
@@ -474,6 +474,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
             }
 
+            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
+                //DSHOT protocols, simplify UI
+                $('.hide-for-shot').addClass('is-hidden');
+            } else {
+                $('.hide-for-shot').removeClass('is-hidden');
+            }
+
         }
 
         var $escProtocol = $('#esc-protocol');
@@ -510,8 +517,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
         }
         /*
-            *  If rate from FC is not on the list, add a new entry
-            */
+         *  If rate from FC is not on the list, add a new entry
+         */
         if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
             $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
         }
@@ -590,8 +597,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $gyroSync.change();
 
         /*
-            * Async mode select
-            */
+         * Async mode select
+         */
         GUI.fillSelect($asyncMode, FC.getAsyncModes());
         $asyncMode.val(INAV_PID_CONFIG.asynchronousMode);
         $asyncMode.change(function () {
@@ -716,11 +723,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             if (state) {
                 BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
-                if(element.attr('name') === 'MOTOR_STOP')
+                if (element.attr('name') === 'MOTOR_STOP')
                     $('div.disarmdelay').show();
             } else {
                 BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
-                if(element.attr('name') === 'MOTOR_STOP')
+                if (element.attr('name') === 'MOTOR_STOP')
                     $('div.disarmdelay').hide();
             }
         });
@@ -733,7 +740,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             var controls_e = $('input[name="' + group + '"]');
             var selected_bit = controls_e.filter(':checked').val();
 
-            controls_e.each(function() {
+            controls_e.each(function () {
                 var bit = $(this).attr('value');
 
                 var selected = (selected_bit == bit);
@@ -829,7 +836,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             /*
              * send gyro LPF and async_mode tracking
              */
-            if(semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
+            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
                 googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
                 googleAnalytics.sendEvent('Setting', 'AsyncMode', FC.getAsyncModes()[INAV_PID_CONFIG.asynchronousMode]);
 
