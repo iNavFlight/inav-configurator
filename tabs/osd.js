@@ -71,6 +71,8 @@ SYM.ROLL_LEVEL = 0xCD;
 SYM.ROLL_RIGHT = 0xCE;
 SYM.PITCH_UP = 0xCF;
 SYM.PITCH_DOWN = 0xDF;
+SYM.TEMP_C = 0x0E;
+SYM.TEMP_F = 0x0D;
 SYM.LAST_CHAR = 190;
 
 var FONT = FONT || {};
@@ -589,6 +591,19 @@ OSD.constants = {
                     id: 29,
                     min_version: '1.7.4',
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
+                },
+                {
+                    name: 'TEMPERATURE',
+                    id: 86,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
                 },
             ]
         },
@@ -1974,7 +1989,7 @@ TABS.osd.initialize = function (callback) {
 
         // Open modal window
         OSD.GUI.jbox = new jBox('Modal', {
-            width: 600,
+            width: 650,
             height: 240,
             closeButton: 'title',
             animation: false,
@@ -2013,10 +2028,16 @@ TABS.osd.initialize = function (callback) {
                 FONT.preview($preview);
                 OSD.GUI.update();
             });
+            chrome.storage.local.set({'osd_font': $(this).data('font-file')});
         });
 
-        // load the first font when we change tabs
-        $fontPicker.first().click();
+        // load the last selected font when we change tabs
+        chrome.storage.local.get('osd_font', function (result) {
+            if (result.osd_font != undefined)
+                $('.fontbuttons button[data-font-file="' + result.osd_font + '"]').click()
+            else
+                $fontPicker.first().click();
+        });
 
         $('button.load_font_file').click(function () {
             $fontPicker.removeClass('active');

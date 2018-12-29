@@ -103,7 +103,8 @@ var FC = {
             battery_profile: 0,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
-            armingFlags: 0
+            armingFlags: 0,
+            name: ''
         };
 
         BF_CONFIG = {
@@ -567,7 +568,7 @@ var FC = {
         features.push(
             {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
         );
-    
+
         /*
          * Transponder disabled until not implemented in firmware
          */
@@ -922,6 +923,34 @@ var FC = {
                     16000: "16kHz",
                     32000: "32kHz"
                 }
+            },
+            5: {
+                name: "DSHOT150",
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
+            },
+            6: {
+                name: "DSHOT300",
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz"
+                }
+            },
+            7: {
+                name: "DSHOT600",
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
+            },
+            8: {
+                name: "DSHOT1200",
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
             }
         };
     },
@@ -965,7 +994,10 @@ var FC = {
         return [];
     },
     getAccelerometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
+        }
+        else if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "FAKE"];
         }
         else {
@@ -1065,8 +1097,8 @@ var FC = {
         return {
             0: "Land",
             1: "Drop",
-            2: "RTH", 
-            3: "Do Nothing", 
+            2: "RTH",
+            3: "Do Nothing",
         }
     },
     getRcMapLetters: function () {

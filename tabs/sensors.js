@@ -276,6 +276,10 @@ TABS.sensors.initialize = function (callback) {
             initDataArray(1),
             initDataArray(1),
             initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
             initDataArray(1)
         ];
 
@@ -289,7 +293,11 @@ TABS.sensors.initialize = function (callback) {
             initGraphHelpers('#debug1', samples_debug_i),
             initGraphHelpers('#debug2', samples_debug_i),
             initGraphHelpers('#debug3', samples_debug_i),
-            initGraphHelpers('#debug4', samples_debug_i)
+            initGraphHelpers('#debug4', samples_debug_i),
+            initGraphHelpers('#debug5', samples_debug_i),
+            initGraphHelpers('#debug6', samples_debug_i),
+            initGraphHelpers('#debug7', samples_debug_i),
+            initGraphHelpers('#debug8', samples_debug_i)
         ];
 
         var raw_data_text_ements = {
@@ -449,7 +457,11 @@ TABS.sensors.initialize = function (callback) {
                         return;
                     }
 
-                    MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
+                    if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
+                        MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
+                    } else {
+                        MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
+                    }
                 }, rates.debug, true);
             }
 
@@ -516,7 +528,7 @@ TABS.sensors.initialize = function (callback) {
             }
 
             function update_debug_graphs() {
-                for (var i = 0; i < 4; i++) {
+                for (var i = 0; i < 8; i++) {
                     updateGraphHelperSize(debugHelpers[i]);
 
                     addSampleToData(debug_data[i], samples_debug_i, [SENSOR_DATA.debug[i]]);
