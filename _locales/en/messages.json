@@ -2629,6 +2629,12 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
     },
+    "uploadingCharacters": {
+        "message": "Uploading..."
+    },
+    "uploadedCharacters": {
+        "message": "Uploaded $1 characters"
+    },
     "portColumnSensors": {
         "message": "Sensors"
     },
