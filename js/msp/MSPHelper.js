@@ -565,10 +565,9 @@ var mspHelper = (function (gui) {
                             'max': data.getInt16(i + 2, true),
                             'middle': data.getInt16(i + 4, true),
                             'rate': data.getInt8(i + 6),
-                            'indexOfChannelToForward': data.getInt8(i + 9),
-                            'reversedInputSources': data.getUint32(i + 10)
+                            'indexOfChannelToForward': data.getInt8(i + 9)
                         };
-
+                        data.getUint32(i + 10); // Skip 4 bytes that used to be reversed Sources
                         SERVO_CONFIG.push(arr);
                     }
                 }
@@ -2160,10 +2159,11 @@ var mspHelper = (function (gui) {
             }
             buffer.push(out);
 
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 0));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 1));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 2));
-            buffer.push(specificByte(servoConfiguration.reversedInputSources, 3));
+            //Mock 4 bytes of servoConfiguration.reversedInputSources
+            buffer.push(0);
+            buffer.push(0);
+            buffer.push(0);
+            buffer.push(0);
 
             // prepare for next iteration
             servoIndex++;
