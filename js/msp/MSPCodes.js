@@ -191,5 +191,8 @@ var MSPCodes = {
 
     MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018,
 
-    MSP2_INAV_DEBUG:                    0x2019
+    MSP2_INAV_DEBUG:                    0x2019,
+
+    MSP2_INAV_SERVO_MIXER:              0x2020,
+    MSP2_INAV_SET_SERVO_MIXER:          0x2021
 };

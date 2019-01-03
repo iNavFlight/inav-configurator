@@ -42,7 +42,7 @@ var ServoMixRule = function (target, input, rate, speed, condition, operandA, op
     };
 
     self.getCondition = function () {
-        return condition;
+        return (condition == undefined) ? 0 : condition;
     };
 
     self.setCondition = function (data) {
@@ -50,7 +50,7 @@ var ServoMixRule = function (target, input, rate, speed, condition, operandA, op
     };
 
     self.getOperandA = function () {
-        return operandA;
+        return (operandA == undefined) ? 0 : operandA;
     };
 
     self.setOperandA = function (data) {
@@ -58,7 +58,7 @@ var ServoMixRule = function (target, input, rate, speed, condition, operandA, op
     };
 
     self.getOperandB = function () {
-        return operandB;
+        return (operandB == undefined) ? 0 : operandB;
     };
 
     self.setOperandB = function (data) {

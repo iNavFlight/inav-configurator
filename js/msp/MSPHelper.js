@@ -525,6 +525,26 @@ var mspHelper = (function (gui) {
 
                 break;
 
+            case MSPCodes.MSP2_INAV_SERVO_MIXER:
+                SERVO_RULES.flush();
+
+                if (data.byteLength % 9 === 0) {
+                    for (i = 0; i < data.byteLength; i += 9) {
+                        SERVO_RULES.put(new ServoMixRule(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt8(i + 2),
+                            data.getInt8(i + 3),
+                            data.getInt8(i + 4),
+                            data.getInt16(i + 5, true),
+                            data.getInt16(i + 7, true)
+                        ));
+                    }
+                }
+                SERVO_RULES.cleanup();
+
+                break;
+
             case MSPCodes.MSP_SET_SERVO_MIX_RULE:
                 console.log("Servo mix saved");
                 break;
@@ -3118,11 +3138,15 @@ var mspHelper = (function (gui) {
     };
 
     self.loadServoMixRules = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) { //FIXME after firmware version is dumped, change to 2.2.0
+            MSP.send_message(MSPCodes.MSP2_INAV_SERVO_MIXER, false, false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+        }
     };
 
     self.loadMotorMixRules = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
         } else {
             callback();
