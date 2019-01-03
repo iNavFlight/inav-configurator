@@ -549,6 +549,10 @@ var mspHelper = (function (gui) {
                 console.log("Servo mix saved");
                 break;
 
+            case MSPCodes.MSP2_INAV_SET_SERVO_MIXER:
+                console.log("Servo MSP2 mix saved");
+                break;
+
             case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
                 MOTOR_RULES.flush();
 
@@ -2195,8 +2199,14 @@ var mspHelper = (function (gui) {
     };
 
     self.sendServoMixer = function (onCompleteCallback) {
-        var nextFunction = sendMixer,
+        let nextFunction,
             servoIndex = 0;
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) { //FIXME set version after firmware version was bumped
+            nextFunction = sendMixerMsp2;
+        } else {
+            nextFunction = sendMixer;
+        }
 
         if (SERVO_RULES.length == 0) {
             onCompleteCallback();
@@ -2205,6 +2215,32 @@ var mspHelper = (function (gui) {
         }
 
         function sendMixer() {
+
+            let buffer = [];
+
+            // send one at a time, with index
+
+            let servoRule = SERVO_RULES.get()[servoIndex];
+
+            buffer.push(servoIndex);
+            buffer.push(servoRule.getTarget());
+            buffer.push(servoRule.getInput());
+            buffer.push(servoRule.getRate());
+            buffer.push(servoRule.getSpeed());
+            
+            buffer.push(0);
+            buffer.push(0);
+            buffer.push(0);
+
+            // prepare for next iteration
+            servoIndex++;
+            if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                nextFunction = onCompleteCallback;
+            }
+            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+        }
+
+        function sendMixerMsp2() {
 
             var buffer = [];
 
@@ -2217,22 +2253,25 @@ var mspHelper = (function (gui) {
             buffer.push(servoRule.getInput());
             buffer.push(servoRule.getRate());
             buffer.push(servoRule.getSpeed());
-            buffer.push(0);
-            buffer.push(0);
-            buffer.push(0);
+            
+            buffer.push(servoRule.getCondition());
+            buffer.push(lowByte(servoRule.getOperandA()));
+            buffer.push(highByte(servoRule.getOperandA()));
+            buffer.push(lowByte(servoRule.getOperandB()));
+            buffer.push(highByte(servoRule.getOperandB()));
 
             // prepare for next iteration
             servoIndex++;
             if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
                 nextFunction = onCompleteCallback;
             }
-            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_SERVO_MIXER, buffer, false, nextFunction);
         }
     };
 
     self.sendMotorMixer = function (onCompleteCallback) {
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
+        if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
             onCompleteCallback();
         }
 
