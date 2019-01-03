@@ -1152,6 +1152,12 @@ var FC = {
             'RC Channel 14',        // 20
             'RC Channel 15',        // 21
             'RC Channel 16',        // 22
+            'Stabilized Roll+',     // 23
+            'Stabilized Roll-',     // 24
+            'Stabilized Pitch+',    // 25
+            'Stabilized Pitch-',    // 26
+            'Stabilized Yaw+',      // 27
+            'Stabilized Yaw-'       // 28,
         ];
     },
     getServoMixInputName: function (input) {
