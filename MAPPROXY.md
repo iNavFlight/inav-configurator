@@ -1,0 +1,1 @@
+# INAV Configurator MapProxy setup
