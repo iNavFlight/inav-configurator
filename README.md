@@ -86,7 +86,7 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 1. Click the **Create** button. The new key displays in the list of available keys. Use this key to authenticate your Bing Maps application as described in the documentation for the Bing Maps API you are using.
 
 ### How to setup a MapProxy server for offline caching and mission planning
-1. Follow process described in [MAPPROXY.md]
+1. Follow process described in [MAPPROXY.md](MAPPROXY.md)
 	1. Once you have a working MapProxy server choose MapProxy as your map provider
 	1. Enter MapProxy service URL, eg: http://192.168.20.247/mapproxy/service?
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
