@@ -15,3 +15,4 @@ inav-configurator.iml
 /apps
 /.vscode/
 .eslintrc.json
+/.project

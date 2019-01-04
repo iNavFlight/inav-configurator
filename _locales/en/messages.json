@@ -2839,6 +2839,12 @@
     "mapApiKey": {
         "message": "Map API key"
     },
+    "proxyURL": {
+        "message": "MapProxy URL"
+    },
+    "proxyLayer": {
+        "message": "MapProxy Layer"
+    },
     "accNotchHz": {
         "message": "Acc. notch filter freq."
     },
