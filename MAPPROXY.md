@@ -12,6 +12,7 @@ https://hub.docker.com/r/yagajs/mapproxy/ Docker image (untested)
 
 ## Linux MapProxy virtual machine setup instructions
 1. Using virtualization platform of your choice, install a base 14.04 LTS Ubuntu server
+    http://releases.ubuntu.com/14.04/ubuntu-14.04.5-server-i386.iso
 1. Use NAT networking so that the virtual machine can download maps while online
 1. Create a mapproxy user (this can be done during installation)
 1. All commands executed as mapproxy user from mapproxy user home directory
