@@ -64,6 +64,9 @@ var FC = {
     isNewMixer: function () {
         return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
+    isConditionalMixer: function () {
+        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.1.0")); //FIXME set version after firmware version was bumped
+    },
     resetState: function () {
         SENSOR_STATUS = {
             isHardwareHealthy: 0,
@@ -1169,5 +1172,27 @@ var FC = {
     },
     isModeEnabled: function (name) {
         return FC.isModeBitSet(FC.getModeId(name));
+    },
+    getMixerConditions: function () {
+        return {
+            0: {
+                name: "Always"
+            },
+            1: {
+                name: "RC Channel Greater Than"
+            },
+            2: {
+                name: "RC Channel Lower Than"
+            },
+            3: {
+                name: "RC Channel Low"
+            },
+            4: {
+                name: "RC Channel Mid"
+            },
+            5: {
+                name: "RC Channel High"
+            }
+        }
     }
 };

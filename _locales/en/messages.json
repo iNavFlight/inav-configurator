@@ -2743,6 +2743,9 @@
     "speed": {
         "message": "Speed"
     },
+    "condition": {
+        "message": "Condition"
+    },
     "mixerPresetTitle": {
         "message": "Mixer preset"
     },

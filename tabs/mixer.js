@@ -112,6 +112,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
          * Process servo mix table UI
          */
         let rules = SERVO_RULES.get();
+        let conditions = FC.getMixerConditions();
+
         $servoMixTableBody.find("*").remove();
         for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
@@ -123,6 +125,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <td><select class="mix-rule-input"></select></td>\
                     <td><input type="number" class="mix-rule-rate" step="1" min="-100" max="100" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td class="mix-rule-condition"></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
                 ');
@@ -147,6 +150,24 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     servoRule.setSpeed($(this).val());
                 });
                 
+                let $conditionCell = $row.find(".mix-rule-condition");
+                if (FC.isConditionalMixer()) {
+                    $conditionCell.append('<select class="condition-operator"> <input class="condition-operand-a" type="number" step="1" min="0" max="2000"> <input class="condition-operand-b" type="number" step="1" min="0" max="2000">');
+                    
+                    let $conditionSelect = $conditionCell.find(".condition-operator");
+                    console.log($conditionCell , $conditionSelect);
+
+                    for (let i in conditions) {
+                        if (conditions.hasOwnProperty(i)) {
+                            $conditionSelect.append('<option value="' + i + '">' + conditions[i].name + '</option>');
+                        }
+                    }
+
+                    
+                } else {
+                    $conditionCell.html('-');
+                }
+
                 $row.find("[data-role='role-servo-delete']").attr("data-index", servoRuleIndex);
             }
 

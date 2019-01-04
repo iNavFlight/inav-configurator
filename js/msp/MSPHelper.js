@@ -2202,7 +2202,7 @@ var mspHelper = (function (gui) {
         let nextFunction,
             servoIndex = 0;
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) { //FIXME set version after firmware version was bumped
+        if (FC.isConditionalMixer()) { 
             nextFunction = sendMixerMsp2;
         } else {
             nextFunction = sendMixer;
@@ -3177,7 +3177,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadServoMixRules = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) { //FIXME after firmware version is dumped, change to 2.2.0
+        if (FC.isConditionalMixer()) {
             MSP.send_message(MSPCodes.MSP2_INAV_SERVO_MIXER, false, false, callback);
         } else {
             MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);

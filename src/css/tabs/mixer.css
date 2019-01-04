@@ -30,6 +30,19 @@
     float: none;
 }
 
+.mixer-table .mix-rule-condition {
+    text-align: left;
+}
+
+.mixer-table .mix-rule-condition input,
+.mixer-table .mix-rule-condition select {
+    float: none;
+}
+
+.mixer-table .mix-rule-condition input {
+    width: 6em;
+}
+
 /* .mixer-table tbody tr:first-child, */
 .mixer-table thead tr {
     border-left: 1px solid #e4e4e4;
