@@ -2512,6 +2512,12 @@
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
     },
+    "osdElement_MSL_ALTITUDE": {
+        "message": "MSL Altitude"
+    },
+    "osdElement_MSL_ALTITUDE_HELP": {
+        "message": "Altitude above Mean Sea Level"
+    },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
     },   

@@ -808,6 +808,17 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'MSL_ALTITUDE',
+                    id: 87,
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ALT_FT) + '275';
+                        }
+                        return FONT.symbol(SYM.ALT_M) + '477';
+                    },
+                },
+                {
                     name: '3D_SPEED',
                     id: 85,
                     min_version: '2.1.0',
