@@ -849,6 +849,16 @@ OSD.constants = {
                     preview: osdCoordinatePreview(SYM.LAT, 52.9872367),
                 },
                 {
+                    name: 'PLUS_CODE',
+                    id: 88,
+                    min_version: '2.1.0',
+                    preview: function() {
+                        var digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        console.log("DITIS", digits);
+                        return '9547X6PM+VWCCC'.substr(0, digits);
+                    }
+                },
+                {
                     name: 'DIRECTION_TO_HOME',
                     id: 22,
                     min_version: '1.6.0',
