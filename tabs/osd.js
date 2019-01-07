@@ -819,6 +819,12 @@ OSD.constants = {
                     },
                 },
                 {
+                    name: 'SLOPE_TO_HOME',
+                    id: 89,
+                    min_version: '2.1.0',
+                    preview: '100%'
+                },
+                {
                     name: '3D_SPEED',
                     id: 85,
                     min_version: '2.1.0',

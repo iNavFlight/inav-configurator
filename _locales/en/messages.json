@@ -2518,6 +2518,12 @@
     "osdElement_MSL_ALTITUDE_HELP": {
         "message": "Altitude above Mean Sea Level"
     },
+    "osdElement_SLOPE_TO_HOME": {
+        "message": "Slope to Home"
+    },
+    "osdElement_SLOPE_TO_HOME_HELP": {
+        "message": "Slope from the aircraft to the home, in % (distance / height). Negative when the aircraft is below the home point."
+    },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
     },   
