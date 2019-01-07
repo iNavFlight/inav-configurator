@@ -2536,6 +2536,12 @@
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
     },
+    "osdElement_PLUS_CODE": {
+        "message": "Plus Code (latitude + longitude)"
+    },
+    "osdElement_PLUS_CODE_HELP": {
+        "message": "Plus codes encode both latitude and longitude on a single value that can be entered directly in Google Maps. It provides the same level of precision than latitude and longitude while using less screen space."
+    },
     "osdElement_TRIP_DIST": {
         "message": "Trip distance"
     },
