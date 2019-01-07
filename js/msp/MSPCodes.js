@@ -164,6 +164,9 @@ var MSPCodes = {
     MSP2_COMMON_SETTING_INFO:           0x1007,
     MSP2_COMMON_PG_LIST:                0x1008,
 
+    MSP2_CF_SERIAL_CONFIG:              0x1009,
+    MSP2_SET_CF_SERIAL_CONFIG:          0x100A,
+
     MSPV2_INAV_STATUS:                  0x2000,
     MSPV2_INAV_OPTICAL_FLOW:            0x2001,
     MSPV2_INAV_ANALOG:                  0x2002,
