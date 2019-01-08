@@ -900,6 +900,9 @@
     "portsFunction_GPS": {
         "message": "GPS"
     },
+    "portsFunction_RANGEFINDER": {
+        "message": "Rangefinder"
+    },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
     },

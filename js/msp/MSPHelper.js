@@ -44,7 +44,8 @@ var mspHelper = (function (gui) {
         'TELEMETRY_IBUS': 9,
         'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
-        'IRC_TRAMP': 12
+        'IRC_TRAMP': 12,
+        'RANGEFINDER': 16
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -763,12 +764,39 @@ var mspHelper = (function (gui) {
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
+                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
+
+                    offset += bytesPerPort;
+                    SERIAL_CONFIG.ports.push(serialPort);
+                }
+                break;
+
+            case MSPCodes.MSP2_CF_SERIAL_CONFIG:
+                SERIAL_CONFIG.ports = [];
+                var bytesPerPort = 1 + 4 + 4;
+                var serialPortCount = data.byteLength / bytesPerPort;
+
+                for (i = 0; i < serialPortCount; i++) {
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+
+                    var serialPort = {
+                        identifier: data.getUint8(offset),
+                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint32(offset + 1, true)),
+                        msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
+                        sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
+                        telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
+                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
+                    };
+
+                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
+
                     offset += bytesPerPort;
                     SERIAL_CONFIG.ports.push(serialPort);
                 }
                 break;
 
             case MSPCodes.MSP_SET_CF_SERIAL_CONFIG:
+            case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
                 console.log('Serial config saved');
                 break;
 
@@ -1720,6 +1748,7 @@ var mspHelper = (function (gui) {
                     buffer.push(out);
                 }
                 break;
+
             case MSPCodes.MSP_SET_CF_SERIAL_CONFIG:
                 for (i = 0; i < SERIAL_CONFIG.ports.length; i++) {
                     var serialPort = SERIAL_CONFIG.ports[i];
@@ -1729,6 +1758,26 @@ var mspHelper = (function (gui) {
                     var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
                     buffer.push(specificByte(functionMask, 0));
                     buffer.push(specificByte(functionMask, 1));
+
+                    var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
+                    buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                }
+                break;
+
+            case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
+                for (i = 0; i < SERIAL_CONFIG.ports.length; i++) {
+                    var serialPort = SERIAL_CONFIG.ports[i];
+
+                    buffer.push(serialPort.identifier);
+
+                    var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
+                    buffer.push(specificByte(functionMask, 0));
+                    buffer.push(specificByte(functionMask, 1));
+                    buffer.push(specificByte(functionMask, 2));
+                    buffer.push(specificByte(functionMask, 3));
 
                     var BAUD_RATES = (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) ? mspHelper.BAUD_RATES_post1_6_3 : mspHelper.BAUD_RATES_pre1_6_3;
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
