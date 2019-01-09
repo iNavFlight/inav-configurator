@@ -49,7 +49,7 @@ sources.css = [
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
-    './node_modules/openlayers/dist/ol.css'
+    './node_modules/ol/ol.css'
 ];
 
 sources.js = [
@@ -107,8 +107,7 @@ sources.js = [
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
-    './js/appUpdater.js',
-    './node_modules/openlayers/dist/ol.js'
+    './js/appUpdater.js'
 ];
 
 sources.receiverCss = [
