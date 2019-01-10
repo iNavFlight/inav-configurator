@@ -132,6 +132,11 @@ $(document).ready(function () {
     // Tabs
     var ui_tabs = $('#tabs > ul');
     $('a', ui_tabs).click(function () {
+
+        if ($(this).parent().hasClass("tab_help")) {            
+            return;
+        }
+
         if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
             var self = this,
                 tabClass = $(self).parent().prop('class');
@@ -189,10 +194,6 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
-                    case 'help':
-                        TABS.help.initialize(content_ready);
-                        break;
-
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
