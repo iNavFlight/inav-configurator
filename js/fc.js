@@ -1129,10 +1129,10 @@ var FC = {
     },
     getServoMixInputNames: function () {
         return [
-            'Stabilised Roll',      // 0
-            'Stabilised Pitch',     // 1
-            'Stabilised Yaw',       // 2
-            'Stabilised Throttle',  // 3
+            'Stabilized Roll',      // 0
+            'Stabilized Pitch',     // 1
+            'Stabilized Yaw',       // 2
+            'Stabilized Throttle',  // 3
             'RC Roll',              // 4
             'RC Pitch',             // 5
             'RC Yaw',               // 6
