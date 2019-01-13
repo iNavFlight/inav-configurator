@@ -706,6 +706,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $(".requires-v2_0_0").hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            $(".removed-v2_1_0").hide();
+            $(".requires-v2_1_0").show();
+        } else {
+            $(".removed-v2_1_0").show();
+            $(".requires-v2_1_0").hide();
+        }
+
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
