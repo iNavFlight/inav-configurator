@@ -557,26 +557,9 @@ var FC = {
             );
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
-            features.push(
-                {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', showNameInTip: true},
-                {bit: 9, group: 'other', name: 'SONAR', showNameInTip: true},
-                {bit: 8, group: 'rxFailsafe', name: 'FAILSAFE'}
-            );
-        }
-
         features.push(
             {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
         );
-
-        /*
-         * Transponder disabled until not implemented in firmware
-         */
-        if (false && semver.gte(CONFIG.apiVersion, "1.16.0")) {
-            features.push(
-                {bit: 21, group: 'other', name: 'TRANSPONDER', haveTip: true, showNameInTip: true}
-            );
-        }
 
         if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
             features.push(
@@ -833,13 +816,10 @@ var FC = {
             'SUMH',
             'XBUS_MODE_B',
             'XBUS_MODE_B_RJ01',
-            'IBUS'
+            'IBUS',
+            'JETI EXBUS',
+            'TBS Crossfire'
         ];
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            data.push('JETI EXBUS');
-            data.push('TBS Crossfire');
-        }
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
             data.push('FPort');
@@ -1072,23 +1052,18 @@ var FC = {
         ]
     },
     getPidNames: function () {
-
-        if (semver.lt(CONFIG.flightControllerVersion, "1.6.0")) {
-            return PID_names;
-        } else {
-            return [
-                'Roll',
-                'Pitch',
-                'Yaw',
-                'Position Z',
-                'Position XY',
-                'Velocity XY',
-                'Surface',
-                'Level',
-                'Heading',
-                'Velocity Z'
-            ];
-        }
+        return [
+            'Roll',
+            'Pitch',
+            'Yaw',
+            'Position Z',
+            'Position XY',
+            'Velocity XY',
+            'Surface',
+            'Level',
+            'Heading',
+            'Velocity Z'
+        ];
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];

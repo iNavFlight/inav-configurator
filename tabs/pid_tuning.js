@@ -201,12 +201,6 @@ TABS.pid_tuning.initialize = function (callback) {
             PID_ADVANCED.axisAccelerationLimitYaw = Math.round(parseInt($axisAccelerationLimitYaw.val(), 10) / 10);
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            $('.requires-v1_6').show();
-        } else {
-            $('.requires-v1_6').hide();
-        }
-
         if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             $('.deprecated-v2_0').hide();
         } else {

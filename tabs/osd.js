@@ -586,7 +586,6 @@ OSD.constants = {
                 {
                     name: 'HEADING',
                     id: 24,
-                    min_version: '1.6.0',
                     preview: FONT.symbol(SYM.HEADING) + '175' + FONT.symbol(SYM.DEGREES)
                 },
                 {
@@ -663,7 +662,6 @@ OSD.constants = {
                 {
                     name: 'VARIO',
                     id: 25,
-                    min_version: '1.6.0',
                     preview: FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
                         FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
                         FONT.symbol(SYM.VARIO_UP_2A) + '\n' +
@@ -673,7 +671,6 @@ OSD.constants = {
                 {
                     name: 'VARIO_NUM',
                     id: 26,
-                    min_version: '1.6.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -766,7 +763,6 @@ OSD.constants = {
                 {
                     name: 'POWER',
                     id: 19,
-                    min_version: '1.6.0',
                     preview: FONT.symbol(SYM.WATT) + '50 ' // 3 chars
                 },
                 {
@@ -839,13 +835,11 @@ OSD.constants = {
                 {
                     name: 'LONGITUDE',
                     id: 20,
-                    min_version: '1.6.0',
                     preview: osdCoordinatePreview(SYM.LON, -114.7652134),
                 },
                 {
                     name: 'LATITUDE',
                     id: 21,
-                    min_version: '1.6.0',
                     preview: osdCoordinatePreview(SYM.LAT, 52.9872367),
                 },
                 {
@@ -861,7 +855,6 @@ OSD.constants = {
                 {
                     name: 'DIRECTION_TO_HOME',
                     id: 22,
-                    min_version: '1.6.0',
                     preview: FONT.symbol(SYM.DIR_TO_HOME)
                 },
                 {
@@ -873,7 +866,6 @@ OSD.constants = {
                 {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
-                    min_version: '1.6.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -988,7 +980,6 @@ OSD.constants = {
         },
         {
             name: 'osdGroupPIDs',
-            min_version: '1.6.0',
             items: [
                 {
                     name: 'ROLL_PIDS',

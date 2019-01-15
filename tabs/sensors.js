@@ -269,7 +269,7 @@ TABS.sensors.initialize = function (callback) {
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
-            altitude_data = (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) ? initDataArray(2) : initDataArray(1),
+            altitude_data = initDataArray(2),
             sonar_data = initDataArray(1),
             airspeed_data = initDataArray(1),
             debug_data = [
@@ -499,13 +499,7 @@ TABS.sensors.initialize = function (callback) {
 
             function update_altitude_graph() {
                 updateGraphHelperSize(altitudeHelpers);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
-                }
-                else {
-                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude]);
-                }
+                samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
                 drawGraph(altitudeHelpers, altitude_data, samples_altitude_i);
                 raw_data_text_ements.x[3].text(SENSOR_DATA.altitude.toFixed(2));
                 raw_data_text_ements.y[3].text(SENSOR_DATA.barometer.toFixed(2));
