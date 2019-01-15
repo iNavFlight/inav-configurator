@@ -2844,5 +2844,11 @@
     },
     "gyroStage2LpfCutoffFrequencyHelp": {
         "message": "Second stage gyro low pass filter that is an equivalent of Betaflight not-Kalman stage2 filter. It has to be setup above first stage gyro LPF. For 5 and 6-inch miniquads, this usually means above 150Hz. 7-inch quads above 125Hz."
+    },
+    "escProtocolNotAdvised": {
+        "message": "This ESC protocol is not advised, use it at your own risk"
+    },
+    "looptimeNotAdvised": {
+        "message": "PID loop might be not stable if GPS is in use"
     }
 }
