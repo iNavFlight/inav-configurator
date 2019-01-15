@@ -1,4 +1,4 @@
-/*global chrome,GUI,FC_CONFIG*/
+/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG*/
 'use strict';
 
 TABS.configuration = {};
@@ -481,6 +481,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $('.hide-for-shot').removeClass('is-hidden');
             }
 
+            if (protocolData.message !== null) {
+                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
+                $('#esc-protocol-warning').show();
+            } else {
+                $('#esc-protocol-warning').hide();
+            }
+
         }
 
         var $escProtocol = $('#esc-protocol');
@@ -492,8 +499,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
         }
 
-        buildMotorRates();
         $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+        buildMotorRates();
         $escRate.val(ADVANCED_CONFIG.motorPwmRate);
 
         $escProtocol.change(function () {
@@ -573,6 +580,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $looptime.val(FC_CONFIG.loopTime);
         $looptime.change(function () {
             FC_CONFIG.loopTime = $(this).val();
+
+            if (FC_CONFIG.loopTime < 500) {
+                $('#looptime-warning').show();
+            } else {
+                $('#looptime-warning').hide();
+            }
 
             if (INAV_PID_CONFIG.asynchronousMode == 0) {
                 //All task running together
@@ -818,8 +831,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             craftName = $('input[name="craft_name"]').val();
-
-            var rxTypes = FC.getRxTypes();
 
             // track feature usage
             if ($('#rxType').val() == 'RX_SERIAL') {
