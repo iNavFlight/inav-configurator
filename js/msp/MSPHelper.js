@@ -88,15 +88,6 @@ var mspHelper = (function (gui) {
                 CONFIG.profile = data.getUint8(10);
                 gui.updateProfileChange();
                 gui.updateStatusBar();
-
-                /*
-                 * Update sensor status only for older firmwares
-                 * Newer firmwares use MSP_SENSOR_STATUS instead
-                 */
-                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status(CONFIG.activeSensors);
-                }
-
                 break;
             case MSPCodes.MSP_STATUS_EX:
                 CONFIG.cycleTime = data.getUint16(0, true);
@@ -110,14 +101,7 @@ var mspHelper = (function (gui) {
 
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, true);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    CONFIG.armingFlags = data.getUint16(13, true);
-                }
-
-                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status(CONFIG.activeSensors);
-                }
+                CONFIG.armingFlags = data.getUint16(13, true);
                 gui.updateStatusBar();
                 gui.updateProfileChange();
                 break;
@@ -158,9 +142,7 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
-                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status_ex(SENSOR_STATUS);
-                }
+                sensor_status_ex(SENSOR_STATUS);
                 break;
 
             case MSPCodes.MSP_RAW_IMU:
@@ -2747,19 +2729,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadSensorConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
     };
 
     self.loadSensorStatus = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
     };
 
     self.loadRcDeadband = function (callback) {
@@ -2859,11 +2833,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveSensorConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
     };
 
     self.loadNavPosholdConfig = function (callback) {

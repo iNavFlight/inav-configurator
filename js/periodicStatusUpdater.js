@@ -119,9 +119,7 @@ helper.periodicStatusUpdater = (function () {
                 return;
             }
 
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
-            }
+            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
 
             if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
                 MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);

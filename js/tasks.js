@@ -15,9 +15,7 @@ helper.task = (function () {
     publicScope.statusPullStart = function () {
         helper.interval.add('status_pull', function () {
             MSP.send_message(MSPCodes.MSP_STATUS, false, false, function () {
-                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
-                }
+                MSP.send_message(MSPCodes.MSP_SENSOR_STATUS);
             });
 
         }, privateScope.getStatusPullInterval(), true);

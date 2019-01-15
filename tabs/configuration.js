@@ -650,56 +650,50 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             INAV_PID_CONFIG.attitudeTaskFrequency = $attitudeFrequency.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
 
-            var $sensorAcc = $('#sensor-acc'),
-                $sensorMag = $('#sensor-mag'),
-                $sensorBaro = $('#sensor-baro'),
-                $sensorPitot = $('#sensor-pitot'),
-                $sensorRangefinder = $('#sensor-rangefinder'),
-                $sensorOpflow = $('#sensor-opflow');
+        var $sensorAcc = $('#sensor-acc'),
+            $sensorMag = $('#sensor-mag'),
+            $sensorBaro = $('#sensor-baro'),
+            $sensorPitot = $('#sensor-pitot'),
+            $sensorRangefinder = $('#sensor-rangefinder'),
+            $sensorOpflow = $('#sensor-opflow');
 
-            GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
-            $sensorAcc.val(SENSOR_CONFIG.accelerometer);
-            $sensorAcc.change(function () {
-                SENSOR_CONFIG.accelerometer = $sensorAcc.val();
-            });
+        GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
+        $sensorAcc.val(SENSOR_CONFIG.accelerometer);
+        $sensorAcc.change(function () {
+            SENSOR_CONFIG.accelerometer = $sensorAcc.val();
+        });
 
 
-            GUI.fillSelect($sensorMag, FC.getMagnetometerNames());
-            $sensorMag.val(SENSOR_CONFIG.magnetometer);
-            $sensorMag.change(function () {
-                SENSOR_CONFIG.magnetometer = $sensorMag.val();
-            });
+        GUI.fillSelect($sensorMag, FC.getMagnetometerNames());
+        $sensorMag.val(SENSOR_CONFIG.magnetometer);
+        $sensorMag.change(function () {
+            SENSOR_CONFIG.magnetometer = $sensorMag.val();
+        });
 
-            GUI.fillSelect($sensorBaro, FC.getBarometerNames());
-            $sensorBaro.val(SENSOR_CONFIG.barometer);
-            $sensorBaro.change(function () {
-                SENSOR_CONFIG.barometer = $sensorBaro.val();
-            });
+        GUI.fillSelect($sensorBaro, FC.getBarometerNames());
+        $sensorBaro.val(SENSOR_CONFIG.barometer);
+        $sensorBaro.change(function () {
+            SENSOR_CONFIG.barometer = $sensorBaro.val();
+        });
 
-            GUI.fillSelect($sensorPitot, FC.getPitotNames());
-            $sensorPitot.val(SENSOR_CONFIG.pitot);
-            $sensorPitot.change(function () {
-                SENSOR_CONFIG.pitot = $sensorPitot.val();
-            });
+        GUI.fillSelect($sensorPitot, FC.getPitotNames());
+        $sensorPitot.val(SENSOR_CONFIG.pitot);
+        $sensorPitot.change(function () {
+            SENSOR_CONFIG.pitot = $sensorPitot.val();
+        });
 
-            GUI.fillSelect($sensorRangefinder, FC.getRangefinderNames());
-            $sensorRangefinder.val(SENSOR_CONFIG.rangefinder);
-            $sensorRangefinder.change(function () {
-                SENSOR_CONFIG.rangefinder = $sensorRangefinder.val();
-            });
+        GUI.fillSelect($sensorRangefinder, FC.getRangefinderNames());
+        $sensorRangefinder.val(SENSOR_CONFIG.rangefinder);
+        $sensorRangefinder.change(function () {
+            SENSOR_CONFIG.rangefinder = $sensorRangefinder.val();
+        });
 
-            GUI.fillSelect($sensorOpflow, FC.getOpticalFlowNames());
-            $sensorOpflow.val(SENSOR_CONFIG.opflow);
-            $sensorOpflow.change(function () {
-                SENSOR_CONFIG.opflow = $sensorOpflow.val();
-            });
-
-            $(".requires-v1_5").show();
-        } else {
-            $(".requires-v1_5").hide();
-        }
+        GUI.fillSelect($sensorOpflow, FC.getOpticalFlowNames());
+        $sensorOpflow.val(SENSOR_CONFIG.opflow);
+        $sensorOpflow.change(function () {
+            SENSOR_CONFIG.opflow = $sensorOpflow.val();
+        });
 
         if (semver.gte(CONFIG.flightControllerVersion, "1.7.0")) {
             $(".requires-v1_7").show();
@@ -855,15 +849,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             /*
              * send gyro LPF and async_mode tracking
              */
-            if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
-                googleAnalytics.sendEvent('Setting', 'AsyncMode', FC.getAsyncModes()[INAV_PID_CONFIG.asynchronousMode]);
+            googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
+            googleAnalytics.sendEvent('Setting', 'AsyncMode', FC.getAsyncModes()[INAV_PID_CONFIG.asynchronousMode]);
 
-                googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
-                googleAnalytics.sendEvent('Board', 'Magnetometer', FC.getMagnetometerNames()[SENSOR_CONFIG.magnetometer]);
-                googleAnalytics.sendEvent('Board', 'Barometer', FC.getBarometerNames()[SENSOR_CONFIG.barometer]);
-                googleAnalytics.sendEvent('Board', 'Pitot', FC.getPitotNames()[SENSOR_CONFIG.pitot]);
-            }
+            googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
+            googleAnalytics.sendEvent('Board', 'Magnetometer', FC.getMagnetometerNames()[SENSOR_CONFIG.magnetometer]);
+            googleAnalytics.sendEvent('Board', 'Barometer', FC.getBarometerNames()[SENSOR_CONFIG.barometer]);
+            googleAnalytics.sendEvent('Board', 'Pitot', FC.getPitotNames()[SENSOR_CONFIG.pitot]);
 
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
