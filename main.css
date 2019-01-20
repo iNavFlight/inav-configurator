@@ -2067,3 +2067,12 @@ select {
     padding: 1em;
     clear: both;
 }
+
+.ok-box {
+    background-color: green;
+    color: white;
+    font-weight: bold;
+    margin: 0.4em 0;
+    padding: 1em;
+    clear: both;
+}

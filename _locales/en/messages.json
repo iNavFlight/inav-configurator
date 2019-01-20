@@ -2850,5 +2850,20 @@
     },
     "looptimeNotAdvised": {
         "message": "PID loop might be not stable if GPS is in use"
+    },
+    "gyroLpfSuggestedMessage": {
+        "message": "This is suggested setting for all Multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
+    },
+    "gyroLpfNotAdvisedMessage": {
+        "message": "It is suggested to choose higher cutoff frequency"
+    },
+    "gyroLpfNotFlyableMessage": {
+        "message": "This setting will probably make UAV unflyable"
+    },
+    "gyroLpfWhyNotHigherMessage": {
+        "message": "If motors are not overheating, try going 256Hz instead"
+    },
+    "gyroLpfWhyNotSlightlyHigherMessage": {
+        "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
     }
 }
