@@ -881,6 +881,7 @@ var FC = {
         return {
             0: {
                 name: "STANDARD",
+                message: null,
                 defaultRate: 400,
                 rates: {
                     50: "50Hz",
@@ -889,6 +890,7 @@ var FC = {
             },
             1: {
                 name: "ONESHOT125",
+                message: null,
                 defaultRate: 1000,
                 rates: {
                     400: "400Hz",
@@ -898,6 +900,7 @@ var FC = {
             },
             2: {
                 name: "ONESHOT42",
+                message: null,
                 defaultRate: 2000,
                 rates: {
                     400: "400Hz",
@@ -909,6 +912,7 @@ var FC = {
             },
             3: {
                 name: "MULTISHOT",
+                message: null,
                 defaultRate: 2000,
                 rates: {
                     400: "400Hz",
@@ -920,6 +924,7 @@ var FC = {
             },
             4: {
                 name: "BRUSHED",
+                message: null,
                 defaultRate: 8000,
                 rates: {
                     8000: "8kHz",
@@ -929,6 +934,7 @@ var FC = {
             },
             5: {
                 name: "DSHOT150",
+                message: null,
                 defaultRate: 4000,
                 rates: {
                     4000: "4kHz"
@@ -936,6 +942,7 @@ var FC = {
             },
             6: {
                 name: "DSHOT300",
+                message: null,
                 defaultRate: 8000,
                 rates: {
                     8000: "8kHz"
@@ -943,6 +950,7 @@ var FC = {
             },
             7: {
                 name: "DSHOT600",
+                message: "escProtocolNotAdvised",
                 defaultRate: 16000,
                 rates: {
                     16000: "16kHz"
@@ -950,6 +958,7 @@ var FC = {
             },
             8: {
                 name: "DSHOT1200",
+                message: "escProtocolNotAdvised",
                 defaultRate: 16000,
                 rates: {
                     16000: "16kHz"

@@ -283,6 +283,7 @@
                     <div class="features esc-priority"></div>
                     <!--list of generated features goes here-->
                     <div id="esc-protocols">
+                        <div id="esc-protocol-warning" class="warning-box"></div>
                         <div class="select">
                             <select name="esc-protocol" id="esc-protocol"></select>
                             <label for="esc-protocol">
@@ -354,14 +355,14 @@
                     <div class="spacer_box_title" data-i18n="configurationSystem"></div>
                 </div>
                 <div class="spacer_box">
-
+                    <div id="gyrolpf-info" class="info-box"></div>
                     <div class="select">
                         <select id="gyro-lpf"></select>
                         <label for="gyro-lpf"> <span data-i18n="configurationGyroLpfTitle"></span></label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationGyroLpfHelp"></div>
                     </div>
 
-                    <div class="select">
+                    <div class="select removed-v2_1_0">
                         <select id="async-mode"></select>
                         <label for="async-mode"> <span data-i18n="configurationAsyncMode"></span></label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationAsyncModeHelp"></div>
@@ -382,7 +383,7 @@
                         <div class="helpicon cf_tip" data-i18n_title="configurationGyroFrequencyHelp"></div>
                     </div>
 
-                    <div id="accelerometer-frequency-wrapper" class="checkbox">
+                    <div id="accelerometer-frequency-wrapper" class="checkbox removed-v2_1_0">
                         <select id="accelerometer-frequency"></select>
                         <label for="accelerometer-frequency">
                             <span data-i18n="configurationAccelerometerFrequencyTitle"></span>
@@ -390,14 +391,14 @@
                         <div class="helpicon cf_tip" data-i18n_title="configurationAccelerometerFrequencyHelp"></div>
                     </div>
 
-                    <div id="attitude-frequency-wrapper" class="checkbox">
+                    <div id="attitude-frequency-wrapper" class="checkbox removed-v2_1_0">
                         <select id="attitude-frequency"></select>
                         <label for="attitude-frequency">
                             <span data-i18n="configurationAttitudeFrequencyTitle"></span>
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationAttitudeFrequencyHelp"></div>
                     </div>
-
+                    <div id="looptime-warning" class="info-box" data-i18n="looptimeNotAdvised"></div>
                     <div class="select">
                         <select id="looptime"></select>
                         <label for="looptime">

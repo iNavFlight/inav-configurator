@@ -239,23 +239,58 @@ FONT.draw = function (charAddress) {
     return cached;
 };
 
+// Returns the font data for a blank character
+FONT.blank = function() {
+    var blank = 0x55; // A byte with all pixels set to transparent
+    var size = FONT.constants.SIZES.MAX_NVM_FONT_CHAR_SIZE;
+    return Array.apply(null, {length: size}).map(function() { return blank; });
+};
+
 FONT.msp = {
     encode: function (charAddress) {
-        return [charAddress].concat(FONT.data.characters_bytes[charAddress].slice(0, FONT.constants.SIZES.MAX_NVM_FONT_CHAR_SIZE));
+        var addr = [];
+        if (charAddress > 255) {
+            addr.push16(charAddress);
+        } else {
+            addr.push8(charAddress);
+        }
+        var data = FONT.data.characters_bytes[charAddress];
+        if (!data) {
+            data = FONT.blank();
+        }
+        return addr.concat(data.slice(0, FONT.constants.SIZES.MAX_NVM_FONT_CHAR_SIZE));
     }
 };
 
-FONT.upload = function ($progress) {
-    return Promise.mapSeries(FONT.data.characters, function (data, i) {
-        $progress.val((i / FONT.data.characters.length) * 100);
+FONT.upload = function (callback) {
+    // Always upload 512 characters, using extra blanks if the font
+    // has less characters. This ensures we overwrite the 2nd page
+    // when uploading a 1-page font over a 2-page one.
+    var count = 512;
+    var promises = [];
+    var updateProgress = function(p) {
+        return function() {
+            if (callback) {
+                callback(p, count, (p / count) * 100);
+            }
+        }
+    };
+    for (var ii = 0; ii < count; ii++) {
+        // Upload 2nd page first, so chips supporting just one page
+        // overwrite page 2 with page 1. Note that this works fine with
+        // INAV < 2.1 because it will write invalid character data over
+        // the first pass, but then it will be ovewritten by the first
+        // 256 characters.
+        var charIndex = ii < 256 ? ii + 256 : ii - 256;
         // Force usage of V1 protocol to workaround the 64 byte write bug
         // on F3 when the configurator is running on macOS
-        return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(i), MSP.constants.PROTOCOL_V1);
-    })
-        .then(function () {
-            OSD.GUI.jbox.close();
-            return MSP.promise(MSPCodes.MSP_SET_REBOOT);
-        });
+        var p = MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(charIndex, MSP.constants.PROTOCOL_V1));
+        promises.push(p.then(updateProgress(ii)));
+    }
+    return Promise.all(promises).then(function() {
+        OSD.GUI.jbox.close();
+        return MSP.promise(MSPCodes.MSP_SET_REBOOT);
+    });
 };
 
 FONT.preview = function ($el) {
@@ -773,6 +808,17 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'MSL_ALTITUDE',
+                    id: 87,
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ALT_FT) + '275';
+                        }
+                        return FONT.symbol(SYM.ALT_M) + '477';
+                    },
+                },
+                {
                     name: '3D_SPEED',
                     id: 85,
                     min_version: '2.1.0',
@@ -801,6 +847,16 @@ OSD.constants = {
                     id: 21,
                     min_version: '1.6.0',
                     preview: osdCoordinatePreview(SYM.LAT, 52.9872367),
+                },
+                {
+                    name: 'PLUS_CODE',
+                    id: 88,
+                    min_version: '2.1.0',
+                    preview: function() {
+                        var digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        console.log("DITIS", digits);
+                        return '9547X6PM+VWCCC'.substr(0, digits);
+                    }
                 },
                 {
                     name: 'DIRECTION_TO_HOME',
@@ -2033,10 +2089,15 @@ TABS.osd.initialize = function (callback) {
 
         // load the last selected font when we change tabs
         chrome.storage.local.get('osd_font', function (result) {
-            if (result.osd_font != undefined)
-                $('.fontbuttons button[data-font-file="' + result.osd_font + '"]').click()
-            else
+            if (result.osd_font != undefined) {
+                previous_font_button = $('.fontbuttons button[data-font-file="' + result.osd_font + '"]');
+                if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
+            }
+
+            if (previous_font_button == undefined)
                 $fontPicker.first().click();
+            else
+                previous_font_button.click();
         });
 
         $('button.load_font_file').click(function () {
@@ -2050,11 +2111,19 @@ TABS.osd.initialize = function (callback) {
         // font upload
         $('a.flash_font').click(function () {
             if (!GUI.connect_lock) { // button disabled while flashing is in progress
-                $('.progressLabel').text('Uploading...');
-                FONT.upload($('.progress').val(0)).then(function () {
-                    var msg = 'Uploaded all ' + FONT.data.characters.length + ' characters';
-                    $('.progressLabel').text(msg);
-                });
+                var progressLabel = $('.progressLabel');
+                var progressBar = $('.progress');
+                var uploading = chrome.i18n.getMessage('uploadingCharacters');
+                progressLabel.text(uploading);
+                var progressCallback = function(done, total, percentage) {
+                    progressBar.val(percentage);
+                    if (done == total) {
+                        progressLabel.text(chrome.i18n.getMessage('uploadedCharacters'), [total]);
+                    } else {
+                        progressLabel.text(uploading + ' (' + done + '/' + total + ')');
+                    }
+                }
+                FONT.upload(progressCallback);
             }
         });
 

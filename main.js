@@ -13,7 +13,9 @@ chrome.storage = chrome.storage || {};
 
 let globalSettings = {
     mapProviderType: null,
-    mapApiKey: null
+    mapApiKey: null,
+    proxyURL: null,
+    proxyLayer: null
 };
 
 $(document).ready(function () {
@@ -32,7 +34,19 @@ $(document).ready(function () {
         }
         globalSettings.mapApiKey = result.map_api_key;
     });
-
+    chrome.storage.local.get('proxyurl', function (result) {
+        if (typeof result.proxyurl === 'undefined') {
+            result.proxyurl = 'http://192.168.1.222/mapproxy/service?';
+        }
+        globalSettings.proxyURL = result.proxyurl;
+    });
+    chrome.storage.local.get('proxylayer', function (result) {
+        if (typeof result.proxylayer === 'undefined') {
+            result.proxylayer = 'your_proxy_layer_name';
+        }
+        globalSettings.proxyLayer = result.proxylayer;
+    });
+    
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
@@ -118,6 +132,11 @@ $(document).ready(function () {
     // Tabs
     var ui_tabs = $('#tabs > ul');
     $('a', ui_tabs).click(function () {
+
+        if ($(this).parent().hasClass("tab_help")) {            
+            return;
+        }
+
         if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
             var self = this,
                 tabClass = $(self).parent().prop('class');
@@ -175,10 +194,6 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
-                    case 'help':
-                        TABS.help.initialize(content_ready);
-                        break;
-
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
@@ -302,6 +317,8 @@ $(document).ready(function () {
 
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
+                $('#proxyurl').val(globalSettings.proxyURL);
+                $('#proxylayer').val(globalSettings.proxyLayer);
                 
                 $('#map-provider-type').change(function () {
                     chrome.storage.local.set({
@@ -315,7 +332,18 @@ $(document).ready(function () {
                     });
                     globalSettings.mapApiKey = $(this).val();
                 });
-
+                $('#proxyurl').change(function () {
+                    chrome.storage.local.set({
+                        'proxyurl': $(this).val()
+                    });
+                    globalSettings.proxyURL = $(this).val();
+                });
+				$('#proxylayer').change(function () {
+                    chrome.storage.local.set({
+                        'proxylayer': $(this).val()
+                    });
+                    globalSettings.proxyLayer = $(this).val();
+                });
                 function close_and_cleanup(e) {
                     if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
                         $(document).unbind('click keyup', close_and_cleanup);

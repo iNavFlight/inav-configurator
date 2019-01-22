@@ -245,7 +245,7 @@
     },
 
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"http://www.multiwiicopter.com/products/inav-air3-fixed-wing\" target=\"_blank\">Sirius AIR3</a>, <a href=\"http://seriouslypro.com/spracingf3\" target=\"_blank\">SPRacingF3</a>, <a href=\"http://www.immersionrc.com/fpv-products/vortex-racing-quad/\" target=\"_blank\">Vortex</a>, <a href=\"https://github.com/TauLabs/TauLabs/wiki/Sparky\" target=\"_blank\">Sparky</a>, <a href=\"http://www.readymaderc.com/store/index.php?main_page=product_info&cPath=76_156&products_id=4221\" target=\"_blank\">DoDo</a>, <a href=\"https://www.openpilot.org/product/coptercontrol/\" target=\"_blank\">CC3D/EVO</a>, <a href=\"http://www.readytoflyquads.com/flight-controllers/flip-series\" target=\"_blank\">Flip32/+/Deluxe</a>, <a href=\"http://multirotormania.com/129-dragonfly32\" target=\"_blank\">DragonFly32</a>, <a href=\"http://www.goodluckbuy.com/micro-quadcopter-flight-driver-controller-9dof-9-axis-altitude-sensor-stm32f103.html\" target=\"_blank\">CJMCU Microquad</a>, Chebuzz F3, <a href=\"http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/PF254044\" target=\"_blank\">STM32F3Discovery</a>, <a href=\"http://www.overskyrc.com/hermit-micro-fpv-brushless-quadcopter-145mm-98g-fully-assembled-p-621.html\" target=\"_blank\">Hermit</a>, <a href=\"http://rcexplorer.se/blog/2015/05/introducing-the-naze32-tricopter-frame/\" target=\"_blank\">Naze32 Tricopter Frame</a>, <a href=\"http://www.2dogrc.com/skyline-32-naze-32-bit-flight-controller-acro-version.html\" target=\"_blank\">Skyline32</a>, <a href=\"http://abusemark.com/store/index.php?main_page=index&cPath=1\" target=\"_blank\">Naze/32/Mini/Pro</a>/<a href=\"http://www.massiverc.com/Shop/en/574-massive-acro-blackbox-flight-control-board.html\" target=\"_blank\">Blackbox</a> etc)<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://telegra.ph/Welcome-to-INAV-useful-links-and-products-12-09\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -267,45 +267,6 @@
     },
     "defaultSponsorsHead": {
         "message": "Sponsors"
-    },
-    "defaultDocumentationHead": {
-        "message": "Documentation / Manual"
-    },
-    "defaultDocumentation": {
-        "message": "INAV documentation is available in Markdown format.<br /><br />"
-    },
-    "defaultDocumentation1": {
-        "message": "The PDF manual appropriate to the firmware can be downloaded from the github releases page, <a href=\"https://github.com/iNavFlight/inav/releases\" target=\"_blank\">here</a>."
-    },
-    "defaultDocumentation2": {
-        "message": "The Markdown latest online documentation is available <a href=\"https://github.com/iNavFlight/inav/tree/master/docs\" target=\"_blank\">here</a> - you can switch to the appropriate version of the documentation by selecting the tag."
-    },
-    "defaultSupportHead": {
-        "message": "Support"
-    },
-    "defaultSupportSubline1": {
-        "message": "Support Scources"
-    },
-    "defaultSupportSubline2": {
-        "message": "Developer"
-    },
-    "defaultSupport": {
-        "message": "For support please search the forums first or contact your vendor.<br /><br />"
-    },
-    "defaultSupport1": {
-        "message": "<a href=\"http://www.rcgroups.com/forums/showthread.php?t=2249574&page=1\" target=\"_blank\">RC Groups thread</a>"
-    },
-    "defaultSupport2": {
-        "message": "<a href=\"http://www.multiwii.com/forum/viewtopic.php?f=23&t=5149\" target=\"_blank\">MultiWii forums thread</a>"
-    },
-    "defaultSupport3": {
-        "message": "<a href=\"https://github.com/iNavFlight\" target=\"_blank\">GitHub</a>"
-    },
-    "defaultSupport4": {
-        "message": "<a href=\"https://gitter.im/iNavFlight/inav\" target=\"_blank\">Gitter channel</a>"
-    },
-    "defaultSupport5": {
-        "message": "<a href=\"https://gitter.im/iNavFlight/inav\" target=\"_blank\">Join via WebClient</a>"
     },
     "communityRCGroupsSupport": {
         "message": "RC Groups Support"
@@ -899,6 +860,9 @@
     },
     "portsFunction_GPS": {
         "message": "GPS"
+    },
+    "portsFunction_RANGEFINDER": {
+        "message": "Rangefinder"
     },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
@@ -2512,6 +2476,12 @@
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
     },
+    "osdElement_MSL_ALTITUDE": {
+        "message": "MSL Altitude"
+    },
+    "osdElement_MSL_ALTITUDE_HELP": {
+        "message": "Altitude above Mean Sea Level"
+    },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
     },   
@@ -2529,6 +2499,12 @@
     },
     "osdElement_GPS_HDOP_HELP": {
         "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
+    },
+    "osdElement_PLUS_CODE": {
+        "message": "Plus Code (latitude + longitude)"
+    },
+    "osdElement_PLUS_CODE_HELP": {
+        "message": "Plus codes encode both latitude and longitude on a single value that can be entered directly in Google Maps. It provides the same level of precision than latitude and longitude while using less screen space."
     },
     "osdElement_TRIP_DIST": {
         "message": "Trip distance"
@@ -2628,6 +2604,12 @@
     },
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
+    },
+    "uploadingCharacters": {
+        "message": "Uploading..."
+    },
+    "uploadedCharacters": {
+        "message": "Uploaded $1 characters"
     },
     "portColumnSensors": {
         "message": "Sensors"
@@ -2842,6 +2824,12 @@
     "mapApiKey": {
         "message": "Map API key"
     },
+    "proxyURL": {
+        "message": "MapProxy URL"
+    },
+    "proxyLayer": {
+        "message": "MapProxy Layer"
+    },
     "accNotchHz": {
         "message": "Acc. notch filter freq."
     },
@@ -2859,5 +2847,26 @@
     },
     "gyroStage2LpfCutoffFrequencyHelp": {
         "message": "Second stage gyro low pass filter that is an equivalent of Betaflight not-Kalman stage2 filter. It has to be setup above first stage gyro LPF. For 5 and 6-inch miniquads, this usually means above 150Hz. 7-inch quads above 125Hz."
+    },
+    "escProtocolNotAdvised": {
+        "message": "This ESC protocol is not advised, use it at your own risk"
+    },
+    "looptimeNotAdvised": {
+        "message": "PID loop might be not stable if GPS is in use"
+    },
+    "gyroLpfSuggestedMessage": {
+        "message": "This is suggested setting for all Multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
+    },
+    "gyroLpfNotAdvisedMessage": {
+        "message": "It is suggested to choose higher cutoff frequency"
+    },
+    "gyroLpfNotFlyableMessage": {
+        "message": "This setting will probably make UAV unflyable"
+    },
+    "gyroLpfWhyNotHigherMessage": {
+        "message": "If motors are not overheating, try going 256Hz instead"
+    },
+    "gyroLpfWhyNotSlightlyHigherMessage": {
+        "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
     }
 }

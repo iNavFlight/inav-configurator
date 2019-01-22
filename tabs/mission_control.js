@@ -326,6 +326,11 @@ TABS.mission_control.initialize = function (callback) {
                 imagerySet: 'AerialWithLabels',
                 maxZoom: 19
             });
+        } else if ( globalSettings.mapProviderType == 'mapproxy' ) {
+        	mapLayer = new ol.source.TileWMS({
+        		url: globalSettings.proxyURL,
+                params: {'LAYERS':globalSettings.proxyLayer}
+             })            
         } else {
             mapLayer = new ol.source.OSM();
         }
