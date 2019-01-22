@@ -1,7 +1,7 @@
 /*global $*/
 'use strict';
 
-var ServoMixRule = function (target, input, rate, speed, condition, operandA, operandB) {
+var ServoMixRule = function (target, input, rate, speed, condition, operandAType, operandA, operandBType, operandB) {
 
     var self = {};
 
@@ -63,6 +63,22 @@ var ServoMixRule = function (target, input, rate, speed, condition, operandA, op
 
     self.setOperandB = function (data) {
         operandB = data;
+    };
+
+    self.getOperandAType = function () {
+        return (operandAType == undefined) ? 0 : operandAType;
+    };
+
+    self.setOperandAType = function (data) {
+        operandAType = data;
+    };
+
+    self.getOperandBType = function () {
+        return (operandBType == undefined) ? 0 : operandBType;
+    };
+
+    self.setOperandBType = function (data) {
+        operandBType = data;
     };
 
     return self;

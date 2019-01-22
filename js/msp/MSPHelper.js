@@ -528,16 +528,18 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SERVO_MIXER:
                 SERVO_RULES.flush();
 
-                if (data.byteLength % 9 === 0) {
-                    for (i = 0; i < data.byteLength; i += 9) {
+                if (data.byteLength % 11 === 0) {
+                    for (i = 0; i < data.byteLength; i += 11) {
                         SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt8(i + 2),
-                            data.getInt8(i + 3),
-                            data.getInt8(i + 4),
-                            data.getInt16(i + 5, true),
-                            data.getInt16(i + 7, true)
+                            data.getInt8(i),                // target
+                            data.getInt8(i + 1),            // input
+                            data.getInt8(i + 2),            // rate
+                            data.getInt8(i + 3),            // speed
+                            data.getInt8(i + 4),            // condition
+                            data.getInt8(i + 5),            // operandA type
+                            data.getInt16(i + 6, true),     // operandA
+                            data.getInt8(i + 8),            // operandB type
+                            data.getInt16(i + 9, true)      // operandB
                         ));
                     }
                 }
@@ -2255,8 +2257,10 @@ var mspHelper = (function (gui) {
             buffer.push(servoRule.getSpeed());
             
             buffer.push(servoRule.getCondition());
+            buffer.push(servoRule.getOperandAType());
             buffer.push(lowByte(servoRule.getOperandA()));
             buffer.push(highByte(servoRule.getOperandA()));
+            buffer.push(servoRule.getOperandBType());
             buffer.push(lowByte(servoRule.getOperandB()));
             buffer.push(highByte(servoRule.getOperandB()));
 

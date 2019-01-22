@@ -1173,26 +1173,47 @@ var FC = {
     isModeEnabled: function (name) {
         return FC.isModeBitSet(FC.getModeId(name));
     },
-    getMixerConditions: function () {
+    getLogicOperators: function () {
         return {
             0: {
-                name: "Always"
+                name: "True",
+                hasOperand: [false, false]
             },
             1: {
-                name: "RC Channel Greater Than"
+                name: "Equal",
+                hasOperand: [true, true]
             },
             2: {
-                name: "RC Channel Lower Than"
+                name: "Greater Than",
+                hasOperand: [true, true]
             },
             3: {
-                name: "RC Channel Low"
+                name: "Lower Than",
+                hasOperand: [true, true]
             },
             4: {
-                name: "RC Channel Mid"
+                name: "Low",
+                hasOperand: [true, false]
             },
             5: {
-                name: "RC Channel High"
+                name: "Mid",
+                hasOperand: [true, false]
+            },
+            6: {
+                name: "High",
+                hasOperand: [true, false]
+            }
+        }
+    },
+    getOperandTypes: function () {
+        return {
+            0: {
+                name: "Value"
+            },
+            1: {
+                name: "RC Channel"
             }
         }
     }
+
 };

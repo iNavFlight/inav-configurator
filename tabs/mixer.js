@@ -112,7 +112,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
          * Process servo mix table UI
          */
         let rules = SERVO_RULES.get();
-        let conditions = FC.getMixerConditions();
+        let conditions = FC.getLogicOperators();
+        let operandTypes = FC.getOperandTypes();
 
         $servoMixTableBody.find("*").remove();
         for (let servoRuleIndex in rules) {
@@ -152,18 +153,57 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 
                 let $conditionCell = $row.find(".mix-rule-condition");
                 if (FC.isConditionalMixer()) {
-                    $conditionCell.append('<select class="condition-operator"> <input class="condition-operand-a" type="number" step="1" min="0" max="2000"> <input class="condition-operand-b" type="number" step="1" min="0" max="2000">');
+                    $conditionCell.append(
+                        '<select class="condition-operator"></select> ' +
+                        '<select class="condition-operand-a-type"></select> ' +
+                        '<input class="condition-operand-a" type="number" step="1" min="0" max="2000"> ' + 
+                        '<select class="condition-operand-b-type"></select> ' +
+                        '<input class="condition-operand-b" type="number" step="1" min="0" max="2000">'
+                    );
                     
                     let $conditionSelect = $conditionCell.find(".condition-operator");
-                    console.log($conditionCell , $conditionSelect);
+                    let $conditionOperandAType = $conditionCell.find(".condition-operand-a-type");
+                    let $conditionOperandBType = $conditionCell.find(".condition-operand-b-type");
+                    let $conditionOperandA = $conditionCell.find(".condition-operand-a");
+                    let $conditionOperandB = $conditionCell.find(".condition-operand-b");
 
                     for (let i in conditions) {
                         if (conditions.hasOwnProperty(i)) {
                             $conditionSelect.append('<option value="' + i + '">' + conditions[i].name + '</option>');
                         }
                     }
+                    $conditionSelect.val(servoRule.getCondition());
 
-                    
+                    $conditionSelect.change(function () {
+                        let cType = conditions[servoRule.getCondition()];
+                        if (cType.hasOperand[0]) {
+                            $conditionOperandAType.show();
+                            $conditionOperandA.show();
+                        } else {
+                            $conditionOperandAType.hide();
+                            $conditionOperandA.hide();
+                        }
+                        if (cType.hasOperand[1]) {
+                            $conditionOperandBType.show();
+                            $conditionOperandB.show();
+                        } else {
+                            $conditionOperandBType.hide();
+                            $conditionOperandB.hide();
+                        }
+                    });
+                    $conditionSelect.change();
+
+                    for (let i in operandTypes) {
+                        if (operandTypes.hasOwnProperty(i)) {
+                            $conditionOperandAType.append('<option value="' + i + '">' + operandTypes[i].name + '</option>');
+                            $conditionOperandBType.append('<option value="' + i + '">' + operandTypes[i].name + '</option>');
+                        }
+                    }
+                    $conditionOperandAType.val(servoRule.getOperandAType());
+                    $conditionOperandBType.val(servoRule.getOperandBType());
+
+                    $conditionOperandA.val(servoRule.getOperandA());
+                    $conditionOperandB.val(servoRule.getOperandB());
                 } else {
                     $conditionCell.html('-');
                 }
