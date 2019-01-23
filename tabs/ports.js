@@ -3,8 +3,6 @@
 TABS.ports = {};
 
 TABS.ports.initialize = function (callback) {
-    var board_definition = {};
-
 
     var functionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
@@ -134,8 +132,6 @@ TABS.ports.initialize = function (callback) {
 
         function on_configuration_loaded_handler() {
             $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
-
-            board_definition = BOARD.find_board_definition(CONFIG.boardIdentifier);
         }
     }
 

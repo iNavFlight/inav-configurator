@@ -22,7 +22,7 @@ $(document).ready(function () {
 
     GUI.handleReconnect = function ($tabElement) {
 
-        if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
+        if (BOARD.hasVcp(CONFIG.boardIdentifier)) { // VCP-based flight controls may crash old drivers, we catch and reconnect
 
             /*
              Disconnect
