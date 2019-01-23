@@ -46,7 +46,7 @@ $(document).ready(function () {
                     }, 500);
                 }
 
-            }, 5000);
+            }, 7000);
         } else {
 
             helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
