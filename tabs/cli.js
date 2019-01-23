@@ -1,7 +1,7 @@
 'use strict';
 /*global chrome*/
 TABS.cli = {
-    lineDelayMs: 15,
+    lineDelayMs: 50,
     profileSwitchDelayMs: 100,
     outputHistory: "",
     cliBuffer: ""
