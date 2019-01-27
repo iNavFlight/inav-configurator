@@ -358,7 +358,6 @@ function osdMainBatteryPreview() {
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
     }
-    s += 'V';
     return FONT.symbol(SYM.VOLT) + FONT.embed_dot(s);
 }
 
@@ -557,13 +556,13 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
                     id: 32,
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90')
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
                     id: 54,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18V')
+                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18')
                 },
                 {
                     name: 'POWER_SUPPLY_IMPEDANCE',
@@ -589,20 +588,20 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                         }
-                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                     }
                 },
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                    preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
                     name: 'THROTTLE_POSITION_AUTO_THR',
                     id: 33,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR) + ' 51'
                 },
                 {
                     name: 'CRAFT_NAME',
@@ -622,7 +621,7 @@ OSD.constants = {
                 {
                     name: 'HEADING',
                     id: 24,
-                    preview: FONT.symbol(SYM.HEADING) + '175' + FONT.symbol(SYM.DEGREES)
+                    preview: FONT.symbol(SYM.HEADING) + '175'
                 },
                 {
                     name: 'HEADING_GRAPH',
@@ -808,10 +807,10 @@ OSD.constants = {
                     id: 15,
                     preview: function () {
                         if (OSD.data.preferences.units === 0) {
-                            // metric
-                            return FONT.symbol(SYM.ALT_M) + '399'
+                            // Imperial
+                            return '118' + FONT.symbol(SYM.ALT_FT);
                         }
-                        return FONT.symbol(SYM.ALT_FT) + '118';
+                        return '399' + FONT.symbol(SYM.ALT_M);
                     }
                 },
                 {
@@ -901,22 +900,22 @@ OSD.constants = {
                 {
                     name: 'CURRENT_DRAW',
                     id: 11,
-                    preview: FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1')
+                    preview: FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP)
                 },
                 {
                     name: 'MAH_DRAWN',
                     id: 12,
-                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                    preview: '2560' + FONT.symbol(SYM.MAH)
                 },
                 {
                     name: 'WH_DRAWN',
                     id: 36,
-                    preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
+                    preview: FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
                 },
                 {
                     name: 'POWER',
                     id: 19,
-                    preview: FONT.symbol(SYM.WATT) + '50 ' // 3 chars
+                    preview: '150' + FONT.symbol(SYM.WATT)
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
@@ -948,9 +947,9 @@ OSD.constants = {
                         // 3 chars
                         if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
                             // Imperial
-                            return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
+                            return FONT.embed_dot('125') + FONT.symbol(SYM.MPH);
                         }
-                        return FONT.embed_dot(' 40') + FONT.symbol(SYM.KMH);
+                        return FONT.embed_dot('140') + FONT.symbol(SYM.KMH);
                     }
                 },
                 {
@@ -959,9 +958,9 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return FONT.symbol(SYM.ALT_FT) + '275';
+                            return '275' + FONT.symbol(SYM.ALT_FT);
                         }
-                        return FONT.symbol(SYM.ALT_M) + '477';
+                        return '477' + FONT.symbol(SYM.ALT_M);
                     },
                 },
                 {
@@ -972,9 +971,9 @@ OSD.constants = {
                         // 3 chars
                         if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
                             // Imperial
-                            return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
+                            return FONT.embed_dot('110') + FONT.symbol(SYM.MPH_3D);
                         }
-                        return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
+                        return FONT.embed_dot('120') + FONT.symbol(SYM.KMH_3D);
                     }
                 },
                 {
@@ -1019,9 +1018,9 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                         }
-                        return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                     }
                 },
                 {
@@ -1031,9 +1030,9 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                         }
-                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                     }
                 },
                 {
