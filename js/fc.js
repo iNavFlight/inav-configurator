@@ -198,6 +198,7 @@ var FC = {
             sonar: 0,
             air_speed: 0,
             kinematics: [0.0, 0.0, 0.0],
+            temperature: [0, 0, 0, 0, 0, 0, 0, 0],
             debug: [0, 0, 0, 0]
         };
 

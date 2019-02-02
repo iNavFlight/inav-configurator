@@ -2383,6 +2383,9 @@
     "osdGroupTimers": {
         "message": "Timers"
     },
+    "osdGroupTemperature": {
+        "message": "Temperature"
+    },
     "osdGroupAttitude": {
         "message": "Attitude"
     },
@@ -2596,11 +2599,41 @@
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ P controllers outputs"
     },
-    "osdElement_TEMPERATURE": {
-        "message": "Temperature"
+    "osdElement_IMU_TEMPERATURE": {
+        "message": "IMU Temperature"
     },
-    "osdElement_TEMPERATURE_HELP": {
-        "message": "Temperature of the FC, obtained from the most accurate available source."
+    "osdElement_IMU_TEMPERATURE_HELP": {
+        "message": "Temperature of the IMU"
+    },
+    "osdElement_BARO_TEMPERATURE": {
+        "message": "Baro Temperature"
+    },
+    "osdElement_BARO_TEMPERATURE_HELP": {
+        "message": "Temperature of the barometer"
+    },
+    "osdElement_SENSOR1_TEMPERATURE": {
+        "message": "Temperature sensor 1"
+    },
+    "osdElement_SENSOR2_TEMPERATURE": {
+        "message": "Temperature sensor 2"
+    },
+    "osdElement_SENSOR3_TEMPERATURE": {
+        "message": "Temperature sensor 3"
+    },
+    "osdElement_SENSOR4_TEMPERATURE": {
+        "message": "Temperature sensor 4"
+    },
+    "osdElement_SENSOR5_TEMPERATURE": {
+        "message": "Temperature sensor 5"
+    },
+    "osdElement_SENSOR6_TEMPERATURE": {
+        "message": "Temperature sensor 6"
+    },
+    "osdElement_SENSOR7_TEMPERATURE": {
+        "message": "Temperature sensor 7"
+    },
+    "osdElement_SENSOR8_TEMPERATURE": {
+        "message": "Temperature sensor 8"
     },
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
