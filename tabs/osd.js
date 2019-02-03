@@ -853,6 +853,7 @@ OSD.constants = {
                     id: 88,
                     min_version: '2.1.0',
                     preview: function() {
+                        console.log("ZERO");
                         var digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
                         console.log("DITIS", digits);
                         return '9547X6PM+VWCCC'.substr(0, digits);
@@ -2094,10 +2095,11 @@ TABS.osd.initialize = function (callback) {
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
 
-            if (previous_font_button == undefined)
+            if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().click();
-            else
+            } else {
                 previous_font_button.click();
+            }
         });
 
         $('button.load_font_file').click(function () {
