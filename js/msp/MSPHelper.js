@@ -1452,6 +1452,15 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
                 console.log('Braking config saved');
                 break;
+            case MSPCodes.MSP2_BLACKBOX_CONFIG:
+                BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
+                BLACKBOX.blackboxDevice = data.getUint8(1);
+                BLACKBOX.blackboxRateNum = data.getUint16(2);
+                BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                break;
+            case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
+                console.log("Blackbox config saved");
+                break;
 
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
@@ -2155,15 +2164,22 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-        var message = [
-            BLACKBOX.blackboxDevice & 0xFF,
-            BLACKBOX.blackboxRateNum & 0xFF,
-            BLACKBOX.blackboxRateDenom & 0xFF
-        ];
-
+	var buffer = [];
+	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+	if (semver.gte(CONFIG.apiVersion, "2.3.0")) {
+	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+	} else {
+	    buffer.push(BLACKBOX.blackboxRateNum & 0xFF);
+	    buffer.push(BLACKBOX.blackboxRateDenom & 0xFF);
+	}
         //noinspection JSUnusedLocalSymbols
-        MSP.send_message(MSPCodes.MSP_SET_BLACKBOX_CONFIG, message, false, function (response) {
-            onDataCallback();
+        MSP.send_message(messageId, buffer, false, function (response) {
+	    onDataCallback();
         });
     };
 
