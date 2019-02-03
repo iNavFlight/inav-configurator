@@ -512,14 +512,27 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SERVO_MIX_RULES:
                 SERVO_RULES.flush();
 
-                if (data.byteLength % 7 === 0) {
-                    for (i = 0; i < data.byteLength; i += 7) {
-                        SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt8(i + 2),
-                            data.getInt8(i + 3)
-                        ));
+                if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+                    if (data.byteLength % 8 === 0) {
+                        for (i = 0; i < data.byteLength; i += 8) {
+                            SERVO_RULES.put(new ServoMixRule(
+                                data.getInt8(i),
+                                data.getInt8(i + 1),
+                                data.getInt16(i + 2, true),
+                                data.getInt8(i + 4)
+                            ));
+                        }
+                    }
+                } else {
+                    if (data.byteLength % 7 === 0) {
+                        for (i = 0; i < data.byteLength; i += 7) {
+                            SERVO_RULES.put(new ServoMixRule(
+                                data.getInt8(i),
+                                data.getInt8(i + 1),
+                                data.getInt8(i + 2),
+                                data.getInt8(i + 3)
+                            ));
+                        }
                     }
                 }
                 SERVO_RULES.cleanup();
@@ -2244,7 +2257,12 @@ var mspHelper = (function (gui) {
             buffer.push(servoIndex);
             buffer.push(servoRule.getTarget());
             buffer.push(servoRule.getInput());
-            buffer.push(servoRule.getRate());
+            if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+                buffer.push(lowByte(servoRule.getRate()));
+                buffer.push(highByte(servoRule.getRate()));
+            } else {
+                buffer.push(servoRule.getRate());
+            }
             buffer.push(servoRule.getSpeed());
             buffer.push(0);
             buffer.push(0);

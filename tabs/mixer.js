@@ -121,7 +121,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <tr>\
                     <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
                     <td><select class="mix-rule-input"></select></td>\
-                    <td><input type="number" class="mix-rule-rate" step="1" min="-100" max="100" /></td>\
+                    <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
@@ -151,6 +151,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
         }
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            rate_inputs = $('.mix-rule-rate');
+            rate_inputs.attr("min", -1000);
+            rate_inputs.attr("max", 1000);
+        }
+
         localize();
     }
 
