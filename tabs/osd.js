@@ -853,8 +853,7 @@ OSD.constants = {
                     id: 88,
                     min_version: '2.1.0',
                     preview: function() {
-                        console.log("ZERO");
-                        var digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
                         console.log("DITIS", digits);
                         return '9547X6PM+VWCCC'.substr(0, digits);
                     }
