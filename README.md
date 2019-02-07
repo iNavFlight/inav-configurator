@@ -119,7 +119,7 @@ GitHub issue tracker is reserved for bugs and other technical problems. If you d
 everything, hardware is not working or have any other _support_ problem, please consult:
 
 * [rcgroups main thread](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
-* [Slack channel](https://inavflight.signup.team/)
+* [Slack channel](https://publicslack.com/slacks/inavflight/invites/new)
 
 ## Issue trackers
 
