@@ -120,6 +120,7 @@ everything, hardware is not working or have any other _support_ problem, please 
 
 * [rcgroups main thread](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [Slack channel](https://inavflight.signup.team/)
+* [Telegram Group](https://t.me/INAVFlight)
 
 ## Issue trackers
 
