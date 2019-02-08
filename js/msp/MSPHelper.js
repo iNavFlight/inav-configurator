@@ -1462,6 +1462,13 @@ var mspHelper = (function (gui) {
                 console.log("Blackbox config saved");
                 break;
 
+            case MSPCodes.MSP2_INAV_TEMPERATURES:
+                for (i = 0; i < 8; ++i) {
+                    temp_decidegrees = data.getInt16(i * 2, true);
+                    SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
+                }
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {

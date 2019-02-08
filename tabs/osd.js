@@ -627,9 +627,131 @@ OSD.constants = {
                     min_version: '1.7.4',
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
+            ]
+        },
+        {
+            name: 'osdGroupTemperature',
+            items: [
                 {
-                    name: 'TEMPERATURE',
+                    name: 'IMU_TEMPERATURE',
                     id: 86,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'BARO_TEMPERATURE',
+                    id: 87,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR1_TEMPERATURE',
+                    id: 88,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR2_TEMPERATURE',
+                    id: 89,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR3_TEMPERATURE',
+                    id: 90,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR4_TEMPERATURE',
+                    id: 91,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR5_TEMPERATURE',
+                    id: 92,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR6_TEMPERATURE',
+                    id: 93,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR7_TEMPERATURE',
+                    id: 94,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return '32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR8_TEMPERATURE',
+                    id: 95,
                     min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
@@ -809,7 +931,7 @@ OSD.constants = {
                 },
                 {
                     name: 'MSL_ALTITUDE',
-                    id: 87,
+                    id: 96,
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -850,7 +972,7 @@ OSD.constants = {
                 },
                 {
                     name: 'PLUS_CODE',
-                    id: 88,
+                    id: 97,
                     min_version: '2.1.0',
                     preview: function() {
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
