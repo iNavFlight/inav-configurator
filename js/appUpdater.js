@@ -19,7 +19,7 @@ appUpdater.checkRelease = function (currVersion) {
             //     }
             // });
 
-            GUI.log('New version aviable!');
+            GUI.log('New version available!');
             modalStart = new jBox('Modal', {
                 width: 400,
                 height: 200,
