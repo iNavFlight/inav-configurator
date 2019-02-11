@@ -2211,7 +2211,6 @@ TABS.osd.initialize = function (callback) {
 
         // load the last selected font when we change tabs
         chrome.storage.local.get('osd_font', function (result) {
-            console.log('storage callback one');
             if (result.osd_font != undefined) {
                 previous_font_button = $('.fontbuttons button[data-font-file="' + result.osd_font + '"]');
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
