@@ -7,7 +7,7 @@ helper.mspQueue = (function (serial, MSP) {
     var publicScope = {},
         privateScope = {};
 
-    privateScope.handlerFrequency = 100;
+    privateScope.handlerFrequency = 10;
     privateScope.balancerFrequency = 20;
 
     privateScope.loadFilter = new classes.SimpleSmoothFilter(1, 0.85);
