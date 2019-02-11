@@ -91,7 +91,7 @@ $(document).ready(function () {
             }
         });
 
-        win.setMinimumSize(1024, 800);
+        win.setMinimumSize(1024, 700);
 
         win.on('close', function () {
             //Save window size and position
