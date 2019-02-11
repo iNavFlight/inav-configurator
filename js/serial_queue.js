@@ -99,7 +99,7 @@ helper.mspQueue = (function (serial, MSP) {
 
     privateScope.getTimeout = function (code) {
         if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
-            return 5000;
+            return 6000;
         } else {
             return serial.getTimeout();
         }
