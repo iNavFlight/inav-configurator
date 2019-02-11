@@ -95,7 +95,6 @@ sources.js = [
     './js/protocols/stm32usbdfu.js',
     './js/localization.js',
     './js/boards.js',
-    './js/tasks.js',
     './js/servoMixerRuleCollection.js',
     './js/motorMixerRuleCollection.js',
     './js/vtx.js',
