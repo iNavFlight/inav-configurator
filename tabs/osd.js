@@ -2337,5 +2337,8 @@ TABS.osd.cleanup = function (callback) {
     $(document).unbind('keypress');
     $(document).off('click', 'span.progressLabel a');
 
+    delete OSD.GUI.jbox;
+    $('.jBox-wrapper').remove()
+
     if (callback) callback();
 };
