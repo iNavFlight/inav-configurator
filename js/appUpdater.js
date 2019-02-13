@@ -7,17 +7,13 @@ appUpdater.checkRelease = function (currVersion) {
     $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases', function (releaseData) {
         GUI.log('Loaded release information from GitHub.');
         //Git return sorted list, 0 - last release
-        if (semver.gt(releaseData[0].tag_name, currVersion)) {
-            GUI.log(releaseData[0].tag_name, chrome.runtime.getManifest().version);
-            GUI.log(currVersion);
 
-            //For download zip
-            // releaseData[0].assets.forEach(function(item, i) {
-            //     if (str.indexOf(item.name) !== -1) {
-            //         console.log(item);
-            //         downloadUrl = item.browser_download_url;
-            //     }
-            // });
+        let newVersion = releaseData[0].tag_name;
+        let newPrerelase = releaseData[0].prerelease;
+
+        if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
+            GUI.log(newVersion, chrome.runtime.getManifest().version);
+            GUI.log(currVersion);
 
             GUI.log('New version available!');
             modalStart = new jBox('Modal', {
