@@ -151,7 +151,7 @@ function get_task_name(key) {
 }
 
 function getPlatforms() {
-    var defaultPlatforms = ['win32', 'osx64', 'linux32', 'linux64'];
+    var defaultPlatforms = ['win32', 'win64', 'osx64', 'linux32', 'linux64'];
     var argv = minimist(process.argv.slice(2));
     if (argv.platform) {
         if (defaultPlatforms.indexOf(argv.platform) < 0) {
@@ -249,6 +249,20 @@ gulp.task('release-win32', function() {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'win32');
     var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator');
+    return archive.finalize();
+});
+
+gulp.task('release-win64', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'win64');
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip')));
     var archive = archiver('zip', {
         zlib: { level: 9 }
     });
