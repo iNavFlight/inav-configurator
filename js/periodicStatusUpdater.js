@@ -19,15 +19,11 @@ helper.periodicStatusUpdater = (function () {
         }
 
         if (baudSpeed >= 115200) {
-            return 200;
+            return 300;
         } else if (baudSpeed >= 57600) {
-            return 400;
-        } else if (baudSpeed >= 38400) {
-            return 500;
-        } else if (baudSpeed >= 19200) {
             return 600;
-        } else if (baudSpeed >= 9600) {
-            return 750;
+        } else if (baudSpeed >= 38400) {
+            return 800;
         } else {
             return 1000;
         }

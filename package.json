@@ -1,7 +1,7 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
@@ -24,7 +24,7 @@
     "archiver": "^2.0.3",
     "bluebird": "3.4.1",
     "del": "^3.0.0",
-    "graceful-fs": "^4.1.11",
+    "graceful-fs": "^4.1.15",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "inflection": "1.12.0",

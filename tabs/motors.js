@@ -172,6 +172,8 @@ TABS.motors.initialize = function (callback) {
     }
 
     function update_model(val) {
+        if (MIXER_CONFIG.appliedMixerPreset == -1) return; 
+
         $('.mixerPreview img').attr('src', './resources/motor_order/'
             + helper.mixer.getById(val).image + '.svg');
     }
@@ -189,7 +191,7 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.prop('disabled', true);
 
         if (FC.isNewMixer()) {
-            update_model(MIXER_CONFIG.appliedMixerPreset);;
+            update_model(MIXER_CONFIG.appliedMixerPreset);
         } else {
             update_model(BF_CONFIG.mixerConfiguration);
         }
@@ -410,7 +412,7 @@ TABS.motors.initialize = function (callback) {
             $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).text(val);
             $('div.sliders input:not(:last):first').trigger('input');
         });
-        console.log($motorsEnableTestMode);
+
         $motorsEnableTestMode.change(function () {
             if ($(this).is(':checked')) {
                 $slidersInput.slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);

@@ -639,10 +639,10 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return '90' + FONT.symbol(SYM.TEMP_F);
+                            return 'IMU   90' + FONT.symbol(SYM.TEMP_F);
                         }
                         // Metric, UK
-                        return '32' + FONT.symbol(SYM.TEMP_C);
+                        return 'IMU   32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
@@ -652,10 +652,10 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return '90' + FONT.symbol(SYM.TEMP_F);
+                            return 'BARO  90' + FONT.symbol(SYM.TEMP_F);
                         }
                         // Metric, UK
-                        return '32' + FONT.symbol(SYM.TEMP_C);
+                        return 'BARO  32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
@@ -2336,6 +2336,9 @@ TABS.osd.cleanup = function (callback) {
     // unbind "global" events
     $(document).unbind('keypress');
     $(document).off('click', 'span.progressLabel a');
+
+    delete OSD.GUI.jbox;
+    $('.jBox-wrapper').remove()
 
     if (callback) callback();
 };
