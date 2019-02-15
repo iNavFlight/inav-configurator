@@ -397,6 +397,10 @@ OSD.initData = function () {
             max_altitude: null,
             dist: null,
             max_neg_altitude: null,
+            imu_temp_alarm_min: null,
+            imu_temp_alarm_max: null,
+            baro_temp_alarm_min: null,
+            baro_temp_alarm_max: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
@@ -1475,6 +1479,12 @@ OSD.msp = {
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
+            result.push16(OSD.data.alarms.imu_temp_alarm_min);
+            result.push16(OSD.data.alarms.imu_temp_alarm_max);
+            result.push16(OSD.data.alarms.baro_temp_alarm_min);
+            result.push16(OSD.data.alarms.baro_temp_alarm_max);
+        }
         return result;
     },
 
@@ -1486,6 +1496,12 @@ OSD.msp = {
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
+        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
+            OSD.data.alarms.imu_temp_alarm_min = alarms.readU16();
+            OSD.data.alarms.imu_temp_alarm_max = alarms.readU16();
+            OSD.data.alarms.baro_temp_alarm_min = alarms.readU16();
+            OSD.data.alarms.baro_temp_alarm_max = alarms.readU16();
+        }
     },
 
     encodePreferences: function() {
