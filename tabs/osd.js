@@ -1132,6 +1132,26 @@ OSD.constants = {
                     min_version: '2.0.0',
                     positionable: false,
                 },
+                {
+                    name: 'MAP_SCALE',
+                    id: 98,
+                    min_version: '2.1.1',
+                    preview: function(osd_data) {
+                        var scale;
+                        if (OSD.data.preferences.units === 0) {
+                            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+                        } else {
+                            scale = "100" + FONT.symbol(SYM.M);
+                        }
+                        return FONT.symbol(SYM.SCALE) + scale;
+                    },
+                },
+                {
+                    name: 'MAP_REFERENCE',
+                    id: 99,
+                    min_version: '2.1.1',
+                    preview: FONT.symbol(SYM.DIRECTION) + '\nN',
+                },
             ],
         },
         {
@@ -1982,21 +2002,24 @@ OSD.GUI.updateFields = function() {
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
     if ($('input[name="' + name + '"]').prop('checked')) {
         var mapInitialX = OSD.data.display_size.x - 2;
-        if (directionSymbol) {
-            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
-            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
-        }
         OSD.GUI.checkAndProcessSymbolPosition(mapCenter, centerSymbol);
-        var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
-        OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
-        var scale;
-        if (OSD.data.preferences.units === 0) {
-            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
-        } else {
-            scale = "100" + FONT.symbol(SYM.M);
-        }
-        for (var ii = 0; ii < scale.length; ii++) {
-            OSD.GUI.checkAndProcessSymbolPosition(scalePos + ii + 1, scale.charCodeAt(ii));
+        if (semver.lt(CONFIG.flightControllerVersion, '2.1.1')) {
+            // INAV pre 2.1.1 had hardcoded map reference and scale
+            if (directionSymbol) {
+                OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
+                OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
+            }
+            var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
+            OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
+            var scale;
+            if (OSD.data.preferences.units === 0) {
+                scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+            } else {
+                scale = "100" + FONT.symbol(SYM.M);
+            }
+            for (var ii = 0; ii < scale.length; ii++) {
+                OSD.GUI.checkAndProcessSymbolPosition(scalePos + ii + 1, scale.charCodeAt(ii));
+            }
         }
     }
 };

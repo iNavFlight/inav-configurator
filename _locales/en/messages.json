@@ -2578,6 +2578,18 @@
     "osdElement_RADAR": {
         "message": "Radar"
     },
+    "osdElement_MAP_SCALE": {
+        "message": "Map Scale"
+    },
+    "osdElement_MAP_SCALE_HELP": {
+        "message": "Scale of the currently shown map/radar."
+    },
+    "osdElement_MAP_REFERENCE": {
+        "message": "Map Reference"
+    },
+    "osdElement_MAP_REFERENCE_HELP": {
+        "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
+    },
     "osdElement_WIND_SPEED_HORIZONTAL": {
         "message": "Horizontal Wind Speed"
     },
