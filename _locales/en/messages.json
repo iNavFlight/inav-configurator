@@ -2374,6 +2374,30 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osdAlarmIMU_TEMPERATURE_MIN": {
+        "message": "Minimum IMU temperature"
+    },
+    "osdAlarmIMU_TEMPERATURE_MIN_HELP": {
+        "message": "The temperature indicator will flash when the IMU temperature is bellow this value"
+    },
+    "osdAlarmIMU_TEMPERATURE_MAX": {
+        "message": "Maximum IMU temperature"
+    },
+    "osdAlarmIMU_TEMPERATURE_MAX_HELP": {
+        "message": "The temperature indicator will flash when the IMU temperature is above this value"
+    },
+    "osdAlarmBARO_TEMPERATURE_MIN": {
+        "message": "Minimum baro temperature"
+    },
+    "osdAlarmBARO_TEMPERATURE_MIN_HELP": {
+        "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
+    },
+    "osdAlarmBARO_TEMPERATURE_MAX": {
+        "message": "Maximum baro temperature"
+    },
+    "osdAlarmBARO_TEMPERATURE_MAX_HELP": {
+        "message": "The temperature indicator will flash when the barometer temperature is above this value"
+    },
     "osdGroupGeneral": {
         "message": "General"
     },

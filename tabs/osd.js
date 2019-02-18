@@ -495,6 +495,42 @@ OSD.constants = {
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
         },
+        {
+            name: 'IMU_TEMPERATURE_MIN',
+            field: 'imu_temp_alarm_min',
+            min_version: '2.1.0',
+            unit: '°C',
+            step: 0.5,
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'IMU_TEMPERATURE_MAX',
+            field: 'imu_temp_alarm_max',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'BARO_TEMPERATURE_MIN',
+            field: 'baro_temp_alarm_min',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'BARO_TEMPERATURE_MAX',
+            field: 'baro_temp_alarm_max',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
     ],
 
     // All display fields, from every version, do not remove elements, only add!
@@ -1497,10 +1533,10 @@ OSD.msp = {
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
-            OSD.data.alarms.imu_temp_alarm_min = alarms.readU16();
-            OSD.data.alarms.imu_temp_alarm_max = alarms.readU16();
-            OSD.data.alarms.baro_temp_alarm_min = alarms.readU16();
-            OSD.data.alarms.baro_temp_alarm_max = alarms.readU16();
+            OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
+            OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
+            OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
+            OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
         }
     },
 
@@ -1762,6 +1798,9 @@ OSD.GUI.updateAlarms = function() {
     var $alarms = $('.alarms-container .settings').empty();
     for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
         var alarm = OSD.constants.ALL_ALARMS[kk];
+        if (alarm.min_version && !semver.gte(CONFIG.flightControllerVersion, alarm.min_version)) {
+            continue;
+        }
         var value = OSD.data.alarms[alarm.field];
         if (value === undefined || value === null) {
             continue;
@@ -1775,6 +1814,8 @@ OSD.GUI.updateAlarms = function() {
         var step = 1;
         if (typeof alarm.step === 'function') {
             step = alarm.step(OSD.data)
+        } else if (typeof alarm.step !== 'undefined') {
+            step = alarm.step;
         }
         var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
         alarmInput.data('alarm', alarm);
