@@ -2777,10 +2777,10 @@
         "message": "Input"
     },
     "weight": {
-        "message": "Weight"
+        "message": "Weight (%)"
     },
     "speed": {
-        "message": "Speed"
+        "message": "Speed (10µs/s)"
     },
     "mixerPresetTitle": {
         "message": "Mixer preset"
