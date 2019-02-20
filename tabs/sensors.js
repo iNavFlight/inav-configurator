@@ -599,7 +599,7 @@ TABS.sensors.initialize = function (callback) {
 
                     addSampleToData(debug_data[i], samples_debug_i, [SENSOR_DATA.debug[i]]);
                     drawGraph(debugHelpers[i], debug_data[i], samples_debug_i);
-                    raw_data_text_ements.x[7 + i].text(SENSOR_DATA.debug[i]);
+                    raw_data_text_ements.x[6 + 8 + i].text(SENSOR_DATA.debug[i]);
                 }
                 samples_debug_i++;
             }
