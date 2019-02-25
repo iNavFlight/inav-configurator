@@ -74,6 +74,9 @@ SYM.PITCH_DOWN = 0xDF;
 SYM.TEMP_C = 0x0E;
 SYM.TEMP_F = 0x0D;
 SYM.LAST_CHAR = 190;
+SYM.BARO_TEMP = 0xF0;
+SYM.IMU_TEMP = 0xF1;
+SYM.TEMP = 0xF2;
 
 var FONT = FONT || {};
 
@@ -679,10 +682,10 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return 'IMU   90' + FONT.symbol(SYM.TEMP_F);
+                            return FONT.symbol(SYM.IMU_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
                         }
                         // Metric, UK
-                        return 'IMU   32' + FONT.symbol(SYM.TEMP_C);
+                        return FONT.symbol(SYM.IMU_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
@@ -692,10 +695,10 @@ OSD.constants = {
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return 'BARO  90' + FONT.symbol(SYM.TEMP_F);
+                            return FONT.symbol(SYM.BARO_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
                         }
                         // Metric, UK
-                        return 'BARO  32' + FONT.symbol(SYM.TEMP_C);
+                        return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
