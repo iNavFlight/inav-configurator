@@ -4,7 +4,7 @@
 
 FONT_VERSION = 1
 
-FONTS = default vision vision-alt clarity clarity_medium bold large
+FONTS = default vision impact clarity clarity_medium bold large
 CHARMAPS = $(addsuffix .mcm, $(FONTS))
 PREVIEWS = $(addsuffix .png, $(FONTS))
 

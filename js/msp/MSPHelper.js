@@ -491,14 +491,27 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SERVO_MIX_RULES:
                 SERVO_RULES.flush();
 
-                if (data.byteLength % 7 === 0) {
-                    for (i = 0; i < data.byteLength; i += 7) {
-                        SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt8(i + 2),
-                            data.getInt8(i + 3)
-                        ));
+                if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+                    if (data.byteLength % 8 === 0) {
+                        for (i = 0; i < data.byteLength; i += 8) {
+                            SERVO_RULES.put(new ServoMixRule(
+                                data.getInt8(i),
+                                data.getInt8(i + 1),
+                                data.getInt16(i + 2, true),
+                                data.getInt8(i + 4)
+                            ));
+                        }
+                    }
+                } else {
+                    if (data.byteLength % 7 === 0) {
+                        for (i = 0; i < data.byteLength; i += 7) {
+                            SERVO_RULES.put(new ServoMixRule(
+                                data.getInt8(i),
+                                data.getInt8(i + 1),
+                                data.getInt8(i + 2),
+                                data.getInt8(i + 3)
+                            ));
+                        }
                     }
                 }
                 SERVO_RULES.cleanup();
@@ -1427,6 +1440,22 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
                 console.log('Braking config saved');
                 break;
+            case MSPCodes.MSP2_BLACKBOX_CONFIG:
+                BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
+                BLACKBOX.blackboxDevice = data.getUint8(1);
+                BLACKBOX.blackboxRateNum = data.getUint16(2);
+                BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                break;
+            case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
+                console.log("Blackbox config saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_TEMPERATURES:
+                for (i = 0; i < 8; ++i) {
+                    temp_decidegrees = data.getInt16(i * 2, true);
+                    SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
+                }
+                break;
 
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
@@ -2124,15 +2153,22 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-        var message = [
-            BLACKBOX.blackboxDevice & 0xFF,
-            BLACKBOX.blackboxRateNum & 0xFF,
-            BLACKBOX.blackboxRateDenom & 0xFF
-        ];
-
+	var buffer = [];
+	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+	if (semver.gte(CONFIG.apiVersion, "2.3.0")) {
+	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+	} else {
+	    buffer.push(BLACKBOX.blackboxRateNum & 0xFF);
+	    buffer.push(BLACKBOX.blackboxRateDenom & 0xFF);
+	}
         //noinspection JSUnusedLocalSymbols
-        MSP.send_message(MSPCodes.MSP_SET_BLACKBOX_CONFIG, message, false, function (response) {
-            onDataCallback();
+        MSP.send_message(messageId, buffer, false, function (response) {
+	    onDataCallback();
         });
     };
 
@@ -2213,7 +2249,12 @@ var mspHelper = (function (gui) {
             buffer.push(servoIndex);
             buffer.push(servoRule.getTarget());
             buffer.push(servoRule.getInput());
-            buffer.push(servoRule.getRate());
+            if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+                buffer.push(lowByte(servoRule.getRate()));
+                buffer.push(highByte(servoRule.getRate()));
+            } else {
+                buffer.push(servoRule.getRate());
+            }
             buffer.push(servoRule.getSpeed());
             buffer.push(0);
             buffer.push(0);

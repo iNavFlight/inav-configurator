@@ -2374,6 +2374,30 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osdAlarmIMU_TEMPERATURE_MIN": {
+        "message": "Minimum IMU temperature"
+    },
+    "osdAlarmIMU_TEMPERATURE_MIN_HELP": {
+        "message": "The temperature indicator will flash when the IMU temperature is bellow this value"
+    },
+    "osdAlarmIMU_TEMPERATURE_MAX": {
+        "message": "Maximum IMU temperature"
+    },
+    "osdAlarmIMU_TEMPERATURE_MAX_HELP": {
+        "message": "The temperature indicator will flash when the IMU temperature is above this value"
+    },
+    "osdAlarmBARO_TEMPERATURE_MIN": {
+        "message": "Minimum baro temperature"
+    },
+    "osdAlarmBARO_TEMPERATURE_MIN_HELP": {
+        "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
+    },
+    "osdAlarmBARO_TEMPERATURE_MAX": {
+        "message": "Maximum baro temperature"
+    },
+    "osdAlarmBARO_TEMPERATURE_MAX_HELP": {
+        "message": "The temperature indicator will flash when the barometer temperature is above this value"
+    },
     "osdGroupGeneral": {
         "message": "General"
     },
@@ -2382,6 +2406,9 @@
     },
     "osdGroupTimers": {
         "message": "Timers"
+    },
+    "osdGroupTemperature": {
+        "message": "Temperature"
     },
     "osdGroupAttitude": {
         "message": "Attitude"
@@ -2596,11 +2623,41 @@
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ P controllers outputs"
     },
-    "osdElement_TEMPERATURE": {
-        "message": "Temperature"
+    "osdElement_IMU_TEMPERATURE": {
+        "message": "IMU Temperature"
     },
-    "osdElement_TEMPERATURE_HELP": {
-        "message": "Temperature of the FC, obtained from the most accurate available source."
+    "osdElement_IMU_TEMPERATURE_HELP": {
+        "message": "Temperature of the IMU"
+    },
+    "osdElement_BARO_TEMPERATURE": {
+        "message": "Baro Temperature"
+    },
+    "osdElement_BARO_TEMPERATURE_HELP": {
+        "message": "Temperature of the barometer"
+    },
+    "osdElement_SENSOR1_TEMPERATURE": {
+        "message": "Temperature sensor 1"
+    },
+    "osdElement_SENSOR2_TEMPERATURE": {
+        "message": "Temperature sensor 2"
+    },
+    "osdElement_SENSOR3_TEMPERATURE": {
+        "message": "Temperature sensor 3"
+    },
+    "osdElement_SENSOR4_TEMPERATURE": {
+        "message": "Temperature sensor 4"
+    },
+    "osdElement_SENSOR5_TEMPERATURE": {
+        "message": "Temperature sensor 5"
+    },
+    "osdElement_SENSOR6_TEMPERATURE": {
+        "message": "Temperature sensor 6"
+    },
+    "osdElement_SENSOR7_TEMPERATURE": {
+        "message": "Temperature sensor 7"
+    },
+    "osdElement_SENSOR8_TEMPERATURE": {
+        "message": "Temperature sensor 8"
     },
     "osdSettingMainVoltageDecimals": {
         "message": "Main Voltage Decimals"
@@ -2720,10 +2777,10 @@
         "message": "Input"
     },
     "weight": {
-        "message": "Weight"
+        "message": "Weight (%)"
     },
     "speed": {
-        "message": "Speed"
+        "message": "Speed (10µs/s)"
     },
     "mixerPresetTitle": {
         "message": "Mixer preset"
@@ -2850,5 +2907,20 @@
     },
     "looptimeNotAdvised": {
         "message": "PID loop might be not stable if GPS is in use"
+    },
+    "gyroLpfSuggestedMessage": {
+        "message": "This is suggested setting for all Multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
+    },
+    "gyroLpfNotAdvisedMessage": {
+        "message": "It is suggested to choose higher cutoff frequency"
+    },
+    "gyroLpfNotFlyableMessage": {
+        "message": "This setting will probably make UAV unflyable"
+    },
+    "gyroLpfWhyNotHigherMessage": {
+        "message": "If motors are not overheating, try going 256Hz instead"
+    },
+    "gyroLpfWhyNotSlightlyHigherMessage": {
+        "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
     }
 }

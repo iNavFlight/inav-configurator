@@ -22,7 +22,18 @@ $(document).ready(function () {
 
     GUI.handleReconnect = function ($tabElement) {
 
-        if (BOARD.find_board_definition(CONFIG.boardIdentifier).vcp) { // VCP-based flight controls may crash old drivers, we catch and reconnect
+        let modal;
+
+        if (BOARD.hasVcp(CONFIG.boardIdentifier)) { // VCP-based flight controls may crash old drivers, we catch and reconnect
+
+            modal = new jBox('Modal', {
+                width: 400,
+                height: 100,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-reconnect')
+            }).open();
 
             /*
              Disconnect
@@ -35,6 +46,7 @@ $(document).ready(function () {
              Connect again
              */
             setTimeout(function start_connection() {
+                modal.close();
                 $('a.connect').click();
 
                 /*
@@ -46,7 +58,7 @@ $(document).ready(function () {
                     }, 500);
                 }
 
-            }, 5000);
+            }, 7000);
         } else {
 
             helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {

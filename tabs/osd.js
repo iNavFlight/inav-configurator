@@ -74,6 +74,9 @@ SYM.PITCH_DOWN = 0xDF;
 SYM.TEMP_C = 0x0E;
 SYM.TEMP_F = 0x0D;
 SYM.LAST_CHAR = 190;
+SYM.BARO_TEMP = 0xF0;
+SYM.IMU_TEMP = 0xF1;
+SYM.TEMP = 0xF2;
 
 var FONT = FONT || {};
 
@@ -397,6 +400,10 @@ OSD.initData = function () {
             max_altitude: null,
             dist: null,
             max_neg_altitude: null,
+            imu_temp_alarm_min: null,
+            imu_temp_alarm_max: null,
+            baro_temp_alarm_min: null,
+            baro_temp_alarm_max: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
@@ -490,6 +497,42 @@ OSD.constants = {
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
+        },
+        {
+            name: 'IMU_TEMPERATURE_MIN',
+            field: 'imu_temp_alarm_min',
+            min_version: '2.1.0',
+            unit: '°C',
+            step: 0.5,
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'IMU_TEMPERATURE_MAX',
+            field: 'imu_temp_alarm_max',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'BARO_TEMPERATURE_MIN',
+            field: 'baro_temp_alarm_min',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
+        },
+        {
+            name: 'BARO_TEMPERATURE_MAX',
+            field: 'baro_temp_alarm_max',
+            min_version: '2.1.0',
+            step: 0.5,
+            unit: '°C',
+            to_display: function(osd_data, value) { return value / 10 },
+            from_display: function(osd_data, value) { return value * 10 },
         },
     ],
 
@@ -626,17 +669,139 @@ OSD.constants = {
                     min_version: '1.7.4',
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
+            ]
+        },
+        {
+            name: 'osdGroupTemperature',
+            items: [
                 {
-                    name: 'TEMPERATURE',
+                    name: 'IMU_TEMPERATURE',
                     id: 86,
                     min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
-                            return '90' + FONT.symbol(SYM.TEMP_F);
+                            return FONT.symbol(SYM.IMU_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
                         }
                         // Metric, UK
-                        return '32' + FONT.symbol(SYM.TEMP_C);
+                        return FONT.symbol(SYM.IMU_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'BARO_TEMPERATURE',
+                    id: 87,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.BARO_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR1_TEMPERATURE',
+                    id: 88,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR2_TEMPERATURE',
+                    id: 89,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR3_TEMPERATURE',
+                    id: 90,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR4_TEMPERATURE',
+                    id: 91,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR5_TEMPERATURE',
+                    id: 92,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR6_TEMPERATURE',
+                    id: 93,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR7_TEMPERATURE',
+                    id: 94,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'SENSOR8_TEMPERATURE',
+                    id: 95,
+                    min_version: '2.1.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
             ]
@@ -805,7 +970,7 @@ OSD.constants = {
                 },
                 {
                     name: 'MSL_ALTITUDE',
-                    id: 87,
+                    id: 96,
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -844,10 +1009,10 @@ OSD.constants = {
                 },
                 {
                     name: 'PLUS_CODE',
-                    id: 88,
+                    id: 97,
                     min_version: '2.1.0',
                     preview: function() {
-                        var digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
                         console.log("DITIS", digits);
                         return '9547X6PM+VWCCC'.substr(0, digits);
                     }
@@ -1344,6 +1509,12 @@ OSD.msp = {
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
+            result.push16(OSD.data.alarms.imu_temp_alarm_min);
+            result.push16(OSD.data.alarms.imu_temp_alarm_max);
+            result.push16(OSD.data.alarms.baro_temp_alarm_min);
+            result.push16(OSD.data.alarms.baro_temp_alarm_max);
+        }
         return result;
     },
 
@@ -1355,6 +1526,12 @@ OSD.msp = {
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
+        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
+            OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
+            OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
+            OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
+            OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
+        }
     },
 
     encodePreferences: function() {
@@ -1615,6 +1792,9 @@ OSD.GUI.updateAlarms = function() {
     var $alarms = $('.alarms-container .settings').empty();
     for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
         var alarm = OSD.constants.ALL_ALARMS[kk];
+        if (alarm.min_version && !semver.gte(CONFIG.flightControllerVersion, alarm.min_version)) {
+            continue;
+        }
         var value = OSD.data.alarms[alarm.field];
         if (value === undefined || value === null) {
             continue;
@@ -1628,6 +1808,8 @@ OSD.GUI.updateAlarms = function() {
         var step = 1;
         if (typeof alarm.step === 'function') {
             step = alarm.step(OSD.data)
+        } else if (typeof alarm.step !== 'undefined') {
+            step = alarm.step;
         }
         var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
         alarmInput.data('alarm', alarm);
@@ -2085,10 +2267,11 @@ TABS.osd.initialize = function (callback) {
                 if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
             }
 
-            if (previous_font_button == undefined)
+            if (typeof previous_font_button == "undefined") {
                 $fontPicker.first().click();
-            else
+            } else {
                 previous_font_button.click();
+            }
         });
 
         $('button.load_font_file').click(function () {
@@ -2204,6 +2387,9 @@ TABS.osd.cleanup = function (callback) {
     // unbind "global" events
     $(document).unbind('keypress');
     $(document).off('click', 'span.progressLabel a');
+
+    delete OSD.GUI.jbox;
+    $('.jBox-wrapper').remove()
 
     if (callback) callback();
 };
