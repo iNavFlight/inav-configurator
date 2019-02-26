@@ -64,16 +64,8 @@ TABS.onboard_logging.initialize = function (callback) {
                 dataflashPresent = DATAFLASH.totalSize > 0,
                 blackboxSupport;
 
-            /*
-             * Pre-1.11.0 firmware supported DATAFLASH API (on targets with SPI flash) but not the BLACKBOX config API.
-             *
-             * The best we can do on those targets is check the BLACKBOX feature bit to identify support for Blackbox instead.
-             */
-            if (BLACKBOX.supported || DATAFLASH.supported
-                    || semver.gte(CONFIG.flightControllerVersion, "1.5.0") && semver.lte(CONFIG.flightControllerVersion, "1.10.0") && bit_check(BF_CONFIG.features, 19)) {
+            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(BF_CONFIG.features, 19)) {
                 blackboxSupport = 'yes';
-            } else if (semver.gte(CONFIG.flightControllerVersion, "1.5.0") && semver.lte(CONFIG.flightControllerVersion, "1.10.0")) {
-                blackboxSupport = 'maybe';
             } else {
                 blackboxSupport = 'no';
             }
@@ -84,9 +76,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 .toggleClass("dataflash-present", dataflashPresent)
                 .toggleClass("sdcard-supported", SDCARD.supported)
                 .toggleClass("blackbox-config-supported", BLACKBOX.supported)
-
                 .toggleClass("blackbox-supported", blackboxSupport == 'yes')
-                .toggleClass("blackbox-maybe-supported", blackboxSupport == 'maybe')
                 .toggleClass("blackbox-unsupported", blackboxSupport == 'no');
 
             if (dataflashPresent) {
