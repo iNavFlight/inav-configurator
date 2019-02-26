@@ -1229,10 +1229,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_CALIBRATION_DATA:
-                if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
-                    break;
-                }
-
                 var callibrations = data.getUint8(0);
                 CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
                 CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
@@ -2253,10 +2249,6 @@ var mspHelper = (function (gui) {
 
     self.sendMotorMixer = function (onCompleteCallback) {
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
-            onCompleteCallback();
-        }
-
         var nextFunction = sendMixer,
             servoIndex = 0;
 
@@ -2863,19 +2855,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
     };
 
     self.saveCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
     };
 
     self.loadRthAndLandConfig = function (callback) {
@@ -2895,11 +2879,7 @@ var mspHelper = (function (gui) {
     };
 
     self.getMissionInfo = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
     };
 
     self._getSetting = function (name) {
@@ -3111,11 +3091,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadMotorMixRules = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
     };
 
     self.loadMotors = function (callback) {
@@ -3123,29 +3099,21 @@ var mspHelper = (function (gui) {
     };
 
     self.getCraftName = function(callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
-                var name = resp.data.readString();
-                if (callback) {
-                    callback(name);
-                }
-            });
-        } else if (callback) {
-            callback(null);
-        }
+        MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
+            var name = resp.data.readString();
+            if (callback) {
+                callback(name);
+            }
+        });
     };
 
     self.setCraftName = function(name, callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            var data = [];
-            name = name || "";
-            for (var ii = 0; ii < name.length; ii++) {
-                data.push(name.charCodeAt(ii));
-            }
-            MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
-        } else if (callback) {
-            callback();
+        var data = [];
+        name = name || "";
+        for (var ii = 0; ii < name.length; ii++) {
+            data.push(name.charCodeAt(ii));
         }
+        MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
     };
 
     self.loadMixerConfig = function (callback) {

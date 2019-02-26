@@ -44,12 +44,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         loadCraftName
     ];
 
-    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-        loadChain.push(mspHelper.loadMiscV2);
-    } else {
-        loadChain.push(mspHelper.loadMisc);
-    }
-
+    loadChain.push(mspHelper.loadMiscV2);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -71,12 +66,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         saveCraftName,
     ];
 
-    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-        saveChain.push(mspHelper.saveMiscV2);
-    } else {
-        saveChain.push(mspHelper.saveMisc);
-    }
-
+    saveChain.push(mspHelper.saveMiscV2);
     saveChain.push(mspHelper.saveToEeprom);
 
     saveChainer.setChain(saveChain);
@@ -417,14 +407,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
 
-        // Battery thresholds resolution is 100mV and voltage scale max is 255 before 1.8.1
-        if (semver.lt(CONFIG.flightControllerVersion, '1.8.1')) {
-            $('#mincellvoltage').attr('step', '0.1');
-            $('#maxcellvoltage').attr('step', '0.1');
-            $('#warningcellvoltage').attr('step', '0.1');
-            $('#voltagescale').attr('max', '255');
-        }
-
         // fill battery voltage
         $('#voltagesource').val(MISC.voltage_source);
         $('#cells').val(MISC.battery_cells);
@@ -736,12 +718,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            $(".requires-v1_8_1").show();
-        } else {
-            $(".requires-v1_8_1").hide();
-        }
-
         if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             $(".requires-v2_0_0").show();
         } else {
@@ -903,11 +879,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         });
 
         helper.interval.add('config_load_analog', function () {
-            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-                $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
-            } else {
-                $('#batteryvoltage').val([ANALOG.voltage.toFixed(1)]);
-            }
+            $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
 

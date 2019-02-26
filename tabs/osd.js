@@ -574,7 +574,6 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
                     id: 38,
-                    min_version: '1.8.1',
                     preview: '100%'
                 },
                 {
@@ -912,7 +911,6 @@ OSD.constants = {
                 {
                     name: 'WH_DRAWN',
                     id: 36,
-                    min_version: '1.8.1',
                     preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
                 },
                 {
@@ -923,7 +921,6 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
-                    min_version: '1.8.1',
                     preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
                 },
                 {
@@ -934,7 +931,6 @@ OSD.constants = {
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    min_version: '1.8.1',
                     preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
                 }
             ]

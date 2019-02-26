@@ -580,12 +580,10 @@ var FC = {
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
         );
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-            features.push(
-                {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
-                {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
-            );
-        }
+        features.push(
+            {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
+            {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
+        );
 
         if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
             features.push(
