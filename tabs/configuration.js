@@ -736,12 +736,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.0")) {
-            $(".requires-v1_7").show();
-        } else {
-            $(".requires-v1_7").hide();
-        }
-
         if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
             $(".requires-v1_8_1").show();
         } else {

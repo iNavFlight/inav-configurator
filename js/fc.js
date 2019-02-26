@@ -576,11 +576,9 @@ var FC = {
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false}
         );
 
-        if (semver.gte(CONFIG.flightControllerVersion, '1.7.3')) {
-            features.push(
-                {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
-            );
-        }
+        features.push(
+            {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
+        );
 
         if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
             features.push(
@@ -697,22 +695,14 @@ var FC = {
         ];
     },
     getGpsProtocols: function () {
-        var data = [
+        return [
             'NMEA',
             'UBLOX',
             'I2C-NAV',
-            'DJI NAZA'
+            'DJI NAZA',
+            'UBLOX7',
+            'MTK'
         ];
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            data.push('UBLOX7')
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.2")) {
-            data.push('MTK')
-        }
-
-        return data;
     },
     getGpsBaudRates: function () {
         return [
@@ -769,12 +759,10 @@ var FC = {
 
         // Versions using feature bits don't allow not having an
         // RX and fallback to RX_PPM.
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            rxTypes.push({
-                name: 'RX_NONE',
-                value: 0,
-            });
-        }
+        rxTypes.push({
+            name: 'RX_NONE',
+            value: 0,
+        });
 
         return rxTypes;
     },
@@ -788,25 +776,10 @@ var FC = {
                 }
             }
         }
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            return RX_CONFIG.receiver_type == rxType.value;
-        }
-        return bit_check(BF_CONFIG.features, rxType.bit);
+        return RX_CONFIG.receiver_type == rxType.value;
     },
     setRxTypeEnabled: function(rxType) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            RX_CONFIG.receiver_type = rxType.value;
-        } else {
-            // Clear other rx features before
-            var rxTypes = this.getRxTypes();
-            for (var ii = 0; ii < rxTypes.length; ii++) {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, rxTypes[ii].bit);
-            }
-            // Set the feature for this rx type (if any, RX_NONE is set by clearing all)
-            if (rxType.bit !== undefined) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, rxType.bit);
-            }
-        }
+        RX_CONFIG.receiver_type = rxType.value;
     },
     getSerialRxTypes: function () {
         var data = [
@@ -1070,11 +1043,7 @@ var FC = {
         return ["Current", "Extra", "Fixed", "Max", "At Least"];
     },
     getRthAllowLanding: function() {
-        var values = ["Never", "Always"];
-        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            values.push("Only on failsafe");
-        }
-        return values;
+        return ["Never", "Always", "Only on failsafe"];
     },
     getFailsafeProcedure: function () {
         return {

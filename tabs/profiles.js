@@ -546,11 +546,7 @@ presets.model = (function () {
         if (mixerType == 'airplane' || mixerType == 'flyingwing') {
             // Always set MOTOR_STOP and feature AIRMODE for fixed wing
             window.BF_CONFIG.features |= 1 << 4; // MOTOR_STOP
-            if (semver.gt(CONFIG.flightControllerVersion, '1.7.2')) {
-                // Note that feature_AIRMODE is only supported on
-                // INAV > 1.7.2.
-                window.BF_CONFIG.features |= 1 << 22; // AIRMODE
-            }
+            window.BF_CONFIG.features |= 1 << 22; // AIRMODE
         }
     };
 
@@ -643,13 +639,11 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
             }
         }
         var promises = {};
-        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            var settings = presets.settings.get(currentPreset.type);
-            Object.keys(settings).forEach(function(key, ii) {
-                var value = settings[key];
-                promises[key] = mspHelper.setSetting(name, value);
-            });
-        }
+        var settings = presets.settings.get(currentPreset.type);
+        Object.keys(settings).forEach(function(key, ii) {
+            var value = settings[key];
+            promises[key] = mspHelper.setSetting(name, value);
+        });
         Promise.props(promises).then(function () {
             saveChainer.execute();
         });

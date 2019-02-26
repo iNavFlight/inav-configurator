@@ -68,53 +68,46 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.requires-v2_1').hide();
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
+        $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
+        $rthClimbFirst.change(function () {
+            if ($(this).is(":checked")) {
+                RTH_AND_LAND_CONFIG.rthClimbFirst = 1;
+            } else {
+                RTH_AND_LAND_CONFIG.rthClimbFirst = 0;
+            }
+        });
+        $rthClimbFirst.change();
 
-            $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
-            $rthClimbFirst.change(function () {
-                if ($(this).is(":checked")) {
-                    RTH_AND_LAND_CONFIG.rthClimbFirst = 1;
-                } else {
-                    RTH_AND_LAND_CONFIG.rthClimbFirst = 0;
-                }
-            });
-            $rthClimbFirst.change();
+        $rthClimbIgnoreEmergency.prop("checked", RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
+        $rthClimbIgnoreEmergency.change(function () {
+            if ($(this).is(":checked")) {
+                RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 1;
+            } else {
+                RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 0;
+            }
+        });
+        $rthClimbIgnoreEmergency.change();
 
-            $rthClimbIgnoreEmergency.prop("checked", RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
-            $rthClimbIgnoreEmergency.change(function () {
-                if ($(this).is(":checked")) {
-                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 1;
-                } else {
-                    RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency = 0;
-                }
-            });
-            $rthClimbIgnoreEmergency.change();
+        $rthTailFirst.prop("checked", RTH_AND_LAND_CONFIG.rthTailFirst);
+        $rthTailFirst.change(function () {
+            if ($(this).is(":checked")) {
+                RTH_AND_LAND_CONFIG.rthTailFirst = 1;
+            } else {
+                RTH_AND_LAND_CONFIG.rthTailFirst = 0;
+            }
+        });
+        $rthTailFirst.change();
 
-            $rthTailFirst.prop("checked", RTH_AND_LAND_CONFIG.rthTailFirst);
-            $rthTailFirst.change(function () {
-                if ($(this).is(":checked")) {
-                    RTH_AND_LAND_CONFIG.rthTailFirst = 1;
-                } else {
-                    RTH_AND_LAND_CONFIG.rthTailFirst = 0;
-                }
-            });
-            $rthTailFirst.change();
-
-            GUI.fillSelect($rthAltControlMode, FC.getRthAltControlMode(), RTH_AND_LAND_CONFIG.rthAltControlMode);
-            $rthAltControlMode.val(RTH_AND_LAND_CONFIG.rthAltControlMode);
-            $rthAltControlMode.change(function () {
-                RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
-            });
-            GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
-            $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
-            $rthAllowLanding.change(function () {
-                RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();
-            });
-
-            $('.requires-v1_7_1').show();
-        } else {
-            $('.requires-v1_7_1').hide();
-        }
+        GUI.fillSelect($rthAltControlMode, FC.getRthAltControlMode(), RTH_AND_LAND_CONFIG.rthAltControlMode);
+        $rthAltControlMode.val(RTH_AND_LAND_CONFIG.rthAltControlMode);
+        $rthAltControlMode.change(function () {
+            RTH_AND_LAND_CONFIG.rthAltControlMode = $rthAltControlMode.val();
+        });
+        GUI.fillSelect($rthAllowLanding, FC.getRthAllowLanding(), RTH_AND_LAND_CONFIG.rthAllowLanding);
+        $rthAllowLanding.val(RTH_AND_LAND_CONFIG.rthAllowLanding);
+        $rthAllowLanding.change(function () {
+            RTH_AND_LAND_CONFIG.rthAllowLanding = $rthAllowLanding.val();
+        });
 
         GUI.fillSelect($userControlMode, FC.getUserControlMode(), NAV_POSHOLD.userControlMode);
         $userControlMode.val(NAV_POSHOLD.userControlMode);
