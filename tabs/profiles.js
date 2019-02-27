@@ -227,6 +227,36 @@ presets.presets = [
         type: 'multirotor'
     },
     {
+        name: '7" Freestyle',
+        description: "Quadcopter using 7\" propellers with F4/F7 CPU on 4S battery<br>" +
+            "<span>1500-1800KV motors optimized for acro and freestyle</span>",
+        features: [
+            "Multishot at 4kHz",
+            "700dps/600dps rates",
+            "Improved filtering",
+            "Improved PID defaults"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
+            presets.elementHelper("FC_CONFIG", "loopTime", 250),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 3),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 4000),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
+            presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 80),
+            presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 175),
+            presets.elementHelper("RC_tuning", "roll_rate", 700),
+            presets.elementHelper("RC_tuning", "pitch_rate", 700),
+            presets.elementHelper("RC_tuning", "yaw_rate", 500),
+            presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("PIDs", 0, [30, 50, 25]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [30, 50, 25]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [60, 50, 0])  //YAW PIDs
+        ],
+        type: 'multirotor'
+    },
+    {
         name: '10" General Purpose',
         description: "450-600 class general purpose multirotor <br><span>1.0kg - 1.4kg weight, 10 inch propellers, <br>F3/F4/F7 CPU, MPU6000 or MPU6050 gyro, GPS optional.</span>",
         features: [
