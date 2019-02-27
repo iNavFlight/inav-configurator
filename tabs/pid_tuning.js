@@ -16,12 +16,7 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig
     ];
-
-    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-        loadChain.push(mspHelper.loadRateProfileData);
-    } else {
-        loadChain.push(mspHelper.loadRcTuningData);
-    }
+    loadChain.push(mspHelper.loadRateProfileData);
 
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
@@ -233,11 +228,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function send_rc_tuning_changes() {
-                if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-                    MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
-                } else {
-                    MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, saveINAVPidConfig);
-                }
+                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
             }
 
             function saveINAVPidConfig() {

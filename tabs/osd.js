@@ -349,10 +349,7 @@ function altitude_alarm_from_display(osd_data, value) {
 // depending on the OSD display unit used (hence, no conversion)
 function altitude_alarm_display_function(fn) {
     return function(osd_data, value) {
-        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            return fn(osd_data, value)
-        }
-        return value;
+        return fn(osd_data, value)
     }
 }
 
@@ -433,7 +430,7 @@ OSD.constants = {
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
         {name: 'osdUnitMetric', value: 1},
-        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 2, min_version: "1.7.3"},
+        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 2},
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
@@ -560,7 +557,6 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
                     id: 32,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
                 },
                 {
@@ -578,7 +574,6 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
                     id: 38,
-                    min_version: '1.8.1',
                     preview: '100%'
                 },
                 {
@@ -607,7 +602,6 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION_AUTO_THR',
                     id: 33,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
                 },
                 {
@@ -623,7 +617,6 @@ OSD.constants = {
                 {
                     name: 'MESSAGES',
                     id: 30,
-                    min_version: '1.7.4',
                     preview: '       SYSTEM MESSAGE       ', // 28 chars, like OSD_MESSAGE_LENGTH on osd.c
                 },
                 {
@@ -634,7 +627,6 @@ OSD.constants = {
                 {
                     name: 'HEADING_GRAPH',
                     id: 34,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.HEADING_W) +
                         FONT.symbol(SYM.HEADING_LINE) +
                         FONT.symbol(SYM.HEADING_DIVIDED_LINE) +
@@ -648,7 +640,6 @@ OSD.constants = {
                 {
                     name: 'AIR_SPEED',
                     id: 27,
-                    min_version: '1.7.3',
                     enabled: function() {
                         return SENSOR_CONFIG.pitot != 0;
                     },
@@ -666,7 +657,6 @@ OSD.constants = {
                 {
                     name: 'RTC_TIME',
                     id: 29,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
             ]
@@ -852,7 +842,6 @@ OSD.constants = {
                 {
                     name: 'ONTIME_FLYTIME',
                     id: 28,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.FLY_M) + '04:11'
                 },
                 {
@@ -922,7 +911,6 @@ OSD.constants = {
                 {
                     name: 'WH_DRAWN',
                     id: 36,
-                    min_version: '1.8.1',
                     preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
                 },
                 {
@@ -933,19 +921,16 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
-                    min_version: '1.8.1',
                     preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
                 },
                 {
                     name: 'EFFICIENCY_MAH',
                     id: 35,
-                    min_version: '1.7.4',
                     preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
                 },
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    min_version: '1.8.1',
                     preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
                 }
             ]
@@ -1054,7 +1039,6 @@ OSD.constants = {
                 {
                     name: 'GPS_HDOP',
                     id: 31,
-                    min_version: '1.7.4',
                     preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + FONT.embed_dot('1.8')
                 },
                 {
@@ -1631,10 +1615,8 @@ OSD.msp = {
         d.alarms.fly_minutes = view.readU16();
         d.alarms.max_altitude = view.readU16();
 
-        if (semver.gt(CONFIG.flightControllerVersion, '1.7.3')) {
-            d.alarms.dist = view.readU16();
-            d.alarms.max_neg_altitude = view.readU16();
-        }
+        d.alarms.dist = view.readU16();
+        d.alarms.max_neg_altitude = view.readU16();
 
         d.items = [];
         // start at the offset from the other fields

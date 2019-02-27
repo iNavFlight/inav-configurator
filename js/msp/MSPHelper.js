@@ -93,12 +93,6 @@ var mspHelper = (function (gui) {
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
-
-                /* For 1.7.4+ MSP_ACTIVEBOXES should be used to determine active modes */
-                if (semver.lt(CONFIG.flightControllerVersion, "1.7.4")) {
-                    CONFIG.mode = data.getUint32(6, true);
-                }
-
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, true);
                 CONFIG.armingFlags = data.getUint16(13, true);
@@ -867,12 +861,10 @@ var mspHelper = (function (gui) {
                     RX_CONFIG.spirx_channel_count = data.getUint8(offset);
                     offset += 1;
                 }
-                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
-                    offset += 1;
-                    RX_CONFIG.receiver_type = data.getUint8(offset);
-                    offset += 1;
-                }
+                // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                offset += 1;
+                RX_CONFIG.receiver_type = data.getUint8(offset);
+                offset += 1;
                 break;
 
             case MSPCodes.MSP_FAILSAFE_CONFIG:
@@ -888,24 +880,20 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                 offset++;
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-                    FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
-                    offset++;
-                    FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
-                    offset += 2;
-                }
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
-                    FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
-                    offset++;
-                }
+                FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
+                offset++;
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -1241,10 +1229,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_CALIBRATION_DATA:
-                if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
-                    break;
-                }
-
                 var callibrations = data.getUint8(0);
                 CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
                 CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
@@ -1702,12 +1686,10 @@ var mspHelper = (function (gui) {
                     buffer.push32(RX_CONFIG.spirx_id);
                     buffer.push(RX_CONFIG.spirx_channel_count);
                 }
-                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
-                    buffer.push(0);
-                    // receiver type in RX_CONFIG rather than in BF_CONFIG.features
-                    buffer.push(RX_CONFIG.receiver_type);
-                }
+                // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                buffer.push(0);
+                // receiver type in RX_CONFIG rather than in BF_CONFIG.features
+                buffer.push(RX_CONFIG.receiver_type);
                 break;
 
             case MSPCodes.MSP_SET_FAILSAFE_CONFIG:
@@ -1719,22 +1701,18 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-                    buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                }
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
-                    buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-                }
+                buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
@@ -2270,10 +2248,6 @@ var mspHelper = (function (gui) {
     };
 
     self.sendMotorMixer = function (onCompleteCallback) {
-
-        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
-            onCompleteCallback();
-        }
 
         var nextFunction = sendMixer,
             servoIndex = 0;
@@ -2881,59 +2855,31 @@ var mspHelper = (function (gui) {
     };
 
     self.loadCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
     };
 
     self.saveCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
     };
 
     self.loadRthAndLandConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
     };
 
     self.saveRthAndLandConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
     };
 
     self.loadFwConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
     };
 
     self.saveFwConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
             MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
-        } else {
-            callback();
-        }
     };
 
     self.getMissionInfo = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
     };
 
     self._getSetting = function (name) {
@@ -3117,31 +3063,23 @@ var mspHelper = (function (gui) {
     };
 
     self.getRTC = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            MSP.send_message(MSPCodes.MSP_RTC, false, false, function (resp) {
-                var seconds = resp.data.read32();
-                var millis = resp.data.readU16();
-                if (callback) {
-                    callback(seconds, millis);
-                }
-            });
-        } else if (callback) {
-            callback(0, 0);
-        }
+        MSP.send_message(MSPCodes.MSP_RTC, false, false, function (resp) {
+            var seconds = resp.data.read32();
+            var millis = resp.data.readU16();
+            if (callback) {
+                callback(seconds, millis);
+            }
+        });
     };
 
     self.setRTC = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            var now = Date.now();
-            var secs = now / 1000;
-            var millis = now % 1000;
-            var data = [];
-            data.push32(secs);
-            data.push16(millis);
-            MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
-        } else if (callback) {
-            callback();
-        }
+        var now = Date.now();
+        var secs = now / 1000;
+        var millis = now % 1000;
+        var data = [];
+        data.push32(secs);
+        data.push16(millis);
+        MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
     };
 
     self.loadServoConfiguration = function (callback) {
@@ -3153,11 +3091,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadMotorMixRules = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
     };
 
     self.loadMotors = function (callback) {
@@ -3165,29 +3099,21 @@ var mspHelper = (function (gui) {
     };
 
     self.getCraftName = function(callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
-                var name = resp.data.readString();
-                if (callback) {
-                    callback(name);
-                }
-            });
-        } else if (callback) {
-            callback(null);
-        }
+        MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
+            var name = resp.data.readString();
+            if (callback) {
+                callback(name);
+            }
+        });
     };
 
     self.setCraftName = function(name, callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            var data = [];
-            name = name || "";
-            for (var ii = 0; ii < name.length; ii++) {
-                data.push(name.charCodeAt(ii));
-            }
-            MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
-        } else if (callback) {
-            callback();
+        var data = [];
+        name = name || "";
+        for (var ii = 0; ii < name.length; ii++) {
+            data.push(name.charCodeAt(ii));
         }
+        MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
     };
 
     self.loadMixerConfig = function (callback) {

@@ -43,26 +43,22 @@ TABS.ports.initialize = function (callback) {
     }
 
     // support configure RunCam Device
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-        functionRules.push({
-            name: 'RUNCAM_DEVICE_CONTROL',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'RUNCAM_DEVICE_CONTROL',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
 
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
-        functionRules.push({
-            name: 'TBS_SMARTAUDIO',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-        functionRules.push({
-            name: 'IRC_TRAMP',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'TBS_SMARTAUDIO',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+    functionRules.push({
+        name: 'IRC_TRAMP',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
  
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);

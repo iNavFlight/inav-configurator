@@ -24,12 +24,7 @@ TABS.receiver.initialize = function (callback) {
         mspHelper.loadRcDeadband
     ];
 
-    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-        loadChain.push(mspHelper.loadRateProfileData);
-    } else {
-        loadChain.push(mspHelper.loadRcTuningData);
-    }
-
+    loadChain.push(mspHelper.loadRateProfileData);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -328,11 +323,7 @@ TABS.receiver.initialize = function (callback) {
                 });
             }
 
-            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
-            } else {
-                MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, save_rc_map);
-            }
+            MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
         });
 
         $("a.sticks").click(function () {

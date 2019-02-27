@@ -52,30 +52,20 @@ TABS.calibration.initialize = function (callback) {
         GUI.active_tab = 'calibration';
         googleAnalytics.sendAppView('Calibration');
     }
-    if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-        loadChainer.setChain([
-            mspHelper.loadStatus,
-            mspHelper.loadSensorConfig,
-            mspHelper.loadCalibrationData
-        ]);
-        loadChainer.setExitPoint(loadHtml);
-        loadChainer.execute();
+    loadChainer.setChain([
+        mspHelper.loadStatus,
+        mspHelper.loadSensorConfig,
+        mspHelper.loadCalibrationData
+    ]);
+    loadChainer.setExitPoint(loadHtml);
+    loadChainer.execute();
 
-        saveChainer.setChain([
-            mspHelper.saveCalibrationData
-        ]);
-        saveChainer.setExitPoint(reboot);
+    saveChainer.setChain([
+        mspHelper.saveCalibrationData
+    ]);
+    saveChainer.setExitPoint(reboot);
 
-        MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
-    } else {
-        loadChainer.setChain([
-            mspHelper.loadStatus
-        ]);
-        loadChainer.setExitPoint(loadHtml);
-        loadChainer.execute();
-
-        saveChainer.setExitPoint(reboot);
-    }
+    MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
 
     function reboot() {
         //noinspection JSUnresolvedVariable
@@ -130,32 +120,6 @@ TABS.calibration.initialize = function (callback) {
             }).open();
         }
         updateSensorData();
-    }
-
-    //For 1.8.0
-    function calibrate() {
-        var self = $(this);
-
-        if (!self.hasClass('disabled')) {
-            self.addClass('disabled');
-            MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
-            });
-
-            helper.timeout.add('button_reset', function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
-
-                self.removeClass('disabled');
-
-                if (!bit_check(CONFIG.armingFlags & 0xff00, 13)) {
-                    for (var i = 0; i < 6; i++) {
-                        CALIBRATION_DATA.acc['Pos' + i] = 1;
-                    }
-                    updateCalibrationSteps();
-                }
-
-            }, 2000);
-        }
     }
 
     function calibrateNew() {
@@ -215,17 +179,6 @@ TABS.calibration.initialize = function (callback) {
             saveChainer.execute();
         });
 
-        if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
-            $('#accPosAll, #mag-calibrated-data').hide();
-
-            var accIsCalibrate = +(!bit_check(CONFIG.armingFlags & 0xff00, 13));
-            for (var i = 0; i < 6; i++) {
-                CALIBRATION_DATA.acc['Pos' + i] = accIsCalibrate;
-            }
-
-            updateCalibrationSteps();
-        }
-
         if (SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
@@ -258,9 +211,7 @@ TABS.calibration.initialize = function (callback) {
 
                     modalProcessing.close();
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
-                    if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-                        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-                    }
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('compass_calibration_interval');
                 }
             }, 1000);
@@ -277,13 +228,10 @@ TABS.calibration.initialize = function (callback) {
 
         // translate to user-selected language
         localize();
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            $('#calibrate-start-button').on('click', calibrateNew);
 
-            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-        } else {
-            $('#calibrate-start-button').on('click', calibrate);
-        }
+        $('#calibrate-start-button').on('click', calibrateNew);
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+
         GUI.content_ready(callback);
     }
 };
