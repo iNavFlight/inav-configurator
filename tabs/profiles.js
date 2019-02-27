@@ -106,12 +106,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
             presets.elementHelper("FC_CONFIG", "loopTime", 500),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 4),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
@@ -148,12 +144,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
             presets.elementHelper("FC_CONFIG", "loopTime", 250),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 100),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 3),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 4000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 100),
@@ -171,7 +163,7 @@ presets.presets = [
     },
     {
         name: '5" GPS',
-        description: "210-250 class quadcopter with F3/F4/F7 CPU on 3S or 4S battery<br>" +
+        description: "210-250 class quadcopter with F4/F7 CPU on 3S or 4S battery<br>" +
             "<span>500g-700g weight, 2000KV - 2600KV motors, 5 inch propellers, MPU6000 or MPU6050 gyro, GPS optimized</span>",
         features: [
             "OneShot125 at 1kHz",
@@ -183,11 +175,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 0),
-            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 2),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
+            presets.elementHelper("FC_CONFIG", "loopTime", 500),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 1000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
@@ -210,9 +199,9 @@ presets.presets = [
     {
         name: '7" Endurance',
         description: "Quadcopter using 7\" propellers with F4/F7 CPU on 4S battery<br>" +
-            "<span>long range scout with full GPS capabilities</span>",
+            "<span>long range scout with full GPS capabilities, 1200-1500KV motors</span>",
         features: [
-            "OneShot125 at 2kHz",
+            "Multishot at 4kHz",
             "600dps rates",
             "Improved filtering",
             "Improved PID defaults"
@@ -220,14 +209,10 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 2),
             presets.elementHelper("FC_CONFIG", "loopTime", 250),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("INAV_PID_CONFIG", "attitudeTaskFrequency", 1000),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 3),
+            presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 4000),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 90),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 75),
             presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 175),
@@ -254,11 +239,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
             presets.elementHelper("FC_CONFIG", "loopTime", 1000),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 70),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 40),
             presets.elementHelper("RC_tuning", "roll_rate", 400),
@@ -294,11 +276,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 3),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
             presets.elementHelper("FC_CONFIG", "loopTime", 1000),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 1),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 55),
             presets.elementHelper("FILTER_CONFIG", "dtermLpfHz", 30),
             presets.elementHelper("RC_tuning", "roll_rate", 180),
@@ -322,7 +301,7 @@ presets.presets = [
     },
     {
         name: '280mm Tricopter',
-        description: "280mm class tricopter with F3/F4/F7 CPU",
+        description: "280mm class tricopter with F4/F7 CPU",
         features: [
             "Asynchronous processing",
             "Dterm and gyro notch filter",
@@ -332,11 +311,8 @@ presets.presets = [
         applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG"],
         settings: [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
-            presets.elementHelper("INAV_PID_CONFIG", "asynchronousMode", 1),
-            presets.elementHelper("FC_CONFIG", "loopTime", 1000),
+            presets.elementHelper("FC_CONFIG", "loopTime", 500),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 0),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 490),
             presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
@@ -373,8 +349,6 @@ presets.presets = [
             presets.elementHelper("BF_CONFIG", "mixerConfiguration", 1),
             presets.elementHelper("FC_CONFIG", "loopTime", 1000),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSyncDenominator", 8),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmProtocol", 1),
             presets.elementHelper("ADVANCED_CONFIG", "motorPwmRate", 2000),
             presets.elementHelper("ADVANCED_CONFIG", "servoPwmRate", 50),
@@ -412,7 +386,6 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "roll_rate", 200),
             presets.elementHelper("RC_tuning", "pitch_rate", 150),
             presets.elementHelper("RC_tuning", "yaw_rate", 90),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ],
         type: 'airplane'
@@ -433,7 +406,6 @@ presets.presets = [
             presets.elementHelper("PIDs", 1, [15, 40, 15]),  //PITCH PIDs
             presets.elementHelper("RC_tuning", "roll_rate", 400),
             presets.elementHelper("RC_tuning", "pitch_rate", 150),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
         ],
         type: 'flyingwing'
@@ -457,7 +429,6 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 90),
             presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1300),
-            presets.elementHelper("ADVANCED_CONFIG", "gyroSync", 1),
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         type: 'flyingwing'
