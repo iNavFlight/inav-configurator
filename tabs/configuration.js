@@ -565,7 +565,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $gyroLpfMessage.removeClass('warning-box');
 
             if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                console.log($gyroLpfMessage);
                 switch (parseInt(INAV_PID_CONFIG.gyroscopeLpf, 10)) {
                     case 0:
                         $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfSuggestedMessage'));
