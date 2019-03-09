@@ -64,6 +64,12 @@ var FC = {
     isNewMixer: function () {
         return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
     },
+    isRpyFfComponentUsed: function () {
+        return MIXER_CONFIG.platformType == PLATFORM_AIRPLANE;
+    },
+    isRpyDComponentUsed: function () {
+        return MIXER_CONFIG.platformType != PLATFORM_AIRPLANE;
+    },
     resetState: function () {
         SENSOR_STATUS = {
             isHardwareHealthy: 0,

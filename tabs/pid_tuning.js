@@ -212,6 +212,13 @@ TABS.pid_tuning.initialize = function (callback) {
             $('[name=ff]').prop('disabled', 'disabled');
         }
 
+        if (!FC.isRpyFfComponentUsed()) {
+            $('.rpy_ff').prop('disabled', 'disabled');
+        }
+        if (!FC.isRpyDComponentUsed()) {
+            $('.rpy_d').prop('disabled', 'disabled');
+        }
+
         GUI.simpleBind();
 
         // UI Hooks
