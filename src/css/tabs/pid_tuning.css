@@ -112,7 +112,8 @@
     padding: 5px;
     text-align: left;
     border-right: 1px solid #ccc;
-    width: calc(100% -1px);
+    /* width: calc(100% -1px); */
+    width: 20%;
 }
 
 .tab-pid_tuning .pid_titlebar th:first-child {
@@ -134,7 +135,7 @@
 
 .tab-pid_tuning table td {
     padding: 1px;
-    width: 25%;
+    width: 20%;
     border-right: 1px solid #ccc;
 }
 

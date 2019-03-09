@@ -208,6 +208,10 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.requires-v2_1').hide();
         }
 
+        if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+            $('[name=ff]').prop('disabled', 'disabled');
+        }
+
         GUI.simpleBind();
 
         // UI Hooks
@@ -222,10 +226,6 @@ TABS.pid_tuning.initialize = function (callback) {
         // update == save.
         $('a.update').click(function () {
             form_to_pid_and_rc();
-
-            function send_pids() {
-                MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, send_rc_tuning_changes);
-            }
 
             function send_rc_tuning_changes() {
                 MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
@@ -253,7 +253,7 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            send_pids();
+            mspHelper.savePidData(send_rc_tuning_changes);
         });
 
         GUI.content_ready(callback);
