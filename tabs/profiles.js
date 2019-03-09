@@ -25,9 +25,9 @@ presets.defaultValues = {
             [100, 50, 10, 0]   //PID_VEL_Z
         ],
         fw: [
-            [5, 7, 50, 0],     //PID_ROLL
-            [5, 7, 50, 0],     //PID_PITCH
-            [6, 10, 60, 0],    //PID_YAW
+            [5, 7, 0, 50],     //PID_ROLL
+            [5, 7, 0, 50],     //PID_PITCH
+            [6, 10, 0, 60],    //PID_YAW
             [40, 5, 10, 0],    //PID_POS_Z
             [75, 5, 8, 0],     //PID_POS_XY
             [0, 0, 0, 0],      //PID_VEL_XY
