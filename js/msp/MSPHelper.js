@@ -320,6 +320,15 @@ var mspHelper = (function (gui) {
                     PIDs[i][2] = data.getUint8(needle + 2);
                 }
                 break;
+            case MSPCodes.MSP2_PID:
+                // PID data arrived, we need to scale it and save to appropriate bank / array
+                for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    PIDs[i][0] = data.getUint8(needle);
+                    PIDs[i][1] = data.getUint8(needle + 1);
+                    PIDs[i][2] = data.getUint8(needle + 2);
+                    PIDs[i][3] = data.getUint8(needle + 3);
+                }
+                break;
             case MSPCodes.MSP_ARMING_CONFIG:
                 ARMING_CONFIG.auto_disarm_delay = data.getUint8(0);
                 ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
@@ -580,6 +589,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RAW_GPS:
                 break;
             case MSPCodes.MSP_SET_PID:
+                console.log('PID settings saved');
+                break;
+            case MSPCodes.MSP2_SET_PID:
                 console.log('PID settings saved');
                 break;
             case MSPCodes.MSP_SET_RC_TUNING:
@@ -1515,6 +1527,14 @@ var mspHelper = (function (gui) {
                     buffer.push(parseInt(PIDs[i][0]));
                     buffer.push(parseInt(PIDs[i][1]));
                     buffer.push(parseInt(PIDs[i][2]));
+                }
+                break;
+            case MSPCodes.MSP2_SET_PID:
+                for (i = 0; i < PIDs.length; i++) {
+                    buffer.push(parseInt(PIDs[i][0]));
+                    buffer.push(parseInt(PIDs[i][1]));
+                    buffer.push(parseInt(PIDs[i][2]));
+                    buffer.push(parseInt(PIDs[i][3]));
                 }
                 break;
             case MSPCodes.MSP_SET_RC_TUNING:
@@ -2667,7 +2687,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadPidData = function (callback) {
-        MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            MSP.send_message(MSPCodes.MSP2_PID, false, false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+        }
     };
 
     self.loadPidNames = function (callback) {
@@ -2779,7 +2803,11 @@ var mspHelper = (function (gui) {
     };
 
     self.savePidData = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            MSP.send_message(MSPCodes.MSP2_SET_PID, mspHelper.crunch(MSPCodes.MSP2_SET_PID), false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+        }
     };
 
     self.saveRcTuningData = function (callback) {

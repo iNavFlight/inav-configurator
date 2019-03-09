@@ -128,7 +128,7 @@ var FC = {
         PID_names = [];
         PIDs = new Array(10);
         for (var i = 0; i < 10; i++) {
-            PIDs[i] = new Array(3);
+            PIDs[i] = new Array(4);
         }
 
         RC_MAP = [];

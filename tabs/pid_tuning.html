@@ -26,11 +26,12 @@
                             <th class="proportional" data-i18n="pidTuningProportional"></th>
                             <th class="integral" data-i18n="pidTuningIntegral"></th>
                             <th class="derivative" data-i18n="pidTuningDerivative"></th>
+                            <th class="feedforward" data-i18n="pidTuningFeedForward"></th>
                         </tr>
                     </table>
                     <table id="pid_main" class="pid_tuning">
                         <tr>
-                            <th colspan="4">
+                            <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuningBasic"></div>
                             </th>
                         </tr>
@@ -40,6 +41,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                         <tr class="PITCH" data-pid-bank-position="1">
                             <!-- 1 -->
@@ -47,6 +49,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                         <tr class="YAW" data-pid-bank-position="2">
                             <!-- 2 -->
@@ -54,11 +57,12 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                     </table>
                     <table id="pid_baro" class="pid_tuning">
                         <tr>
-                            <th colspan="4">
+                            <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuningAltitude"></div>
                             </th>
                         </tr>
@@ -68,6 +72,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                         <tr class="Vario" data-pid-bank-position="9">
                             <!-- 9 -->
@@ -75,11 +80,12 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                     </table>
                     <table id="pid_mag" class="pid_tuning">
                         <tr>
-                            <th colspan="4">
+                            <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuningMag"></div>
                             </th>
                         </tr>
@@ -89,11 +95,12 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                         </tr>
                     </table>
                     <table id="pid_gps" class="pid_tuning">
                         <tr>
-                            <th colspan="4">
+                            <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuningGps"></div>
                             </th>
                         </tr>
@@ -103,6 +110,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                         <tr class="PosR" data-pid-bank-position="5">
                             <!-- 5 -->
@@ -110,6 +118,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="ff" step="1" min="0" max="255" /></td>
                         </tr>
                         <tr class="NavR" data-pid-bank-position="6">
                             <!-- 6 -->
@@ -117,6 +126,7 @@
                             <td><input type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="i" step="1" min="0" max="255" /></td>
                             <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
                         </tr>
                     </table>
                 </div>

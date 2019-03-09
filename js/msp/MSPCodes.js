@@ -201,5 +201,8 @@ var MSPCodes = {
 
     MSP2_INAV_TEMP_SENSOR_CONFIG:       0x201C,
     MSP2_INAV_SET_TEMP_SENSOR_CONFIG:   0x201D,
-    MSP2_INAV_TEMPERATURES:             0x201E
+    MSP2_INAV_TEMPERATURES:             0x201E,
+
+    MSP2_PID:                           0x2030,
+    MSP2_SET_PID:                       0x2031
 };
