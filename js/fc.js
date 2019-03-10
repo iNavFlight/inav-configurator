@@ -1133,5 +1133,73 @@ var FC = {
     },
     isModeEnabled: function (name) {
         return FC.isModeBitSet(FC.getModeId(name));
+    },
+    getLogicOperators: function () {
+        return {
+            0: {
+                name: "True",
+                hasOperand: [false, false]
+            },
+            1: {
+                name: "Equal",
+                hasOperand: [true, true]
+            },
+            2: {
+                name: "Greater Than",
+                hasOperand: [true, true]
+            },
+            3: {
+                name: "Lower Than",
+                hasOperand: [true, true]
+            },
+            4: {
+                name: "Low",
+                hasOperand: [true, false]
+            },
+            5: {
+                name: "Mid",
+                hasOperand: [true, false]
+            },
+            6: {
+                name: "High",
+                hasOperand: [true, false]
+            }
+        }
+    },
+    getOperandTypes: function () {
+        return {
+            0: {
+                name: "Value",
+                type: "value"
+            },
+            1: {
+                name: "RC Channel",
+                type: "range",
+                range: [1, 16]
+            },
+            2: {
+                name: "Flight",
+                type: "dictionary",
+                values: {
+                    0: "ARM timer [s]",
+                    1: "Home distance [m]",
+                    2: "Trip distance [m]",
+                    3: "RSSI", 
+                    4: "Vbat [deci-Volt] [1V = 10]",
+                    5: "Cell voltage [deci-Volt] [1V = 10]",
+                    6: "Current [centi-Amp] [1A = 100]",
+                    7: "Current drawn [mAh]",
+                    8: "GPS Sats",
+                    9: "Ground speed [cm/s]",
+                    10: "3D speed [cm/s]",
+                    11: "Air speed [cm/s]",
+                    12: "Altitude [cm]",
+                    13: "Vertical speed [cm/s]",
+                    14: "Throttle position [%]",
+                    15: "Roll [deg]",
+                    16: "Pitch [deg]" 
+                }
+            }
+        }
     }
 };
