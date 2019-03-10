@@ -2925,5 +2925,26 @@
     },
     "gyroLpfWhyNotSlightlyHigherMessage": {
         "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
+    },
+    "tabLogicConditions": {
+        "message": "Logic conditions"
+    },
+    "logicId": {
+        "message": "#"
+    },
+    "logicEnabled": {
+        "message": "Enabled"
+    },
+    "logicOperation": {
+        "message": "Operation"
+    },
+    "logicOperandA": {
+        "message": "Operand A"
+    },
+    "logicOperandB": {
+        "message": "Operand B"
+    },
+    "logicFlags": {
+        "message": "Flags"
     }
 }

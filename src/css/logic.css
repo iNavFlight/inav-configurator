@@ -1,0 +1,22 @@
+.logic__background {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: black;
+    opacity: 0.75;
+    z-index: 2000;
+}
+
+.logic__content {
+    position: absolute;
+    top: 2em;
+    bottom: 2em;
+    left: 4em;
+    right: 4em;
+    background-color: #efefef;
+    border-radius: 2px;
+    z-index: 2001;
+    padding: 2em;
+}

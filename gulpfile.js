@@ -49,7 +49,8 @@ sources.css = [
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
-    './node_modules/openlayers/dist/ol.css'
+    './node_modules/openlayers/dist/ol.css',
+    './src/css/logic.css'
 ];
 
 sources.js = [
