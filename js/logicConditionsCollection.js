@@ -21,5 +21,15 @@ let LogicConditionsCollection = function () {
         return data.length
     }
 
+    self.render = function ($container) {
+
+        for (let k in self.get()) {
+            if (self.get().hasOwnProperty(k)) {
+                self.get()[k].render($container);
+            }
+        }
+
+    }
+
     return self;
 };

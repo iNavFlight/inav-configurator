@@ -378,6 +378,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         renderOutputMapping();
 
         localize();
+
+        LOGIC_CONDITIONS.render($('#logic-table'));
+
         GUI.content_ready(callback);
     }
 

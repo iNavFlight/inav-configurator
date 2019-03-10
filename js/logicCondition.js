@@ -59,5 +59,20 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         flags = data;
     };
 
+
+    self.render = function ($container) {
+
+        $container.find('tbody').append('<tr>\
+                <td class="logic_cell__index"></td>\
+                <td class="logic_cell__enabled"></td>\
+                <td class="logic_cell__operation"></td>\
+                <td class="logic_cell__operandA"></td>\
+                <td class="logic_cell__operandB"></td>\
+                <td class="logic_cell__flags"></td>\
+            </tr>\
+        ');
+
+    }
+
     return self;
 };
