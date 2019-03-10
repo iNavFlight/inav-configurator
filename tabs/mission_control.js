@@ -1,5 +1,41 @@
 'use strict';
 
+// MultiWii NAV Protocol
+var MWNP = MWNP || {};
+
+// WayPoint type
+MWNP.WPTYPE = {
+    WAYPOINT:     1,
+    PH_UNLIM:     2,
+    PH_TIME:      3,
+    RTH:          4,
+    SET_POI:      5,
+    JUMP:         6,
+    SET_HEAD:     7,
+    LAND:         8
+};
+
+// Argument type
+MWNP.ARGTYPE = {
+    P1:           1,
+    P2:           2,
+    P3:           3,
+    COORD:        4,
+    ALT:          5
+};
+
+// "WP type has argument" table
+MWNP.WP_HAS_ARG = [];
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.WAYPOINT,  MWNP.ARGTYPE.COORD] = true;   MWNP.WP_HAS_ARG[MWNP.WPTYPE.WAYPOINT, MWNP.ARGTYPE.ALT] = true;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.WAYPOINT,  MWNP.ARGTYPE.P1] = { type: "number", unit: "cm/s" }; MWNP.WP_HAS_ARG[MWNP.WPTYPE.WAYPOINT,  MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.WAYPOINT,  MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_UNLIM,  MWNP.ARGTYPE.COORD] = true;   MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_UNLIM, MWNP.ARGTYPE.ALT] = true;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_UNLIM,  MWNP.ARGTYPE.P1] = false;                            MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_UNLIM,  MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_UNLIM,  MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_TIME,   MWNP.ARGTYPE.COORD] = true;   MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_TIME,  MWNP.ARGTYPE.ALT] = true;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_TIME,   MWNP.ARGTYPE.P1] = { type: "number", unit: "s" };    MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_TIME,   MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.PH_TIME,   MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.RTH,       MWNP.ARGTYPE.COORD] = false;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.RTH,      MWNP.ARGTYPE.ALT] = true;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.RTH,       MWNP.ARGTYPE.P1] = { type: "boolean" };              MWNP.WP_HAS_ARG[MWNP.WPTYPE.RTH,       MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.RTH,       MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_POI,   MWNP.ARGTYPE.COORD] = true;   MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_POI,  MWNP.ARGTYPE.ALT] = false; MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_POI,   MWNP.ARGTYPE.P1] = false;                            MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_POI,   MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_POI,   MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.JUMP,      MWNP.ARGTYPE.COORD] = false;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.JUMP,     MWNP.ARGTYPE.ALT] = false; MWNP.WP_HAS_ARG[MWNP.WPTYPE.JUMP,      MWNP.ARGTYPE.P1] = { type: "number", unit: "wp#" };  MWNP.WP_HAS_ARG[MWNP.WPTYPE.JUMP,      MWNP.ARGTYPE.P2] = { type: "number", unit: "repeat#" };  MWNP.WP_HAS_ARG[MWNP.WPTYPE.JUMP,      MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_HEAD,  MWNP.ARGTYPE.COORD] = false;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_HEAD, MWNP.ARGTYPE.ALT] = false; MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_HEAD,  MWNP.ARGTYPE.P1] = { type: "number", unit: "°" };    MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_HEAD,  MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.SET_HEAD,  MWNP.ARGTYPE.P3] = false;
+MWNP.WP_HAS_ARG[MWNP.WPTYPE.LAND,      MWNP.ARGTYPE.COORD] = true;   MWNP.WP_HAS_ARG[MWNP.WPTYPE.LAND,     MWNP.ARGTYPE.ALT] = true;  MWNP.WP_HAS_ARG[MWNP.WPTYPE.LAND,      MWNP.ARGTYPE.P1] = false;                            MWNP.WP_HAS_ARG[MWNP.WPTYPE.LAND,      MWNP.ARGTYPE.P2] = false;                                MWNP.WP_HAS_ARG[MWNP.WPTYPE.LAND,      MWNP.ARGTYPE.P3] = false;
+
+
 TABS.mission_control = {};
 TABS.mission_control.isYmapLoad = false;
 TABS.mission_control.initialize = function (callback) {
@@ -9,16 +45,24 @@ TABS.mission_control.initialize = function (callback) {
         googleAnalytics.sendAppView('Mission Control');
     }
 
-    var loadChainer = new MSPChainerClass();
-    loadChainer.setChain([
-        mspHelper.getMissionInfo
-    ]);
-    loadChainer.setExitPoint(loadHtml);
-    loadChainer.execute();
+    if (CONFIGURATOR.connectionValid) {
+        var loadChainer = new MSPChainerClass();
+        loadChainer.setChain([
+            mspHelper.getMissionInfo
+        ]);
+        loadChainer.setExitPoint(loadHtml);
+        loadChainer.execute();
+    } else {
+
+        // FC not connected, load page anyway
+        loadHtml();
+    }
 
     function updateTotalInfo() {
-        $('#availablePoints').text(MISSION_PLANER.countBusyPoints + '/' + MISSION_PLANER.maxWaypoints);
-        $('#missionValid').html(MISSION_PLANER.isValidMission ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
+        if (CONFIGURATOR.connectionValid) {
+            $('#availablePoints').text(MISSION_PLANER.countBusyPoints + '/' + MISSION_PLANER.maxWaypoints);
+            $('#missionValid').html(MISSION_PLANER.isValidMission ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
+        }
     }
 
     function loadHtml() {
@@ -26,25 +70,35 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function process_html() {
+
+        // set GUI for offline operations
+        if (!CONFIGURATOR.connectionValid) {
+            $('#infoAvailablePoints').hide();
+            $('#infoMissionValid').hide();
+            $('#loadMissionButton').addClass('disabled');
+            $('#saveMissionButton').addClass('disabled');
+            $('#loadEepromMissionButton').addClass('disabled');
+            $('#saveEepromMissionButton').addClass('disabled');
+        }
+
         if (typeof require !== "undefined") {
-            chrome.storage.local.get('missionPlanerSettings', function (result) {
-                if (result.missionPlanerSettings) {
-                    $('#MPdefaultPointAlt').val(result.missionPlanerSettings.alt);
-                    $('#MPdefaultPointSpeed').val(result.missionPlanerSettings.speed);
-                } else {
-                    chrome.storage.local.set({'missionPlanerSettings': {speed: 0, alt: 5000}});
-                    $('#MPdefaultPointAlt').val(5000);
-                    $('#MPdefaultPointSpeed').val(0);
-                }
-            });
-
-
+            loadSettings();
             initMap();
         } else {
             $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
         }
         localize();
+
+/* * /
+// TESTING: load mission file at startup
+nw.Window.get().showDevTools(null, function() {
+//    let fileXml = "./131208-0513.mission";
+    let fileXml = "./131227-0505.mission";
+//    let fileXml = "./131227-0511.mission";
+    loadMissionFile(fileXml);
+});
+/* */
 
         GUI.content_ready(callback);
     }
@@ -54,6 +108,7 @@ TABS.mission_control.initialize = function (callback) {
     var map;
     var selectedMarker = null;
     var pointForSend = 0;
+    var settings = { speed: 0, alt: 5000 };
 
     function clearEditForm() {
         $('#pointLat').val('');
@@ -62,6 +117,25 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointSpeed').val('');
         $('[name=pointNumber]').val('');
         $('#MPeditPoint').fadeOut(300);
+    }
+
+    function loadSettings() {
+        chrome.storage.local.get('missionPlanerSettings', function (result) {
+            if (result.missionPlanerSettings) {
+                settings = result.missionPlanerSettings;
+            }
+
+            refreshSettings();
+        });
+    }
+
+    function saveSettings() {
+        chrome.storage.local.set({'missionPlanerSettings': settings});
+    }
+
+    function refreshSettings() {
+        $('#MPdefaultPointAlt').val(settings.alt);
+        $('#MPdefaultPointSpeed').val(settings.speed);
     }
 
     function repaint() {
@@ -122,16 +196,16 @@ TABS.mission_control.initialize = function (callback) {
                 scale: 0.5,
                 src: '../images/icons/cf_icon_position' + (isEdit ? '_edit' : '') + '.png'
             }))
-//            text: new ol.style.Text({
-//                text: '10',
-//                offsetX: -1,
-//                offsetY: -30,
-//                overflow: true,
-//                scale: 2,
-//                fill: new ol.style.Fill({
-//                    color: 'black'
-//                })
-//            })
+            /*
+            text: new ol.style.Text({
+                text: '10',
+                offsetX: -1,
+                offsetY: -30,
+                overflow: true,
+                scale: 2,
+                fill: new ol.style.Fill({ color: 'black' })
+            })
+            */
         });
     }
 
@@ -315,8 +389,8 @@ TABS.mission_control.initialize = function (callback) {
             return false;
         };
 
-        var lat = GPS_DATA.lat / 10000000;
-        var lon = GPS_DATA.lon / 10000000;
+        var lat = (GPS_DATA ? (GPS_DATA.lat / 10000000) : 0);
+        var lon = (GPS_DATA ? (GPS_DATA.lon / 10000000) : 0);
 
         let mapLayer;
 
@@ -367,6 +441,22 @@ TABS.mission_control.initialize = function (callback) {
             }
         }, 100);
 
+        // save map view settings when user moves it
+        map.on('moveend', function (evt) {
+            chrome.storage.local.set({'missionPlanerLastValues': {
+                center: ol.proj.toLonLat(map.getView().getCenter()),
+                zoom: map.getView().getZoom()
+            }});
+        });
+
+        // load map view settings on startup
+        chrome.storage.local.get('missionPlanerLastValues', function (result) {
+            if (result.missionPlanerLastValues && result.missionPlanerLastValues.center) {
+                map.getView().setCenter(ol.proj.fromLonLat(result.missionPlanerLastValues.center));
+                map.getView().setZoom(result.missionPlanerLastValues.zoom);
+            }
+        });
+
         map.on('click', function (evt) {
             if (selectedMarker != null) {
                 try {
@@ -392,14 +482,14 @@ TABS.mission_control.initialize = function (callback) {
 
                 selectedFeature.setStyle(getPointIcon(true));
 
-                $('#pointLon').val(coord[0]);
-                $('#pointLat').val(coord[1]);
+                $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                 $('#pointAlt').val(selectedMarker.alt);
                 $('#pointType').val(selectedMarker.action);
                 $('#pointSpeed').val(selectedMarker.speedValue);
                 $('#MPeditPoint').fadeIn(300);
             } else {
-                map.addLayer(addMarker(evt.coordinate, $('#MPdefaultPointAlt').val(), 1, $('#MPdefaultPointSpeed').val()));
+                map.addLayer(addMarker(evt.coordinate, settings.alt, MWNP.WPTYPE.WAYPOINT, settings.speed));
                 repaint();
             }
         });
@@ -418,7 +508,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#removeAllPoints').on('click', function () {
-            if (confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
+            if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
                 removeAllPoints();
             }
         });
@@ -460,13 +550,28 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
+        $('#loadFileMissionButton').on('click', function () {
+            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            removeAllPoints();
+            var dialog = require('nw-dialog');
+            dialog.setContext(document);
+            dialog.openFileDialog(function(result) {
+                loadMissionFile(result);
+            })
+        });
+
+        $('#saveFileMissionButton').on('click', function () {
+            //if (!markers.length) return;
+            var dialog = require('nw-dialog');
+            dialog.setContext(document);
+            dialog.saveFileDialog('name', '.mission', function(result) {
+                saveMissionFile(result);
+            })
+        });
+
         $('#loadMissionButton').on('click', function () {
-            if (markers.length) {
-                if (!confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
-                    return;
-                }
-                removeAllPoints();
-            }
+            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            removeAllPoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
 
@@ -483,12 +588,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadEepromMissionButton').on('click', function () {
-            if (markers.length) {
-                if (!confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
-                    return;
-                }
-                removeAllPoints();
-            }
+            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            removeAllPoints();
             GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
 
             MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getPointsFromEprom);
@@ -507,15 +608,25 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#saveSettings').on('click', function () {
-            chrome.storage.local.set({'missionPlanerSettings': {speed: $('#MPdefaultPointSpeed').val(), alt: $('#MPdefaultPointAlt').val()}});
-            $('#missionPlanerSettings').hide();
-            $('#missionPalnerTotalInfo').fadeIn(300);
-            if (selectedMarker !== null) {
-                $('#MPeditPoint').fadeIn(300);
-            }
+            settings = { speed: $('#MPdefaultPointSpeed').val(), alt: $('#MPdefaultPointAlt').val() };
+            saveSettings();
+            closeSettingsPanel();
+        });
+
+        $('#cancelSettings').on('click', function () {
+            loadSettings();
+            closeSettingsPanel();
         });
 
         updateTotalInfo();
+    }
+
+    function closeSettingsPanel() {
+        $('#missionPlanerSettings').hide();
+        $('#missionPalnerTotalInfo').fadeIn(300);
+        if (selectedMarker !== null) {
+            $('#MPeditPoint').fadeIn(300);
+        }
     }
 
     function removeAllPoints() {
@@ -524,7 +635,180 @@ TABS.mission_control.initialize = function (callback) {
         }
         markers = [];
         clearEditForm();
+        updateTotalInfo();
+        $('#rthEndMission').prop('checked', false);
+        $('#rthSettings').fadeOut(300);
+        $('#rthLanding').prop('checked', false);
         repaint();
+    }
+
+    function loadMissionFile(filename) {
+        const fs = require('fs-extra');
+        const xml2js = require('xml2js');
+
+        fs.readFile(filename, (err, data) => {
+            if (err) {
+                GUI.log('<span style="color: red">Error reading file</span>');
+                return console.error(err);
+            }
+
+            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+                if (err) {
+                    GUI.log('<span style="color: red">Error parsing file</span>');
+                    return console.error(err);
+                }
+
+                var mission = { points: [] };
+
+                // parse mission file
+
+                var nodemission = null;
+                for (var noderoot in result) {
+                    if (!nodemission && noderoot.match(/mission/i)) {
+                        nodemission = result[noderoot];
+                        if (nodemission.$$ && nodemission.$$.length) {
+                            for (var i = 0; i < nodemission.$$.length; i++) {
+                                if (nodemission.$$[i]['#name'].match(/version/i) && nodemission.$$[i].$) {
+                                    for (var attr in nodemission.$$[i].$) {
+                                        if (attr.match(/value/i)) {
+                                            mission.version = nodemission.$$[i].$[attr]
+                                        }
+                                    }
+                                } else if (nodemission.$$[i]['#name'].match(/mwp/i) && nodemission.$$[i].$) {
+                                    mission.center = {};
+                                    for (var attr in nodemission.$$[i].$) {
+                                        if (attr.match(/zoom/i)) {
+                                            mission.center.zoom = parseInt(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/cx/i)) {
+                                            mission.center.lon = parseFloat(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/cy/i)) {
+                                            mission.center.lat = parseFloat(nodemission.$$[i].$[attr]);
+                                        }
+                                    }
+                                } else if (nodemission.$$[i]['#name'].match(/missionitem/i) && nodemission.$$[i].$) {
+                                    var point = {};
+                                    for (var attr in nodemission.$$[i].$) {
+                                        if (attr.match(/no/i)) {
+                                            point.index = parseInt(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/action/i)) {
+                                            if (nodemission.$$[i].$[attr].match(/WAYPOINT/i)) {
+                                                point.action = MWNP.WPTYPE.WAYPOINT;
+                                            } else if (nodemission.$$[i].$[attr].match(/PH_UNLIM/i) || nodemission.$$[i].$[attr].match(/POSHOLD_UNLIM/i)) {
+                                                point.action = MWNP.WPTYPE.PH_UNLIM;
+                                            } else if (nodemission.$$[i].$[attr].match(/PH_TIME/i) || nodemission.$$[i].$[attr].match(/POSHOLD_TIME/i)) {
+                                                point.action = MWNP.WPTYPE.PH_TIME;
+                                            } else if (nodemission.$$[i].$[attr].match(/RTH/i)) {
+                                                point.action = MWNP.WPTYPE.RTH;
+                                            } else if (nodemission.$$[i].$[attr].match(/SET_POI/i)) {
+                                                point.action = MWNP.WPTYPE.SET_POI;
+                                            } else if (nodemission.$$[i].$[attr].match(/JUMP/i)) {
+                                                point.action = MWNP.WPTYPE.JUMP;
+                                            } else if (nodemission.$$[i].$[attr].match(/SET_HEAD/i)) {
+                                                point.action = MWNP.WPTYPE.SET_HEAD;
+                                            } else if (nodemission.$$[i].$[attr].match(/LAND/i)) {
+                                                point.action = MWNP.WPTYPE.LAND;
+                                            } else {
+                                                point.action = 0;
+                                            }
+                                        } else if (attr.match(/lat/i)) {
+                                            point.lat = parseFloat(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/lon/i)) {
+                                            point.lon = parseFloat(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/alt/i)) {
+                                            point.alt = (parseInt(nodemission.$$[i].$[attr]) * 100);
+                                        } else if (attr.match(/parameter1/i)) {
+                                            point.p1 = parseInt(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/parameter2/i)) {
+                                            point.p2 = parseInt(nodemission.$$[i].$[attr]);
+                                        } else if (attr.match(/parameter3/i)) {
+                                            point.p3 = parseInt(nodemission.$$[i].$[attr]);
+                                        }
+                                    }
+                                    mission.points.push(point);
+                                }
+                            }
+                        }
+                    }
+                }
+                //console.log(mission);
+
+                // draw actual mission
+
+                removeAllPoints();
+
+                for (var i = 0; i < mission.points.length; i++) {
+                    //if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND].includes(mission.points[i].action)) {
+                    if (mission.points[i].action == MWNP.WPTYPE.WAYPOINT) {
+                        var coord = ol.proj.fromLonLat([mission.points[i].lon, mission.points[i].lat]);
+                        map.addLayer(addMarker(coord, mission.points[i].alt, mission.points[i].action, mission.points[i].p1));
+                        if (i == 0) {
+                            map.getView().setCenter(coord);
+                            map.getView().setZoom(16);
+                        }
+                    } else if (mission.points[i].action == MWNP.WPTYPE.RTH) {
+                        $('#rthEndMission').prop('checked', true);
+                        $('#rthSettings').fadeIn(300);
+                        if (mission.points[i].p1 > 0) {
+                            $('#rthLanding').prop('checked', true);
+                        }
+                    }
+                }
+
+                if (mission.center) {
+                    var coord = ol.proj.fromLonLat([mission.center.lon, mission.center.lat]);
+                    map.getView().setCenter(coord);
+                    if (mission.center.zoom) map.getView().setZoom(mission.center.zoom);
+                }
+
+                repaint();
+                updateTotalInfo();
+
+            });
+
+        });
+    }
+
+    function saveMissionFile(filename) {
+        const fs = require('fs-extra');
+        const xml2js = require('xml2js');
+
+        var center = ol.proj.toLonLat(map.getView().getCenter());
+        var zoom = map.getView().getZoom();
+
+        var data = {
+            'version': { $: { 'value': '2.3-pre8' } },
+            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 'cy': (Math.round(center[1] * 10000000) / 10000000), 'zoom': zoom } },
+            'missionitem': []
+        };
+
+        for (var i = 0; i < markers.length; i++) {
+            var geometry = markers[i].getSource().getFeatures()[0].getGeometry();
+            var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
+            var point = { $: {
+                'no': (i + 1),
+                'action': ((markers[i].action == MWNP.WPTYPE.WAYPOINT) ? 'WAYPOINT' : markers[i].action),
+                'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
+                'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
+                'alt': (markers[i].alt / 100)
+            } };
+            if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].speedValue > 0)) point.$['parameter1'] = markers[i].speedValue;
+            data.missionitem.push(point);
+        }
+
+        // add last RTH point
+        if ($('#rthEndMission').is(':checked')) {
+            data.missionitem.push({ $: { 'no': (markers.length + 1), 'action': 'RTH', 'lon': 0, 'lat': 0, 'alt': (settings.alt / 100), 'parameter1': ($('#rthLanding').is(':checked') ? 1 : 0) } });
+        }
+
+        var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
+        var xml = builder.buildObject(data);
+        fs.writeFile(filename, xml, (err) => {
+            if (err) {
+                GUI.log('<span style="color: red">Error writing file</span>');
+                return console.error(err);
+            }
+            GUI.log('File saved');
+        });
     }
 
     function getPointsFromEprom() {
@@ -551,10 +835,10 @@ TABS.mission_control.initialize = function (callback) {
             // console.log(MISSION_PLANER.bufferPoint.alt);
             // console.log(MISSION_PLANER.bufferPoint.action);
             if (MISSION_PLANER.bufferPoint.action == 4) {
-                $('#rthEndMission').attr('checked', true);
+                $('#rthEndMission').prop('checked', true);
                 $('#rthSettings').fadeIn(300);
                 if (MISSION_PLANER.bufferPoint.p1 > 0) {
-                    $('#rthLanding').attr('checked', true);
+                    $('#rthLanding').prop('checked', true);
                 }
             } else {
                 var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
