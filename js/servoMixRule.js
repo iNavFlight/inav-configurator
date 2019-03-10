@@ -1,7 +1,7 @@
 /*global $*/
 'use strict';
 
-var ServoMixRule = function (target, input, rate, speed, condition) {
+let ServoMixRule = function (target, input, rate, speed, condition) {
 
     var self = {};
 
@@ -43,7 +43,7 @@ var ServoMixRule = function (target, input, rate, speed, condition) {
 
     self.getConditionId = function () {
         return (condition == undefined) ? -1 : condition;
-    }
+    };
 
     self.setConditionId = function (data) {
         condition = data;

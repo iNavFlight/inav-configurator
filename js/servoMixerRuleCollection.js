@@ -1,7 +1,7 @@
 /*global ServoMixRule*/
 'use strict';
 
-var ServoMixerRuleCollection = function () {
+let ServoMixerRuleCollection = function () {
 
     let self = {},
         data = [],

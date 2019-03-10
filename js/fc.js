@@ -19,6 +19,7 @@ var CONFIG,
     SERVO_CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
+    LOGIC_CONDITIONS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -174,6 +175,7 @@ var FC = {
         SERVO_CONFIG = [];
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS = new LogicConditionsCollection();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
