@@ -25,7 +25,7 @@ let LogicConditionsCollection = function () {
 
         for (let k in self.get()) {
             if (self.get().hasOwnProperty(k)) {
-                self.get()[k].render($container);
+                self.get()[k].render(k, $container);
             }
         }
 
