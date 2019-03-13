@@ -1170,16 +1170,22 @@ var FC = {
         return {
             0: {
                 name: "Value",
-                type: "value"
+                type: "value",
+                min: -1000000,
+                max: 1000000,
+                step: 1,
+                default: 0
             },
             1: {
                 name: "RC Channel",
                 type: "range",
-                range: [1, 16]
+                range: [1, 16],
+                default: 1
             },
             2: {
                 name: "Flight",
                 type: "dictionary",
+                default: 0,
                 values: {
                     0: "ARM timer [s]",
                     1: "Home distance [m]",
