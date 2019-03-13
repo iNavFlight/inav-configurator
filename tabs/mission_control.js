@@ -544,7 +544,7 @@ nw.Window.get().showDevTools(null, function() {
             //if (!markers.length) return;
             var dialog = require('nw-dialog');
             dialog.setContext(document);
-            dialog.saveFileDialog('name', '.mission', function(result) {
+            dialog.saveFileDialog('', '.mission', function(result) {
                 saveMissionFile(result);
             })
         });
