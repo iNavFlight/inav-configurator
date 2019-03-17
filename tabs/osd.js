@@ -1349,6 +1349,62 @@ OSD.constants = {
             ]
         },
         {
+            // TODO: Hide this when not using a CRSF receiver.
+            name: 'osdGroupCRSF',
+            items: [
+                {
+                    name: 'CRSF_UPLINK_RSSI_ANT1',
+                    id: 98,
+                    preview: FONT.symbol(SYM.RSSI) + '99',
+                },
+                {
+                    name: 'CRSF_UPLINK_RSSI_ANT2',
+                    id: 99,
+                    preview: FONT.symbol(SYM.RSSI) + '99',
+                },
+                {
+                    name: 'CRSF_UPLINK_LQ',
+                    id: 100,
+                    preview: FONT.symbol(SYM.RSSI) + '100%',
+                },
+                {
+                    name: 'CRSF_UPLINK_SNR',
+                    id: 101,
+                    preview: '-100DB',
+                },
+                {
+                    name: 'CRSF_ACTIVE_ANTENNA',
+                    id: 102,
+                    preview: 'ANT1',
+                },
+                {
+                    name: 'CRSF_RF_MODE',
+                    id: 103,
+                    preview: 'HIGH',
+                },
+                {
+                    name: 'CRSF_UPLINK_TX_POWER',
+                    id: 104,
+                    preview: '0.025W',
+                },
+                {
+                    name: 'CRSF_DOWNLINK_RSSI',
+                    id: 105,
+                    preview: FONT.symbol(SYM.RSSI) + '99',
+                },
+                {
+                    name: 'CRSF_DOWNLINK_LQ',
+                    id: 106,
+                    preview: FONT.symbol(SYM.RSSI) + '100%',
+                },
+                {
+                    name: 'CRSF_DOWNLINK_SNR',
+                    id: 107,
+                    preview: '-100DB',
+                },
+            ]
+        },
+        {
             name: 'osdGroupPIDs',
             items: [
                 {
