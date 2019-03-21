@@ -808,10 +808,10 @@ OSD.constants = {
                     id: 15,
                     preview: function () {
                         if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.ALT_FT) + '118';
+                            // metric
+                            return FONT.symbol(SYM.ALT_M) + '399'
                         }
-                        return FONT.symbol(SYM.ALT_M) + '399'
+                        return FONT.symbol(SYM.ALT_FT) + '118';
                     }
                 },
                 {
@@ -828,10 +828,10 @@ OSD.constants = {
                     id: 26,
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                            // Metric
+                            return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                         }
-                        return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
+                        return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
                     }
                 }
             ]
