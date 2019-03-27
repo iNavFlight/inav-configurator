@@ -43,6 +43,8 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 For local development, **node.js** build system is used.
 
 1. Install node.js
+1. After download package-lock.json should be deleted, othervise `npm install` will end with errors
+1. Install git if it is not installed
 1. From project folder run `npm install`
 1. To build the JS and CSS files and start the configurator:
     - With NW.js: Run `npm start`.
