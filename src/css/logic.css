@@ -19,6 +19,7 @@
     border-radius: 2px;
     z-index: 2001;
     padding: 2em;
+    overflow-y: auto;
 }
 
 input.logic_element__operand--value {

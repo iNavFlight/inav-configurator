@@ -1163,6 +1163,30 @@ var FC = {
             6: {
                 name: "High",
                 hasOperand: [true, false]
+            },
+            7: {
+                name: "AND",
+                hasOperand: [true, true]
+            },
+            8: {
+                name: "OR",
+                hasOperand: [true, true]
+            },
+            9: {
+                name: "XOR",
+                hasOperand: [true, true]
+            },
+            10: {
+                name: "NAND",
+                hasOperand: [true, true]
+            },
+            11: {
+                name: "NOR",
+                hasOperand: [true, true]
+            },
+            12: {
+                name: "NOT",
+                hasOperand: [true, false]
             }
         }
     },
@@ -1205,7 +1229,13 @@ var FC = {
                     15: "Roll [deg]",
                     16: "Pitch [deg]" 
                 }
-            }
+            },
+            3: {
+                name: "Logic Condition",
+                type: "range",
+                range: [0, 15],
+                default: 0
+            },
         }
     }
 };
