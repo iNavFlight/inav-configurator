@@ -24,10 +24,10 @@ var VTX = (function() {
     }
 
     self.getMaxPower = function(vtxDev) {
-        if (vtxDev == self.DEV_SMARTAUDIO) {
-            return 4;
+        if ((vtxDev == self.DEV_SMARTAUDIO) || (vtxDev == self.DEV_TRAMP)) {
+            return 5;
         }
-        return 5;
+        return 3;
     }
 
     self.LOW_POWER_DISARM_MIN = 0;

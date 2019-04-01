@@ -975,10 +975,11 @@ var FC = {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
     },
     getBarometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
+        } else if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "FAKE"];
-        }
-        else {
+        } else {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
         }
     },
@@ -991,7 +992,13 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
+        let data = [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            data.push("Benewake TFmini")
+        }
+
+        return data;
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
@@ -1115,7 +1122,8 @@ var FC = {
             'Stabilized Pitch+',    // 25
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
-            'Stabilized Yaw-'       // 28,
+            'Stabilized Yaw-',      // 28,
+            'ONE'                   // 29,
         ];
     },
     getServoMixInputName: function (input) {
