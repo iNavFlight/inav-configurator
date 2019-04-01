@@ -63,7 +63,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
 
     self.onEnabledChange = function (event) {
         let $cT = $(event.currentTarget);
-        console.log($cT);
+        self.setEnabled(!!$cT.prop('checked'));
     };
 
     self.getOperatorMetadata = function () {
@@ -231,9 +231,6 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
 
         self.renderOperand(0);
         self.renderOperand(1);
-
-        console.log($row);
-
     }
 
     return self;

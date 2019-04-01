@@ -2370,7 +2370,7 @@ var mspHelper = (function (gui) {
 
             let buffer = [];
 
-            // send one at a time, with index
+            // send one at a time, with index, 14 bytes per one condition
 
             let condition = LOGIC_CONDITIONS.get()[conditionIndex];
 
@@ -2383,10 +2383,10 @@ var mspHelper = (function (gui) {
             buffer.push(specificByte(condition.getOperandAValue(), 2));
             buffer.push(specificByte(condition.getOperandAValue(), 3));
             buffer.push(condition.getOperandBType());
-            buffer.push(specificByte(condition.getOperandAValue(), 0));
-            buffer.push(specificByte(condition.getOperandAValue(), 1));
-            buffer.push(specificByte(condition.getOperandAValue(), 2));
-            buffer.push(specificByte(condition.getOperandAValue(), 3));
+            buffer.push(specificByte(condition.getOperandBValue(), 0));
+            buffer.push(specificByte(condition.getOperandBValue(), 1));
+            buffer.push(specificByte(condition.getOperandBValue(), 2));
+            buffer.push(specificByte(condition.getOperandBValue(), 3));
             buffer.push(condition.getFlags());
 
             // prepare for next iteration

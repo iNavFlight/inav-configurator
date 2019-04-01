@@ -1,4 +1,4 @@
-/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics*/
+/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics,LOGIC_CONDITIONS,TABS,ServoMixRule*/
 'use strict';
 
 TABS.mixer = {};
@@ -379,7 +379,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         localize();
 
-        LOGIC_CONDITIONS.render($('#logic-table'));
+        LOGIC_CONDITIONS.init($('#logic-wrapper'));
+        LOGIC_CONDITIONS.render();
 
         GUI.content_ready(callback);
     }

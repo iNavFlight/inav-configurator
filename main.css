@@ -1446,15 +1446,16 @@ dialog {
     transition: all ease 0.2s;
 }
 
-.red a {
-    /* background-color: #37a8db; */
+.btn.red a,
+.btn.red a:active {
+    background-color: #fafafa;
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     color: #ff1e1e;
     border: 1px solid #a00000;
     transition: all ease 0.2s;
 }
 
-.red a:hover {
+.btn.red a:hover {
     background-color: #f86975;
     border: 1px solid #a00000;
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);

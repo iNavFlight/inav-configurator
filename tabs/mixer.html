@@ -127,10 +127,11 @@
         </div>
 
         <div id="logic-wrapper">
-            <div id="logic-background" class="logic__background"></div>
-            <div id="logic-content" class="logic__content">
+            <div class="logic__background"></div>
+            <div class="logic__content">
                 <div class="tab_title" data-i18n="tabLogicConditions"></div>
-                <table id="logic-table" class="mixer-table">
+                <div class="logic__content--wrapper">
+                    <table class="mixer-table logic__table">
                         <thead>
                             <tr>
                                 <th style="width: 50px" data-i18n="logicId"></th>
@@ -142,9 +143,17 @@
                             </tr>
                         </thead>
                         <tbody>
-        
                         </tbody>
                     </table>
+                </div>
+                <div class="logic__content--buttons content_toolbar">
+                    <div class="btn save_btn">
+                        <a href="#" class="logic__save" data-i18n="logicSave"></a>
+                    </div>
+                    <div class="btn save_btn red">
+                        <a href="#" class="logic__close" data-i18n="logicClose"></a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

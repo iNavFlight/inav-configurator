@@ -2958,5 +2958,11 @@
     },
     "logicFlags": {
         "message": "Flags"
+    },
+    "logicSave": {
+        "message": "Save"
+    },
+    "logicClose": {
+        "message": "Close"
     }
 }

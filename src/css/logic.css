@@ -19,10 +19,29 @@
     border-radius: 2px;
     z-index: 2001;
     padding: 2em;
+}
+
+.logic__content--wrapper {
     overflow-y: auto;
+    margin-bottom: 30px;
+    position: absolute;
+    left: 2em;
+    right: 2em;
+    top: 65px;
+    bottom: 35px;
 }
 
 input.logic_element__operand--value {
     float: none;
     width: 9em;
+}
+
+.logic__content--buttons {
+    left: 0;
+    right: 0;
+}
+
+.logic_cell__operandA,
+.logic_cell__operandB {
+    text-align: left;
 }
