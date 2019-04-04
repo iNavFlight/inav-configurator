@@ -22,6 +22,16 @@ let LogicConditionsCollection = function () {
         return data.length
     };
 
+    self.open = function () {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+            return;
+        }
+
+        self.render();
+        $container.show();
+    };
+
     self.render = function () {
         let $table = $container.find(".logic__table")
         $table.find("tbody tr").remove();
@@ -31,6 +41,8 @@ let LogicConditionsCollection = function () {
                 self.get()[k].render(k, $table);
             }
         }
+
+        GUI.switchery();
     };
 
     self.onSave = function () {
@@ -49,6 +61,11 @@ let LogicConditionsCollection = function () {
     };
 
     self.init = function ($element) {
+
+        if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+            return;
+        }
+
         $container = $element;
 
         $container.find('.logic__save').click(self.onSave);

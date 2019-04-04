@@ -369,6 +369,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         });
 
+        $("[data-role='role-logic-conditions-open']").click(function () {
+            LOGIC_CONDITIONS.open();
+        });
+        
         $('#save-button').click(saveAndReboot);
 
         renderServoMixRules();
@@ -377,11 +381,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         renderOutputTable();
         renderOutputMapping();
 
-        localize();
-
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
-        LOGIC_CONDITIONS.render();
 
+        localize();
+        
         GUI.content_ready(callback);
     }
 
