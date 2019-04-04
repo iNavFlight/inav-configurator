@@ -19,6 +19,7 @@ var CONFIG,
     SERVO_CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
+    LOGIC_CONDITIONS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -174,6 +175,7 @@ var FC = {
         SERVO_CONFIG = [];
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS = new LogicConditionsCollection();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -1139,5 +1141,109 @@ var FC = {
     },
     isModeEnabled: function (name) {
         return FC.isModeBitSet(FC.getModeId(name));
+    },
+    getLogicOperators: function () {
+        return {
+            0: {
+                name: "True",
+                hasOperand: [false, false]
+            },
+            1: {
+                name: "Equal",
+                hasOperand: [true, true]
+            },
+            2: {
+                name: "Greater Than",
+                hasOperand: [true, true]
+            },
+            3: {
+                name: "Lower Than",
+                hasOperand: [true, true]
+            },
+            4: {
+                name: "Low",
+                hasOperand: [true, false]
+            },
+            5: {
+                name: "Mid",
+                hasOperand: [true, false]
+            },
+            6: {
+                name: "High",
+                hasOperand: [true, false]
+            },
+            7: {
+                name: "AND",
+                hasOperand: [true, true]
+            },
+            8: {
+                name: "OR",
+                hasOperand: [true, true]
+            },
+            9: {
+                name: "XOR",
+                hasOperand: [true, true]
+            },
+            10: {
+                name: "NAND",
+                hasOperand: [true, true]
+            },
+            11: {
+                name: "NOR",
+                hasOperand: [true, true]
+            },
+            12: {
+                name: "NOT",
+                hasOperand: [true, false]
+            }
+        }
+    },
+    getOperandTypes: function () {
+        return {
+            0: {
+                name: "Value",
+                type: "value",
+                min: -1000000,
+                max: 1000000,
+                step: 1,
+                default: 0
+            },
+            1: {
+                name: "RC Channel",
+                type: "range",
+                range: [1, 16],
+                default: 1
+            },
+            2: {
+                name: "Flight",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "ARM timer [s]",
+                    1: "Home distance [m]",
+                    2: "Trip distance [m]",
+                    3: "RSSI", 
+                    4: "Vbat [deci-Volt] [1V = 10]",
+                    5: "Cell voltage [deci-Volt] [1V = 10]",
+                    6: "Current [centi-Amp] [1A = 100]",
+                    7: "Current drawn [mAh]",
+                    8: "GPS Sats",
+                    9: "Ground speed [cm/s]",
+                    10: "3D speed [cm/s]",
+                    11: "Air speed [cm/s]",
+                    12: "Altitude [cm]",
+                    13: "Vertical speed [cm/s]",
+                    14: "Throttle position [%]",
+                    15: "Roll [deg]",
+                    16: "Pitch [deg]" 
+                }
+            },
+            3: {
+                name: "Logic Condition",
+                type: "range",
+                range: [0, 15],
+                default: 0
+            },
+        }
     }
 };

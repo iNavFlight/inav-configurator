@@ -1,4 +1,4 @@
-/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics*/
+/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics,LOGIC_CONDITIONS,TABS,ServoMixRule*/
 'use strict';
 
 TABS.mixer = {};
@@ -24,7 +24,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
-        mspHelper.loadOutputMapping
+        mspHelper.loadOutputMapping,
+        mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -123,11 +124,21 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <td><select class="mix-rule-input"></select></td>\
                     <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td><select class="mix-rule-condition"></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
                 ');
 
                 const $row = $servoMixTableBody.find('tr:last');
+                const $conditions = $row.find('.mix-rule-condition');
+
+                $conditions.append('<option value="-1">Always</option>')
+                for (let i = 0; i < 16 ; i++) {
+                    $conditions.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
+                }
+                $conditions.val(servoRule.getConditionId()).change(function () {
+                    servoRule.setConditionId($(this).val());
+                });
 
                 GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
                 
@@ -368,6 +379,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         });
 
+        $("[data-role='role-logic-conditions-open']").click(function () {
+            LOGIC_CONDITIONS.open();
+        });
+        
         $('#save-button').click(saveAndReboot);
 
         renderServoMixRules();
@@ -376,7 +391,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         renderOutputTable();
         renderOutputMapping();
 
+        LOGIC_CONDITIONS.init($('#logic-wrapper'));
+
         localize();
+        
         GUI.content_ready(callback);
     }
 

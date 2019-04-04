@@ -70,57 +70,86 @@
         <!-- middle roew -->
         <div class="clear-both"></div>
         <!-- bottom row -->
-        <div>
-            <div class="leftWrapper">
-                <div class="motor-mixer gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="motorMixer"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <table id="motor-mix-table" class="mixer-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 75px">Motor</th>
-                                    <th data-i18n="controlAxisThrottle"></th>
-                                    <th data-i18n="controlAxisRoll"></th>
-                                    <th data-i18n="controlAxisPitch"></th>
-                                    <th data-i18n="controlAxisYaw"></th>
-                                    <th class="delete"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            
-                            </tbody>
-                        </table>
-                        <div class="btn default_btn narrow pull-right green mixer_btn_add">
-                            <a href="#" data-role="role-motor-add" data-i18n="servoMixerAdd"></a>
-                        </div>
-                    </div>
+        <div class="motor-mixer gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="motorMixer"></div>
+            </div>
+            <div class="spacer_box">
+                <table id="motor-mix-table" class="mixer-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 75px">Motor</th>
+                            <th data-i18n="controlAxisThrottle"></th>
+                            <th data-i18n="controlAxisRoll"></th>
+                            <th data-i18n="controlAxisPitch"></th>
+                            <th data-i18n="controlAxisYaw"></th>
+                            <th class="delete"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    
+                    </tbody>
+                </table>
+                <div class="btn default_btn narrow pull-right green mixer_btn_add">
+                    <a href="#" data-role="role-motor-add" data-i18n="servoMixerAdd"></a>
                 </div>
             </div>
-            <div class="rightWrapper">
-                <div class="motor-mixer gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="servoMixer"></div>
+        </div>
+        <div class="motor-mixer gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="servoMixer"></div>
+            </div>
+            <div class="spacer_box">
+                <table id="servo-mix-table" class="mixer-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 75px" data-i18n="servo"></th>
+                            <th data-i18n="input"></th>
+                            <th data-i18n="weight"></th>
+                            <th data-i18n="speed"></th>
+                            <th data-i18n="active"></th>
+                            <th class="delete"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    
+                    </tbody>
+                </table>
+                <div class="btn default_btn narrow pull-left mixer_btn_add">
+                    <a href="#" data-role="role-logic-conditions-open" data-i18n="tabLogicConditions"></a>
+                </div>
+                <div class="btn default_btn narrow pull-right green mixer_btn_add">
+                    <a href="#" data-role="role-servo-add" data-i18n="servoMixerAdd"></a>
+                </div>
+            </div>
+        </div>
+
+        <div id="logic-wrapper" style="display: none">
+            <div class="logic__background"></div>
+            <div class="logic__content">
+                <div class="tab_title" data-i18n="tabLogicConditions"></div>
+                <div class="logic__content--wrapper">
+                    <table class="mixer-table logic__table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px" data-i18n="logicId"></th>
+                                <th style="width: 80px" data-i18n="logicEnabled"></th>
+                                <th style="width: 120px" data-i18n="logicOperation"></th>
+                                <th data-i18n="logicOperandA"></th>
+                                <th data-i18n="logicOperandB"></th>
+                                <th data-i18n="logicFlags"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="logic__content--buttons content_toolbar">
+                    <div class="btn save_btn">
+                        <a href="#" class="logic__save" data-i18n="logicSave"></a>
                     </div>
-                    <div class="spacer_box">
-                        <table id="servo-mix-table" class="mixer-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 75px" data-i18n="servo"></th>
-                                    <th data-i18n="input"></th>
-                                    <th data-i18n="weight"></th>
-                                    <th data-i18n="speed"></th>
-                                    <th class="delete"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            
-                            </tbody>
-                        </table>
-                        <div class="btn default_btn narrow pull-right green mixer_btn_add">
-                            <a href="#" data-role="role-servo-add" data-i18n="servoMixerAdd"></a>
-                        </div>
+                    <div class="btn save_btn red">
+                        <a href="#" class="logic__close" data-i18n="logicClose"></a>
                     </div>
                 </div>
             </div>

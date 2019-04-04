@@ -203,6 +203,11 @@ var MSPCodes = {
     MSP2_INAV_SET_TEMP_SENSOR_CONFIG:   0x201D,
     MSP2_INAV_TEMPERATURES:             0x201E,
 
+    MSP2_INAV_SERVO_MIXER:              0x2020,
+    MSP2_INAV_SET_SERVO_MIXER:          0x2021,
+    MSP2_INAV_LOGIC_CONDITIONS:         0x2022,
+    MSP2_INAV_SET_LOGIC_CONDITIONS:     0x2023,
+
     MSP2_PID:                           0x2030,
     MSP2_SET_PID:                       0x2031
 };
