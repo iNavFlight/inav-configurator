@@ -2964,5 +2964,8 @@
     },
     "logicClose": {
         "message": "Close"
+    },
+    "active": {
+        "message": "Active"
     }
 }

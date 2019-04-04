@@ -539,7 +539,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_SERVO_MIX_RULE:
                 console.log("Servo mix saved");
                 break;
-
+            case MSPCodes.MSP2_INAV_SET_SERVO_MIXER:
+                console.log("Servo mix saved");
+                break;
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS:
                 LOGIC_CONDITIONS.flush();
                 if (data.byteLength % 13 === 0) {
@@ -2280,26 +2282,44 @@ var mspHelper = (function (gui) {
 
             var servoRule = SERVO_RULES.get()[servoIndex];
 
-            buffer.push(servoIndex);
-            buffer.push(servoRule.getTarget());
-            buffer.push(servoRule.getInput());
-            if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+                buffer.push(servoIndex);
+                buffer.push(servoRule.getTarget());
+                buffer.push(servoRule.getInput());
+                if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+                    buffer.push(lowByte(servoRule.getRate()));
+                    buffer.push(highByte(servoRule.getRate()));
+                } else {
+                    buffer.push(servoRule.getRate());
+                }
+                buffer.push(servoRule.getSpeed());
+                buffer.push(0);
+                buffer.push(0);
+                buffer.push(0);
+
+                // prepare for next iteration
+                servoIndex++;
+                if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                    nextFunction = onCompleteCallback;
+                }
+                MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+            } else {
+                //INAV 2.2 uses different MSP frame
+                buffer.push(servoIndex);
+                buffer.push(servoRule.getTarget());
+                buffer.push(servoRule.getInput());
                 buffer.push(lowByte(servoRule.getRate()));
                 buffer.push(highByte(servoRule.getRate()));
-            } else {
-                buffer.push(servoRule.getRate());
-            }
-            buffer.push(servoRule.getSpeed());
-            buffer.push(0);
-            buffer.push(0);
-            buffer.push(0);
+                buffer.push(servoRule.getSpeed());
+                buffer.push(servoRule.getConditionId());
 
-            // prepare for next iteration
-            servoIndex++;
-            if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
-                nextFunction = onCompleteCallback;
+                 // prepare for next iteration
+                 servoIndex++;
+                 if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                     nextFunction = onCompleteCallback;
+                 }
+                 MSP.send_message(MSPCodes.MSP2_INAV_SET_SERVO_MIXER, buffer, false, nextFunction);
             }
-            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
         }
     };
 
