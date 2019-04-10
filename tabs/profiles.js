@@ -232,9 +232,9 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 600),
             presets.elementHelper("RC_tuning", "yaw_rate", 500),
             presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
-            presets.elementHelper("PIDs", 0, [40, 28, 35, 0]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [45, 28, 40, 0]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 2, [85, 45, 15, 0])  //YAW PIDs
+            presets.elementHelper("PIDs", 0, [40, 35, 24, 0]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [45, 35, 24, 0]),  //PITCH PIDs
+            presets.elementHelper("PIDs", 2, [85, 45, 0, 0])  //YAW PIDs
         ],
         type: 'multirotor'
     },
