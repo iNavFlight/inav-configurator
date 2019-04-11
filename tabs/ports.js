@@ -59,7 +59,11 @@ TABS.ports.initialize = function (callback) {
         groups: ['peripherals'],
         maxPorts: 1 }
     );
- 
+    functionRules.push({
+        name: 'FFPV_24G',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    ); 
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
