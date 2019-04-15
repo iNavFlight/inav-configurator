@@ -900,8 +900,8 @@
     "portsFunction_IRC_TRAMP": {
         "message": "IRC Tramp"
     },
-    "portsFunction_FFPV_24G": {
-        "message": "FuriousFPV 2.4G"
+    "portsFunction_VTX_FFPV": {
+        "message": "FuriousFPV Vtx"
     },
     "pidTuningName": {
         "message": "Name"

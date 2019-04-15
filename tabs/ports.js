@@ -60,7 +60,7 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1 }
     );
     functionRules.push({
-        name: 'FFPV_24G',
+        name: 'VTX_FFPV',
         groups: ['peripherals'],
         maxPorts: 1 }
     ); 

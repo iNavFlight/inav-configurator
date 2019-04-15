@@ -46,7 +46,7 @@ var mspHelper = (function (gui) {
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12,
         'RANGEFINDER': 16,
-        'FFPV_24G': 17,
+        'VTX_FFPV': 17,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
