@@ -800,8 +800,6 @@ var mspHelper = (function (gui) {
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
-                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
-
                     offset += bytesPerPort;
                     SERIAL_CONFIG.ports.push(serialPort);
                 }
@@ -823,8 +821,6 @@ var mspHelper = (function (gui) {
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
                     };
-
-                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
 
                     offset += bytesPerPort;
                     SERIAL_CONFIG.ports.push(serialPort);
