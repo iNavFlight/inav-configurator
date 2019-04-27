@@ -121,16 +121,6 @@ PortHandler.check = function () {
                 $('div#port-picker #port').val(GUI.connected_to);
             }
 
-            // start connect procedure (if statement is valid)
-            if (GUI.auto_connect && !GUI.connecting_to && !GUI.connected_to) {
-                // we need firmware flasher protection over here
-                if (GUI.active_tab != 'firmware_flasher') {
-                    helper.timeout.add('auto-connect_timeout', function () {
-                        $('div#port-picker a.connect').click();
-                    }, 100); // timeout so bus have time to initialize after being detected by the system
-                }
-            }
-
             // trigger callbacks
             for (var i = (self.port_detected_callbacks.length - 1); i >= 0; i--) {
                 var obj = self.port_detected_callbacks[i];
