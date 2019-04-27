@@ -50,6 +50,12 @@ var Settings = (function () {
                     }
                 } else if (s.setting.type == 'string') {
                     input.val(s.value);
+                } else if (s.setting.type == 'float') {
+                    input.attr('type', 'number');
+                    input.attr('step', "0.01");
+                    input.attr('min', s.setting.min);
+                    input.attr('max', s.setting.max);
+                    input.val(s.value.toFixed(2));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
                     input.attr('type', 'number');

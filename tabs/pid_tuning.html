@@ -334,6 +334,34 @@
         <div class="cf_column half">
             <table class="rate-tpa rate-tpa--misc">
                 <tr>
+                    <th data-i18n="dtermSetpointWeight"></th>
+                    <td >
+                        <input type="number" data-setting="dterm_setpoint_weight" class="rate-tpa_input"/>
+                        <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
+                    </td>
+                </tr>
+                <tr class="requires-v2_2">
+                    <th data-i18n="itermRelax"></th>
+                    <td >
+                        <select data-setting="mc_iterm_relax" />
+                        <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
+                    </td>
+                </tr>
+                <tr class="requires-v2_2">
+                        <th data-i18n="itermRelaxType"></th>
+                        <td >
+                            <select data-setting="mc_iterm_relax_type" />
+                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
+                        </td>
+                    </tr>
+                <tr class="requires-v2_2">
+                        <th data-i18n="itermRelaxCutoff"></th>
+                        <td >
+                            <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
+                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
+                        </td>
+                    </tr>
+                <tr>
                     <th data-i18n="yawJumpPreventionLimit"></th>
                     <td >
                         <input type="number" id="yawJumpPreventionLimit" class="rate-tpa_input" step="10" min="80" max="500" />
