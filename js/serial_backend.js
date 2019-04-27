@@ -257,7 +257,7 @@ function onInvalidFirmwareVariant()
 
 function onInvalidFirmwareVersion()
 {
-    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.firmwareVersionAccepted]));
+    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted], [CONFIGURATOR.maxFirmwareVersionAccepted]));
     CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
     GUI.allowedTabs = ['cli'];
     onConnect();
@@ -317,7 +317,7 @@ function onOpen(openInfo) {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
                         googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
-                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
+                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxfirmwareVersionAccepted)) {
                             mspHelper.getCraftName(function(name) {
                                 if (name) {
                                     CONFIG.name = name;

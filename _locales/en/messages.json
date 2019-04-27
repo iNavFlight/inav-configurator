@@ -159,7 +159,7 @@
         "message": "No configuration received within <span style=\"color: red\">10 seconds</span>, communication <span style=\"color: red\">failed</span>"
     },
     "firmwareVersionNotSupported": {
-        "message": "This firmware version is <span style=\"color: red\">not supported</span>. Please upgrade to firmware that supports api version <strong>$1</strong> or higher. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
+        "message": "This firmware version is <span style=\"color: red\">not supported</span>. This version of Configurator supports firmware from $1 to $2 (excluded)"
     },
     "firmwareVariantNotSupported": {
         "message": "This firmware variant is <span style=\"color: red\">not supported</span>. Please upgrade to INAV firmware. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
