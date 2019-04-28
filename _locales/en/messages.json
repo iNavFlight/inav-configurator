@@ -915,6 +915,12 @@
     "pidTuningFeedForward": {
         "message": "FeedForward"
     },
+    "dtermSetpointWeight": {
+        "message": "Dterm setpoint weight"
+    },
+    "dtermSetpointWeightHelp": {
+        "message": "The lower the value, the more damped all the maneuvers are. 0 mean Dterm is computed from gyro, 1 from error and 2 from setpoint. For gentler feel lower the value. For sharper response, raise it"
+    },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
@@ -2967,5 +2973,23 @@
     },
     "active": {
         "message": "Active"
+    },
+    "itermRelax": {
+        "message": "Iterm Relax"
+    },
+    "itermRelaxHelp": {
+        "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axises. PRY is active also on Yaw."
+    },
+    "itermRelaxType": {
+        "message": "Iterm Relax Type"
+    },
+    "itermRelaxTypeHelp": {
+        "message": "GYRO mode is more clinical and complete in suppressing iTerm, SETPOINT mode is a bit smoother with slightly softer landings after flips."
+    },
+    "itermRelaxCutoff": {
+        "message": "Iterm Relax Cutoff Frequency"
+    },
+    "itermRelaxCutoffHelp": {
+        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm supression. Higher values shortens the time windows and reduces supression."
     }
 }

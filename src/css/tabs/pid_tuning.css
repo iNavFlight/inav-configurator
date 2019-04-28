@@ -179,6 +179,11 @@
     line-height: 20px;
 }
 
+.tab-pid_tuning select {
+    line-height: 20px;
+    margin: 4px;
+}
+
 .tab-pid_tuning .pid_tuning .name {
     width: 25%;
 }
