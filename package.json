@@ -34,8 +34,10 @@
     "minimist": "^1.2.0",
     "nw": "^0.36.1-sdk",
     "nw-builder": "^3.5.7",
+    "nw-dialog": "^1.0.7",
     "openlayers": "^4.6.5",
     "temp": "^0.8.3",
-    "three": "0.72.0"
+    "three": "0.72.0",
+    "xml2js": "^0.4.19"
   }
 }

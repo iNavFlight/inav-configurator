@@ -2719,6 +2719,18 @@
     "saveEepromMissionButton": {
         "message": "Save Eeprom mission"
     },
+    "loadFileMissionButton": {
+        "message": "Load file"
+    },
+    "saveFileMissionButton": {
+        "message": "Save file"
+    },
+    "missionSettingsSave": {
+        "message": "Save"
+    },
+    "missionSettingsCancel": {
+        "message": "Cancel"
+    },
     "editPointHead": {
         "message": "Edit point"
     },

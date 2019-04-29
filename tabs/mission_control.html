@@ -14,16 +14,17 @@
                     </div>
                     <div class="spacer">
                         <div class="point">
-                            <label class="point-label" for="pointAlt">Alt (cm): </label>
+                            <label class="point-label" for="MPdefaultPointAlt">Alt (cm): </label>
                             <input id="MPdefaultPointAlt" type="text" value="0" required>
                         </div>
                         <div class="point">
-                            <label class="point-label" for="pointSpeed">Speed (cm/s): </label>
+                            <label class="point-label" for="MPdefaultPointSpeed">Speed (cm/s): </label>
                             <input id="MPdefaultPointSpeed" type="text" value="0" required>
                         </div>
                         <div>
-                            <div id="saveSettings" class="btn save_btn" style="padding-top: 10px; display: inline-block">
-                                <a class="save" href="#" data-i18n="editPointButtonSave" style="float: left">Save</a>
+                            <div class="btn save_btn" style="padding-top: 10px;">
+                                <a id="saveSettings" class="save" href="#" data-i18n="missionSettingsSave" style="float: left">Save</a>
+                                <a id="cancelSettings" class="save" href="#" data-i18n="missionSettingsCancel" style="float: right">Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -33,30 +34,34 @@
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
                     </div>
                     <div class="spacer">
-                        <div style="padding-bottom: 2px;">
+                        <div id="infoMissionDistance" style="padding-bottom: 2px;">
                             <span>Distance (m):</span>
                             <span id="missionDistance"></span>
                         </div>
-                        <div style="padding-bottom: 2px;">
+                        <div id="infoAvailablePoints" style="padding-bottom: 2px;">
                             <span>Available Points</span>
                             <span id="availablePoints">0/0</span>
                         </div>
-                        <div style="padding-bottom: 2px;">
+                        <div id="infoMissionValid" style="padding-bottom: 2px;">
                             <span>Mission valid</span>
                             <div id="missionValid" style="display: inline-block"></div>
                         </div>
                         <br>
                         <div style="display: flex;">
-                            <input type="checkbox" style="width: 18px;margin-left: 5px;" id="rthEndMission">
+                            <input type="checkbox" style="width: 18px; margin-left: 5px;" id="rthEndMission">
                             <label for="rthEndMission" style="padding: 2px;">RTH at the end of the mission</label>
                         </div>
                         <div id="rthSettings" style="display: none">
                             <div style="display: flex">
-                                <input type="checkbox" id="rthLanding" style="width: 18px;margin-left: 5px;">
+                                <input type="checkbox" id="rthLanding" style="width: 18px; margin-left: 5px;">
                                 <label for="rthLanding" style="padding: 2px">Landing</label>
                             </div>
                         </div>
                         <hr>
+                        <div class="btn save_btn">
+                            <a id="loadFileMissionButton" class="save" href="#" data-i18n="loadFileMissionButton">Load file mission</a>
+                            <a id="saveFileMissionButton" class="save" href="#" data-i18n="saveFileMissionButton">Save file mission</a>
+                        </div>
                         <div class="btn save_btn">
                             <a id="loadMissionButton" class="save" href="#" data-i18n="loadMissionButton">Load mission from FC</a>
                             <a id="saveMissionButton" class="save" href="#" data-i18n="saveMissionButton">Save mission to FC</a>

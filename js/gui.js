@@ -13,6 +13,7 @@ var GUI_control = function () {
     this.defaultAllowedTabsWhenDisconnected = [
         'landing',
         'firmware_flasher',
+        'mission_control',
         'help'
     ];
     this.defaultAllowedTabsWhenConnected = [
