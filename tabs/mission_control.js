@@ -55,10 +55,10 @@ TABS.mission_control.initialize = function (callback) {
         if (!CONFIGURATOR.connectionValid) {
             $('#infoAvailablePoints').hide();
             $('#infoMissionValid').hide();
-            $('#loadMissionButton').addClass('disabled');
-            $('#saveMissionButton').addClass('disabled');
-            $('#loadEepromMissionButton').addClass('disabled');
-            $('#saveEepromMissionButton').addClass('disabled');
+            $('#loadMissionButton').hide();
+            $('#saveMissionButton').hide();
+            $('#loadEepromMissionButton').hide();
+            $('#saveEepromMissionButton').hide();
         }
 
         if (typeof require !== "undefined") {
@@ -69,16 +69,6 @@ TABS.mission_control.initialize = function (callback) {
             $('#notLoadMap').show();
         }
         localize();
-
-/* * /
-// TESTING: load mission file at startup
-nw.Window.get().showDevTools(null, function() {
-//    let fileXml = "./131208-0513.mission";
-    let fileXml = "./131227-0505.mission";
-//    let fileXml = "./131227-0511.mission";
-    loadMissionFile(fileXml);
-});
-/* */
 
         GUI.content_ready(callback);
     }
@@ -638,70 +628,70 @@ nw.Window.get().showDevTools(null, function() {
                     return console.error(err);
                 }
 
-                var mission = { points: [] };
-
                 // parse mission file
-
+                var mission = { points: [] };
+                var node = null;
                 var nodemission = null;
                 for (var noderoot in result) {
                     if (!nodemission && noderoot.match(/mission/i)) {
                         nodemission = result[noderoot];
                         if (nodemission.$$ && nodemission.$$.length) {
                             for (var i = 0; i < nodemission.$$.length; i++) {
-                                if (nodemission.$$[i]['#name'].match(/version/i) && nodemission.$$[i].$) {
-                                    for (var attr in nodemission.$$[i].$) {
+                                node = nodemission.$$[i];
+                                if (node['#name'].match(/version/i) && node.$) {
+                                    for (var attr in node.$) {
                                         if (attr.match(/value/i)) {
-                                            mission.version = nodemission.$$[i].$[attr]
+                                            mission.version = node.$[attr]
                                         }
                                     }
-                                } else if (nodemission.$$[i]['#name'].match(/mwp/i) && nodemission.$$[i].$) {
+                                } else if (node['#name'].match(/mwp/i) && node.$) {
                                     mission.center = {};
-                                    for (var attr in nodemission.$$[i].$) {
+                                    for (var attr in node.$) {
                                         if (attr.match(/zoom/i)) {
-                                            mission.center.zoom = parseInt(nodemission.$$[i].$[attr]);
+                                            mission.center.zoom = parseInt(node.$[attr]);
                                         } else if (attr.match(/cx/i)) {
-                                            mission.center.lon = parseFloat(nodemission.$$[i].$[attr]);
+                                            mission.center.lon = parseFloat(node.$[attr]);
                                         } else if (attr.match(/cy/i)) {
-                                            mission.center.lat = parseFloat(nodemission.$$[i].$[attr]);
+                                            mission.center.lat = parseFloat(node.$[attr]);
                                         }
                                     }
-                                } else if (nodemission.$$[i]['#name'].match(/missionitem/i) && nodemission.$$[i].$) {
+                                } else if (node['#name'].match(/missionitem/i) && node.$) {
                                     var point = {};
-                                    for (var attr in nodemission.$$[i].$) {
+                                    for (var attr in node.$) {
                                         if (attr.match(/no/i)) {
-                                            point.index = parseInt(nodemission.$$[i].$[attr]);
+                                            point.index = parseInt(node.$[attr]);
                                         } else if (attr.match(/action/i)) {
-                                            if (nodemission.$$[i].$[attr].match(/WAYPOINT/i)) {
+                                            if (node.$[attr].match(/WAYPOINT/i)) {
                                                 point.action = MWNP.WPTYPE.WAYPOINT;
-                                            } else if (nodemission.$$[i].$[attr].match(/PH_UNLIM/i) || nodemission.$$[i].$[attr].match(/POSHOLD_UNLIM/i)) {
+                                            } else if (node.$[attr].match(/PH_UNLIM/i) || node.$[attr].match(/POSHOLD_UNLIM/i)) {
                                                 point.action = MWNP.WPTYPE.PH_UNLIM;
-                                            } else if (nodemission.$$[i].$[attr].match(/PH_TIME/i) || nodemission.$$[i].$[attr].match(/POSHOLD_TIME/i)) {
+                                            } else if (node.$[attr].match(/PH_TIME/i) || node.$[attr].match(/POSHOLD_TIME/i)) {
                                                 point.action = MWNP.WPTYPE.PH_TIME;
-                                            } else if (nodemission.$$[i].$[attr].match(/RTH/i)) {
+                                            } else if (node.$[attr].match(/RTH/i)) {
                                                 point.action = MWNP.WPTYPE.RTH;
-                                            } else if (nodemission.$$[i].$[attr].match(/SET_POI/i)) {
+                                            } else if (node.$[attr].match(/SET_POI/i)) {
                                                 point.action = MWNP.WPTYPE.SET_POI;
-                                            } else if (nodemission.$$[i].$[attr].match(/JUMP/i)) {
+                                            } else if (node.$[attr].match(/JUMP/i)) {
                                                 point.action = MWNP.WPTYPE.JUMP;
-                                            } else if (nodemission.$$[i].$[attr].match(/SET_HEAD/i)) {
+                                            } else if (node.$[attr].match(/SET_HEAD/i)) {
                                                 point.action = MWNP.WPTYPE.SET_HEAD;
-                                            } else if (nodemission.$$[i].$[attr].match(/LAND/i)) {
+                                            } else if (node.$[attr].match(/LAND/i)) {
                                                 point.action = MWNP.WPTYPE.LAND;
                                             } else {
                                                 point.action = 0;
                                             }
                                         } else if (attr.match(/lat/i)) {
-                                            point.lat = parseFloat(nodemission.$$[i].$[attr]);
+                                            point.lat = parseFloat(node.$[attr]);
                                         } else if (attr.match(/lon/i)) {
-                                            point.lon = parseFloat(nodemission.$$[i].$[attr]);
+                                            point.lon = parseFloat(node.$[attr]);
                                         } else if (attr.match(/alt/i)) {
-                                            point.alt = (parseInt(nodemission.$$[i].$[attr]) * 100);
+                                            point.alt = (parseInt(node.$[attr]) * 100);
                                         } else if (attr.match(/parameter1/i)) {
-                                            point.p1 = parseInt(nodemission.$$[i].$[attr]);
+                                            point.p1 = parseInt(node.$[attr]);
                                         } else if (attr.match(/parameter2/i)) {
-                                            point.p2 = parseInt(nodemission.$$[i].$[attr]);
+                                            point.p2 = parseInt(node.$[attr]);
                                         } else if (attr.match(/parameter3/i)) {
-                                            point.p3 = parseInt(nodemission.$$[i].$[attr]);
+                                            point.p3 = parseInt(node.$[attr]);
                                         }
                                     }
                                     mission.points.push(point);
@@ -710,12 +700,9 @@ nw.Window.get().showDevTools(null, function() {
                         }
                     }
                 }
-                //console.log(mission);
 
                 // draw actual mission
-
                 removeAllPoints();
-
                 for (var i = 0; i < mission.points.length; i++) {
                     //if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND].includes(mission.points[i].action)) {
                     if (mission.points[i].action == MWNP.WPTYPE.WAYPOINT) {
