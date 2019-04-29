@@ -131,6 +131,7 @@ presets.presets = [
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff1", 300),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz2", 200),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchCutoff2", 100),
+            presets.elementHelper("FILTER_CONFIG", "yawLpfHz", 0),
             presets.elementHelper("PIDs", 0, [36, 40, 20, 0]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [48, 50, 22, 0]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [70, 45, 0, 0])  //YAW PIDs
@@ -164,6 +165,7 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 750),
             presets.elementHelper("RC_tuning", "yaw_rate", 750),
             presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("FILTER_CONFIG", "yawLpfHz", 0),
             presets.elementHelper("FILTER_CONFIG", "gyroStage2LowpassHz", 220),
             presets.elementHelper("PIDs", 0, [32, 45, 23, 0]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [38, 54, 25, 0]),  //PITCH PIDs
@@ -195,6 +197,7 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "roll_rate", 500),
             presets.elementHelper("RC_tuning", "pitch_rate", 500),
             presets.elementHelper("RC_tuning", "yaw_rate", 450),
+            presets.elementHelper("FILTER_CONFIG", "yawLpfHz", 0),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchHz", 200),
             presets.elementHelper("FILTER_CONFIG", "dtermNotchCutoff", 100),
             presets.elementHelper("FILTER_CONFIG", "gyroNotchHz1", 200),
@@ -232,6 +235,7 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 600),
             presets.elementHelper("RC_tuning", "yaw_rate", 500),
             presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("FILTER_CONFIG", "yawLpfHz", 0),
             presets.elementHelper("PIDs", 0, [40, 35, 24, 0]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [45, 35, 24, 0]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [85, 45, 0, 0])  //YAW PIDs
@@ -263,6 +267,7 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 700),
             presets.elementHelper("RC_tuning", "yaw_rate", 500),
             presets.elementHelper("RC_tuning", "RC_YAW_EXPO", 0.7),
+            presets.elementHelper("FILTER_CONFIG", "yawLpfHz", 0),
             presets.elementHelper("PIDs", 0, [30, 50, 25, 0]),  //ROLL PIDs
             presets.elementHelper("PIDs", 1, [30, 50, 25, 0]),  //PITCH PIDs
             presets.elementHelper("PIDs", 2, [60, 50, 0, 0])  //YAW PIDs
