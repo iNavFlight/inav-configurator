@@ -63,7 +63,8 @@ TABS.mission_control.initialize = function (callback) {
 
         if (typeof require !== "undefined") {
             loadSettings();
-            initMap();
+            // let the dom load finish, avoiding the resizing of the map
+            setTimeout(initMap, 200);
         } else {
             $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
@@ -402,13 +403,8 @@ TABS.mission_control.initialize = function (callback) {
 
         // Set the attribute link to open on an external browser window, so
         // it doesn't interfere with the configurator.
-        var interval;
-        interval = setInterval(function() {
-            var anchor = $('.ol-attribution a');
-            if (anchor.length) {
-                anchor.attr('target', '_blank');
-                clearInterval(interval);
-            }
+        setTimeout(function() {
+            $('.ol-attribution a').attr('target', '_blank');
         }, 100);
 
         // save map view settings when user moves it
@@ -476,6 +472,13 @@ TABS.mission_control.initialize = function (callback) {
                 map.getTarget().style.cursor = '';
             }
         });
+
+        // handle map size on container resize
+        setInterval(function () {
+            let width = $("#missionMap canvas").width(), height = $("#missionMap canvas").height();
+            if ((map.width_ != width) || (map.height_ != height)) map.updateSize();
+            map.width_ = width; map.height_ = height;
+        }, 200);
 
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
