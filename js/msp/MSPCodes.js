@@ -209,5 +209,7 @@ var MSPCodes = {
     MSP2_INAV_SET_LOGIC_CONDITIONS:     0x2023,
 
     MSP2_PID:                           0x2030,
-    MSP2_SET_PID:                       0x2031
+    MSP2_SET_PID:                       0x2031,
+
+    MSP2_INAV_OPFLOW_CALIBRATION:       0x2032
 };

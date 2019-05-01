@@ -463,6 +463,12 @@
     "initialSetupMagCalibEnded": {
         "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
     },
+    "initialSetupOpflowCalibStarted": {
+        "message": "Optic flow calibration started"
+    },
+    "initialSetupOpflowCalibEnded": {
+        "message": "Optic flow calibration <span style=\"color: #37a8db\">finished</span>"
+    },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
     },
@@ -2067,6 +2073,15 @@
     },
     "calibrationHead4": {
         "message": "Compass Calibration"
+    },
+    "calibrationHead5": {
+        "message": "Optic Flow Calibration"
+    },
+    "OpflowCalText": {
+        "message": "After pressing the button you have 30 seconds to hold the copter in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
+    },
+    "OpflowCalBtn": {
+        "message": "Calibrate Optic Flow sensor"
     },
     "accZero": {
         "message": "Acc Zero"

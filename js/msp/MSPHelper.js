@@ -642,6 +642,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_MAG_CALIBRATION:
                 console.log('Mag calibration executed');
                 break;
+            case MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION:
+                console.log('Optic flow calibration executed');
+                break;
             case MSPCodes.MSP_SET_MISC:
                 console.log('MISC Configuration saved');
                 break;
@@ -1293,6 +1296,11 @@ var mspHelper = (function (gui) {
                 CALIBRATION_DATA.magZero.X = data.getInt16(13, true);
                 CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
                 CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+                    CALIBRATION_DATA.opflow.Scale = (data.getInt16(19, true) / 256.0);
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_CALIBRATION_DATA:
@@ -1945,6 +1953,11 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(CALIBRATION_DATA.magZero.Z));
                 buffer.push(highByte(CALIBRATION_DATA.magZero.Z));
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+                    buffer.push(lowByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                    buffer.push(highByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                }
                 break;
 
             case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:

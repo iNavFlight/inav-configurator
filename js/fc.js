@@ -400,6 +400,9 @@ var FC = {
                 X: null,
                 Y: null,
                 Z: null
+            },
+            opflow: {
+                Scale: null
             }
         };
 
