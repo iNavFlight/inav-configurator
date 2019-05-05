@@ -622,7 +622,7 @@ var FC = {
     getLooptimes: function () {
         return {
             125: {
-                defaultLooptime: 2000,
+                defaultLooptime: 1000,
                 looptimes: {
                     4000: "250Hz",
                     3000: "334Hz",
@@ -635,7 +635,7 @@ var FC = {
                 }
             },
             1000: {
-                defaultLooptime: 2000,
+                defaultLooptime: 1000,
                 looptimes: {
                     4000: "250Hz",
                     2000: "500Hz",
