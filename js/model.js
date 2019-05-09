@@ -1,6 +1,6 @@
 'use strict';
 
-const enableHelicopter = true;
+const enableHelicopter = false;
 
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
