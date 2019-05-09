@@ -837,6 +837,23 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupGForce',
+            items: [
+                {
+                    name: 'G_FORCE',
+                    id: 100,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('1.00')
+                },
+                {
+                    name: 'G_FORCE_Z',
+                    id: 101,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('1.00')
+                },
+            ]
+        },
+        {
             name: 'osdGroupTimers',
             items: [
                 {
