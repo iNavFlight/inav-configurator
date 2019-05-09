@@ -242,7 +242,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('#mixer-hidden-content').removeClass("is-hidden");
             $('#mixer-main-content').remove();
         }
-
+		        
         $servoMixTable = $('#servo-mix-table');
         $servoMixTableBody = $servoMixTable.find('tbody');
         $motorMixTable = $('#motor-mix-table');
@@ -290,6 +290,17 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
 
+			$pitchRollWeightWrapper = $('#pitch-roll-weight-wrapper');
+			$pitchRollWeight = $('#pitch-roll-weight');
+       		if (MIXER_CONFIG.platformType==PLATFORM_HELICOPTER)
+				$pitchRollWeightWrapper.removeClass('is-hidden');
+			else
+				$pitchRollWeightWrapper.addClass('is-hidden');
+			$pitchRollWeight.val(MIXER_CONFIG.pitchRollWeight);
+			$pitchRollWeight.change(function () {
+                MIXER_CONFIG.pitchRollWeight = $pitchRollWeight.val();
+			});
+			
             var $platformSelectParent = $platformSelect.parent('.select');
 
             if (currentPlatform.flapsPossible) {
@@ -334,7 +345,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#execute-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadServoRules(currentMixerPreset, $('#pitch-roll-weight').val());
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();
@@ -344,7 +355,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#load-mixer-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadServoRules(currentMixerPreset, $('#pitch-roll-weight').val());
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
             renderMotorMixRules();

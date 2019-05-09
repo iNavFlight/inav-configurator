@@ -1,5 +1,7 @@
 'use strict';
 
+const enableHelicopter = true;
+
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
     SERVO_ELEVATOR = 2,
@@ -13,7 +15,12 @@ const SERVO_GIMBAL_PITCH = 0,
     SERVO_SINGLECOPTER_1 = 3,
     SERVO_SINGLECOPTER_2 = 4,
     SERVO_SINGLECOPTER_3 = 5,
-    SERVO_SINGLECOPTER_4 = 6;
+    SERVO_SINGLECOPTER_4 = 6,
+    SERVO_SWASHPLATE_1 = 3,
+    SERVO_SWASHPLATE_2 = 4,
+    SERVO_SWASHPLATE_3 = 5,
+    SERVO_SWASHPLATE_4 = 6,
+    SERVO_HELICOPTER_TAIL = 7;
 
 const INPUT_STABILIZED_ROLL = 0,
     INPUT_STABILIZED_PITCH = 1,
@@ -29,7 +36,8 @@ const INPUT_STABILIZED_ROLL = 0,
     INPUT_RC_AUX4 = 11,
     INPUT_GIMBAL_PITCH = 12,
     INPUT_GIMBAL_ROLL = 13,
-    INPUT_FEATURE_FLAPS = 14;
+    INPUT_FEATURE_FLAPS = 14,
+    INPUT_FEATURE_COLLECTIVE_PITCH = 30;
 
 const
     PLATFORM_MULTIROTOR     = 0,
@@ -304,26 +312,50 @@ const mixerList = [
     },           // 14
     {
         id: 15,
-        name: 'Heli 120',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
+        name: 'CCPM 120',
+        model: 'heli',
+        image: 'ccpm120',
+        enabled: enableHelicopter,
         legacy: true,
         platform: PLATFORM_HELICOPTER,
-        motorMixer: [],
-        servoMixer: []
+        motorMixer: [
+			new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+        ],
+        servoMixer: [            
+			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,         -100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,          50, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,          50, 0),
+			new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
+		]
     },             // 15
     {
         id: 16,
-        name: 'Heli 90',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
+        name: 'CCPM 120 Inv',
+        model: 'heli',
+        image: 'ccpm120inv',
+        enabled: enableHelicopter,
         legacy: true,
         platform: PLATFORM_HELICOPTER,
-        motorMixer: [],
-        servoMixer: []
-    },              // 16
+        motorMixer: [
+			new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+        ],
+        servoMixer: [            
+			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,          100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,         -50, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
+			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,         -50, 0),
+			new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
+		]
+    },             // 16
     {
         id: 17,
         name: 'V-tail Quad',
@@ -536,7 +568,7 @@ const platformList = [
     {
         id: 2,
         name: "Helicopter",
-        enabled: false,
+        enabled: enableHelicopter,
         flapsPossible: false
     },
     {
@@ -622,17 +654,21 @@ helper.mixer = (function (mixerList) {
         return retVal;
     };
 
-    publicScope.loadServoRules = function (mixer) {
+    publicScope.loadServoRules = function (mixer, pitchRollWeight) {
         SERVO_RULES.flush();
-
+		var fPitchRollWeight = parseFloat(pitchRollWeight)/100.0;
+		
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
+                var rate = r.getRate();
+                if ((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH))
+					rate *= fPitchRollWeight;
                 SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),
                         r.getInput(),
-                        r.getRate(),
+                        rate,
                         r.getSpeed()
                     )
                 );

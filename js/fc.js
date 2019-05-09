@@ -182,6 +182,7 @@ var FC = {
             yawJumpPreventionLimit: 0,
             platformType: -1,
             hasFlaps: false,
+            pitchRollWeight: 30,
             appliedMixerPreset: -1,
             numberOfMotors: 0,
             numberOfServos: 0
@@ -1126,7 +1127,8 @@ var FC = {
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
             'Stabilized Yaw-',      // 28,
-            'ONE'                   // 29,
+            'ONE',                  // 29,
+            'Collective Pitch'      // 30
         ];
     },
     getServoMixInputName: function (input) {
