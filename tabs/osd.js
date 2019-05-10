@@ -846,10 +846,22 @@ OSD.constants = {
                     preview: FONT.embed_dot('1.00')
                 },
                 {
-                    name: 'G_FORCE_Z',
+                    name: 'G_FORCE_X',
                     id: 101,
                     min_version: '2.2.0',
-                    preview: FONT.embed_dot('1.00')
+                    preview: FONT.embed_dot('-0.10')
+                },
+                {
+                    name: 'G_FORCE_Y',
+                    id: 102,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('-0.10')
+                },
+                {
+                    name: 'G_FORCE_Z',
+                    id: 103,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('-0.10')
                 },
             ]
         },
