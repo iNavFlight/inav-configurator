@@ -319,19 +319,19 @@ const mixerList = [
         legacy: true,
         platform: PLATFORM_HELICOPTER,
         motorMixer: [
-			new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0)
         ],
         servoMixer: [            
-			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,         -100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,          50, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,          50, 0),
-			new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
-		]
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,         -100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,          50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,          50, 0),
+            new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
+        ]
     },             // 15
     {
         id: 16,
@@ -342,19 +342,19 @@ const mixerList = [
         legacy: true,
         platform: PLATFORM_HELICOPTER,
         motorMixer: [
-			new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0)
         ],
         servoMixer: [            
-			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,          100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,         -50, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
-			new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,         -50, 0),
-			new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
-		]
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,          100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,         -50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,         -50, 0),
+            new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
+        ]
     },             // 16
     {
         id: 17,
@@ -656,14 +656,13 @@ helper.mixer = (function (mixerList) {
 
     publicScope.loadServoRules = function (mixer, pitchRollWeight) {
         SERVO_RULES.flush();
-		var fPitchRollWeight = parseFloat(pitchRollWeight)/100.0;
-		
+        var fPitchRollWeight = parseFloat(pitchRollWeight)/100.0;
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
                 var rate = r.getRate();
                 if ((mixer.platform==PLATFORM_HELICOPTER)&&((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH)))
-					rate *= fPitchRollWeight;
+                    rate *= fPitchRollWeight;
                 SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),

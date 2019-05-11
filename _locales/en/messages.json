@@ -2801,8 +2801,8 @@
         "message": "Mixer preset"
     },
     "mixerPitchRollWeight": {
-		"message": "CCPM Pitch/Roll weight (%)"
-	},
+        "message": "CCPM Pitch/Roll weight (%)"
+    },
     "mixerLoadPresetRules": {
         "message": "Load mixer"
     },
