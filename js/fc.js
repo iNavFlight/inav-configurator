@@ -921,6 +921,14 @@ var FC = {
                 rates: {
                     16000: "16kHz"
                 }
+            },
+            9: {
+                name: "SERIALSHOT",
+                message: "escProtocolExperimental",
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
             }
         };
     },

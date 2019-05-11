@@ -2956,6 +2956,9 @@
     "escProtocolNotAdvised": {
         "message": "This ESC protocol is not advised, use it at your own risk"
     },
+    "escProtocolExperimental": {
+        "message": "Experimental ESC protocol, use at your own risk"
+    },
     "looptimeNotAdvised": {
         "message": "PID loop might be not stable if GPS is in use"
     },
