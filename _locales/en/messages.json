@@ -870,6 +870,12 @@
     "portsFunction_RANGEFINDER": {
         "message": "Rangefinder"
     },
+    "portsFunction_OPFLOW": {
+        "message": "Optic flow"
+    },
+    "portsFunction_ESC": {
+        "message": "ESC output/telemetry"
+    },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
     },
