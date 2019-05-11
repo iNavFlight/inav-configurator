@@ -662,13 +662,13 @@ helper.mixer = (function (mixerList) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
                 var rate = r.getRate();
-                if ((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH))
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH)))
 					rate *= fPitchRollWeight;
                 SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),
                         r.getInput(),
-                        rate,
+                        Math.round(rate),
                         r.getSpeed()
                     )
                 );
