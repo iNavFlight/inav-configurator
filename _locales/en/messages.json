@@ -2440,6 +2440,9 @@
     "osdGroupTimers": {
         "message": "Timers"
     },
+    "osdGroupGForce": {
+        "message": "G force"
+    },
     "osdGroupTemperature": {
         "message": "Temperature"
     },
@@ -2577,6 +2580,30 @@
     },
     "osdElement_VARIO_NUM_HELP": {
         "message": "Shows vertical speed using a number"
+    },
+    "osdElement_G_FORCE": {
+        "message": "g force"
+    },
+    "osdElement_G_FORCE_HELP": {
+        "message": "Shows the g force taking into account all axes"
+    },
+    "osdElement_G_FORCE_X": {
+        "message": "Longitudinal g force in body frame (X)"
+    },
+    "osdElement_G_FORCE_X_HELP": {
+        "message": "Shows the g force in the X axis (longitudinal)"
+    },
+    "osdElement_G_FORCE_Y": {
+        "message": "Lateral g force in body frame (Y)"
+    },
+    "osdElement_G_FORCE_Y_HELP": {
+        "message": "Shows the g force in the Y axis (lateral)"
+    },
+    "osdElement_G_FORCE_Z": {
+        "message": "Vertical g force in body frame (Z)"
+    },
+    "osdElement_G_FORCE_Z_HELP": {
+        "message": "Shows the g force in the Z axis (vertical)"
     },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
