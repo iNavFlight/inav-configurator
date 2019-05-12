@@ -45,8 +45,11 @@ var mspHelper = (function (gui) {
         'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12,
+        'OPFLOW': 14,
+        'LOG': 15,
         'RANGEFINDER': 16,
         'VTX_FFPV': 17,
+        'ESC': 18,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
