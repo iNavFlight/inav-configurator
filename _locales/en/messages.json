@@ -742,10 +742,10 @@
         "message": "Capacity"
     },
     "configurationBatteryCapacityWarning": {
-        "message": "Warning Capacity (%)"
+        "message": "Warning Capacity (remaining %)"
     },
     "configurationBatteryCapacityCritical": {
-        "message": "Critical Capacity (%)"
+        "message": "Critical Capacity (remaining %)"
     },
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
