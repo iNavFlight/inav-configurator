@@ -1389,6 +1389,9 @@
   "osd_alt_alarm": {
     "type": "uint16_t"
   },
+  "osd_current_alarm": {
+    "type": "uint8_t"
+  },
   "osd_artificial_horizon_reverse_roll": {
     "type": "uint8_t",
     "table": {
