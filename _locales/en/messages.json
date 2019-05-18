@@ -3057,5 +3057,44 @@
     },
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm supression. Higher values shortens the time windows and reduces supression."
+    },
+    "gyro_lpf_type": {
+        "message": "Gyro LPF type"
+    },
+    "gyro_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "tabFilteringAdvanced": {
+        "message": "Advanced filtering"
+    },
+    "acc_lpf_type": {
+        "message": "Accelerometer LPF type"
+    },
+    "acc_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dTermMechanics": {
+        "message": "D-term mechanics"
+    },
+    "d_boost_factor": {
+        "message": "D-Boost Factor"
+    },
+    "d_boost_factor_help": {
+        "message": "Defines the max. Dterm boost when max. angular acceleration is reached. 1.0 means D-Boost is diabled, 2.0 means Dterm is allowed grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
+    },
+    "d_boost_max_at_acceleration": {
+        "message": "Top D-Boost at acceleration [dps^2]"
+    },
+    "d_boost_max_at_acceleration_help": {
+        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
+    },
+    "d_boost_gyro_delta_lpf_hz": {
+        "message": "D-Boost gyro LPF"
+    },
+    "d_boost_gyro_delta_lpf_hz_help": {
+        "message": "Should be set to the frequency of propwash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
+    },
+    "iTermMechanics": {
+        "message": "I-term mechanics"
     }
 }
