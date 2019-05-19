@@ -1,6 +1,6 @@
 'use strict';
 
-const enableHelicopter = true; //This is for totally hide helicopter settings from user until all heli features will be ready
+const enableHelicopter = false; //This is for totally hide helicopter settings from user until all heli features will be ready
 
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
