@@ -2407,6 +2407,12 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osdAlarmCURRENT": {
+        "message": "Current"
+    },
+    "osdAlarmCURRENT_HELP": {
+        "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
+    },
     "osdAlarmIMU_TEMPERATURE_MIN": {
         "message": "Minimum IMU temperature"
     },
@@ -2547,7 +2553,7 @@
     },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
-    },   
+    },
     "osdElement_3D_SPEED_HELP": {
         "message": "Shows 3D speed considering both horizontal and vertical speed."
     },

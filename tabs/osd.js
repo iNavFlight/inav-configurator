@@ -402,6 +402,7 @@ OSD.initData = function () {
             max_altitude: null,
             dist: null,
             max_neg_altitude: null,
+            current: null,
             imu_temp_alarm_min: null,
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
@@ -499,6 +500,13 @@ OSD.constants = {
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
+        },
+        {
+            name: 'CURRENT',
+            field: 'current',
+            min_version: '2.2.0',
+            step: 1,
+            unit: 'A',
         },
         {
             name: 'IMU_TEMPERATURE_MIN',
@@ -1617,6 +1625,9 @@ OSD.msp = {
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            result.push8(OSD.data.alarms.current);
+        }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
             result.push16(OSD.data.alarms.imu_temp_alarm_min);
             result.push16(OSD.data.alarms.imu_temp_alarm_max);
@@ -1634,6 +1645,9 @@ OSD.msp = {
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            OSD.data.alarms.current = alarms.readU8();
+        }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
             OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
             OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
@@ -1707,6 +1721,11 @@ OSD.msp = {
         result.push16(OSD.data.alarms.fly_minutes);
         result.push16(OSD.data.alarms.max_altitude);
         // These might be null, since there weren't supported
+        // until version 2.2
+        if (OSD.data.alarms.current !== null) {
+            result.push8(OSD.data.alarms.current);
+        }
+        // These might be null, since there weren't supported
         // until version 1.8
         if (OSD.data.alarms.dist !== null) {
             result.push16(OSD.data.alarms.dist);
@@ -1741,6 +1760,10 @@ OSD.msp = {
 
         d.alarms.dist = view.readU16();
         d.alarms.max_neg_altitude = view.readU16();
+
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            d.alarms.current = view.readU8();
+        }
 
         d.items = [];
         // start at the offset from the other fields
