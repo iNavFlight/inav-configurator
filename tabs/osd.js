@@ -402,6 +402,9 @@ OSD.initData = function () {
             max_altitude: null,
             dist: null,
             max_neg_altitude: null,
+            gforce: null,
+            gforce_axis_min: null,
+            gforce_axis_max: null,
             current: null,
             imu_temp_alarm_min: null,
             imu_temp_alarm_max: null,
@@ -500,6 +503,33 @@ OSD.constants = {
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_to_display,
             from_display: altitude_alarm_from_display,
+        },
+        {
+            name: 'GFORCE',
+            field: 'gforce',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
+        },
+        {
+            name: 'GFORCE_AXIS_MIN',
+            field: 'gforce_axis_min',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
+        },
+        {
+            name: 'GFORCE_AXIS_MAX',
+            field: 'gforce_axis_max',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
         },
         {
             name: 'CURRENT',
@@ -1626,6 +1656,9 @@ OSD.msp = {
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
         if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            result.push16(OSD.data.alarms.gforce);
+            result.push16(OSD.data.alarms.gforce_axis_min);
+            result.push16(OSD.data.alarms.gforce_axis_max);
             result.push8(OSD.data.alarms.current);
         }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
@@ -1646,6 +1679,9 @@ OSD.msp = {
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
         if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            OSD.data.alarms.gforce = alarms.readU16();
+            OSD.data.alarms.gforce_axis_min = alarms.read16();
+            OSD.data.alarms.gforce_axis_max = alarms.read16();
             OSD.data.alarms.current = alarms.readU8();
         }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
@@ -1721,11 +1757,6 @@ OSD.msp = {
         result.push16(OSD.data.alarms.fly_minutes);
         result.push16(OSD.data.alarms.max_altitude);
         // These might be null, since there weren't supported
-        // until version 2.2
-        if (OSD.data.alarms.current !== null) {
-            result.push8(OSD.data.alarms.current);
-        }
-        // These might be null, since there weren't supported
         // until version 1.8
         if (OSD.data.alarms.dist !== null) {
             result.push16(OSD.data.alarms.dist);
@@ -1760,10 +1791,6 @@ OSD.msp = {
 
         d.alarms.dist = view.readU16();
         d.alarms.max_neg_altitude = view.readU16();
-
-        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
-            d.alarms.current = view.readU8();
-        }
 
         d.items = [];
         // start at the offset from the other fields
