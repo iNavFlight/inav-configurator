@@ -2407,6 +2407,24 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osdAlarmGFORCE": {
+        "message": "g force"
+    },
+    "osdAlarmGFORCE_HELP": {
+        "message": "The g force element will start blinking when greater than this value"
+    },
+    "osdAlarmGFORCE_AXIS_MIN": {
+        "message": "g force axis min"
+    },
+    "osdAlarmGFORCE_AXIS_MIN_HELP": {
+        "message": "The axes g force elements will start blinking when lower than this value"
+    },
+    "osdAlarmGFORCE_AXIS_MAX": {
+        "message": "g force axis max"
+    },
+    "osdAlarmGFORCE_AXIS_MAX_HELP": {
+        "message": "The axes g force elements will start blinking when greater than this value"
+    },
     "osdAlarmCURRENT": {
         "message": "Current"
     },
