@@ -290,17 +290,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
 
-            $pitchRollWeightWrapper = $('#pitch-roll-weight-wrapper');
-            $pitchRollWeight = $('#pitch-roll-weight');
-            if (MIXER_CONFIG.platformType==PLATFORM_HELICOPTER)
-                $pitchRollWeightWrapper.removeClass('is-hidden');
-            else
-                $pitchRollWeightWrapper.addClass('is-hidden');
-            $pitchRollWeight.val(MIXER_CONFIG.pitchRollWeight);
-            $pitchRollWeight.change(function () {
-                MIXER_CONFIG.pitchRollWeight = $pitchRollWeight.val();
-            });
-
             var $platformSelectParent = $platformSelect.parent('.select');
 
             if (currentPlatform.flapsPossible) {
@@ -344,22 +333,51 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerApplyContent')
         });
 
-        $('#execute-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset, $('#pitch-roll-weight').val());
-            helper.mixer.loadMotorRules(currentMixerPreset);
+        heliModal = new jBox('Modal', {
+            width: 480,
+            height: 240,
+            closeButton: 'title',
+            animation: false,
+            title: chrome.i18n.getMessage("heliModalTitle"),
+            content: $('#heliModalContent')
+        });
+
+        function mixerApply() {
+            heliModal.close();
+            heliSettings = {
+                pitchRollWeight: $('#pitch-roll-weight').val(),
+                useTailMotor: $('#use-tail-motor').is(':checked')
+            };
+            helper.mixer.loadServoRules(currentMixerPreset, heliSettings);
+            helper.mixer.loadMotorRules(currentMixerPreset, heliSettings);
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
-            modal.close();
+        }
+
+        function mixerApplyAndReboot() {
+            mixerApply();
             saveAndReboot();
+        }
+
+        function mixerApplyWithModal(apply) {
+            $('#pitch-roll-weight').val(50);
+            $('#use-tail-motor').prop("checked", false);
+            if (MIXER_CONFIG.platformType==PLATFORM_HELICOPTER) {
+                $('#heli-apply-button').click(apply);
+                heliModal.open();
+            }
+            else
+                apply();
+        }
+        
+        $('#execute-button').click(function () {
+            modal.close();
+            mixerApplyWithModal(mixerApplyAndReboot);
         });
 
         $('#load-mixer-button').click(function () {
-            helper.mixer.loadServoRules(currentMixerPreset, $('#pitch-roll-weight').val());
-            helper.mixer.loadMotorRules(currentMixerPreset);
-            renderServoMixRules();
-            renderMotorMixRules();
-            renderOutputMapping();
+            mixerApplyWithModal(mixerApply);
         });
 
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {

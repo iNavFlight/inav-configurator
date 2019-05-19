@@ -37,12 +37,6 @@
                             </div>
                             <div class="half" style="width: calc(50% - 10px); margin-left: 10px;">
                                 <select id="mixer-preset"></select>
-                                <div class="number" id="pitch-roll-weight-wrapper" style="margin-top: 10px">
-                                    <input type="number" id="pitch-roll-weight" name="pitchrollweight" min="5" max="200" />
-                                    <label for="pitch-roll-weight">
-                                        <span data-i18n="mixerPitchRollWeight"></span>
-                                    </label>
-                                </div>
                             </div>
                             <div class="mixer-load-button">
                                 <div class="btn default_btn narrow red">
@@ -168,6 +162,29 @@
         </div>
         <div class="modal__buttons">
             <a id="execute-button" class="modal__button modal__button--main" data-i18n="mixerButtonSaveAndReboot"></a>
+        </div>
+    </div>
+    <div id="heliModalContent" class="is-hidden">
+        <div class="modal__content">
+            <h1 class="modal__title" data-i18n="heliModalHeader"></h1>
+            <div class="modal__text" data-i18n="heliModalDescription"></div>
+            <div class="tab-configuration">
+                <div class="modal__text number" style="margin-top: 10px">
+                    <input type="number" id="pitch-roll-weight" name="pitchrollweight" min="5" max="200" />
+                    <label for="pitch-roll-weight">
+                        <span data-i18n="mixerPitchRollWeight"></span>
+                    </label>
+                </div>
+                <div class="modal__text checkbox" style="margin-top: 10px">
+                    <input type="checkbox" id="use-tail-motor" class="toggle" />
+                    <label for="use-tail-motor">
+                        <span data-i18n="mixerUseTailMotor"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal__buttons">
+            <a id="heli-apply-button" class="modal__button modal__button--main" data-i18n="heliModalApply"></a>
         </div>
     </div>
     <div class="content_toolbar">

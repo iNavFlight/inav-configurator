@@ -1,6 +1,6 @@
 'use strict';
 
-const enableHelicopter = false; //This is for totally hide helicopter settings from user until all heli features will be ready
+const enableHelicopter = true; //This is for totally hide helicopter settings from user until all heli features will be ready
 
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
@@ -319,7 +319,8 @@ const mixerList = [
         legacy: true,
         platform: PLATFORM_HELICOPTER,
         motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+            new MotorMixRule(0.5, 0.0, 0.0, 0.5)
         ],
         servoMixer: [            
             new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
@@ -342,7 +343,8 @@ const mixerList = [
         legacy: true,
         platform: PLATFORM_HELICOPTER,
         motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0)
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+            new MotorMixRule(0.5, 0.0, 0.0, 0.5)
         ],
         servoMixer: [            
             new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
@@ -654,13 +656,15 @@ helper.mixer = (function (mixerList) {
         return retVal;
     };
 
-    publicScope.loadServoRules = function (mixer, pitchRollWeight) {
+    publicScope.loadServoRules = function (mixer, heliSettings) {
         SERVO_RULES.flush();
-        var fPitchRollWeight = parseFloat(pitchRollWeight)/100.0;
+        var fPitchRollWeight = parseFloat(heliSettings.pitchRollWeight)/100.0;
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
                 var rate = r.getRate();
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getInput()==INPUT_STABILIZED_YAW)&&heliSettings.useTailMotor)
+                    continue;
                 if ((mixer.platform==PLATFORM_HELICOPTER)&&((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH)))
                     rate *= fPitchRollWeight;
                 SERVO_RULES.put(
@@ -675,12 +679,14 @@ helper.mixer = (function (mixerList) {
         }
     }
 
-    publicScope.loadMotorRules = function (mixer) {
+    publicScope.loadMotorRules = function (mixer, heliSettings) {
         MOTOR_RULES.flush();
 
         for (const i in mixer.motorMixer) {
             if (mixer.motorMixer.hasOwnProperty(i)) {
                 const r = mixer.motorMixer[i];
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getYaw()!=0)&&!heliSettings.useTailMotor)
+                    continue;
                 MOTOR_RULES.put(
                     new MotorMixRule(
                         r.getThrottle(),

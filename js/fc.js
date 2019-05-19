@@ -182,7 +182,6 @@ var FC = {
             yawJumpPreventionLimit: 0,
             platformType: -1,
             hasFlaps: false,
-            pitchRollWeight: 30,
             appliedMixerPreset: -1,
             numberOfMotors: 0,
             numberOfServos: 0
