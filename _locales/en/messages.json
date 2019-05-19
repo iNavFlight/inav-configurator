@@ -2813,7 +2813,7 @@
         "message": "Additional settings"
     },
     "heliModalDescription": {
-        "message": "Please, fill helicopter specific settings mixer below"
+        "message": "Please, fill helicopter specific mixer settings"
     },
     "heliModalApply": {
         "message": "Create mixer"
