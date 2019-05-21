@@ -1251,6 +1251,9 @@
     "adjustmentsFunction38": {
         "message": "Level D Adjustment"
     },
+    "adjustmentsFunction49":{
+        "message": "VTX Power Level Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },

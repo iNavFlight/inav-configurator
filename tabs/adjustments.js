@@ -64,9 +64,11 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 32;
+        var availableFunctionCount = 40;
 
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
+        // Remove item 32-39 from list. Need rework
+        functionListOptions.splice(32, 7);
         functionList.empty().append(functionListOptions);
 
         functionList.val(adjustmentRange.adjustmentFunction);
