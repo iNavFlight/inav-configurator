@@ -345,6 +345,14 @@ function altitude_alarm_from_display(osd_data, value) {
     return value;
 }
 
+function altitude_alarm_max(osd_data, value) {
+    if (OSD.data.preferences.units === 0) {
+        // feet to meters
+        return Math.trunc(10000 * 3.28084);
+    }
+    return 10000;
+}
+
 // Used to wrap altitude conversion functions for firmwares up
 // to 1.7.3, since the altitude alarm used either m or feet
 // depending on the OSD display unit used (hence, no conversion)
@@ -449,16 +457,22 @@ OSD.constants = {
             name: 'RSSI',
             field: 'rssi',
             unit: '%',
+            min: 0,
+            max: 100
         },
         {
             name: 'BATT_CAP',
             field: 'batt_cap',
             unit: 'mah',
+            min: 0,
+            max: 4294967295
         },
         {
             name: 'FLY_MINUTES',
             field: 'fly_minutes',
             unit: 'minutes',
+            min: 0,
+            max: 600
         },
         {
             name: 'MAX_ALTITUDE',
@@ -466,6 +480,17 @@ OSD.constants = {
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_display_function(altitude_alarm_to_display),
             from_display: altitude_alarm_display_function(altitude_alarm_from_display),
+            min: 0,
+            max: altitude_alarm_max
+        },
+        {
+            name: 'MAX_NEG_ALTITUDE',
+            field: 'max_neg_altitude',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_to_display,
+            from_display: altitude_alarm_from_display,
+            min: 0,
+            max: altitude_alarm_max
         },
         {
             name: 'DIST',
@@ -495,14 +520,14 @@ OSD.constants = {
                     return 0.01;
                 }
                 return 1;
+            },
+            min: 0,
+            max: function(osd_data) {
+                if (OSD.data.preferences.units === 0) {
+                    return 31;
+                }
+                return 50000;
             }
-        },
-        {
-            name: 'MAX_NEG_ALTITUDE',
-            field: 'max_neg_altitude',
-            unit: altitude_alarm_unit,
-            to_display: altitude_alarm_to_display,
-            from_display: altitude_alarm_from_display,
         },
         {
             name: 'GFORCE',
@@ -512,6 +537,8 @@ OSD.constants = {
             unit: 'g',
             to_display: function(osd_data, value) { return value / 1000 },
             from_display: function(osd_data, value) { return value * 1000 },
+            min: 0,
+            max: 20
         },
         {
             name: 'GFORCE_AXIS_MIN',
@@ -521,6 +548,8 @@ OSD.constants = {
             unit: 'g',
             to_display: function(osd_data, value) { return value / 1000 },
             from_display: function(osd_data, value) { return value * 1000 },
+            min: -20,
+            max: 20
         },
         {
             name: 'GFORCE_AXIS_MAX',
@@ -530,6 +559,8 @@ OSD.constants = {
             unit: 'g',
             to_display: function(osd_data, value) { return value / 1000 },
             from_display: function(osd_data, value) { return value * 1000 },
+            min: -20,
+            max: 20
         },
         {
             name: 'CURRENT',
@@ -537,6 +568,8 @@ OSD.constants = {
             min_version: '2.2.0',
             step: 1,
             unit: 'A',
+            min: 0,
+            max: 255
         },
         {
             name: 'IMU_TEMPERATURE_MIN',
@@ -546,6 +579,8 @@ OSD.constants = {
             step: 0.5,
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'IMU_TEMPERATURE_MAX',
@@ -555,6 +590,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'BARO_TEMPERATURE_MIN',
@@ -564,6 +601,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'BARO_TEMPERATURE_MAX',
@@ -573,6 +612,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
     ],
 
@@ -1967,7 +2008,19 @@ OSD.GUI.updateAlarms = function() {
         } else if (typeof alarm.step !== 'undefined') {
             step = alarm.step;
         }
-        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+        var amin = 0;
+        if (typeof alarm.min === 'function') {
+            amin = alarm.min(OSD.data)
+        } else if (typeof alarm.min !== 'undefined') {
+            amin = alarm.min;
+        }
+        var amax = 0;
+        if (typeof alarm.max === 'function') {
+            amax = alarm.max(OSD.data)
+        } else if (typeof alarm.max !== 'undefined') {
+            amax = alarm.max;
+        }
+        var alarmInput = $('<input name="alarm" type="number" step="' + step + '" min="' + amin + '" max="' + amax + '"/>' + label + '</label>');
         alarmInput.data('alarm', alarm);
         if (typeof alarm.to_display === 'function') {
             value = alarm.to_display(OSD.data, value);
