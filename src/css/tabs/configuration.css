@@ -35,7 +35,7 @@
 
 .config-section .number input,
 .tab-configuration .number input {
-    width: 65px;
+    width: 106px;
 }
 
 .config-section .string input,
@@ -233,7 +233,7 @@ hr {
 
 .config-section label {
     position: absolute;
-    left: 80px;
+    left: 118px;
 }
 
 .config-section .radio label {
@@ -255,7 +255,7 @@ hr {
 }
 
 .config-section select {
-    width: 70px;
+    width: 110px;
 }
 
 .config-section .helpicon {
