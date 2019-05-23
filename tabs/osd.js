@@ -346,11 +346,12 @@ function altitude_alarm_from_display(osd_data, value) {
 }
 
 function altitude_alarm_max(osd_data, value) {
+    var meters_max = 10000;
     if (OSD.data.preferences.units === 0) {
-        // feet to meters
-        return Math.trunc(10000 * 3.28084);
+        // meters max to feet max
+        return Math.trunc(meters_max * 3.28084);
     }
-    return 10000;
+    return meters_max;
 }
 
 // Used to wrap altitude conversion functions for firmwares up
@@ -523,10 +524,12 @@ OSD.constants = {
             },
             min: 0,
             max: function(osd_data) {
+                var meters_max = 50000;
                 if (OSD.data.preferences.units === 0) {
-                    return 31;
+                    // Meters max to miles max
+                    return Math.trunc(meters_max / 1609.344);
                 }
-                return 50000;
+                return meters_max;
             }
         },
         {
