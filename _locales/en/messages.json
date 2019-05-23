@@ -2647,6 +2647,18 @@
     "osdElement_RTC_TIME_HELP": {
         "message": "Shows the current time, as retrieved from the GPS or set via the radio."
     },
+    "osdElement_RC_SOURCE": {
+        "message": "RC source"
+    },
+    "osdElement_RC_SOURCE_HELP": {
+        "message": "Shows the current RC source, STD or MSP (useful when using MSP override)"
+    },
+    "osdElement_VTX_POWER": {
+        "message": "Video TX power level"
+    },
+    "osdElement_VTX_POWER_HELP": {
+        "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
