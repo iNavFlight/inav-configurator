@@ -754,6 +754,11 @@ OSD.constants = {
                     id: 29,
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
                 },
+                {
+                    name: 'RC_SOURCE',
+                    id: 104,
+                    preview: 'MSP'
+                },
             ]
         },
         {
@@ -1330,6 +1335,11 @@ OSD.constants = {
                         }
                         return preview;
                     },
+                },
+                {
+                    name: 'VTX_POWER',
+                    id: 105,
+                    preview: '1'
                 },
             ]
         },
