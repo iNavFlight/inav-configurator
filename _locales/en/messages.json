@@ -1231,25 +1231,58 @@
         "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction32": {
-        "message": "PosR D Adjustment"
-    },
-    "adjustmentsFunction33": {
-        "message": "NavR P Adjustment"
-    },
-    "adjustmentsFunction34": {
-        "message": "NavR I Adjustment"
-    },
-    "adjustmentsFunction35": {
-        "message": "NavR D Adjustment"
-    },
-    "adjustmentsFunction36": {
         "message": "Level P Adjustment"
     },
-    "adjustmentsFunction37": {
+    "adjustmentsFunction33": {
         "message": "Level I Adjustment"
     },
-    "adjustmentsFunction38": {
+    "adjustmentsFunction34": {
         "message": "Level D Adjustment"
+    },
+    "adjustmentsFunction35": {
+        "message": "Pos XY P Adjustment"
+    },
+    "adjustmentsFunction36": {
+        "message": "Pos XY I Adjustment"
+    },
+    "adjustmentsFunction37": {
+        "message": "Pos XY D Adjustment"
+    },
+    "adjustmentsFunction38": {
+        "message": "Pos Z P Adjustment"
+    },
+    "adjustmentsFunction39": {
+        "message": "Pos Z I Adjustment"
+    },
+    "adjustmentsFunction40": {
+        "message": "Pos Z D Adjustment"
+    },
+    "adjustmentsFunction41": {
+        "message": "Heading P Adjustment"
+    },
+    "adjustmentsFunction42": {
+        "message": "Vel XY P Adjustment"
+    },
+    "adjustmentsFunction43": {
+        "message": "Vel XY I Adjustment"
+    },
+    "adjustmentsFunction44": {
+        "message": "Vel XY D Adjustment"
+    },
+    "adjustmentsFunction45": {
+        "message": "Vel Z P Adjustment"
+    },
+    "adjustmentsFunction46": {
+        "message": "Vel Z I Adjustment"
+    },
+    "adjustmentsFunction47": {
+        "message": "Vel Z D Adjustment"
+    },
+    "adjustmentsFunction48": {
+        "message": "FW min thr down pitch angle Adjustment"
+    },
+    "adjustmentsFunction49": {
+        "message": "VTX power level Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
