@@ -50,6 +50,7 @@ var mspHelper = (function (gui) {
         'RANGEFINDER': 16,
         'VTX_FFPV': 17,
         'ESC': 18,
+        'GSM_SMS': 19,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
