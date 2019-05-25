@@ -2386,6 +2386,8 @@ var mspHelper = (function (gui) {
     self.loadLogicConditions = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
+        } else {
+            callback();
         }
     }
 
