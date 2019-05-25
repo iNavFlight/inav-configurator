@@ -891,6 +891,9 @@
     "portsFunction_TELEMETRY_IBUS": {
         "message": "IBUS"
     },
+    "portsFunction_GSM_SMS": {
+        "message": "GSM SMS"
+    },
     "portsFunction_TELEMETRY_MSP": {
         "message": "MSP"
     },

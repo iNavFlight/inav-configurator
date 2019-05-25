@@ -42,6 +42,14 @@ TABS.ports.initialize = function (callback) {
         );
     }
 
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+        functionRules.push({
+            name: 'GSM_SMS',
+            groups: ['telemetry'],
+            maxPorts: 1 }
+        );
+    }
+
     // support configure RunCam Device
     functionRules.push({
         name: 'RUNCAM_DEVICE_CONTROL',
