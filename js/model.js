@@ -663,10 +663,12 @@ helper.mixer = (function (mixerList) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
                 var rate = r.getRate();
-                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getInput()==INPUT_STABILIZED_YAW)&&heliSettings.useTailMotor)
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getInput()==INPUT_STABILIZED_YAW)&&heliSettings.useTailMotor) {
                     continue;
-                if ((mixer.platform==PLATFORM_HELICOPTER)&&((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH)))
+                }
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&((r.getInput()==INPUT_STABILIZED_ROLL)||(r.getInput()==INPUT_STABILIZED_PITCH))) {
                     rate *= fPitchRollWeight;
+                }
                 SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),
@@ -685,8 +687,9 @@ helper.mixer = (function (mixerList) {
         for (const i in mixer.motorMixer) {
             if (mixer.motorMixer.hasOwnProperty(i)) {
                 const r = mixer.motorMixer[i];
-                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getYaw()!=0)&&!heliSettings.useTailMotor)
+                if ((mixer.platform==PLATFORM_HELICOPTER)&&(r.getYaw()!=0)&&!heliSettings.useTailMotor) {
                     continue;
+                }
                 MOTOR_RULES.put(
                     new MotorMixRule(
                         r.getThrottle(),

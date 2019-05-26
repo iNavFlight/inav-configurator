@@ -323,7 +323,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $mixerPreset.change();
         }
 
-        modal = new jBox('Modal', {
+        TABS.mixer.modal = new jBox('Modal', {
             width: 480,
             height: 240,
             closeButton: 'title',
@@ -333,7 +333,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerApplyContent')
         });
 
-        heliModal = new jBox('Modal', {
+        TABS.mixer.heliModal = new jBox('Modal', {
             width: 480,
             height: 240,
             closeButton: 'title',
@@ -343,11 +343,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         function mixerApply() {
-            heliModal.close();
             heliSettings = {
                 pitchRollWeight: $('#pitch-roll-weight').val(),
                 useTailMotor: $('#use-tail-motor').is(':checked')
             };
+            TABS.mixer.heliModal.close();
             helper.mixer.loadServoRules(currentMixerPreset, heliSettings);
             helper.mixer.loadMotorRules(currentMixerPreset, heliSettings);
             renderServoMixRules();
@@ -365,14 +365,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $('#use-tail-motor').prop("checked", false);
             if (MIXER_CONFIG.platformType==PLATFORM_HELICOPTER) {
                 $('#heli-apply-button').click(apply);
-                heliModal.open();
+                TABS.mixer.heliModal.open();
             }
             else
                 apply();
         }
         
         $('#execute-button').click(function () {
-            modal.close();
+            TABS.mixer.modal.close();
             mixerApplyWithModal(mixerApplyAndReboot);
         });
 
@@ -430,5 +430,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 };
 
 TABS.mixer.cleanup = function (callback) {
+    delete TABS.mixer.modal;
+    delete TABS.mixer.heliModal;
+    $('.jBox-wrapper').remove()
     if (callback) callback();
 };
