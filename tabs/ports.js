@@ -42,6 +42,14 @@ TABS.ports.initialize = function (callback) {
         );
     }
 
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+        functionRules.push({
+            name: 'GSM_SMS',
+            groups: ['telemetry'],
+            maxPorts: 1 }
+        );
+    }
+
     // support configure RunCam Device
     functionRules.push({
         name: 'RUNCAM_DEVICE_CONTROL',
@@ -59,7 +67,26 @@ TABS.ports.initialize = function (callback) {
         groups: ['peripherals'],
         maxPorts: 1 }
     );
- 
+    functionRules.push({
+        name: 'VTX_FFPV',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    ); 
+
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+        functionRules.push({
+            name: 'OPFLOW',
+            groups: ['sensors'],
+            maxPorts: 1 }
+        );
+
+        functionRules.push({
+            name: 'ESC',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }

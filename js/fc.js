@@ -19,6 +19,7 @@ var CONFIG,
     SERVO_CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
+    LOGIC_CONDITIONS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -174,6 +175,7 @@ var FC = {
         SERVO_CONFIG = [];
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS = new LogicConditionsCollection();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -398,6 +400,9 @@ var FC = {
                 X: null,
                 Y: null,
                 Z: null
+            },
+            opflow: {
+                Scale: null
             }
         };
 
@@ -617,7 +622,7 @@ var FC = {
     getLooptimes: function () {
         return {
             125: {
-                defaultLooptime: 2000,
+                defaultLooptime: 1000,
                 looptimes: {
                     4000: "250Hz",
                     3000: "334Hz",
@@ -630,7 +635,7 @@ var FC = {
                 }
             },
             1000: {
-                defaultLooptime: 2000,
+                defaultLooptime: 1000,
                 looptimes: {
                     4000: "250Hz",
                     2000: "500Hz",
@@ -916,6 +921,14 @@ var FC = {
                 rates: {
                     16000: "16kHz"
                 }
+            },
+            9: {
+                name: "SERIALSHOT",
+                message: "escProtocolExperimental",
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
             }
         };
     },
@@ -973,10 +986,11 @@ var FC = {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
     },
     getBarometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
+        } else if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "FAKE"];
-        }
-        else {
+        } else {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
         }
     },
@@ -989,7 +1003,13 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
+        let data = [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            data.push("Benewake TFmini")
+        }
+
+        return data;
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
@@ -1113,7 +1133,8 @@ var FC = {
             'Stabilized Pitch+',    // 25
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
-            'Stabilized Yaw-'       // 28,
+            'Stabilized Yaw-',      // 28,
+            'ONE'                   // 29,
         ];
     },
     getServoMixInputName: function (input) {
@@ -1131,5 +1152,109 @@ var FC = {
     },
     isModeEnabled: function (name) {
         return FC.isModeBitSet(FC.getModeId(name));
+    },
+    getLogicOperators: function () {
+        return {
+            0: {
+                name: "True",
+                hasOperand: [false, false]
+            },
+            1: {
+                name: "Equal",
+                hasOperand: [true, true]
+            },
+            2: {
+                name: "Greater Than",
+                hasOperand: [true, true]
+            },
+            3: {
+                name: "Lower Than",
+                hasOperand: [true, true]
+            },
+            4: {
+                name: "Low",
+                hasOperand: [true, false]
+            },
+            5: {
+                name: "Mid",
+                hasOperand: [true, false]
+            },
+            6: {
+                name: "High",
+                hasOperand: [true, false]
+            },
+            7: {
+                name: "AND",
+                hasOperand: [true, true]
+            },
+            8: {
+                name: "OR",
+                hasOperand: [true, true]
+            },
+            9: {
+                name: "XOR",
+                hasOperand: [true, true]
+            },
+            10: {
+                name: "NAND",
+                hasOperand: [true, true]
+            },
+            11: {
+                name: "NOR",
+                hasOperand: [true, true]
+            },
+            12: {
+                name: "NOT",
+                hasOperand: [true, false]
+            }
+        }
+    },
+    getOperandTypes: function () {
+        return {
+            0: {
+                name: "Value",
+                type: "value",
+                min: -1000000,
+                max: 1000000,
+                step: 1,
+                default: 0
+            },
+            1: {
+                name: "RC Channel",
+                type: "range",
+                range: [1, 16],
+                default: 1
+            },
+            2: {
+                name: "Flight",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "ARM timer [s]",
+                    1: "Home distance [m]",
+                    2: "Trip distance [m]",
+                    3: "RSSI", 
+                    4: "Vbat [deci-Volt] [1V = 10]",
+                    5: "Cell voltage [deci-Volt] [1V = 10]",
+                    6: "Current [centi-Amp] [1A = 100]",
+                    7: "Current drawn [mAh]",
+                    8: "GPS Sats",
+                    9: "Ground speed [cm/s]",
+                    10: "3D speed [cm/s]",
+                    11: "Air speed [cm/s]",
+                    12: "Altitude [cm]",
+                    13: "Vertical speed [cm/s]",
+                    14: "Throttle position [%]",
+                    15: "Roll [deg]",
+                    16: "Pitch [deg]" 
+                }
+            },
+            3: {
+                name: "Logic Condition",
+                type: "range",
+                range: [0, 15],
+                default: 0
+            },
+        }
     }
 };

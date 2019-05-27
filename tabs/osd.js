@@ -3,11 +3,12 @@
 
 var SYM = SYM || {};
 SYM.MILLIOHM = 0x00;
-SYM.VOLT = 0x90;
+SYM.BATT = 0x90;
 SYM.RSSI = 0x01;
 SYM.AH_RIGHT = 0x02;
 SYM.AH_LEFT = 0x03;
 SYM.THR = 0x04;
+SYM.VOLT = 0x06;
 SYM.AH_DECORATION_UP = 5;
 SYM.WIND_SPEED_HORIZONTAL = 22;
 SYM.WIND_SPEED_VERTICAL = 23;
@@ -344,6 +345,15 @@ function altitude_alarm_from_display(osd_data, value) {
     return value;
 }
 
+function altitude_alarm_max(osd_data, value) {
+    var meters_max = 10000;
+    if (OSD.data.preferences.units === 0) {
+        // meters max to feet max
+        return Math.trunc(meters_max * 3.28084);
+    }
+    return meters_max;
+}
+
 // Used to wrap altitude conversion functions for firmwares up
 // to 1.7.3, since the altitude alarm used either m or feet
 // depending on the OSD display unit used (hence, no conversion)
@@ -358,8 +368,12 @@ function osdMainBatteryPreview() {
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
     }
-    s += 'V';
-    return FONT.symbol(SYM.VOLT) + FONT.embed_dot(s);
+    if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+        s += 'V';
+    } else {
+        s += FONT.symbol(SYM.VOLT);
+    }
+    return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
 function osdCoordinatePreview(symbol, coordinate) {
@@ -397,6 +411,10 @@ OSD.initData = function () {
             max_altitude: null,
             dist: null,
             max_neg_altitude: null,
+            gforce: null,
+            gforce_axis_min: null,
+            gforce_axis_max: null,
+            current: null,
             imu_temp_alarm_min: null,
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
@@ -440,16 +458,22 @@ OSD.constants = {
             name: 'RSSI',
             field: 'rssi',
             unit: '%',
+            min: 0,
+            max: 100
         },
         {
             name: 'BATT_CAP',
             field: 'batt_cap',
             unit: 'mah',
+            min: 0,
+            max: 4294967295
         },
         {
             name: 'FLY_MINUTES',
             field: 'fly_minutes',
             unit: 'minutes',
+            min: 0,
+            max: 600
         },
         {
             name: 'MAX_ALTITUDE',
@@ -457,6 +481,17 @@ OSD.constants = {
             unit: altitude_alarm_unit,
             to_display: altitude_alarm_display_function(altitude_alarm_to_display),
             from_display: altitude_alarm_display_function(altitude_alarm_from_display),
+            min: 0,
+            max: altitude_alarm_max
+        },
+        {
+            name: 'MAX_NEG_ALTITUDE',
+            field: 'max_neg_altitude',
+            unit: altitude_alarm_unit,
+            to_display: altitude_alarm_to_display,
+            from_display: altitude_alarm_from_display,
+            min: 0,
+            max: altitude_alarm_max
         },
         {
             name: 'DIST',
@@ -486,14 +521,58 @@ OSD.constants = {
                     return 0.01;
                 }
                 return 1;
+            },
+            min: 0,
+            max: function(osd_data) {
+                var meters_max = 50000;
+                if (OSD.data.preferences.units === 0) {
+                    // Meters max to miles max
+                    return Math.trunc(meters_max / 1609.344);
+                }
+                return meters_max;
             }
         },
         {
-            name: 'MAX_NEG_ALTITUDE',
-            field: 'max_neg_altitude',
-            unit: altitude_alarm_unit,
-            to_display: altitude_alarm_to_display,
-            from_display: altitude_alarm_from_display,
+            name: 'GFORCE',
+            field: 'gforce',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
+            min: 0,
+            max: 20
+        },
+        {
+            name: 'GFORCE_AXIS_MIN',
+            field: 'gforce_axis_min',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
+            min: -20,
+            max: 20
+        },
+        {
+            name: 'GFORCE_AXIS_MAX',
+            field: 'gforce_axis_max',
+            min_version: '2.2.0',
+            step: 0.1,
+            unit: 'g',
+            to_display: function(osd_data, value) { return value / 1000 },
+            from_display: function(osd_data, value) { return value * 1000 },
+            min: -20,
+            max: 20
+        },
+        {
+            name: 'CURRENT',
+            field: 'current',
+            min_version: '2.2.0',
+            step: 1,
+            unit: 'A',
+            min: 0,
+            max: 255
         },
         {
             name: 'IMU_TEMPERATURE_MIN',
@@ -503,6 +582,8 @@ OSD.constants = {
             step: 0.5,
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'IMU_TEMPERATURE_MAX',
@@ -512,6 +593,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'BARO_TEMPERATURE_MIN',
@@ -521,6 +604,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
         {
             name: 'BARO_TEMPERATURE_MAX',
@@ -530,6 +615,8 @@ OSD.constants = {
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
             from_display: function(osd_data, value) { return value * 10 },
+            min: -55,
+            max: 125
         },
     ],
 
@@ -557,13 +644,13 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_CELL_VOLTAGE',
                     id: 32,
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('3.90V')
+                    preview: FONT.symbol(SYM.BATT) + FONT.embed_dot('3.90') + FONT.symbol(SYM.VOLT)
                 },
                 {
                     name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
                     id: 54,
                     min_version: '2.0.0',
-                    preview: FONT.symbol(SYM.VOLT) + FONT.embed_dot('4.18V')
+                    preview: FONT.symbol(SYM.BATT) + FONT.embed_dot('4.18') + FONT.symbol(SYM.VOLT)
                 },
                 {
                     name: 'POWER_SUPPLY_IMPEDANCE',
@@ -587,11 +674,19 @@ OSD.constants = {
                     id: 49,
                     min_version: '2.0.0',
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            }
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        } else {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            }
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
-                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {
@@ -658,6 +753,11 @@ OSD.constants = {
                     name: 'RTC_TIME',
                     id: 29,
                     preview: FONT.symbol(SYM.CLOCK) + '13:37'
+                },
+                {
+                    name: 'RC_SOURCE',
+                    id: 104,
+                    preview: 'MSP'
                 },
             ]
         },
@@ -807,11 +907,19 @@ OSD.constants = {
                     name: 'ALTITUDE',
                     id: 15,
                     preview: function () {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.ALT_FT) + '118';
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            if (OSD.data.preferences.units === 0) {
+                                // imperial
+                                return FONT.symbol(SYM.ALT_FT) + '118';
+                            }
+                            return FONT.symbol(SYM.ALT_M) + '399'
+                        } else {
+                            if (OSD.data.preferences.units === 0) {
+                                // imperial
+                                return '118' + FONT.symbol(SYM.ALT_FT);
+                            }
+                            return '399' + FONT.symbol(SYM.ALT_M);
                         }
-                        return FONT.symbol(SYM.ALT_M) + '399'
                     }
                 },
                 {
@@ -828,12 +936,41 @@ OSD.constants = {
                     id: 26,
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
-                            // Imperial
+                            // imperial
                             return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
                         }
                         return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                     }
                 }
+            ]
+        },
+        {
+            name: 'osdGroupGForce',
+            items: [
+                {
+                    name: 'G_FORCE',
+                    id: 100,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('1.00')
+                },
+                {
+                    name: 'G_FORCE_X',
+                    id: 101,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('-0.10')
+                },
+                {
+                    name: 'G_FORCE_Y',
+                    id: 102,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('-0.10')
+                },
+                {
+                    name: 'G_FORCE_Z',
+                    id: 103,
+                    min_version: '2.2.0',
+                    preview: FONT.embed_dot('-0.10')
+                },
             ]
         },
         {
@@ -901,27 +1038,57 @@ OSD.constants = {
                 {
                     name: 'CURRENT_DRAW',
                     id: 11,
-                    preview: FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1')
+                    preview: function() {
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            return FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1');
+                        } else {
+                            return FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP);
+                        }
+                    }
                 },
                 {
                     name: 'MAH_DRAWN',
                     id: 12,
-                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                    preview: function() {
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
+                        } else {
+                            return ' 690' + FONT.symbol(SYM.MAH); // 4 chars
+                        }
+                    }
                 },
                 {
                     name: 'WH_DRAWN',
                     id: 36,
-                    preview: FONT.symbol(SYM.WH) + FONT.embed_dot('1.25')
+                    preview: function() {
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            return FONT.symbol(SYM.WH) + FONT.embed_dot('1.25');
+                        } else {
+                            return FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
+                        }
+                    }
                 },
                 {
                     name: 'POWER',
                     id: 19,
-                    preview: FONT.symbol(SYM.WATT) + '50 ' // 3 chars
+                    preview: function() {
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            return FONT.symbol(SYM.WATT) + '50 '; // 3 chars
+                        } else {
+                            return ' 50' + FONT.symbol(SYM.WATT); // 3 chars
+                        }
+                    }
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
-                    preview: FONT.symbol(SYM.MAH) + '690 ' // 4 chars
+                    preview: function() {
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
+                        } else {
+                            return ' 690' + FONT.symbol(SYM.MAH); // 4 chars
+                        }
+                    }
                 },
                 {
                     name: 'EFFICIENCY_MAH',
@@ -957,11 +1124,19 @@ OSD.constants = {
                     name: 'MSL_ALTITUDE',
                     id: 96,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.ALT_FT) + '275';
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.ALT_FT) + '275';
+                            }
+                            return FONT.symbol(SYM.ALT_M) + '477';
+                        } else {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return '275' + FONT.symbol(SYM.ALT_FT);
+                            }
+                            return '477' + FONT.symbol(SYM.ALT_M);
                         }
-                        return FONT.symbol(SYM.ALT_M) + '477';
                     },
                 },
                 {
@@ -1017,11 +1192,19 @@ OSD.constants = {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            }
+                            return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        } else {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            }
+                            return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
-                        return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {
@@ -1029,11 +1212,19 @@ OSD.constants = {
                     id: 40,
                     min_version: '1.9.1',
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            }
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                        } else {
+                            if (OSD.data.preferences.units === 0) {
+                                // Imperial
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            }
+                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
-                        return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                     }
                 },
                 {
@@ -1108,6 +1299,26 @@ OSD.constants = {
                     min_version: '2.0.0',
                     positionable: false,
                 },
+                {
+                    name: 'MAP_SCALE',
+                    id: 98,
+                    min_version: '2.1.1',
+                    preview: function(osd_data) {
+                        var scale;
+                        if (OSD.data.preferences.units === 0) {
+                            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+                        } else {
+                            scale = "100" + FONT.symbol(SYM.M);
+                        }
+                        return FONT.symbol(SYM.SCALE) + scale;
+                    },
+                },
+                {
+                    name: 'MAP_REFERENCE',
+                    id: 99,
+                    min_version: '2.1.1',
+                    preview: FONT.symbol(SYM.DIRECTION) + '\nN',
+                },
             ],
         },
         {
@@ -1124,6 +1335,11 @@ OSD.constants = {
                         }
                         return preview;
                     },
+                },
+                {
+                    name: 'VTX_POWER',
+                    id: 105,
+                    preview: '1'
                 },
             ]
         },
@@ -1493,6 +1709,12 @@ OSD.msp = {
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            result.push16(OSD.data.alarms.gforce);
+            result.push16(OSD.data.alarms.gforce_axis_min);
+            result.push16(OSD.data.alarms.gforce_axis_max);
+            result.push8(OSD.data.alarms.current);
+        }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
             result.push16(OSD.data.alarms.imu_temp_alarm_min);
             result.push16(OSD.data.alarms.imu_temp_alarm_max);
@@ -1510,6 +1732,12 @@ OSD.msp = {
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            OSD.data.alarms.gforce = alarms.readU16();
+            OSD.data.alarms.gforce_axis_min = alarms.read16();
+            OSD.data.alarms.gforce_axis_max = alarms.read16();
+            OSD.data.alarms.current = alarms.readU8();
+        }
         if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
             OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
             OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
@@ -1793,7 +2021,19 @@ OSD.GUI.updateAlarms = function() {
         } else if (typeof alarm.step !== 'undefined') {
             step = alarm.step;
         }
-        var alarmInput = $('<input name="alarm" type="number" step="' + step + '"/>' + label + '</label>');
+        var amin = 0;
+        if (typeof alarm.min === 'function') {
+            amin = alarm.min(OSD.data)
+        } else if (typeof alarm.min !== 'undefined') {
+            amin = alarm.min;
+        }
+        var amax = 0;
+        if (typeof alarm.max === 'function') {
+            amax = alarm.max(OSD.data)
+        } else if (typeof alarm.max !== 'undefined') {
+            amax = alarm.max;
+        }
+        var alarmInput = $('<input name="alarm" type="number" step="' + step + '" min="' + amin + '" max="' + amax + '"/>' + label + '</label>');
         alarmInput.data('alarm', alarm);
         if (typeof alarm.to_display === 'function') {
             value = alarm.to_display(OSD.data, value);
@@ -1955,21 +2195,24 @@ OSD.GUI.updateFields = function() {
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
     if ($('input[name="' + name + '"]').prop('checked')) {
         var mapInitialX = OSD.data.display_size.x - 2;
-        if (directionSymbol) {
-            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
-            OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
-        }
         OSD.GUI.checkAndProcessSymbolPosition(mapCenter, centerSymbol);
-        var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
-        OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
-        var scale;
-        if (OSD.data.preferences.units === 0) {
-            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
-        } else {
-            scale = "100" + FONT.symbol(SYM.M);
-        }
-        for (var ii = 0; ii < scale.length; ii++) {
-            OSD.GUI.checkAndProcessSymbolPosition(scalePos + ii + 1, scale.charCodeAt(ii));
+        if (semver.lt(CONFIG.flightControllerVersion, '2.1.1')) {
+            // INAV pre 2.1.1 had hardcoded map reference and scale
+            if (directionSymbol) {
+                OSD.GUI.checkAndProcessSymbolPosition(mapInitialX, SYM.DIRECTION);
+                OSD.GUI.checkAndProcessSymbolPosition(mapInitialX + OSD.data.display_size.x, directionSymbol.charCodeAt(0));
+            }
+            var scalePos = 1 + OSD.data.display_size.x * (OSD.data.display_size.y - 2);
+            OSD.GUI.checkAndProcessSymbolPosition(scalePos, SYM.SCALE);
+            var scale;
+            if (OSD.data.preferences.units === 0) {
+                scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+            } else {
+                scale = "100" + FONT.symbol(SYM.M);
+            }
+            for (var ii = 0; ii < scale.length; ii++) {
+                OSD.GUI.checkAndProcessSymbolPosition(scalePos + ii + 1, scale.charCodeAt(ii));
+            }
         }
     }
 };

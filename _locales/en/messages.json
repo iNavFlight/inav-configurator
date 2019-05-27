@@ -159,7 +159,7 @@
         "message": "No configuration received within <span style=\"color: red\">10 seconds</span>, communication <span style=\"color: red\">failed</span>"
     },
     "firmwareVersionNotSupported": {
-        "message": "This firmware version is <span style=\"color: red\">not supported</span>. Please upgrade to firmware that supports api version <strong>$1</strong> or higher. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
+        "message": "This firmware version is <span style=\"color: red\">not supported</span>. This version of Configurator supports firmware from $1 to $2 (excluded)"
     },
     "firmwareVariantNotSupported": {
         "message": "This firmware variant is <span style=\"color: red\">not supported</span>. Please upgrade to INAV firmware. Use CLI for backup before flashing.  CLI backup/restore procedure is in the documention."
@@ -245,7 +245,7 @@
     },
 
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://telegra.ph/Welcome-to-INAV-useful-links-and-products-12-09\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -462,6 +462,12 @@
     },
     "initialSetupMagCalibEnded": {
         "message": "Magnetometer calibration <span style=\"color: #37a8db\">finished</span>"
+    },
+    "initialSetupOpflowCalibStarted": {
+        "message": "Optic flow calibration started"
+    },
+    "initialSetupOpflowCalibEnded": {
+        "message": "Optic flow calibration <span style=\"color: #37a8db\">finished</span>"
     },
     "initialSetupSettingsRestored": {
         "message": "Settings restored to <strong>default</strong>"
@@ -736,10 +742,10 @@
         "message": "Capacity"
     },
     "configurationBatteryCapacityWarning": {
-        "message": "Warning Capacity (%)"
+        "message": "Warning Capacity (remaining %)"
     },
     "configurationBatteryCapacityCritical": {
-        "message": "Critical Capacity (%)"
+        "message": "Critical Capacity (remaining %)"
     },
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
@@ -864,6 +870,12 @@
     "portsFunction_RANGEFINDER": {
         "message": "Rangefinder"
     },
+    "portsFunction_OPFLOW": {
+        "message": "Optic flow"
+    },
+    "portsFunction_ESC": {
+        "message": "ESC output/telemetry"
+    },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
     },
@@ -878,6 +890,9 @@
     },
     "portsFunction_TELEMETRY_IBUS": {
         "message": "IBUS"
+    },
+    "portsFunction_GSM_SMS": {
+        "message": "GSM SMS"
     },
     "portsFunction_TELEMETRY_MSP": {
         "message": "MSP"
@@ -900,6 +915,9 @@
     "portsFunction_IRC_TRAMP": {
         "message": "IRC Tramp"
     },
+    "portsFunction_VTX_FFPV": {
+        "message": "FuriousFPV Vtx"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -914,6 +932,12 @@
     },
     "pidTuningFeedForward": {
         "message": "FeedForward"
+    },
+    "dtermSetpointWeight": {
+        "message": "Dterm setpoint weight"
+    },
+    "dtermSetpointWeightHelp": {
+        "message": "The lower the value, the more damped all the maneuvers are. 0 mean Dterm is computed from gyro, 1 from error and 2 from setpoint. For gentler feel lower the value. For sharper response, raise it"
     },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
@@ -1210,25 +1234,58 @@
         "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction32": {
-        "message": "PosR D Adjustment"
-    },
-    "adjustmentsFunction33": {
-        "message": "NavR P Adjustment"
-    },
-    "adjustmentsFunction34": {
-        "message": "NavR I Adjustment"
-    },
-    "adjustmentsFunction35": {
-        "message": "NavR D Adjustment"
-    },
-    "adjustmentsFunction36": {
         "message": "Level P Adjustment"
     },
-    "adjustmentsFunction37": {
+    "adjustmentsFunction33": {
         "message": "Level I Adjustment"
     },
-    "adjustmentsFunction38": {
+    "adjustmentsFunction34": {
         "message": "Level D Adjustment"
+    },
+    "adjustmentsFunction35": {
+        "message": "Pos XY P Adjustment"
+    },
+    "adjustmentsFunction36": {
+        "message": "Pos XY I Adjustment"
+    },
+    "adjustmentsFunction37": {
+        "message": "Pos XY D Adjustment"
+    },
+    "adjustmentsFunction38": {
+        "message": "Pos Z P Adjustment"
+    },
+    "adjustmentsFunction39": {
+        "message": "Pos Z I Adjustment"
+    },
+    "adjustmentsFunction40": {
+        "message": "Pos Z D Adjustment"
+    },
+    "adjustmentsFunction41": {
+        "message": "Heading P Adjustment"
+    },
+    "adjustmentsFunction42": {
+        "message": "Vel XY P Adjustment"
+    },
+    "adjustmentsFunction43": {
+        "message": "Vel XY I Adjustment"
+    },
+    "adjustmentsFunction44": {
+        "message": "Vel XY D Adjustment"
+    },
+    "adjustmentsFunction45": {
+        "message": "Vel Z P Adjustment"
+    },
+    "adjustmentsFunction46": {
+        "message": "Vel Z I Adjustment"
+    },
+    "adjustmentsFunction47": {
+        "message": "Vel Z D Adjustment"
+    },
+    "adjustmentsFunction48": {
+        "message": "FW min thr down pitch angle Adjustment"
+    },
+    "adjustmentsFunction49": {
+        "message": "VTX power level Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -2059,6 +2116,15 @@
     "calibrationHead4": {
         "message": "Compass Calibration"
     },
+    "calibrationHead5": {
+        "message": "Optic Flow Calibration"
+    },
+    "OpflowCalText": {
+        "message": "After pressing the button you have 30 seconds to hold the copter in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
+    },
+    "OpflowCalBtn": {
+        "message": "Calibrate Optic Flow sensor"
+    },
     "accZero": {
         "message": "Acc Zero"
     },
@@ -2377,6 +2443,30 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osdAlarmGFORCE": {
+        "message": "g force"
+    },
+    "osdAlarmGFORCE_HELP": {
+        "message": "The g force element will start blinking when greater than this value"
+    },
+    "osdAlarmGFORCE_AXIS_MIN": {
+        "message": "g force axis min"
+    },
+    "osdAlarmGFORCE_AXIS_MIN_HELP": {
+        "message": "The axes g force elements will start blinking when lower than this value"
+    },
+    "osdAlarmGFORCE_AXIS_MAX": {
+        "message": "g force axis max"
+    },
+    "osdAlarmGFORCE_AXIS_MAX_HELP": {
+        "message": "The axes g force elements will start blinking when greater than this value"
+    },
+    "osdAlarmCURRENT": {
+        "message": "Current"
+    },
+    "osdAlarmCURRENT_HELP": {
+        "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
+    },
     "osdAlarmIMU_TEMPERATURE_MIN": {
         "message": "Minimum IMU temperature"
     },
@@ -2409,6 +2499,9 @@
     },
     "osdGroupTimers": {
         "message": "Timers"
+    },
+    "osdGroupGForce": {
+        "message": "G force"
     },
     "osdGroupTemperature": {
         "message": "Temperature"
@@ -2514,7 +2607,7 @@
     },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
-    },   
+    },
     "osdElement_3D_SPEED_HELP": {
         "message": "Shows 3D speed considering both horizontal and vertical speed."
     },
@@ -2548,6 +2641,30 @@
     "osdElement_VARIO_NUM_HELP": {
         "message": "Shows vertical speed using a number"
     },
+    "osdElement_G_FORCE": {
+        "message": "g force"
+    },
+    "osdElement_G_FORCE_HELP": {
+        "message": "Shows the g force taking into account all axes"
+    },
+    "osdElement_G_FORCE_X": {
+        "message": "Longitudinal g force in body frame (X)"
+    },
+    "osdElement_G_FORCE_X_HELP": {
+        "message": "Shows the g force in the X axis (longitudinal)"
+    },
+    "osdElement_G_FORCE_Y": {
+        "message": "Lateral g force in body frame (Y)"
+    },
+    "osdElement_G_FORCE_Y_HELP": {
+        "message": "Shows the g force in the Y axis (lateral)"
+    },
+    "osdElement_G_FORCE_Z": {
+        "message": "Vertical g force in body frame (Z)"
+    },
+    "osdElement_G_FORCE_Z_HELP": {
+        "message": "Shows the g force in the Z axis (vertical)"
+    },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
     },
@@ -2566,6 +2683,18 @@
     "osdElement_RTC_TIME_HELP": {
         "message": "Shows the current time, as retrieved from the GPS or set via the radio."
     },
+    "osdElement_RC_SOURCE": {
+        "message": "RC source"
+    },
+    "osdElement_RC_SOURCE_HELP": {
+        "message": "Shows the current RC source, STD or MSP (useful when using MSP override)"
+    },
+    "osdElement_VTX_POWER": {
+        "message": "Video TX power level"
+    },
+    "osdElement_VTX_POWER_HELP": {
+        "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
@@ -2580,6 +2709,18 @@
     },
     "osdElement_RADAR": {
         "message": "Radar"
+    },
+    "osdElement_MAP_SCALE": {
+        "message": "Map Scale"
+    },
+    "osdElement_MAP_SCALE_HELP": {
+        "message": "Scale of the currently shown map/radar."
+    },
+    "osdElement_MAP_REFERENCE": {
+        "message": "Map Reference"
+    },
+    "osdElement_MAP_REFERENCE_HELP": {
+        "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
     },
     "osdElement_WIND_SPEED_HORIZONTAL": {
         "message": "Horizontal Wind Speed"
@@ -2920,6 +3061,9 @@
     "escProtocolNotAdvised": {
         "message": "This ESC protocol is not advised, use it at your own risk"
     },
+    "escProtocolExperimental": {
+        "message": "Experimental ESC protocol, use at your own risk"
+    },
     "looptimeNotAdvised": {
         "message": "PID loop might be not stable if GPS is in use"
     },
@@ -2937,5 +3081,104 @@
     },
     "gyroLpfWhyNotSlightlyHigherMessage": {
         "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
+    },
+    "tabLogicConditions": {
+        "message": "Logic conditions"
+    },
+    "logicId": {
+        "message": "#"
+    },
+    "logicEnabled": {
+        "message": "Enabled"
+    },
+    "logicOperation": {
+        "message": "Operation"
+    },
+    "logicOperandA": {
+        "message": "Operand A"
+    },
+    "logicOperandB": {
+        "message": "Operand B"
+    },
+    "logicFlags": {
+        "message": "Flags"
+    },
+    "logicSave": {
+        "message": "Save"
+    },
+    "logicClose": {
+        "message": "Close"
+    },
+    "active": {
+        "message": "Active"
+    },
+    "itermRelax": {
+        "message": "Iterm Relax"
+    },
+    "itermRelaxHelp": {
+        "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axises. PRY is active also on Yaw."
+    },
+    "itermRelaxType": {
+        "message": "Iterm Relax Type"
+    },
+    "itermRelaxTypeHelp": {
+        "message": "GYRO mode is more clinical and complete in suppressing iTerm, SETPOINT mode is a bit smoother with slightly softer landings after flips."
+    },
+    "itermRelaxCutoff": {
+        "message": "Iterm Relax Cutoff Frequency"
+    },
+    "itermRelaxCutoffHelp": {
+        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm supression. Higher values shortens the time windows and reduces supression."
+    },
+    "gyro_lpf_type": {
+        "message": "Gyro LPF type"
+    },
+    "gyro_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "tabFilteringAdvanced": {
+        "message": "Advanced filtering"
+    },
+    "acc_lpf_type": {
+        "message": "Accelerometer LPF type"
+    },
+    "acc_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dTermMechanics": {
+        "message": "D-term mechanics"
+    },
+    "d_boost_factor": {
+        "message": "D-Boost Factor"
+    },
+    "d_boost_factor_help": {
+        "message": "Defines the max. Dterm boost when max. angular acceleration is reached. 1.0 means D-Boost is diabled, 2.0 means Dterm is allowed grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
+    },
+    "d_boost_max_at_acceleration": {
+        "message": "Top D-Boost at acceleration [dps^2]"
+    },
+    "d_boost_max_at_acceleration_help": {
+        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
+    },
+    "d_boost_gyro_delta_lpf_hz": {
+        "message": "D-Boost gyro LPF"
+    },
+    "d_boost_gyro_delta_lpf_hz_help": {
+        "message": "Should be set to the frequency of propwash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
+    },
+    "iTermMechanics": {
+        "message": "I-term mechanics"
+    },
+    "mc_airmode_type": {
+        "message": "Airmode handling type"
+    },
+    "mc_airmode_type_help": {
+        "message": "Defines the Airmode state handling type for Multirotors. <br />Default STICK_CENTER is the classical approach in which Airmode is always active if enabled, but when the throttle is low and ROLL/PITCH/YAW sticks are centered, Iterms is not allowed to grow (ANTI_WINDUP). <br />THROTTLE_THRESHOLD is the Airmode behavior known from Betaflight. In this mode, Airmode is active as soon THROTTLE position is above <i>mc_airmode_threshold</i> and stays active until disarm. ANTI_WINDUP is never triggered. For small Multirotors (up to 7-inch propellers) it is suggested to switch to THROTTLE_THRESHOLD since it keeps full stabilization no matter what pilot does with the sticks. Fixed Wings always use STICK_CENTER mode."
+    },
+    "mc_airmode_threshold": {
+        "message": "Airmode Throttle threshold"
+    },
+    "mc_airmode_threshold_help": {
+        "message": "Defines airmode THROTTLE activation threshold when mc_airmode_type THROTTLE_THRESHOLD is used"
     }
 }

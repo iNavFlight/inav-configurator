@@ -61,7 +61,8 @@ TABS.calibration.initialize = function (callback) {
     loadChainer.execute();
 
     saveChainer.setChain([
-        mspHelper.saveCalibrationData
+        mspHelper.saveCalibrationData,
+        mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
 
@@ -105,6 +106,7 @@ TABS.calibration.initialize = function (callback) {
             $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accZero[item]);
             $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
         });
+        $('[name=OpflowScale]').val(CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
     }
 
@@ -176,12 +178,18 @@ TABS.calibration.initialize = function (callback) {
 
     function processHtml() {
         $('#calibrateButtonSave').on('click', function () {
+            CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
             saveChainer.execute();
         });
 
         if (SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+        }
+
+        if (SENSOR_CONFIG.opflow === 0) {
+            //Comment for test
+            $('#opflow_btn, #opflow-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }
 
         $('#mag_btn').on('click', function () {
@@ -213,6 +221,39 @@ TABS.calibration.initialize = function (callback) {
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('compass_calibration_interval');
+                }
+            }, 1000);
+        });
+
+        $('#opflow_btn').on('click', function () {
+            MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibStarted'));
+            });
+
+            var button = $(this);
+
+            $(button).addClass('disabled');
+
+            modalProcessing = new jBox('Modal', {
+                width: 400,
+                height: 100,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-opflow-processing')
+            }).open();
+
+            var countdown = 30;
+            helper.interval.add('opflow_calibration_interval', function () {
+                countdown--;
+                $('#modal-opflow-countdown').text(countdown);
+                if (countdown === 0) {
+                    $(button).removeClass('disabled');
+
+                    modalProcessing.close();
+                    GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibEnded'));
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+                    helper.interval.remove('opflow_calibration_interval');
                 }
             }, 1000);
         });

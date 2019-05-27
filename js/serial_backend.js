@@ -153,9 +153,7 @@ $(document).ready(function () {
 
                     // unlock port select & baud
                     $port.prop('disabled', false);
-                    if (!GUI.auto_connect) {
-                        $baud.prop('disabled', false);
-                    }
+                    $baud.prop('disabled', false);
 
                     // reset connect / disconnect button
                     $('div.connect_controls a.connect').removeClass('active');
@@ -175,45 +173,6 @@ $(document).ready(function () {
                 $(this).data("clicks", !clicks);
             }
         }
-    });
-
-    // auto-connect
-    chrome.storage.local.get('auto_connect', function (result) {
-        if (result.auto_connect === 'undefined' || result.auto_connect) {
-            // default or enabled by user
-            GUI.auto_connect = true;
-
-            $('input.auto_connect').prop('checked', true);
-            $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectEnabled'));
-
-            $baud.val(115200).prop('disabled', true);
-        } else {
-            // disabled by user
-            GUI.auto_connect = false;
-
-            $('input.auto_connect').prop('checked', false);
-            $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectDisabled'));
-        }
-
-        // bind UI hook to auto-connect checkbos
-        $('input.auto_connect').change(function () {
-            GUI.auto_connect = $(this).is(':checked');
-
-            // update title/tooltip
-            if (GUI.auto_connect) {
-                $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectEnabled'));
-
-                $baud.val(115200).prop('disabled', true);
-            } else {
-                $('input.auto_connect, span.auto_connect').prop('title', chrome.i18n.getMessage('autoConnectDisabled'));
-
-                if (!GUI.connected_to && !GUI.connecting_to) $('select#baud').prop('disabled', false);
-            }
-
-            chrome.storage.local.set({'auto_connect': GUI.auto_connect});
-
-
-        });
     });
 
     PortHandler.initialize();
@@ -257,7 +216,7 @@ function onInvalidFirmwareVariant()
 
 function onInvalidFirmwareVersion()
 {
-    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.firmwareVersionAccepted]));
+    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted], [CONFIGURATOR.maxFirmwareVersionAccepted]));
     CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
     GUI.allowedTabs = ['cli'];
     onConnect();
@@ -317,7 +276,7 @@ function onOpen(openInfo) {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
                         googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
-                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.firmwareVersionAccepted)) {
+                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
                             mspHelper.getCraftName(function(name) {
                                 if (name) {
                                     CONFIG.name = name;

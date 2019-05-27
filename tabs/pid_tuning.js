@@ -208,6 +208,12 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.requires-v2_1').hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+            $('.requires-v2_2').show();
+        } else {
+            $('.requires-v2_2').hide();
+        }
+
         if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
             $('[name=ff]').prop('disabled', 'disabled');
         }

@@ -49,7 +49,8 @@ sources.css = [
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
-    './node_modules/openlayers/dist/ol.css'
+    './node_modules/openlayers/dist/ol.css',
+    './src/css/logic.css'
 ];
 
 sources.js = [
@@ -84,6 +85,7 @@ sources.js = [
     './js/serial.js',
     './js/servoMixRule.js',
     './js/motorMixRule.js',
+    './js/logicCondition.js',
     './js/settings.js',
     './js/outputMapping.js',
     './js/model.js',
@@ -97,6 +99,7 @@ sources.js = [
     './js/boards.js',
     './js/servoMixerRuleCollection.js',
     './js/motorMixerRuleCollection.js',
+    './js/logicConditionsCollection.js',
     './js/vtx.js',
     './main.js',
     './tabs/*.js',

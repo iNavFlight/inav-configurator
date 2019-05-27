@@ -115,6 +115,25 @@
                         </table>
                     </div>
                 </div>
+                <div class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="calibrationHead5"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <span data-i18n="OpflowCalText">text</span>
+                        <div class="default_btn">
+                            <div id="opflow_btn">
+                                <a class="calibrateopflow" href="#" data-i18n="OpflowCalBtn"></a>
+                            </div>
+                        </div>
+                        <table id="opflow-calibrated-data" class="cf_table">
+                            <tr>
+                                <td><label for="OpflowScale"><span>Scale</span></label></td>
+                                <td><input type="number" name="OpflowScale" min="0" max="10000"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -153,5 +172,12 @@
     <div class="modal__content">
         <h1 class="modal__title modal__title--center" data-i18n="accCalibrationProcessing"></h1>
         <div id="modal-compass-countdown" class="modal__text"></div>
+    </div>
+</div>
+
+<div id="modal-opflow-processing" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title modal__title--center" data-i18n="accCalibrationProcessing"></h1>
+        <div id="modal-opflow-countdown" class="modal__text"></div>
     </div>
 </div>

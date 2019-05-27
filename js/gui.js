@@ -4,7 +4,6 @@
 var TABS = {}; // filled by individual tab js file
 
 var GUI_control = function () {
-    this.auto_connect = false;
     this.connecting_to = false;
     this.connected_to = false;
     this.connect_lock = false;
