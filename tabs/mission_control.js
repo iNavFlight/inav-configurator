@@ -526,18 +526,16 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllPoints();
-            var dialog = require('nw-dialog');
-            dialog.setContext(document);
-            dialog.openFileDialog(function(result) {
+            nwdialog.setContext(document);
+            nwdialog.openFileDialog(function(result) {
                 loadMissionFile(result);
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
             //if (!markers.length) return;
-            var dialog = require('nw-dialog');
-            dialog.setContext(document);
-            dialog.saveFileDialog('', '.mission', function(result) {
+            nwdialog.setContext(document);
+            nwdialog.saveFileDialog('', '.mission', function(result) {
                 saveMissionFile(result);
             })
         });
@@ -616,7 +614,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function loadMissionFile(filename) {
-        const fs = require('fs-extra');
+        const fs = require('fs');
         const xml2js = require('xml2js');
 
         fs.readFile(filename, (err, data) => {
@@ -739,7 +737,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function saveMissionFile(filename) {
-        const fs = require('fs-extra');
+        const fs = require('fs');
         const xml2js = require('xml2js');
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
