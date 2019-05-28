@@ -62,6 +62,7 @@ sources.js = [
     './js/libraries/jquery.nouislider.all.min.js',
     './node_modules/three/three.min.js',
     './node_modules/nw-dialog/index.js',
+    './js/libraries/bundle_xml2js.js',
     './js/libraries/Projector.js',
     './js/libraries/CanvasRenderer.js',
     './js/libraries/jquery.flightindicators.js',

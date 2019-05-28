@@ -615,7 +615,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function loadMissionFile(filename) {
         const fs = require('fs');
-        const xml2js = require('xml2js');
+        if (!window.xml2js) return GUI.log('<span style="color: red">Error reading file (xml2js not found)</span>');
 
         fs.readFile(filename, (err, data) => {
             if (err) {
@@ -623,7 +623,7 @@ TABS.mission_control.initialize = function (callback) {
                 return console.error(err);
             }
 
-            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+            window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
                     GUI.log('<span style="color: red">Error parsing file</span>');
                     return console.error(err);
@@ -738,7 +738,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function saveMissionFile(filename) {
         const fs = require('fs');
-        const xml2js = require('xml2js');
+        if (!window.xml2js) return GUI.log('<span style="color: red">Error writing file (xml2js not found)</span>');
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
@@ -768,7 +768,7 @@ TABS.mission_control.initialize = function (callback) {
             data.missionitem.push({ $: { 'no': (markers.length + 1), 'action': 'RTH', 'lon': 0, 'lat': 0, 'alt': (settings.alt / 100), 'parameter1': ($('#rthLanding').is(':checked') ? 1 : 0) } });
         }
 
-        var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
+        var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         fs.writeFile(filename, xml, (err) => {
             if (err) {
