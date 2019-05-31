@@ -142,7 +142,7 @@ presets.presets = [
         name: '5" Performance',
         description: "210-220 class racer with F4/F7 CPU on 4S battery<br>" +
             "<span>450g-600g weight, 2300KV - 2600KV motors, 5 inch triblade propellers, MPU6000 or MPU6050 gyro.</span>" + 
-            "<strong>This preset uses agressive filter tuning. Check motor temperature! Do not use bended propellers or motors</strong>",
+            "<strong>This preset uses agressive filter tuning. Check motor temperature! Do not use bent propellers or motors</strong>",
         features: [
             "8kHz / 4kHz / 4kHz",
             "Multishot",
