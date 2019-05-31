@@ -24,6 +24,7 @@
     "archiver": "^2.0.3",
     "bluebird": "3.4.1",
     "del": "^3.0.0",
+    "fs": "0.0.1-security",
     "graceful-fs": "^4.1.15",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
