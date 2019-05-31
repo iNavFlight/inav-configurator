@@ -78,6 +78,10 @@ SYM.LAST_CHAR = 190;
 SYM.BARO_TEMP = 0xF0;
 SYM.IMU_TEMP = 0xF1;
 SYM.TEMP = 0xF2;
+SYM.GFORCE = 0xE6;
+SYM.GFORCE_X = 0xE7;
+SYM.GFORCE_Y = 0xE8;
+SYM.GFORCE_Z = 0xE9;
 
 var FONT = FONT || {};
 
@@ -951,25 +955,25 @@ OSD.constants = {
                     name: 'G_FORCE',
                     id: 100,
                     min_version: '2.2.0',
-                    preview: FONT.embed_dot('1.00')
+                    preview: FONT.symbol(SYM.GFORCE) + FONT.embed_dot('1.00')
                 },
                 {
                     name: 'G_FORCE_X',
                     id: 101,
                     min_version: '2.2.0',
-                    preview: FONT.embed_dot('-0.10')
+                    preview: FONT.symbol(SYM.GFORCE_X) + FONT.embed_dot('-0.10')
                 },
                 {
                     name: 'G_FORCE_Y',
                     id: 102,
                     min_version: '2.2.0',
-                    preview: FONT.embed_dot('-0.10')
+                    preview: FONT.symbol(SYM.GFORCE_Y) + FONT.embed_dot('-0.20')
                 },
                 {
                     name: 'G_FORCE_Z',
                     id: 103,
                     min_version: '2.2.0',
-                    preview: FONT.embed_dot('-0.10')
+                    preview: FONT.symbol(SYM.GFORCE_Z) + FONT.embed_dot('-0.30')
                 },
             ]
         },
