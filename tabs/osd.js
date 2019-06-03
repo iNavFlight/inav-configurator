@@ -271,14 +271,7 @@ FONT.upload = function (callback) {
     // has less characters. This ensures we overwrite the 2nd page
     // when uploading a 1-page font over a 2-page one.
     var count = 512;
-    var promises = [];
-    var updateProgress = function(p) {
-        return function() {
-            if (callback) {
-                callback(p, count, (p / count) * 100);
-            }
-        }
-    };
+    var addrs = [];
     for (var ii = 0; ii < count; ii++) {
         // Upload 2nd page first, so chips supporting just one page
         // overwrite page 2 with page 1. Note that this works fine with
@@ -286,12 +279,18 @@ FONT.upload = function (callback) {
         // the first pass, but then it will be ovewritten by the first
         // 256 characters.
         var charIndex = ii < 256 ? ii + 256 : ii - 256;
-        // Force usage of V1 protocol to workaround the 64 byte write bug
-        // on F3 when the configurator is running on macOS
-        var p = MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(charIndex, MSP.constants.PROTOCOL_V1));
-        promises.push(p.then(updateProgress(ii)));
+        addrs.push(charIndex);
     }
-    return Promise.all(promises).then(function() {
+    addrs.reduce(function(p, next, idx) {
+        return p.then(function() {
+            if (callback) {
+                callback(idx, count, (idx / count) * 100);
+            }
+            // Force usage of V1 protocol to workaround the 64 byte write bug
+            // on F3 when the configurator is running on macOS
+            return MSP.promise(MSPCodes.MSP_OSD_CHAR_WRITE, FONT.msp.encode(next, MSP.constants.PROTOCOL_V1));
+        });
+    }, Promise.resolve()).then(function() {
         OSD.GUI.jbox.close();
         return MSP.promise(MSPCodes.MSP_SET_REBOOT);
     });
