@@ -1064,7 +1064,10 @@ var FC = {
         ];
     },
     getRthAltControlMode: function () {
-        return ["Current", "Extra", "Fixed", "Max", "At Least"];
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0'))
+            return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
+        else
+            return ["Current", "Extra", "Fixed", "Max", "At least"];
     },
     getRthAllowLanding: function() {
         return ["Never", "Always", "Only on failsafe"];
