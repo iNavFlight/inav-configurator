@@ -221,16 +221,112 @@
                 </div>
             </div>
         </form>
+
+        <div class="clear-both"></div>
+        <div class="tab_title" data-i18n="iTermMechanics" style="margin-top: 1em;"></div>
+        <div class="cf_column half">
+            <table class="rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="mc_airmode_type"></th>
+                        <td >
+                            <select data-setting="mc_airmode_type" />
+                            <div class="helpicon cf_tip" data-i18n_title="mc_airmode_type_help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="itermRelax"></th>
+                        <td >
+                            <select data-setting="mc_iterm_relax" />
+                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="itermRelaxCutoff"></th>
+                        <td >
+                            <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
+                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="cf_column half">
+            <table class="spacer_left rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="mc_airmode_threshold"></th>
+                        <td >
+                            <select data-setting="mc_airmode_threshold" />
+                            <div class="helpicon cf_tip" data-i18n_title="mc_airmode_threshold_help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="itermRelaxType"></th>
+                        <td >
+                            <select data-setting="mc_iterm_relax_type" />
+                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="clear-both"></div>
+        <div class="tab_title" data-i18n="dTermMechanics" style="margin-top: 1em;"></div>
+        <div class="cf_column half">
+            <table class="rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr>
+                        <th data-i18n="dtermSetpointWeight"></th>
+                        <td >
+                            <input type="number" data-setting="dterm_setpoint_weight" class="rate-tpa_input"/>
+                            <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="d_boost_factor"></th>
+                        <td >
+                            <input data-setting="d_boost_factor" class="rate-tpa_input" />
+                            <div class="helpicon cf_tip" data-i18n_title="d_boost_factor_help"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="cf_column half">
+            <table class="spacer_left rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="d_boost_max_at_acceleration"></th>
+                        <td >
+                            <input data-setting="d_boost_max_at_acceleration" class="rate-tpa_input" />
+                            <div class="helpicon cf_tip" data-i18n_title="d_boost_max_at_acceleration_help"></div>
+                        </td>
+                    </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="d_boost_gyro_delta_lpf_hz"></th>
+                        <td >
+                            <input data-setting="d_boost_gyro_delta_lpf_hz" class="rate-tpa_input" />
+                            <div class="helpicon cf_tip" data-i18n_title="d_boost_gyro_delta_lpf_hz_help"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <div class="clear-both"></div>
         <div class="tab_title" data-i18n="tabFiltering" style="margin-top: 1em;"></div>
         <div class="cf_column half">
             <table class="rate-tpa rate-tpa--filtering">
                 <tbody>
-                    <tr>
-                        <th data-i18n="gyroLpfCutoffFrequency"></th>
-                        <td>
-                            <input type="number" id="gyroSoftLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" data-i18n_title="gyroLpfCutoffFrequencyHelp"></div>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="gyro_lpf_type"></th>
+                        <td >
+                            <select data-setting="gyro_lpf_type" />
+                            <div class="helpicon cf_tip" data-i18n_title="gyro_lpf_type_help"></div>
                         </td>
                     </tr>
                     <tr class="requires-v2_1">
@@ -240,6 +336,42 @@
                             <div class="helpicon cf_tip" data-i18n_title="gyroStage2LpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
+                    <tr class="requires-v2_2">
+                        <th data-i18n="acc_lpf_type"></th>
+                        <td >
+                            <select data-setting="acc_lpf_type" />
+                            <div class="helpicon cf_tip" data-i18n_title="acc_lpf_type_help"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="yawLpfCutoffFrequency"></th>
+                        <td>
+                            <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="cf_column half">
+            <table class="spacer_left rate-tpa rate-tpa--filtering">
+                <tbody>
+                    <tr>
+                        <th data-i18n="gyroLpfCutoffFrequency"></th>
+                        <td>
+                            <input type="number" id="gyroSoftLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="gyroLpfCutoffFrequencyHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="dtermLpfCutoffFrequency"></th>
+                        <td>
+                            <input type="number" id="dtermLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
+                            <div class="helpicon cf_tip" data-i18n_title="dtermLpfCutoffFrequencyHelp"></div>
+                        </td>
+                    </tr>
                     <tr>
                         <th data-i18n="accLpfCutoffFrequency"></th>
                         <td>
@@ -247,7 +379,15 @@
                             <div class="helpicon cf_tip" data-i18n_title="accLpfCutoffFrequencyHelp"></div>
                         </td>
                     </tr>
+                </tbody>
+            </table>
+        </div>
 
+        <div class="clear-both"></div>
+        <div class="tab_title" data-i18n="tabFilteringAdvanced" style="margin-top: 1em;"></div>
+        <div class="cf_column half">
+            <table class="rate-tpa rate-tpa--filtering">
+                <tbody>
                     <tr>
                         <th data-i18n="gyroNotchHz1"></th>
                         <td>
@@ -280,23 +420,10 @@
                 </tbody>
             </table>
         </div>
+        
         <div class="cf_column half">
             <table class="spacer_left rate-tpa rate-tpa--filtering">
                 <tbody>
-                    <tr>
-                        <th data-i18n="dtermLpfCutoffFrequency"></th>
-                        <td>
-                            <input type="number" id="dtermLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" data-i18n_title="dtermLpfCutoffFrequencyHelp"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th data-i18n="yawLpfCutoffFrequency"></th>
-                        <td>
-                            <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" /> Hz
-                            <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
-                        </td>
-                    </tr>
                     <tr>
                         <th data-i18n="dtermNotchHz"></th>
                         <td>
@@ -333,34 +460,6 @@
         <div class="tab_title" data-i18n="tabMisc" style="margin-top: 1em;"></div>
         <div class="cf_column half">
             <table class="rate-tpa rate-tpa--misc">
-                <tr>
-                    <th data-i18n="dtermSetpointWeight"></th>
-                    <td >
-                        <input type="number" data-setting="dterm_setpoint_weight" class="rate-tpa_input"/>
-                        <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
-                    </td>
-                </tr>
-                <tr class="requires-v2_2">
-                    <th data-i18n="itermRelax"></th>
-                    <td >
-                        <select data-setting="mc_iterm_relax" />
-                        <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
-                    </td>
-                </tr>
-                <tr class="requires-v2_2">
-                        <th data-i18n="itermRelaxType"></th>
-                        <td >
-                            <select data-setting="mc_iterm_relax_type" />
-                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
-                        </td>
-                    </tr>
-                <tr class="requires-v2_2">
-                        <th data-i18n="itermRelaxCutoff"></th>
-                        <td >
-                            <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
-                            <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
-                        </td>
-                    </tr>
                 <tr>
                     <th data-i18n="yawJumpPreventionLimit"></th>
                     <td >

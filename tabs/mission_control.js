@@ -526,18 +526,16 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllPoints();
-            var dialog = require('nw-dialog');
-            dialog.setContext(document);
-            dialog.openFileDialog(function(result) {
+            nwdialog.setContext(document);
+            nwdialog.openFileDialog(function(result) {
                 loadMissionFile(result);
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
             //if (!markers.length) return;
-            var dialog = require('nw-dialog');
-            dialog.setContext(document);
-            dialog.saveFileDialog('', '.mission', function(result) {
+            nwdialog.setContext(document);
+            nwdialog.saveFileDialog('', '.mission', function(result) {
                 saveMissionFile(result);
             })
         });
@@ -616,8 +614,8 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function loadMissionFile(filename) {
-        const fs = require('fs-extra');
-        const xml2js = require('xml2js');
+        const fs = require('fs');
+        if (!window.xml2js) return GUI.log('<span style="color: red">Error reading file (xml2js not found)</span>');
 
         fs.readFile(filename, (err, data) => {
             if (err) {
@@ -625,7 +623,7 @@ TABS.mission_control.initialize = function (callback) {
                 return console.error(err);
             }
 
-            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+            window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
                     GUI.log('<span style="color: red">Error parsing file</span>');
                     return console.error(err);
@@ -739,8 +737,8 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function saveMissionFile(filename) {
-        const fs = require('fs-extra');
-        const xml2js = require('xml2js');
+        const fs = require('fs');
+        if (!window.xml2js) return GUI.log('<span style="color: red">Error writing file (xml2js not found)</span>');
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
@@ -770,7 +768,7 @@ TABS.mission_control.initialize = function (callback) {
             data.missionitem.push({ $: { 'no': (markers.length + 1), 'action': 'RTH', 'lon': 0, 'lat': 0, 'alt': (settings.alt / 100), 'parameter1': ($('#rthLanding').is(':checked') ? 1 : 0) } });
         }
 
-        var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
+        var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         fs.writeFile(filename, xml, (err) => {
             if (err) {
