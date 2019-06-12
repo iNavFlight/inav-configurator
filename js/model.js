@@ -19,8 +19,8 @@ const SERVO_GIMBAL_PITCH = 0,
     SERVO_SWASHPLATE_1 = 3,
     SERVO_SWASHPLATE_2 = 4,
     SERVO_SWASHPLATE_3 = 5,
-    SERVO_SWASHPLATE_4 = 6,
-    SERVO_HELICOPTER_TAIL = 7;
+    SERVO_SWASHPLATE_4 = 7
+    SERVO_HELICOPTER_TAIL = 6;
 
 const INPUT_STABILIZED_ROLL = 0,
     INPUT_STABILIZED_PITCH = 1,
@@ -324,13 +324,13 @@ const mixerList = [
         ],
         servoMixer: [            
             new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,         -100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,          100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,          50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,         -50, 0),
             new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,          50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,         -50, 0),
             new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
         ]
     },             // 15
@@ -348,13 +348,13 @@ const mixerList = [
         ],
         servoMixer: [            
             new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,          100, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_1, INPUT_STABILIZED_PITCH,         -100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_ROLL,           86.6025, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,         -50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_2, INPUT_STABILIZED_PITCH,          50, 0),
             new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_FEATURE_COLLECTIVE_PITCH,  100, 0),
             new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_ROLL,          -86.6025, 0),
-            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,         -50, 0),
+            new ServoMixRule(SERVO_SWASHPLATE_3, INPUT_STABILIZED_PITCH,          50, 0),
             new ServoMixRule(SERVO_HELICOPTER_TAIL, INPUT_STABILIZED_YAW,         100, 0)
         ]
     },             // 16
