@@ -527,7 +527,21 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_SERVO_MIXER:
                 SERVO_RULES.flush();
-                if (data.byteLength % 6 === 0) {
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
+                    if (data.byteLength % 8 === 0) {
+                        for (i = 0; i < data.byteLength; i += 8) {
+                            SERVO_RULES.put(new ServoMixRule(
+                                data.getInt8(i),
+                                data.getInt8(i + 1),
+                                data.getInt16(i + 2, true),
+                                data.getInt8(i + 4),
+                                data.getInt16(i + 5, true),
+                                data.getInt8(i + 7)
+                            ));
+                        }
+                    }
+                } else if (data.byteLength % 6 === 0) {
                     for (i = 0; i < data.byteLength; i += 6) {
                         SERVO_RULES.put(new ServoMixRule(
                             data.getInt8(i),
@@ -2318,13 +2332,17 @@ var mspHelper = (function (gui) {
                 }
                 MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
             } else {
-                //INAV 2.2 uses different MSP frame
+                // INAV >=2.2 uses different MSP frame
                 buffer.push(servoIndex);
                 buffer.push(servoRule.getTarget());
                 buffer.push(servoRule.getInput());
                 buffer.push(lowByte(servoRule.getRate()));
                 buffer.push(highByte(servoRule.getRate()));
                 buffer.push(servoRule.getSpeed());
+                if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
+                    buffer.push(lowByte(servoRule.getFixedValue()));
+                    buffer.push(highByte(servoRule.getFixedValue()));
+                }
                 buffer.push(servoRule.getConditionId());
 
                  // prepare for next iteration

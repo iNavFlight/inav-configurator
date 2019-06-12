@@ -124,6 +124,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <td><select class="mix-rule-input"></select></td>\
                     <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
+                    <td><input type="number" class="mix-rule-fixed-value" step="1" min="1000" max="2000" disabled/></td>\
                     <td><select class="mix-rule-condition"></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
@@ -131,6 +132,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 const $row = $servoMixTableBody.find('tr:last');
                 const $conditions = $row.find('.mix-rule-condition');
+
+                const fixedValueUpdateEnabled = function() {
+                    $row.find(".mix-rule-fixed-value").prop('disabled', parseInt(servoRule.getInput()) !== 30);
+                };
 
                 $conditions.append('<option value="-1">Always</option>')
                 for (let i = 0; i < 16 ; i++) {
@@ -144,6 +149,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 
                 $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
                     servoRule.setInput($(this).val());
+                    fixedValueUpdateEnabled();
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
@@ -158,6 +164,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     servoRule.setSpeed($(this).val());
                 });
                 
+                $row.find(".mix-rule-fixed-value").val(servoRule.getFixedValue()).change(function () {
+                    servoRule.setFixedValue($(this).val());
+                });
+                fixedValueUpdateEnabled();
+
                 $row.find("[data-role='role-servo-delete']").attr("data-index", servoRuleIndex);
             }
 

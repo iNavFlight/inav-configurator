@@ -2938,6 +2938,9 @@
     "speed": {
         "message": "Speed (10µs/s)"
     },
+    "fixedValue": {
+        "message": "Fixed value (µs)"
+    },
     "mixerPresetTitle": {
         "message": "Mixer preset"
     },

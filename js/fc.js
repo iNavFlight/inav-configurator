@@ -1137,11 +1137,12 @@ var FC = {
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
             'Stabilized Yaw-',      // 28,
-            'ONE'                   // 29,
+            'ONE',                  // 29,
+            'Fixed Value'           // 30,
         ];
     },
     getServoMixInputName: function (input) {
-        return getServoMixInputNames()[input];
+        return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
         for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -1154,7 +1155,7 @@ var FC = {
         return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
-        return FC.isModeBitSet(FC.getModeId(name));
+        return this.isModeBitSet(this.getModeId(name));
     },
     getLogicOperators: function () {
         return {
