@@ -78,11 +78,6 @@ var Settings = (function () {
         var settingName = input.data('setting');
         var setting = input.data('setting-info');
         var value;
-
-        if (typeof setting == 'undefined') {
-            return null;
-        }
-
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;

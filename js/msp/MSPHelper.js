@@ -45,12 +45,8 @@ var mspHelper = (function (gui) {
         'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12,
-        'OPFLOW': 14,
-        'LOG': 15,
         'RANGEFINDER': 16,
         'VTX_FFPV': 17,
-        'ESC': 18,
-        'GSM_SMS': 19,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -2387,8 +2383,6 @@ var mspHelper = (function (gui) {
     self.loadLogicConditions = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
-        } else {
-            callback();
         }
     }
 

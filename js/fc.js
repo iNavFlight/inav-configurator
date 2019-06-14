@@ -622,7 +622,7 @@ var FC = {
     getLooptimes: function () {
         return {
             125: {
-                defaultLooptime: 1000,
+                defaultLooptime: 2000,
                 looptimes: {
                     4000: "250Hz",
                     3000: "334Hz",
@@ -635,7 +635,7 @@ var FC = {
                 }
             },
             1000: {
-                defaultLooptime: 1000,
+                defaultLooptime: 2000,
                 looptimes: {
                     4000: "250Hz",
                     2000: "500Hz",
@@ -921,14 +921,6 @@ var FC = {
                 rates: {
                     16000: "16kHz"
                 }
-            },
-            9: {
-                name: "SERIALSHOT",
-                message: "escProtocolExperimental",
-                defaultRate: 4000,
-                rates: {
-                    4000: "4kHz"
-                }
             }
         };
     },
@@ -1064,10 +1056,7 @@ var FC = {
         ];
     },
     getRthAltControlMode: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0'))
-            return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
-        else
-            return ["Current", "Extra", "Fixed", "Max", "At least"];
+        return ["Current", "Extra", "Fixed", "Max", "At Least"];
     },
     getRthAllowLanding: function() {
         return ["Never", "Always", "Only on failsafe"];

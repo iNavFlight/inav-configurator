@@ -459,7 +459,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-                //DSHOT/SERIALSHOT protocols, simplify UI
+                //DSHOT protocols, simplify UI
                 $('.hide-for-shot').addClass('is-hidden');
             } else {
                 $('.hide-for-shot').removeClass('is-hidden');

@@ -742,10 +742,10 @@
         "message": "Capacity"
     },
     "configurationBatteryCapacityWarning": {
-        "message": "Warning Capacity (remaining %)"
+        "message": "Warning Capacity (%)"
     },
     "configurationBatteryCapacityCritical": {
-        "message": "Critical Capacity (remaining %)"
+        "message": "Critical Capacity (%)"
     },
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
@@ -870,12 +870,6 @@
     "portsFunction_RANGEFINDER": {
         "message": "Rangefinder"
     },
-    "portsFunction_OPFLOW": {
-        "message": "Optic flow"
-    },
-    "portsFunction_ESC": {
-        "message": "ESC output/telemetry"
-    },
     "portsFunction_TELEMETRY_FRSKY": {
         "message": "FrSky"
     },
@@ -890,9 +884,6 @@
     },
     "portsFunction_TELEMETRY_IBUS": {
         "message": "IBUS"
-    },
-    "portsFunction_GSM_SMS": {
-        "message": "GSM SMS"
     },
     "portsFunction_TELEMETRY_MSP": {
         "message": "MSP"
@@ -1234,58 +1225,25 @@
         "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction32": {
-        "message": "Level P Adjustment"
+        "message": "PosR D Adjustment"
     },
     "adjustmentsFunction33": {
-        "message": "Level I Adjustment"
+        "message": "NavR P Adjustment"
     },
     "adjustmentsFunction34": {
-        "message": "Level D Adjustment"
+        "message": "NavR I Adjustment"
     },
     "adjustmentsFunction35": {
-        "message": "Pos XY P Adjustment"
+        "message": "NavR D Adjustment"
     },
     "adjustmentsFunction36": {
-        "message": "Pos XY I Adjustment"
+        "message": "Level P Adjustment"
     },
     "adjustmentsFunction37": {
-        "message": "Pos XY D Adjustment"
+        "message": "Level I Adjustment"
     },
     "adjustmentsFunction38": {
-        "message": "Pos Z P Adjustment"
-    },
-    "adjustmentsFunction39": {
-        "message": "Pos Z I Adjustment"
-    },
-    "adjustmentsFunction40": {
-        "message": "Pos Z D Adjustment"
-    },
-    "adjustmentsFunction41": {
-        "message": "Heading P Adjustment"
-    },
-    "adjustmentsFunction42": {
-        "message": "Vel XY P Adjustment"
-    },
-    "adjustmentsFunction43": {
-        "message": "Vel XY I Adjustment"
-    },
-    "adjustmentsFunction44": {
-        "message": "Vel XY D Adjustment"
-    },
-    "adjustmentsFunction45": {
-        "message": "Vel Z P Adjustment"
-    },
-    "adjustmentsFunction46": {
-        "message": "Vel Z I Adjustment"
-    },
-    "adjustmentsFunction47": {
-        "message": "Vel Z D Adjustment"
-    },
-    "adjustmentsFunction48": {
-        "message": "FW min thr down pitch angle Adjustment"
-    },
-    "adjustmentsFunction49": {
-        "message": "VTX power level Adjustment"
+        "message": "Level D Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -1811,7 +1769,7 @@
         "message": "Failsafe Throttle"
     },
     "failsafeFeaturesHelpNew": {
-        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse duration, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
+        "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse length, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
     },
     "failsafePulsrangeTitle": {
         "message": "Valid Pulse Range Settings"
@@ -1820,10 +1778,10 @@
         "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for radio channels or entering stage 1 for flightchannels"
     },
     "failsafeRxMinUsecItem": {
-        "message": "Minimum duration"
+        "message": "Minimum length"
     },
     "failsafeRxMaxUsecItem": {
-        "message": "Maximum duration"
+        "message": "Maximum length"
     },
     "failsafeChannelFallbackSettingsTitle": {
         "message": "Channel Fallback Settings"
@@ -2276,25 +2234,25 @@
         "message": "Position Estimator"
     },
     "w_z_baro_p": {
-        "message": "Vertical position barometer weight"
+        "message": "Vertical Position Baro Weight"
     },
     "w_z_gps_p": {
-        "message": "Vertical position GPS weight"
+        "message": "Vertical Position GPS Weight"
     },
     "w_z_gps_v": {
-        "message": "Vertical speed GPS weight"
+        "message": "Vertical Speed GPS Weight"
     },
     "w_xy_gps_p": {
-        "message": "Horizontal position GPS weight"
+        "message": "Horizontal Position GPS Weight"
     },
     "w_xy_gps_v": {
-        "message": "Horizontal speed GPS weight"
+        "message": "Horizontal Speed GPS Weight"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "This value should be changed very carefully. In most cases there is not need to change that. For advanced users only!"
+        "message": "Those value should be changed very carefully. In most cases there is not need to change them. For advanced users only!"
     },
     "gps_min_sats": {
-        "message": "Min. GPS satellites for a valid fix"
+        "message": "Min. GPS sats for valid fix"
     },
     "use_gps_velned": {
         "message": "Use GPS data for velocity calculation"
@@ -2318,13 +2276,13 @@
         "message": "Min. RTH distance [cm]"
     },
     "minRthDistanceHelp": {
-        "message": "If UAV is within this distance from the home point, it will land instead of RTH then land"
+        "message": "If UAV is within this distance from Home Point, it will execute Land instead of RTH and Land"
     },
     "rthClimbFirst": {
         "message": "Climb before RTH"
     },
     "rthClimbIgnoreEmergency": {
-        "message": "Climb regardless of position sensors health"
+        "message": "Climb regardless of position sensor health"
     },
     "rthTailFirst": {
         "message": "Tail first"
@@ -2333,16 +2291,16 @@
         "message": "Land after RTH"
     },
     "rthAltControlMode": {
-        "message": "RTH altitude mode"
+        "message": "RTH Altitude mode"
     },
     "rthAbortThreshold": {
         "message": "RTH abort threshold [cm]"
     },
     "rthAbortThresholdHelp": {
-        "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
+        "message": "RTH sanity checking feature will notice if distance to home is increasing during RTH and once amount of increase exceeds the threshold defined by this parameter, instead of continuing RTH machine will enter emergency landing, self-level and go down safely. Default is 500m which is safe enough for both multirotor machines and airplanes."
     },
     "rthAltitude": {
-        "message": "RTH altitude [cm]"
+        "message": "RTH Altitude [cm]"
     },
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
@@ -2443,30 +2401,6 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
-    "osdAlarmGFORCE": {
-        "message": "g force"
-    },
-    "osdAlarmGFORCE_HELP": {
-        "message": "The g force element will start blinking when greater than this value"
-    },
-    "osdAlarmGFORCE_AXIS_MIN": {
-        "message": "g force axis min"
-    },
-    "osdAlarmGFORCE_AXIS_MIN_HELP": {
-        "message": "The axes g force elements will start blinking when lower than this value"
-    },
-    "osdAlarmGFORCE_AXIS_MAX": {
-        "message": "g force axis max"
-    },
-    "osdAlarmGFORCE_AXIS_MAX_HELP": {
-        "message": "The axes g force elements will start blinking when greater than this value"
-    },
-    "osdAlarmCURRENT": {
-        "message": "Current"
-    },
-    "osdAlarmCURRENT_HELP": {
-        "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
-    },
     "osdAlarmIMU_TEMPERATURE_MIN": {
         "message": "Minimum IMU temperature"
     },
@@ -2499,9 +2433,6 @@
     },
     "osdGroupTimers": {
         "message": "Timers"
-    },
-    "osdGroupGForce": {
-        "message": "G force"
     },
     "osdGroupTemperature": {
         "message": "Temperature"
@@ -2607,7 +2538,7 @@
     },
     "osdElement_3D_SPEED": {
         "message": "3D Speed"
-    },
+    },   
     "osdElement_3D_SPEED_HELP": {
         "message": "Shows 3D speed considering both horizontal and vertical speed."
     },
@@ -2621,7 +2552,7 @@
         "message": "GPS HDOP"
     },
     "osdElement_GPS_HDOP_HELP": {
-        "message": "Shows the Horizontal Dilution Of Precision from the GPS. The lower, the more accurate the GPS fix is."
+        "message": "Shows the Horizontal Dilution Of Precission from the GPS. The lower, the most accurate the GPS fix is."
     },
     "osdElement_PLUS_CODE": {
         "message": "Plus Code (latitude + longitude)"
@@ -2636,34 +2567,10 @@
         "message": "Shows vertical speed using up or down arrows. Each arrow represents 10cm (~4 inches) per second."
     },
     "osdElement_VARIO_NUM": {
-        "message": "Numeric vario"
+        "message": "Numeric Vario"
     },
     "osdElement_VARIO_NUM_HELP": {
         "message": "Shows vertical speed using a number"
-    },
-    "osdElement_G_FORCE": {
-        "message": "g force"
-    },
-    "osdElement_G_FORCE_HELP": {
-        "message": "Shows the g force taking into account all axes"
-    },
-    "osdElement_G_FORCE_X": {
-        "message": "Longitudinal g force in body frame (X)"
-    },
-    "osdElement_G_FORCE_X_HELP": {
-        "message": "Shows the g force in the X axis (longitudinal)"
-    },
-    "osdElement_G_FORCE_Y": {
-        "message": "Lateral g force in body frame (Y)"
-    },
-    "osdElement_G_FORCE_Y_HELP": {
-        "message": "Shows the g force in the Y axis (lateral)"
-    },
-    "osdElement_G_FORCE_Z": {
-        "message": "Vertical g force in body frame (Z)"
-    },
-    "osdElement_G_FORCE_Z_HELP": {
-        "message": "Shows the g force in the Z axis (vertical)"
     },
     "osdElement_ROLL_PIDS": {
         "message": "Roll PIDs"
@@ -2683,18 +2590,6 @@
     "osdElement_RTC_TIME_HELP": {
         "message": "Shows the current time, as retrieved from the GPS or set via the radio."
     },
-    "osdElement_RC_SOURCE": {
-        "message": "RC source"
-    },
-    "osdElement_RC_SOURCE_HELP": {
-        "message": "Shows the current RC source, STD or MSP (useful when using MSP override)"
-    },
-    "osdElement_VTX_POWER": {
-        "message": "Video TX power level"
-    },
-    "osdElement_VTX_POWER_HELP": {
-        "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
-    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
@@ -2702,10 +2597,10 @@
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
     },
     "osdElement_MAP_NORTH": {
-        "message": "Map (Up is north)"
+        "message": "Map (North pointing up)"
     },
     "osdElement_MAP_TAKEOFF": {
-        "message": "Map (Up is the takeoff direction)"
+        "message": "Map (takeoff direction pointing up)"
     },
     "osdElement_RADAR": {
         "message": "Radar"
@@ -2723,13 +2618,13 @@
         "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
     },
     "osdElement_WIND_SPEED_HORIZONTAL": {
-        "message": "Horizontal wind speed"
+        "message": "Horizontal Wind Speed"
     },
     "osdElement_WIND_SPEED_HORIZONTAL_HELP": {
         "message": "Shows estimated horizontal wind speed and direction."
     },
     "osdElement_WIND_SPEED_VERTICAL": {
-        "message": "Vertical wind speed"
+        "message": "Vertical Wind Speed"
     },
     "osdElement_WIND_SPEED_VERTICAL_HELP": {
         "message": "Shows estimated vertical wind speed and direction (up or down)."
@@ -2804,7 +2699,7 @@
         "message": "Temperature sensor 8"
     },
     "osdSettingMainVoltageDecimals": {
-        "message": "Main voltage decimals"
+        "message": "Main Voltage Decimals"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -2960,7 +2855,7 @@
         "message": "Mixer preset"
     },
     "fcFirmwareUpdateRequired": {
-        "message": "Flight controller firmware has to be updated to latest version to use this function"
+        "message": "Flight Controller firmware has to be updated to latest version to use this function"
     },
     "mixerNotConfigured": {
         "message": "Mixer not configured. Use <u>Mixer</u> tab to set it up!"
@@ -2990,10 +2885,10 @@
         "message": "Altitude"
     },
     "GROUND_SPEED": {
-        "message": "Ground speed"
+        "message": "Ground Speed"
     },
     "HOME_DISTANCE": {
-        "message": "Distance to home"
+        "message": "Distance to Home"
     },
     "brakingSpeedThreshold": {
         "message": "Min. speed threshold [cm/s]"
@@ -3008,7 +2903,7 @@
         "message": "Braking will end when speed goes below this value"
     },
     "brakingTimeout": {
-        "message": "Max. braking duration [ms]"
+        "message": "Max. braking length [ms]"
     },
     "brakingTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking can be active."
@@ -3017,10 +2912,10 @@
         "message": "Boost factor [%]"
     },
     "brakingBoostFactorTip": {
-        "message": "Defines how strong the braking boost will be. 100% means the navigation engine is allowed to double the banking speed and acceleration"
+        "message": "Defines for strong braking boost will be. 100% means navigation engine is allowed to double banking speed and acceleration than normal"
     },
     "brakingBoostTimeout": {
-        "message": "Max. braking boost duration [ms]"
+        "message": "Max. braking boost length [ms]"
     },
     "brakingBoostTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking boost can be active."
@@ -3079,26 +2974,23 @@
     "escProtocolNotAdvised": {
         "message": "This ESC protocol is not advised, use it at your own risk"
     },
-    "escProtocolExperimental": {
-        "message": "Experimental ESC protocol, use at your own risk"
-    },
     "looptimeNotAdvised": {
         "message": "PID loop might be not stable if GPS is in use"
     },
     "gyroLpfSuggestedMessage": {
-        "message": "This is suggested setting for all multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
+        "message": "This is suggested setting for all Multirotors with propeller size below 8 inches. Always check motor temperature after the first flight"
     },
     "gyroLpfNotAdvisedMessage": {
-        "message": "It is suggested to choose an higher cutoff frequency"
+        "message": "It is suggested to choose higher cutoff frequency"
     },
     "gyroLpfNotFlyableMessage": {
-        "message": "This setting will probably make the UAV unflyable"
+        "message": "This setting will probably make UAV unflyable"
     },
     "gyroLpfWhyNotHigherMessage": {
-        "message": "If motors are not overheating, try to set 256Hz instead"
+        "message": "If motors are not overheating, try going 256Hz instead"
     },
     "gyroLpfWhyNotSlightlyHigherMessage": {
-        "message": "If there are no vibration problems and motors are not overheating, try to set 188Hz instead"
+        "message": "If there are not vibration problems and motors are not overheating, try going 188Hz instead"
     },
     "tabLogicConditions": {
         "message": "Logic conditions"
@@ -3134,7 +3026,7 @@
         "message": "Iterm Relax"
     },
     "itermRelaxHelp": {
-        "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
+        "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axises. PRY is active also on Yaw."
     },
     "itermRelaxType": {
         "message": "Iterm Relax Type"
@@ -3146,57 +3038,6 @@
         "message": "Iterm Relax Cutoff Frequency"
     },
     "itermRelaxCutoffHelp": {
-        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
-    },
-    "gyro_lpf_type": {
-        "message": "Gyro LPF type"
-    },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "tabFilteringAdvanced": {
-        "message": "Advanced filtering"
-    },
-    "acc_lpf_type": {
-        "message": "Accelerometer LPF type"
-    },
-    "acc_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "dTermMechanics": {
-        "message": "D-term mechanics"
-    },
-    "d_boost_factor": {
-        "message": "D-Boost Factor"
-    },
-    "d_boost_factor_help": {
-        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
-    },
-    "d_boost_max_at_acceleration": {
-        "message": "Top D-Boost at acceleration [dps^2]"
-    },
-    "d_boost_max_at_acceleration_help": {
-        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
-    },
-    "d_boost_gyro_delta_lpf_hz": {
-        "message": "D-Boost gyro LPF"
-    },
-    "d_boost_gyro_delta_lpf_hz_help": {
-        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
-    },
-    "iTermMechanics": {
-        "message": "I-term mechanics"
-    },
-    "mc_airmode_type": {
-        "message": "Airmode handling type"
-    },
-    "mc_airmode_type_help": {
-        "message": "Defines the Airmode state handling type for Multirotors. <br />Default STICK_CENTER is the classical approach in which Airmode is always active if enabled, but when the throttle is low and ROLL/PITCH/YAW sticks are centered, Iterms is not allowed to grow (ANTI_WINDUP). <br />THROTTLE_THRESHOLD is the Airmode behavior known from Betaflight. In this mode, Airmode is active as soon THROTTLE position is above <i>mc_airmode_threshold</i> and stays active until disarm. ANTI_WINDUP is never triggered. For small Multirotors (up to 7-inch propellers) it is suggested to switch to THROTTLE_THRESHOLD since it keeps full stabilization no matter what pilot does with the sticks. Fixed Wings always use STICK_CENTER mode."
-    },
-    "mc_airmode_threshold": {
-        "message": "Airmode Throttle threshold"
-    },
-    "mc_airmode_threshold_help": {
-        "message": "Defines airmode THROTTLE activation threshold when mc_airmode_type THROTTLE_THRESHOLD is used"
+        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm supression. Higher values shortens the time windows and reduces supression."
     }
 }
