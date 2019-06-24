@@ -216,7 +216,7 @@ function onInvalidFirmwareVariant()
 
 function onInvalidFirmwareVersion()
 {
-    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted], [CONFIGURATOR.maxFirmwareVersionAccepted]));
+    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted, CONFIGURATOR.maxFirmwareVersionAccepted]));
     CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
     GUI.allowedTabs = ['cli'];
     onConnect();
