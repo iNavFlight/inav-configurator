@@ -3180,5 +3180,8 @@
     },
     "mc_airmode_threshold_help": {
         "message": "Defines airmode THROTTLE activation threshold when mc_airmode_type THROTTLE_THRESHOLD is used"
+    },
+    "gps_map_center": {
+        "message": "Center"
     }
 }
