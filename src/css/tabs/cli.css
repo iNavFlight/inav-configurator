@@ -50,12 +50,29 @@
     resize: none;
 }
 
+.jBox-container textarea#preview {
+    background-color: rgba(0, 0, 0, 0.75);
+    width: 100%;
+    resize: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    font-family: monospace;
+    color: white;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
 .tab-cli #content-watermark {
     z-index: 0;
 }
 
 .tab-cli .window .wrapper {
     white-space: pre-wrap;
+}
+
+.tab-cli .window .error_message {
+    color: red;
+    font-weight: bold;
 }
 
 .tab-cli .save {

@@ -4,7 +4,10 @@ TABS.cli = {
     lineDelayMs: 50,
     profileSwitchDelayMs: 100,
     outputHistory: "",
-    cliBuffer: ""
+    cliBuffer: "",
+    GUI: {
+        snippetPreviewWindow: null,
+    },
 };
 
 function removePromptHash(promptText) {
@@ -41,6 +44,74 @@ function getCliCommand(command, cliBuffer) {
     return commandWithBackSpaces(command, buffer, noOfCharsToDelete);
 }
 
+function copyToClipboard(text) {
+    function onCopySuccessful() {
+        const button = $('.tab-cli .copy');
+        const origText = button.text();
+        const origWidth = button.css("width");
+        button.text(chrome.i18n.getMessage("cliCopySuccessful"));
+        button.css({
+            width: origWidth,
+            textAlign: "center",
+        });
+        setTimeout(() => {
+            button.text(origText);
+            button.css({
+                width: "",
+                textAlign: "",
+            });
+        }, 1500);
+    }
+
+    function onCopyFailed(ex) {
+        console.warn(ex);
+    }
+
+    function nwCopy(text) {
+        try {
+            let clipboard = require('nw.gui').Clipboard.get();
+            clipboard.set(text, "text");
+            onCopySuccessful();
+        } catch (ex) {
+            onCopyFailed(ex);
+        }
+    }
+
+    function webCopy(text) {
+        navigator.clipboard.writeText(text)
+            .then(onCopySuccessful, onCopyFailed);
+    }
+
+    let copyFunc;
+    try {
+        let nwGui = require('nw.gui');
+        copyFunc = nwCopy;
+    } catch (e) {
+        copyFunc = webCopy;
+    }
+    copyFunc(text);
+}
+
+function sendLinesWithDelay(outputArray) {
+    return (delay, line, index) => {
+        return new Promise((resolve) => {
+            helper.timeout.add('CLI_send_slowly', () => {
+                var processingDelay = self.lineDelayMs;
+                if (line.toLowerCase().startsWith('profile')) {
+                    processingDelay = self.profileSwitchDelayMs;
+                }
+                const isLastCommand = outputArray.length === index + 1;
+                if (isLastCommand && self.cliBuffer) {
+                    line = getCliCommand(line, self.cliBuffer);
+                }
+                TABS.cli.sendLine(line, () => {
+                    resolve(processingDelay);
+                });
+            }, delay);
+        });
+    };
+}
+
 TABS.cli.initialize = function (callback) {
     var self = this;
 
@@ -56,13 +127,28 @@ TABS.cli.initialize = function (callback) {
     self.outputHistory = "";
     self.cliBuffer = "";
 
+    const clipboardCopySupport = (() => {
+        let nwGui = null;
+        try {
+            nwGui = require('nw.gui');
+        } catch (e) {}
+        return !(nwGui == null && !navigator.clipboard)
+        })();
+
+    function executeCommands(out_string) {
+        self.history.add(out_string.trim());
+
+        var outputArray = out_string.split("\n");
+        Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
+    }
+
     $('#content').load("./tabs/cli.html", function () {
         // translate to user-selected language
         localize();
 
         CONFIGURATOR.cliActive = true;
 
-        var textarea = $('.tab-cli textarea');
+        var textarea = $('.tab-cli textarea[name="commands"]');
 
         $('.tab-cli .save').click(function() {
             var prefix = 'cli';
@@ -111,9 +197,74 @@ TABS.cli.initialize = function (callback) {
             });
         });
 
-$('.tab-cli .clear').click(function() {
+        $('.tab-cli .clear').click(function() {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
+        });
+
+        if (clipboardCopySupport) {
+            $('.tab-cli .copy').click(function() {
+                copyToClipboard(self.outputHistory);
+            });
+        } else {
+            $('.tab-cli .copy').hide();
+        }
+
+        $('.tab-cli .load').click(function() {
+            var accepts = [
+                {
+                    description: 'Config files', extensions: ["txt", "config"],
+                },
+                {
+                    description: 'All files',
+                },
+            ];
+
+            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts}, function(entry) {
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError.message);
+                    return;
+                }
+
+                if (!entry) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                let previewArea = $("#snippetpreviewcontent textarea#preview");
+
+                function executeSnippet() {
+                    const commands = previewArea.val();
+                    executeCommands(commands);
+                    self.GUI.snippetPreviewWindow.close();
+                }
+
+                function previewCommands(result) {
+                    if (!self.GUI.snippetPreviewWindow) {
+                        self.GUI.snippetPreviewWindow = new jBox("Modal", {
+                            id: "snippetPreviewWindow",
+                            width: 'auto',
+                            height: 'auto',
+                            closeButton: 'title',
+                            animation: false,
+                            isolateScroll: false,
+                            title: chrome.i18n.getMessage("cliConfirmSnippetDialogTitle"),
+                            content: $('#snippetpreviewcontent'),
+                            onCreated: () => $("#snippetpreviewcontent a.confirm").click(() => executeSnippet()),
+                        });
+                    }
+                    previewArea.val(result);
+                    self.GUI.snippetPreviewWindow.open();
+                }
+
+                entry.file((file) => {
+                    let reader = new FileReader();
+                    reader.onload =
+                        () => previewCommands(reader.result);
+                    reader.onerror = () => console.error(reader.error);
+                    reader.readAsText(file);
+                });
+            });
         });
 
         // Tab key detection must be on keydown,
@@ -142,23 +293,7 @@ $('.tab-cli .clear').click(function() {
                 self.history.add(out_string.trim());
 
                 var outputArray = out_string.split("\n");
-                Promise.reduce(outputArray, function(delay, line, index) {
-                    return new Promise(function (resolve) {
-                        helper.timeout.add('CLI_send_slowly', function () {
-                            var processingDelay = self.lineDelayMs;
-                            if (line.toLowerCase().startsWith('profile')) {
-                                processingDelay = self.profileSwitchDelayMs;
-                            }
-                            const isLastCommand = outputArray.length === index + 1;
-                            if (isLastCommand && self.cliBuffer) {
-                                line = getCliCommand(line, self.cliBuffer);
-                            }
-                            self.sendLine(line, function () {
-                                resolve(processingDelay);
-                            });
-                        }, delay)
-                    })
-                }, 0);
+                Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
 
                 textarea.val('');
             }
@@ -224,7 +359,11 @@ function writeToOutput(text) {
 }
 
 function writeLineToOutput(text) {
-    writeToOutput(text + "<br>");
+    if (text.startsWith("### ERROR: ")) {
+        writeToOutput('<span class="error_message">' + text + '</span><br>');
+    } else {
+        writeToOutput(text + "<br>");
+    }
 }
 
 function setPrompt(text) {
