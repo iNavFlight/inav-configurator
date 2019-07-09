@@ -182,7 +182,7 @@ TABS.servos.initialize = function (callback) {
 
         let usedServoIndex = 0;
 
-        for (let servoIndex = 0; servoIndex < 16; servoIndex++) {
+        for (let servoIndex = 0; servoIndex < SERVO_RULES.getServoCount(); servoIndex++) {
             process_servos('Servo ' + servoIndex, '', servoIndex);
         }
         if (usedServoIndex == 0) {
