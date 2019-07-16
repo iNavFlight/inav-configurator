@@ -340,8 +340,14 @@ TABS.motors.initialize = function (callback) {
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
         for (let i = 0; i < SERVO_RULES.getServoCount(); i++) {
+
+            let opacity = "";
+            if (!SERVO_RULES.isServoConfigured(15 - i)) {
+                opacity = ' style="opacity: 0.2"';
+            }
+
             servos_wrapper.append('\
-                <div class="m-block servo-' + (7 - i) + '">\
+                <div class="m-block servo-' + (15 - i) + '" ' + opacity + '>\
                     <div class="meter-bar">\
                         <div class="label"></div>\
                         <div class="indicator">\
