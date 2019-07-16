@@ -120,7 +120,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 $servoMixTableBody.append('\
                     <tr>\
-                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
+                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="15" /></td>\
                     <td><select class="mix-rule-input"></select></td>\
                     <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\

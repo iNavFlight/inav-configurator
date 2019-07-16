@@ -211,7 +211,7 @@ var FC = {
         };
 
         MOTOR_DATA = new Array(8);
-        SERVO_DATA = new Array(8);
+        SERVO_DATA = new Array(16);
 
         GPS_DATA = {
             fix: 0,

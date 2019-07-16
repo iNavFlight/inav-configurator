@@ -5,7 +5,7 @@ let ServoMixerRuleCollection = function () {
 
     let self = {},
         data = [],
-        maxServoCount = 8;
+        maxServoCount = 16;
 
     self.setServoCount = function (value) {
         maxServoCount = value;
