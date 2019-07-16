@@ -70,7 +70,17 @@ let ServoMixerRuleCollection = function () {
             }
         }
         return false;
-    }
+    };
+
+    self.getNumberOfConfiguredServos = function () {
+        let count = 0;
+        for (let i = 0; i < self.getServoCount(); i ++) {
+            if (self.isServoConfigured(i)) {
+                count++;
+            }
+        }
+        return count;
+    };
 
     return self;
 };
