@@ -174,19 +174,12 @@
 }
 
 .tab-motors .motorblock {
-    margin-bottom: 0px;
     background-color: #ECECEC;
-    /*background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.15));*/
 }
 
 .tab-motors .left.motors {
     float: left;
     width: calc(50% - 50px);
-}
-
-.tab-motors .right.servos {
-    float: right;
-    width: 50%;
 }
 
 .tab-motors .title {
@@ -199,7 +192,8 @@
     padding-bottom: 2px;
     text-align: center;
     font-size: 12px;
-    font-family: 'open_sanslight', Arial;
+    font-weight: bold;
+    margin-bottom: 1em;
 }
 
 .tab-motors .titles {
@@ -215,7 +209,7 @@
 
 .tab-motors .servos .titles li {
     float: right;
-    width: calc((100% / 8) - 10px);
+    width: calc((100% / 16) - 10px);
     margin: 0 0 0 10px;
 }
 
@@ -266,7 +260,7 @@
 
 .tab-motors .servos .m-block {
     float: right;
-    width: calc((100% / 8) - 10px);
+    width: calc((100% / 16) - 10px);
     margin: 0 0 0 10px;
     border-radius: 3px;
 }
@@ -310,7 +304,7 @@
     text-align: center;
 }
 
-.tab-motors .motor_testing .notice {
+.tab-motors .motor_testing_notice {
     float: right;
     width: calc(50% - 24px);
     padding: 5px;
@@ -320,10 +314,10 @@
     font-size: 11px;
 }
 
-.tab-motors .motor_testing .notice p {
+.tab-motors .motor_testing_notice p {
     margin-bottom: 10px;
 }
 
-.tab-motors .motor_testing .notice .motorsEnableTestMode {
+.tab-motors .motor_testing_notice .motorsEnableTestMode {
     margin-left: 10px;
 }

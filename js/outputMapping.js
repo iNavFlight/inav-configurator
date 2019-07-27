@@ -16,6 +16,66 @@ let OutputMappingCollection = function () {
     const TIM_USE_LED = 24;
     const TIM_USE_BEEPER = 25;
 
+    const OUTPUT_TYPE_MOTOR = 0;
+    const OUTPUT_TYPE_SERVO = 1;
+
+    function getTimerMap(isMR, motors, servos) {
+        let timerMap = [],
+            motorsToGo = motors,
+            servosToGo = servos;
+
+        for (let i = 0; i < data.length; i++) {
+            timerMap[i] = null;
+
+            if (isMR) {
+                if (servosToGo > 0 && bit_check(data[i], TIM_USE_MC_SERVO)) {
+                    servosToGo--;
+                    timerMap[i] = OUTPUT_TYPE_SERVO;
+                } else if (motorsToGo > 0 && bit_check(data[i], TIM_USE_MC_MOTOR)) {
+                    motorsToGo--;
+                    timerMap[i] = OUTPUT_TYPE_MOTOR;
+                }
+            } else {
+                if (servosToGo > 0 && bit_check(data[i], TIM_USE_FW_SERVO)) {
+                    servosToGo--;
+                    timerMap[i] = OUTPUT_TYPE_SERVO;
+                } else if (motorsToGo > 0 && bit_check(data[i], TIM_USE_FW_MOTOR)) {
+                    motorsToGo--;
+                    timerMap[i] = OUTPUT_TYPE_MOTOR;
+                }
+            }
+
+        }
+
+        return timerMap;
+    };
+
+    self.getOutputTable = function (isMR, motors, servos) {
+        let currentMotorIndex = 1,
+            currentServoIndex = 0,
+            timerMap = getTimerMap(isMR, motors, servos),
+            outputMap = [],
+            offset = getFirstOutputOffset();
+
+        for (let i = 0; i < self.getOutputCount(); i++) {
+            
+            let assignment = timerMap[i + offset];
+
+            if (assignment === null) {
+                outputMap[i] = "-";
+            } else if (assignment == OUTPUT_TYPE_MOTOR) {
+                outputMap[i] = "Motor " + currentMotorIndex;
+                currentMotorIndex++;
+            } else if (assignment == OUTPUT_TYPE_SERVO) {
+                outputMap[i] = "Servo " + currentServoIndex;
+                currentServoIndex++;
+            }
+
+        }
+
+        return outputMap;
+    };
+
     self.flush = function () {
         data = [];
     };
@@ -76,14 +136,6 @@ let OutputMappingCollection = function () {
 
     self.getFwServoOutput = function (servoIndex) {
         return getOutput(servoIndex, TIM_USE_FW_SERVO);
-    };
-
-    self.getFwMotorOutput = function (index) {
-        return getOutput(index, TIM_USE_FW_MOTOR);
-    };
-
-    self.getMrMotorOutput = function (index) {
-        return getOutput(index, TIM_USE_MC_MOTOR);
     };
 
     self.getMrServoOutput = function (index) {

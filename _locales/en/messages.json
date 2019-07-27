@@ -102,7 +102,7 @@
         "message": "GPS"
     },
     "tabMotorTesting": {
-        "message": "Motors"
+        "message": "Outputs"
     },
     "tabLedStrip": {
         "message": "LED Strip"
@@ -1479,6 +1479,24 @@
     },
     "cliClearOutputHistoryBtn": {
         "message": "Clear output history"
+    },
+    "cliCopyToClipboardBtn": {
+        "message": "Copy to clipboard"
+    },
+    "cliCopySuccessful": {
+        "message": "Copied!"
+    },
+    "cliLoadFromFileBtn": {
+        "message": "Load from file"
+    },
+    "cliConfirmSnippetDialogTitle": {
+        "message": "Review loaded commands"
+    },
+    "cliConfirmSnippetNote": {
+        "message": "<strong>Note</strong>: You can review and edit commands before execution."
+    },
+    "cliConfirmSnippetBtn": {
+        "message": "Execute"
     },
 
     "loggingNote": {
@@ -3180,5 +3198,8 @@
     },
     "mc_airmode_threshold_help": {
         "message": "Defines airmode THROTTLE activation threshold when mc_airmode_type THROTTLE_THRESHOLD is used"
+    },
+    "gps_map_center": {
+        "message": "Center"
     }
 }

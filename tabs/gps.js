@@ -27,7 +27,7 @@ TABS.gps.initialize = function (callback) {
             center: ol.proj.fromLonLat([0, 0]),
             zoom: 15
         });
-        
+
         let mapLayer;
 
         if (globalSettings.mapProviderType == 'bing') {
@@ -40,10 +40,17 @@ TABS.gps.initialize = function (callback) {
         	mapLayer = new ol.source.TileWMS({
         		url: globalSettings.proxyURL,
                 params: {'LAYERS':globalSettings.proxyLayer}
-             })               
+             })
         } else {
             mapLayer = new ol.source.OSM();
         }
+
+        $("#center_button").click(function(){
+          let lat = GPS_DATA.lat / 10000000;
+          let lon = GPS_DATA.lon / 10000000;
+          let center = ol.proj.fromLonLat([lon, lat]);
+          mapView.setCenter(center);
+        });
 
         mapHandler = new ol.Map({
             target: document.getElementById('gps-map'),
@@ -82,7 +89,7 @@ TABS.gps.initialize = function (callback) {
             } else if (GPS_DATA.fix >= 1) {
                 gpsFixType = chrome.i18n.getMessage('gpsFix2D');
             }
-            
+
             $('.GPS_info td.fix').html(gpsFixType);
             $('.GPS_info td.alt').text(GPS_DATA.alt + ' m');
             $('.GPS_info td.lat').text(lat.toFixed(4) + ' deg');
@@ -107,6 +114,8 @@ TABS.gps.initialize = function (callback) {
             //Update map
             if (GPS_DATA.fix >= 2) {
 
+                let center = ol.proj.fromLonLat([lon, lat]);
+
                 if (!cursorInitialized) {
                     cursorInitialized = true;
 
@@ -118,29 +127,30 @@ TABS.gps.initialize = function (callback) {
                             src: '../images/icons/cf_icon_position.png'
                         }))
                     });
-            
+
                     let currentPositionLayer;
                     iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([0, 0]));
                     iconFeature = new ol.Feature({
                         geometry: iconGeometry
                     });
-            
+
                     iconFeature.setStyle(iconStyle);
-            
+
                     let vectorSource = new ol.source.Vector({
                         features: [iconFeature]
                     });
                     currentPositionLayer = new ol.layer.Vector({
                         source: vectorSource
                     });
-            
+
                     mapHandler.addLayer(currentPositionLayer);
+                    
+                    mapView.setCenter(center);
+                    mapView.setZoom(14);
                 }
 
-                let center = ol.proj.fromLonLat([lon, lat]);
-                mapView.setCenter(center);
-                mapView.setZoom(14);
                 iconGeometry.setCoordinates(center);
+
             }
         }
 

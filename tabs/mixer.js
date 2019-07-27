@@ -75,36 +75,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function renderOutputMapping() {
-        let motorRules = MOTOR_RULES.get(),
-            servoRules = SERVO_RULES.get(),
-            output;
+        let outputMap = OUTPUT_MAPPING.getOutputTable(
+            MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
+            MOTOR_RULES.getNumberOfConfiguredMotors(),
+            SERVO_RULES.getNumberOfConfiguredServos()
+        );
 
-        for (var index = 0; index < motorRules.length; index++) {
-            if (motorRules[index].isUsed()) {
-                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                    output = OUTPUT_MAPPING.getMrMotorOutput(index);
-                } else {
-                    output = OUTPUT_MAPPING.getFwMotorOutput(index);
-                }
-                if (output !== null) {
-                    $('#function-' + output).html("Motor " + (index + 1));
-                }
-            }
-        }
-
-        let usedServoIndex = 0;
-        for (let i = 0; i < MIXER_CONFIG.numberOfServos; i++) {
-            if (SERVO_RULES.isServoConfigured(i)) {
-                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                    output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
-                } else {
-                    output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
-                }
-                if (output !== null) {
-                    $('#function-' + output).html("Servo " + i);
-                }
-                usedServoIndex++;
-            }
+        for (let i = 1; i <= OUTPUT_MAPPING.getOutputCount(); i++) {
+            $('#function-' + i).html(outputMap[i - 1]);
         }
     }
 
@@ -120,7 +98,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 $servoMixTableBody.append('\
                     <tr>\
-                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="7" /></td>\
+                    <td><input type="number" class="mix-rule-servo" step="1" min="0" max="15" /></td>\
                     <td><select class="mix-rule-input"></select></td>\
                     <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\

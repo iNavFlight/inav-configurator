@@ -211,7 +211,7 @@ var FC = {
         };
 
         MOTOR_DATA = new Array(8);
-        SERVO_DATA = new Array(8);
+        SERVO_DATA = new Array(16);
 
         GPS_DATA = {
             fix: 0,
@@ -1249,10 +1249,27 @@ var FC = {
                     13: "Vertical speed [cm/s]",
                     14: "Throttle position [%]",
                     15: "Roll [deg]",
-                    16: "Pitch [deg]" 
+                    16: "Pitch [deg]",
+                    17: "Flight mode"
                 }
             },
             3: {
+                name: "Flight Mode",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "Failsafe",
+                    1: "Manual",
+                    2: "RTH",
+                    3: "Position Hold",
+                    4: "Cruise",
+                    5: "Altitude Hold",
+                    6: "Angle",
+                    7: "Horizon",
+                    8: "Air"
+                }
+            },
+            4: {
                 name: "Logic Condition",
                 type: "range",
                 range: [0, 15],
