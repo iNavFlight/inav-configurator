@@ -3207,5 +3207,8 @@
     },
     "antigravityAccelerator": {
         "message": "Antigravity Accelerator"
+    },
+    "antigravityCutoff": {
+        "message": "Antigravity Cutoff Frequency"
     }
 }
