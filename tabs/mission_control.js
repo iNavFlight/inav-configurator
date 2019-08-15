@@ -21,9 +21,9 @@ TABS.mission_control.isYmapLoad = false;
 TABS.mission_control.initialize = function (callback) {
   
     let cursorInitialized = false;
-    let iconStyle;
-    let iconGeometry;
-    let iconFeature;
+    let curPosStyle;
+    let curPosGeo;
+    let rthGeo;
     let breadCrumbLS;
     let breadCrumbFeature;
     let breadCrumbStyle;
@@ -33,6 +33,7 @@ TABS.mission_control.initialize = function (callback) {
     let textFeature;
     var textGeom;
     let isOffline = false;
+    let rthUpdateInterval = 0;
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -114,7 +115,10 @@ TABS.mission_control.initialize = function (callback) {
               if (!cursorInitialized) {
                   cursorInitialized = true;
       
-                  iconStyle = new ol.style.Style({
+                  
+                  /////////////////////////////////////
+                  //create layer for current position
+                  curPosStyle = new ol.style.Style({
                       image: new ol.style.Icon(({
                           anchor: [0.5, 0.5],
                           opacity: 1,
@@ -123,24 +127,46 @@ TABS.mission_control.initialize = function (callback) {
                       }))
                   });
                   
-                  
-          
-                  /////////////////////////////////////
-                  //create layer for current position
                   let currentPositionLayer;
-                  iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
+                  curPosGeo = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
         
-                  iconFeature = new ol.Feature({
-                      geometry: iconGeometry
+                  let curPosFeature = new ol.Feature({
+                      geometry: curPosGeo
                   });
           
-                  iconFeature.setStyle(iconStyle);
+                  curPosFeature.setStyle(curPosStyle);
           
                   let vectorSource = new ol.source.Vector({
-                      features: [iconFeature]
+                      features: [curPosFeature]
                   });
                   currentPositionLayer = new ol.layer.Vector({
                       source: vectorSource
+                  });
+                  
+                  ///////////////////////////
+                  //create layer for RTH Marker
+                  let rthStyle = new ol.style.Style({
+                      image: new ol.style.Icon(({
+                          anchor: [0.5, 1.0],
+                          opacity: 1,
+                          scale: 0.5,
+                          src: '../images/icons/cf_icon_RTH.png'
+                      }))
+                  });
+                  
+                  rthGeo = new ol.geom.Point(ol.proj.fromLonLat([90, 0]));
+        
+                  let rthFeature = new ol.Feature({
+                      geometry: rthGeo
+                  });
+          
+                  rthFeature.setStyle(rthStyle);
+          
+                  let rthVector = new ol.source.Vector({
+                      features: [rthFeature]
+                  });
+                  let rthLayer = new ol.layer.Vector({
+                      source: rthVector
                   });
           
                   
@@ -170,9 +196,8 @@ TABS.mission_control.initialize = function (callback) {
                   });
                   
                   
-                  
                   /////////////////////////////
-                  //create layer for headig, alt, groundspeed
+                  //create layer for heading, alt, groundspeed
                   textGeom = new ol.geom.Point([0,0]);
                   
                   textStyle = new ol.style.Style({
@@ -205,7 +230,7 @@ TABS.mission_control.initialize = function (callback) {
                     source: textSource
                   });
                   
-                  
+                  map.addLayer(rthLayer);
                   map.addLayer(breadCrumbVector);
                   map.addLayer(currentPositionLayer);
                   map.addControl(textVector);
@@ -213,17 +238,18 @@ TABS.mission_control.initialize = function (callback) {
               }
       
               let gpsPos = ol.proj.fromLonLat([lon, lat]);
-              iconGeometry.setCoordinates(gpsPos);
+              curPosGeo.setCoordinates(gpsPos);
+              
               breadCrumbLS.appendCoordinate(gpsPos);
+
               var coords = breadCrumbLS.getCoordinates();
               if(coords.length > 100)
               {
                 coords.shift();
                 breadCrumbLS.setCoordinates(coords);
-                
               }
-              //iconStyle.getImage().setRotation((GPS_DATA.ground_course/360.0) * 6.28318);
-              iconStyle.getImage().setRotation((SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
+            
+              curPosStyle.getImage().setRotation((SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
               
               //update data text
               textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
@@ -233,16 +259,25 @@ TABS.mission_control.initialize = function (callback) {
                               '\nAlt: ' + SENSOR_DATA.altitude +
                               'm\nSpeed: ' + GPS_DATA.speed + 'cm/s\n' +
                               'Dist: ' + GPS_DATA.distanceToHome + 'm');
-              //tmpText.setText('H: YYY\nAlt: XXXm\nSpeed: XXXcm/s');
-              textStyle.getText(tmpText);
               
               
+              //update RTH every 5th GPS update since it really shouldn't change
+              if(rthUpdateInterval >= 5)
+              {
+                MISSION_PLANER.bufferPoint.number = -1; //needed to get point 0 which id RTH
+                MSP.send_message(MSPCodes.MSP_WP, mspHelper.crunch(MSPCodes.MSP_WP), false, function rth_update() {
+                    var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+                    rthGeo.setCoordinates(coord);
+                  });
+                rthUpdateInterval = 0;
+              }
+              rthUpdateInterval++;
           }
         }
         
                /*
          * enable data pulling if not offline
-         * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
+         * Refreshing data at 5Hz...  Could slow this down if we have performance issues
          */
         if(!isOffline)
         {
@@ -381,7 +416,6 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         iconFeature.setStyle(getPointIcon());
-        //iconFeature.setGeometryName('Waypoint');
 
         var vectorSource = new ol.source.Vector({
             features: [iconFeature]
