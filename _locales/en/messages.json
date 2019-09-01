@@ -3201,5 +3201,14 @@
     },
     "gps_map_center": {
         "message": "Center"
+    },
+    "antigravityGain": {
+        "message": "Antigravity Gain"
+    },
+    "antigravityAccelerator": {
+        "message": "Antigravity Accelerator"
+    },
+    "antigravityCutoff": {
+        "message": "Antigravity Cutoff Frequency"
     }
 }
