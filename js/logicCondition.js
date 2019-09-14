@@ -191,6 +191,22 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         }
     }
 
+    self.update = function (index, value, $container) {
+        if (typeof $row === 'undefined') {
+            return;
+        }
+        
+        let $marker = $row.find('.logic_cell__active_marker');
+
+        if (!!value) {
+            $marker.addClass("logic_cell__active_marker--active");
+            $marker.removeClass("logic_cell__active_marker--inactive");
+        } else {
+            $marker.removeClass("logic_cell__active_marker--active");
+            $marker.addClass("logic_cell__active_marker--inactive");
+        }
+    }
+
     self.render = function (index, $container) {
 
         $container.find('tbody').append('<tr>\
@@ -199,7 +215,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
                 <td class="logic_cell__operation"></td>\
                 <td class="logic_cell__operandA"></td>\
                 <td class="logic_cell__operandB"></td>\
-                <td class="logic_cell__flags"></td>\
+                <td class="logic_cell__flags"><div class="logic_cell__active_marker"></div></td>\
             </tr>\
         ');
 

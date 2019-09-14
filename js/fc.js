@@ -176,6 +176,7 @@ var FC = {
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
         LOGIC_CONDITIONS = new LogicConditionsCollection();
+        LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,

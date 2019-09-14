@@ -564,6 +564,16 @@ var mspHelper = (function (gui) {
                 }
                 break;
 
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
+                if (data.byteLength % 4 === 0) {
+                    let index = 0;
+                    for (i = 0; i < data.byteLength; i += 4) {
+                        LOGIC_CONDITIONS_STATUS.set(index, data.getInt32(i, true));
+                        index++;
+                    }
+                }
+                break;
+
             case MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS:
                 console.log("Logic conditions saved");
                 break;
@@ -3331,6 +3341,22 @@ var mspHelper = (function (gui) {
                 }
             });
         } else if (callback) {
+            callback();
+        }
+    };
+
+    self.loadBrakingConfig = function(callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
+        } else {
+            callback();
+        }
+    }
+
+    self.loadSensorStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS, false, false, callback);
+        } else {
             callback();
         }
     };

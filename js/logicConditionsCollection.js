@@ -73,5 +73,15 @@ let LogicConditionsCollection = function () {
 
     };
 
+    self.update = function(statuses) {
+        let $table = $container.find(".logic__table")
+
+        for (let k in self.get()) {
+            if (self.get().hasOwnProperty(k)) {
+                self.get()[k].update(k, statuses.get(k), $table);
+            }
+        }
+    }
+
     return self;
 };
