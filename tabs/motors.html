@@ -1,98 +1,53 @@
-<div class="tab-motors">
+<div class="tab-motors toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" i18n="tabMotorTesting">Motors</div>
-        <div class="cf_doc_version_bt">
-            <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
-        </div>
-        <div class="gui_box grey" style="margin-bottom: 15px;">
-            <div class="wrapper modelAndAccel">
-                <div class="mixerPreview">
-                    <img src="./resources/motor_order/custom.svg" />
-                </div>
-                <svg id="accel">
-               <g class="grid x" transform="translate(40, 120)"></g>
-               <g class="grid y" transform="translate(40, 10)"></g>
-               <g class="data" transform="translate(41, 10)"></g>
-               <g class="axis x" transform="translate(40, 120)"></g>
-               <g class="axis y" transform="translate(40, 10)"></g>
-            </svg>
-                <div class="plot_control">
-                    <div class="title">
-                        Accelerometer - <a class="reset_accel_max" href="#" title="Reset overtime maximum">[Reset]</a>
-                    </div>
-                    <dl>
-                        <dt i18n="sensorsRefresh"></dt>
-                        <dd class="rate">
-                            <select name="accel_refresh_rate">
-                                <option value="10">10 ms</option>
-                                <option value="20" selected="selected">20 ms</option>
-                                <option value="30">30 ms</option>
-                                <option value="40">40 ms</option>
-                                <option value="50">50 ms</option>
-                                <option value="100">100 ms</option>
-                                <option value="250">250 ms</option>
-                                <option value="500">500 ms</option>
-                                <option value="1000">1000 ms</option>
-                            </select>
-                        </dd>
-                        <dt i18n="sensorsScale"></dt>
-                        <dd class="scale">
-                            <select name="accel_scale">
-                                <option value="0.05">0.05</option>
-                                <option value="0.1">0.1</option>
-                                <option value="0.2">0.2</option>
-                                <option value="0.3">0.3</option>
-                                <option value="0.4">0.4</option>
-                                <option value="0.5">0.5</option>
-                                <option value="1">1</option>
-                                <option value="2" selected="selected">2</option>
-                            </select>
-                        </dd>
-                        <dt>X:</dt>
-                        <dd class="x">0</dd>
-                        <dt>Y:</dt>
-                        <dd class="y">0</dd>
-                        <dt>Z:</dt>
-                        <dd class="z">0</dd>
-                        <dt>RMS:</dt>
-                        <dd class="rms">0</dd>
-                    </dl>
-                </div>
+        <div class="gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="motors"></div>
             </div>
-        </div>
-        <div class="gui_box motorblock">
             <div class="spacer">
-                <div class="title2">Motors</div>
                 <div class="left motors">
-                
                     <ul class="titles motor-titles">
                     </ul>
                     <div class="bar-wrapper"></div>
+                    <div class="clear-both"></div>
+                    <div class="motor_testing">
+                    <div class="sliders motor-sliders"></div>
+                    <div class="values">
+                        <ul class="motor-values"></ul>
+                    </div>
+                    </div>
                 </div>
-                <div class="motor_testing_notice">
-                    <p i18n="motorsNotice"></p>
-                    <label><input id="motorsEnableTestMode" type="checkbox" class="togglesmall"/><span
-                        class="motorsEnableTestMode" i18n="motorsEnableControl"></span></label>
-                </div>
-                <div class="clear-both"></div>
-                <div class="motor_testing">
-                    <div class="left">
-                        <div class="sliders motor-sliders">
-                            
-                        </div>
-                        <div class="values">
-                            <ul class="motor-values">
-                                
-                            </ul>
+                <div class="motors right">
+                    <div class="half">
+                        <div class="mixerPreview">
+                            <img src="./resources/motor_order/custom.svg" />
                         </div>
                     </div>
-                    <div class="cler-both"></div>
+                    <div class="half">
+                        <table class="cf-table">
+                            <tr>
+                                <th>Acc. noise RMS</th>
+                                <td class="acc-rms"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="clear-both"></div>
+                    <div class="motor_testing_notice">
+                        <p i18n="motorsNotice"></p>
+                        <label><input id="motorsEnableTestMode" type="checkbox" class="togglesmall"/><span
+                            class="motorsEnableTestMode" i18n="motorsEnableControl"></span></label>
+                    </div>
                 </div>
+                <div class="clear-both"></div>
+                
             </div>
         </div>
-        <div class="gui_box motorblock">
+        <div class="gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="servos"></div>
+            </div>
             <div class="spacer" style="padding-left: 0">
-                <div class="title2">Servos</div>
                 <div class="servos">
                     <ul class="titles">
                         <li title="Servo - 8">15</li>
@@ -115,6 +70,29 @@
                     <div class="bar-wrapper"></div>
                 </div>
             </div>
+            <div class="tab-servos" id="servo-config-table-container">
+                <table id="servo-config-table" class="fields">
+                    <tr class="main">
+                        <th width="110px" data-i18n="servosName"></th>
+                        <th data-i18n="servosMid"></th>
+                        <th data-i18n="servosMin"></th>
+                        <th data-i18n="servosMax"></th>
+                        <th data-i18n="servosRate"></th>
+                        <th data-i18n="servosReverse"></th>
+                        <th data-i18n="servoOutput"></th>
+                    </tr>
+                </table>
+                <div class="live">
+                    <input type="checkbox" class="togglemedium" /> <span data-i18n="servosLiveMode"></span>
+                </div>
+            </div>
+            
         </div>
+        
     </div>
+    <div class="content_toolbar">
+            <div class="btn save_btn">
+                <a class="update" href="#" data-i18n="servosButtonSave"></a>
+            </div>
+        </div>
 </div>

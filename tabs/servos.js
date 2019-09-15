@@ -44,43 +44,14 @@ TABS.servos.initialize = function (callback) {
             $tabServos = $(".tab-servos"),
             $servoEmptyTableInfo = $('#servoEmptyTableInfo'),
             $servoConfigTableContainer = $('#servo-config-table-container'),
-            $servoConfigTable = $('#servo-config-table'),
-            $servoMixTable = $('#servo-mix-table'),
-            $servoMixTableBody = $servoMixTable.find('tbody');
+            $servoConfigTable = $('#servo-config-table');
 
         if (SERVO_CONFIG.length == 0) {
             $tabServos.addClass("is-hidden");
             return;
         }
 
-        let servoCheckbox = '',
-            servoHeader = '';
-
-        if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
-
-            $servoEmptyTableInfo.hide();
-
-            for (i = 0; i < RC.active_channels - 4; i++) {
-                servoHeader = servoHeader + '<th class="short">CH' + (i + 5) + '</th>';
-            }
-            servoHeader = servoHeader + '<th data-i18n="servosRate"></th><th data-i18n="servosReverse"></th>';
-
-            for (i = 0; i < RC.active_channels; i++) {
-                servoCheckbox = servoCheckbox + '<td class="channel"><input type="checkbox"/></td>';
-            }
-
-            $servoConfigTable.find('tr.main').append(servoHeader);
-        } else {
-            $servoConfigTable.find('tr.main').html('\
-                <th width="110px" data-i18n="servosName"></th>\
-                    <th data-i18n="servosMid"></th>\
-                    <th data-i18n="servosMin"></th>\
-                    <th data-i18n="servosMax"></th>\
-                    <th data-i18n="servosRate"></th>\
-                    <th data-i18n="servosReverse"></th>\
-                    <th data-i18n="servoOutput"></th>\
-                ');
-        }
+        let servoCheckbox = '';
 
         function process_servos(name, alternate, obj) {
 
@@ -115,39 +86,30 @@ TABS.servos.initialize = function (callback) {
 
             $currentRow.data('info', { 'obj': obj });
 
-            if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
-                // only one checkbox for indicating a channel to forward can be selected at a time, perhaps a radio group would be best here.
-                $currentRow.find('td.channel input').click(function () {
-                    if ($(this).is(':checked')) {
-                        $(this).parent().parent().find('.channel input').not($(this)).prop('checked', false);
-                    }
-                });
+
+            $currentRow.append('<td class="text-center output"></td>');
+
+            let output,
+                outputString;
+
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
             } else {
+                output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+            }
 
-                $currentRow.append('<td class="text-center output"></td>');
+            if (output === null) {
+                outputString = "-";
+            } else {
+                outputString = "S" + output;
+            }
 
-                let output,
-                    outputString;
-
-                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                    output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
-                } else {
-                    output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
-                }
-
-                if (output === null) {
-                    outputString = "-";
-                } else {
-                    outputString = "S" + output;
-                }
-
-                $currentRow.find('.output').html(outputString);
-                //For 2.0 and above hide a row when servo is not configured
-                if (!SERVO_RULES.isServoConfigured(obj)) {
-                    $currentRow.hide();
-                } else {
-                    usedServoIndex++;
-                }
+            $currentRow.find('.output').html(outputString);
+            //For 2.0 and above hide a row when servo is not configured
+            if (!SERVO_RULES.isServoConfigured(obj)) {
+                $currentRow.hide();
+            } else {
+                usedServoIndex++;
             }
         }
 

@@ -1432,7 +1432,12 @@
     "gpsSignalStr": {
         "message": "Signal Strength"
     },
-
+    "motors": {
+        "message": "Motors"
+    },
+    "servos": {
+        "message": "Servos"
+    },
     "motorsMaster": {
         "message": "Master"
     },
