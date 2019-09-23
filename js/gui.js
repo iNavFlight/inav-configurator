@@ -33,7 +33,6 @@ var GUI_control = function () {
         'ports',
         'receiver',
         'sensors',
-        'servos',
         'calibration',
         'setup',
         'osd',
