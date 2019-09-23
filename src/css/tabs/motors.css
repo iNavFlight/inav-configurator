@@ -14,10 +14,6 @@
     width: calc(100% - 292px);
 }
 
-.tab-motors .mixerPreview {
-    float: left;
-}
-
 .tab-motors .mixerPreview img {
     width: 120px;
     height: 120px;
@@ -173,12 +169,13 @@
     stroke: #CB4B4B;
 }
 
-.tab-motors .motorblock {
-    background-color: #ECECEC;
-}
-
 .tab-motors .left.motors {
     float: left;
+    width: calc(50% - 50px);
+}
+
+.tab-motors .right.motors {
+    float: right;
     width: calc(50% - 50px);
 }
 
@@ -186,14 +183,6 @@
     padding-bottom: 2px;
     text-align: center;
     font-weight: bold;
-}
-
-.tab-motors .title2 {
-    padding-bottom: 2px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 1em;
 }
 
 .tab-motors .titles {
@@ -305,8 +294,6 @@
 }
 
 .tab-motors .motor_testing_notice {
-    float: right;
-    width: calc(50% - 24px);
     padding: 5px;
     border: 2px solid #ccc;
     border-radius: 3px;
@@ -321,3 +308,151 @@
 .tab-motors .motor_testing_notice .motorsEnableTestMode {
     margin-left: 10px;
 }
+
+.tab-motors .tab-servos {
+    margin: 1em;
+}
+
+.tab-motors .output-stats-table {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 1.5em;
+    width: 100%;
+}
+
+.tab-motors .output-stats-table th {
+    text-align: left;
+}
+
+.tab-motors .output-stats-table td {
+    text-align: left;
+}
+
+.tab-servos .title {
+    margin-top: 0;
+    line-height: 30px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #e4e4e4;
+    border-bottom: 0;
+    background-color: #DADADA;
+    color: #797979;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.tab-servos table {
+    margin-bottom: 10px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tab-servos table, .tab-servos table th, .tab-servos table td {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+}
+
+.tab-servos input[type="number"]::-webkit-inner-spin-button {
+    border: 0;
+}
+
+.tab-servos .directions .direction select {
+    height: 19px;
+    line-height: 19px;
+}
+
+.tab-servos table th {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    border: 1px solid #e4e4e4;
+}
+
+.tab-servos table td {
+    border-bottom: 1px solid #e4e4e4;
+    padding: 6px 5px 7px 5px;
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+}
+
+.tab-servos table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tab-servos table .main {
+    font-weight: bold;
+    text-align: center;
+    background-color: #ececec;
+}
+
+.tab-servos table .channel {
+    width: 22px;
+    text-align: center;
+}
+
+.tab-servos table input {
+    border: 1px solid silver;
+    border-radius: 3px;
+}
+
+.tab-servos table select {
+    border: 1px solid silver;
+}
+
+.tab-servos table .channel input {
+    vertical-align: middle;
+}
+
+.tab-servos table input[type="number"] {
+    display: block;
+    width: 100%;
+    height: 20px;
+    line-height: 20px;
+    text-align: right;
+}
+
+.tab-servos .direction .name {
+    float: left;
+    display: block;
+    width: 60px;
+}
+
+.tab-servos .direction .alternate {
+    float: left;
+    display: block;
+    width: 60px;
+}
+
+.tab-servos .direction .first {
+    float: left;
+    margin: 2px 10px 0 20px;
+}
+
+.tab-servos .direction .second {
+    float: left;
+    margin: 2px 10px 0 0;
+}
+
+.tab-servos .direction .rate {
+    width: 110px;
+    height: 20px;
+    text-align: center;
+}
+
+.tab-servos .buttons {
+    width: calc(100% - 20px);
+    position: absolute;
+    bottom: 10px;
+}
+
+.tab-servos .live span {
+    margin-right: 10px;
+}
+
+.tab-servos .wide {
+    width: 120px;
+} 
+
+.tab-servos .short {
+    width: 32px;
+} 

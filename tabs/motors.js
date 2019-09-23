@@ -1,3 +1,4 @@
+/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,_3D,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.motors = {
@@ -28,7 +29,11 @@ TABS.motors.initialize = function (callback) {
         mspHelper.loadMotors,
         mspHelper.loadMotorMixRules,
         mspHelper.loadServoMixRules,
-        mspHelper.loadMixerConfig
+        mspHelper.loadMixerConfig,
+        mspHelper.loadServoMixRules,
+        mspHelper.loadServoConfiguration,
+        mspHelper.loadOutputMapping,
+        mspHelper.loadRcData,
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -37,7 +42,7 @@ TABS.motors.initialize = function (callback) {
     var saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
-        mspHelper.sendMotorMixer,
+        mspHelper.sendServoConfigurations,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
@@ -46,8 +51,14 @@ TABS.motors.initialize = function (callback) {
     });
 
     function load_html() {
-        $('#content').load("./tabs/motors.html", process_html);
+        $('#content').load("./tabs/motors.html", onLoad);
     }
+
+    function onLoad() {
+        process_motors();
+        process_servos();
+        finalize();
+    } 
 
     function update_arm_status() {
         self.armed = FC.isModeEnabled('ARM');
@@ -80,95 +91,12 @@ TABS.motors.initialize = function (callback) {
                 data[i].max = dataPoint;
             }
         }
-        while (data[0].length > 300) {
+        while (data[0].length > 40) {
             for (i = 0; i < data.length; i++) {
                 data[i].shift();
             }
         }
         return sampleNumber + 1;
-    }
-
-    var margin = {top: 20, right: 30, bottom: 10, left: 20};
-    function updateGraphHelperSize(helpers) {
-        helpers.width = helpers.targetElement.width() - margin.left - margin.right;
-        helpers.height = helpers.targetElement.height() - margin.top - margin.bottom;
-
-        helpers.widthScale.range([0, helpers.width]);
-        helpers.heightScale.range([helpers.height, 0]);
-
-        helpers.xGrid.tickSize(-helpers.height, 0, 0);
-        helpers.yGrid.tickSize(-helpers.width, 0, 0);
-    }
-
-    function initGraphHelpers(selector, sampleNumber, heightDomain) {
-        var helpers = {selector: selector, targetElement: $(selector), dynamicHeightDomain: !heightDomain};
-
-        helpers.widthScale = d3.scale.linear()
-            .clamp(true)
-            .domain([(sampleNumber - 299), sampleNumber]);
-
-        helpers.heightScale = d3.scale.linear()
-            .clamp(true)
-            .domain(heightDomain || [1, -1]);
-
-        helpers.xGrid = d3.svg.axis();
-        helpers.yGrid = d3.svg.axis();
-
-        updateGraphHelperSize(helpers);
-
-        helpers.xGrid
-            .scale(helpers.widthScale)
-            .orient("bottom")
-            .ticks(5)
-            .tickFormat("");
-
-        helpers.yGrid
-            .scale(helpers.heightScale)
-            .orient("left")
-            .ticks(5)
-            .tickFormat("");
-
-        helpers.xAxis = d3.svg.axis()
-            .scale(helpers.widthScale)
-            .ticks(5)
-            .orient("bottom")
-            .tickFormat(function (d) {return d;});
-
-        helpers.yAxis = d3.svg.axis()
-            .scale(helpers.heightScale)
-            .ticks(5)
-            .orient("left")
-            .tickFormat(function (d) {return d;});
-
-        helpers.line = d3.svg.line()
-            .x(function (d) { return helpers.widthScale(d[0]); })
-            .y(function (d) { return helpers.heightScale(d[1]); });
-
-        return helpers;
-    }
-
-    function drawGraph(graphHelpers, data, sampleNumber) {
-        var svg = d3.select(graphHelpers.selector);
-
-        if (graphHelpers.dynamicHeightDomain) {
-            var limits = [];
-            $.each(data, function (idx, datum) {
-                limits.push(datum.min);
-                limits.push(datum.max);
-            });
-            graphHelpers.heightScale.domain(d3.extent(limits));
-        }
-        graphHelpers.widthScale.domain([(sampleNumber - 299), sampleNumber]);
-
-        svg.select(".x.grid").call(graphHelpers.xGrid);
-        svg.select(".y.grid").call(graphHelpers.yGrid);
-        svg.select(".x.axis").call(graphHelpers.xAxis);
-        svg.select(".y.axis").call(graphHelpers.yAxis);
-
-        var group = svg.select("g.data");
-        var lines = group.selectAll("path").data(data, function (d, i) {return i;});
-        lines.enter().append("path").attr("class", "line");
-        lines.attr('d', graphHelpers.line);
     }
 
     function update_model(val) {
@@ -178,7 +106,134 @@ TABS.motors.initialize = function (callback) {
             + helper.mixer.getById(val).image + '.svg');
     }
 
-    function process_html() {
+    function process_servos() {
+
+        let $tabServos = $(".tab-servos"),
+            $servoEmptyTableInfo = $('#servoEmptyTableInfo'),
+            $servoConfigTableContainer = $('#servo-config-table-container'),
+            $servoConfigTable = $('#servo-config-table');
+
+        if (SERVO_CONFIG.length == 0) {
+            $tabServos.addClass("is-hidden");
+            return;
+        }
+
+        function renderServos(name, alternate, obj) {
+
+            $servoConfigTable.append('\
+                <tr> \
+                    <td class="text-center">' + name + '</td>\
+                    <td class="middle"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].middle + '" /></td>\
+                    <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min + '" /></td>\
+                    <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max + '" /></td>\
+                    <td class="text-center rate">\
+                    <td class="text-center reverse">\
+                    </td>\
+                </tr> \
+            ');
+
+            let $currentRow = $servoConfigTable.find('tr:last');
+
+            //This routine is pre 2.0 only
+            if (SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
+                $currentRow.find('td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
+            }
+
+            // adding select box and generating options
+            $currentRow.find('td.rate').append(
+                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(SERVO_CONFIG[obj].rate) + '" />'
+            );
+
+            $currentRow.find('td.reverse').append(
+                '<input type="checkbox" class="reverse-input togglemedium" ' + (SERVO_CONFIG[obj].rate < 0 ? ' checked ' :  '') + '/>'
+            );
+
+            $currentRow.data('info', { 'obj': obj });
+
+            $currentRow.append('<td class="text-center output"></td>');
+
+            let output,
+                outputString;
+
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+            } else {
+                output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+            }
+
+            if (output === null) {
+                outputString = "-";
+            } else {
+                outputString = "S" + output;
+            }
+
+            $currentRow.find('.output').html(outputString);
+            //For 2.0 and above hide a row when servo is not configured
+            if (!SERVO_RULES.isServoConfigured(obj)) {
+                $currentRow.hide();
+            } else {
+                usedServoIndex++;
+            }
+        }
+
+        function servos_update() {
+            $servoConfigTable.find('tr:not(".main")').each(function () {
+                var info = $(this).data('info');
+
+                var selection = $('.channel input', this);
+                var channelIndex = parseInt(selection.index(selection.filter(':checked')));
+                if (channelIndex == -1) {
+                    channelIndex = undefined;
+                }
+
+                SERVO_CONFIG[info.obj].indexOfChannelToForward = channelIndex;
+
+                SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
+                SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
+                SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
+                var rate = parseInt($('.rate-input', this).val());
+                if ($('.reverse-input', this).is(':checked')) {
+                    rate = -rate;
+                }
+                SERVO_CONFIG[info.obj].rate = rate;
+            });
+
+            //Save configuration to FC
+            saveChainer.execute();
+        }
+
+        // drop previous table
+        $servoConfigTable.find('tr:not(:first)').remove();
+
+        let usedServoIndex = 0;
+
+        for (let servoIndex = 0; servoIndex < SERVO_RULES.getServoCount(); servoIndex++) {
+            renderServos('Servo ' + servoIndex, '', servoIndex);
+        }
+        if (usedServoIndex == 0) {
+            // No servos configured
+            $servoEmptyTableInfo.show();
+            $servoConfigTableContainer.hide();
+        } else {
+            $servoEmptyTableInfo.hide();
+            $servoConfigTableContainer.show();
+        }
+
+        // UI hooks for dynamically generated elements
+        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').change(function () {
+            if ($('div.live input').is(':checked')) {
+                // apply small delay as there seems to be some funky update business going wrong
+                helper.timeout.add('servos_update', servos_update, 10);
+            }
+        });
+
+        $('a.update').click(function () {
+            servos_update();
+        });
+
+    }
+
+    function process_motors() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
         self.feature3DEnabled = bit_check(BF_CONFIG.features, 12);
@@ -202,114 +257,69 @@ TABS.motors.initialize = function (callback) {
         // Setup variables
         var samples_accel_i = 0,
             accel_data = initDataArray(3),
-            accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-2, 2]),
             accel_max_read = [0, 0, 0],
             accel_offset = [0, 0, 0],
             accel_offset_established = false;
 
-        var raw_data_text_ements = {
-            x: [],
-            y: [],
-            z: [],
-            rms: []
-        };
+        let $rmsHelper = $(".acc-rms"),
+            $currentHelper = $(".current-current"),
+            $voltageHelper = $(".current-voltage");
 
-        $('.plot_control .x, .plot_control .y, .plot_control .z, .plot_control .rms').each(function () {
-            var el = $(this);
-            if (el.hasClass('x')) {
-                raw_data_text_ements.x.push(el);
-            } else if (el.hasClass('y')) {
-                raw_data_text_ements.y.push(el);
-            } else if (el.hasClass('z')) {
-                raw_data_text_ements.z.push(el);
-            } else if (el.hasClass('rms')) {
-                raw_data_text_ements.rms.push(el);
+        // timer initialization
+        helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+        helper.mspBalancedInterval.flush();
+
+        helper.interval.add('IMU_pull', function () {
+
+            /*
+            * Enable balancer
+            */
+            if (helper.mspQueue.shouldDrop()) {
+                update_accel_graph();
+                return;
             }
-        });
 
-        // set refresh speeds according to configuration saved in storage
-        chrome.storage.local.get('motors_tab_accel_settings', function (result) {
-            if (result.motors_tab_accel_settings) {
-                $('.tab-motors select[name="accel_refresh_rate"]').val(result.motors_tab_accel_settings.rate);
-                $('.tab-motors select[name="accel_scale"]').val(result.motors_tab_accel_settings.scale);
+            MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
+        }, 25, true);
 
-                // start polling data by triggering refresh rate change event
-                $('.tab-motors .rate select:first').change();
-            } else {
-                // start polling immediatly (as there is no configuration saved in the storage)
-                $('.tab-motors .rate select:first').change();
-            }
-        });
+        helper.interval.add('ANALOG_pull', function () {
+            $currentHelper.html(ANALOG.amperage.toFixed(2));
+            $voltageHelper.html(ANALOG.voltage.toFixed(2));
+        }, 100, true);
 
-        $('.tab-motors .rate select, .tab-motors .scale select').change(function () {
-            var rate = parseInt($('.tab-motors select[name="accel_refresh_rate"]').val(), 10);
-            var scale = parseFloat($('.tab-motors select[name="accel_scale"]').val());
+        function update_accel_graph() {
 
-            // store current/latest refresh rates in the storage
-            chrome.storage.local.set({'motors_tab_accel_settings': {'rate': rate, 'scale': scale}});
-
-            accelHelpers = initGraphHelpers('#accel', samples_accel_i, [-scale, scale]);
-
-            // timer initialization
-            helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
-            helper.mspBalancedInterval.flush();
-
-            helper.interval.add('IMU_pull', function imu_data_pull() {
-
-                /*
-                 * Enable balancer
-                 */
-                if (helper.mspQueue.shouldDrop()) {
-                    update_accel_graph();
-                    return;
-                }
-
-                MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
-            }, rate, true);
-
-            function update_accel_graph() {
-                if (!accel_offset_established) {
-                    for (var i = 0; i < 3; i++) {
-                        accel_offset[i] = SENSOR_DATA.accelerometer[i] * -1;
-                    }
-
-                    accel_offset_established = true;
-                }
-
-                var accel_with_offset = [
-                    accel_offset[0] + SENSOR_DATA.accelerometer[0],
-                    accel_offset[1] + SENSOR_DATA.accelerometer[1],
-                    accel_offset[2] + SENSOR_DATA.accelerometer[2]
-                ];
-
-                updateGraphHelperSize(accelHelpers);
-                samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
-                drawGraph(accelHelpers, accel_data, samples_accel_i);
-
-                // Compute RMS of acceleration in displayed period of time
-                // This is particularly useful for motor balancing as it 
-                // eliminates the need for external tools
-                var sum = 0.0;
-                for (var j = 0; j < accel_data.length; j++)
-                    for (var k = 0; k < accel_data[j].length; k++)
-                       sum += accel_data[j][k][1]*accel_data[j][k][1];
-                var rms = Math.sqrt(sum/(accel_data[0].length+accel_data[1].length+accel_data[2].length));
-
-                raw_data_text_ements.x[0].text(accel_with_offset[0].toFixed(2) + ' (' + accel_max_read[0].toFixed(2) + ')');
-                raw_data_text_ements.y[0].text(accel_with_offset[1].toFixed(2) + ' (' + accel_max_read[1].toFixed(2) + ')');
-                raw_data_text_ements.z[0].text(accel_with_offset[2].toFixed(2) + ' (' + accel_max_read[2].toFixed(2) + ')');
-                raw_data_text_ements.rms[0].text(rms.toFixed(4));
-
+            if (!accel_offset_established) {
                 for (var i = 0; i < 3; i++) {
-                    if (Math.abs(accel_with_offset[i]) > Math.abs(accel_max_read[i])) accel_max_read[i] = accel_with_offset[i];
+                    accel_offset[i] = SENSOR_DATA.accelerometer[i] * -1;
                 }
-            }
-        });
 
-        $('a.reset_accel_max').click(function () {
-            accel_max_read = [0, 0, 0];
-            accel_offset_established = false;
-        });
+                accel_offset_established = true;
+            }
+
+            var accel_with_offset = [
+                accel_offset[0] + SENSOR_DATA.accelerometer[0],
+                accel_offset[1] + SENSOR_DATA.accelerometer[1],
+                accel_offset[2] + SENSOR_DATA.accelerometer[2]
+            ];
+
+            samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
+
+            // Compute RMS of acceleration in displayed period of time
+            // This is particularly useful for motor balancing as it 
+            // eliminates the need for external tools
+            var sum = 0.0;
+            for (var j = 0; j < accel_data.length; j++)
+                for (var k = 0; k < accel_data[j].length; k++)
+                    sum += accel_data[j][k][1]*accel_data[j][k][1];
+
+            let rms = Math.sqrt(sum/(accel_data[0].length+accel_data[1].length+accel_data[2].length));
+            $rmsHelper.text(rms.toFixed(4));
+
+            for (var i = 0; i < 3; i++) {
+                if (Math.abs(accel_with_offset[i]) > Math.abs(accel_max_read[i])) accel_max_read[i] = accel_with_offset[i];
+            }
+        }
 
         let motors_wrapper = $('.motors .bar-wrapper'),
             servos_wrapper = $('.servos .bar-wrapper'),
@@ -559,11 +569,13 @@ TABS.motors.initialize = function (callback) {
 
         // enable Status and Motor data pulling
         helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 75, true);
+    }
 
+    function finalize() {
         localize();
-
         GUI.content_ready(callback);
     }
+
 };
 
 TABS.motors.cleanup = function (callback) {
