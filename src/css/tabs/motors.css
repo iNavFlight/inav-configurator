@@ -313,6 +313,20 @@
     margin: 1em;
 }
 
+.tab-motors .output-stats-table {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 1.5em;
+    width: 100%;
+}
+
+.tab-motors .output-stats-table th {
+    text-align: left;
+}
+
+.tab-motors .output-stats-table td {
+    text-align: left;
+}
+
 .tab-servos .title {
     margin-top: 0;
     line-height: 30px;

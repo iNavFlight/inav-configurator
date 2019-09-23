@@ -427,7 +427,7 @@ TABS.sensors.initialize = function (callback) {
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
-                helper.interval.add('IMU_pull', function imu_data_pull() {
+                helper.interval.add('IMU_pull', function () {
 
                     /*
                      * Enable balancer

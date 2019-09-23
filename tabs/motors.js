@@ -1,3 +1,4 @@
+/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,_3D,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.motors = {
@@ -175,7 +176,7 @@ TABS.motors.initialize = function (callback) {
             }
         }
 
-        function servos_update(save_configuration_to_eeprom) {
+        function servos_update() {
             $servoConfigTable.find('tr:not(".main")').each(function () {
                 var info = $(this).data('info');
 
@@ -227,7 +228,7 @@ TABS.motors.initialize = function (callback) {
         });
 
         $('a.update').click(function () {
-            servos_update(true);
+            servos_update();
         });
 
     }
@@ -260,17 +261,19 @@ TABS.motors.initialize = function (callback) {
             accel_offset = [0, 0, 0],
             accel_offset_established = false;
 
-        let $rmsHelper = $(".acc-rms");
+        let $rmsHelper = $(".acc-rms"),
+            $currentHelper = $(".current-current"),
+            $voltageHelper = $(".current-voltage");
 
         // timer initialization
         helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
         helper.mspBalancedInterval.flush();
 
-        helper.interval.add('IMU_pull', function imu_data_pull() {
+        helper.interval.add('IMU_pull', function () {
 
             /*
-                * Enable balancer
-                */
+            * Enable balancer
+            */
             if (helper.mspQueue.shouldDrop()) {
                 update_accel_graph();
                 return;
@@ -278,6 +281,11 @@ TABS.motors.initialize = function (callback) {
 
             MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
         }, 25, true);
+
+        helper.interval.add('ANALOG_pull', function () {
+            $currentHelper.html(ANALOG.amperage.toFixed(2));
+            $voltageHelper.html(ANALOG.voltage.toFixed(2));
+        }, 100, true);
 
         function update_accel_graph() {
 
