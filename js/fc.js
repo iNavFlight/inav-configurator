@@ -1212,6 +1212,10 @@ var FC = {
             12: {
                 name: "NOT",
                 hasOperand: [true, false]
+            },
+            13: {
+                name: "STICKY",
+                hasOperand: [true, true]
             }
         }
     },
