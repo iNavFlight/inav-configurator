@@ -918,6 +918,9 @@
     "portsFunction_VTX_FFPV": {
         "message": "FuriousFPV Vtx"
     },
+    "portsFunction_FRSKY_OSD": {
+        "message": "FrSky OSD"
+    },
     "pidTuningName": {
         "message": "Name"
     },
