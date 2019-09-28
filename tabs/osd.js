@@ -1349,57 +1349,56 @@ OSD.constants = {
             ]
         },
         {
-            // TODO: Hide this when not using a CRSF receiver.
-            name: 'osdGroupCRSF',
+            name: 'osdGroupRX',
             items: [
                 {
-                    name: 'CRSF_UPLINK_RSSI_ANT1',
-                    id: 98,
+                    name: 'RX_UPLINK_RSSI_ANT1',
+                    id: 106,
                     preview: FONT.symbol(SYM.RSSI) + '99',
                 },
                 {
-                    name: 'CRSF_UPLINK_RSSI_ANT2',
-                    id: 99,
+                    name: 'RX_UPLINK_RSSI_ANT2',
+                    id: 107,
                     preview: FONT.symbol(SYM.RSSI) + '99',
                 },
                 {
-                    name: 'CRSF_UPLINK_LQ',
-                    id: 100,
+                    name: 'RX_UPLINK_LQ',
+                    id: 108,
                     preview: FONT.symbol(SYM.RSSI) + '100%',
                 },
                 {
-                    name: 'CRSF_UPLINK_SNR',
-                    id: 101,
+                    name: 'RX_UPLINK_SNR',
+                    id: 109,
                     preview: '-100DB',
                 },
                 {
-                    name: 'CRSF_ACTIVE_ANTENNA',
-                    id: 102,
+                    name: 'RX_ACTIVE_ANTENNA',
+                    id: 110,
                     preview: 'ANT1',
                 },
                 {
-                    name: 'CRSF_RF_MODE',
-                    id: 103,
+                    name: 'RX_RF_MODE',
+                    id: 111,
                     preview: 'HIGH',
                 },
                 {
-                    name: 'CRSF_UPLINK_TX_POWER',
-                    id: 104,
+                    name: 'RX_UPLINK_TX_POWER',
+                    id: 112,
                     preview: '0.025W',
                 },
                 {
-                    name: 'CRSF_DOWNLINK_RSSI',
-                    id: 105,
+                    name: 'RX_DOWNLINK_RSSI',
+                    id: 113,
                     preview: FONT.symbol(SYM.RSSI) + '99',
                 },
                 {
-                    name: 'CRSF_DOWNLINK_LQ',
-                    id: 106,
+                    name: 'RX_DOWNLINK_LQ',
+                    id: 114,
                     preview: FONT.symbol(SYM.RSSI) + '100%',
                 },
                 {
-                    name: 'CRSF_DOWNLINK_SNR',
-                    id: 107,
+                    name: 'RX_DOWNLINK_SNR',
+                    id: 115,
                     preview: '-100DB',
                 },
             ]

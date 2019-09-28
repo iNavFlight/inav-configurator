@@ -2547,8 +2547,8 @@
     "osdGroupVTX": {
         "message": "VTX"
     },
-    "osdGroupCRSF": {
-        "message": "Crossfire"
+    "osdGroupRX": {
+        "message": "Detailed RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps and Radars"
@@ -2727,35 +2727,35 @@
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
     },
-    "osdElement_CRSF_UPLINK_RSSI_ANT1": {
-        "message": "Crossfire antenna 1 RSSI (0-99%)"
+    "osdElement_RX_UPLINK_RSSI_ANT1": {
+        "message": "RX antenna 1 RSSI (0-99%)"
     },
-    "osdElement_CRSF_UPLINK_RSSI_ANT2": {
-        "message": "Crossfire antenna 2 RSSI (0-99%)"
+    "osdElement_RX_UPLINK_RSSI_ANT2": {
+        "message": "RX antenna 2 RSSI (0-99%)"
     },
-    "osdElement_CRSF_UPLINK_LQ": {
-        "message": "Crossfire uplink quality (0-300%)"
+    "osdElement_RX_UPLINK_LQ": {
+        "message": "RX uplink quality (0-300%)"
     },
-    "osdElement_CRSF_UPLINK_SNR": {
-        "message": "Crossfire uplink SNR"
+    "osdElement_RX_UPLINK_SNR": {
+        "message": "RX uplink SNR"
     },
-    "osdElement_CRSF_ACTIVE_ANTENNA": {
-        "message": "Crossfire active antenna (1/2)"
+    "osdElement_RX_ACTIVE_ANTENNA": {
+        "message": "RX active antenna (1/2)"
     },
-    "osdElement_CRSF_RF_MODE": {
-        "message": "Crossfire RF mode (0/1/2)"
+    "osdElement_RX_RF_MODE": {
+        "message": "RX RF mode (0/1/2)"
     },
-    "osdElement_CRSF_UPLINK_TX_POWER": {
-        "message": "Crossfire TX power (10mW-2W)"
+    "osdElement_RX_UPLINK_TX_POWER": {
+        "message": "RX TX power (10mW-2W)"
     },
-    "osdElement_CRSF_DOWNLINK_RSSI": {
-        "message": "Crossfire downlink RSSI (0-99%)"
+    "osdElement_RX_DOWNLINK_RSSI": {
+        "message": "RX downlink RSSI (0-99%)"
     },
-    "osdElement_CRSF_DOWNLINK_LQ": {
-        "message": "Crossfire downlink quality (0-300%)"
+    "osdElement_RX_DOWNLINK_LQ": {
+        "message": "RX downlink quality (0-300%)"
     },
-    "osdElement_CRSF_DOWNLINK_SNR": {
-        "message": "Crossfire downlink SNR"
+    "osdElement_RX_DOWNLINK_SNR": {
+        "message": "RX downlink SNR"
     },
     "osdElement_MAP_NORTH": {
         "message": "Map (Up is north)"
