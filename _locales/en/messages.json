@@ -3215,5 +3215,8 @@
     },
     "antigravityCutoff": {
         "message": "Antigravity Cutoff Frequency"
+    },
+    "vtxDisclaimer": {
+        "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
     }
 }
