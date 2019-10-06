@@ -23,7 +23,7 @@ TABS.motors.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadMisc,
+        mspHelper.loadMiscV2,
         mspHelper.loadBfConfig,
         mspHelper.load3dConfig,
         mspHelper.loadMotors,
@@ -34,6 +34,7 @@ TABS.motors.initialize = function (callback) {
         mspHelper.loadServoConfiguration,
         mspHelper.loadOutputMapping,
         mspHelper.loadRcData,
+        mspHelper.loadAdvancedConfig,
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -57,8 +58,109 @@ TABS.motors.initialize = function (callback) {
     function onLoad() {
         process_motors();
         process_servos();
+        processConfiguration();
         finalize();
     } 
+
+    function processConfiguration() {
+        let escProtocols = FC.getEscProtocols();
+        let servoRates = FC.getServoRates();
+
+        function buildMotorRates() {
+            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
+
+            $escRate.find('option').remove();
+
+            for (var i in protocolData.rates) {
+                if (protocolData.rates.hasOwnProperty(i)) {
+                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
+                }
+            }
+
+            /*
+             *  If rate from FC is not on the list, add a new entry
+             */
+            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
+                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
+            }
+
+            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
+                //DSHOT/SERIALSHOT protocols, simplify UI
+                $('.hide-for-shot').addClass('is-hidden');
+            } else {
+                $('.hide-for-shot').removeClass('is-hidden');
+            }
+
+            if (protocolData.message !== null) {
+                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
+                $('#esc-protocol-warning').show();
+            } else {
+                $('#esc-protocol-warning').hide();
+            }
+
+        }
+
+        let $escProtocol = $('#esc-protocol');
+        let $escRate = $('#esc-rate');
+        for (i in escProtocols) {
+            if (escProtocols.hasOwnProperty(i)) {
+                var protocolData = escProtocols[i];
+                $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
+            }
+        }
+
+        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+        buildMotorRates();
+        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+
+        $escProtocol.change(function () {
+            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+            buildMotorRates();
+            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
+            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+        });
+
+        $escRate.change(function () {
+            ADVANCED_CONFIG.motorPwmRate = $(this).val();
+        });
+
+        $("#esc-protocols").show();
+
+        var $servoRate = $('#servo-rate');
+
+        for (i in servoRates) {
+            if (servoRates.hasOwnProperty(i)) {
+                $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
+            }
+        }
+        /*
+         *  If rate from FC is not on the list, add a new entry
+         */
+        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
+            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
+        }
+
+        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
+        $servoRate.change(function () {
+            ADVANCED_CONFIG.servoPwmRate = $(this).val();
+        });
+
+        $('#servo-rate-container').show();
+
+        //fill motor disarm params and FC loop time
+        $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
+        $('div.disarm').show();
+        if (bit_check(BF_CONFIG.features, 4)) { //MOTOR_STOP
+            $('div.disarmdelay').show();
+        } else {
+            $('div.disarmdelay').hide();
+        }
+
+        // fill throttle
+        $('#minthrottle').val(MISC.minthrottle);
+        $('#maxthrottle').val(MISC.maxthrottle);
+        $('#mincommand').val(MISC.mincommand);
+    }
 
     function update_arm_status() {
         self.armed = FC.isModeEnabled('ARM');

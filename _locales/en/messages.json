@@ -3215,5 +3215,8 @@
     },
     "antigravityCutoff": {
         "message": "Antigravity Cutoff Frequency"
+    },
+    "ouptputsConfiguration": {
+        "message": "Configuration"
     }
 }
