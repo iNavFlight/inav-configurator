@@ -988,7 +988,7 @@ var FC = {
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL006", "FAKE"];
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "FAKE"];
         } else if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
         } else if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
