@@ -3062,6 +3062,12 @@ var mspHelper = (function (gui) {
                 6: "string",
             };
             var setting = {};
+
+            // Discard setting name
+            if (semver.gte(CONFIG.apiVersion, "2.4.0")) {
+                result.data.readString();
+            }
+
             // Discard PG ID
             result.data.readU16();
 
