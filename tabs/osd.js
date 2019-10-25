@@ -764,6 +764,12 @@ OSD.constants = {
                     id: 104,
                     preview: 'MSP'
                 },
+                {
+                    name: 'ESC_RPM',
+                    id: 106,
+                    min_version: '2.3.0',
+                    preview: FONT.symbol(SYM.THR) + '983',
+                }
             ]
         },
         {
