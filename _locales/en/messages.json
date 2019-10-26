@@ -2721,6 +2721,9 @@
     "osdElement_VTX_POWER_HELP": {
         "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
     },
+    "osdElement_ESC_RPM": {
+        "message": "Motor RPM from ESC telemetry"
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
