@@ -211,7 +211,7 @@ TABS.sensors.initialize = function (callback) {
             checkboxes.eq(4).prop('disabled', true);
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.9.1") || (!bit_check(CONFIG.activeSensors, 6))) { // airspeed
+        if (!bit_check(CONFIG.activeSensors, 6)) { // airspeed
             checkboxes.eq(5).prop('disabled', true);
         }
 

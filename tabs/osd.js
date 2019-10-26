@@ -643,7 +643,6 @@ OSD.constants = {
                 {
                     name: 'SAG_COMP_MAIN_BATT_VOLTAGE',
                     id: 53,
-                    min_version: '2.0.0',
                     preview: osdMainBatteryPreview,
                 },
                 {
@@ -654,13 +653,11 @@ OSD.constants = {
                 {
                     name: 'SAG_COMP_MAIN_BATT_CELL_VOLTAGE',
                     id: 54,
-                    min_version: '2.0.0',
                     preview: FONT.symbol(SYM.BATT) + FONT.embed_dot('4.18') + FONT.symbol(SYM.VOLT)
                 },
                 {
                     name: 'POWER_SUPPLY_IMPEDANCE',
                     id: 55,
-                    min_version: '2.0.0',
                     preview: ' 23' + FONT.symbol(SYM.MILLIOHM)
                 },
                 {
@@ -671,13 +668,11 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_TIME',
                     id: 48,
-                    min_version: '2.0.0',
                     preview: FONT.symbol(SYM.FLY_M) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
-                    min_version: '2.0.0',
                     preview: function(osd_data) {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
                             if (OSD.data.preferences.units === 0) {
@@ -1025,7 +1020,6 @@ OSD.constants = {
                 {
                     name: 'PITCH_ANGLE',
                     id: 41,
-                    min_version: '2.0.0',
                     preview: function () {
                         return FONT.symbol(SYM.PITCH_UP) + FONT.embed_dot(' 1.5');
                     },
@@ -1033,7 +1027,6 @@ OSD.constants = {
                 {
                     name: 'ROLL_ANGLE',
                     id: 42,
-                    min_version: '2.0.0',
                     preview: function () {
                         return FONT.symbol(SYM.ROLL_LEFT) + FONT.embed_dot('31.4');
                     },
@@ -1196,7 +1189,6 @@ OSD.constants = {
                 {
                     name: 'HOME_HEADING_ERROR',
                     id: 50,
-                    min_version: '2.0.0',
                     preview: FONT.symbol(SYM.HOME) + FONT.symbol(SYM.HEADING) + ' -10' + FONT.symbol(SYM.DEGREES)
                 },
                 {
@@ -1246,7 +1238,6 @@ OSD.constants = {
                 {
                     name: 'WIND_SPEED_HORIZONTAL',
                     id: 46,
-                    min_version: '2.0.0',
                     preview: function(osd_data) {
                         // 6 chars
                         var p = FONT.symbol(SYM.WIND_SPEED_HORIZONTAL) + FONT.symbol(SYM.DIRECTION + 1);
@@ -1262,7 +1253,6 @@ OSD.constants = {
                 {
                     name: 'WIND_SPEED_VERTICAL',
                     id: 47,
-                    min_version: '2.0.0',
                     preview: function(osd_data) {
                         // 6 chars
                         var p = FONT.symbol(SYM.WIND_SPEED_VERTICAL) + FONT.symbol(SYM.AH_DECORATION_UP);
@@ -1278,13 +1268,11 @@ OSD.constants = {
                 {
                     name: 'CRUISE_HEADING_ERROR',
                     id: 51,
-                    min_version: '2.0.0',
                     preview: FONT.symbol(SYM.HEADING) + '  5' + FONT.symbol(SYM.DEGREES)
                 },
                 {
                     name: 'CRUISE_HEADING_ADJUSTMENT',
                     id: 52,
-                    min_version: '2.0.0',
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
                 },
             ]
@@ -1295,19 +1283,16 @@ OSD.constants = {
                 {
                     name: 'MAP_NORTH',
                     id: 43,
-                    min_version: '2.0.0',
                     positionable: false,
                 },
                 {
                     name: 'MAP_TAKEOFF',
                     id: 44,
-                    min_version: '2.0.0',
                     positionable: false,
                 },
                 {
                     name: 'RADAR',
                     id: 45,
-                    min_version: '2.0.0',
                     positionable: false,
                 },
                 {
@@ -1340,11 +1325,7 @@ OSD.constants = {
                     id: 10,
                     positionable: true,
                     preview: function(osd_data) {
-                        var preview = 'CH:F7';
-                        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
-                            preview += ':1';
-                        }
-                        return preview;
+                        return 'CH:F7:1';
                     },
                 },
                 {
@@ -1375,140 +1356,117 @@ OSD.constants = {
                 {
                     name: 'LEVEL_PIDS',
                     id: 56,
-                    min_version: '2.0.0',
                     preview: 'LEV  20  15  80'
                 },
                 {
                     name: 'POS_XY_PIDS',
                     id: 57,
-                    min_version: '2.0.0',
                     preview: 'PXY  20  15  80'
                 },
                 {
                     name: 'POS_Z_PIDS',
                     id: 58,
-                    min_version: '2.0.0',
                     preview: 'PZ   20  15  80'
                 },
                 {
                     name: 'VEL_XY_PIDS',
                     id: 59,
-                    min_version: '2.0.0',
                     preview: 'VXY  20  15  80'
                 },
                 {
                     name: 'VEL_Z_PIDS',
                     id: 60,
-                    min_version: '2.0.0',
                     preview: 'VZ   20  15  80'
                 },
                 {
                     name: 'HEADING_P',
                     id: 61,
-                    min_version: '2.0.0',
                     preview: 'HP  20'
                 },
                 {
                     name: 'BOARD_ALIGNMENT_ROLL',
                     id: 62,
-                    min_version: '2.0.0',
                     preview: 'AR    0'
                 },
                 {
                     name: 'BOARD_ALIGNMENT_PITCH',
                     id: 63,
-                    min_version: '2.0.0',
                     preview: 'AP   ' + FONT.embed_dot('1.0')
                 },
                 {
                     name: 'THROTTLE_EXPO',
                     id: 66,
-                    min_version: '2.0.0',
                     preview: 'TEX   0'
                 },
                 {
                     name: 'STABILIZED_RC_EXPO',
                     id: 64,
-                    min_version: '2.0.0',
                     preview: 'EXP  20'
                 },
                 {
                     name: 'STABILIZED_RC_YAW_EXPO',
                     id: 65,
-                    min_version: '2.0.0',
                     preview: 'YEX  20'
                 },
                 {
                     name: 'STABILIZED_PITCH_RATE',
                     id: 67,
-                    min_version: '2.0.0',
                     preview: 'SPR  20'
                 },
                 {
                     name: 'STABILIZED_ROLL_RATE',
                     id: 68,
-                    min_version: '2.0.0',
                     preview: 'SRR  20'
                 },
                 {
                     name: 'STABILIZED_YAW_RATE',
                     id: 69,
-                    min_version: '2.0.0',
                     preview: 'SYR  20'
                 },
                 {
                     name: 'MANUAL_RC_EXPO',
                     id: 70,
-                    min_version: '2.0.0',
                     preview: 'MEX  20'
                 },
                 {
                     name: 'MANUAL_RC_YAW_EXPO',
                     id: 71,
-                    min_version: '2.0.0',
                     preview: 'MYX  20'
                 },
                 {
                     name: 'MANUAL_PITCH_RATE',
                     id: 72,
-                    min_version: '2.0.0',
                     preview: 'MPR  20'
                 },
                 {
                     name: 'MANUAL_ROLL_RATE',
                     id: 73,
-                    min_version: '2.0.0',
                     preview: 'MRR  20'
                 },
                 {
                     name: 'MANUAL_YAW_RATE',
                     id: 74,
-                    min_version: '2.0.0',
                     preview: 'MYR  20'
                 },
                 {
                     name: 'NAV_FW_CRUISE_THROTTLE',
                     id: 75,
-                    min_version: '2.0.0',
                     preview: 'CRS 1500'
                 },
                 {
                     name: 'NAV_FW_PITCH_TO_THROTTLE',
                     id: 76,
-                    min_version: '2.0.0',
                     preview: 'P2T  10'
                 },
                 {
                     name: 'FW_MIN_THROTTLE_DOWN_PITCH_ANGLE',
                     id: 77,
-                    min_version: '2.0.0',
                     preview: '0TP  ' + FONT.embed_dot('4.5')
                 },
             ]
         },
         {
             name: 'osdGroupPIDOutputs',
-            min_version: '2.0.0',
             items: [
                 {
                     name: 'FW_ALT_PID_OUTPUTS',
@@ -1589,10 +1547,6 @@ OSD.get_item_preview = function(item) {
     return preview;
 }
 
-OSD.use_layouts_api = function() {
-    return semver.gte(CONFIG.flightControllerVersion, '2.0.0');
-};
-
 OSD.reload = function(callback) {
     OSD.initData();
     var done = function() {
@@ -1601,39 +1555,32 @@ OSD.reload = function(callback) {
             callback();
         }
     };
-    if (OSD.use_layouts_api()) {
-        MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
+    MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
 
-            OSD.msp.decodeLayoutCounts(resp);
-            // Get data for all layouts
-            var ids = Array.apply(null, {length: OSD.data.layout_count}).map(Number.call, Number);
-            var layouts = Promise.mapSeries(ids, function (layoutIndex, ii) {
-                var data = [];
-                data.push8(layoutIndex);
-                return MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS, data).then(function (resp) {
-                    OSD.msp.decodeLayout(layoutIndex, resp);
-                });
+        OSD.msp.decodeLayoutCounts(resp);
+        // Get data for all layouts
+        var ids = Array.apply(null, {length: OSD.data.layout_count}).map(Number.call, Number);
+        var layouts = Promise.mapSeries(ids, function (layoutIndex, ii) {
+            var data = [];
+            data.push8(layoutIndex);
+            return MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS, data).then(function (resp) {
+                OSD.msp.decodeLayout(layoutIndex, resp);
             });
-            layouts.then(function () {
-                OSD.updateSelectedLayout(OSD.data.selected_layout || 0);
+        });
+        layouts.then(function () {
+            OSD.updateSelectedLayout(OSD.data.selected_layout || 0);
 
-                MSP.promise(MSPCodes.MSP2_INAV_OSD_ALARMS).then(function (resp) {
-                    OSD.msp.decodeAlarms(resp);
+            MSP.promise(MSPCodes.MSP2_INAV_OSD_ALARMS).then(function (resp) {
+                OSD.msp.decodeAlarms(resp);
 
-                    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
-                        OSD.data.supported = true;
-                        OSD.msp.decodePreferences(resp);
-                        done();
-                    });
+                MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
+                    OSD.data.supported = true;
+                    OSD.msp.decodePreferences(resp);
+                    done();
                 });
             });
         });
-    } else {
-        MSP.promise(MSPCodes.MSP_OSD_CONFIG).then(function (data) {
-            OSD.msp.decode(data);
-            done();
-        });
-    }
+    });
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -1655,33 +1602,21 @@ OSD.updateDisplaySize = function () {
 };
 
 OSD.saveAlarms = function(callback) {
-    // Before the layouts API was introduced, config and alarms were saved
-    // with the same MSP cmd.
-    if (!OSD.use_layouts_api()) {
-        return OSD.saveConfig(callback);
-    }
-    var data = OSD.msp.encodeAlarms();
+    let data = OSD.msp.encodeAlarms();
     return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_ALARMS, data).then(callback);
 }
 
 OSD.saveConfig = function(callback) {
-    if (OSD.use_layouts_api()) {
-        return OSD.saveAlarms(function () {
-            var data = OSD.msp.encodePreferences();
-            return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
-        });
-    }
-    return MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, OSD.msp.encodeOther()).then(callback);
+    return OSD.saveAlarms(function () {
+        var data = OSD.msp.encodePreferences();
+        return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES, data).then(callback);
+    });
 };
 
 OSD.saveItem = function(item, callback) {
-    var pos = OSD.data.items[item.id];
-    if (OSD.use_layouts_api()) {
-        var data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
-        return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
-    }
-    var data = OSD.msp.encodeItem(item.id, pos);
-    return MSP.promise(MSPCodes.MSP_SET_OSD_CONFIG, data).then(callback);
+    let pos = OSD.data.items[item.id];
+    let data = OSD.msp.encodeLayoutItem(OSD.data.selected_layout, item, pos);
+    return MSP.promise(MSPCodes.MSP2_INAV_OSD_SET_LAYOUT_ITEM, data).then(callback);
 };
 
 //noinspection JSUnusedLocalSymbols
