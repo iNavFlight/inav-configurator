@@ -935,11 +935,7 @@ var FC = {
         return [];
     },
     getAccelerometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
-        } else {
-            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "FAKE"];
-        }
+        return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
     },
     getMagnetometerNames: function () {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
@@ -955,13 +951,7 @@ var FC = {
         return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
     },
     getRangefinderNames: function () {
-        let data = [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            data.push("Benewake TFmini")
-        }
-
-        return data;
+        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];

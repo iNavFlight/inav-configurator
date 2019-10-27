@@ -472,28 +472,14 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_SERVO_MIX_RULES:
                 SERVO_RULES.flush();
-
-                if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-                    if (data.byteLength % 8 === 0) {
-                        for (i = 0; i < data.byteLength; i += 8) {
-                            SERVO_RULES.put(new ServoMixRule(
-                                data.getInt8(i),
-                                data.getInt8(i + 1),
-                                data.getInt16(i + 2, true),
-                                data.getInt8(i + 4)
-                            ));
-                        }
-                    }
-                } else {
-                    if (data.byteLength % 7 === 0) {
-                        for (i = 0; i < data.byteLength; i += 7) {
-                            SERVO_RULES.put(new ServoMixRule(
-                                data.getInt8(i),
-                                data.getInt8(i + 1),
-                                data.getInt8(i + 2),
-                                data.getInt8(i + 3)
-                            ));
-                        }
+                if (data.byteLength % 8 === 0) {
+                    for (i = 0; i < data.byteLength; i += 8) {
+                        SERVO_RULES.put(new ServoMixRule(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt16(i + 2, true),
+                            data.getInt8(i + 4)
+                        ));
                     }
                 }
                 SERVO_RULES.cleanup();
@@ -2272,12 +2258,8 @@ var mspHelper = (function (gui) {
                 buffer.push(servoIndex);
                 buffer.push(servoRule.getTarget());
                 buffer.push(servoRule.getInput());
-                if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-                    buffer.push(lowByte(servoRule.getRate()));
-                    buffer.push(highByte(servoRule.getRate()));
-                } else {
-                    buffer.push(servoRule.getRate());
-                }
+                buffer.push(lowByte(servoRule.getRate()));
+                buffer.push(highByte(servoRule.getRate()));
                 buffer.push(servoRule.getSpeed());
                 buffer.push(0);
                 buffer.push(0);
@@ -3227,19 +3209,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBrakingConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
     }
 
     self.saveBrakingConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
     };
 
     self.loadParameterGroups = function(callback) {
@@ -3258,11 +3232,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBrakingConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
     }
 
     self.loadSensorStatus = function (callback) {

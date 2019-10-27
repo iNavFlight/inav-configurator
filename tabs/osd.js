@@ -582,7 +582,6 @@ OSD.constants = {
         {
             name: 'IMU_TEMPERATURE_MIN',
             field: 'imu_temp_alarm_min',
-            min_version: '2.1.0',
             unit: '°C',
             step: 0.5,
             to_display: function(osd_data, value) { return value / 10 },
@@ -593,7 +592,6 @@ OSD.constants = {
         {
             name: 'IMU_TEMPERATURE_MAX',
             field: 'imu_temp_alarm_max',
-            min_version: '2.1.0',
             step: 0.5,
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
@@ -604,7 +602,6 @@ OSD.constants = {
         {
             name: 'BARO_TEMPERATURE_MIN',
             field: 'baro_temp_alarm_min',
-            min_version: '2.1.0',
             step: 0.5,
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
@@ -615,7 +612,6 @@ OSD.constants = {
         {
             name: 'BARO_TEMPERATURE_MAX',
             field: 'baro_temp_alarm_max',
-            min_version: '2.1.0',
             step: 0.5,
             unit: '°C',
             to_display: function(osd_data, value) { return value / 10 },
@@ -773,7 +769,6 @@ OSD.constants = {
                 {
                     name: 'IMU_TEMPERATURE',
                     id: 86,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -786,7 +781,6 @@ OSD.constants = {
                 {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -799,7 +793,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR1_TEMPERATURE',
                     id: 88,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -812,7 +805,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR2_TEMPERATURE',
                     id: 89,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -825,7 +817,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR3_TEMPERATURE',
                     id: 90,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -838,7 +829,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR4_TEMPERATURE',
                     id: 91,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -851,7 +841,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR5_TEMPERATURE',
                     id: 92,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -864,7 +853,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR6_TEMPERATURE',
                     id: 93,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -877,7 +865,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR7_TEMPERATURE',
                     id: 94,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -890,7 +877,6 @@ OSD.constants = {
                 {
                     name: 'SENSOR8_TEMPERATURE',
                     id: 95,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         if (OSD.data.preferences.units === 0) {
                             // Imperial
@@ -1146,7 +1132,6 @@ OSD.constants = {
                 {
                     name: '3D_SPEED',
                     id: 85,
-                    min_version: '2.1.0',
                     preview: function(osd_data) {
                         // 3 chars
                         if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
@@ -1174,7 +1159,6 @@ OSD.constants = {
                 {
                     name: 'PLUS_CODE',
                     id: 97,
-                    min_version: '2.1.0',
                     preview: function() {
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
                         console.log("DITIS", digits);
@@ -1661,12 +1645,10 @@ OSD.msp = {
             result.push16(OSD.data.alarms.gforce_axis_max);
             result.push8(OSD.data.alarms.current);
         }
-        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
-            result.push16(OSD.data.alarms.imu_temp_alarm_min);
-            result.push16(OSD.data.alarms.imu_temp_alarm_max);
-            result.push16(OSD.data.alarms.baro_temp_alarm_min);
-            result.push16(OSD.data.alarms.baro_temp_alarm_max);
-        }
+        result.push16(OSD.data.alarms.imu_temp_alarm_min);
+        result.push16(OSD.data.alarms.imu_temp_alarm_max);
+        result.push16(OSD.data.alarms.baro_temp_alarm_min);
+        result.push16(OSD.data.alarms.baro_temp_alarm_max);
         return result;
     },
 
@@ -1684,12 +1666,10 @@ OSD.msp = {
             OSD.data.alarms.gforce_axis_max = alarms.read16();
             OSD.data.alarms.current = alarms.readU8();
         }
-        if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
-            OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
-            OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
-            OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
-            OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
-        }
+        OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
+        OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
+        OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
+        OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
     },
 
     encodePreferences: function() {
