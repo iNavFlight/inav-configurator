@@ -44,6 +44,9 @@ TABS.motors.initialize = function (callback) {
 
     saveChainer.setChain([
         mspHelper.sendServoConfigurations,
+        mspHelper.saveAdvancedConfig,
+        mspHelper.saveBfConfig,
+        mspHelper.saveMiscV2,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
@@ -126,7 +129,7 @@ TABS.motors.initialize = function (callback) {
 
         $("#esc-protocols").show();
 
-        var $servoRate = $('#servo-rate');
+        let $servoRate = $('#servo-rate');
 
         for (i in servoRates) {
             if (servoRates.hasOwnProperty(i)) {
@@ -147,19 +150,33 @@ TABS.motors.initialize = function (callback) {
 
         $('#servo-rate-container').show();
 
-        //fill motor disarm params and FC loop time
-        $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-        $('div.disarm').show();
-        if (bit_check(BF_CONFIG.features, 4)) { //MOTOR_STOP
-            $('div.disarmdelay').show();
-        } else {
-            $('div.disarmdelay').hide();
+        /*
+         * Set all features ON/OFF
+         */ 
+        let features = FC.getFeatures();
+        for (let i in features) {
+            if (features.hasOwnProperty(i)) {
+                let $html = $(".feature[data-bit='" +features[i].bit + "']");
+                if ($html.length) {
+                    $html.prop('checked', bit_check(BF_CONFIG.features, features[i].bit));
+                }
+            }
         }
 
-        // fill throttle
-        $('#minthrottle').val(MISC.minthrottle);
-        $('#maxthrottle').val(MISC.maxthrottle);
-        $('#mincommand').val(MISC.mincommand);
+        $('input[type="checkbox"].feature').change(function () {
+
+            let element = $(this),
+                index = element.data('bit'),
+                state = element.is(':checked');
+
+            if (state) {
+                BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
+            } else {
+                BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
+            }
+        });
+
+        GUI.simpleBind();
     }
 
     function update_arm_status() {
@@ -330,6 +347,20 @@ TABS.motors.initialize = function (callback) {
         });
 
         $('a.update').click(function () {
+            servos_update();
+        });
+        $('a.save').click(function () {
+            saveChainer.setExitPoint(function () {
+                //noinspection JSUnresolvedVariable
+                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        
+                GUI.tab_switch_cleanup(function () {
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.handleReconnect($('.tab_configuration a'));
+                    });
+                });
+            });
             servos_update();
         });
 

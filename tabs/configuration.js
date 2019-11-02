@@ -41,10 +41,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
-        loadCraftName
+        loadCraftName,
+        mspHelper.loadMiscV2
     ];
 
-    loadChain.push(mspHelper.loadMiscV2);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -64,10 +64,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveSensorConfig,
         mspHelper.saveVTXConfig,
         saveCraftName,
+        mspHelper.saveMiscV2,
+        mspHelper.saveToEeprom
     ];
-
-    saveChain.push(mspHelper.saveMiscV2);
-    saveChain.push(mspHelper.saveToEeprom);
 
     saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);

@@ -2,7 +2,7 @@
     <div class="content_wrapper">
         <div class="tab_title" i18n="tabMotorTesting"></div>
 
-        <div class="gui_box grey">
+        <div class="gui_box grey config-section">
             <div class="gui_box_titlebar">
                 <div class="spacer_box_title" data-i18n="ouptputsConfiguration"></div>
             </div>
@@ -53,29 +53,21 @@
                     <div class="helpicon cf_tip" data-i18n_title="featureMOTOR_STOPTip"></div>
                 </div>
 
-                <div class="number disarmdelay" style="display: none; margin-bottom: 5px;">
-                    <input type="number" id="autodisarmdelay" name="autodisarmdelay" min="0" max="60" />
-                    <label for="autodisarmdelay">
-                        <span data-i18n="configurationAutoDisarmDelay"></span>
-                    </label>
-                    <div class="helpicon cf_tip" data-i18n_title="configurationAutoDisarmDelayHelp"></div>
-                </div>
-
                 <!--   -->
                 <div class="number hide-for-shot">
-                    <input type="number" id="minthrottle" name="minthrottle" min="0" max="2000" />
+                    <input type="number" data-simple-bind="MISC.minthrottle" id="minthrottle" name="minthrottle" min="0" max="2000" />
                     <label for="minthrottle">
                         <span data-i18n="configurationThrottleMinimum"></span>
                     </label>
                 </div>
                 <div class="number hide-for-shot">
-                    <input type="number" id="maxthrottle" name="maxthrottle" min="0" max="2000" />
+                    <input type="number" data-simple-bind="MISC.maxthrottle" id="maxthrottle" name="maxthrottle" min="0" max="2000" />
                     <label for="maxthrottle">
                         <span data-i18n="configurationThrottleMaximum"></span>
                     </label>
                 </div>
                 <div class="number hide-for-shot">
-                    <input type="number" id="mincommand" name="mincommand" min="0" max="2000" />
+                    <input type="number" data-simple-bind="MISC.mincommand" id="mincommand" name="mincommand" min="0" max="2000" />
                     <label for="mincommand">
                         <span data-i18n="configurationThrottleMinimumCommand"></span>
                     </label>
@@ -182,6 +174,7 @@
     <div class="content_toolbar">
             <div class="btn save_btn">
                 <a class="update" href="#" data-i18n="servosButtonSave"></a>
+                <a class="save" href="#" data-i18n="configurationButtonSave"></a>
             </div>
         </div>
 </div>
