@@ -50,7 +50,8 @@ sources.css = [
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
     './node_modules/openlayers/dist/ol.css',
-    './src/css/logic.css'
+    './src/css/logic.css',
+    './src/css/defaults_dialog.css'
 ];
 
 sources.js = [
@@ -113,6 +114,7 @@ sources.js = [
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
     './js/appUpdater.js',
+    './js/defaults_dialog.js',
     './node_modules/openlayers/dist/ol.js'
 ];
 

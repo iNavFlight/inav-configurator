@@ -3224,5 +3224,11 @@
     },
     "vtxDisclaimer": {
         "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
+    },
+    "defaultsDialogTitle": {
+        "message": "Default values"
+    },
+    "defaultsDialogInfo": {
+        "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
     }
 }
