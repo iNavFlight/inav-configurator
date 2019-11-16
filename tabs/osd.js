@@ -82,6 +82,7 @@ SYM.GFORCE = 0xE6;
 SYM.GFORCE_X = 0xE7;
 SYM.GFORCE_Y = 0xE8;
 SYM.GFORCE_Z = 0xE9;
+SYM.RPM = 0x8B;
 
 var FONT = FONT || {};
 
@@ -768,7 +769,7 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
-                    preview: FONT.symbol(SYM.THR) + '983',
+                    preview: FONT.symbol(SYM.RPM) + '983',
                 }
             ]
         },
