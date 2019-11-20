@@ -871,7 +871,7 @@ var FC = {
             },
             7: {
                 name: "DSHOT600",
-                message: "escProtocolNotAdvised",
+                message: null,
                 defaultRate: 16000,
                 rates: {
                     16000: "16kHz"
