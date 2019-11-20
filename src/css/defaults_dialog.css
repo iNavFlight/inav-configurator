@@ -1,0 +1,45 @@
+.defaults-dialog__background {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: black;
+    opacity: 0.75;
+    z-index: 2001;
+}
+
+.defaults-dialog__content {
+    background-color: #efefef;
+    border-radius: 2px;
+    z-index: 2002;
+    position: absolute;
+    width: 500px;
+    height: 320px;
+    overflow-y: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    padding: 1em;
+}
+
+.defaults-dialog__content--wrapper {
+    overflow-y: auto;
+}
+
+.defaults-dialog__info {
+    font-size: 1.3em;
+}
+
+.defaults_btn {
+    float: none;
+    display: block;
+    margin-top: 1em;
+}
+
+.defaults_btn a {
+    font-size: 1.4em;
+    line-height: 25px;
+}
