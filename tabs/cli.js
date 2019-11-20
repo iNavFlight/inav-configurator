@@ -96,13 +96,13 @@ function sendLinesWithDelay(outputArray) {
     return (delay, line, index) => {
         return new Promise((resolve) => {
             helper.timeout.add('CLI_send_slowly', () => {
-                var processingDelay = self.lineDelayMs;
+                let processingDelay = TABS.cli.lineDelayMs;
                 if (line.toLowerCase().startsWith('profile')) {
-                    processingDelay = self.profileSwitchDelayMs;
+                    processingDelay = TABS.cli.profileSwitchDelayMs;
                 }
                 const isLastCommand = outputArray.length === index + 1;
-                if (isLastCommand && self.cliBuffer) {
-                    line = getCliCommand(line, self.cliBuffer);
+                if (isLastCommand && TABS.cli.cliBuffer) {
+                    line = getCliCommand(line, TABS.cli.cliBuffer);
                 }
                 TABS.cli.sendLine(line, () => {
                     resolve(processingDelay);
