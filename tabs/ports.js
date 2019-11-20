@@ -34,13 +34,11 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1
     });
 
-    if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-        functionRules.push({
-            name: 'RANGEFINDER',
-            groups: ['sensors'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'RANGEFINDER',
+        groups: ['sensors'],
+        maxPorts: 1 }
+    );
 
     if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
         functionRules.push({
@@ -82,6 +80,14 @@ TABS.ports.initialize = function (callback) {
 
         functionRules.push({
             name: 'ESC',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.2")) {
+        functionRules.push({
+            name: 'FRSKY_OSD',
             groups: ['peripherals'],
             maxPorts: 1 }
         );
@@ -147,11 +153,7 @@ TABS.ports.initialize = function (callback) {
     load_configuration_from_fc();
 
     function load_configuration_from_fc() {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
-        } else {
-            MSP.send_message(MSPCodes.MSP_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
-        }
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
 
         function on_configuration_loaded_handler() {
             $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
@@ -324,11 +326,8 @@ TABS.ports.initialize = function (callback) {
             SERIAL_CONFIG.ports.push(serialPort);
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
-        } else {
-            MSP.send_message(MSPCodes.MSP_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
-        }
+        MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
+        
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
         }

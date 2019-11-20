@@ -145,12 +145,6 @@ $(document).ready(function () {
             var tab = tabClass.substring(4);
             var tabName = $(self).text();
 
-            if (CONFIGURATOR.connectionValid && semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
-                $('#battery_profile_change').hide();
-                $('#profile_change').css('width', '125px');
-                $('#dataflash_wrapper_global').css('width', '125px');
-            }
-
             if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('tabSwitchConnectionRequired'));
                 return;

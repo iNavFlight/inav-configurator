@@ -378,11 +378,7 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
-        if (FC.isNewMixer()) {
-            update_model(MIXER_CONFIG.appliedMixerPreset);
-        } else {
-            update_model(BF_CONFIG.mixerConfiguration);
-        }
+        update_model(MIXER_CONFIG.appliedMixerPreset);
 
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();

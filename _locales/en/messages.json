@@ -918,6 +918,9 @@
     "portsFunction_VTX_FFPV": {
         "message": "FuriousFPV Vtx"
     },
+    "portsFunction_FRSKY_OSD": {
+        "message": "FrSky OSD"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -2718,6 +2721,9 @@
     "osdElement_VTX_POWER_HELP": {
         "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
     },
+    "osdElement_ESC_RPM": {
+        "message": "Motor RPM from ESC telemetry"
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
@@ -3218,5 +3224,8 @@
     },
     "ouptputsConfiguration": {
         "message": "Configuration"
+    },
+    "vtxDisclaimer": {
+        "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
     }
 }
