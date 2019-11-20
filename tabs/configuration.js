@@ -41,10 +41,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
-        loadCraftName
+        loadCraftName,
+        mspHelper.loadMiscV2
     ];
 
-    loadChain.push(mspHelper.loadMiscV2);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -64,10 +64,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveSensorConfig,
         mspHelper.saveVTXConfig,
         saveCraftName,
+        mspHelper.saveMiscV2,
+        mspHelper.saveToEeprom
     ];
-
-    saveChain.push(mspHelper.saveMiscV2);
-    saveChain.push(mspHelper.saveToEeprom);
 
     saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);
@@ -383,30 +382,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill magnetometer
         $('#mag_declination').val(MISC.mag_declination);
 
-        //fill motor disarm params and FC loop time
-        $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-        $('div.disarm').show();
-        if (bit_check(BF_CONFIG.features, 4)) { //MOTOR_STOP
-            $('div.disarmdelay').show();
-        } else {
-            $('div.disarmdelay').hide();
-        }
-
-        // fill throttle
-        $('#minthrottle').val(MISC.minthrottle);
-        // midrc was removed in 2.0, but the firmware still excepts
-        // the MSP frame with it for backwards compatibility, so we
-        // just hide it from the UI.
-        var midThrottleWrapper = $('.midthrottle_wrapper');
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            $('#midthrottle').val(MISC.midrc);
-            midThrottleWrapper.show();
-        } else {
-            midThrottleWrapper.hide();
-        }
-        $('#maxthrottle').val(MISC.maxthrottle);
-        $('#mincommand').val(MISC.mincommand);
-
         // fill battery voltage
         $('#voltagesource').val(MISC.voltage_source);
         $('#cells').val(MISC.battery_cells);
@@ -416,110 +391,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
         $('#voltagescale').val(MISC.vbatscale);
 
-        // adjust current offset input attributes
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            var current_offset_input = $('#currentoffset');
-            current_offset_input.attr('step', '1');
-            current_offset_input.attr('min', '-3300');
-            current_offset_input.attr('max', '3300');
-        }
-
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-            $('#currentoffset').val(BF_CONFIG.currentoffset);
-        else
-            $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
         $('#battery_capacity_warning').val(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
         $('#battery_capacity_critical').val(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
-
-        var escProtocols = FC.getEscProtocols();
-        var servoRates = FC.getServoRates();
-
-        function buildMotorRates() {
-            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
-
-            $escRate.find('option').remove();
-
-            for (var i in protocolData.rates) {
-                if (protocolData.rates.hasOwnProperty(i)) {
-                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
-                }
-            }
-
-            /*
-             *  If rate from FC is not on the list, add a new entry
-             */
-            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
-                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
-            }
-
-            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-                //DSHOT/SERIALSHOT protocols, simplify UI
-                $('.hide-for-shot').addClass('is-hidden');
-            } else {
-                $('.hide-for-shot').removeClass('is-hidden');
-            }
-
-            if (protocolData.message !== null) {
-                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
-                $('#esc-protocol-warning').show();
-            } else {
-                $('#esc-protocol-warning').hide();
-            }
-
-        }
-
-        var $escProtocol = $('#esc-protocol');
-        var $escRate = $('#esc-rate');
-        for (i in escProtocols) {
-            if (escProtocols.hasOwnProperty(i)) {
-                var protocolData = escProtocols[i];
-                $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
-            }
-        }
-
-        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
-        buildMotorRates();
-        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-
-        $escProtocol.change(function () {
-            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
-            buildMotorRates();
-            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
-            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-        });
-
-        $escRate.change(function () {
-            ADVANCED_CONFIG.motorPwmRate = $(this).val();
-        });
-
-        $("#esc-protocols").show();
-
-        var $servoRate = $('#servo-rate');
-
-        for (i in servoRates) {
-            if (servoRates.hasOwnProperty(i)) {
-                $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
-            }
-        }
-        /*
-         *  If rate from FC is not on the list, add a new entry
-         */
-        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
-            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
-        }
-
-        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
-        $servoRate.change(function () {
-            ADVANCED_CONFIG.servoPwmRate = $(this).val();
-        });
-
-        $('#servo-rate-container').show();
 
         var $looptime = $("#looptime");
 
@@ -717,20 +597,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $(".requires-v2_0_0").show();
-        } else {
-            $(".requires-v2_0_0").hide();
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            $(".removed-v2_1_0").hide();
-            $(".requires-v2_1_0").show();
-        } else {
-            $(".removed-v2_1_0").show();
-            $(".requires-v2_1_0").hide();
-        }
-
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
@@ -816,11 +682,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-
-            if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-                BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
-            else
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+            BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
@@ -850,9 +712,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-            if (!FC.isNewMixer()) {
-                googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
-            }
+            
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $('#rxType').val());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
@@ -881,13 +741,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
-
-        /*
-         * Hide mixer section
-         */
-        if (FC.isNewMixer()) {
-            $('.mixer').addClass("is-hidden");
-        }
 
         GUI.content_ready(callback);
     }

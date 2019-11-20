@@ -141,11 +141,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            rate_inputs = $('.mix-rule-rate');
-            rate_inputs.attr("min", -1000);
-            rate_inputs.attr("max", 1000);
-        }
+        let rate_inputs = $('.mix-rule-rate');
+        rate_inputs.attr("min", -1000);
+        rate_inputs.attr("max", 1000);
 
         localize();
     }
@@ -215,11 +213,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function processHtml() {
-
-        if (!FC.isNewMixer()) {
-            $('#mixer-hidden-content').removeClass("is-hidden");
-            $('#mixer-main-content').remove();
-        }
 
         $servoMixTable = $('#servo-mix-table');
         $servoMixTableBody = $servoMixTable.find('tbody');

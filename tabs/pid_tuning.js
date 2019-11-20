@@ -135,8 +135,6 @@ TABS.pid_tuning.initialize = function (callback) {
             $accSoftLpfHz                   = $('#accSoftLpfHz'),
             $dtermLpfHz                     = $('#dtermLpfHz'),
             $yawLpfHz                       = $('#yawLpfHz'),
-            $rollPitchItermIgnoreRate       = $('#rollPitchItermIgnoreRate'),
-            $yawItermIgnoreRate             = $('#yawItermIgnoreRate'),
             $axisAccelerationLimitRollPitch = $('#axisAccelerationLimitRollPitch'),
             $axisAccelerationLimitYaw       = $('#axisAccelerationLimitYaw');
 
@@ -147,8 +145,6 @@ TABS.pid_tuning.initialize = function (callback) {
         $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
         $dtermLpfHz.val(FILTER_CONFIG.dtermLpfHz);
         $yawLpfHz.val(FILTER_CONFIG.yawLpfHz);
-        $rollPitchItermIgnoreRate.val(PID_ADVANCED.rollPitchItermIgnoreRate);
-        $yawItermIgnoreRate.val(PID_ADVANCED.yawItermIgnoreRate);
         $axisAccelerationLimitRollPitch.val(PID_ADVANCED.axisAccelerationLimitRollPitch * 10);
         $axisAccelerationLimitYaw.val(PID_ADVANCED.axisAccelerationLimitYaw * 10);
 
@@ -180,14 +176,6 @@ TABS.pid_tuning.initialize = function (callback) {
             FILTER_CONFIG.yawLpfHz = parseInt($yawLpfHz.val(), 10);
         });
 
-        $rollPitchItermIgnoreRate.change(function () {
-            PID_ADVANCED.rollPitchItermIgnoreRate = parseInt($rollPitchItermIgnoreRate.val(), 10);
-        });
-
-        $yawItermIgnoreRate.change(function () {
-            PID_ADVANCED.yawItermIgnoreRate = parseInt($yawItermIgnoreRate.val(), 10);
-        });
-
         $axisAccelerationLimitRollPitch.change(function () {
             PID_ADVANCED.axisAccelerationLimitRollPitch = Math.round(parseInt($axisAccelerationLimitRollPitch.val(), 10) / 10);
         });
@@ -195,18 +183,6 @@ TABS.pid_tuning.initialize = function (callback) {
         $axisAccelerationLimitYaw.change(function () {
             PID_ADVANCED.axisAccelerationLimitYaw = Math.round(parseInt($axisAccelerationLimitYaw.val(), 10) / 10);
         });
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $('.deprecated-v2_0').hide();
-        } else {
-            $('.deprecated-v2_0').show();
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            $('.requires-v2_1').show();
-        } else {
-            $('.requires-v2_1').hide();
-        }
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
             $('.requires-v2_2').show();

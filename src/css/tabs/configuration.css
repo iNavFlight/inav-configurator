@@ -75,6 +75,7 @@
 
 .config-section .number,
 .config-section .select,
+.config-section .checkbox,
 .tab-configuration .number,
 .tab-configuration .select,
 .tab-configuration .radio,
@@ -90,6 +91,7 @@ hr {
 
 .config-section .number:last-child,
 .config-section .select:last-child,
+.config-section .checkbox:last-child,
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
 .tab-configuration .radio:last-child,
