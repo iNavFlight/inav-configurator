@@ -199,6 +199,10 @@ function onValidFirmware()
                 GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
                 onConnect();
 
+                if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
+                    helper.defaultsDialog.init();
+                }
+
                 $('#tabs ul.mode-connected .tab_setup a').click();
             });
         });
@@ -336,7 +340,6 @@ function onConnect() {
     }, 100);
 
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
-    helper.defaultsDialog.init();
 }
 
 function onClosed(result) {
