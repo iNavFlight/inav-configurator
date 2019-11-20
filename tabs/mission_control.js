@@ -354,7 +354,9 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         //reset text position
-        textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
+        if (textGeom) {
+            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
+        }
     }
 
     function paintLine(pos1, pos2) {
