@@ -1,5 +1,5 @@
 'use strict';
-/*global chrome*/
+/*global chrome,GUI,TABS,nwdialog,$*/
 TABS.cli = {
     lineDelayMs: 50,
     profileSwitchDelayMs: 100,
@@ -96,13 +96,13 @@ function sendLinesWithDelay(outputArray) {
     return (delay, line, index) => {
         return new Promise((resolve) => {
             helper.timeout.add('CLI_send_slowly', () => {
-                var processingDelay = self.lineDelayMs;
+                let processingDelay = TABS.cli.lineDelayMs;
                 if (line.toLowerCase().startsWith('profile')) {
-                    processingDelay = self.profileSwitchDelayMs;
+                    processingDelay = TABS.cli.profileSwitchDelayMs;
                 }
                 const isLastCommand = outputArray.length === index + 1;
-                if (isLastCommand && self.cliBuffer) {
-                    line = getCliCommand(line, self.cliBuffer);
+                if (isLastCommand && TABS.cli.cliBuffer) {
+                    line = getCliCommand(line, TABS.cli.cliBuffer);
                 }
                 TABS.cli.sendLine(line, () => {
                     resolve(processingDelay);
@@ -160,40 +160,22 @@ TABS.cli.initialize = function (callback) {
                 description: suffix.toUpperCase() + ' files', extensions: [suffix],
             }];
 
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: filename, accepts: accepts}, function(entry) {
-                if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message === 'User cancelled') {
-                        GUI.log(chrome.i18n.getMessage('cliSaveToFileAborted'));
-                    } else {
-                        GUI.log(chrome.i18n.getMessage('cliSaveToFileFailed'));
-                        console.error(chrome.runtime.lastError.message);
-                    }
-                    return;
-                }
-
-                if (!entry) {
+            nwdialog.setContext(document);
+            nwdialog.saveFileDialog(filename, accepts, '', function(result) {
+                if (!result) {
                     GUI.log(chrome.i18n.getMessage('cliSaveToFileAborted'));
                     return;
                 }
+                const fs = require('fs');
 
-                entry.createWriter(function (writer) {
-                    writer.onerror = function (){
-                        GUI.log(chrome.i18n.getMessage('cliSaveToFileFailed'));
-                    };
-
-                    writer.onwriteend = function () {
-                        if (self.outputHistory.length > 0 && writer.length === 0) {
-                            writer.write(new Blob([self.outputHistory], {type: 'text/plain'}));
-                        } else {
-                            GUI.log(chrome.i18n.getMessage('cliSaveToFileCompleted'));
-                        }
-                    };
-
-                    writer.truncate(0);
-                }, function (){
-                    GUI.log(chrome.i18n.getMessage('cliSaveToFileFailed'));
-                    console.error('Failed to get file writer');
+                fs.writeFile(result, self.outputHistory, (err) => {
+                    if (err) {
+                        GUI.log('<span style="color: red">Error writing file</span>');
+                        return console.error(err);
+                    }
+                    GUI.log('File saved');
                 });
+
             });
         });
 
@@ -211,22 +193,9 @@ TABS.cli.initialize = function (callback) {
         }
 
         $('.tab-cli .load').click(function() {
-            var accepts = [
-                {
-                    description: 'Config files', extensions: ["txt", "config"],
-                },
-                {
-                    description: 'All files',
-                },
-            ];
-
-            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts}, function(entry) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
-                    return;
-                }
-
-                if (!entry) {
+            nwdialog.setContext(document);
+            nwdialog.openFileDialog(".txt", false, '', function(result) {
+                if (!result) {
                     console.log('No file selected');
                     return;
                 }
@@ -257,12 +226,15 @@ TABS.cli.initialize = function (callback) {
                     self.GUI.snippetPreviewWindow.open();
                 }
 
-                entry.file((file) => {
-                    let reader = new FileReader();
-                    reader.onload =
-                        () => previewCommands(reader.result);
-                    reader.onerror = () => console.error(reader.error);
-                    reader.readAsText(file);
+                const fs = require('fs');
+
+                fs.readFile(result, (err, data) => {
+                    if (err) {
+                        GUI.log('<span style="color: red">Error reading file</span>');
+                        return console.error(err);
+                    }
+
+                    previewCommands(data);
                 });
             });
         });
