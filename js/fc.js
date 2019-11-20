@@ -62,9 +62,6 @@ var CONFIG,
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
-    isNewMixer: function () {
-        return !!(typeof CONFIG != "undefined" && semver.gte(CONFIG.flightControllerVersion, "2.0.0"));
-    },
     isRpyFfComponentUsed: function () {
         return MIXER_CONFIG.platformType == PLATFORM_AIRPLANE;
     },
@@ -560,49 +557,17 @@ var FC = {
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
-            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true}
-        ];
-
-        if (semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
-            features.push(
-                {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', showNameInTip: true},
-                {bit: 5, group: 'other', name: 'SERVO_TILT', showNameInTip: true}
-            );
-        }
-
-        features.push(
-            {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true}
-        );
-
-        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            features.push(
-                {bit: 26, group: 'other', name: 'SOFTSPI'}
-            );
-        }
-
-        features.push(
-            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true}
-        );
-
-        features.push(
-            {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false}
-        );
-
-        features.push(
-            {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false}
-        );
-
-        features.push(
+            {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
+            {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
+            {bit: 26, group: 'other', name: 'SOFTSPI'},
+            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true},
+            {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
+            {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
-            {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false}
-        );
-
-        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0')) {
-            features.push(
-                {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-                {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
-            );
-        }
+            {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
+            {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
+            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
+        ];
 
         return features.reverse();
     },
@@ -802,12 +767,9 @@ var FC = {
             'XBUS_MODE_B_RJ01',
             'IBUS',
             'JETI EXBUS',
-            'TBS Crossfire'
+            'TBS Crossfire',
+            'FPort'
         ];
-
-        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
-            data.push('FPort');
-        }
 
         return data;
     },
@@ -973,15 +935,7 @@ var FC = {
         return [];
     },
     getAccelerometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
-        }
-        else if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "FAKE"];
-        }
-        else {
-            return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "FAKE"];
-        }
+        return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
     },
     getMagnetometerNames: function () {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
@@ -989,30 +943,15 @@ var FC = {
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "FAKE"];
-        } else if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
-        } else if (semver.gte(CONFIG.flightControllerVersion, "1.6.2")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "FAKE"];
         } else {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "FAKE"];
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
         }
     },
     getPitotNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.3")) {
-            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
-        }
-        else {
-            return ["NONE", "AUTO", "MS4525", "FAKE"];
-        }
+        return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
     },
     getRangefinderNames: function () {
-        let data = [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB"];
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            data.push("Benewake TFmini")
-        }
-
-        return data;
+        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
     },
     getOpticalFlowNames: function () {
         return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
@@ -1084,10 +1023,7 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, '1.9.1'))
-            return ['A', 'E', 'R', 'T'];
-        else
-            return ['A', 'E', 'R', 'T', '5', '6', '7', '8'];
+        return ['A', 'E', 'R', 'T'];
     },
     isRcMapValid: function (val) {
         var strBuffer = val.split(''),

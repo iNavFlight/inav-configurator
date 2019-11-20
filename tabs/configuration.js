@@ -397,13 +397,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // midrc was removed in 2.0, but the firmware still excepts
         // the MSP frame with it for backwards compatibility, so we
         // just hide it from the UI.
-        var midThrottleWrapper = $('.midthrottle_wrapper');
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            $('#midthrottle').val(MISC.midrc);
-            midThrottleWrapper.show();
-        } else {
-            midThrottleWrapper.hide();
-        }
+        let midThrottleWrapper = $('.midthrottle_wrapper');
+        midThrottleWrapper.hide();
         $('#maxthrottle').val(MISC.maxthrottle);
         $('#mincommand').val(MISC.mincommand);
 
@@ -416,20 +411,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
         $('#voltagescale').val(MISC.vbatscale);
 
-        // adjust current offset input attributes
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            var current_offset_input = $('#currentoffset');
-            current_offset_input.attr('step', '1');
-            current_offset_input.attr('min', '-3300');
-            current_offset_input.attr('max', '3300');
-        }
-
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-            $('#currentoffset').val(BF_CONFIG.currentoffset);
-        else
-            $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -717,20 +701,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $(".requires-v2_0_0").show();
-        } else {
-            $(".requires-v2_0_0").hide();
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            $(".removed-v2_1_0").hide();
-            $(".requires-v2_1_0").show();
-        } else {
-            $(".removed-v2_1_0").show();
-            $(".requires-v2_1_0").hide();
-        }
-
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
@@ -816,11 +786,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
             BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-
-            if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-                BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
-            else
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+            BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
@@ -850,9 +816,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-            if (!FC.isNewMixer()) {
-                googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
-            }
+            
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $('#rxType').val());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
@@ -881,13 +845,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
-
-        /*
-         * Hide mixer section
-         */
-        if (FC.isNewMixer()) {
-            $('.mixer').addClass("is-hidden");
-        }
 
         GUI.content_ready(callback);
     }
