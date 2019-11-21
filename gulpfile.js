@@ -8,6 +8,7 @@ var minimist = require('minimist');
 var archiver = require('archiver');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var semver = require('semver');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
@@ -235,6 +236,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
+        version: get_nw_version()
     });
     builder.on('log', console.log);
     builder.build(function (err) {
@@ -247,6 +249,10 @@ gulp.task('apps', gulp.series('dist', function(done) {
         done();
     });
 }));
+
+function get_nw_version() {
+    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
+}
 
 function get_release_filename(platform, ext) {
     var pkg = require('./package.json');
