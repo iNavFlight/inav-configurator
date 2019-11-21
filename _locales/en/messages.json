@@ -3168,7 +3168,10 @@
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "tabFilteringAdvanced": {
-        "message": "Advanced filtering"
+        "message": "Other filters"
+    },
+    "mainFilters": {
+        "message": "Main filters"
     },
     "acc_lpf_type": {
         "message": "Accelerometer LPF type"

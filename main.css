@@ -2090,3 +2090,34 @@ select {
 #modal-reconnect div {
     text-align: center;
 }
+
+.subtab__header {
+    padding: 0;
+    height: auto;
+}
+
+.subtab__header_label {
+    display: inline-block;
+    padding: 0 1em;
+    background-color: #ccc;
+    min-width: 7em;
+    height: 1.5em;
+    line-height: 1.5em;
+    cursor: pointer;
+}
+
+.subtab__header_label--current {
+    font-weight: bold;
+}
+
+.subtab__header_label:hover {
+    background-color: #c5c5c5;
+}
+
+.subtab__content {
+    display: none;
+}
+
+.subtab__content--current {
+    display: block;
+}

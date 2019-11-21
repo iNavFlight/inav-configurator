@@ -109,6 +109,8 @@ TABS.pid_tuning.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        helper.tabs.init($('.tab-pid_tuning'));
+
         hideUnusedPids(CONFIG.activeSensors);
 
         $('#showAllPids').on('click', function(){
