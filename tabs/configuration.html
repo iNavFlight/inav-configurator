@@ -10,6 +10,43 @@
             </div>
         </div>
         <div class="leftWrapper">
+                <div class="config-section gui_box grey">
+                        <div class="gui_box_titlebar">
+                            <div class="spacer_box_title" data-i18n="configurationSystem"></div>
+                        </div>
+                        <div class="spacer_box">
+                            <div id="gyrolpf-info" class="info-box"></div>
+                            <div class="select">
+                                <select id="gyro-lpf"></select>
+                                <label for="gyro-lpf"> <span data-i18n="configurationGyroLpfTitle"></span></label>
+                                <div class="helpicon cf_tip" data-i18n_title="configurationGyroLpfHelp"></div>
+                            </div>
+        
+                            <div id="gyro-sync-wrapper" class="checkbox">
+                                <input type="checkbox" id="gyro-sync-checkbox" class="toggle" />
+                                <label for="gyro-sync-checkbox">
+                                    <span data-i18n="configurationGyroSyncTitle"></span>
+                                </label>
+                            </div>
+        
+                            <div id="gyro-frequency-wrapper" class="checkbox">
+                                <select id="gyro-frequency"></select>
+                                <label for="gyro-frequency">
+                                    <span data-i18n="configurationGyroFrequencyTitle"></span>
+                                </label>
+                                <div class="helpicon cf_tip" data-i18n_title="configurationGyroFrequencyHelp"></div>
+                            </div>
+        
+                            <div id="looptime-warning" class="info-box" data-i18n="looptimeNotAdvised"></div>
+                            <div class="select">
+                                <select id="looptime"></select>
+                                <label for="looptime">
+                                    <span data-i18n="configurationLoopTime"></span>
+                                </label>
+                                <div class="helpicon cf_tip" data-i18n_title="configurationLoopTimeHelp"></div>
+                            </div>
+                        </div>
+                    </div>
             <div class="config-section sensors gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationSensors"></div>
@@ -261,44 +298,6 @@
         <!--Right column begins here-->
 
         <div class="rightWrapper">
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationSystem"></div>
-                </div>
-                <div class="spacer_box">
-                    <div id="gyrolpf-info" class="info-box"></div>
-                    <div class="select">
-                        <select id="gyro-lpf"></select>
-                        <label for="gyro-lpf"> <span data-i18n="configurationGyroLpfTitle"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationGyroLpfHelp"></div>
-                    </div>
-
-                    <div id="gyro-sync-wrapper" class="checkbox">
-                        <input type="checkbox" id="gyro-sync-checkbox" class="toggle" />
-                        <label for="gyro-sync-checkbox">
-                            <span data-i18n="configurationGyroSyncTitle"></span>
-                        </label>
-                    </div>
-
-                    <div id="gyro-frequency-wrapper" class="checkbox">
-                        <select id="gyro-frequency"></select>
-                        <label for="gyro-frequency">
-                            <span data-i18n="configurationGyroFrequencyTitle"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationGyroFrequencyHelp"></div>
-                    </div>
-
-                    <div id="looptime-warning" class="info-box" data-i18n="looptimeNotAdvised"></div>
-                    <div class="select">
-                        <select id="looptime"></select>
-                        <label for="looptime">
-                            <span data-i18n="configurationLoopTime"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLoopTimeHelp"></div>
-                    </div>
-                </div>
-            </div>
-
             <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="configurationBatteryVoltage"></div>
