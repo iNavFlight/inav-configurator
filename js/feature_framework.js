@@ -45,6 +45,19 @@ helper.features = (function() {
         toUnset.push(bit);
     };
 
+    publicScope.fromUI = function ($container) {
+
+        $container.find('[data-bit].feature').each(function () {
+            let $this = $(this);
+            if ($this.is(":checked")) {
+                publicScope.set($this.attr("data-bit"));
+            } else {
+                publicScope.unset($this.attr("data-bit"));
+            }
+        });
+
+    };
+
     publicScope.execute = function(callback) {
         exitPoint = callback;
         mspHelper.loadBfConfig(privateScope.setBits);

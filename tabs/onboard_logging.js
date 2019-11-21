@@ -1,4 +1,4 @@
-/*global MSP,MSPCodes*/
+/*global MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper*/
 'use strict';
 
 var
@@ -8,8 +8,7 @@ TABS.onboard_logging = {
 };
 
 TABS.onboard_logging.initialize = function (callback) {
-    var
-        self = this,
+    let
         saveCancelled, eraseCancelled;
 
     if (GUI.active_tab != 'onboard_logging') {
@@ -62,12 +61,10 @@ TABS.onboard_logging.initialize = function (callback) {
 
             var
                 dataflashPresent = DATAFLASH.totalSize > 0,
-                blackboxSupport;
+                blackboxSupport = false;
 
             if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(BF_CONFIG.features, 19)) {
-                blackboxSupport = 'yes';
-            } else {
-                blackboxSupport = 'no';
+                blackboxSupport = true;
             }
 
             $(".tab-onboard_logging")
@@ -76,8 +73,8 @@ TABS.onboard_logging.initialize = function (callback) {
                 .toggleClass("dataflash-present", dataflashPresent)
                 .toggleClass("sdcard-supported", SDCARD.supported)
                 .toggleClass("blackbox-config-supported", BLACKBOX.supported)
-                .toggleClass("blackbox-supported", blackboxSupport == 'yes')
-                .toggleClass("blackbox-unsupported", blackboxSupport == 'no');
+                .toggleClass("blackbox-supported", blackboxSupport)
+                .toggleClass("blackbox-unsupported", !blackboxSupport);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -91,6 +88,12 @@ TABS.onboard_logging.initialize = function (callback) {
                 $('.tab-onboard_logging a.save-flash-dismiss').click(dismiss_saving_dialog);
             }
 
+            $('.save-blackbox-feature').click(function () {
+                helper.features.reset();
+                helper.features.fromUI($('.require-blackbox-unsupported'));
+                helper.features.execute(save_to_eeprom);
+            });
+
             if (BLACKBOX.supported) {
                 $(".tab-onboard_logging a.save-settings").click(function() {
                     var rate = $(".blackboxRate select").val().split('/');
@@ -99,7 +102,11 @@ TABS.onboard_logging.initialize = function (callback) {
                     BLACKBOX.blackboxRateDenom = parseInt(rate[1], 10);
                     BLACKBOX.blackboxDevice = parseInt($(".blackboxDevice select").val(), 10);
 
-                    mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                    helper.features.reset();
+                    helper.features.fromUI($('.require-blackbox-supported'));
+                    helper.features.execute(function () {   
+                        mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                    });
                 });
             }
 

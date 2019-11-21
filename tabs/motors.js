@@ -163,6 +163,7 @@ TABS.motors.initialize = function (callback) {
             }
         }
 
+        /*
         $('input[type="checkbox"].feature').change(function () {
 
             let element = $(this),
@@ -175,6 +176,7 @@ TABS.motors.initialize = function (callback) {
                 BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
             }
         });
+        */
 
         GUI.simpleBind();
     }
