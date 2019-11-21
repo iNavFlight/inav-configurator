@@ -45,6 +45,13 @@ helper.features = (function() {
         toUnset.push(bit);
     };
 
+    publicScope.updateUI = function ($container, values) {
+        $container.find('[data-bit].feature').each(function () {
+            let $this = $(this);
+            $this.prop('checked', bit_check(values, $this.attr("data-bit")));
+        });
+    };
+
     publicScope.fromUI = function ($container) {
 
         $container.find('[data-bit].feature').each(function () {

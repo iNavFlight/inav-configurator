@@ -150,34 +150,7 @@ TABS.motors.initialize = function (callback) {
 
         $('#servo-rate-container').show();
 
-        /*
-         * Set all features ON/OFF
-         */ 
-        let features = FC.getFeatures();
-        for (let i in features) {
-            if (features.hasOwnProperty(i)) {
-                let $html = $(".feature[data-bit='" +features[i].bit + "']");
-                if ($html.length) {
-                    $html.prop('checked', bit_check(BF_CONFIG.features, features[i].bit));
-                }
-            }
-        }
-
-        /*
-        $('input[type="checkbox"].feature').change(function () {
-
-            let element = $(this),
-                index = element.data('bit'),
-                state = element.is(':checked');
-
-            if (state) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
-            } else {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
-            }
-        });
-        */
-
+        helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
         GUI.simpleBind();
     }
 
@@ -349,7 +322,9 @@ TABS.motors.initialize = function (callback) {
         });
 
         $('a.update').click(function () {
-            servos_update();
+            helper.features.reset();
+            helper.features.fromUI($('.tab-motors'));
+            helper.features.execute(servos_update);
         });
         $('a.save').click(function () {
             saveChainer.setExitPoint(function () {
@@ -363,7 +338,9 @@ TABS.motors.initialize = function (callback) {
                     });
                 });
             });
-            servos_update();
+            helper.features.reset();
+            helper.features.fromUI($('.tab-motors'));
+            helper.features.execute(servos_update);
         });
 
     }
