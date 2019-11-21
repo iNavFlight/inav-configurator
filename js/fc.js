@@ -548,7 +548,7 @@ var FC = {
     getFeatures: function () {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 4, group: 'esc', name: 'MOTOR_STOP'},
+            {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
@@ -558,7 +558,7 @@ var FC = {
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
-            {bit: 28, group: 'esc-priority', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
+            {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
             {bit: 26, group: 'other', name: 'SOFTSPI'},
             {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
@@ -566,7 +566,8 @@ var FC = {
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
             {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
             {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
+            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
+            {bit: 5, group: 'other', name: 'DYNAMIC_FILTERS', haveTip: true, showNameInTip: true}
         ];
 
         return features.reverse();

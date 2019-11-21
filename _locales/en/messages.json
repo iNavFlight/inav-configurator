@@ -606,6 +606,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureDYNAMIC_FILTERS": {
+        "message": "Dynamic Gyro Filters"
+    },
+    "featureDYNAMIC_FILTERSTip": {
+        "message": "Use automatic FFT gyro analysis to setup notch filters to attenuate gyro noise. Should be enabled all the time!"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
