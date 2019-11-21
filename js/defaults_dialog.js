@@ -1,3 +1,4 @@
+/*global mspHelper,$,GUI,MSP,BF_CONFIG,chrome*/
 'use strict';
 
 var helper = helper || {};
@@ -192,20 +193,17 @@ helper.defaultsDialog = (function() {
     privateScope.setFeaturesBits = function (selectedDefaultPreset) {
 
         if (selectedDefaultPreset.features && selectedDefaultPreset.features.length > 0) {
+            helper.features.reset();
 
-            for (let i in selectedDefaultPreset.features) {
-                if (selectedDefaultPreset.features.hasOwnProperty(i)) {
-                    let feature = selectedDefaultPreset.features[i];
-
-                    if (feature.state) {
-                        BF_CONFIG.features = bit_set(BF_CONFIG.features, feature.bit);
-                    } else {
-                        BF_CONFIG.features = bit_clear(BF_CONFIG.features, feature.bit);
-                    }
+            for (const feature of selectedDefaultPreset.features) {
+                if (feature.state) {
+                    helper.features.set(feature.bit);
+                } else {
+                    helper.features.unset(feature.bit);
                 }
             }
 
-            mspHelper.saveBfConfig(function () {
+            helper.features.execute(function () {
                 privateScope.setSettings(selectedDefaultPreset);
             });
         } else {

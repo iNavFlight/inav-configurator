@@ -114,6 +114,7 @@ sources.js = [
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
     './js/appUpdater.js',
+    './js/feature_framework.js',
     './js/defaults_dialog.js',
     './node_modules/openlayers/dist/ol.js'
 ];

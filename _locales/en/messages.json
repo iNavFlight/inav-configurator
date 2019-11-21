@@ -606,6 +606,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureDYNAMIC_FILTERS": {
+        "message": "Dynamic Gyro Filters"
+    },
+    "featureDYNAMIC_FILTERSTip": {
+        "message": "Use automatic FFT gyro analysis to setup notch filters to attenuate gyro noise. Should be enabled all the time!"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
@@ -1540,12 +1546,8 @@
     "loggingAutomaticallyRetained": {
         "message": "Automatically loaded previous log file: <strong>$1</strong>"
     },
-
     "blackboxNotSupported": {
-        "message": "Your flight controller's firmware does not support Blackbox logging."
-    },
-    "blackboxMaybeSupported": {
-        "message": "Your flight controller's firmware is too old to support this tab, or the Blackbox feature is disabled on the Configuration tab."
+        "message": "Your flight controller's firmware does not support Blackbox logging or Blackbox feature is not enabled"
     },
     "blackboxConfiguration": {
         "message": "Blackbox configuration"
