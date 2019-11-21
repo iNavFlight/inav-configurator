@@ -311,9 +311,10 @@ function releaseLinux(bits) {
         var dirname = 'linux' + bits;
         var pkg = require('./package.json');
         var src = path.join(appsDir, pkg.name, dirname);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'zip')));
-        var archive = archiver('zip', {
-            zlib: { level: 9 }
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'tar.gz')));
+        var archive = archiver('tar', {
+            zlib: { level: 9 },
+            gzip: true
         });
         archive.on('warning', function(err) { throw err; });
         archive.on('error', function(err) { throw err; });
