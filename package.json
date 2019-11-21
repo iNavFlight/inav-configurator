@@ -41,6 +41,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "nw-builder": "^3.5.7"
+    "nw-builder": "^3.5.7",
+    "semver": "6.3.0"
   }
 }
