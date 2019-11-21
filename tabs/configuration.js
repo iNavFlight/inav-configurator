@@ -149,8 +149,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // generate features
         var features = FC.getFeatures();
 
-        var radioGroups = [];
-
         var features_e = $('.features');
         for (i = 0; i < features.length; i++) {
             var row_e,
@@ -169,37 +167,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
-            if (features[i].mode === 'group') {
-
-                row_e = $('<div class="radio">' +
-                    '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"' +
-                    ' value="' + features[i].bit + '"' +
-                    ' id="feature-' + features[i].bit + '" ' +
-                    '>' +
-                    '<label for="feature-' + features[i].bit + '">' +
-                    '<span data-i18n="feature' + features[i].name + '"></span>' +
-                    '</label>' +
-                    feature_tip_html +
-                    '</div>');
-
-                radioGroups.push(features[i].group);
-            } else {
-
-                row_e = $('<div class="checkbox">' +
-                    '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
-                    ' id="feature-' + features[i].bit + '" ' +
-                    '>' +
-                    '<label for="feature-' + features[i].bit + '">' +
-                    '<span data-i18n="feature' + features[i].name + '"></span>' +
-                    '</label>' +
-                    feature_tip_html +
-                    '</div>');
-
-                var feature_e = row_e.find('input.feature');
-
-                feature_e.prop('checked', bit_check(BF_CONFIG.features, features[i].bit));
-                feature_e.data('bit', features[i].bit);
-            }
+            row_e = $('<div class="checkbox">' +
+                '<input type="checkbox" data-bit="' + features[i].bit + '" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
+                ' id="feature-' + features[i].bit + '" ' +
+                '>' +
+                '<label for="feature-' + features[i].bit + '">' +
+                '<span data-i18n="feature' + features[i].name + '"></span>' +
+                '</label>' +
+                feature_tip_html +
+                '</div>');
 
             features_e.each(function () {
                 if ($(this).hasClass(features[i].group)) {
@@ -208,22 +184,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
+        helper.features.updateUI($('.tab-configuration'), BF_CONFIG.features);
+
         // translate to user-selected language
         localize();
-
-        for (i = 0; i < radioGroups.length; i++) {
-            var group = radioGroups[i];
-            var controls_e = $('input[name="' + group + '"].feature');
-
-
-            controls_e.each(function () {
-                var bit = parseInt($(this).attr('value'));
-                var state = bit_check(BF_CONFIG.features, bit);
-
-                $(this).prop('checked', state);
-            });
-        }
-
 
         var alignments = FC.getSensorAlignments();
 
@@ -606,44 +570,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#deadband-3d-throttle-container').remove();
         }
 
-        $('input[type="checkbox"].feature').change(function () {
-
-            var element = $(this),
-                index = element.data('bit'),
-                state = element.is(':checked');
-
-            if (state) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
-                if (element.attr('name') === 'MOTOR_STOP')
-                    $('div.disarmdelay').show();
-            } else {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
-                if (element.attr('name') === 'MOTOR_STOP')
-                    $('div.disarmdelay').hide();
-            }
-        });
-
-        // UI hooks
-        $('input[type="radio"].feature').change(function () {
-            var element = $(this),
-                group = element.attr('name');
-
-            var controls_e = $('input[name="' + group + '"]');
-            var selected_bit = controls_e.filter(':checked').val();
-
-            controls_e.each(function () {
-                var bit = $(this).attr('value');
-
-                var selected = (selected_bit == bit);
-                if (selected) {
-                    BF_CONFIG.features = bit_set(BF_CONFIG.features, bit);
-                } else {
-                    BF_CONFIG.features = bit_clear(BF_CONFIG.features, bit);
-                }
-
-            });
-        });
-
         // Craft name
         if (craftName != null) {
             $('.config-personalization').show();
@@ -734,7 +660,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-            saveChainer.execute();
+            helper.features.reset();
+            helper.features.fromUI($('.tab-configuration'));
+            helper.features.execute(function () {
+                saveChainer.execute();
+            });
         });
 
         helper.interval.add('config_load_analog', function () {
