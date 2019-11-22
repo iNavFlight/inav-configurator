@@ -1050,6 +1050,15 @@ dialog {
     margin-bottom: 15px;
 }
 
+.tab_subtitle {
+    border-bottom: 1px solid #37a8db;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    height: 25px;
+    font-family: 'open_sanslight', Arial, serif;
+    margin-bottom: 8px;
+}
+
 /* Note */
 .note {
     background-color: #fff7cd;
@@ -2099,15 +2108,17 @@ select {
 .subtab__header_label {
     display: inline-block;
     padding: 0 1em;
-    background-color: #ccc;
+    background-color: #eee;
     min-width: 7em;
     height: 1.5em;
     line-height: 1.5em;
     cursor: pointer;
+    font-size: 18px;
 }
 
 .subtab__header_label--current {
     font-weight: bold;
+    background-color: #ccc;
 }
 
 .subtab__header_label:hover {

@@ -3,191 +3,221 @@
 <div class="tab-pid_tuning toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title subtab__header">
-            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid">PID tuning</span>
-            <span class="subtab__header_label" for="subtab-rates">Rates</span>
+            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid">PID gains</span>
+            <span class="subtab__header_label" for="subtab-rates">Rates & Expo</span>
             <span class="subtab__header_label" for="subtab-filters">Filters</span>
-            <span class="subtab__header_label" for="subtab-mechanics">Fine details</span>
+            <span class="subtab__header_label" for="subtab-mechanics">Mechanics</span>
         </div>
-        <div class="cf_doc_version_bt">
-            <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
-        </div>
-
         <div id="subtab-pid" class="subtab__content subtab__content--current">
-            <div class="cf_column half">
-                <div class="cf_column right">
-                    <div class="default_btn show">
-                        <a href="#" id="showAllPids">Show all PIDs</a>
-                    </div>
-                    <div class="default_btn resetbt">
-                        <a href="#" id="resetPIDs">Reset PID Controller</a>
-                    </div>
+            <div class="cf_column right" style="margin-top: -6px;">
+                <div class="default_btn show">
+                    <a href="#" id="showAllPids">Show all PIDs</a>
+                </div>
+                <div class="default_btn resetbt">
+                    <a href="#" id="resetPIDs">Reset PID Controller</a>
                 </div>
             </div>
-            <form name="pid-tuning" id="pid-tuning">
-                <div class="clear-both"></div>
-                <div class="cf_column half pid-section">
-                    <div class="gui_box grey">
-                        <table class="pid_titlebar">
-                            <tr>
-                                <th class="name" data-i18n="pidTuningName"></th>
-                                <th class="proportional" data-i18n="pidTuningProportional"></th>
-                                <th class="integral" data-i18n="pidTuningIntegral"></th>
-                                <th class="derivative" data-i18n="pidTuningDerivative"></th>
-                                <th class="feedforward" data-i18n="pidTuningFeedForward"></th>
-                            </tr>
-                        </table>
-                        <table id="pid_main" class="pid_tuning">
-                            <tr>
-                                <th colspan="5">
-                                    <div class="pid_mode" data-i18n="pidTuningBasic"></div>
-                                </th>
-                            </tr>
-                            <tr class="ROLL" data-pid-bank-position="0">
-                                <!-- 0 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
-                            </tr>
-                            <tr class="PITCH" data-pid-bank-position="1">
-                                <!-- 1 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
-                            </tr>
-                            <tr class="YAW" data-pid-bank-position="2">
-                                <!-- 2 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                                <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
-                            </tr>
-                        </table>
-                        <table id="pid_baro" class="pid_tuning">
-                            <tr>
-                                <th colspan="5">
-                                    <div class="pid_mode" data-i18n="pidTuningAltitude"></div>
-                                </th>
-                            </tr>
-                            <tr class="ALT" data-pid-bank-position="3">
-                                <!-- 3 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                                <td></td>
-                            </tr>
-                            <tr class="Vario" data-pid-bank-position="9">
-                                <!-- 9 -->
-                                <td>VEL</td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                                <td></td>
-                            </tr>
-                        </table>
-                        <table id="pid_mag" class="pid_tuning">
-                            <tr>
-                                <th colspan="5">
-                                    <div class="pid_mode" data-i18n="pidTuningMag"></div>
-                                </th>
-                            </tr>
-                            <tr class="MAG" data-pid-bank-position="8">
-                                <!-- 8 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </table>
-                        <table id="pid_gps" class="pid_tuning">
-                            <tr>
-                                <th colspan="5">
-                                    <div class="pid_mode" data-i18n="pidTuningGps"></div>
-                                </th>
-                            </tr>
-                            <tr class="Pos" data-pid-bank-position="4">
-                                <!-- 4 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr class="PosR" data-pid-bank-position="5">
-                                <!-- 5 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="ff" step="1" min="0" max="255" /></td>
-                            </tr>
-                            <tr class="NavR" data-pid-bank-position="6">
-                                <!-- 6 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                                <td></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="gui_box grey topspacer">
-                        <table id="pid_accel" class="pid_tuning">
-                            <tr>
-                                <th colspan="4">
-                                    <div class="pid_mode borderleft">
-                                        <div class="textleft">
-                                            <div class="pidTuningLevel" data-i18n="pidTuningLevel"></div>
-                                            <div class="helpicon cf_tip" data-i18n_title="pidTuningLevelHelp"></div>
-                                        </div>
-                                        <div class="pids" data-i18n="pidTuningLevelP"></div>
-                                        <div class="pids" data-i18n="pidTuningLevelI"></div>
-                                        <div class="pids" data-i18n="pidTuningLevelD"></div>
-                                    </div>
-                                </th>
-                            </tr>
-                            <tr class="LEVEL" data-pid-bank-position="7">
-                                <!-- 7 -->
-                                <td></td>
-                                <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                                <td><input type="number" name="d" step="1" min="0" max="255" /></td>
-                            </tr>
-                        </table>
-                    </div>
+            <div class="tab_subtitle" style="margin-top: 1em;">PID gains</div>
+            <div class="clear-both"></div>
+            <div class="cf_column pid-section">
+                <div class="gui_box grey">
+                    <table class="pid_titlebar">
+                        <tr>
+                            <th class="name" data-i18n="pidTuningName"></th>
+                            <th class="proportional" data-i18n="pidTuningProportional"></th>
+                            <th class="integral" data-i18n="pidTuningIntegral"></th>
+                            <th class="derivative" data-i18n="pidTuningDerivative"></th>
+                            <th class="feedforward" data-i18n="pidTuningFeedForward"></th>
+                        </tr>
+                    </table>
+                    <table id="pid_main" class="pid_tuning">
+                        <tr>
+                            <th colspan="5">
+                                <div class="pid_mode" data-i18n="pidTuningBasic"></div>
+                            </th>
+                        </tr>
+                        <tr class="ROLL" data-pid-bank-position="0">
+                            <!-- 0 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                        </tr>
+                        <tr class="PITCH" data-pid-bank-position="1">
+                            <!-- 1 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                        </tr>
+                        <tr class="YAW" data-pid-bank-position="2">
+                            <!-- 2 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                        </tr>
+                    </table>
+                    <table id="pid_baro" class="pid_tuning">
+                        <tr>
+                            <th colspan="5">
+                                <div class="pid_mode" data-i18n="pidTuningAltitude"></div>
+                            </th>
+                        </tr>
+                        <tr class="ALT" data-pid-bank-position="3">
+                            <!-- 3 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
+                        </tr>
+                        <tr class="Vario" data-pid-bank-position="9">
+                            <!-- 9 -->
+                            <td>VEL</td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <table id="pid_mag" class="pid_tuning">
+                        <tr>
+                            <th colspan="5">
+                                <div class="pid_mode" data-i18n="pidTuningMag"></div>
+                            </th>
+                        </tr>
+                        <tr class="MAG" data-pid-bank-position="8">
+                            <!-- 8 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <table id="pid_gps" class="pid_tuning">
+                        <tr>
+                            <th colspan="5">
+                                <div class="pid_mode" data-i18n="pidTuningGps"></div>
+                            </th>
+                        </tr>
+                        <tr class="Pos" data-pid-bank-position="4">
+                            <!-- 4 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="PosR" data-pid-bank-position="5">
+                            <!-- 5 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="ff" step="1" min="0" max="255" /></td>
+                        </tr>
+                        <tr class="NavR" data-pid-bank-position="6">
+                            <!-- 6 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
+                        </tr>
+                    </table>
                 </div>
-            </form>
+                <div class="gui_box grey topspacer">
+                    <table id="pid_accel" class="pid_tuning">
+                        <tr>
+                            <th colspan="4">
+                                <div class="pid_mode borderleft">
+                                    <div class="textleft">
+                                        <div class="pidTuningLevel" data-i18n="pidTuningLevel"></div>
+                                        <div class="helpicon cf_tip" data-i18n_title="pidTuningLevelHelp"></div>
+                                    </div>
+                                    <div class="pids" data-i18n="pidTuningLevelP"></div>
+                                    <div class="pids" data-i18n="pidTuningLevelI"></div>
+                                    <div class="pids" data-i18n="pidTuningLevelD"></div>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="LEVEL" data-pid-bank-position="7">
+                            <!-- 7 -->
+                            <td></td>
+                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="d" step="1" min="0" max="255" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clear-both"></div>
+            <div class="cf_column" style="margin-top:1em;">
+                <table class="rate-tpa rate-tpa--misc">
+                    <tr>
+                        <th data-i18n="pidTuningTPA"></th>
+                        <td>
+                            <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
+                            %
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="pidTuningTPABreakPoint"></th>
+                        <td>
+                            <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000"
+                                max="2000" />
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <div id="subtab-rates" class="subtab__content">
-            <div class="cf_column half">
+            <div class="tab_subtitle" style="margin-top: 1em;">Rates & Expo</div>
+            <div class="clear-both"></div>
+            <div class="cf_column">
                 <table class="rate-tpa rate-tpa--inav">
                     <tbody>
                         <tr>
                             <th class="roll" data-i18n="pidTuningRollRate"></th>
                             <td class="roll">
-                                <input type="number" name="roll" class="rate-tpa_input" step="10" min="60" max="1800" />
+                                <input type="number" id="rate-roll" class="rate-tpa_input" step="10" min="60"
+                                    max="1800" />
                                 degrees per second
                             </td>
                         </tr>
                         <tr>
                             <th class="pitch" data-i18n="pidTuningPitchRate"></th>
                             <td class="pitch">
-                                <input type="number" name="pitch" class="rate-tpa_input" step="10" min="60"
+                                <input type="number" id="rate-pitch" class="rate-tpa_input" step="10" min="60"
                                     max="1800" /> degrees per second
                             </td>
                         </tr>
                         <tr>
                             <th class="yaw" data-i18n="pidTuningYawRate"></th>
                             <td class="yaw">
-                                <input type="number" name="yaw" class="rate-tpa_input" step="10" min="20" max="1800" />
+                                <input type="number" id="rate-yaw" class="rate-tpa_input" step="10" min="20"
+                                    max="1800" />
                                 degrees per second
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Roll & Pitch Expo</th>
+                            <td>
+                                <input data-setting="rc_expo" type="number" class="rate-tpa_input" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Yaw Expo</th>
+                            <td>
+                                <input data-setting="rc_yaw_expo" type="number" class="rate-tpa_input" />
                             </td>
                         </tr>
                         <tr>
@@ -207,32 +237,32 @@
                             </td>
                         </tr>
                         <tr>
+                            <th data-i18n="magHoldYawRate"></th>
+                            <td>
+                                <input type="number" id="magHoldYawRate" class="rate-tpa_input" step="5" min="10"
+                                    max="250" /> degrees per second
+                                <div class="helpicon cf_tip" data-i18n_title="pidTuningMagHoldYawRateHelp"></div>
+                            </td>
+                        </tr>
+                        <tr>
                             <th class="roll" data-i18n="pidTuningManualRollRate"></th>
                             <td class="roll">
-                                <input type="number" name="manual_roll" class="rate-tpa_input" step="1" min="0"
+                                <input type="number" id="rate-manual-roll" class="rate-tpa_input" step="1" min="0"
                                     max="100" /> %
                             </td>
                         </tr>
                         <tr>
                             <th class="pitch" data-i18n="pidTuningManualPitchRate"></th>
                             <td class="pitch">
-                                <input type="number" name="manual_pitch" class="rate-tpa_input" step="1" min="0"
+                                <input type="number" id="rate-manual-pitch" class="rate-tpa_input" step="1" min="0"
                                     max="100" /> %
                             </td>
                         </tr>
                         <tr>
                             <th class="yaw" data-i18n="pidTuningManualYawRate"></th>
                             <td class="yaw">
-                                <input type="number" name="manual_yaw" class="rate-tpa_input" step="1" min="0"
+                                <input type="number" id="rate-manual-yaw" class="rate-tpa_input" step="1" min="0"
                                     max="100" /> %
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="magHoldYawRate"></th>
-                            <td>
-                                <input type="number" id="magHoldYawRate" class="rate-tpa_input" step="5" min="10"
-                                    max="250" /> degrees per second
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuningMagHoldYawRateHelp"></div>
                             </td>
                         </tr>
                     </tbody>
@@ -241,9 +271,9 @@
         </div>
 
         <div id="subtab-filters" class="subtab__content">
-            <div class="tab_title" data-i18n="mainFilters" style="margin-top: 1em;"></div>
+            <div class="tab_subtitle" data-i18n="mainFilters" style="margin-top: 1em;"></div>
             <div class="clear-both"></div>
-            <div class="cf_column half">
+            <div class="cf_column">
                 <table class="rate-tpa rate-tpa--filtering">
                     <tbody>
                         <tr class="requires-v2_2">
@@ -283,8 +313,8 @@
             </div>
 
             <div class="clear-both"></div>
-            <div class="tab_title" data-i18n="tabFilteringAdvanced" style="margin-top: 1em;"></div>
-            <div class="cf_column half">
+            <div class="tab_subtitle" data-i18n="tabFilteringAdvanced" style="margin-top: 1em;"></div>
+            <div class="cf_column">
                 <table class="rate-tpa rate-tpa--filtering">
                     <tbody>
                         <tr>
@@ -300,6 +330,39 @@
                             <td>
                                 <select data-setting="acc_lpf_type" />
                                 <div class="helpicon cf_tip" data-i18n_title="acc_lpf_type_help"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="yawLpfCutoffFrequency"></th>
+                            <td>
+                                <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" />
+                                Hz
+                                <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" style="margin-top: 1em;">Static Notch Filters (deprecated)</div>
+            <div class="cf_column">
+                <table class="rate-tpa rate-tpa--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="accNotchHz"></th>
+                            <td>
+                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchHz" id="accNotchHz"
+                                    class="rate-tpa_input" step="1" min="0" max="255" /> Hz
+                                <div class="helpicon cf_tip" data-i18n_title="accNotchHzHelp"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="accNotchCutoff"></th>
+                            <td>
+                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchCutoff"
+                                    id="gyroNotchCutoff2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
+                                <div class="helpicon cf_tip" data-i18n_title="accNotchCutoffHelp"></div>
                             </td>
                         </tr>
                         <tr>
@@ -334,22 +397,6 @@
                                 <div class="helpicon cf_tip" data-i18n_title="gyroNotchCutoff2Help"></div>
                             </td>
                         </tr>
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="cf_column half">
-                <table class="spacer_left rate-tpa rate-tpa--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="yawLpfCutoffFrequency"></th>
-                            <td>
-                                <input type="number" id="yawLpfHz" class="rate-tpa_input" step="1" min="0" max="200" />
-                                Hz
-                                <div class="helpicon cf_tip" data-i18n_title="yawLpfCutoffFrequencyHelp"></div>
-                            </td>
-                        </tr>
                         <tr>
                             <th data-i18n="dtermNotchHz"></th>
                             <td>
@@ -366,202 +413,110 @@
                                 <div class="helpicon cf_tip" data-i18n_title="dtermNotchCutoffHelp"></div>
                             </td>
                         </tr>
-                        <tr>
-                            <th data-i18n="accNotchHz"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchHz" id="accNotchHz"
-                                    class="rate-tpa_input" step="1" min="0" max="255" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="accNotchHzHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="accNotchCutoff"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchCutoff"
-                                    id="gyroNotchCutoff2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="accNotchCutoffHelp"></div>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div id="subtab-mechanics" class="subtab__content">
-                <div class="clear-both"></div>
-                <div class="tab_title" data-i18n="iTermMechanics" style="margin-top: 1em;"></div>
-                <div class="cf_column half">
-                    <table class="rate-tpa rate-tpa--filtering">
-                        <tbody>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="mc_airmode_type"></th>
-                                <td>
-                                    <select data-setting="mc_airmode_type" />
-                                    <div class="helpicon cf_tip" data-i18n_title="mc_airmode_type_help"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="itermRelax"></th>
-                                <td>
-                                    <select data-setting="mc_iterm_relax" />
-                                    <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="itermRelaxCutoff"></th>
-                                <td>
-                                    <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
-                                    <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <div class="cf_column half">
-                    <table class="spacer_left rate-tpa rate-tpa--filtering">
-                        <tbody>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="mc_airmode_threshold"></th>
-                                <td>
-                                    <select data-setting="mc_airmode_threshold" />
-                                    <div class="helpicon cf_tip" data-i18n_title="mc_airmode_threshold_help"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="itermRelaxType"></th>
-                                <td>
-                                    <select data-setting="mc_iterm_relax_type" />
-                                    <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2_2">
-                                <th data-i18n="antigravityGain"></th>
-                                <td>
-                                    <input class="rate-tpa_input" data-setting="antigravity_gain" />
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2_2">
-                                <th data-i18n="antigravityAccelerator"></th>
-                                <td>
-                                    <input class="rate-tpa_input" data-setting="antigravity_accelerator" />
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2_2">
-                                <th data-i18n="antigravityCutoff"></th>
-                                <td>
-                                    <input class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <div class="clear-both"></div>
-                <div class="tab_title" data-i18n="dTermMechanics" style="margin-top: 1em;"></div>
-                <div class="cf_column half">
-                    <table class="rate-tpa rate-tpa--filtering">
-                        <tbody>
-                            <tr>
-                                <th data-i18n="dtermSetpointWeight"></th>
-                                <td>
-                                    <input type="number" data-setting="dterm_setpoint_weight" class="rate-tpa_input" />
-                                    <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="d_boost_factor"></th>
-                                <td>
-                                    <input data-setting="d_boost_factor" class="rate-tpa_input" />
-                                    <div class="helpicon cf_tip" data-i18n_title="d_boost_factor_help"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <div class="cf_column half">
-                    <table class="spacer_left rate-tpa rate-tpa--filtering">
-                        <tbody>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="d_boost_max_at_acceleration"></th>
-                                <td>
-                                    <input data-setting="d_boost_max_at_acceleration" class="rate-tpa_input" />
-                                    <div class="helpicon cf_tip" data-i18n_title="d_boost_max_at_acceleration_help"></div>
-                                </td>
-                            </tr>
-                            <tr class="requires-v2_2">
-                                <th data-i18n="d_boost_gyro_delta_lpf_hz"></th>
-                                <td>
-                                    <input data-setting="d_boost_gyro_delta_lpf_hz" class="rate-tpa_input" />
-                                    <div class="helpicon cf_tip" data-i18n_title="d_boost_gyro_delta_lpf_hz_help"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <div class="clear-both"></div>
-                <div class="tab_title" data-i18n="tabMisc" style="margin-top: 1em;"></div>
-                <div class="cf_column half">
-                    <table class="rate-tpa rate-tpa--misc">
-                        <tr>
-                            <th data-i18n="yawJumpPreventionLimit"></th>
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="iTermMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column">
+                <table class="rate-tpa rate-tpa--filtering">
+                    <tbody>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="mc_airmode_type"></th>
                             <td>
-                                <input type="number" id="yawJumpPreventionLimit" class="rate-tpa_input" step="10" min="80"
-                                    max="500" />
-                                <div class="helpicon cf_tip" data-i18n_title="yawJumpPreventionLimitHelp"></div>
+                                <select data-setting="mc_airmode_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="mc_airmode_type_help"></div>
                             </td>
                         </tr>
-                        <tr>
-                            <th data-i18n="yawPLimit"></th>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="mc_airmode_threshold"></th>
                             <td>
-                                <input type="number" id="yawPLimit" class="rate-tpa_input" step="10" min="100" max="500" />
-                                <div class="helpicon cf_tip" data-i18n_title="yawPLimitHelp"></div>
+                                <select data-setting="mc_airmode_threshold" />
+                                <div class="helpicon cf_tip" data-i18n_title="mc_airmode_threshold_help"></div>
                             </td>
                         </tr>
-                    </table>
-                </div>
-                <div class="cf_column half">
-                    <table class="spacer_left rate-tpa rate-tpa--filtering">
-                        <tbody>
-                            <tr>
-                                <th data-i18n="axisAccelerationLimitRollPitch"></th>
-                                <td>
-                                    <input type="number" id="axisAccelerationLimitRollPitch" class="rate-tpa_input" step="10"
-                                        min="0" max="655350" />
-                                    dps^2
-                                    <div class="helpicon cf_tip" data-i18n_title="axisAccelerationLimitRollPitchHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th data-i18n="axisAccelerationLimitYaw"></th>
-                                <td>
-                                    <input type="number" id="axisAccelerationLimitYaw" class="rate-tpa_input" step="10" min="0"
-                                        max="655350" />
-                                    dps^2
-                                    <div class="helpicon cf_tip" data-i18n_title="axisAccelerationLimitYawHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th data-i18n="pidTuningTPA"></th>
-                                <td>
-                                    <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
-                                    %
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th data-i18n="pidTuningTPABreakPoint"></th>
-                                <td>
-                                    <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000"
-                                        max="2000" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="itermRelax"></th>
+                            <td>
+                                <select data-setting="mc_iterm_relax" />
+                                <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="itermRelaxCutoff"></th>
+                            <td>
+                                <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="itermRelaxType"></th>
+                            <td>
+                                <select data-setting="mc_iterm_relax_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2_2">
+                            <th data-i18n="antigravityGain"></th>
+                            <td>
+                                <input class="rate-tpa_input" data-setting="antigravity_gain" />
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2_2">
+                            <th data-i18n="antigravityAccelerator"></th>
+                            <td>
+                                <input class="rate-tpa_input" data-setting="antigravity_accelerator" />
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2_2">
+                            <th data-i18n="antigravityCutoff"></th>
+                            <td>
+                                <input class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="dTermMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column">
+                <table class="rate-tpa rate-tpa--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="dtermSetpointWeight"></th>
+                            <td>
+                                <input type="number" data-setting="dterm_setpoint_weight" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="d_boost_factor"></th>
+                            <td>
+                                <input data-setting="d_boost_factor" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="d_boost_factor_help"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="d_boost_max_at_acceleration"></th>
+                            <td>
+                                <input data-setting="d_boost_max_at_acceleration" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="d_boost_max_at_acceleration_help"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_2">
+                            <th data-i18n="d_boost_gyro_delta_lpf_hz"></th>
+                            <td>
+                                <input data-setting="d_boost_gyro_delta_lpf_hz" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="d_boost_gyro_delta_lpf_hz_help"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="clear-both"></div>
