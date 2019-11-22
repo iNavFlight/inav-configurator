@@ -1,5 +1,5 @@
 'use strict';
-/*global $,TABS,GUI*/
+/*global $,TABS,GUI,googleAnalytics*/
 
 TABS.landing = {};
 TABS.landing.initialize = function (callback) {
@@ -10,10 +10,9 @@ TABS.landing.initialize = function (callback) {
     }
 
     $('#content').load("./tabs/landing.html", function () {
-        // translate to user-selected language
         localize();
 
-        $('div.welcome a, div.sponsors a').click(function () {
+        $('.tab-landing a').click(function () {
             googleAnalytics.sendEvent('ExternalUrls', 'Click', $(this).prop('href'));
         });
 
