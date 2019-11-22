@@ -1,4 +1,4 @@
-/*global chrome*/
+/*global chrome,helper,mspHelper*/
 'use strict';
 
 TABS.pid_tuning = {
@@ -14,7 +14,8 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadPidData,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
-        mspHelper.loadFilterConfig
+        mspHelper.loadFilterConfig,
+        mspHelper.loadBfConfig
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -108,6 +109,7 @@ TABS.pid_tuning.initialize = function (callback) {
         localize();
 
         helper.tabs.init($('.tab-pid_tuning'));
+        helper.features.updateUI($('.tab-pid_tuning'), BF_CONFIG.features);
 
         hideUnusedPids(CONFIG.activeSensors);
 
@@ -224,7 +226,11 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            mspHelper.savePidData(send_rc_tuning_changes);
+            helper.features.reset();
+            helper.features.fromUI($('.tab-pid_tuning'));
+            helper.features.execute(function () {
+                mspHelper.savePidData(send_rc_tuning_changes);    
+            });
         });
 
         GUI.content_ready(callback);
