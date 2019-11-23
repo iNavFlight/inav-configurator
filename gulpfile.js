@@ -8,6 +8,7 @@ var minimist = require('minimist');
 var archiver = require('archiver');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var semver = require('semver');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
@@ -236,6 +237,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
+        version: get_nw_version()
     });
     builder.on('log', console.log);
     builder.build(function (err) {
@@ -248,6 +250,10 @@ gulp.task('apps', gulp.series('dist', function(done) {
         done();
     });
 }));
+
+function get_nw_version() {
+    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
+}
 
 function get_release_filename(platform, ext) {
     var pkg = require('./package.json');
@@ -306,9 +312,10 @@ function releaseLinux(bits) {
         var dirname = 'linux' + bits;
         var pkg = require('./package.json');
         var src = path.join(appsDir, pkg.name, dirname);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'zip')));
-        var archive = archiver('zip', {
-            zlib: { level: 9 }
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'tar.gz')));
+        var archive = archiver('tar', {
+            zlib: { level: 9 },
+            gzip: true
         });
         archive.on('warning', function(err) { throw err; });
         archive.on('error', function(err) { throw err; });
