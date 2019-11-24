@@ -5,14 +5,26 @@
         <div class="cf_doc_version_bt">
             <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
         </div>
-        <div class="require-blackbox-unsupported note">
-            <div class="note_spacer">
-                <p data-i18n="blackboxNotSupported"></p>
-            </div>
-        </div>
-        <div class="require-blackbox-maybe-supported note">
-            <div class="note_spacer">
-                <p data-i18n="blackboxMaybeSupported"></p>
+        <div class="require-blackbox-unsupported">
+            
+            <div class="gui_box grey require-blackbox-config-supported">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
+                </div>
+                <div class="spacer_box config-section">
+                    <div class="note note_spacer mb1em">
+                        <p data-i18n="blackboxNotSupported"></p>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-1">
+                        <label for="feature-19-1">
+                            <span data-i18n="featureBLACKBOX"></span>
+                        </label>
+                    </div>
+                    <div class="line">
+                        <a href="#" class="save-blackbox-feature regular-button" data-i18n="blackboxButtonSave"></a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="require-blackbox-supported">
@@ -20,13 +32,19 @@
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
                 </div>
-                <div class="spacer_box">
-                    <div class="line blackboxDevice">
+                <div class="spacer_box config-section">
+                    <div class="checkbox">
+                            <input checked type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-2">
+                            <label for="feature-19-2">
+                                <span data-i18n="featureBLACKBOX"></span>
+                            </label>
+                        </div>
+                    <div class="select line blackboxDevice">
                         <select name="blackbox_device">
                         </select>
                         <span>Blackbox logging device</span>
                     </div>
-                    <div class="line blackboxRate">
+                    <div class="select line blackboxRate">
                         <select name="blackbox_rate">
                         </select>
                         <span>Portion of flight loop iterations to log (logging rate)</span>
