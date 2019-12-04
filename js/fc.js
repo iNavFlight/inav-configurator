@@ -942,10 +942,10 @@ var FC = {
         return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
     },
     getBarometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "FAKE"];
         } else {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "FAKE"];
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "FAKE"];
         }
     },
     getPitotNames: function () {
