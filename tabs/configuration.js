@@ -580,11 +580,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         $('a.save').click(function () {
-            // gather data that doesn't have automatic change event bound
-            BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
-            BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
-            BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
-
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
@@ -606,9 +601,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
-
-            BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-            BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
@@ -663,6 +655,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
+                BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
+                BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
+                BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
+                BF_CONFIG.currentscale = parseInt($('#currentscale').val());
+                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();
             });
         });
