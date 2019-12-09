@@ -78,7 +78,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         let outputMap = OUTPUT_MAPPING.getOutputTable(
             MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
             MOTOR_RULES.getNumberOfConfiguredMotors(),
-            SERVO_RULES.getNumberOfConfiguredServos()
+            SERVO_RULES.getUsedServoIndexes()
         );
 
         for (let i = 1; i <= OUTPUT_MAPPING.getOutputCount(); i++) {
@@ -331,6 +331,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
             MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
+            renderOutputMapping();
+        });
+
+        $servoMixTableBody.on('change', "input", function (event) {
             renderOutputMapping();
         });
 
