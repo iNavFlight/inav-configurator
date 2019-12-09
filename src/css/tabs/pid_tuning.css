@@ -12,7 +12,7 @@
 .rate-tpa.rate-tpa--inav td,
 .rate-tpa.rate-tpa--filtering td,
 .rate-tpa.rate-tpa--misc td {
-    background-color: #DEDEDE;
+    background-color: #f3f3f3;
     width: auto;
     border-bottom: 1px solid #ccc;
 }
@@ -375,4 +375,8 @@
 .rate-tpa .helpicon {
     top: 10px;
     position: relative;
+}
+
+.rate-tpa tbody {
+    /* background: #D6D6D6 linear-gradient(-45deg, rgba(255, 255, 255, .2) 10%, transparent 10%, transparent 20%, rgba(255, 255, 255, .2) 20%, rgba(255, 255, 255, .2) 30%, transparent 30%, transparent 40%, rgba(255, 255, 255, .2) 40%, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent 60%, rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .2) 70%, transparent 70%, transparent 80%, rgba(255, 255, 255, .2) 80%, rgba(255, 255, 255, .2) 90%, transparent 90%, transparent 100%, rgba(255, 255, 255, .2) 100%, transparent); */
 }
