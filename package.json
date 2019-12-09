@@ -1,7 +1,7 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
@@ -41,6 +41,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "nw-builder": "^3.5.7"
+    "nw-builder": "^3.5.7",
+    "semver": "6.3.0"
   }
 }
