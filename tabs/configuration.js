@@ -584,11 +584,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
 
-            MISC.minthrottle = parseInt($('#minthrottle').val());
-            MISC.midrc = parseInt($('#midthrottle').val());
-            MISC.maxthrottle = parseInt($('#maxthrottle').val());
-            MISC.mincommand = parseInt($('#mincommand').val());
-
             MISC.battery_cells = parseInt($('#cells').val());
             MISC.voltage_source = parseInt($('#voltagesource').val());
             MISC.vbatdetectcellvoltage = parseFloat($('#celldetectvoltage').val());
