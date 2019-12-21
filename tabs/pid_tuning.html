@@ -276,12 +276,26 @@
             <div class="cf_column">
                 <table class="rate-tpa rate-tpa--filtering">
                     <tbody>
-                        <tr>
-                            <th>Gyro Dynamic Filters</th>
+                        <tr class="requires-v2_3">
+                            <th>Gyro Dynamic Notch Filter</th>
                             <td>
                                 <div style="padding-left: 1em; line-height: 28px;">
                                 <input type="checkbox" data-bit="5" class="feature toggle" name="DYNAMIC_FILTERS" title="DYNAMIC_FILTERS" id="feature-5">
                             </div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_3">
+                            <th>Gyro Dynamic Notch Width</th>
+                            <td>
+                                <input data-setting="dyn_notch_width_percent" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="Sets the distance in percent between dynamic gyro notches. Set to 0 to use single dynamic gyro notch."></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_3">
+                            <th>Gyro Dynamic Notch Min Frequency</th>
+                            <td>
+                                <input data-setting="dyn_notch_min_hz" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="Minimum frequency for dynamic gyro notch filters. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."></div>
                             </td>
                         </tr>
                         <tr class="requires-v2_2">
@@ -292,20 +306,20 @@
                             </td>
                         </tr>
                         <tr>
+                            <th data-i18n="gyroLpfCutoffFrequency"></th>
+                            <td>
+                                <input type="number" id="gyroSoftLpfHz" class="rate-tpa_input" step="1" min="0"
+                                    max="200" /> Hz
+                                <div class="helpicon cf_tip" data-i18n_title="gyroLpfCutoffFrequencyHelp"></div>
+                            </td>
+                        </tr>
+                        <tr>
                             <th data-i18n="gyroStage2LpfCutoffFrequency"></th>
                             <td>
                                 <input type="number" id="gyroStage2LpfCutoffFrequency"
                                     data-simple-bind="FILTER_CONFIG.gyroStage2LowpassHz" class="rate-tpa_input" step="1"
                                     min="0" max="500" /> Hz
                                 <div class="helpicon cf_tip" data-i18n_title="gyroStage2LpfCutoffFrequencyHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="gyroLpfCutoffFrequency"></th>
-                            <td>
-                                <input type="number" id="gyroSoftLpfHz" class="rate-tpa_input" step="1" min="0"
-                                    max="200" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="gyroLpfCutoffFrequencyHelp"></div>
                             </td>
                         </tr>
                         <tr>
