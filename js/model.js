@@ -517,7 +517,53 @@ const mixerList = [
             new ServoMixRule(3, INPUT_STABILIZED_YAW,  50, 0),
             new ServoMixRule(4, INPUT_STABILIZED_YAW,  50, 0),
         ]
-    }            
+    },
+    {
+        id: 31,
+        name: 'Rover',
+        model: 'custom',
+        image: 'custom',
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_ROVER,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,  100, 0),
+        ]
+    },
+    {
+        id: 32,
+        name: 'Boat',
+        model: 'custom',
+        image: 'custom',
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_BOAT,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,  100, 0),
+        ]
+    }    
+    ,
+    {
+        id: 33,
+        name: 'Boat',
+        model: 'custom',
+        image: 'custom',
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_OTHER,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,  100, 0),
+        ]
+    }                 
 ];
 
 const platformList = [
