@@ -130,8 +130,8 @@ var FC = {
         };
 
         PID_names = [];
-        PIDs = new Array(10);
-        for (var i = 0; i < 10; i++) {
+        PIDs = new Array(11);
+        for (let i = 0; i < PIDs.length; i++) {
             PIDs[i] = new Array(4);
         }
 
