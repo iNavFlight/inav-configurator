@@ -548,19 +548,19 @@ const platformList = [
     {
         id: 4,
         name: "Rover",
-        enabled: false,
+        enabled: true,
         flapsPossible: false
     },
     {
         id: 5,
         name: "Boat",
-        enabled: false,
+        enabled: true,
         flapsPossible: false
     },
     {
         id: 6,
         name: "Other",
-        enabled: false,
+        enabled: true,
         flapsPossible: false
     }
 ];
