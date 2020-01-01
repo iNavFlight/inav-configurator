@@ -532,6 +532,29 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1550)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "ZOHD Dart 250G",
+        description: "Small and light flying wing that can be build below 250g and as such be fully legal in many countries",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG", "MIXER_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("MIXER_CONFIG", "platformType", 1),
+            presets.elementHelper("PIDs", 0, [9, 12, 0, 15]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [9, 15, 0, 14]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
+            presets.elementHelper("RC_tuning", "roll_rate", 360),
+            presets.elementHelper("RC_tuning", "pitch_rate", 130),
+            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
+            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1500)
+        ],
+        type: 'flyingwing'
     }
 ];
 
