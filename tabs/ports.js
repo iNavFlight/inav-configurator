@@ -93,6 +93,15 @@ TABS.ports.initialize = function (callback) {
         );
     }
 
+    if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+        functionRules.push({
+            name: 'DJI_FPV',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
+
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }

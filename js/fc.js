@@ -769,7 +769,8 @@ var FC = {
             'IBUS',
             'JETI EXBUS',
             'TBS Crossfire',
-            'FPort'
+            'FPort',
+            'SBUS Fast',
         ];
 
         return data;
