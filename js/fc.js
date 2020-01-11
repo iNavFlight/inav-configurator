@@ -1082,7 +1082,7 @@ var FC = {
         ];
     },
     getServoMixInputName: function (input) {
-        return getServoMixInputNames()[input];
+        return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
         for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -1095,7 +1095,7 @@ var FC = {
         return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
-        return FC.isModeBitSet(FC.getModeId(name));
+        return this.isModeBitSet(this.getModeId(name));
     },
     getLogicOperators: function () {
         return {
@@ -1181,7 +1181,7 @@ var FC = {
                     0: "ARM timer [s]",
                     1: "Home distance [m]",
                     2: "Trip distance [m]",
-                    3: "RSSI", 
+                    3: "RSSI",
                     4: "Vbat [deci-Volt] [1V = 10]",
                     5: "Cell voltage [deci-Volt] [1V = 10]",
                     6: "Current [centi-Amp] [1A = 100]",

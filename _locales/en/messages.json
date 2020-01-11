@@ -2966,6 +2966,9 @@
     "input": {
         "message": "Input"
     },
+    "fixedValue": {
+        "message": "Fixed Value (µs)"
+    },
     "weight": {
         "message": "Weight (%)"
     },
