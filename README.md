@@ -26,6 +26,14 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Run INAV Configurator app from unpacked folder
 1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run 
 
+### Linux
+
+1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
+1. Download Configurator for Linux platform (linux32 and linux64 are present)
+1. Extract tar.gz archive
+1. Make the inav-configurator file executable (chmod +x inav-configurator)
+1. Run INAV Configurator app from unpacked folder
+
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
