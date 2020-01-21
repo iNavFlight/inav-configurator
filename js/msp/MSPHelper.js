@@ -1495,7 +1495,10 @@ var mspHelper = (function (gui) {
                     dataHandler.callbacks.splice(i, 1);
 
                     // fire callback
-                    if (callback) callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    if (callback) {
+                        callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    }
+                    break;
                 }
             }
         }
