@@ -165,7 +165,7 @@ TABS.ports.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
 
         function on_configuration_loaded_handler() {
-            $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
+            GUI.load("./tabs/ports.html", on_tab_loaded_handler);
         }
     }
 

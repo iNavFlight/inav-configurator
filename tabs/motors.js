@@ -55,7 +55,7 @@ TABS.motors.initialize = function (callback) {
     });
 
     function load_html() {
-        $('#content').load("./tabs/motors.html", onLoad);
+        GUI.load("./tabs/motors.html", onLoad);
     }
 
     function onLoad() {

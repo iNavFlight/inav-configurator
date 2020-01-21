@@ -21,7 +21,7 @@ TABS.transponder.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/transponder.html", process_html);
+        GUI.load("./tabs/transponder.html", process_html);
     }
 
     // get the transponder data and a flag to see if transponder support is enabled on the FC

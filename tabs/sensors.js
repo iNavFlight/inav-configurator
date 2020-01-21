@@ -198,7 +198,7 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    $('#content').load("./tabs/sensors.html", function load_html() {
+    GUI.load("./tabs/sensors.html", function load_html() {
         // translate to user-selected language
         localize();
 

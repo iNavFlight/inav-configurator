@@ -985,6 +985,14 @@ li.active .ic_mixer {
     /* Cause the height to shrink to contain its floated contents while log is open */
 }
 
+#content.loading {
+    overflow-y: hidden;
+}
+
+#content.loading > * {
+    opacity: 0;
+}
+
 #status-bar {
     position: fixed;
     bottom: 0;
@@ -1015,9 +1023,17 @@ li.active .ic_mixer {
 }
 
 .data-loading {
+    z-index: 10000;
+    position: absolute;
+    top: 0;
     width: 100%;
     height: 100%;
     background: url('../images/loading-bars.svg') no-repeat center 45%;
+    background-color: #FFF;
+}
+
+#content.loading .data-loading {
+    opacity: 1;
 }
 
 .data-loading p {

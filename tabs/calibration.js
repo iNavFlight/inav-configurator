@@ -84,7 +84,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        $('#content').load("./tabs/calibration.html", processHtml);
+        GUI.load("./tabs/calibration.html", processHtml);
     }
 
     function updateCalibrationSteps() {

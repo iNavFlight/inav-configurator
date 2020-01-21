@@ -54,7 +54,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        $('#content').load("./tabs/mixer.html", processHtml);
+        GUI.load("./tabs/mixer.html", processHtml);
     }
 
     function renderOutputTable() {
