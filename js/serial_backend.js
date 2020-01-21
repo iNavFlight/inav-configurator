@@ -340,7 +340,6 @@ function onConnect() {
     }, 100);
 
     helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
-    helper.defaultsDialog.init();
 }
 
 function onClosed(result) {
