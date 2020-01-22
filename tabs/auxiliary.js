@@ -28,7 +28,7 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/auxiliary.html", process_html);
+        GUI.load("./tabs/auxiliary.html", process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);

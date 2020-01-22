@@ -171,6 +171,7 @@ $(document).ready(function () {
 
                 // detach listeners and remove element data
                 var content = $('#content');
+                content.data('empty', !!content.is(':empty'));
                 content.empty();
 
                 // display loading screen

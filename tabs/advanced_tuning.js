@@ -33,7 +33,7 @@ TABS.advanced_tuning.initialize = function (callback) {
     saveChainer.setExitPoint(reboot);
 
     function loadHtml() {
-        $('#content').load("./tabs/advanced_tuning.html", processHtml);
+        GUI.load("./tabs/advanced_tuning.html", processHtml);
     }
 
     function reboot() {

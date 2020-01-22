@@ -659,7 +659,7 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     saveChainer.setExitPoint(reboot);
 
     function loadHtml() {
-        $('#content').load("./tabs/profiles.html", processHtml);
+        GUI.load("./tabs/profiles.html", processHtml);
     }
 
     function reboot() {

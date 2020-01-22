@@ -30,7 +30,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        $('#content').load("./tabs/receiver.html", process_html);
+        GUI.load("./tabs/receiver.html", process_html);
     }
 
     function drawRollPitchExpo() {

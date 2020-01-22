@@ -55,7 +55,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/onboard_logging.html", function() {
+        GUI.load("./tabs/onboard_logging.html", function() {
             // translate to user-selected language
             localize();
 

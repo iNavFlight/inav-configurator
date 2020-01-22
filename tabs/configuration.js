@@ -87,7 +87,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/configuration.html", process_html);
+        GUI.load("./tabs/configuration.html", process_html);
     }
 
     function process_html() {

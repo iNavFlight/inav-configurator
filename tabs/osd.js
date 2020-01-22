@@ -2344,7 +2344,7 @@ TABS.osd.initialize = function (callback) {
         GUI.active_tab = 'osd';
     }
 
-    $('#content').load("./tabs/osd.html", Settings.processHtml(function () {
+    GUI.load("./tabs/osd.html", Settings.processHtml(function () {
         // translate to user-selected language
         localize();
 

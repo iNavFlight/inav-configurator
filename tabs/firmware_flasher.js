@@ -23,7 +23,7 @@ TABS.firmware_flasher.initialize = function (callback) {
     var intel_hex = false, // standard intel hex in string format
         parsed_hex = false; // parsed raw hex in array format
 
-    $('#content').load("./tabs/firmware_flasher.html", function () {
+    GUI.load("./tabs/firmware_flasher.html", function () {
         // translate to user-selected language
         localize();
 

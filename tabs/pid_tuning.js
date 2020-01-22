@@ -29,7 +29,7 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/pid_tuning.html", Settings.processHtml(process_html));
+        GUI.load("./tabs/pid_tuning.html", Settings.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {

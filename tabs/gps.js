@@ -9,7 +9,7 @@ TABS.gps.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/gps.html", process_html);
+        GUI.load("./tabs/gps.html", process_html);
     }
 
     load_html();

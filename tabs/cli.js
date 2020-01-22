@@ -142,7 +142,7 @@ TABS.cli.initialize = function (callback) {
         Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
     }
 
-    $('#content').load("./tabs/cli.html", function () {
+    GUI.load("./tabs/cli.html", function () {
         // translate to user-selected language
         localize();
 

@@ -20,7 +20,7 @@ TABS.logging.initialize = function (callback) {
         }
 
         var load_html = function () {
-            $('#content').load("./tabs/logging.html", process_html);
+            GUI.load("./tabs/logging.html", process_html);
         }
 
         MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);
