@@ -53,25 +53,21 @@
                     <div class="helpicon cf_tip" data-i18n_title="featureMOTOR_STOPTip"></div>
                 </div>
 
-                <!--   -->
-                <div class="number hide-for-shot">
-                    <input type="number" data-simple-bind="MISC.minthrottle" id="minthrottle" name="minthrottle" min="0" max="2000" />
-                    <label for="minthrottle">
-                        <span data-i18n="configurationThrottleMinimum"></span>
+                <div id="throttle_idle-info" class="info-box"></div>
+                <div class="number requires-v2_4">
+                    <input id="throttle_idle" data-setting="throttle_idle" type="number" data-step="1.0" />
+                    <label for="throttle_idle">
+                        <span data-i18n="throttleIdle"></span>
                     </label>
                 </div>
-                <div class="number hide-for-shot">
-                    <input type="number" data-simple-bind="MISC.maxthrottle" id="maxthrottle" name="maxthrottle" min="0" max="2000" />
-                    <label for="maxthrottle">
-                        <span data-i18n="configurationThrottleMaximum"></span>
+
+                <div class="number requires-v2_4">
+                    <input id="motor_poles" data-setting="motor_poles" type="number" />
+                    <label for="motor_poles">
+                        <span data-i18n="motor_poles"></span>
                     </label>
                 </div>
-                <div class="number hide-for-shot">
-                    <input type="number" data-simple-bind="MISC.mincommand" id="mincommand" name="mincommand" min="0" max="2000" />
-                    <label for="mincommand">
-                        <span data-i18n="configurationThrottleMinimumCommand"></span>
-                    </label>
-                </div>
+                 
             </div>
         </div>
         <div class="gui_box grey">
