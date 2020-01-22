@@ -3244,5 +3244,17 @@
     },
     "defaultsDialogInfo": {
         "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
+    },
+    "throttleIdle": {
+        "message": "Motors IDLE power [%]"
+    },
+    "throttleIdleDigitalInfo": {
+        "message": "For digital protocols, IDLE can be lowered even down to 5-7% without motors stopping in the air. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "throttleIdleAnalogInfo": {
+        "message": "For analog protocols, IDLE can be lowered below 10% if motors are working smooth without stuttering. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "motor_poles": {
+        "message": "Number of motor poles (number of magnets)"
     }
 }

@@ -43,6 +43,7 @@ TABS.motors.initialize = function (callback) {
     var saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
+        saveSettings,
         mspHelper.sendServoConfigurations,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveBfConfig,
@@ -55,19 +56,31 @@ TABS.motors.initialize = function (callback) {
     });
 
     function load_html() {
-        GUI.load("./tabs/motors.html", onLoad);
+        GUI.load("./tabs/motors.html", Settings.processHtml(onLoad));
+    }
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
     }
 
     function onLoad() {
         process_motors();
         process_servos();
         processConfiguration();
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+            $('.requires-v2_4').show();
+        } else {
+            $('.requires-v2_4').hide();
+        }
+
         finalize();
     } 
 
     function processConfiguration() {
-        let escProtocols = FC.getEscProtocols();
-        let servoRates = FC.getServoRates();
+        let escProtocols = FC.getEscProtocols(),
+            servoRates = FC.getServoRates(),
+            $idleInfoBox = $("#throttle_idle-info");
 
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
@@ -88,10 +101,15 @@ TABS.motors.initialize = function (callback) {
             }
 
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-                //DSHOT/SERIALSHOT protocols, simplify UI
-                $('.hide-for-shot').addClass('is-hidden');
+
+                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                $idleInfoBox.addClass('ok-box');
+                $idleInfoBox.show();
+
             } else {
-                $('.hide-for-shot').removeClass('is-hidden');
+                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                $idleInfoBox.addClass('ok-box');
+                $idleInfoBox.show();
             }
 
             if (protocolData.message !== null) {
