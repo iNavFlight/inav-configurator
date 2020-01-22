@@ -102,3 +102,14 @@ DataView.prototype.readString = function() {
     }
     return s;
 };
+
+DataView.prototype.asHex = function() {
+    let s = "";
+    for (let ii = 0; ii < this.byteLength; ii++) {
+        if (ii == this.offset) {
+            s += "/"
+        }
+        s += this.getUint8(ii).toString(16);
+    }
+    return s;
+};
