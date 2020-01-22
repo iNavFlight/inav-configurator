@@ -551,7 +551,7 @@ const mixerList = [
     ,
     {
         id: 33,
-        name: 'Boat',
+        name: 'Other',
         model: 'custom',
         image: 'custom',
         enabled: true,
