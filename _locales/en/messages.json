@@ -606,6 +606,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureDYNAMIC_FILTERS": {
+        "message": "Dynamic Gyro Filters"
+    },
+    "featureDYNAMIC_FILTERSTip": {
+        "message": "Use automatic FFT gyro analysis to setup notch filters to attenuate gyro noise. Should be enabled all the time!"
+    },
     "configurationFeatureEnabled": {
         "message": "Enabled"
     },
@@ -921,6 +927,9 @@
     "portsFunction_FRSKY_OSD": {
         "message": "FrSky OSD"
     },
+    "portsFunction_DJI_FPV": {
+        "message": "DJI FPV VTX"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -982,7 +991,7 @@
         "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
     },
     "pidTuningTPA": {
-        "message": "TPA"
+        "message": "Thrust PID Attenuation (TPA)"
     },
     "pidTuningTPABreakPoint": {
         "message": "TPA Breakpoint"
@@ -1540,12 +1549,8 @@
     "loggingAutomaticallyRetained": {
         "message": "Automatically loaded previous log file: <strong>$1</strong>"
     },
-
     "blackboxNotSupported": {
-        "message": "Your flight controller's firmware does not support Blackbox logging."
-    },
-    "blackboxMaybeSupported": {
-        "message": "Your flight controller's firmware is too old to support this tab, or the Blackbox feature is disabled on the Configuration tab."
+        "message": "Your flight controller's firmware does not support Blackbox logging or Blackbox feature is not enabled"
     },
     "blackboxConfiguration": {
         "message": "Blackbox configuration"
@@ -1960,7 +1965,7 @@
         "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
     },
     "logPwmOutputDisabled": {
-        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Configuration</u> tab to enable!"
+        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Outputs</u> tab to enable!"
     },
     "configurationGyroSyncTitle": {
         "message" : "Synchronize looptime with gyroscope"
@@ -2961,6 +2966,9 @@
     "input": {
         "message": "Input"
     },
+    "fixedValue": {
+        "message": "Fixed Value (µs)"
+    },
     "weight": {
         "message": "Weight (%)"
     },
@@ -3166,7 +3174,10 @@
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "tabFilteringAdvanced": {
-        "message": "Advanced filtering"
+        "message": "Other filters"
+    },
+    "mainFilters": {
+        "message": "Main filters"
     },
     "acc_lpf_type": {
         "message": "Accelerometer LPF type"
@@ -3222,7 +3233,28 @@
     "antigravityCutoff": {
         "message": "Antigravity Cutoff Frequency"
     },
+    "ouptputsConfiguration": {
+        "message": "Configuration"
+    },
     "vtxDisclaimer": {
         "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
+    },
+    "defaultsDialogTitle": {
+        "message": "Default values"
+    },
+    "defaultsDialogInfo": {
+        "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
+    },
+    "throttleIdle": {
+        "message": "Motors IDLE power [%]"
+    },
+    "throttleIdleDigitalInfo": {
+        "message": "For digital protocols, IDLE can be lowered even down to 5-7% without motors stopping in the air. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "throttleIdleAnalogInfo": {
+        "message": "For analog protocols, IDLE can be lowered below 10% if motors are working smooth without stuttering. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "motor_poles": {
+        "message": "Number of motor poles (number of magnets)"
     }
 }

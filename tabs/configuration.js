@@ -41,10 +41,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
-        loadCraftName
+        loadCraftName,
+        mspHelper.loadMiscV2
     ];
 
-    loadChain.push(mspHelper.loadMiscV2);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -64,10 +64,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveSensorConfig,
         mspHelper.saveVTXConfig,
         saveCraftName,
+        mspHelper.saveMiscV2,
+        mspHelper.saveToEeprom
     ];
-
-    saveChain.push(mspHelper.saveMiscV2);
-    saveChain.push(mspHelper.saveToEeprom);
 
     saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);
@@ -88,7 +87,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/configuration.html", process_html);
+        GUI.load("./tabs/configuration.html", process_html);
     }
 
     function process_html() {
@@ -150,8 +149,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // generate features
         var features = FC.getFeatures();
 
-        var radioGroups = [];
-
         var features_e = $('.features');
         for (i = 0; i < features.length; i++) {
             var row_e,
@@ -170,37 +167,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 feature_tip_html = '<div class="helpicon cf_tip" title="' + tips.join("<br><br>") + '"></div>';
             }
 
-            if (features[i].mode === 'group') {
-
-                row_e = $('<div class="radio">' +
-                    '<input type="radio" class="feature" name="' + features[i].group + '" title="' + features[i].name + '"' +
-                    ' value="' + features[i].bit + '"' +
-                    ' id="feature-' + features[i].bit + '" ' +
-                    '>' +
-                    '<label for="feature-' + features[i].bit + '">' +
-                    '<span data-i18n="feature' + features[i].name + '"></span>' +
-                    '</label>' +
-                    feature_tip_html +
-                    '</div>');
-
-                radioGroups.push(features[i].group);
-            } else {
-
-                row_e = $('<div class="checkbox">' +
-                    '<input type="checkbox" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
-                    ' id="feature-' + features[i].bit + '" ' +
-                    '>' +
-                    '<label for="feature-' + features[i].bit + '">' +
-                    '<span data-i18n="feature' + features[i].name + '"></span>' +
-                    '</label>' +
-                    feature_tip_html +
-                    '</div>');
-
-                var feature_e = row_e.find('input.feature');
-
-                feature_e.prop('checked', bit_check(BF_CONFIG.features, features[i].bit));
-                feature_e.data('bit', features[i].bit);
-            }
+            row_e = $('<div class="checkbox">' +
+                '<input type="checkbox" data-bit="' + features[i].bit + '" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
+                ' id="feature-' + features[i].bit + '" ' +
+                '>' +
+                '<label for="feature-' + features[i].bit + '">' +
+                '<span data-i18n="feature' + features[i].name + '"></span>' +
+                '</label>' +
+                feature_tip_html +
+                '</div>');
 
             features_e.each(function () {
                 if ($(this).hasClass(features[i].group)) {
@@ -209,22 +184,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
+        helper.features.updateUI($('.tab-configuration'), BF_CONFIG.features);
+
         // translate to user-selected language
         localize();
-
-        for (i = 0; i < radioGroups.length; i++) {
-            var group = radioGroups[i];
-            var controls_e = $('input[name="' + group + '"].feature');
-
-
-            controls_e.each(function () {
-                var bit = parseInt($(this).attr('value'));
-                var state = bit_check(BF_CONFIG.features, bit);
-
-                $(this).prop('checked', state);
-            });
-        }
-
 
         var alignments = FC.getSensorAlignments();
 
@@ -383,30 +346,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // fill magnetometer
         $('#mag_declination').val(MISC.mag_declination);
 
-        //fill motor disarm params and FC loop time
-        $('input[name="autodisarmdelay"]').val(ARMING_CONFIG.auto_disarm_delay);
-        $('div.disarm').show();
-        if (bit_check(BF_CONFIG.features, 4)) { //MOTOR_STOP
-            $('div.disarmdelay').show();
-        } else {
-            $('div.disarmdelay').hide();
-        }
-
-        // fill throttle
-        $('#minthrottle').val(MISC.minthrottle);
-        // midrc was removed in 2.0, but the firmware still excepts
-        // the MSP frame with it for backwards compatibility, so we
-        // just hide it from the UI.
-        var midThrottleWrapper = $('.midthrottle_wrapper');
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            $('#midthrottle').val(MISC.midrc);
-            midThrottleWrapper.show();
-        } else {
-            midThrottleWrapper.hide();
-        }
-        $('#maxthrottle').val(MISC.maxthrottle);
-        $('#mincommand').val(MISC.mincommand);
-
         // fill battery voltage
         $('#voltagesource').val(MISC.voltage_source);
         $('#cells').val(MISC.battery_cells);
@@ -416,110 +355,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
         $('#voltagescale').val(MISC.vbatscale);
 
-        // adjust current offset input attributes
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            var current_offset_input = $('#currentoffset');
-            current_offset_input.attr('step', '1');
-            current_offset_input.attr('min', '-3300');
-            current_offset_input.attr('max', '3300');
-        }
-
         // fill current
         $('#currentscale').val(BF_CONFIG.currentscale);
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-            $('#currentoffset').val(BF_CONFIG.currentoffset);
-        else
-            $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
         $('#battery_capacity_warning').val(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
         $('#battery_capacity_critical').val(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
-
-        var escProtocols = FC.getEscProtocols();
-        var servoRates = FC.getServoRates();
-
-        function buildMotorRates() {
-            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
-
-            $escRate.find('option').remove();
-
-            for (var i in protocolData.rates) {
-                if (protocolData.rates.hasOwnProperty(i)) {
-                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
-                }
-            }
-
-            /*
-             *  If rate from FC is not on the list, add a new entry
-             */
-            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
-                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
-            }
-
-            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-                //DSHOT/SERIALSHOT protocols, simplify UI
-                $('.hide-for-shot').addClass('is-hidden');
-            } else {
-                $('.hide-for-shot').removeClass('is-hidden');
-            }
-
-            if (protocolData.message !== null) {
-                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
-                $('#esc-protocol-warning').show();
-            } else {
-                $('#esc-protocol-warning').hide();
-            }
-
-        }
-
-        var $escProtocol = $('#esc-protocol');
-        var $escRate = $('#esc-rate');
-        for (i in escProtocols) {
-            if (escProtocols.hasOwnProperty(i)) {
-                var protocolData = escProtocols[i];
-                $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
-            }
-        }
-
-        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
-        buildMotorRates();
-        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-
-        $escProtocol.change(function () {
-            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
-            buildMotorRates();
-            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
-            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
-        });
-
-        $escRate.change(function () {
-            ADVANCED_CONFIG.motorPwmRate = $(this).val();
-        });
-
-        $("#esc-protocols").show();
-
-        var $servoRate = $('#servo-rate');
-
-        for (i in servoRates) {
-            if (servoRates.hasOwnProperty(i)) {
-                $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
-            }
-        }
-        /*
-         *  If rate from FC is not on the list, add a new entry
-         */
-        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
-            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
-        }
-
-        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
-        $servoRate.change(function () {
-            ADVANCED_CONFIG.servoPwmRate = $(this).val();
-        });
-
-        $('#servo-rate-container').show();
 
         var $looptime = $("#looptime");
 
@@ -717,20 +561,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            $(".requires-v2_0_0").show();
-        } else {
-            $(".requires-v2_0_0").hide();
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            $(".removed-v2_1_0").hide();
-            $(".requires-v2_1_0").show();
-        } else {
-            $(".removed-v2_1_0").show();
-            $(".requires-v2_1_0").hide();
-        }
-
         $('#3ddeadbandlow').val(_3D.deadband3d_low);
         $('#3ddeadbandhigh').val(_3D.deadband3d_high);
         $('#3dneutral').val(_3D.neutral3d);
@@ -739,44 +569,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         } else {
             $('#deadband-3d-throttle-container').remove();
         }
-
-        $('input[type="checkbox"].feature').change(function () {
-
-            var element = $(this),
-                index = element.data('bit'),
-                state = element.is(':checked');
-
-            if (state) {
-                BF_CONFIG.features = bit_set(BF_CONFIG.features, index);
-                if (element.attr('name') === 'MOTOR_STOP')
-                    $('div.disarmdelay').show();
-            } else {
-                BF_CONFIG.features = bit_clear(BF_CONFIG.features, index);
-                if (element.attr('name') === 'MOTOR_STOP')
-                    $('div.disarmdelay').hide();
-            }
-        });
-
-        // UI hooks
-        $('input[type="radio"].feature').change(function () {
-            var element = $(this),
-                group = element.attr('name');
-
-            var controls_e = $('input[name="' + group + '"]');
-            var selected_bit = controls_e.filter(':checked').val();
-
-            controls_e.each(function () {
-                var bit = $(this).attr('value');
-
-                var selected = (selected_bit == bit);
-                if (selected) {
-                    BF_CONFIG.features = bit_set(BF_CONFIG.features, bit);
-                } else {
-                    BF_CONFIG.features = bit_clear(BF_CONFIG.features, bit);
-                }
-
-            });
-        });
 
         // Craft name
         if (craftName != null) {
@@ -788,19 +580,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
 
         $('a.save').click(function () {
-            // gather data that doesn't have automatic change event bound
-            BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
-            BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
-            BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
-
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
-
-            MISC.minthrottle = parseInt($('#minthrottle').val());
-            MISC.midrc = parseInt($('#midthrottle').val());
-            MISC.maxthrottle = parseInt($('#maxthrottle').val());
-            MISC.mincommand = parseInt($('#mincommand').val());
 
             MISC.battery_cells = parseInt($('#cells').val());
             MISC.voltage_source = parseInt($('#voltagesource').val());
@@ -814,13 +596,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
-
-            BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-
-            if (semver.lt(CONFIG.flightControllerVersion, '2.0.0'))
-                BF_CONFIG.currentoffset = parseInt($('#currentoffset').val());
-            else
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
 
             _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
             _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
@@ -850,9 +625,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-            if (!FC.isNewMixer()) {
-                googleAnalytics.sendEvent('Setting', 'Mixer', helper.mixer.getById(BF_CONFIG.mixerConfiguration).name);
-            }
+            
             googleAnalytics.sendEvent('Setting', 'ReceiverMode', $('#rxType').val());
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
@@ -874,20 +647,22 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-            saveChainer.execute();
+            helper.features.reset();
+            helper.features.fromUI($('.tab-configuration'));
+            helper.features.execute(function () {
+                BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
+                BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
+                BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
+                BF_CONFIG.currentscale = parseInt($('#currentscale').val());
+                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                saveChainer.execute();
+            });
         });
 
         helper.interval.add('config_load_analog', function () {
             $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
-
-        /*
-         * Hide mixer section
-         */
-        if (FC.isNewMixer()) {
-            $('.mixer').addClass("is-hidden");
-        }
 
         GUI.content_ready(callback);
     }

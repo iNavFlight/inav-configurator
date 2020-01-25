@@ -34,7 +34,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/failsafe.html", process_html);
+        GUI.load("./tabs/failsafe.html", process_html);
     }
 
     load_rx_config();

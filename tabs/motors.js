@@ -23,7 +23,7 @@ TABS.motors.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     loadChainer.setChain([
-        mspHelper.loadMisc,
+        mspHelper.loadMiscV2,
         mspHelper.loadBfConfig,
         mspHelper.load3dConfig,
         mspHelper.loadMotors,
@@ -34,6 +34,7 @@ TABS.motors.initialize = function (callback) {
         mspHelper.loadServoConfiguration,
         mspHelper.loadOutputMapping,
         mspHelper.loadRcData,
+        mspHelper.loadAdvancedConfig,
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -42,7 +43,11 @@ TABS.motors.initialize = function (callback) {
     var saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
+        saveSettings,
         mspHelper.sendServoConfigurations,
+        mspHelper.saveAdvancedConfig,
+        mspHelper.saveBfConfig,
+        mspHelper.saveMiscV2,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
@@ -51,14 +56,121 @@ TABS.motors.initialize = function (callback) {
     });
 
     function load_html() {
-        $('#content').load("./tabs/motors.html", onLoad);
+        GUI.load("./tabs/motors.html", Settings.processHtml(onLoad));
+    }
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
     }
 
     function onLoad() {
         process_motors();
         process_servos();
+        processConfiguration();
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+            $('.requires-v2_4').show();
+        } else {
+            $('.requires-v2_4').hide();
+        }
+
         finalize();
     } 
+
+    function processConfiguration() {
+        let escProtocols = FC.getEscProtocols(),
+            servoRates = FC.getServoRates(),
+            $idleInfoBox = $("#throttle_idle-info");
+
+        function buildMotorRates() {
+            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
+
+            $escRate.find('option').remove();
+
+            for (var i in protocolData.rates) {
+                if (protocolData.rates.hasOwnProperty(i)) {
+                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
+                }
+            }
+
+            /*
+             *  If rate from FC is not on the list, add a new entry
+             */
+            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
+                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
+            }
+
+            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
+
+                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                $idleInfoBox.addClass('ok-box');
+                $idleInfoBox.show();
+
+            } else {
+                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                $idleInfoBox.addClass('ok-box');
+                $idleInfoBox.show();
+            }
+
+            if (protocolData.message !== null) {
+                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
+                $('#esc-protocol-warning').show();
+            } else {
+                $('#esc-protocol-warning').hide();
+            }
+
+        }
+
+        let $escProtocol = $('#esc-protocol');
+        let $escRate = $('#esc-rate');
+        for (i in escProtocols) {
+            if (escProtocols.hasOwnProperty(i)) {
+                var protocolData = escProtocols[i];
+                $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
+            }
+        }
+
+        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+        buildMotorRates();
+        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+
+        $escProtocol.change(function () {
+            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+            buildMotorRates();
+            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
+            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
+        });
+
+        $escRate.change(function () {
+            ADVANCED_CONFIG.motorPwmRate = $(this).val();
+        });
+
+        $("#esc-protocols").show();
+
+        let $servoRate = $('#servo-rate');
+
+        for (i in servoRates) {
+            if (servoRates.hasOwnProperty(i)) {
+                $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
+            }
+        }
+        /*
+         *  If rate from FC is not on the list, add a new entry
+         */
+        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
+            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
+        }
+
+        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
+        $servoRate.change(function () {
+            ADVANCED_CONFIG.servoPwmRate = $(this).val();
+        });
+
+        $('#servo-rate-container').show();
+
+        helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
+        GUI.simpleBind();
+    }
 
     function update_arm_status() {
         self.armed = FC.isModeEnabled('ARM');
@@ -228,7 +340,25 @@ TABS.motors.initialize = function (callback) {
         });
 
         $('a.update').click(function () {
-            servos_update();
+            helper.features.reset();
+            helper.features.fromUI($('.tab-motors'));
+            helper.features.execute(servos_update);
+        });
+        $('a.save').click(function () {
+            saveChainer.setExitPoint(function () {
+                //noinspection JSUnresolvedVariable
+                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        
+                GUI.tab_switch_cleanup(function () {
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.handleReconnect($('.tab_motors a'));
+                    });
+                });
+            });
+            helper.features.reset();
+            helper.features.fromUI($('.tab-motors'));
+            helper.features.execute(servos_update);
         });
 
     }
@@ -245,11 +375,7 @@ TABS.motors.initialize = function (callback) {
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
-        if (FC.isNewMixer()) {
-            update_model(MIXER_CONFIG.appliedMixerPreset);
-        } else {
-            update_model(BF_CONFIG.mixerConfiguration);
-        }
+        update_model(MIXER_CONFIG.appliedMixerPreset);
 
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();

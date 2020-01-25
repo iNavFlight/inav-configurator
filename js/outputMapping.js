@@ -53,7 +53,7 @@ let OutputMappingCollection = function () {
     self.getOutputTable = function (isMR, motors, servos) {
         let currentMotorIndex = 1,
             currentServoIndex = 0,
-            timerMap = getTimerMap(isMR, motors, servos),
+            timerMap = getTimerMap(isMR, motors, servos.length),
             outputMap = [],
             offset = getFirstOutputOffset();
 
@@ -67,7 +67,7 @@ let OutputMappingCollection = function () {
                 outputMap[i] = "Motor " + currentMotorIndex;
                 currentMotorIndex++;
             } else if (assignment == OUTPUT_TYPE_SERVO) {
-                outputMap[i] = "Servo " + currentServoIndex;
+                outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
             }
 

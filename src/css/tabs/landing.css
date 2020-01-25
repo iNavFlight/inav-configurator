@@ -122,7 +122,7 @@
     margin-bottom: 15px;
     font-weight: normal;
     font-family: 'open_sansregular', Arial,serif;
-    font-size: 12px;
+    font-size: 1.2em;
 	color: #c2efff;
 }
 
@@ -155,11 +155,11 @@
 }
 
 .tab-landing .content_mid .text1 {
-    width: 37%;
+    width: 47%;
 }
 
 .tab-landing .content_mid .text2 {
-    width: 40%;
+    width: 47%;
 }
 
 .tab-landing .content_mid .text2 ul {
@@ -189,74 +189,4 @@
 .tab-landing .content_mid .text3 .donate {
     margin-top: 10px;
     text-align: center;
-}
-
-/* changelog block */
-#changelog {
-    width: 250px;
-    height: 100%;
-    position: fixed;
-    right: -245px;
-    top: 0;
-    background: white;
-}
-
-#changelog .wrapper {
-    height: 100%;
-    padding: 0 20px;
-    border-left: 5px solid #3394b5;
-    overflow-y: auto;
-    display: none;
-}
-
-#changelog .button {
-    transform: rotate(270deg);
-    top: 50px;
-    right: 215px;
-    position: absolute;
-    background: #3394b5;
-    border-radius: 5px 5px 0 0;
-    border-bottom: none;
-    height: 30px;
-}
-
-#changelog .button a {
-    display: block;
-    padding: 5px 10px;
-    width: 70px;
-    text-align: center;
-    color: white;
-}
-
-#changelog .title {
-    margin: 20px 0;
-    font-size: 16px;
-}
-
-#changelog .wrapper {
-    display: block;
-}
-
-#changelog .log {
-    line-height: 17px;
-}
-
-#changelog .log span {
-    display: block;
-    font-weight: bold;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
-}
-
-#changelog .log ul {
-    margin: 5px 0 20px 10px;
-}
-
-#changelog .log li {
-    font-weight: normal;
-    margin-bottom: 5px;
-}
-
-#changelog .log p {
-    margin-bottom: 20px;
 }

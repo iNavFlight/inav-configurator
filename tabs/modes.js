@@ -24,7 +24,7 @@ TABS.modes.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/modes.html", process_html);
+        GUI.load("./tabs/modes.html", process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_active_box_data);

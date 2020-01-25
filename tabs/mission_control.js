@@ -61,7 +61,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function loadHtml() {
-        $('#content').load("./tabs/mission_control.html", process_html);
+        GUI.load("./tabs/mission_control.html", process_html);
     }
 
     function process_html() {
@@ -354,7 +354,9 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         //reset text position
-        textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
+        if (textGeom) {
+            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
+        }
     }
 
     function paintLine(pos1, pos2) {

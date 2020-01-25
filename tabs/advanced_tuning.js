@@ -33,7 +33,7 @@ TABS.advanced_tuning.initialize = function (callback) {
     saveChainer.setExitPoint(reboot);
 
     function loadHtml() {
-        $('#content').load("./tabs/advanced_tuning.html", processHtml);
+        GUI.load("./tabs/advanced_tuning.html", processHtml);
     }
 
     function reboot() {
@@ -60,13 +60,6 @@ TABS.advanced_tuning.initialize = function (callback) {
             $rthTailFirst = $('#rthTailFirst'),
             $rthAllowLanding = $('#rthAllowLanding'),
             $rthAltControlMode = $('#rthAltControlMode');
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-
-            $('.requires-v2_1').show();
-        } else {
-            $('.requires-v2_1').hide();
-        }
 
         $rthClimbFirst.prop("checked", RTH_AND_LAND_CONFIG.rthClimbFirst);
         $rthClimbFirst.change(function () {

@@ -30,7 +30,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        $('#content').load("./tabs/receiver.html", process_html);
+        GUI.load("./tabs/receiver.html", process_html);
     }
 
     function drawRollPitchExpo() {
@@ -71,14 +71,6 @@ TABS.receiver.initialize = function (callback) {
     function process_html() {
         // translate to user-selected language
         localize();
-
-        if (semver.lt(CONFIG.flightControllerVersion, '1.9.1')) {
-            rcmap_options = $('select[name="rcmap_helper"] option');
-            for (i = 0; i < rcmap_options.length; ++i) {
-                option = rcmap_options[i];
-                option.setAttribute("value", option.getAttribute("value") + "5678");
-            }
-        }
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));

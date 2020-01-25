@@ -198,7 +198,7 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    $('#content').load("./tabs/sensors.html", function load_html() {
+    GUI.load("./tabs/sensors.html", function load_html() {
         // translate to user-selected language
         localize();
 
@@ -211,15 +211,12 @@ TABS.sensors.initialize = function (callback) {
             checkboxes.eq(4).prop('disabled', true);
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.9.1") || (!bit_check(CONFIG.activeSensors, 6))) { // airspeed
+        if (!bit_check(CONFIG.activeSensors, 6)) { // airspeed
             checkboxes.eq(5).prop('disabled', true);
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            if (!bit_check(CONFIG.activeSensors, 7))
-                checkboxes.eq(6).prop('disabled', true);
-        } else {
-            $(".requires-v2_1_0").hide();
+        if (!bit_check(CONFIG.activeSensors, 7)) {
+            checkboxes.eq(6).prop('disabled', true);
         }
 
         $('.tab-sensors .info .checkboxes input').change(function () {
@@ -486,7 +483,7 @@ TABS.sensors.initialize = function (callback) {
                 }, rates.airspeed, true);
             }
 
-            if (checkboxes[6] && (semver.gte(CONFIG.flightControllerVersion, "2.1.0"))) {
+            if (checkboxes[6]) {
                 helper.interval.add('temperature_pull', function temperature_data_pull() {
 
                     /*
@@ -512,11 +509,7 @@ TABS.sensors.initialize = function (callback) {
                         return;
                     }
 
-                    if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
-                        MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
-                    } else {
-                        MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
-                    }
+                    MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
                 }, rates.debug, true);
             }
 

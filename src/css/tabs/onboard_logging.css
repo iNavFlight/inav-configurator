@@ -174,7 +174,6 @@
 .require-sdcard-ready,
 .require-sdcard-supported,
 .require-blackbox-supported,
-.require-blackbox-maybe-supported,
 .require-blackbox-unsupported,
 .require-blackbox-config-supported,
 .tab-onboard_logging.dataflash-present .require-dataflash-not-present,
@@ -189,7 +188,6 @@
 .tab-onboard_logging.sdcard-ready .require-sdcard-ready,
 .tab-onboard_logging.sdcard-supported .require-sdcard-supported,
 .tab-onboard_logging.blackbox-supported .require-blackbox-supported,
-.tab-onboard_logging.blackbox-maybe-supported .require-blackbox-maybe-supported,
 .tab-onboard_logging.blackbox-unsupported .require-blackbox-unsupported,
 .tab-onboard_logging.blackbox-config-supported .require-blackbox-config-supported {
     display: block;

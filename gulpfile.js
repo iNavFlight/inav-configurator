@@ -8,6 +8,7 @@ var minimist = require('minimist');
 var archiver = require('archiver');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var semver = require('semver');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
@@ -50,7 +51,8 @@ sources.css = [
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
     './node_modules/openlayers/dist/ol.css',
-    './src/css/logic.css'
+    './src/css/logic.css',
+    './src/css/defaults_dialog.css'
 ];
 
 sources.js = [
@@ -105,6 +107,7 @@ sources.js = [
     './js/logicConditionsStatus.js',
     './js/vtx.js',
     './main.js',
+    './js/tabs.js',
     './tabs/*.js',
     './js/eventFrequencyAnalyzer.js',
     './js/periodicStatusUpdater.js',
@@ -113,6 +116,8 @@ sources.js = [
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
     './js/appUpdater.js',
+    './js/feature_framework.js',
+    './js/defaults_dialog.js',
     './node_modules/openlayers/dist/ol.js'
 ];
 
@@ -233,6 +238,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
+        version: get_nw_version()
     });
     builder.on('log', console.log);
     builder.build(function (err) {
@@ -245,6 +251,10 @@ gulp.task('apps', gulp.series('dist', function(done) {
         done();
     });
 }));
+
+function get_nw_version() {
+    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
+}
 
 function get_release_filename(platform, ext) {
     var pkg = require('./package.json');
@@ -303,9 +313,10 @@ function releaseLinux(bits) {
         var dirname = 'linux' + bits;
         var pkg = require('./package.json');
         var src = path.join(appsDir, pkg.name, dirname);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'zip')));
-        var archive = archiver('zip', {
-            zlib: { level: 9 }
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'tar.gz')));
+        var archive = archiver('tar', {
+            zlib: { level: 9 },
+            gzip: true
         });
         archive.on('warning', function(err) { throw err; });
         archive.on('error', function(err) { throw err; });

@@ -82,5 +82,20 @@ let ServoMixerRuleCollection = function () {
         return count;
     };
 
+    self.getUsedServoIndexes = function () {
+        let out = [];
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                let rule = data[ruleIndex];
+                out.push(rule.getTarget());
+            }
+        }
+
+        return jQuery.unique(out).sort(function(a, b){
+            return a-b;
+        });
+    }
+
     return self;
 };

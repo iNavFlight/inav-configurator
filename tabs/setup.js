@@ -27,7 +27,7 @@ TABS.setup.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        $('#content').load("./tabs/setup.html", process_html);
+        GUI.load("./tabs/setup.html", process_html);
     }
 
     function process_html() {
@@ -235,15 +235,11 @@ TABS.setup.initialize3D = function () {
 
     // load the model including materials
     if (useWebGlRenderer) {
-        if (FC.isNewMixer()) {
-            if (MIXER_CONFIG.appliedMixerPreset === -1) {
-                model_file = 'custom';
-                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
-            } else {
-                model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
-            }
+        if (MIXER_CONFIG.appliedMixerPreset === -1) {
+            model_file = 'custom';
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         } else {
-            model_file = helper.mixer.getById(BF_CONFIG.mixerConfiguration).model;
+            model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
         }
     } else {
         model_file = 'fallback'
