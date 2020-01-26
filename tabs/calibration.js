@@ -66,8 +66,6 @@ TABS.calibration.initialize = function (callback) {
     ]);
     saveChainer.setExitPoint(reboot);
 
-    MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
-
     function reboot() {
         //noinspection JSUnresolvedVariable
         GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
