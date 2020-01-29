@@ -239,8 +239,8 @@ $(document).ready(function () {
                     case 'mixer':
                         TABS.mixer.initialize(content_ready);
                         break;
-                    case 'motors':
-                        TABS.motors.initialize(content_ready);
+                    case 'outputs':
+                        TABS.outputs.initialize(content_ready);
                         break;
                     case 'osd':
                         TABS.osd.initialize(content_ready);
