@@ -5,7 +5,9 @@
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
-    "start": "node node_modules/gulp/bin/gulp.js build && node node_modules/nw/bin/nw ."
+    "start": "node node_modules/gulp/bin/gulp.js build && node node_modules/nw/bin/nw .",
+    "gulp": "gulp",
+    "nw": "nw"
   },
   "window": {
     "title": "INAV Configurator",
