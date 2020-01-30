@@ -101,7 +101,7 @@
     "tabGPS": {
         "message": "GPS"
     },
-    "tabMotorTesting": {
+    "tabOutputs": {
         "message": "Outputs"
     },
     "tabLedStrip": {
