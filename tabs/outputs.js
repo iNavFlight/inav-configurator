@@ -101,12 +101,13 @@ TABS.outputs.initialize = function (callback) {
             }
 
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-
+                $('.hide-for-shot').hide();
                 $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
                 $idleInfoBox.addClass('ok-box');
                 $idleInfoBox.show();
 
             } else {
+                $('.hide-for-shot').show();
                 $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
                 $idleInfoBox.addClass('ok-box');
                 $idleInfoBox.show();
