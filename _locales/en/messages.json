@@ -654,12 +654,6 @@
     "configurationBoardAlignmentYaw": {
         "message": "Yaw Degrees"
     },
-    "configurationSensorAlignmentGyro": {
-        "message": "GYRO Alignment"
-    },
-    "configurationSensorAlignmentAcc": {
-        "message": "ACCEL Alignment"
-    },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
     },
