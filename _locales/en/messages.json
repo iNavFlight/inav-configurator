@@ -3167,6 +3167,30 @@
     "gyro_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
+    "gyro_stage2_lowpass_type": {
+        "message": "Gyro Stage 2 LPF type"
+    },
+    "gyro_stage2_lowpass_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf_type": {
+        "message": "D-term LPF type"
+    },
+    "dterm_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf2_type": {
+        "message": "D-term Stage 2 LPF type"
+    },
+    "dterm_lpf2_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf2_hz": {
+        "message": "D-term Stage 2 LPF cutoff frequency"
+    },
+    "dterm_lpf2_hz_help": {
+        "message": "Lowpass cutoff filter for D-term on ROLL and PITCH axises. 0 mean filter is disabled"
+    },
     "tabFilteringAdvanced": {
         "message": "Other filters"
     },
