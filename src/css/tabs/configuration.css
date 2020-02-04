@@ -156,11 +156,14 @@ hr {
 }
 
 .tab-configuration .alignicon {
+    display: inline-block;
+    position: relative;
     width: 20px;
     height: 20px;
-    float: left;
-    margin-left: -5px;
-    margin-right: 3px;
+    margin-top: 0px;
+    margin-left: 6px;
+    margin-right: 2px;
+    top: 6px;
 }
 
 .tab-configuration .pitch {
@@ -179,24 +182,7 @@ hr {
 }
 
 .tab-configuration .board select {
-    width: 45%;
-    height: 20px;
-    margin: 0 0 2px 0;
-}
-
-.tab-configuration .sensoralignment {
-    width: 50%;
-    float: left;
-}
-
-.tab-configuration .board_align_content {
-    width: 50%;
-    float: left;
-}
-
-.tab-configuration .sensoralignment span {
-    width: 55%;
-    float: left;
+    width: 110px;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
