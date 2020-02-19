@@ -1,4 +1,4 @@
-/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,_3D,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
+/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.outputs = {
@@ -506,10 +506,10 @@ TABS.outputs.initialize = function (callback) {
         if(self.feature3DEnabled && self.feature3DSupported) {
             //Arbitrary sanity checks
             //Note: values may need to be revisited
-            if(_3D.neutral3d > 1575 || _3D.neutral3d < 1425)
-                _3D.neutral3d = 1500;
+            if(REVERSIBLE_MOTORS.neutral > 1575 || REVERSIBLE_MOTORS.neutral < 1425)
+                REVERSIBLE_MOTORS.neutral = 1500;
 
-            $slidersInput.val(_3D.neutral3d);
+            $slidersInput.val(REVERSIBLE_MOTORS.neutral);
         } else {
             $slidersInput.val(MISC.mincommand);
         }
@@ -568,7 +568,7 @@ TABS.outputs.initialize = function (callback) {
 
                 // change all values to default
                 if (self.feature3DEnabled && self.feature3DSupported) {
-                    $slidersInput.val(_3D.neutral3d);
+                    $slidersInput.val(REVERSIBLE_MOTORS.neutral);
                 } else {
                     $slidersInput.val(MISC.mincommand);
                 }
@@ -587,7 +587,7 @@ TABS.outputs.initialize = function (callback) {
                     break;
                 }
             }else{
-                if( (MOTOR_DATA[i] < _3D.deadband3d_low) || (MOTOR_DATA[i] > _3D.deadband3d_high) ){
+                if( (MOTOR_DATA[i] < REVERSIBLE_MOTORS.deadband_low) || (MOTOR_DATA[i] > REVERSIBLE_MOTORS.deadband_high) ){
                     motors_running = true;
                     break;
                 }

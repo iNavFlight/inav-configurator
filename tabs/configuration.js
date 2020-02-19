@@ -487,11 +487,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_CONFIG.opflow = $sensorOpflow.val();
         });
 
-        $('#3ddeadbandlow').val(_3D.deadband3d_low);
-        $('#3ddeadbandhigh').val(_3D.deadband3d_high);
-        $('#3dneutral').val(_3D.neutral3d);
+        $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
+        $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
+        $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
         if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-            $('#3ddeadbandthrottle').val(_3D.deadband3d_throttle);
+            $('#3ddeadbandthrottle').val(REVERSIBLE_MOTORS.deadband_throttle);
         } else {
             $('#deadband-3d-throttle-container').remove();
         }
@@ -523,11 +523,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
-            _3D.deadband3d_low = parseInt($('#3ddeadbandlow').val());
-            _3D.deadband3d_high = parseInt($('#3ddeadbandhigh').val());
-            _3D.neutral3d = parseInt($('#3dneutral').val());
+            REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
+            REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
+            REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
             if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                _3D.deadband3d_throttle = ($('#3ddeadbandthrottle').val());
+                REVERSIBLE_MOTORS.deadband_throttle = ($('#3ddeadbandthrottle').val());
             }
 
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());

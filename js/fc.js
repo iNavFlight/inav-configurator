@@ -30,7 +30,7 @@ var CONFIG,
     ARMING_CONFIG,
     FC_CONFIG,
     MISC,
-    _3D,
+    REVERSIBLE_MOTORS,
     DATAFLASH,
     SDCARD,
     BLACKBOX,
@@ -419,11 +419,11 @@ var FC = {
              emergencyDescentRate: null
         };
 
-        _3D = {
-            deadband3d_low: 0,
-            deadband3d_high: 0,
-            neutral3d: 0,
-            deadband3d_throttle: 0
+        REVERSIBLE_MOTORS = {
+            deadband_low: 0,
+            deadband_high: 0,
+            neutral: 0,
+            deadband_throttle: 0
         };
 
         DATAFLASH = {
