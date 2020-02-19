@@ -553,7 +553,7 @@ var FC = {
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
-            {bit: 12, group: 'other', name: '3D', showNameInTip: true},
+            {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
