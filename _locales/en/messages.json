@@ -505,7 +505,7 @@
         "message": "In-flight level calibration"
     },
     "featureMOTOR_STOP": {
-        "message": "Don't spin the motors when armed"
+        "message": "Stop motors on low throttle"
     },
     "featureSERVO_TILT": {
         "message": "Servo gimbal"
@@ -3286,5 +3286,8 @@
     },
     "motor_poles": {
         "message": "Number of motor poles (number of magnets)"
+    },
+    "motorStopWarning": {
+        "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
     }
 }
