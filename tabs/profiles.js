@@ -555,6 +555,27 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1500)
         ],
         type: 'flyingwing'
+    },
+    {
+        name: "Mini AR Wing",
+        description: "Small, 600mm wingspan, FPV flying wing",
+        features: [
+            "Adjusted gyro filtering",
+            "Adjusted PIDs",
+            "Adjusted rates"
+        ],
+        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "ADVANCED_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG", "FC_CONFIG", "MIXER_CONFIG"],
+        settings: [
+            presets.elementHelper("BF_CONFIG", "mixerConfiguration", 8),
+            presets.elementHelper("MIXER_CONFIG", "platformType", 1),
+            presets.elementHelper("PIDs", 0, [8, 16, 0, 64]),  //ROLL PIDs
+            presets.elementHelper("PIDs", 1, [5, 18, 0, 60]),  //PITCH PIDs
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
+            presets.elementHelper("RC_tuning", "roll_rate", 280),
+            presets.elementHelper("RC_tuning", "pitch_rate", 120)
+        ],
+        type: 'flyingwing'
     }
 ];
 
