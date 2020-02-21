@@ -108,6 +108,12 @@ TABS.pid_tuning.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+            $('.requires-v2_4').show();
+        } else {
+            $('.requires-v2_4').hide();
+        }
+
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), BF_CONFIG.features);
 

@@ -3195,7 +3195,19 @@
         "message": "Other filters"
     },
     "mainFilters": {
-        "message": "Main filters"
+        "message": "Gyro filters"
+    },
+    "rpmFilters": {
+        "message": "Gyro RPM filters"
+    },
+    "dtermFilters": {
+        "message": "D-term filters"
+    },
+    "rpm_gyro_filter_enabled": {
+        "message": "Gyro RPM filter (requires ESC telemetry)"
+    },
+    "rpm_gyro_min_hz": {
+        "message": "Gyro RPM filter min. frequency"
     },
     "acc_lpf_type": {
         "message": "Accelerometer LPF type"

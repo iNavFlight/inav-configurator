@@ -329,6 +329,16 @@
                                 <div class="helpicon cf_tip" data-i18n_title="gyroStage2LpfCutoffFrequencyHelp"></div>
                             </td>
                         </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="dtermFilters" style="margin-top: 1em;"></div>
+            <div class="cf_column">
+                <table class="rate-tpa rate-tpa--filtering">
+                    <tbody>
                         <tr>
                             <th data-i18n="dterm_lpf_type"></th>
                             <td>
@@ -356,6 +366,27 @@
                             <td>
                                 <input data-setting="dterm_lpf2_hz" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="dterm_lpf2_hz_help"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both requires-v2_4"></div>
+            <div class="tab_subtitle requires-v2_4" data-i18n="rpmFilters" style="margin-top: 1em;"></div>
+            <div class="cf_column requires-v2_4">
+                <table class="rate-tpa rate-tpa--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="rpm_gyro_filter_enabled"></th>
+                            <td>
+                                <select data-setting="rpm_gyro_filter_enabled" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="rpm_gyro_min_hz"></th>
+                            <td>
+                                <input data-setting="rpm_gyro_min_hz" type="number" class="rate-tpa_input" />
                             </td>
                         </tr>
                     </tbody>
