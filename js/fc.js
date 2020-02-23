@@ -1195,7 +1195,15 @@ var FC = {
                     14: "Throttle position [%]",
                     15: "Roll [deg]",
                     16: "Pitch [deg]",
-                    17: "Flight mode"
+                    17: "Is Armed",
+                    18: "Is Autolaunch",
+                    19: "Is Controlling Altitude",
+                    20: "Is Controlling Position",
+                    21: "Is Emergency Landing",
+                    22: "Is RTH",
+                    23: "Is WP",
+                    24: "Is Landing",
+                    25: "Is Failsafe"
                 }
             },
             3: {
