@@ -547,7 +547,7 @@
         "message": "Battery current monitoring"
     },
     "feature3D": {
-        "message": "3D mode (for use with reversible ESCs)"
+        "message": "Reversible motors mode (for use with reversible ESCs)"
     },
     "featureRSSI_ADC": {
         "message": "Analog RSSI input"
@@ -751,19 +751,19 @@
         "message": "Battery Capacity Unit"
     },
     "configuration3d": {
-        "message": "3D"
+        "message": "Reversible motors"
     },
     "configuration3dDeadbandLow": {
-        "message": "3D Deadband Low"
+        "message": "Reversible Motors Deadband Low"
     },
     "configuration3dDeadbandHigh": {
-        "message": "3D Deadband High"
+        "message": "Reversible Motors Deadband High"
     },
     "configuration3dNeutral": {
-        "message": "3D Neutral"
+        "message": "Reversible Motors Neutral"
     },
     "configuration3dDeadbandThrottle": {
-        "message": "3D Deadband Throttle"
+        "message": "Reversible Motors Deadband Throttle"
     },
     "configurationSystem": {
         "message": "System configuration"
