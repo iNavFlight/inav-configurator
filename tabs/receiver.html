@@ -33,7 +33,43 @@
             </div>
         </div>
         <div class="fc_column half" style="margin-left: 20px;">
-            <div class="gui_box grey" style="float: right;">
+            
+            <div class="gui_box grey config-section">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationReceiver"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="select">
+                        <select id="receiver_type" data-setting="receiver_type"/>
+                        <label for="receiver_type">
+                            <span data-i18n="receiverType"></span>
+                        </label>
+                    </div>
+                    <div id="serialrx_provider-wrapper">
+                        <div class="info-box ok-box" data-i18n="configurationSerialRXHelp"></div>
+                        <div class="select">
+                            <select id="serialrx_provider" data-setting="serialrx_provider"/>
+                            <label for="serialrx_provider">
+                                <span data-i18n="configurationSerialRX"></span>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <select id="serialrx_inverted" data-setting="serialrx_inverted"/>
+                            <label for="serialrx_inverted">
+                                <span data-i18n="serialrx_inverted"></span>
+                            </label>
+                        </div><div class="select">
+                            <select id="serialrx_halfduplex" data-setting="serialrx_halfduplex"/>
+                            <label for="serialrx_halfduplex">
+                                <span data-i18n="serialrx_halfduplex"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="gui_box grey">
                 <div class="spacer" style="margin-top: 10px; margin-bottom: 10px;">
                     <div class="cf_column curves" style="width: calc(55% - 10px); min-width: 200px;">
                         <div class="throttle_curve">
@@ -72,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            <div class="gui_box grey" style="float: right;">
+            <div class="gui_box grey">
                 <div class="spacer" style="margin-top: 10px; margin-bottom: 10px;">
                     <div class="fc_column curves" style="width: calc(50% - 10px);">
                         <table>

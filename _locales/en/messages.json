@@ -636,11 +636,17 @@
     "configurationEscFeatures": {
         "message": "ESC/Motor Features"
     },
+    "serialrx_inverted": {
+        "message": "Serial Port Inverted (comparing to protocol default)"
+    },
+    "serialrx_halfduplex" : {
+        "message": "Serial receiver half-duplex"
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
-        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) and choose a Serial Receiver Provider when using RX_SERIAL feature."
+        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
     },
     "configurationBoardAlignment": {
         "message": "Board and Sensor Alignment"
@@ -788,6 +794,9 @@
     },
     "configurationGPSHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using GPS feature."
+    },
+    "receiverType": {
+        "message": "Receiver type"
     },
     "configurationSerialRX": {
         "message": "Serial Receiver Provider"
