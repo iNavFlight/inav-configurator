@@ -1937,9 +1937,6 @@
     "warning": {
         "message": "Warning"
     },
-    "boardLimitedFunctionality": {
-        "message": "Due to limited flash size, the board you have selected will have limited functionality, not all functions and features will be available. Hardware support map is available on <a href=\"https://github.com/iNavFlight/inav/wiki/Hardware-support-map\" target=\"_blank\">INAV Wiki pages</a>"
-    },
     "escProtocol": {
         "message": "ESC protocol"
     },

@@ -1,18 +1,7 @@
 'use strict';
 
-var limitedFunctionalityTargets = [
-        "NAZE",
-        "CC3D",
-        "CJMCU",
-        "CRAZEPONYMINI",
-        "OLIMEXINO",
-        "RMDO",
-        "CC3D PPM1"
-];
-
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
-    var self = this;
 
     if (GUI.active_tab != 'firmware_flasher') {
         GUI.active_tab = 'firmware_flasher';
@@ -159,14 +148,6 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                 $("a.load_remote_file").addClass('disabled');
                 var target = $(this).val();
-
-                console.log(target, limitedFunctionalityTargets.indexOf(target));
-
-                if (limitedFunctionalityTargets.indexOf(target) >= 0) {
-                    $('.limited-functionality-warning').show();
-                } else {
-                    $('.limited-functionality-warning').hide();
-                }
 
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');
