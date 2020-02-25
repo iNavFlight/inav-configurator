@@ -258,12 +258,3 @@
     text-shadow: none;
     opacity: 0.5;
 }
-
-.limited-functionality-warning {
-    margin-bottom: 1em;
-}
-
-.limited-functionality-warning h1 {
-    color: red;
-    text-align: center;
-}
