@@ -270,22 +270,6 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('a.refresh').click(function () {
-            MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('receiverDataRefreshed'));
-
-                // fill in data from RC_tuning
-                $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
-                $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
-
-                $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
-
-                // update visual representation
-                $('.tunings .throttle input').change();
-                $('.tunings .rate input').change();
-            });
-        });
-
         $('a.update').click(function () {
             // catch RC_tuning changes
             RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
@@ -335,6 +319,13 @@ TABS.receiver.initialize = function (callback) {
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('receiverEepromSaved'));
+
+                    GUI.tab_switch_cleanup(function () {
+                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.handleReconnect($('.tab_receiver a'));
+                        });
+                    });
                 });
             }
 
