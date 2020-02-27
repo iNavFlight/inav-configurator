@@ -80,7 +80,9 @@ TABS.outputs.initialize = function (callback) {
     function processConfiguration() {
         let escProtocols = FC.getEscProtocols(),
             servoRates = FC.getServoRates(),
+            $idlePercent = $('#throttle_idle'),
             $idleInfoBox = $("#throttle_idle-info");
+            $motorStopWarningBox = $("#motor-stop-warning");
 
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
@@ -100,17 +102,21 @@ TABS.outputs.initialize = function (callback) {
                 $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
             }
 
+            $idleInfoBox.hide();
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
                 $('.hide-for-shot').hide();
-                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
-                $idleInfoBox.addClass('ok-box');
-                $idleInfoBox.show();
-
+                if ($idlePercent.val() > 7.0) {
+                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                    $idleInfoBox.addClass('ok-box');
+                    $idleInfoBox.show();
+                }
             } else {
                 $('.hide-for-shot').show();
-                $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
-                $idleInfoBox.addClass('ok-box');
-                $idleInfoBox.show();
+                if ($idlePercent.val() > 10.0) {
+                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                    $idleInfoBox.addClass('ok-box');
+                    $idleInfoBox.show();
+                }
             }
 
             if (protocolData.message !== null) {
@@ -146,6 +152,8 @@ TABS.outputs.initialize = function (callback) {
             ADVANCED_CONFIG.motorPwmRate = $(this).val();
         });
 
+        $idlePercent.change(buildMotorRates);
+
         $("#esc-protocols").show();
 
         let $servoRate = $('#servo-rate');
@@ -171,6 +179,19 @@ TABS.outputs.initialize = function (callback) {
 
         helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
         GUI.simpleBind();
+
+        let $motorStopCheckbox = $('#feature-4');
+        function showHideMotorStopWarning() {
+            const platformNeedsMotorStop = [PLATFORM_AIRPLANE, PLATFORM_ROVER, PLATFORM_BOAT].includes(MIXER_CONFIG.platformType);
+            const motorStopEnabled = $motorStopCheckbox.is(':checked');
+            if (platformNeedsMotorStop && motorStopEnabled || !platformNeedsMotorStop && !motorStopEnabled) {
+                $motorStopWarningBox.hide();
+            } else {
+                $motorStopWarningBox.show();
+            }
+        }
+        $motorStopCheckbox.change(showHideMotorStopWarning);
+        showHideMotorStopWarning();
     }
 
     function update_arm_status() {
