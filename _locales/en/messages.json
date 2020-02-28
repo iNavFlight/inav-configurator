@@ -546,7 +546,7 @@
     "featureCURRENT_METER": {
         "message": "Battery current monitoring"
     },
-    "feature3D": {
+    "featureREVERSIBLE_MOTORS": {
         "message": "Reversible motors mode (for use with reversible ESCs)"
     },
     "featureRSSI_ADC": {
