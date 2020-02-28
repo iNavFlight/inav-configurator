@@ -114,6 +114,14 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.requires-v2_4').hide();
         }
 
+        if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
+            $('.requires-v2_5').show();
+            $('.hides-v2_5').hide();
+        } else {
+            $('.requires-v2_5').hide();
+            $('.hides-v2_5').show();
+        }
+
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), BF_CONFIG.features);
 

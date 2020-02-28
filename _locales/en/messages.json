@@ -3295,5 +3295,8 @@
     },
     "motorStopWarning": {
         "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
+    },
+    "dynamic_gyro_notch_enabled_help": {
+        "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."
     }
 }
