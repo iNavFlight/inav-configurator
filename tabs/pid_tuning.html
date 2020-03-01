@@ -276,26 +276,47 @@
             <div class="cf_column">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
-                        <tr>
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Filter</th>
                             <td>
                                 <div style="padding-left: 1em; line-height: 28px;">
                                 <input type="checkbox" data-bit="5" class="feature toggle" name="DYNAMIC_FILTERS" title="DYNAMIC_FILTERS" id="feature-5">
-                            </div>
+                                </div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Width</th>
                             <td>
                                 <input data-setting="dyn_notch_width_percent" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" title="Sets the distance in percent between dynamic gyro notches. Set to 0 to use single dynamic gyro notch."></div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Min Frequency</th>
                             <td>
                                 <input data-setting="dyn_notch_min_hz" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" title="Minimum frequency for dynamic gyro notch filters. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_5">
+                            <th>Matrix Gyro Filter</th>
+                            <td>
+                                <select data-setting="dynamic_gyro_notch_enabled" />
+                                <div class="helpicon cf_tip" data-i18n_title="dynamic_gyro_notch_enabled_help"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_5">
+                            <th>Matrix Filter Min Frequency</th>
+                            <td>
+                                <input data-setting="dynamic_gyro_notch_min_hz" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="Minimum frequency for the Matrix Filter. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_5">
+                            <th>Matrix Filter Q Factor</th>
+                            <td>
+                                <input data-setting="dynamic_gyro_notch_q" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended"></div>
                             </td>
                         </tr>
                         <tr>
