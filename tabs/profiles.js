@@ -97,28 +97,37 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
         mspHelper.saveFilterConfig,
         mspHelper.savePidData,
         mspHelper.saveRcTuningData,
-        mspHelper.savePidAdvanced,
-        mspHelper.saveToEeprom
+        mspHelper.savePidAdvanced
     ]);
-    saveChainer.setExitPoint(reboot);
+    saveChainer.setExitPoint(applySettings);
 
     function loadHtml() {
         GUI.load("./tabs/profiles.html", processHtml);
     }
-
-    function reboot() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-        GUI.tab_switch_cleanup(function () {
-            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+    
+    function applySettings() {
+        Promise.mapSeries(currentPreset.settings, function (input, ii) {
+            return mspHelper.getSetting(input.key);
+        }).then(function () {
+            Promise.mapSeries(currentPreset.settings, function (input, ii) {
+                console.log('applying', input.key, input.value);
+                return mspHelper.setSetting(input.key, input.value);
+            }).then(function () {
+                mspHelper.saveToEeprom(function () {
+                    //noinspection JSUnresolvedVariable
+                    GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+            
+                    GUI.tab_switch_cleanup(function() {
+                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                            //noinspection JSUnresolvedVariable
+                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.handleReconnect();
+                        });
+                    });
+                });
+            })
         });
-    }
-
-    function reinitialize() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_setup a'));
-    }
+    } 
 
     function applyAndSave() {
 
