@@ -108,6 +108,7 @@ sources.js = [
     './js/vtx.js',
     './main.js',
     './js/tabs.js',
+    './js/preset_definitions.js',
     './tabs/*.js',
     './js/eventFrequencyAnalyzer.js',
     './js/periodicStatusUpdater.js',
