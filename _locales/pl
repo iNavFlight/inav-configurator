@@ -1,12 +1,12 @@
 {
   "translation_version": {
-    "message": "1"
+    "message": "0"
   },
   "options_title": {
     "message": "Opcje aplikacji"
   },
   "options_receive_app_notifications": {
-    "message": "Otrzymuj powiadomienie <strong>pulpitu</strong>gdy aplikacja się zaktualizuje"
+    "message": "Otrzymuj powiadomienie <strong>pulpitu</strong> gdy aplikacja się zaktualizuje"
   },
   "options_improve_configurator": {
     "message": "Wyślij anonimowe dane użytkowania do zespołu deweloperów"
@@ -930,46 +930,46 @@
     "message": "ROLL &amp; PITCH rate"
   },
   "pidTuningRollRate": {
-    "message": "ROLL rate"
+    "message": "Wskaźnik ROLL"
   },
   "pidTuningPitchRate": {
-    "message": "PITCH rate"
+    "message": "Wskaźnik PITCH"
   },
   "pidTuningYawRate": {
-    "message": "YAW rate"
+    "message": "Wskaźnik YAW"
   },
   "pidTuningMaxRollAngle": {
-    "message": "Max. ROLL angle"
+    "message": "Maks. kąt ROLL"
   },
   "pidTuningMaxRollAngleHelp": {
-    "message": "Maximum ROLL angle in ANGLE mode. This also constrains the maximum bank in navigation modes."
+    "message": "Maksymalny kąt ROLL w trybie ANGL. Ogranicza to również maksymalny kąt w trybach nawigacji."
   },
   "pidTuningMaxPitchAngle": {
-    "message": "Max. PITCH angle"
+    "message": "Maks. kąt PITCH"
   },
   "pidTuningMaxPitchAngleHelp": {
-    "message": "Maximum PITCH angle in ANGLE mode. This also constrains the maximum climb and dive in navigation modes."
+    "message": "Maksymalny kąt PITCH w trybie ANGL. Ogranicza również maksymalne wznoszenie i zniżanie w trybach nawigacji."
   },
   "pidTuningManualRollRate": {
-    "message": "Manual ROLL rate"
+    "message": "Ręczna szybkość ROLL"
   },
   "pidTuningManualPitchRate": {
-    "message": "Manual PITCH rate"
+    "message": "Ręczna szybkość PITCH"
   },
   "pidTuningManualYawRate": {
-    "message": "Manual YAW rate"
+    "message": "Ręczna szybkość YAW"
   },
   "magHoldYawRate": {
-    "message": "MagHold rate"
+    "message": "Szybkość MagHold"
   },
   "pidTuningMagHoldYawRateHelp": {
     "message": "Maksymalna prędkość obrotu w osi YAW jaką kontroler lotu w trybie MagHold może żądać od Bezzałogowego statku powietrznego. Używane tylko wtedy, gdy tryb MagHold jest włączony, podczas nawigacji RTH i WAYPOIN. Wartości poniżej 30 dps dają efektowne zwroty \"kinowe\""
   },
   "pidTuningTPA": {
-    "message": "Thrust PID Attenuation (TPA)"
+    "message": "PID Tłumienie ciągu (TPA)"
   },
   "pidTuningTPABreakPoint": {
-    "message": "TPA Breakpoint"
+    "message": "Punkt przerwania TPA"
   },
   "pidTuningButtonSave": {
     "message": "Zapisz"
@@ -990,31 +990,31 @@
     "message": "Dane PID <strong>odświeżone</strong>"
   },
   "pidTuningEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+    "message": "EEPROM <span style=\"color: #37a8db\">zapisano</span>"
   },
   "receiverHelp": {
-    "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+    "message": "Proszę przeczytać rozdział dokumentacji dotyczący odbiornika. Skonfiguruj port szeregowy (jeżeli jest wymagany), tryb odbiornika (szeregowy/ppm/pwm), dostawce (dla odbiorników szeregowych) powiąż odbiornik z nadajnikiem, ustaw mapę kanałôw skonfiguruj punkty końcowe oraz zakres kanałôw w TX tak, aby wszystkie kanały przechodziły od ~1000 do ~2000. Ustaw punkt środkowy (domyślnie 1500) wytrymuj kanały do wartości 1500 skonfiguruj strefę nieczułości drążka, sprawdź zachowanie, gdy TX jest wyłączony lub poza zasięgiem. <br/><span style =\"color: red\"> WAŻNE: </span> Przed lotem przeczytaj rozdział dokumentacji dotyczący bezpieczeństwa i skonfiguruj tryb awaryjny."
   },
   "receiverThrottleMid": {
-    "message": "Throttle MID"
+    "message": "Przepustnica MID"
   },
   "receiverThrottleExpo": {
-    "message": "Throttle EXPO"
+    "message": "Przepustnica EXPO"
   },
   "receiverRcRate": {
     "message": "RC Rate"
   },
   "receiverDeadband": {
-    "message": "RC Deadband"
+    "message": "Strefa nieczułości RC"
   },
   "receiverHelpDeadband": {
-    "message": "These are values (in us) by how much RC input can be different before it's considered valid. For transmitters with jitter on outputs, this value can be increased if rc inputs twitch while idle."
+    "message": "Są to wartości podane (w us) o ile dane wejściowe RC mogą być różne, zanim zostaną uznane za prawidłowe to w przypadku nadajników z funkcją trymowania na wyjściu wartości tę można zwiększyć, jeśli wejścia rc drgają podczas biegu jałowego."
   },
   "receiverHelpYawDeadband": {
-    "message": "These are values (in us) by how much RC input can be different before it's considered valid. For transmitters with jitter on outputs, this value can be increased if rc inputs twitch while idle. <strong>This setting is for Yaw only.</strong>"
+    "message": "Są to wartości podane (w us) o ile dane wejściowe RC mogą być różne, zanim zostaną uznane za prawidłowe to w przypadku nadajników z funkcją trymowania na wyjściu wartości tę można zwiększyć, jeśli wejścia rc drgają podczas biegu jałowego.<strong>To ustawienie jest tylko dla Yaw.</strong>"
   },
   "receiverYawDeadband": {
-    "message": "Yaw Deadband"
+    "message": "Strefa nieczułości Yaw"
   },
   "receiverRcExpo": {
     "message": "RC Expo"
@@ -1023,22 +1023,22 @@
     "message": "RC Yaw Expo"
   },
   "receiverManualRcExpo": {
-    "message": "Manual RC Expo"
+    "message": "Ręczne RC Expo"
   },
   "receiverManualRcYawExpo": {
-    "message": "Manual RC Yaw Expo"
+    "message": "Ręczne RC Yaw Expo"
   },
   "receiverChannelMap": {
-    "message": "Channel Map"
+    "message": "Mapa kanałów"
   },
   "receiverChannelMapTitle": {
-    "message": "You can define your own channel map by clicking inside the box"
+    "message": "Możesz zdefiniować własną mapę kanałów, klikając w okno"
   },
   "receiverRssiChannel": {
     "message": "Kanał RSSI"
   },
   "receiverRefreshRateTitle": {
-    "message": "Graph refresh rate"
+    "message": "Częstotliwość odświeżania wykresu"
   },
   "receiverButtonSave": {
     "message": "Zapisz"
@@ -1047,13 +1047,13 @@
     "message": "Odśwież"
   },
   "receiverButtonSticks": {
-    "message": "Control sticks"
+    "message": "Drążki kontrolne"
   },
   "receiverDataRefreshed": {
-    "message": "RC Tuning data <strong>refreshed</strong>"
+    "message": "Dane dostrajające RC <strong>odświeżone</strong>"
   },
   "receiverEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+    "message": "EEPROM <span style=\"color: #37a8db\">zapisano</span>"
   },
   "auxiliaryHelp": {
     "message": "Użyj zakresów, aby zdefiniować przełączniki nadajnika i odpowiadające im tryby. Kanał odbiornika dający odczyt między zakresem min/maks aktywuje tryb. Pamiętaj, aby zapisać ustawienia za pomocą przycisku Zapisz."
@@ -1080,28 +1080,28 @@
     "message": "Przykłady"
   },
   "adjustmentsExample1": {
-    "message": "Use Slot 1 and a 3POS switch on CH5 to select between Pitch/Roll P, I and D and another 3POS switch on CH6 to increase or decrease the value when held up or down."
+    "message": "Użyj automatycznego profilu nr 1 i przełącznika 3POZ na kanale CH5, aby wybrać między Pitch/Roll P, I i D oraz innego 3POZ przełącznika na kanale CH6 aby zwiększyć lub zmniejszyć wartość w momencie przełączania w gòre lub w dòł."
   },
   "adjustmentsExample2": {
-    "message": "Use Slot 2 and a 3POS switch on CH8 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
+    "message": "Użyj 2-go automatycznego profilu i przełącznika 3POZ na kanale CH8, aby włączyć wybór profilu za pomocą tego samego przełącznika 3POZ na tym samym kanale."
   },
   "adjustmentsColumnEnable": {
     "message": "Jeśli włączone"
   },
   "adjustmentsColumnUsingSlot": {
-    "message": "using slot"
+    "message": "używając profilu"
   },
   "adjustmentsColumnWhenChannel": {
-    "message": "when channel"
+    "message": "kiedy kanał"
   },
   "adjustmentsColumnIsInRange": {
-    "message": "is in range"
+    "message": "jest w zakresie"
   },
   "adjustmentsColumnThenApplyFunction": {
-    "message": "then apply"
+    "message": "następnie zastosuj"
   },
   "adjustmentsColumnViaChannel": {
-    "message": "via channel"
+    "message": "przez kanał"
   },
   "adjustmentsSlot0": {
     "message": "Profil 1"
@@ -1143,22 +1143,22 @@
     "message": "Regulacja Pitch & Roll P"
   },
   "adjustmentsFunction7": {
-    "message": "Pitch & Roll I Adjustment"
+    "message": "Regulacja Pitch & Roll I"
   },
   "adjustmentsFunction8": {
-    "message": "Pitch & Roll D Adjustment"
+    "message": "Regulacja Pitch & Roll D"
   },
   "adjustmentsFunction9": {
-    "message": "Yaw P Adjustment"
+    "message": "Regulacja Yaw P"
   },
   "adjustmentsFunction10": {
-    "message": "Yaw I Adjustment"
+    "message": "Regulacja Yaw I"
   },
   "adjustmentsFunction11": {
-    "message": "Yaw D Adjustment"
+    "message": "Regulacja Yaw D"
   },
   "adjustmentsFunction12": {
-    "message": "Rate Profile Selection"
+    "message": "Wybòr Profilu Rate"
   },
   "adjustmentsFunction13": {
     "message": "Pitch Rate"
@@ -1167,109 +1167,109 @@
     "message": "Roll Rate"
   },
   "adjustmentsFunction15": {
-    "message": "Pitch P Adjustment"
+    "message": "Regulacja Pitch P"
   },
   "adjustmentsFunction16": {
-    "message": "Pitch I Adjustment"
+    "message": "Regulacja Pitch I"
   },
   "adjustmentsFunction17": {
-    "message": "Pitch D Adjustment"
+    "message": "Regulacja Pitch D"
   },
   "adjustmentsFunction18": {
-    "message": "Roll P Adjustment"
+    "message": "Regulacja Roll P"
   },
   "adjustmentsFunction19": {
-    "message": "Roll I Adjustment"
+    "message": "Regulacja Roll I"
   },
   "adjustmentsFunction20": {
-    "message": "Roll D Adjustment"
+    "message": "Regulacja Roll D"
   },
   "adjustmentsFunction21": {
-    "message": "RC Yaw Expo Adjustment"
+    "message": "Regulacja RC Yaw Expo"
   },
   "adjustmentsFunction22": {
-    "message": "Manual RC Expo Adjustment"
+    "message": "Ręczna regulacja Expo RC"
   },
   "adjustmentsFunction23": {
-    "message": "Manual RC Yaw Expo Adjustment"
+    "message": "Ręczna regulacja RC Yaw Expo"
   },
   "adjustmentsFunction24": {
-    "message": "Manual Pitch & Roll Rate Adjustment"
+    "message": "Ręczna regulacja Pitch & Roll Rate"
   },
   "adjustmentsFunction25": {
-    "message": "Manual Roll Rate Adjustment"
+    "message": "Ręczna regulacja Roll Rate"
   },
   "adjustmentsFunction26": {
-    "message": "Manual Pitch Rate Adjustment"
+    "message": "Ręczna regulacja Pitch Rate"
   },
   "adjustmentsFunction27": {
-    "message": "Manual Yaw Rate Adjustment"
+    "message": "Ręczna regulacja Yaw Rate"
   },
   "adjustmentsFunction28": {
-    "message": "Navigation FW Cruise Throttle Adjustment"
+    "message": "Regulacja przepustnicy tempomatu FW"
   },
   "adjustmentsFunction29": {
-    "message": "Navigation FW Pitch To Throttle Adjustment"
+    "message": "Regulacja przepustnicy FW Pitch"
   },
   "adjustmentsFunction30": {
-    "message": "Board Roll Alignment Adjustment"
+    "message": "Regulacja wyròwnania kontrolera Roll"
   },
   "adjustmentsFunction31": {
-    "message": "Board Pitch Alignment Adjustment"
+    "message": "Regulacja wyròwnania kontrolera Pitch"
   },
   "adjustmentsFunction32": {
-    "message": "Level P Adjustment"
+    "message": "Regulacja poziomu P"
   },
   "adjustmentsFunction33": {
-    "message": "Level I Adjustment"
+    "message": "Regulacja poziomu I"
   },
   "adjustmentsFunction34": {
-    "message": "Level D Adjustment"
+    "message": "Regulacja poziomu D"
   },
   "adjustmentsFunction35": {
-    "message": "Pos XY P Adjustment"
+    "message": "Regulacja poz. XY P"
   },
   "adjustmentsFunction36": {
-    "message": "Pos XY I Adjustment"
+    "message": "Regulacja poz. XY I"
   },
   "adjustmentsFunction37": {
-    "message": "Pos XY D Adjustment"
+    "message": "Regulacja poz. XY D"
   },
   "adjustmentsFunction38": {
-    "message": "Pos Z P Adjustment"
+    "message": "Regulacja poz. Z P"
   },
   "adjustmentsFunction39": {
-    "message": "Pos Z I Adjustment"
+    "message": "Regulacja poz. Z I"
   },
   "adjustmentsFunction40": {
-    "message": "Pos Z D Adjustment"
+    "message": "Regulacja poz. Z D"
   },
   "adjustmentsFunction41": {
-    "message": "Heading P Adjustment"
+    "message": "Regulacja pozycji P"
   },
   "adjustmentsFunction42": {
-    "message": "Vel XY P Adjustment"
+    "message": "Regulacja Vel XY P"
   },
   "adjustmentsFunction43": {
-    "message": "Vel XY I Adjustment"
+    "message": "Regulacja Vel XY I"
   },
   "adjustmentsFunction44": {
-    "message": "Vel XY D Adjustment"
+    "message": "Regulacja Vel XY D"
   },
   "adjustmentsFunction45": {
-    "message": "Vel Z P Adjustment"
+    "message": "Regulacja Vel Z P"
   },
   "adjustmentsFunction46": {
-    "message": "Vel Z I Adjustment"
+    "message": "Regulacja Vel Z I"
   },
   "adjustmentsFunction47": {
-    "message": "Vel Z D Adjustment"
+    "message": "Regulacja Vel Z D"
   },
   "adjustmentsFunction48": {
-    "message": "FW min thr down pitch angle Adjustment"
+    "message": "FW Min. Kąt nachylenia Regulacja Pitch"
   },
   "adjustmentsFunction49": {
-    "message": "VTX power level Adjustment"
+    "message": "Regulacja poziomu mocy VTX"
   },
   "adjustmentsSave": {
     "message": "Zapisz"
@@ -1284,7 +1284,7 @@
     "message": "Skonfiguruj swój kod transpondera. Uwaga: Tylko prawidłowe kody będą rozpoznawane przez systemy czasów wyścigów. Prawidłowe kody transpondera można uzyskać z <a href=\"http://seriouslypro.com/transponder-codes\" target=\"_blank\">Poważnie Pro</a>."
   },
   "transponderInformation": {
-    "message": "Transponders systems allow race organizers to time your laps.  The transponder is fitted to your aircraft and when your aircraft passes the timing gate the track-side receiver registers your code and records your laptime.  When fitting an IR based transponder your should ensure that it points outward from your aircraft towards the track-side receivers and that the light beam is not obstructed by your airframe, battery-straps, cables, propellers, etc."
+    "message": "System transponderów pozwala organizatorom wyścigu mierzyć czas Twoich okrążeń. Transponder jest zamontowany w twoim statku powietrznym w chwili gdy minie bramkę pomiaru czasu, odbiornik przytorowy rejestruje kod i rejestruje czas okrążenia. Instalując transponder na podczerwień, należy upewnić się, że jest skierowany na zewnątrz statku powietrznego w kierunku odbiorników przytorowych, a wiązka światła nie jest zasłonięta przez kadłub, paski akumulatora, kable, śmigła itp."
   },
   "transponderConfiguration": {
     "message": "Konfiguracja"
@@ -1305,13 +1305,13 @@
     "message": "EEPROM <span style=\"color: #37a8db\">zapisano</span>"
   },
   "servosChangeDirection": {
-    "message": "Change Direction in TX To Match"
+    "message": "Zmień kierunek w TX aby dopasować"
   },
   "servosName": {
     "message": "Nazwa"
   },
   "servosMid": {
-    "message": "MID"
+    "message": "Środek"
   },
   "servosMin": {
     "message": "MIN"
@@ -1338,13 +1338,13 @@
     "message": "Normalne"
   },
   "servoEmptyTableInfo": {
-    "message": "No servos configured. Add them using the Mixer tab."
+    "message": "Nie skonfigurowano seromechanizmòw. Dodaj je za pomocą zakładki Mixer."
   },
   "servosEepromSave": {
-    "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+    "message": "EEPROM <span style=\"color: #37a8db\">zapisano</span>"
   },
   "mixerSaved": {
-    "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
+    "message": "Mixer <span style=\"color: #37a8db\">zapisano</span>"
   },
   "gpsHead": {
     "message": "GPS"
@@ -1356,13 +1356,13 @@
     "message": "Aktualna lokalizacja GPS"
   },
   "gpsMapMessage1": {
-    "message": "Please check your internet connection"
+    "message": "Sprawdź połączenie z Internetem"
   },
   "gpsMapMessage2": {
     "message": "Oczekiwanie na poprawkę sygnału GPS 3D…"
   },
   "gpsFix": {
-    "message": "Fix type:"
+    "message": "Typ zasięgu:"
   },
   "gpsFix2D": {
     "message": "<span class=\"fix2d\">2D</span>"
@@ -1371,7 +1371,7 @@
     "message": "<span class=\"fix3d\">3D</span>"
   },
   "gpsFixNone": {
-    "message": "<span class=\"fixnone\">None</span>"
+    "message": "<span class=\"fixnone\">Brak</span>"
   },
   "gpsAltitude": {
     "message": "Wysokość:"
@@ -1389,16 +1389,16 @@
     "message": "Satelity:"
   },
   "gpsDistToHome": {
-    "message": "Dist to Home:"
+    "message": "Powròt do Domu:"
   },
   "gpsHDOP": {
     "message": "HDOP:"
   },
   "gpsTotalMessages": {
-    "message": "Total messages:"
+    "message": "Razem wiadomości:"
   },
   "gpsMessageRate": {
-    "message": "Update time:"
+    "message": "Czas aktualizacji:"
   },
   "gpsErrors": {
     "message": "Błędy:"
@@ -1416,37 +1416,37 @@
     "message": "Siła Sygnału"
   },
   "motors": {
-    "message": "Motors"
+    "message": "Silniki"
   },
   "servos": {
-    "message": "Servos"
+    "message": "Serwo"
   },
   "motorsMaster": {
-    "message": "Master"
+    "message": "Główny"
   },
   "motorsNotice": {
-    "message": "<strong>Motor Test Mode Notice:</strong><br />Moving the sliders will cause the motors to <strong>spin up</strong>.<br />In order to prevent injury <strong style=\"color: red\">remove ALL propellers</strong> before using this feature.<br />"
+    "message": "<strong> Uwaga Tryb testu silnikôw:</strong><br /> Przesunięcie suwaków spowoduje, że silniki będą się obracać <strong></strong>. <br /> Aby zapobiec obrażeniom <strong style = \"color: red\"> usuń WSZYSTKIE śmigła </strong> przed użyciem tej funkcji. <br />"
   },
   "motorsEnableControl": {
-    "message": "I understand the risks, propellers are removed - Enable motor control."
+    "message": "Rozumiem zagrożenia, śmigła są zdemontowane - Włącz kontrolę silnikòw."
   },
   "sensorsInfo": {
-    "message": "Keep in mind that using fast update periods and rendering multiple graphs at the same time is resource heavy and will burn your battery quicker if you use a laptop.<br />We recommend to only render graphs for sensors you are interested in while using reasonable update periods."
+    "message": "Pamiętaj, że duża częstotliwość odświeżania i renderowania wielu wykresów w tym samym czasie j bardziej obciąża zasoby i szybciej zużywa baterię, jeśli korzystasz z laptopa. <br /> Zalecamy renderowanie wykresów tylko dla czujników ktòrymi jesteś zainteresowany z rozsądną częstotliwością odświerzania."
   },
   "sensorsRefresh": {
-    "message": "Refresh:"
+    "message": "Odśwież:"
   },
   "sensorsScale": {
-    "message": "Scale:"
+    "message": "Skala:"
   },
   "cliInfo": {
-    "message": "<strong>Note</strong>: Leaving CLI tab or pressing Disconnect will <strong>automatically</strong> send \"<strong>exit</strong>\" to the board.  With the latest firmware this will make the controller <span style=\"color: red\">restart</span> and unsaved changes will be <span style=\"color: red\">lost</span>."
+    "message": "<strong>Uwaga</strong>: Opuszczenie zakładki CLI lub naciśnięcie przycisku Rozłącz<strong>automatycznie</strong> wyśle polecenie\"<strong>wyjdź</strong>\" do kontrolera lotu. W najnowszym oprogramowaniu spowoduje to że kontroler <span style=\"color: red\">zrestartuje</span> się a niezapisane zmiany zostaną<span style=\"color: red\">utracone</span>."
   },
   "cliInputPlaceholder": {
-    "message": "Write your command here"
+    "message": "Napisz swoje polecenie tutaj"
   },
   "cliEnter": {
-    "message": "CLI mode detected"
+    "message": "Wykryto tryb CLI"
   },
   "cliReboot": {
     "message": "Wykryto ponowne uruchomienie CLI"
@@ -1458,31 +1458,31 @@
     "message": "Nie udało się zapisać zmian podczas wyjścia z CLI"
   },
   "cliSaveToFileAborted": {
-    "message": "Saving CLI output to file was aborted"
+    "message": "Zapisywanie pliku podczas wyjścia z CLI zostało przerwane"
   },
   "cliSaveToFileCompleted": {
-    "message": "CLI output successfully saved to file"
+    "message": "Pomyślnie zapisano plik podczas wyjścia z CLI"
   },
   "cliClearOutputHistoryBtn": {
-    "message": "Clear output history"
+    "message": "Wyczyść historię wyjść"
   },
   "cliCopyToClipboardBtn": {
     "message": "Kopiuj do schowka"
   },
   "cliCopySuccessful": {
-    "message": "Copied!"
+    "message": "Skopiowano!"
   },
   "cliLoadFromFileBtn": {
-    "message": "Load from file"
+    "message": "Wczytaj z pliku"
   },
   "cliConfirmSnippetDialogTitle": {
-    "message": "Review loaded commands"
+    "message": "Przejrzyj załadowane komendy"
   },
   "cliConfirmSnippetNote": {
-    "message": "<strong>Note</strong>: You can review and edit commands before execution."
+    "message": "<strong>Uwaga</strong>: Możesz przejrzeć i edytować komendy przed wykonaniem."
   },
   "cliConfirmSnippetBtn": {
-    "message": "Execute"
+    "message": "Wykonaj"
   },
   "loggingNote": {
     "message": "Data will be logged in this tab <span style=\"color: red\">only</span>, leaving the tab will <span style=\"color: red\">cancel</span> logging and application will return to its normal <strong>\"configurator\"</strong> state.<br /> You are free to select the global update period, data will be written into the log file every <strong>1</strong> second for performance reasons."
@@ -1491,31 +1491,31 @@
     "message": "Samples Saved:"
   },
   "loggingLogSize": {
-    "message": "Log Size:"
+    "message": "Rozmiar dziennika:"
   },
   "loggingButtonLogFile": {
-    "message": "Select Log File"
+    "message": "Wybierz plik dziennika"
   },
   "loggingStart": {
-    "message": "Start Logging"
+    "message": "Rozpocznij logowanie"
   },
   "loggingStop": {
-    "message": "Stop Logging"
+    "message": "Zatrzymaj logowanie"
   },
   "loggingBack": {
     "message": "Leave Logging / Disconnect"
   },
   "loggingErrorNotConnected": {
-    "message": "You need to <strong>connect</strong> first"
+    "message": "Najpierw musisz <strong>się połączyć</strong>"
   },
   "loggingErrorLogFile": {
-    "message": "Please select log file"
+    "message": "Proszę wybrać plik dziennika"
   },
   "loggingErrorOneProperty": {
-    "message": "Please select at least one property to log"
+    "message": "Wybierz przynajmniej jedną właściwość do zarejestrowania"
   },
   "loggingAutomaticallyRetained": {
-    "message": "Automatically loaded previous log file: <strong>$1</strong>"
+    "message": "Automatycznie załadowano poprzedni plik dziennika: <strong>$1</strong>"
   },
   "blackboxNotSupported": {
     "message": "Oprogramowanie kontrolera lotu nie obsługuje rejestrowania na czarnej skrzynce lub funkcja rejestrowania nie jest włączona"
@@ -1527,25 +1527,25 @@
     "message": "Zapisz i Uruchom ponownie"
   },
   "serialLoggingSupportedNote": {
-    "message": "You can log to an external logging device (such as an OpenLog or compatible clone) by using a serial port. Configure the port on the Ports tab."
+    "message": "Możesz zalogować się do zewnętrznego urządzenia rejestrującego (takiego jak OpenLog lub kompatybilny klon) za pomocą portu szeregowego. Skonfiguruj port na karcie Porty."
   },
   "sdcardNote": {
-    "message": "Flight logs can be recorded to your flight controller's onboard SD card slot."
+    "message": "Rejestry lotów mogą być zapisywane na pokładowej kartcie SD kontrolera lotu."
   },
   "dataflashNote": {
-    "message": "Flight logs can be recorded to your flight controller's onboard dataflash chip."
+    "message": "Rejestry lotów mogą być zapisywane na pokładowym chipie danych kontrolera lotu."
   },
   "dataflashNotPresentNote": {
-    "message": "Your flight controller does not have a compatible dataflash chip available."
+    "message": "Twój kontroler lotu nie posiada kompatybilnego chipu na dane."
   },
   "dataflashFirmwareUpgradeRequired": {
     "message": "Dataflash requires firmware &gt;= 1.8.0."
   },
   "dataflashButtonSaveFile": {
-    "message": "Save flash to file..."
+    "message": "Zapisz pamięć do pliku..."
   },
   "dataflashButtonErase": {
-    "message": "Erase flash"
+    "message": "Wyczyść pamięć"
   },
   "dataflashConfirmEraseTitle": {
     "message": "Confirm dataflash erase"
@@ -1554,46 +1554,46 @@
     "message": "This will erase any Blackbox logs or other data contained in the dataflash which will take about 20 seconds, are you sure?"
   },
   "dataflashSavingTitle": {
-    "message": "Saving dataflash to file"
+    "message": "Zapisywanie danych do pliku"
   },
   "dataflashSavingNote": {
-    "message": "Saving could take several minutes, please wait."
+    "message": "Zapisywanie może potrwać kilka minut, proszę czekać."
   },
   "dataflashSavingNoteAfter": {
-    "message": "Save completed! Press \"Ok\" to continue."
+    "message": "Zapisywanie zakończone! Naciśnij \"Ok\", aby kontynuować."
   },
   "dataflashButtonSaveCancel": {
-    "message": "Cancel"
+    "message": "Anuluj"
   },
   "dataflashButtonSaveDismiss": {
     "message": "Ok"
   },
   "dataflashButtonEraseConfirm": {
-    "message": "Yes, erase dataflash"
+    "message": "Tak, usuń dane"
   },
   "dataflashButtonEraseCancel": {
-    "message": "Cancel"
+    "message": "Anuluj"
   },
   "dataflashFileWriteFailed": {
     "message": "Nie udało się zapisać pliku, czy uprawnienia dla tego folderu są właściwe?"
   },
   "firmwareFlasherReleaseSummaryHead": {
-    "message": "Release info"
+    "message": "Informacje o wersji"
   },
   "firmwareFlasherReleaseName": {
-    "message": "Name/Version:"
+    "message": "Nazwa/Wersja:"
   },
   "firmwareFlasherReleaseVersionUrl": {
     "message": "Visit release page."
   },
   "firmwareFlasherReleaseNotes": {
-    "message": "Release notes:"
+    "message": "Informacja o wydaniu:"
   },
   "firmwareFlasherReleaseDate": {
-    "message": "Date:"
+    "message": "Data:"
   },
   "firmwareFlasherReleaseStatus": {
-    "message": "State:"
+    "message": "Stan:"
   },
   "firmwareFlasherReleaseTarget": {
     "message": "Target:"
@@ -1611,49 +1611,49 @@
     "message": "<span style=\"color: red\">IMPORTANT</span>: Ensure you flash a file appropriate for your target.  Flashing a binary for the wrong target can cause <span style=\"color: red\">bad</span> things to happen."
   },
   "firmwareFlasherPath": {
-    "message": "Path:"
+    "message": "Ścieżka:"
   },
   "firmwareFlasherSize": {
-    "message": "Size:"
+    "message": "Rozmiar:"
   },
   "firmwareFlasherStatus": {
-    "message": "Status:"
+    "message": "Stan:"
   },
   "firmwareFlasherProgress": {
-    "message": "Progress:"
+    "message": "Postęp:"
   },
   "firmwareFlasherLoadFirmwareFile": {
-    "message": "Please load firmware file"
+    "message": "Proszę załadować plik oprogramowania"
   },
   "firmwareFlasherNoReboot": {
-    "message": "No reboot sequence"
+    "message": "Brak sekwencji restartu"
   },
   "firmwareFlasherOnlineSelectBoardDescription": {
-    "message": "Select your board to see available online firmware releases - Select the correct firmware appropriate for your board."
+    "message": "Wybierz kontroler lotu ktòrego używasz aby zobaczyć dostępne wersje oprogramowwnia online. Następnie wybierz odpowiednie oprogramowanie dla twojego kontrolera."
   },
   "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
-    "message": "Select firmware version for your board."
+    "message": "Wybierz wersję oprogramowania dla swojejgo kontrolera."
   },
   "firmwareFlasherNoRebootDescription": {
-    "message": "Enable if you powered your FC while the bootloader pins are jumpered or have your FC's BOOT button pressed."
+    "message": "Włącz, jeśli zasilałeś swój FC a styki bootloadera są zwarte lub gdy przycisk FC BOOT jest wciśnięty."
   },
   "firmwareFlasherFlashOnConnect": {
-    "message": "Flash on connect"
+    "message": "Wgraj przy połączeniu"
   },
   "firmwareFlasherFlashOnConnectDescription": {
-    "message": "Attempt to flash the board automatically (triggered by newly detected serial port)."
+    "message": "Próba automatycznego wgrywania oprogramowania do kontrolera lotu (uruchamiana przez nowo wykryty port szeregowy)."
   },
   "firmwareFlasherFullChipErase": {
-    "message": "Full chip erase"
+    "message": "Usuwanie całego chipu"
   },
   "firmwareFlasherFullChipEraseDescription": {
-    "message": "Wipes all configuration data currently stored on the board."
+    "message": "Usuwa wszystkie dane konfiguracyjne aktualnie przechowywane w pamięci kontrolera."
   },
   "firmwareFlasherFlashDevelopmentFirmware": {
-    "message": "Use Development Firmware"
+    "message": "Użyj oprogramowania programistycznego"
   },
   "firmwareFlasherFlashDevelopmentFirmwareDescription": {
-    "message": "Flash most recent (untested) development firmware."
+    "message": "Wgraj najnowsze (nietestowane) oprogramowanie rozwojowe."
   },
   "firmwareFlasherManualBaud": {
     "message": "Ręczna szybkość transmisji"
@@ -1668,37 +1668,37 @@
     "message": "Show Release-Candidates and Development Releases."
   },
   "firmwareFlasherOptionLabelSelectFirmware": {
-    "message": "Choose a Firmware / Board"
+    "message": "Wybierz wersję oprogramowania/Kontrolera lotu"
   },
   "firmwareFlasherOptionLabelSelectBoard": {
-    "message": "Choose a Board"
+    "message": "Wybierz kontroler lotu"
   },
   "firmwareFlasherOptionLabelSelectFirmwareVersion": {
-    "message": "Choose a Firmware version"
+    "message": "Wybierz wersję oprogramowania"
   },
   "firmwareFlasherOptionLabelSelectFirmwareVersionFor": {
-    "message": "Choose a Firmware version for"
+    "message": "Wybierz wersję oprogramowania dla"
   },
   "firmwareFlasherButtonLoadLocal": {
-    "message": "Load Firmware [Local]"
+    "message": "Załaduj oprogramowanie [Local]"
   },
   "firmwareFlasherButtonLoadOnline": {
-    "message": "Load Firmware [Online]"
+    "message": "Załaduj oprogramowanie [Online]"
   },
   "firmwareFlasherButtonLoading": {
-    "message": "Loading..."
+    "message": "Ładowanie..."
   },
   "firmwareFlasherFlashFirmware": {
-    "message": "Flash Firmware"
+    "message": "Wgraj oprogramowanie"
   },
   "firmwareFlasherGithubInfoHead": {
-    "message": "Github Firmware Info"
+    "message": "Github oprogramowanie Info"
   },
   "firmwareFlasherCommiter": {
     "message": "Committer:"
   },
   "firmwareFlasherDate": {
-    "message": "Date:"
+    "message": "Data:"
   },
   "firmwareFlasherHash": {
     "message": "Hash:"
@@ -1707,16 +1707,16 @@
     "message": "Go to GitHub to review this commit..."
   },
   "firmwareFlasherMessage": {
-    "message": "Message:"
+    "message": "Wiadomość:"
   },
   "firmwareFlasherWarningHead": {
-    "message": "Warning"
+    "message": "Ostrzeżenie"
   },
   "firmwareFlasherWarningText": {
-    "message": "Please do <span style=\"color: red\">not</span> try to flash <strong>non-iNAV</strong> hardware with this firmware flasher.<br />Do <span style=\"color: red\">not</span> <strong>disconnect</strong> the board or <strong>turn off</strong> your computer while flashing.<br /><br /><strong>Note: </strong>STM32 bootloader is stored in ROM, it cannot be bricked.<br /><strong>Note: </strong><span style=\"color: red\">Auto-Connect</span> is always disabled while you are inside firmware flasher.<br /><strong>Note: </strong>Make sure you have a backup; some upgrades/downgrades will wipe your configuration.<br /><strong>Note:</strong> If you have problems flashing try disconnecting all cables from your FC first, try rebooting, upgrade chrome, upgrade drivers.<br /><strong>Note:</strong> When flashing boards that have directly connected USB sockets (SPRacingF3Mini, Sparky, ColibriRace, etc) ensure you have read the USB Flashing section of the INAV manual and have the correct software and drivers installed"
+    "message": "Proszę <span style=\"color: red\">nie</span>wgrywać oprogramowania innego niż <strong>INAV</strong> za pomocą tego Programu.<br />Nie <span style=\"color: red\">odłączaj</span> <strong>kontrolera lotu</strong> oraz nie<strong>wyłączaj</strong> twojego komputera podczas wgrywania oprogramowania.<br /><br /><strong>Uwaga: </strong>bootloader STM32 jest przechowywany w pamięci ROM dlatego nie może być przeprogramowany.<br /><strong>Uwaga: </strong><span style=\"color: red\">Automatyczne Połączenie</span> jest zawsze wyłączone podczas wgrywania oprogramowania.<br /><strong>Uwaga: </strong>Upewnij się, że masz kopię zapasową; niektóre aktualizacje zostaną usunięte.<br /><strong>Uwaga:</strong> Jeśli masz problemy z wgrywaniem, spróbuj najpierw odłączyć wszystkie kable USB od swojego FC, spróbuj ponownie uruchomić urządzenie, uaktualnij chrom, uaktualnij sterowniki.<br /><strong>Uwaga:</strong> Podczas migania diod sygnalizacyjnych które mają bezpośrednio podłączone gniazda USB np: (SPRacingF3Mini, Sparky, ColibriRace itp.) upewnij się, że przeczytałeś sekcję flashowania USB w instrukcji INAV i masz zainstalowane prawidłowe oprogramowanie i sterowniki"
   },
   "firmwareFlasherRecoveryHead": {
-    "message": "<strong>Recovery / Lost communication<strong>"
+    "message": "<strong>Odzyskiwanie / utrata komunikacji<strong>"
   },
   "firmwareFlasherRecoveryText": {
     "message": "If you have lost communication with your board follow these steps to restore communication: <ul><li>Power off</li><li>Enable 'No reboot sequence', enable 'Full chip erase'.</li><li>Jumper the BOOT pins or hold BOOT button.</li><li>Power on (activity LED will NOT flash if done correctly).</li><li>Install all STM32 drivers and Zadig if required (see <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> section of INAV manual).</li><li>Close configurator, Close all running chrome instances, Close all Chrome apps, Restart Configurator.</li><li>Release BOOT button if your FC has one.</li><li>Flash with correct firmware (using manual baud rate if specified in your FC's manual).</li><li>Power off.</li><li>Remove BOOT jumper.</li><li>Power on (activity LED should flash).</li><li>Connect normally.</li></ul>"
@@ -1725,10 +1725,10 @@
     "message": "Leave Firmware Flasher"
   },
   "firmwareFlasherFirmwareNotLoaded": {
-    "message": "Firmware not loaded"
+    "message": "Nie załadowano oprogramowania"
   },
   "firmwareFlasherHexCorrupted": {
-    "message": "HEX file appears to be corrupted"
+    "message": "Plik HEX wydaje się być uszkodzony"
   },
   "firmwareFlasherRemoteFirmwareLoaded": {
     "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
@@ -1770,16 +1770,16 @@
     "message": "Barometer & Sonar/Altitude"
   },
   "pidTuningMag": {
-    "message": "Magnometer/Heading"
+    "message": "Magnometer/Pozycja"
   },
   "pidTuningGps": {
     "message": "Nawigacja GPS"
   },
   "pidTuningLevelP": {
-    "message": "Strength"
+    "message": "Siła"
   },
   "pidTuningLevelI": {
-    "message": "LPF cutoff (Hz)"
+    "message": "Odcięcie LPF (Hz)"
   },
   "pidTuningLevelD": {
     "message": "Transition (Horizon)"
@@ -1797,13 +1797,13 @@
     "message": "Receiver failsafe"
   },
   "failsafeFeatureItemOld": {
-    "message": "Failsafe settings on RX signal loss"
+    "message": "Ustawienia trybu awaryjnego przy utracie sygnału RX"
   },
   "failsafeThrottleItemOld": {
     "message": "Failsafe Throttle"
   },
   "failsafeFeaturesHelpNew": {
-    "message": "Failsafe has two stages. <strong>Stage 1</strong> is entered when a flightchannel has an invalid pulse duration, the receiver reports failsafe mode or there is no signal from the receiver at all, the channel fallback settings are applied to <span style=\"color: red\">all channels</span> and a short amount of time is provided to allow for recovery. <strong>Stage 2</strong> is entered when the error condition takes longer than the configured guard time while the craft is <span style=\"color: red\">armed</span>, all channels will remain at the applied channel fallback setting unless overruled by the chosen procedure. <br /><strong>Note:</strong> Prior to entering stage 1, channel fallback settings are also applied to individual radio channels that have invalid pulses."
+    "message": "Tryb awaryjny ma dwa etapy. <strong> Etap 1 </strong> jest wprowadzany, gdy sygnał z odbiornika ma nieprawidłowy czas trwania impulsu oraz gdy za pomocą zdefiniowanego przełącznika włączysz tryb awaryjny lub w ogóle nie ma sygnału z odbiornika, ustawienia trybu awaryjnego są stosowane dla <span style = \"color: red\"> wszystkich kanałòw </span> i masz małą ilość czasu na odzyskanie kontroli. <strong> Etap 2 </strong> jest wprowadzany, gdy błąd trwa dłużej niż skonfigurowany czas a jednostka jest <span style = \"color: red\"> uzbrojona</span>, wszystkie kanały pozostaną na ustawieniu awaryjnym chyba że zostaną pominięte przez wybraną procedurę. <br /> <strong> Uwaga: </strong> przed wejściem do etapu 1 ustawienia zastępowania kanałów są również stosowane do poszczególnych kanałów radiowych, które mają nieprawidłowe impulsy."
   },
   "failsafePulsrangeTitle": {
     "message": "Valid Pulse Range Settings"
@@ -1830,16 +1830,16 @@
     "message": "<strong>Hold</strong> means maintain the last good value received. <strong>Set</strong> means the value given here will be used"
   },
   "failsafeStageTwoSettingsTitle": {
-    "message": "Settings"
+    "message": "Ustawienia"
   },
   "failsafeFeatureItem": {
     "message": "Włączone"
   },
   "failsafeFeatureHelp": {
-    "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
+    "message": "<strong>Uwaga:</strong> gdy WYŁĄCZONY jest Etap 2, dla wszystkich kanałów lotu (Roll, Pitch, Yaw i Throttle) używane jest ustawienie zastępcze <strong>Auto</strong>."
   },
   "failsafeDelayItem": {
-    "message": "Guard time for activation after signal lost [1 = 0.1 sec.]"
+    "message": "Czas do aktywacji po utracie sygnału [1 = 0,1 sek.]"
   },
   "failsafeDelayHelp": {
     "message": "Time for stage 1 to wait for recovery"
@@ -1851,16 +1851,16 @@
     "message": "Delay for turning off the Motors during Failsafe [1 = 0.1 sec.]"
   },
   "failsafeOffDelayHelp": {
-    "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
+    "message": "Czas pozostawania w trybie lądowania aż do momętu gdy silniki zostaną wyłączone, a jednostka rozbrojona"
   },
   "failsafeSubTitle1": {
-    "message": "Procedure"
+    "message": "Procedura"
   },
   "failsafeProcedureItemSelect1": {
-    "message": "Land"
+    "message": "Ląduj"
   },
   "failsafeProcedureItemSelect2": {
-    "message": "Drop"
+    "message": "Upadek"
   },
   "failsafeProcedureItemSelect3": {
     "message": "RTH"
@@ -1869,10 +1869,10 @@
     "message": "Do nothing"
   },
   "failsafeKillSwitchItem": {
-    "message": "Failsafe Kill Switch (instantly disarm aircraft on failsafe)"
+    "message": "Failsafe Kill Switch (natychmiastowe rozbrojenie statku powietrznego po włączeniu trybu awaryjnego)"
   },
   "failsafeKillSwitchHelp": {
-    "message": "Set this option to make the failsafe switch, configured in the modes tab, act as a direct kill switch, bypassing the selected failsafe procedure. <strong>Note:</strong> Arming is blocked with the failsafe kill switch in the ON position"
+    "message": "Ustaw tę opcję, aby ustawić przełącznik dla trybu awaryjnego. Możesz go skonfigurować w zakładce tryby, będzie działać jako bezpośredni przełącznik włączający tryb awaryjny pomijając wybraną procedure. <strong>Uwaga:</strong> Uzbrajanie jednostki latającej jest zablokowane gdy przełącznik opcji Failsafe Kill Switch jest w pozycji włączonej"
   },
   "failsafeUseMinimumDistanceItem": {
     "message": "Use alternate Minimum Distance Failsafe Procedure when close to Home"
@@ -2040,7 +2040,7 @@
     "message": "OSD"
   },
   "configurationSensors": {
-    "message": "Sensors"
+    "message": "Czujniki"
   },
   "sensorAccelerometer": {
     "message": "Accelerometer"
@@ -2052,31 +2052,31 @@
     "message": "Barometer"
   },
   "sensorPitot": {
-    "message": "Pitot tube"
+    "message": "Rura Pitota"
   },
   "sensorRangefinder": {
-    "message": "Rangefinder"
+    "message": "Dalmierz"
   },
   "sensorOpflow": {
-    "message": "Optical flow"
+    "message": "Układ optyczny"
   },
   "manualEnablingTemplate": {
     "message": "Aby włączyć przez CLI, użyj polecenia <strong> {name}</strong>"
   },
   "armingFailureReasonTitle": {
-    "message": "Pre-arming checks"
+    "message": "Kontrola wstępnego uzbrajania"
   },
   "BLOCKED_UAV_NOT_LEVEL": {
     "message": "Dron jest wypoziomowany"
   },
   "BLOCKED_SENSORS_CALIBRATING": {
-    "message": "Run-time calibration"
+    "message": "Kalibracja czasu pracy"
   },
   "BLOCKED_SYSTEM_OVERLOADED": {
-    "message": "CPU load"
+    "message": "Obciążenie CPU"
   },
   "BLOCKED_NAVIGATION_SAFETY": {
-    "message": "Navigation is safe"
+    "message": "Nawigacja jest bezpieczna"
   },
   "BLOCKED_COMPASS_NOT_CALIBRATED": {
     "message": "Kompas skalibrowany"
@@ -2127,7 +2127,7 @@
     "message": "Uwaga: Jeśli kontroler lotu jest zamontowany pod innym kątem lub do góry nogami wykonaj etapy kalibracji z kontrolerem lotu w sposób pokazany na zdjęciach, a nie dronie(w przeciwnym razie kalibracja nie powiedzie się)."
   },
   "AccBtn": {
-    "message": "Calibrate Accelerometer"
+    "message": "Kalibruj Akcelerometr"
   },
   "MagCalText": {
     "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
@@ -2415,7 +2415,7 @@
     "message": "Zużyta bateria"
   },
   "osdAlarmBATT_CAP_HELP": {
-    "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
+    "message": "Wskaźnik zużycia baterii będzie migać, gdy całkowita ilość zużytych (mah) będzie większa niż ta wartość. Wymaga czujnika prądu. Zero wyłącza ten alarm."
   },
   "osdAlarmFLY_MINUTES": {
     "message": "Czas lotu"
@@ -2427,19 +2427,19 @@
     "message": "Odległość"
   },
   "osdAlarmDIST_HELP": {
-    "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
+    "message": "Wskaźnik odległości do domu będzie migał, gdy odległość jest większa niż ta wartość. Zero wyłącza ten alarm."
   },
   "osdAlarmMAX_NEG_ALTITUDE": {
-    "message": "Negative Altitude"
+    "message": "Wysokość negatywna"
   },
   "osdAlarmMAX_NEG_ALTITUDE_HELP": {
     "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
   },
   "osdAlarmGFORCE": {
-    "message": "g force"
+    "message": "g siła"
   },
   "osdAlarmGFORCE_HELP": {
-    "message": "The g force element will start blinking when greater than this value"
+    "message": "Element siły g zacznie migać gdy wartość jest większa niż ta"
   },
   "osdAlarmGFORCE_AXIS_MIN": {
     "message": "g force axis min"
@@ -2478,10 +2478,10 @@
     "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
   },
   "osdAlarmBARO_TEMPERATURE_MAX": {
-    "message": "Maximum baro temperature"
+    "message": "Maksymalna temperatura barometru"
   },
   "osdAlarmBARO_TEMPERATURE_MAX_HELP": {
-    "message": "The temperature indicator will flash when the barometer temperature is above this value"
+    "message": "Wskaźnik temperatury będzie migał, gdy temperatura barometru jest wyższa od tej wartości"
   },
   "osdGroupGeneral": {
     "message": "General"
