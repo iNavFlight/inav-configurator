@@ -2205,7 +2205,7 @@
         "message": "Warning"
     },
     "presetApplyDescription": {
-        "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
+        "message": "<p style='color: darkred;'>Make sure that <strong>mixer</strong> was configured before applying any Presets!</p><p>Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!</p>"
     },
     "OK": {
         "message": "OK"
