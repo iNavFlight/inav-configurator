@@ -61,7 +61,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function loadHtml() {
-        $('#content').load("./tabs/mission_control.html", process_html);
+        GUI.load("./tabs/mission_control.html", process_html);
     }
 
     function process_html() {

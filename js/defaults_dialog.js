@@ -43,6 +43,10 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "mc_iterm_relax_type",
+                    value: "SETPOINT"
+                },
+                {
+                    key: "mc_iterm_relax",
                     value: "RP"
                 },
                 {

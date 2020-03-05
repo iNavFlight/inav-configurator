@@ -52,7 +52,15 @@ var Settings = (function () {
                     input.val(s.value);
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
-                    input.attr('step', "0.01");
+
+                    let dataStep = input.data("step");
+
+                    if (dataStep !== undefined) {
+                        input.attr('step', dataStep);
+                    } else {
+                        input.attr('step', "0.01");
+                    }
+                    
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
                     input.val(s.value.toFixed(2));

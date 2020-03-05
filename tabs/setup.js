@@ -27,7 +27,7 @@ TABS.setup.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        $('#content').load("./tabs/setup.html", process_html);
+        GUI.load("./tabs/setup.html", process_html);
     }
 
     function process_html() {

@@ -91,20 +91,10 @@ $(document).ready(function () {
             }
         });
 
-        win.setMinimumSize(1024, 800);
+        win.setMinimumSize(800, 600);
 
         win.on('close', function () {
             //Save window size and position
-            // var height = win.height;
-            // var width = win.width;
-            //
-            // if (height < 400) {
-            //     height = 400
-            // }
-            // if (width < 512) {
-            //     width = 512
-            // }
-
             chrome.storage.local.set({'windowSize': {height: win.height, width: win.width, x: win.x, y: win.y}}, function () {
                 // Notify that we saved.
                 console.log('Settings saved');
@@ -171,6 +161,7 @@ $(document).ready(function () {
 
                 // detach listeners and remove element data
                 var content = $('#content');
+                content.data('empty', !!content.is(':empty'));
                 content.empty();
 
                 // display loading screen
@@ -238,8 +229,8 @@ $(document).ready(function () {
                     case 'mixer':
                         TABS.mixer.initialize(content_ready);
                         break;
-                    case 'motors':
-                        TABS.motors.initialize(content_ready);
+                    case 'outputs':
+                        TABS.outputs.initialize(content_ready);
                         break;
                     case 'osd':
                         TABS.osd.initialize(content_ready);

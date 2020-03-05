@@ -101,7 +101,7 @@
     "tabGPS": {
         "message": "GPS"
     },
-    "tabMotorTesting": {
+    "tabOutputs": {
         "message": "Outputs"
     },
     "tabLedStrip": {
@@ -505,7 +505,7 @@
         "message": "In-flight level calibration"
     },
     "featureMOTOR_STOP": {
-        "message": "Don't spin the motors when armed"
+        "message": "Stop motors on low throttle"
     },
     "featureSERVO_TILT": {
         "message": "Servo gimbal"
@@ -546,8 +546,8 @@
     "featureCURRENT_METER": {
         "message": "Battery current monitoring"
     },
-    "feature3D": {
-        "message": "3D mode (for use with reversible ESCs)"
+    "featureREVERSIBLE_MOTORS": {
+        "message": "Reversible motors mode (for use with reversible ESCs)"
     },
     "featureRSSI_ADC": {
         "message": "Analog RSSI input"
@@ -636,11 +636,17 @@
     "configurationEscFeatures": {
         "message": "ESC/Motor Features"
     },
+    "serialrx_inverted": {
+        "message": "Serial Port Inverted (comparing to protocol default)"
+    },
+    "serialrx_halfduplex" : {
+        "message": "Serial receiver half-duplex"
+    },
     "configurationFeaturesHelp": {
         "message": "<strong>Note:</strong> Not all combinations of features are valid.  When the flight controller firmware detects invalid feature combinations conflicting features will be disabled.<br /><strong>Note:</strong> Configure serial ports <span style=\"color: red\">before</span> enabling the features that will use the ports."
     },
     "configurationSerialRXHelp": {
-        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) and choose a Serial Receiver Provider when using RX_SERIAL feature."
+        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
     },
     "configurationBoardAlignment": {
         "message": "Board and Sensor Alignment"
@@ -653,12 +659,6 @@
     },
     "configurationBoardAlignmentYaw": {
         "message": "Yaw Degrees"
-    },
-    "configurationSensorAlignmentGyro": {
-        "message": "GYRO Alignment"
-    },
-    "configurationSensorAlignmentAcc": {
-        "message": "ACCEL Alignment"
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
@@ -757,19 +757,19 @@
         "message": "Battery Capacity Unit"
     },
     "configuration3d": {
-        "message": "3D"
+        "message": "Reversible motors"
     },
     "configuration3dDeadbandLow": {
-        "message": "3D Deadband Low"
+        "message": "Reversible Motors Deadband Low"
     },
     "configuration3dDeadbandHigh": {
-        "message": "3D Deadband High"
+        "message": "Reversible Motors Deadband High"
     },
     "configuration3dNeutral": {
-        "message": "3D Neutral"
+        "message": "Reversible Motors Neutral"
     },
     "configuration3dDeadbandThrottle": {
-        "message": "3D Deadband Throttle"
+        "message": "Reversible Motors Deadband Throttle"
     },
     "configurationSystem": {
         "message": "System configuration"
@@ -794,6 +794,9 @@
     },
     "configurationGPSHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using GPS feature."
+    },
+    "receiverType": {
+        "message": "Receiver type"
     },
     "configurationSerialRX": {
         "message": "Serial Receiver Provider"
@@ -926,6 +929,9 @@
     },
     "portsFunction_FRSKY_OSD": {
         "message": "FrSky OSD"
+    },
+    "portsFunction_DJI_FPV": {
+        "message": "DJI FPV VTX"
     },
     "pidTuningName": {
         "message": "Name"
@@ -1940,9 +1946,6 @@
     "warning": {
         "message": "Warning"
     },
-    "boardLimitedFunctionality": {
-        "message": "Due to limited flash size, the board you have selected will have limited functionality, not all functions and features will be available. Hardware support map is available on <a href=\"https://github.com/iNavFlight/inav/wiki/Hardware-support-map\" target=\"_blank\">INAV Wiki pages</a>"
-    },
     "escProtocol": {
         "message": "ESC protocol"
     },
@@ -1962,7 +1965,7 @@
         "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
     },
     "logPwmOutputDisabled": {
-        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Configuration</u> tab to enable!"
+        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Outputs</u> tab to enable!"
     },
     "configurationGyroSyncTitle": {
         "message" : "Synchronize looptime with gyroscope"
@@ -2202,7 +2205,7 @@
         "message": "Warning"
     },
     "presetApplyDescription": {
-        "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
+        "message": "<p style='color: darkred;'>Make sure that <strong>mixer</strong> was configured before applying any Presets!</p><p>Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!</p>"
     },
     "OK": {
         "message": "OK"
@@ -2963,6 +2966,9 @@
     "input": {
         "message": "Input"
     },
+    "fixedValue": {
+        "message": "Fixed Value (µs)"
+    },
     "weight": {
         "message": "Weight (%)"
     },
@@ -3167,11 +3173,47 @@
     "gyro_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
+    "gyro_stage2_lowpass_type": {
+        "message": "Gyro Stage 2 LPF type"
+    },
+    "gyro_stage2_lowpass_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf_type": {
+        "message": "D-term LPF type"
+    },
+    "dterm_lpf_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf2_type": {
+        "message": "D-term Stage 2 LPF type"
+    },
+    "dterm_lpf2_type_help": {
+        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
+    },
+    "dterm_lpf2_hz": {
+        "message": "D-term Stage 2 LPF cutoff frequency"
+    },
+    "dterm_lpf2_hz_help": {
+        "message": "Lowpass cutoff filter for D-term on ROLL and PITCH axises. 0 mean filter is disabled"
+    },
     "tabFilteringAdvanced": {
         "message": "Other filters"
     },
     "mainFilters": {
-        "message": "Main filters"
+        "message": "Gyro filters"
+    },
+    "rpmFilters": {
+        "message": "Gyro RPM filters"
+    },
+    "dtermFilters": {
+        "message": "D-term filters"
+    },
+    "rpm_gyro_filter_enabled": {
+        "message": "Gyro RPM filter (requires ESC telemetry)"
+    },
+    "rpm_gyro_min_hz": {
+        "message": "Gyro RPM filter min. frequency"
     },
     "acc_lpf_type": {
         "message": "Accelerometer LPF type"
@@ -3238,5 +3280,23 @@
     },
     "defaultsDialogInfo": {
         "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
+    },
+    "throttleIdle": {
+        "message": "Motors IDLE power [%]"
+    },
+    "throttleIdleDigitalInfo": {
+        "message": "For digital protocols, IDLE can be lowered even down to 5-7% without motors stopping in the air. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "throttleIdleAnalogInfo": {
+        "message": "For analog protocols, IDLE can be lowered below 10% if motors are working smooth without stuttering. If a drone wobbles after pulling throttle low, try increasing IDLE to tune this behavior out."
+    },
+    "motor_poles": {
+        "message": "Number of motor poles (number of magnets)"
+    },
+    "motorStopWarning": {
+        "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
+    },
+    "dynamic_gyro_notch_enabled_help": {
+        "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."
     }
 }

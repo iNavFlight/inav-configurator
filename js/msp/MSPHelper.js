@@ -52,6 +52,7 @@ var mspHelper = (function (gui) {
         'ESC': 18,
         'GSM_SMS': 19,
         'FRSKY_OSD': 20,
+        'DJI_FPV': 21,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -409,14 +410,14 @@ var mspHelper = (function (gui) {
                 BATTERY_CONFIG.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSP_3D:
-                _3D.deadband3d_low = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.deadband_low = data.getUint16(offset, true);
                 offset += 2;
-                _3D.deadband3d_high = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.deadband_high = data.getUint16(offset, true);
                 offset += 2;
-                _3D.neutral3d = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.neutral = data.getUint16(offset, true);
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                     offset += 2;
-                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                    REVERSIBLE_MOTORS.deadband_throttle = data.getUint16(offset, true);
                 }
                 break;
             case MSPCodes.MSP_MOTOR_PINS:
@@ -586,7 +587,7 @@ var mspHelper = (function (gui) {
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
                 if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
-                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                    REVERSIBLE_MOTORS.deadband_throttle = data.getUint16(offset, true);
                 }
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
@@ -1494,7 +1495,10 @@ var mspHelper = (function (gui) {
                     dataHandler.callbacks.splice(i, 1);
 
                     // fire callback
-                    if (callback) callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    if (callback) {
+                        callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    }
+                    break;
                 }
             }
         }
@@ -1799,15 +1803,15 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_SET_3D:
-                buffer.push(lowByte(_3D.deadband3d_low));
-                buffer.push(highByte(_3D.deadband3d_low));
-                buffer.push(lowByte(_3D.deadband3d_high));
-                buffer.push(highByte(_3D.deadband3d_high));
-                buffer.push(lowByte(_3D.neutral3d));
-                buffer.push(highByte(_3D.neutral3d));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(highByte(REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(highByte(REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.neutral));
+                buffer.push(highByte(REVERSIBLE_MOTORS.neutral));
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                    buffer.push(lowByte(_3D.deadband3d_throttle));
-                    buffer.push(highByte(_3D.deadband3d_throttle));
+                    buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_throttle));
+                    buffer.push(highByte(REVERSIBLE_MOTORS.deadband_throttle));
                 }
                 break;
 
@@ -1816,8 +1820,8 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
                 if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
-                    buffer.push(lowByte(_3D.deadband3d_throttle));
-                    buffer.push(highByte(_3D.deadband3d_throttle));
+                    buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_throttle));
+                    buffer.push(highByte(REVERSIBLE_MOTORS.deadband_throttle));
                 }
                 break;
 

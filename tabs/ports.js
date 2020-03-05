@@ -93,6 +93,15 @@ TABS.ports.initialize = function (callback) {
         );
     }
 
+    if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+        functionRules.push({
+            name: 'DJI_FPV',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
+
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
@@ -156,7 +165,7 @@ TABS.ports.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
 
         function on_configuration_loaded_handler() {
-            $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
+            GUI.load("./tabs/ports.html", on_tab_loaded_handler);
         }
     }
 

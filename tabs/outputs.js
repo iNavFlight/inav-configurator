@@ -1,12 +1,12 @@
-/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,_3D,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
+/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
-TABS.motors = {
+TABS.outputs = {
     allowTestMode: false,
     feature3DEnabled: false,
     feature3DSupported: false
 };
-TABS.motors.initialize = function (callback) {
+TABS.outputs.initialize = function (callback) {
     var self = this;
 
     self.armed = false;
@@ -15,9 +15,9 @@ TABS.motors.initialize = function (callback) {
 
     var $motorsEnableTestMode;
 
-    if (GUI.active_tab !== 'motors') {
-        GUI.active_tab = 'motors';
-        googleAnalytics.sendAppView('Motors');
+    if (GUI.active_tab !== 'outputs') {
+        GUI.active_tab = 'outputs';
+        googleAnalytics.sendAppView('Outputs');
     }
 
     var loadChainer = new MSPChainerClass();
@@ -43,6 +43,7 @@ TABS.motors.initialize = function (callback) {
     var saveChainer = new MSPChainerClass();
 
     saveChainer.setChain([
+        saveSettings,
         mspHelper.sendServoConfigurations,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveBfConfig,
@@ -55,19 +56,33 @@ TABS.motors.initialize = function (callback) {
     });
 
     function load_html() {
-        $('#content').load("./tabs/motors.html", onLoad);
+        GUI.load("./tabs/outputs.html", Settings.processHtml(onLoad));
+    }
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
     }
 
     function onLoad() {
         process_motors();
         process_servos();
         processConfiguration();
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+            $('.requires-v2_4').show();
+        } else {
+            $('.requires-v2_4').hide();
+        }
+
         finalize();
-    } 
+    }
 
     function processConfiguration() {
-        let escProtocols = FC.getEscProtocols();
-        let servoRates = FC.getServoRates();
+        let escProtocols = FC.getEscProtocols(),
+            servoRates = FC.getServoRates(),
+            $idlePercent = $('#throttle_idle'),
+            $idleInfoBox = $("#throttle_idle-info");
+            $motorStopWarningBox = $("#motor-stop-warning");
 
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
@@ -87,11 +102,21 @@ TABS.motors.initialize = function (callback) {
                 $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
             }
 
+            $idleInfoBox.hide();
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
-                //DSHOT/SERIALSHOT protocols, simplify UI
-                $('.hide-for-shot').addClass('is-hidden');
+                $('.hide-for-shot').hide();
+                if ($idlePercent.val() > 7.0) {
+                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                    $idleInfoBox.addClass('ok-box');
+                    $idleInfoBox.show();
+                }
             } else {
-                $('.hide-for-shot').removeClass('is-hidden');
+                $('.hide-for-shot').show();
+                if ($idlePercent.val() > 10.0) {
+                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                    $idleInfoBox.addClass('ok-box');
+                    $idleInfoBox.show();
+                }
             }
 
             if (protocolData.message !== null) {
@@ -127,6 +152,8 @@ TABS.motors.initialize = function (callback) {
             ADVANCED_CONFIG.motorPwmRate = $(this).val();
         });
 
+        $idlePercent.change(buildMotorRates);
+
         $("#esc-protocols").show();
 
         let $servoRate = $('#servo-rate');
@@ -152,6 +179,19 @@ TABS.motors.initialize = function (callback) {
 
         helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
         GUI.simpleBind();
+
+        let $motorStopCheckbox = $('#feature-4');
+        function showHideMotorStopWarning() {
+            const platformNeedsMotorStop = [PLATFORM_AIRPLANE, PLATFORM_ROVER, PLATFORM_BOAT].includes(MIXER_CONFIG.platformType);
+            const motorStopEnabled = $motorStopCheckbox.is(':checked');
+            if (platformNeedsMotorStop && motorStopEnabled || !platformNeedsMotorStop && !motorStopEnabled) {
+                $motorStopWarningBox.hide();
+            } else {
+                $motorStopWarningBox.show();
+            }
+        }
+        $motorStopCheckbox.change(showHideMotorStopWarning);
+        showHideMotorStopWarning();
     }
 
     function update_arm_status() {
@@ -194,7 +234,7 @@ TABS.motors.initialize = function (callback) {
     }
 
     function update_model(val) {
-        if (MIXER_CONFIG.appliedMixerPreset == -1) return; 
+        if (MIXER_CONFIG.appliedMixerPreset == -1) return;
 
         $('.mixerPreview img').attr('src', './resources/motor_order/'
             + helper.mixer.getById(val).image + '.svg');
@@ -330,11 +370,11 @@ TABS.motors.initialize = function (callback) {
             saveChainer.setExitPoint(function () {
                 //noinspection JSUnresolvedVariable
                 GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-        
+
                 GUI.tab_switch_cleanup(function () {
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                         GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                        GUI.handleReconnect($('.tab_motors a'));
+                        GUI.handleReconnect($('.tab_outputs a'));
                     });
                 });
             });
@@ -414,7 +454,7 @@ TABS.motors.initialize = function (callback) {
             samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
 
             // Compute RMS of acceleration in displayed period of time
-            // This is particularly useful for motor balancing as it 
+            // This is particularly useful for motor balancing as it
             // eliminates the need for external tools
             var sum = 0.0;
             for (var j = 0; j < accel_data.length; j++)
@@ -483,24 +523,24 @@ TABS.motors.initialize = function (callback) {
         $slidersInput.prop('min', MISC.mincommand);
         $slidersInput.prop('max', MISC.maxthrottle);
         $('div.values li:not(:last)').text(MISC.mincommand);
-        
+
         if(self.feature3DEnabled && self.feature3DSupported) {
             //Arbitrary sanity checks
             //Note: values may need to be revisited
-            if(_3D.neutral3d > 1575 || _3D.neutral3d < 1425)
-                _3D.neutral3d = 1500;
+            if(REVERSIBLE_MOTORS.neutral > 1575 || REVERSIBLE_MOTORS.neutral < 1425)
+                REVERSIBLE_MOTORS.neutral = 1500;
 
-            $slidersInput.val(_3D.neutral3d);
+            $slidersInput.val(REVERSIBLE_MOTORS.neutral);
         } else {
             $slidersInput.val(MISC.mincommand);
         }
 
-        if(self.allowTestMode){ 
+        if(self.allowTestMode){
            // UI hooks
            var buffering_set_motor = [],
            buffer_delay = false;
            $('div.sliders input:not(.master)').on('input', function () {
-            
+
                var index = $('div.sliders input:not(.master)').index(this),
                buffer = [],
                i;
@@ -513,20 +553,20 @@ TABS.motors.initialize = function (callback) {
                buffer.push(lowByte(val));
                buffer.push(highByte(val));
                }
-             
+
                buffering_set_motor.push(buffer);
 
                if (!buffer_delay) {
                    buffer_delay = setTimeout(function () {
                        buffer = buffering_set_motor.pop();
-                    
+
                        MSP.send_message(MSPCodes.MSP_SET_MOTOR, buffer);
 
                        buffering_set_motor = [];
                        buffer_delay = false;
                    }, 10);
                }
-           });  
+           });
         }
 
         $('div.sliders input.master').on('input', function () {
@@ -549,7 +589,7 @@ TABS.motors.initialize = function (callback) {
 
                 // change all values to default
                 if (self.feature3DEnabled && self.feature3DSupported) {
-                    $slidersInput.val(_3D.neutral3d);
+                    $slidersInput.val(REVERSIBLE_MOTORS.neutral);
                 } else {
                     $slidersInput.val(MISC.mincommand);
                 }
@@ -568,11 +608,11 @@ TABS.motors.initialize = function (callback) {
                     break;
                 }
             }else{
-                if( (MOTOR_DATA[i] < _3D.deadband3d_low) || (MOTOR_DATA[i] > _3D.deadband3d_high) ){
+                if( (MOTOR_DATA[i] < REVERSIBLE_MOTORS.deadband_low) || (MOTOR_DATA[i] > REVERSIBLE_MOTORS.deadband_high) ){
                     motors_running = true;
                     break;
                 }
-            } 
+            }
         }
 
         if (motors_running) {
@@ -605,7 +645,7 @@ TABS.motors.initialize = function (callback) {
         }
 
         $motorsEnableTestMode.change();
-        
+
         function getPeriodicMotorOutput() {
 
             if (helper.mspQueue.shouldDrop()) {
@@ -626,7 +666,7 @@ TABS.motors.initialize = function (callback) {
         }
 
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
-        
+
         function update_ui() {
             var previousArmState = self.armed,
                 block_height = $('div.m-block:first').height(),
@@ -657,9 +697,9 @@ TABS.motors.initialize = function (callback) {
                 $('.servo-' + i + ' .indicator', servos_wrapper).css({'margin-top' : margin_top + 'px', 'height' : height + 'px', 'background-color' : '#37a8db'+ color +')'});
             }
             //keep the following here so at least we get a visual cue of our motor setup
-            update_arm_status();                        
+            update_arm_status();
             if (!self.allowTestMode) return;
-            
+
             if (self.armed) {
                 $motorsEnableTestMode.prop('disabled', true);
                 $motorsEnableTestMode.prop('checked', false);
@@ -686,6 +726,6 @@ TABS.motors.initialize = function (callback) {
 
 };
 
-TABS.motors.cleanup = function (callback) {
+TABS.outputs.cleanup = function (callback) {
     if (callback) callback();
 };

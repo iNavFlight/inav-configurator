@@ -9,7 +9,7 @@ TABS.landing.initialize = function (callback) {
         googleAnalytics.sendAppView('Landing');
     }
 
-    $('#content').load("./tabs/landing.html", function () {
+    GUI.load("./tabs/landing.html", function () {
         localize();
 
         $('.tab-landing a').click(function () {

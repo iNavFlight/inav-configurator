@@ -1,11 +1,13 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "2.3.2",
+  "version": "2.5.0",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
-    "start": "node node_modules/gulp/bin/gulp.js build && node node_modules/nw/bin/nw ."
+    "start": "node node_modules/gulp/bin/gulp.js build && node node_modules/nw/bin/nw .",
+    "gulp": "gulp",
+    "nw": "nw"
   },
   "window": {
     "title": "INAV Configurator",
@@ -33,7 +35,7 @@
     "jquery-ui-npm": "1.12.0",
     "marked": "^0.3.17",
     "minimist": "^1.2.0",
-    "nw": "^0.39.3-sdk",
+    "nw": "^0.42.2-sdk",
     "nw-dialog": "^1.0.7",
     "openlayers": "^4.6.5",
     "temp": "^0.8.3",

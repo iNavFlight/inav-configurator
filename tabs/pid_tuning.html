@@ -158,7 +158,7 @@
             </div>
             <div class="clear-both"></div>
             <div class="cf_column" style="margin-top:1em;">
-                <table class="rate-tpa rate-tpa--misc">
+                <table class="settings-table settings-table--misc">
                     <tr>
                         <th data-i18n="pidTuningTPA"></th>
                         <td>
@@ -183,7 +183,7 @@
             <div class="tab_subtitle" style="margin-top: 1em;">Rates & Expo</div>
             <div class="clear-both"></div>
             <div class="cf_column">
-                <table class="rate-tpa rate-tpa--inav">
+                <table class="settings-table settings-table--inav">
                     <tbody>
                         <tr>
                             <th class="roll" data-i18n="pidTuningRollRate"></th>
@@ -274,31 +274,52 @@
             <div class="tab_subtitle" data-i18n="mainFilters" style="margin-top: 1em;"></div>
             <div class="clear-both"></div>
             <div class="cf_column">
-                <table class="rate-tpa rate-tpa--filtering">
+                <table class="settings-table settings-table--filtering">
                     <tbody>
-                        <tr class="requires-v2_3">
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Filter</th>
                             <td>
                                 <div style="padding-left: 1em; line-height: 28px;">
                                 <input type="checkbox" data-bit="5" class="feature toggle" name="DYNAMIC_FILTERS" title="DYNAMIC_FILTERS" id="feature-5">
-                            </div>
+                                </div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_3">
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Width</th>
                             <td>
                                 <input data-setting="dyn_notch_width_percent" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" title="Sets the distance in percent between dynamic gyro notches. Set to 0 to use single dynamic gyro notch."></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_3">
+                        <tr class="hides-v2_5">
                             <th>Gyro Dynamic Notch Min Frequency</th>
                             <td>
                                 <input data-setting="dyn_notch_min_hz" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" title="Minimum frequency for dynamic gyro notch filters. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr class="requires-v2_5">
+                            <th>Matrix Gyro Filter</th>
+                            <td>
+                                <select data-setting="dynamic_gyro_notch_enabled" />
+                                <div class="helpicon cf_tip" data-i18n_title="dynamic_gyro_notch_enabled_help"></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_5">
+                            <th>Matrix Filter Min Frequency</th>
+                            <td>
+                                <input data-setting="dynamic_gyro_notch_min_hz" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="Minimum frequency for the Matrix Filter. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."></div>
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_5">
+                            <th>Matrix Filter Q Factor</th>
+                            <td>
+                                <input data-setting="dynamic_gyro_notch_q" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" title="The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended"></div>
+                            </td>
+                        </tr>
+                        <tr>
                             <th data-i18n="gyro_lpf_type"></th>
                             <td>
                                 <select data-setting="gyro_lpf_type" />
@@ -314,12 +335,36 @@
                             </td>
                         </tr>
                         <tr>
+                            <th data-i18n="gyro_stage2_lowpass_type"></th>
+                            <td>
+                                <select data-setting="gyro_stage2_lowpass_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="gyro_stage2_lowpass_type_help"></div>
+                            </td>
+                        </tr>
+                        <tr>
                             <th data-i18n="gyroStage2LpfCutoffFrequency"></th>
                             <td>
                                 <input type="number" id="gyroStage2LpfCutoffFrequency"
                                     data-simple-bind="FILTER_CONFIG.gyroStage2LowpassHz" class="rate-tpa_input" step="1"
                                     min="0" max="500" /> Hz
                                 <div class="helpicon cf_tip" data-i18n_title="gyroStage2LpfCutoffFrequencyHelp"></div>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="dtermFilters" style="margin-top: 1em;"></div>
+            <div class="cf_column">
+                <table class="settings-table settings-table--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="dterm_lpf_type"></th>
+                            <td>
+                                <select data-setting="dterm_lpf_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="dterm_lpf_type_help"></div>
                             </td>
                         </tr>
                         <tr>
@@ -330,6 +375,41 @@
                                 <div class="helpicon cf_tip" data-i18n_title="dtermLpfCutoffFrequencyHelp"></div>
                             </td>
                         </tr>
+                        <tr>
+                            <th data-i18n="dterm_lpf2_type"></th>
+                            <td>
+                                <select data-setting="dterm_lpf2_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="dterm_lpf2_type_help"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="dterm_lpf2_hz"></th>
+                            <td>
+                                <input data-setting="dterm_lpf2_hz" type="number" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="dterm_lpf2_hz_help"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both requires-v2_4"></div>
+            <div class="tab_subtitle requires-v2_4" data-i18n="rpmFilters" style="margin-top: 1em;"></div>
+            <div class="cf_column requires-v2_4">
+                <table class="settings-table settings-table--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="rpm_gyro_filter_enabled"></th>
+                            <td>
+                                <select data-setting="rpm_gyro_filter_enabled" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="rpm_gyro_min_hz"></th>
+                            <td>
+                                <input data-setting="rpm_gyro_min_hz" type="number" class="rate-tpa_input" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -337,7 +417,7 @@
             <div class="clear-both"></div>
             <div class="tab_subtitle" data-i18n="tabFilteringAdvanced" style="margin-top: 1em;"></div>
             <div class="cf_column">
-                <table class="rate-tpa rate-tpa--filtering">
+                <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
                             <th data-i18n="accLpfCutoffFrequency"></th>
@@ -347,7 +427,7 @@
                                 <div class="helpicon cf_tip" data-i18n_title="accLpfCutoffFrequencyHelp"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="acc_lpf_type"></th>
                             <td>
                                 <select data-setting="acc_lpf_type" />
@@ -366,134 +446,62 @@
                     </tbody>
                 </table>
             </div>
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" style="margin-top: 1em;">Static Notch Filters (deprecated)</div>
-            <div class="cf_column">
-                <table class="rate-tpa rate-tpa--filtering">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="accNotchHz"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchHz" id="accNotchHz"
-                                    class="rate-tpa_input" step="1" min="0" max="255" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="accNotchHzHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="accNotchCutoff"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.accNotchCutoff"
-                                    id="gyroNotchCutoff2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="accNotchCutoffHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="gyroNotchHz1"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchHz1" id="gyroNotchHz1"
-                                    class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="gyroNotchHz1Help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="gyroNotchCutoff1"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchCutoff1"
-                                    id="gyroNotchCutoff1" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="gyroNotchCutoff1Help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="gyroNotchHz2"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchHz2" id="gyroNotchHz2"
-                                    class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="gyroNotchHz2Help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="gyroNotchCutoff2"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.gyroNotchCutoff2"
-                                    id="gyroNotchCutoff2" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="gyroNotchCutoff2Help"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="dtermNotchHz"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.dtermNotchHz" id="dtermNotchHz"
-                                    class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="dtermNotchHzHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="dtermNotchCutoff"></th>
-                            <td>
-                                <input type="number" data-simple-bind="FILTER_CONFIG.dtermNotchCutoff"
-                                    id="dtermNotchCutoff" class="rate-tpa_input" step="1" min="0" max="500" /> Hz
-                                <div class="helpicon cf_tip" data-i18n_title="dtermNotchCutoffHelp"></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
 
         <div id="subtab-mechanics" class="subtab__content">
             <div class="clear-both"></div>
             <div class="tab_subtitle" data-i18n="iTermMechanics" style="margin-top: 1em;"></div>
             <div class="cf_column">
-                <table class="rate-tpa rate-tpa--filtering">
+                <table class="settings-table settings-table--filtering">
                     <tbody>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="mc_airmode_type"></th>
                             <td>
                                 <select data-setting="mc_airmode_type" />
                                 <div class="helpicon cf_tip" data-i18n_title="mc_airmode_type_help"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="mc_airmode_threshold"></th>
                             <td>
                                 <select data-setting="mc_airmode_threshold" />
                                 <div class="helpicon cf_tip" data-i18n_title="mc_airmode_threshold_help"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="itermRelax"></th>
                             <td>
                                 <select data-setting="mc_iterm_relax" />
                                 <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="itermRelaxCutoff"></th>
                             <td>
                                 <input data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="itermRelaxCutoffHelp"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="itermRelaxType"></th>
                             <td>
                                 <select data-setting="mc_iterm_relax_type" />
                                 <div class="helpicon cf_tip" data-i18n_title="itermRelaxTypeHelp"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2_2">
+                        <tr>
                             <th data-i18n="antigravityGain"></th>
                             <td>
                                 <input class="rate-tpa_input" data-setting="antigravity_gain" />
                             </td>
                         </tr>
-                        <tr class="requires-v2_2_2">
+                        <tr>
                             <th data-i18n="antigravityAccelerator"></th>
                             <td>
                                 <input class="rate-tpa_input" data-setting="antigravity_accelerator" />
                             </td>
                         </tr>
-                        <tr class="requires-v2_2_2">
+                        <tr>
                             <th data-i18n="antigravityCutoff"></th>
                             <td>
                                 <input class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" />
@@ -506,7 +514,7 @@
             <div class="clear-both"></div>
             <div class="tab_subtitle" data-i18n="dTermMechanics" style="margin-top: 1em;"></div>
             <div class="cf_column">
-                <table class="rate-tpa rate-tpa--filtering">
+                <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
                             <th data-i18n="dtermSetpointWeight"></th>
@@ -515,21 +523,21 @@
                                 <div class="helpicon cf_tip" data-i18n_title="dtermSetpointWeightHelp"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="d_boost_factor"></th>
                             <td>
                                 <input data-setting="d_boost_factor" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="d_boost_factor_help"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="d_boost_max_at_acceleration"></th>
                             <td>
                                 <input data-setting="d_boost_max_at_acceleration" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="d_boost_max_at_acceleration_help"></div>
                             </td>
                         </tr>
-                        <tr class="requires-v2_2">
+                        <tr>
                             <th data-i18n="d_boost_gyro_delta_lpf_hz"></th>
                             <td>
                                 <input data-setting="d_boost_gyro_delta_lpf_hz" class="rate-tpa_input" />

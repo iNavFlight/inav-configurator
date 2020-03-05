@@ -30,7 +30,7 @@ var CONFIG,
     ARMING_CONFIG,
     FC_CONFIG,
     MISC,
-    _3D,
+    REVERSIBLE_MOTORS,
     DATAFLASH,
     SDCARD,
     BLACKBOX,
@@ -415,11 +415,11 @@ var FC = {
              emergencyDescentRate: null
         };
 
-        _3D = {
-            deadband3d_low: 0,
-            deadband3d_high: 0,
-            neutral3d: 0,
-            deadband3d_throttle: 0
+        REVERSIBLE_MOTORS = {
+            deadband_low: 0,
+            deadband_high: 0,
+            neutral: 0,
+            deadband_throttle: 0
         };
 
         DATAFLASH = {
@@ -549,7 +549,7 @@ var FC = {
             {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
-            {bit: 12, group: 'other', name: '3D', showNameInTip: true},
+            {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},
             {bit: 15, group: 'other', name: 'RSSI_ADC', haveTip: true, showNameInTip: true},
             {bit: 16, group: 'other', name: 'LED_STRIP', showNameInTip: true},
             {bit: 17, group: 'other', name: 'DASHBOARD', showNameInTip: true},
@@ -562,9 +562,12 @@ var FC = {
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
             {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
             {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
-            {bit: 5, group: 'other', name: 'DYNAMIC_FILTERS', haveTip: true, showNameInTip: true}
+            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
         ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0") && semver.lt(CONFIG.flightControllerVersion, "2.5.0")) {
+            features.push({bit: 5, group: 'other', name: 'DYNAMIC_FILTERS', haveTip: true, showNameInTip: true});
+        }
 
         return features.reverse();
     },
@@ -693,94 +696,6 @@ var FC = {
             'Japanese MSAS',
             'Indian GAGAN',
             'Disabled'
-        ];
-    },
-    getRxTypes: function() {
-        // Keep value field in sync with rxReceiverType_e in rx.h
-        var rxTypes = [
-            {
-                name: 'RX_SERIAL',
-                bit: 3,
-                value: 3,
-            },
-            {
-                name: 'RX_PPM',
-                bit: 0,
-                value: 2,
-            },
-            {
-                name: 'RX_PWM',
-                bit: 13,
-                value: 1,
-            },
-        ];
-
-        if (semver.gte(CONFIG.apiVersion, "1.21.0")) {
-            rxTypes.push({
-                name: 'RX_SPI',
-                bit: 25,
-                value: 5,
-            });
-        }
-
-        rxTypes.push({
-            name: 'RX_MSP',
-            bit: 14,
-            value: 4,
-        });
-
-        // Versions using feature bits don't allow not having an
-        // RX and fallback to RX_PPM.
-        rxTypes.push({
-            name: 'RX_NONE',
-            value: 0,
-        });
-
-        return rxTypes;
-    },
-    isRxTypeEnabled: function(rxType) {
-        if (typeof rxType === 'string') {
-            var types = this.getRxTypes();
-            for (var ii = 0; ii < types.length; ii++) {
-                if (types[ii].name == rxType) {
-                    rxType = types[ii];
-                    break;
-                }
-            }
-        }
-        return RX_CONFIG.receiver_type == rxType.value;
-    },
-    setRxTypeEnabled: function(rxType) {
-        RX_CONFIG.receiver_type = rxType.value;
-    },
-    getSerialRxTypes: function () {
-        var data = [
-            'SPEKTRUM1024',
-            'SPEKTRUM2048',
-            'SBUS',
-            'SUMD',
-            'SUMH',
-            'XBUS_MODE_B',
-            'XBUS_MODE_B_RJ01',
-            'IBUS',
-            'JETI EXBUS',
-            'TBS Crossfire',
-            'FPort'
-        ];
-
-        return data;
-    },
-    getSPIProtocolTypes: function () {
-        return [
-            'V202 250Kbps',
-            'V202 1Mbps',
-            'Syma X',
-            'Syma X5C',
-            'Cheerson CX10',
-            'Cheerson CX10A',
-            'JJRC H8_3D',
-            'iNav Reference protocol',
-            'eLeReS'
         ];
     },
     getSensorAlignments: function () {
@@ -1077,7 +992,7 @@ var FC = {
         ];
     },
     getServoMixInputName: function (input) {
-        return getServoMixInputNames()[input];
+        return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
         for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -1090,7 +1005,7 @@ var FC = {
         return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
-        return FC.isModeBitSet(FC.getModeId(name));
+        return this.isModeBitSet(this.getModeId(name));
     },
     getLogicOperators: function () {
         return {
@@ -1176,7 +1091,7 @@ var FC = {
                     0: "ARM timer [s]",
                     1: "Home distance [m]",
                     2: "Trip distance [m]",
-                    3: "RSSI", 
+                    3: "RSSI",
                     4: "Vbat [deci-Volt] [1V = 10]",
                     5: "Cell voltage [deci-Volt] [1V = 10]",
                     6: "Current [centi-Amp] [1A = 100]",
@@ -1190,7 +1105,15 @@ var FC = {
                     14: "Throttle position [%]",
                     15: "Roll [deg]",
                     16: "Pitch [deg]",
-                    17: "Flight mode"
+                    17: "Is Armed",
+                    18: "Is Autolaunch",
+                    19: "Is Controlling Altitude",
+                    20: "Is Controlling Position",
+                    21: "Is Emergency Landing",
+                    22: "Is RTH",
+                    23: "Is WP",
+                    24: "Is Landing",
+                    25: "Is Failsafe"
                 }
             },
             3: {

@@ -19,8 +19,12 @@ function localize() {
     $('[data-i18n]:not(.i18n-replaced)').each(function() {
         var element = $(this);
 
-        element.html(translate(element.data('i18n')));
+        const translated = translate(element.data('i18n'));
+        element.html(translated);
         element.addClass('i18n-replaced');
+        if (element.attr("title") !== "") {
+            element.attr("title", translated);
+        }
     });
 
     $('[i18n_title]:not(.i18n_title-replaced)').each(function() {

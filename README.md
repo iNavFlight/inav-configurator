@@ -26,6 +26,14 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Run INAV Configurator app from unpacked folder
 1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run 
 
+### Linux
+
+1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
+1. Download Configurator for Linux platform (linux32 and linux64 are present)
+1. Extract tar.gz archive
+1. Make the inav-configurator file executable (chmod +x inav-configurator)
+1. Run INAV Configurator app from unpacked folder
+
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
@@ -46,7 +54,7 @@ For local development, **node.js** build system is used.
 1. From project folder run `npm install`
 1. To build the JS and CSS files and start the configurator:
     - With NW.js: Run `npm start`.
-    - With Chrome: Run `./node_modules/gulp/bin/gulp.js`. Then open `chrome://extensions`, enable
+    - With Chrome: Run `npm run gulp`. Then open `chrome://extensions`, enable
     the `Developer mode`, click on the `Load unpacked extension...` button and select the `inav-configurator` directory.
 
 Other tasks are also defined in `gulpfile.js`. To run a task, use `./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
