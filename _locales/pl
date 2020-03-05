@@ -1,6 +1,6 @@
 {
   "translation_version": {
-    "message": "0"
+    "message": "1"
   },
   "options_title": {
     "message": "Opcje aplikacji"
@@ -1485,10 +1485,10 @@
     "message": "Wykonaj"
   },
   "loggingNote": {
-    "message": "Data will be logged in this tab <span style=\"color: red\">only</span>, leaving the tab will <span style=\"color: red\">cancel</span> logging and application will return to its normal <strong>\"configurator\"</strong> state.<br /> You are free to select the global update period, data will be written into the log file every <strong>1</strong> second for performance reasons."
+    "message": "Dane będą rejestrowane w tej zakładce <span style=\"color: red\"> tylko </span>, opuszczenie zakładki <span style =\"color: red\"> anuluje </span> rejestrowanie a aplikacja powróci do normalnego stanu <strong> „konfiguratora” </strong>. <br /> Możesz wybrać globalny okres aktualizacji, dane będą zapisywane do pliku dziennika co <strong>1</strong> sekundę ze względu na wydajność."
   },
   "loggingSamplesSaved": {
-    "message": "Samples Saved:"
+    "message": "Zapisano próbkę:"
   },
   "loggingLogSize": {
     "message": "Rozmiar dziennika:"
@@ -1503,7 +1503,7 @@
     "message": "Zatrzymaj logowanie"
   },
   "loggingBack": {
-    "message": "Leave Logging / Disconnect"
+    "message": "Opuść logowanie / Rozłącz"
   },
   "loggingErrorNotConnected": {
     "message": "Najpierw musisz <strong>się połączyć</strong>"
@@ -1539,7 +1539,7 @@
     "message": "Twój kontroler lotu nie posiada kompatybilnego chipu na dane."
   },
   "dataflashFirmwareUpgradeRequired": {
-    "message": "Dataflash requires firmware &gt;= 1.8.0."
+    "message": "Wgrywanie danych wymaga oprogramowania &gt;= 1.8.0."
   },
   "dataflashButtonSaveFile": {
     "message": "Zapisz pamięć do pliku..."
@@ -1548,10 +1548,10 @@
     "message": "Wyczyść pamięć"
   },
   "dataflashConfirmEraseTitle": {
-    "message": "Confirm dataflash erase"
+    "message": "Potwierdź usunięcie danych"
   },
   "dataflashConfirmEraseNote": {
-    "message": "This will erase any Blackbox logs or other data contained in the dataflash which will take about 20 seconds, are you sure?"
+    "message": "Spowoduje to usunięcie dzienników Blackbox lub innych danych zawartych w pliku może to zająć około 20 sekund, jesteś pewien?"
   },
   "dataflashSavingTitle": {
     "message": "Zapisywanie danych do pliku"
@@ -1584,7 +1584,7 @@
     "message": "Nazwa/Wersja:"
   },
   "firmwareFlasherReleaseVersionUrl": {
-    "message": "Visit release page."
+    "message": "Odwiedź stronę wydawcy."
   },
   "firmwareFlasherReleaseNotes": {
     "message": "Informacja o wydaniu:"
@@ -1596,19 +1596,19 @@
     "message": "Stan:"
   },
   "firmwareFlasherReleaseTarget": {
-    "message": "Target:"
+    "message": "Cel:"
   },
   "firmwareFlasherReleaseFile": {
-    "message": "Binary:"
+    "message": "Binarny:"
   },
   "firmwareFlasherReleaseStatusReleaseCandidate": {
-    "message": "<span style=\"color: red\">IMPORTANT: This firmware release is currently marked as a release candidate.  Please report any issues immediately.</span>"
+    "message": "<span style=\"color: red\">WAŻNE: Ta wersja oprogramowania jest obecnie oznaczona jako rozwojowa. Prosimy niezwłocznie zgłosić wszelkie problemy.</span>"
   },
   "firmwareFlasherReleaseFileUrl": {
-    "message": "Download manually."
+    "message": "Pobierz ręcznie."
   },
   "firmwareFlasherTargetWarning": {
-    "message": "<span style=\"color: red\">IMPORTANT</span>: Ensure you flash a file appropriate for your target.  Flashing a binary for the wrong target can cause <span style=\"color: red\">bad</span> things to happen."
+    "message": "<span style=\"color: red\">WAŻNE</span>: Upewnij się, że wgrałeś plik odpowiedni dla Twojego kontrolera. Wgrywanie  niewłaściwego pliku może spowodować <span style=\"color: red\">nieodwracalne</span> uszkodzenie kontrolera lotu."
   },
   "firmwareFlasherPath": {
     "message": "Ścieżka:"
@@ -1659,13 +1659,13 @@
     "message": "Ręczna szybkość transmisji"
   },
   "firmwareFlasherManualBaudDescription": {
-    "message": "Manual selection of baud rate for boards that don't support the default speed or for flashing via bluetooth.<br /><span style=\"color: red\">Note:</span> Not used when flashing via USB DFU"
+    "message": "Ręczny wybór prędkości transmisji dla kontroleròw które nie obsługują domyślnej prędkości lub do wgrywania oprogramowania przez bluetooth. <br /> <span style = \"color: red\"> Uwaga: </span> Nieużywany podczas wgrywania przez USB DFU"
   },
   "firmwareFlasherShowDevelopmentReleases": {
-    "message": "Show unstable releases"
+    "message": "Pokaż niestabilne wydania"
   },
   "firmwareFlasherShowDevelopmentReleasesDescription": {
-    "message": "Show Release-Candidates and Development Releases."
+    "message": "Pokaż Wydania i wersję rozwojowe."
   },
   "firmwareFlasherOptionLabelSelectFirmware": {
     "message": "Wybierz wersję oprogramowania/Kontrolera lotu"
@@ -1695,7 +1695,7 @@
     "message": "Github oprogramowanie Info"
   },
   "firmwareFlasherCommiter": {
-    "message": "Committer:"
+    "message": "Zatwierdzenie:"
   },
   "firmwareFlasherDate": {
     "message": "Data:"
@@ -1704,7 +1704,7 @@
     "message": "Hash:"
   },
   "firmwareFlasherUrl": {
-    "message": "Go to GitHub to review this commit..."
+    "message": "Przejdź do GitHub, aby przejrzeć to zatwierdzenie..."
   },
   "firmwareFlasherMessage": {
     "message": "Wiadomość:"
@@ -1722,7 +1722,7 @@
     "message": "If you have lost communication with your board follow these steps to restore communication: <ul><li>Power off</li><li>Enable 'No reboot sequence', enable 'Full chip erase'.</li><li>Jumper the BOOT pins or hold BOOT button.</li><li>Power on (activity LED will NOT flash if done correctly).</li><li>Install all STM32 drivers and Zadig if required (see <a href=\"https://github.com/iNavFlight/inav/blob/master/docs/USB%20Flashing.md\"target=\"_blank\">USB Flashing</a> section of INAV manual).</li><li>Close configurator, Close all running chrome instances, Close all Chrome apps, Restart Configurator.</li><li>Release BOOT button if your FC has one.</li><li>Flash with correct firmware (using manual baud rate if specified in your FC's manual).</li><li>Power off.</li><li>Remove BOOT jumper.</li><li>Power on (activity LED should flash).</li><li>Connect normally.</li></ul>"
   },
   "firmwareFlasherButtonLeave": {
-    "message": "Leave Firmware Flasher"
+    "message": "Opuść aktualizator oprogramowania"
   },
   "firmwareFlasherFirmwareNotLoaded": {
     "message": "Nie załadowano oprogramowania"
@@ -1731,7 +1731,7 @@
     "message": "Plik HEX wydaje się być uszkodzony"
   },
   "firmwareFlasherRemoteFirmwareLoaded": {
-    "message": "<span style=\"color: #37a8db\">Remote Firmware loaded, ready for flashing</span>"
+    "message": "<span style=\"color: #37a8db\">Zdalne oprogramowanie zostało załadowane, gotowe do wgrania</span>"
   },
   "firmwareFlasherFailedToLoadOnlineFirmware": {
     "message": "Nie udało się wczytać zdalnego oprogramowania"
@@ -1782,43 +1782,43 @@
     "message": "Odcięcie LPF (Hz)"
   },
   "pidTuningLevelD": {
-    "message": "Transition (Horizon)"
+    "message": "Przejście (Horizon)"
   },
   "pidTuningLevelHelp": {
     "message": "Poniższe wartości zmieniają zachowanie trybów lotu ANGLE i HORIZON. Różne ustawienia PID obsługują wartości samopoziomowania inaczej. Sprawdź dokumentację."
   },
   "configHelp2": {
-    "message": "Arbitrary board rotation in degrees, to allow mounting it sideways / upside down / rotated etc. When running external sensors, use the sensor alignments (Gyro, Acc, Mag) to define sensor position independent from board orientation. "
+    "message": "Obrót Kontrolera lotu w stopniach, aby umożliwić montaż gdy jest obkręcony w bok lub do góry nogami itp. Podczas uruchamiania zewnętrznych czujników, użyj ustawienia czujników (Żyro, Akc, Mag), aby określić położenie czujnika niezależnie od orientacji kontrolera lotu. "
   },
   "failsafeFeaturesHelpOld": {
-    "message": "Failsafe configuration has changed considerably. Use latest INAV"
+    "message": "Konfiguracja Trybu awaryjnego znacznie się zmieniła. Użyj najnowszej wersji INAV"
   },
   "failsafePaneTitleOld": {
-    "message": "Receiver failsafe"
+    "message": "Odbiornik Trybu awaryjnego"
   },
   "failsafeFeatureItemOld": {
     "message": "Ustawienia trybu awaryjnego przy utracie sygnału RX"
   },
   "failsafeThrottleItemOld": {
-    "message": "Failsafe Throttle"
+    "message": "Przepustnica Trybu awaryjnego"
   },
   "failsafeFeaturesHelpNew": {
     "message": "Tryb awaryjny ma dwa etapy. <strong> Etap 1 </strong> jest wprowadzany, gdy sygnał z odbiornika ma nieprawidłowy czas trwania impulsu oraz gdy za pomocą zdefiniowanego przełącznika włączysz tryb awaryjny lub w ogóle nie ma sygnału z odbiornika, ustawienia trybu awaryjnego są stosowane dla <span style = \"color: red\"> wszystkich kanałòw </span> i masz małą ilość czasu na odzyskanie kontroli. <strong> Etap 2 </strong> jest wprowadzany, gdy błąd trwa dłużej niż skonfigurowany czas a jednostka jest <span style = \"color: red\"> uzbrojona</span>, wszystkie kanały pozostaną na ustawieniu awaryjnym chyba że zostaną pominięte przez wybraną procedurę. <br /> <strong> Uwaga: </strong> przed wejściem do etapu 1 ustawienia zastępowania kanałów są również stosowane do poszczególnych kanałów radiowych, które mają nieprawidłowe impulsy."
   },
   "failsafePulsrangeTitle": {
-    "message": "Valid Pulse Range Settings"
+    "message": "Prawidłowe ustawienia zakresu impulsu"
   },
   "failsafePulsrangeHelp": {
-    "message": "Pulses shorter than minimum or longer than maximum are invalid and will trigger application of individual channel fallback settings for radio channels or entering stage 1 for flightchannels"
+    "message": "Impulsy krótsze niż minimum lub dłuższe niż maksimum są nieprawidłowe i spowodują zastosowanie indywidualnych awaryjnych ustawień dla poszczególnych kanałów radiowych lub przejście do etapu 1-go trybu awaryjnego"
   },
   "failsafeRxMinUsecItem": {
-    "message": "Minimum duration"
+    "message": "Minimalny czas"
   },
   "failsafeRxMaxUsecItem": {
-    "message": "Maximum duration"
+    "message": "Maksymalny czas"
   },
   "failsafeChannelFallbackSettingsTitle": {
-    "message": "Channel Fallback Settings"
+    "message": "Ustawienia zastępowania kanału"
   },
   "failsafeChannelFallbackSettingsHelp": {
     "message": "These settings are applied to invalid individual radio channels or to all channels when entering stage 1. <strong>Note:</strong> values are saved in steps of 25usec, so small changes disappear"
@@ -1866,7 +1866,7 @@
     "message": "RTH"
   },
   "failsafeProcedureItemSelect4": {
-    "message": "Do nothing"
+    "message": "Nie rób nic"
   },
   "failsafeKillSwitchItem": {
     "message": "Failsafe Kill Switch (natychmiastowe rozbrojenie statku powietrznego po włączeniu trybu awaryjnego)"
@@ -1896,34 +1896,34 @@
     "message": "Uzbrojenie silników"
   },
   "mainHelpFailsafe": {
-    "message": "Failsafe Mode"
+    "message": "Tryb awaryjny"
   },
   "mainHelpLink": {
-    "message": "Serial Link Status"
+    "message": "Status łącza"
   },
   "warning": {
-    "message": "Warning"
+    "message": "Ostrzeżenie"
   },
   "boardLimitedFunctionality": {
     "message": "Due to limited flash size, the board you have selected will have limited functionality, not all functions and features will be available. Hardware support map is available on <a href=\"https://github.com/iNavFlight/inav/wiki/Hardware-support-map\" target=\"_blank\">INAV Wiki pages</a>"
   },
   "escProtocol": {
-    "message": "ESC protocol"
+    "message": "Protokół ESC"
   },
   "escRefreshRate": {
-    "message": "ESC refresh rate"
+    "message": "Szybkość odświeżania ESC"
   },
   "escProtocolHelp": {
-    "message": "ESC has to support chosen protocol. Change only if you know that ESC supports it!"
+    "message": "ESC musi obsługiwać wybrany protokół. Zmień tylko jeśli wiesz, że ESC go obsługuje!"
   },
   "escRefreshRatelHelp": {
-    "message": "ESC has to support refresh rate. Change only if you know that ESC supports it!"
+    "message": "ESC musi wspierać odświeżanie. Zmień tylko jeśli wiesz, że ESC je obsługuje!"
   },
   "servoRefreshRate": {
-    "message": "Servo refresh rate"
+    "message": "Częstotliwość odświeżania serwo"
   },
   "servoRefreshRatelHelp": {
-    "message": "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
+    "message": "Serwomechanizm musi obsługiwać odświeżanie. Zmień tylko, jeśli wiesz, że serwo je obsługuje. Zbyt wysoki wskaźnik odświeżania może uszkodzić serwomechanizm!"
   },
   "logPwmOutputDisabled": {
     "message": "Wyjście PWM jest wyłączone. Silniki i serwa nie będą działać. Użyj karty <u>Wyjścia</u>, aby włączyć!"
@@ -1932,40 +1932,40 @@
     "message": "Synchronizuj czas pętli z żyroskopem"
   },
   "configurationGyroLpfTitle": {
-    "message": "Gyroscope LPF cutoff frequency"
+    "message": "Żyroskop częstotliwość odcięcia LPF"
   },
   "configurationGyroSyncDenominator": {
-    "message": "Gyroscope denominator"
+    "message": "Mianownik żyroskopu"
   },
   "yawJumpPreventionLimit": {
-    "message": "Yaw jump prevention"
+    "message": "Zapobieganie skokom Yaw"
   },
   "yawJumpPreventionLimitHelp": {
     "message": "Prevent yaw jumps during yaw stops and rapid YAW input. To disable set to 500. Adjust this if your aircraft 'skids out'. Higher values increases YAW authority but can cause roll/pitch instability in case of underpowered UAVs. Lower values makes yaw adjustments more gentle but can cause UAV unable to keep heading"
   },
   "yawPLimit": {
-    "message": "Yaw P limit"
+    "message": "Limit Yaw P"
   },
   "yawPLimitHelp": {
     "message": "Limiter for yaw P term. Increasing it improves yaw authority but can cause instability on ROLL and PITCH."
   },
   "tabFiltering": {
-    "message": "Filtering"
+    "message": "Filtrowanie"
   },
   "gyroLpfCutoffFrequency": {
-    "message": "Gyro LPF cutoff frequency"
+    "message": "Żyroskop częstotliwość odcięcia LPF"
   },
   "gyroLpfCutoffFrequencyHelp": {
-    "message": "Software-based filter to remove mechanical vibrations from the gyro signal. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value. Too high value can cause motor and ESC overheating."
+    "message": "Filtr oparty na oprogramowaniu do usuwania drgań mechanicznych z sygnału żyroskopowego. Wartość podana w (Hz) jest częstotliwość odcięcia. Dla większych jednostek latających z dużymi śmigłami ustaw niższą wartość. Zbyt wysoka wartość może spowodować przegrzanie się oraz uszkodzenia silnika i ESC."
   },
   "accLpfCutoffFrequency": {
-    "message": "Accelerometer LPF cutoff frequency"
+    "message": "Akcelerometr częstotliwość odcięcia LPF"
   },
   "accLpfCutoffFrequencyHelp": {
-    "message": "Software-based filter to remove mechanical vibrations from the accelerometer measurements. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value."
+    "message": "Filtr oparty na oprogramowaniu do usuwania drgań mechanicznych oparty na danych z pomiarów akcelerometru. Wartość (Hz) to częstotliwość odcięcia. Dla większych jednostek latających z większymi śmigłami powinna być ustawiona niższa wartość."
   },
   "dtermLpfCutoffFrequency": {
-    "message": "D-term LPF cutoff frequency"
+    "message": "D-term LPF Częstotliwość odcięcia"
   },
   "dtermLpfCutoffFrequencyHelp": {
     "message": "Lowpass cutoff filter for Dterm for all PID controllers"
@@ -2007,7 +2007,7 @@
     "message": "Throttle PID Attenuation begins when Throttle position exceeds this value. "
   },
   "configurationAsyncMode": {
-    "message": "Asynchronous mode"
+    "message": "Tryb asynchroniczny"
   },
   "configurationGyroFrequencyTitle": {
     "message": "Gyroscope task frequency"
@@ -2085,10 +2085,10 @@
     "message": "Akcelerometr skalibrowany"
   },
   "BLOCKED_HARDWARE_FAILURE": {
-    "message": "Hardware health"
+    "message": "Stan urządzenia"
   },
   "BLOCKED_INVALID_SETTING": {
-    "message": "Settings validated"
+    "message": "Ustawienia potwierdzone"
   },
   "armingCheckPass": {
     "message": "<div class=\"checkspass\"></div>"
@@ -2100,7 +2100,7 @@
     "message": "Kalibracja akcelerometru"
   },
   "calibrationHead2": {
-    "message": "Accelerometer Values"
+    "message": "Wartość Akcelerometru"
   },
   "calibrationHead3": {
     "message": "Kalibracja w Poziomie"
@@ -2109,13 +2109,13 @@
     "message": "Kalibracja kompasu"
   },
   "calibrationHead5": {
-    "message": "Optic Flow Calibration"
+    "message": "Kalibracja czujnika optycznego"
   },
   "OpflowCalText": {
-    "message": "After pressing the button you have 30 seconds to hold the copter in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
+    "message": "Po naciśnięciu przycisku masz 30 sekund na przytrzymanie jednostki latającej w powietrzu i przechylenie jej na boki bez przesuwania poziomo. Należy zauważyć, że czujnik optyczny musi stale obserwować powierzchnię."
   },
   "OpflowCalBtn": {
-    "message": "Calibrate Optic Flow sensor"
+    "message": "Kalibracja czujnika optycznego"
   },
   "accZero": {
     "message": "Acc Zero"
@@ -2133,37 +2133,37 @@
     "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
   },
   "MagBtn": {
-    "message": "Calibrate Compass"
+    "message": "Kalibruj Kompas"
   },
   "LevCalText": {
-    "message": "Please put some Text here…"
+    "message": "Proszę umieścić tutaj tekst…"
   },
   "LevBtn": {
-    "message": "Level calibration"
+    "message": "Kalibracja pozioma"
   },
   "tabMixer": {
     "message": "Mixer"
   },
   "tabPresets": {
-    "message": "Presets"
+    "message": "Predefiniowane"
   },
   "presetsPreset": {
-    "message": "Preset"
+    "message": "Domyślne"
   },
   "presetsDescription": {
-    "message": "Description"
+    "message": "Opis"
   },
   "presetsButtonApply": {
-    "message": "Apply"
+    "message": "Zapisz"
   },
   "presetApplyTitle": {
-    "message": "Confirm"
+    "message": "Potwierdź"
   },
   "presetsButtonSaveAndReboot": {
     "message": "Zapisz i Uruchom ponownie"
   },
   "presetsApplyHeader": {
-    "message": "Warning"
+    "message": "Ostrzeżenie"
   },
   "presetApplyDescription": {
     "message": "Preset overwrites selected configuration values including mixer, filtering, PIDs and other. Settings like: flight modes, radio settings, failsafe and OSD are not changed. Applied values should <strong>NOT</strong> treated as final values, but entry points for final tuning. <br> Always check new configuration before flying!"
@@ -2172,31 +2172,31 @@
     "message": "OK"
   },
   "accCalibrationStartTitle": {
-    "message": "Accelerometer Calibration"
+    "message": "Kalibruj Akcelerometr"
   },
   "accCalibrationStartBody": {
-    "message": "Place flight controller in a position showed in image, then press <strong>Calibrate</strong> button again. Repeat for each of 6 position. Keep it stable during calibration."
+    "message": "Ustaw kontroler lotu w pozycji pokazanej na obrazku, a następnie naciśnij przycisk <strong>Kalibruj</strong>. Powtórz tą czynność dla każdej z 6 pozycji. Zachowaj stabilność podczas kalibracji."
   },
   "accCalibrationStopTitle": {
-    "message": "Calibration finished"
+    "message": "Kalibracja zakończona"
   },
   "accCalibrationStopBody": {
     "message": "Kalibracja akcelerometru zakończona, sprawdź czy wartości zostały zapisane."
   },
   "accCalibrationProcessing": {
-    "message": "Processing..."
+    "message": "Przetwarzanie..."
   },
   "tabAdvancedTuning": {
-    "message": "Advanced tuning"
+    "message": "Zaawansowane dostrajanie"
   },
   "advancedTuningSave": {
-    "message": "Save and Reboot"
+    "message": "Zapisz i uruchom ponownie"
   },
   "tabAdvancedTuningTitle": {
-    "message": "Advanced tuning"
+    "message": "Zaawansowane dostrajanie"
   },
   "presetApplyHead": {
-    "message": "Applies following settings:"
+    "message": "Zastosuj następujące ustawienia:"
   },
   "gyroNotchHz1": {
     "message": "First gyro notch filter freq."
@@ -2238,13 +2238,13 @@
     "message": "Multirotor Navigation Settings"
   },
   "userControlMode": {
-    "message": "User Control Mode"
+    "message": "Tryb kontroli użytkownika"
   },
   "posholdMaxSpeed": {
-    "message": "Max. navigation speed [cm/s]"
+    "message": "Maks. prędkość nawigacji [cm/s]"
   },
   "posholdMaxManualSpeed": {
-    "message": "Max. CRUISE speed [cm/s]"
+    "message": "Maks. prędkość CRUISE [cm/s]"
   },
   "posholdMaxClimbRate": {
     "message": "Max. navigation climb rate [cm/s]"
@@ -2265,7 +2265,7 @@
     "message": "Use mid. throttle for ALTHOLD"
   },
   "positionEstimatorConfiguration": {
-    "message": "Position Estimator"
+    "message": "Szacowana pozycja"
   },
   "w_z_baro_p": {
     "message": "Vertical position barometer weight"
@@ -2301,10 +2301,10 @@
     "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
   },
   "wirelessModeSwitch": {
-    "message": "Wireless mode"
+    "message": "Tryb bezprzewodowy"
   },
   "rthConfiguration": {
-    "message": "RTH and Landing Settings"
+    "message": "Ustawienia Lądowania i RTH"
   },
   "minRthDistance": {
     "message": "Min. RTH distance [cm]"
@@ -2355,13 +2355,13 @@
     "message": "Cruise throttle"
   },
   "minThrottle": {
-    "message": "Min. throttle"
+    "message": "Min. przepustnica"
   },
   "maxThrottle": {
-    "message": "Max. throttle"
+    "message": "Maks. przepustnica"
   },
   "maxBankAngle": {
-    "message": "Max. bank angle [degrees]"
+    "message": "Maks. kąt przechylenia [degrees]"
   },
   "maxBankAngleHelp": {
     "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
@@ -2517,7 +2517,7 @@
     "message": "VTX"
   },
   "osdGroupMapsAndRadars": {
-    "message": "Maps and Radars"
+    "message": "Mapy i radary"
   },
   "osdGroupMapsAndRadars_HELP": {
     "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
@@ -2532,7 +2532,7 @@
     "message": "Shows the quality of the signal received from the RC radio (the higher the better)."
   },
   "osdElement_MAIN_BATT_VOLTAGE": {
-    "message": "Battery Voltage"
+    "message": "Napięcie baterii"
   },
   "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
     "message": "Sag Compensated Battery Voltage"
@@ -2769,7 +2769,7 @@
     "message": "Temperature of the IMU"
   },
   "osdElement_BARO_TEMPERATURE": {
-    "message": "Baro Temperature"
+    "message": "Temperatura Baro"
   },
   "osdElement_BARO_TEMPERATURE_HELP": {
     "message": "Temperature of the barometer"
@@ -2808,22 +2808,22 @@
     "message": "Uploaded $1 characters"
   },
   "portColumnSensors": {
-    "message": "Sensors"
+    "message": "Czujniki"
   },
   "appUpdateNotificationHeader": {
-    "message": "New Configurator version available."
+    "message": "Dostępna jest nowa wersja konfiguratora."
   },
   "appUpdateNotificationDescription": {
     "message": "Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
   },
   "closeUpdateBtn": {
-    "message": "Close"
+    "message": "Zamknij"
   },
   "downloadUpdatesBtn": {
-    "message": "Download new app"
+    "message": "Pobierz nową aplikację"
   },
   "tabMissionControl": {
-    "message": "Mission Control"
+    "message": "Planowanie Misji"
   },
   "loadMissionButton": {
     "message": "Load mission from FC"
@@ -2841,34 +2841,34 @@
     "message": "Load file"
   },
   "saveFileMissionButton": {
-    "message": "Save file"
+    "message": "Zapisz plik"
   },
   "missionSettingsSave": {
-    "message": "Save"
+    "message": "Zapisz"
   },
   "missionSettingsCancel": {
-    "message": "Cancel"
+    "message": "Anuluj"
   },
   "editPointHead": {
-    "message": "Edit point"
+    "message": "Edytuj punkt"
   },
   "editPointButtonSave": {
-    "message": "Save"
+    "message": "Zapisz"
   },
   "editPointButtonRemove": {
-    "message": "Remove"
+    "message": "Usuń"
   },
   "removeAllPointButtonSave": {
-    "message": "Remove all points"
+    "message": "Usuń wszystkie punkty"
   },
   "missionTotalInformationHead": {
-    "message": "Total information"
+    "message": "Informacje ogólne"
   },
   "missionRTHsettingsTitle": {
-    "message": "RTH settings"
+    "message": "Ustawienia RTH"
   },
   "missionDefaultSettingsHead": {
-    "message": "Default settings"
+    "message": "Ustawienia Domyślne"
   },
   "useOnlyStandalone": {
     "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
@@ -2883,7 +2883,7 @@
     "message": "Servo mixer"
   },
   "servoMixerDelete": {
-    "message": "Delete"
+    "message": "Usuń"
   },
   "servoMixerAdd": {
     "message": "Add new mixer rule"
@@ -2910,13 +2910,13 @@
     "message": "Confirm"
   },
   "mixerButtonSaveAndReboot": {
-    "message": "Save and reboot"
+    "message": "Zapisz i uruchom ponownie"
   },
   "mixerApplyDescription": {
     "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
   },
   "settings": {
-    "message": "Settings"
+    "message": "Ustawienia"
   },
   "motorMixer": {
     "message": "Motor Mixer"
@@ -2958,13 +2958,13 @@
     "message": "Output Mapping"
   },
   "NONE": {
-    "message": "None"
+    "message": "Brak"
   },
   "DEFAULT": {
-    "message": "Default"
+    "message": "Domyślne"
   },
   "AIRCRAFT": {
-    "message": "Aircraft"
+    "message": "Dron"
   },
   "ALTITUDE": {
     "message": "Altitude"
@@ -3099,16 +3099,16 @@
     "message": "Operand B"
   },
   "logicFlags": {
-    "message": "Flags"
+    "message": "Flagi"
   },
   "logicSave": {
-    "message": "Save"
+    "message": "Zapisz"
   },
   "logicClose": {
-    "message": "Close"
+    "message": "Zamknij"
   },
   "active": {
-    "message": "Active"
+    "message": "Aktywne"
   },
   "itermRelax": {
     "message": "Iterm Relax"
@@ -3237,7 +3237,7 @@
     "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
   },
   "defaultsDialogTitle": {
-    "message": "Default values"
+    "message": "Wartość domyślna"
   },
   "defaultsDialogInfo": {
     "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
