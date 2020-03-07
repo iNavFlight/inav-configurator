@@ -173,7 +173,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 GUI.handleReconnect($('.tab_failsafe a'));
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, save_failssafe_config);
+            save_failssafe_config();
         });
 
         GUI.content_ready(callback);
