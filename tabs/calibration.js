@@ -52,30 +52,19 @@ TABS.calibration.initialize = function (callback) {
         GUI.active_tab = 'calibration';
         googleAnalytics.sendAppView('Calibration');
     }
-    if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-        loadChainer.setChain([
-            mspHelper.loadStatus,
-            mspHelper.loadSensorConfig,
-            mspHelper.loadCalibrationData
-        ]);
-        loadChainer.setExitPoint(loadHtml);
-        loadChainer.execute();
+    loadChainer.setChain([
+        mspHelper.loadStatus,
+        mspHelper.loadSensorConfig,
+        mspHelper.loadCalibrationData
+    ]);
+    loadChainer.setExitPoint(loadHtml);
+    loadChainer.execute();
 
-        saveChainer.setChain([
-            mspHelper.saveCalibrationData
-        ]);
-        saveChainer.setExitPoint(reboot);
-
-        MSP.send_message(MSPCodes.MSP_IDENT, false, false, loadHtml);
-    } else {
-        loadChainer.setChain([
-            mspHelper.loadStatus
-        ]);
-        loadChainer.setExitPoint(loadHtml);
-        loadChainer.execute();
-
-        saveChainer.setExitPoint(reboot);
-    }
+    saveChainer.setChain([
+        mspHelper.saveCalibrationData,
+        mspHelper.saveToEeprom
+    ]);
+    saveChainer.setExitPoint(reboot);
 
     function reboot() {
         //noinspection JSUnresolvedVariable
@@ -93,7 +82,7 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        $('#content').load("./tabs/calibration.html", processHtml);
+        GUI.load("./tabs/calibration.html", processHtml);
     }
 
     function updateCalibrationSteps() {
@@ -115,6 +104,7 @@ TABS.calibration.initialize = function (callback) {
             $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accZero[item]);
             $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
         });
+        $('[name=OpflowScale]').val(CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
     }
 
@@ -130,32 +120,6 @@ TABS.calibration.initialize = function (callback) {
             }).open();
         }
         updateSensorData();
-    }
-
-    //For 1.8.0
-    function calibrate() {
-        var self = $(this);
-
-        if (!self.hasClass('disabled')) {
-            self.addClass('disabled');
-            MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
-            });
-
-            helper.timeout.add('button_reset', function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
-
-                self.removeClass('disabled');
-
-                if (!bit_check(CONFIG.armingFlags & 0xff00, 13)) {
-                    for (var i = 0; i < 6; i++) {
-                        CALIBRATION_DATA.acc['Pos' + i] = 1;
-                    }
-                    updateCalibrationSteps();
-                }
-
-            }, 2000);
-        }
     }
 
     function calibrateNew() {
@@ -212,23 +176,18 @@ TABS.calibration.initialize = function (callback) {
 
     function processHtml() {
         $('#calibrateButtonSave').on('click', function () {
+            CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
             saveChainer.execute();
         });
-
-        if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
-            $('#accPosAll, #mag-calibrated-data').hide();
-
-            var accIsCalibrate = +(!bit_check(CONFIG.armingFlags & 0xff00, 13));
-            for (var i = 0; i < 6; i++) {
-                CALIBRATION_DATA.acc['Pos' + i] = accIsCalibrate;
-            }
-
-            updateCalibrationSteps();
-        }
 
         if (SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
+        }
+
+        if (SENSOR_CONFIG.opflow === 0) {
+            //Comment for test
+            $('#opflow_btn, #opflow-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }
 
         $('#mag_btn').on('click', function () {
@@ -258,10 +217,41 @@ TABS.calibration.initialize = function (callback) {
 
                     modalProcessing.close();
                     GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
-                    if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-                        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-                    }
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('compass_calibration_interval');
+                }
+            }, 1000);
+        });
+
+        $('#opflow_btn').on('click', function () {
+            MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibStarted'));
+            });
+
+            var button = $(this);
+
+            $(button).addClass('disabled');
+
+            modalProcessing = new jBox('Modal', {
+                width: 400,
+                height: 100,
+                animation: false,
+                closeOnClick: false,
+                closeOnEsc: false,
+                content: $('#modal-opflow-processing')
+            }).open();
+
+            var countdown = 30;
+            helper.interval.add('opflow_calibration_interval', function () {
+                countdown--;
+                $('#modal-opflow-countdown').text(countdown);
+                if (countdown === 0) {
+                    $(button).removeClass('disabled');
+
+                    modalProcessing.close();
+                    GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibEnded'));
+                    MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+                    helper.interval.remove('opflow_calibration_interval');
                 }
             }, 1000);
         });
@@ -277,13 +267,10 @@ TABS.calibration.initialize = function (callback) {
 
         // translate to user-selected language
         localize();
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            $('#calibrate-start-button').on('click', calibrateNew);
 
-            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-        } else {
-            $('#calibrate-start-button').on('click', calibrate);
-        }
+        $('#calibrate-start-button').on('click', calibrateNew);
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
+
         GUI.content_ready(callback);
     }
 };

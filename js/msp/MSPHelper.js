@@ -45,7 +45,14 @@ var mspHelper = (function (gui) {
         'RUNCAM_DEVICE_CONTROL': 10,
         'TBS_SMARTAUDIO': 11,
         'IRC_TRAMP': 12,
-        'RANGEFINDER': 16
+        'OPFLOW': 14,
+        'LOG': 15,
+        'RANGEFINDER': 16,
+        'VTX_FFPV': 17,
+        'ESC': 18,
+        'GSM_SMS': 19,
+        'FRSKY_OSD': 20,
+        'DJI_FPV': 21,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -88,36 +95,14 @@ var mspHelper = (function (gui) {
                 CONFIG.profile = data.getUint8(10);
                 gui.updateProfileChange();
                 gui.updateStatusBar();
-
-                /*
-                 * Update sensor status only for older firmwares
-                 * Newer firmwares use MSP_SENSOR_STATUS instead
-                 */
-                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status(CONFIG.activeSensors);
-                }
-
                 break;
             case MSPCodes.MSP_STATUS_EX:
                 CONFIG.cycleTime = data.getUint16(0, true);
                 CONFIG.i2cError = data.getUint16(2, true);
                 CONFIG.activeSensors = data.getUint16(4, true);
-
-                /* For 1.7.4+ MSP_ACTIVEBOXES should be used to determine active modes */
-                if (semver.lt(CONFIG.flightControllerVersion, "1.7.4")) {
-                    CONFIG.mode = data.getUint32(6, true);
-                }
-
                 CONFIG.profile = data.getUint8(10);
                 CONFIG.cpuload = data.getUint16(11, true);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    CONFIG.armingFlags = data.getUint16(13, true);
-                }
-
-                if (semver.lt(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status(CONFIG.activeSensors);
-                }
+                CONFIG.armingFlags = data.getUint16(13, true);
                 gui.updateStatusBar();
                 gui.updateProfileChange();
                 break;
@@ -158,9 +143,7 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
-                if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-                    sensor_status_ex(SENSOR_STATUS);
-                }
+                sensor_status_ex(SENSOR_STATUS);
                 break;
 
             case MSPCodes.MSP_RAW_IMU:
@@ -234,10 +217,7 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_ALTITUDE:
                 SENSOR_DATA.altitude = parseFloat((data.getInt32(0, true) / 100.0).toFixed(2)); // correct scale factor
-                // On 1.6 and above this provides also baro raw altitude
-                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    SENSOR_DATA.barometer = parseFloat((data.getInt32(6, true) / 100.0).toFixed(2)); // correct scale factor
-                }
+                SENSOR_DATA.barometer = parseFloat((data.getInt32(6, true) / 100.0).toFixed(2)); // correct scale factor
                 break;
             case MSPCodes.MSP_SONAR:
                 SENSOR_DATA.sonar = data.getInt32(0, true);
@@ -252,49 +232,26 @@ var mspHelper = (function (gui) {
                 ANALOG.amperage = data.getInt16(5, true) / 100; // A
                 break;
             case MSPCodes.MSPV2_INAV_ANALOG:
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    var tmp = data.getUint8(offset++);
-                    ANALOG.battery_full_when_plugged_in = (tmp & 1 ? true : false);
-                    ANALOG.use_capacity_thresholds = ((tmp & 2) >> 1 ? true : false);
-                    ANALOG.battery_state = (tmp & 12) >> 2;
-                    ANALOG.cell_count = (tmp & 0xF0) >> 4;
-                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
-                    offset += 2;
-                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
-                    offset += 2;
-                    ANALOG.power = data.getInt32(offset, true) / 100.0;
-                    offset += 4;
-                    ANALOG.mAhdrawn = data.getInt32(offset, true);
-                    offset += 4;
-                    ANALOG.mWhdrawn = data.getInt32(offset, true);
-                    offset += 4;
-                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
-                    offset += 4;
-                    ANALOG.battery_percentage = data.getUint8(offset++);
-                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
-                    offset += 2;
-                } else {
-                    ANALOG.voltage = data.getUint16(offset, true) / 100.0;
-                    offset += 2;
-                    ANALOG.cell_count = data.getUint8(offset++);
-                    ANALOG.battery_percentage = data.getUint8(offset++);
-                    ANALOG.power = data.getUint16(offset, true);
-                    offset += 2;
-                    ANALOG.mAhdrawn = data.getUint16(offset, true);
-                    offset += 2;
-                    ANALOG.mWhdrawn = data.getUint16(offset, true);
-                    offset += 2;
-                    ANALOG.rssi = data.getUint16(offset, true); // 0-1023
-                    offset += 2;
-                    ANALOG.amperage = data.getInt16(offset, true) / 100; // A
-                    offset += 2;
-                    var battery_flags = data.getUint8(offset++);
-                    ANALOG.battery_full_when_plugged_in = (battery_flags & 1 ? true : false);
-                    ANALOG.use_capacity_thresholds = ((battery_flags & 2) >> 1 ? true : false);
-                    ANALOG.battery_state = (battery_flags & 12) >> 2;
-                    ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
-                    offset += 4;
-                }
+                let tmp = data.getUint8(offset++);
+                ANALOG.battery_full_when_plugged_in = (tmp & 1 ? true : false);
+                ANALOG.use_capacity_thresholds = ((tmp & 2) >> 1 ? true : false);
+                ANALOG.battery_state = (tmp & 12) >> 2;
+                ANALOG.cell_count = (tmp & 0xF0) >> 4;
+                ANALOG.voltage = data.getUint16(offset, true) / 100.0;
+                offset += 2;
+                ANALOG.amperage = data.getInt16(offset, true) / 100; // A
+                offset += 2;
+                ANALOG.power = data.getInt32(offset, true) / 100.0;
+                offset += 4;
+                ANALOG.mAhdrawn = data.getInt32(offset, true);
+                offset += 4;
+                ANALOG.mWhdrawn = data.getInt32(offset, true);
+                offset += 4;
+                ANALOG.battery_remaining_capacity = data.getUint32(offset, true);
+                offset += 4;
+                ANALOG.battery_percentage = data.getUint8(offset++);
+                ANALOG.rssi = data.getUint16(offset, true); // 0-1023
+                offset += 2;
                 //noinspection JSValidateTypes
                 dataHandler.analog_last_received_timestamp = Date.now();
                 break;
@@ -347,6 +304,15 @@ var mspHelper = (function (gui) {
                     PIDs[i][2] = data.getUint8(needle + 2);
                 }
                 break;
+            case MSPCodes.MSP2_PID:
+                // PID data arrived, we need to scale it and save to appropriate bank / array
+                for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
+                    PIDs[i][0] = data.getUint8(needle);
+                    PIDs[i][1] = data.getUint8(needle + 1);
+                    PIDs[i][2] = data.getUint8(needle + 2);
+                    PIDs[i][3] = data.getUint8(needle + 3);
+                }
+                break;
             case MSPCodes.MSP_ARMING_CONFIG:
                 ARMING_CONFIG.auto_disarm_delay = data.getUint8(0);
                 ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
@@ -397,12 +363,10 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 MISC.vbatscale = data.getUint16(offset, true);
                 offset += 2;
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    MISC.voltage_source = data.getUint8(offset++);
-                    MISC.battery_cells = data.getUint8(offset++);
-                    MISC.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
-                    offset += 2;
-                }
+                MISC.voltage_source = data.getUint8(offset++);
+                MISC.battery_cells = data.getUint8(offset++);
+                MISC.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
                 MISC.vbatmincellvoltage = data.getUint16(offset, true) / 100;
                 offset += 2;
                 MISC.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
@@ -423,12 +387,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_BATTERY_CONFIG:
                 BATTERY_CONFIG.vbatscale = data.getUint16(offset, true);
                 offset += 2;
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    BATTERY_CONFIG.voltage_source = data.getUint8(offset++);
-                    BATTERY_CONFIG.battery_cells = data.getUint8(offset++);
-                    BATTERY_CONFIG.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
-                    offset += 2;
-                }
+                BATTERY_CONFIG.voltage_source = data.getUint8(offset++);
+                BATTERY_CONFIG.battery_cells = data.getUint8(offset++);
+                BATTERY_CONFIG.vbatdetectcellvoltage = data.getUint16(offset, true) / 100;
+                offset += 2;
                 BATTERY_CONFIG.vbatmincellvoltage = data.getUint16(offset, true) / 100;
                 offset += 2;
                 BATTERY_CONFIG.vbatmaxcellvoltage = data.getUint16(offset, true) / 100;
@@ -448,14 +410,14 @@ var mspHelper = (function (gui) {
                 BATTERY_CONFIG.battery_capacity_unit = (data.getUint8(offset++) ? 'mWh' : 'mAh');
                 break;
             case MSPCodes.MSP_3D:
-                _3D.deadband3d_low = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.deadband_low = data.getUint16(offset, true);
                 offset += 2;
-                _3D.deadband3d_high = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.deadband_high = data.getUint16(offset, true);
                 offset += 2;
-                _3D.neutral3d = data.getUint16(offset, true);
+                REVERSIBLE_MOTORS.neutral = data.getUint16(offset, true);
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
                     offset += 2;
-                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                    REVERSIBLE_MOTORS.deadband_throttle = data.getUint16(offset, true);
                 }
                 break;
             case MSPCodes.MSP_MOTOR_PINS:
@@ -511,23 +473,70 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_SERVO_MIX_RULES:
                 SERVO_RULES.flush();
-
-                if (data.byteLength % 7 === 0) {
-                    for (i = 0; i < data.byteLength; i += 7) {
+                if (data.byteLength % 8 === 0) {
+                    for (i = 0; i < data.byteLength; i += 8) {
                         SERVO_RULES.put(new ServoMixRule(
                             data.getInt8(i),
                             data.getInt8(i + 1),
-                            data.getInt8(i + 2),
-                            data.getInt8(i + 3)
+                            data.getInt16(i + 2, true),
+                            data.getInt8(i + 4)
                         ));
                     }
                 }
                 SERVO_RULES.cleanup();
 
                 break;
+            case MSPCodes.MSP2_INAV_SERVO_MIXER:
+                SERVO_RULES.flush();
+                if (data.byteLength % 6 === 0) {
+                    for (i = 0; i < data.byteLength; i += 6) {
+                        SERVO_RULES.put(new ServoMixRule(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt16(i + 2, true),
+                            data.getInt8(i + 4),
+                            data.getInt8(i + 5)
+                        ));
+                    }
+                }
+                SERVO_RULES.cleanup();
+                break;
 
             case MSPCodes.MSP_SET_SERVO_MIX_RULE:
                 console.log("Servo mix saved");
+                break;
+            case MSPCodes.MSP2_INAV_SET_SERVO_MIXER:
+                console.log("Servo mix saved");
+                break;
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS:
+                LOGIC_CONDITIONS.flush();
+                if (data.byteLength % 13 === 0) {
+                    for (i = 0; i < data.byteLength; i += 13) {
+                        LOGIC_CONDITIONS.put(new LogicCondition(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getInt8(i + 2),
+                            data.getInt32(i + 3, true),
+                            data.getInt8(i + 7),
+                            data.getInt32(i + 8, true),
+                            data.getInt8(i + 12)
+                        ));
+                    }
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
+                if (data.byteLength % 4 === 0) {
+                    let index = 0;
+                    for (i = 0; i < data.byteLength; i += 4) {
+                        LOGIC_CONDITIONS_STATUS.set(index, data.getInt32(i, true));
+                        index++;
+                    }
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS:
+                console.log("Logic conditions saved");
                 break;
 
             case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
@@ -578,22 +587,23 @@ var mspHelper = (function (gui) {
                 RC_deadband.yaw_deadband = data.getUint8(offset++);
                 RC_deadband.alt_hold_deadband = data.getUint8(offset++);
                 if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
-                    _3D.deadband3d_throttle = data.getUint16(offset, true);
+                    REVERSIBLE_MOTORS.deadband_throttle = data.getUint16(offset, true);
                 }
                 break;
             case MSPCodes.MSP_SENSOR_ALIGNMENT:
                 SENSOR_ALIGNMENT.align_gyro = data.getUint8(offset++);
                 SENSOR_ALIGNMENT.align_acc = data.getUint8(offset++);
                 SENSOR_ALIGNMENT.align_mag = data.getUint8(offset++);
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    SENSOR_ALIGNMENT.align_opflow = data.getUint8(offset++);
-                }
+                SENSOR_ALIGNMENT.align_opflow = data.getUint8(offset++);
                 break;
             case MSPCodes.MSP_SET_RAW_RC:
                 break;
             case MSPCodes.MSP_SET_RAW_GPS:
                 break;
             case MSPCodes.MSP_SET_PID:
+                console.log('PID settings saved');
+                break;
+            case MSPCodes.MSP2_SET_PID:
                 console.log('PID settings saved');
                 break;
             case MSPCodes.MSP_SET_RC_TUNING:
@@ -604,6 +614,9 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_MAG_CALIBRATION:
                 console.log('Mag calibration executed');
+                break;
+            case MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION:
+                console.log('Optic flow calibration executed');
                 break;
             case MSPCodes.MSP_SET_MISC:
                 console.log('MISC Configuration saved');
@@ -764,8 +777,6 @@ var mspHelper = (function (gui) {
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
                     };
 
-                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
-
                     offset += bytesPerPort;
                     SERIAL_CONFIG.ports.push(serialPort);
                 }
@@ -787,8 +798,6 @@ var mspHelper = (function (gui) {
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
                         blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
                     };
-
-                    GUI.log("SP" + i + ": "+data.getUint16(offset+1, true));
 
                     offset += bytesPerPort;
                     SERIAL_CONFIG.ports.push(serialPort);
@@ -875,12 +884,10 @@ var mspHelper = (function (gui) {
                     RX_CONFIG.spirx_channel_count = data.getUint8(offset);
                     offset += 1;
                 }
-                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
-                    offset += 1;
-                    RX_CONFIG.receiver_type = data.getUint8(offset);
-                    offset += 1;
-                }
+                // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                offset += 1;
+                RX_CONFIG.receiver_type = data.getUint8(offset);
+                offset += 1;
                 break;
 
             case MSPCodes.MSP_FAILSAFE_CONFIG:
@@ -896,24 +903,20 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_procedure = data.getUint8(offset);
                 offset++;
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-                    FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
-                    offset++;
-                    FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
-                    offset += 2;
-                }
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
-                    FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
-                    offset += 2;
-                    FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
-                    offset++;
-                }
+                FAILSAFE_CONFIG.failsafe_recovery_delay = data.getUint8(offset);
+                offset++;
+                FAILSAFE_CONFIG.failsafe_fw_roll_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_pitch_angle = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_fw_yaw_rate = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_stick_motion_threshold = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance = data.getUint16(offset, true);
+                offset += 2;
+                FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
+                offset++;
                 break;
 
             case MSPCodes.MSP_RXFAIL_CONFIG:
@@ -1179,11 +1182,9 @@ var mspHelper = (function (gui) {
                 FILTER_CONFIG.gyroNotchHz2 = data.getUint16(13, true);
                 FILTER_CONFIG.gyroNotchCutoff2 = data.getUint16(15, true);
 
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    FILTER_CONFIG.accNotchHz = data.getUint16(17, true);
-                    FILTER_CONFIG.accNotchCutoff = data.getUint16(19, true);
-                    FILTER_CONFIG.gyroStage2LowpassHz = data.getUint16(21, true);
-                }
+                FILTER_CONFIG.accNotchHz = data.getUint16(17, true);
+                FILTER_CONFIG.accNotchCutoff = data.getUint16(19, true);
+                FILTER_CONFIG.gyroStage2LowpassHz = data.getUint16(21, true);
 
                 break;
 
@@ -1195,12 +1196,8 @@ var mspHelper = (function (gui) {
                 PID_ADVANCED.rollPitchItermIgnoreRate = data.getUint16(0, true);
                 PID_ADVANCED.yawItermIgnoreRate = data.getUint16(2, true);
                 PID_ADVANCED.yawPLimit = data.getUint16(4, true);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
-                    PID_ADVANCED.pidSumLimit = data.getUint16(10, true);
-                }
-
+                PID_ADVANCED.dtermSetpointWeight = data.getUint8(9);
+                PID_ADVANCED.pidSumLimit = data.getUint16(10, true);
                 PID_ADVANCED.axisAccelerationLimitRollPitch = data.getUint16(13, true);
                 PID_ADVANCED.axisAccelerationLimitYaw = data.getUint16(15, true);
                 break;
@@ -1253,10 +1250,6 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_CALIBRATION_DATA:
-                if (semver.lte(CONFIG.flightControllerVersion, "1.8.0")) {
-                    break;
-                }
-
                 var callibrations = data.getUint8(0);
                 CALIBRATION_DATA.acc.Pos0 = (1 & (callibrations >> 0));
                 CALIBRATION_DATA.acc.Pos1 = (1 & (callibrations >> 1));
@@ -1274,6 +1267,11 @@ var mspHelper = (function (gui) {
                 CALIBRATION_DATA.magZero.X = data.getInt16(13, true);
                 CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
                 CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+                    CALIBRATION_DATA.opflow.Scale = (data.getInt16(19, true) / 256.0);
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_CALIBRATION_DATA:
@@ -1452,6 +1450,22 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
                 console.log('Braking config saved');
                 break;
+            case MSPCodes.MSP2_BLACKBOX_CONFIG:
+                BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
+                BLACKBOX.blackboxDevice = data.getUint8(1);
+                BLACKBOX.blackboxRateNum = data.getUint16(2);
+                BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                break;
+            case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
+                console.log("Blackbox config saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_TEMPERATURES:
+                for (i = 0; i < 8; ++i) {
+                    temp_decidegrees = data.getInt16(i * 2, true);
+                    SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
+                }
+                break;
 
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
@@ -1481,7 +1495,10 @@ var mspHelper = (function (gui) {
                     dataHandler.callbacks.splice(i, 1);
 
                     // fire callback
-                    if (callback) callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    if (callback) {
+                        callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                    }
+                    break;
                 }
             }
         }
@@ -1527,6 +1544,14 @@ var mspHelper = (function (gui) {
                     buffer.push(parseInt(PIDs[i][0]));
                     buffer.push(parseInt(PIDs[i][1]));
                     buffer.push(parseInt(PIDs[i][2]));
+                }
+                break;
+            case MSPCodes.MSP2_SET_PID:
+                for (i = 0; i < PIDs.length; i++) {
+                    buffer.push(parseInt(PIDs[i][0]));
+                    buffer.push(parseInt(PIDs[i][1]));
+                    buffer.push(parseInt(PIDs[i][2]));
+                    buffer.push(parseInt(PIDs[i][3]));
                 }
                 break;
             case MSPCodes.MSP_SET_RC_TUNING:
@@ -1627,12 +1652,10 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(Math.round(MISC.mag_declination * 10)));
                 buffer.push(lowByte(MISC.vbatscale));
                 buffer.push(highByte(MISC.vbatscale));
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    buffer.push(MISC.voltage_source);
-                    buffer.push(MISC.battery_cells);
-                    buffer.push(lowByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
-                    buffer.push(highByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
-                }
+                buffer.push(MISC.voltage_source);
+                buffer.push(MISC.battery_cells);
+                buffer.push(lowByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
+                buffer.push(highByte(Math.round(MISC.vbatdetectcellvoltage * 100)));
                 buffer.push(lowByte(Math.round(MISC.vbatmincellvoltage * 100)));
                 buffer.push(highByte(Math.round(MISC.vbatmincellvoltage * 100)));
                 buffer.push(lowByte(Math.round(MISC.vbatmaxcellvoltage * 100)));
@@ -1650,12 +1673,10 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
                 buffer.push(lowByte(BATTERY_CONFIG.vbatscale));
                 buffer.push(highByte(BATTERY_CONFIG.vbatscale));
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    buffer.push(BATTERY_CONFIG.voltage_source);
-                    buffer.push(BATTERY_CONFIG.battery_cells);
-                    buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
-                    buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
-                }
+                buffer.push(BATTERY_CONFIG.voltage_source);
+                buffer.push(BATTERY_CONFIG.battery_cells);
+                buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
+                buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
                 buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
                 buffer.push(highByte(Math.round(BATTERY_CONFIG.vbatmincellvoltage * 100)));
                 buffer.push(lowByte(Math.round(BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
@@ -1698,12 +1719,10 @@ var mspHelper = (function (gui) {
                     buffer.push32(RX_CONFIG.spirx_id);
                     buffer.push(RX_CONFIG.spirx_channel_count);
                 }
-                if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-                    // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
-                    buffer.push(0);
-                    // receiver type in RX_CONFIG rather than in BF_CONFIG.features
-                    buffer.push(RX_CONFIG.receiver_type);
-                }
+                // unused byte for fpvCamAngleDegrees, for compatiblity with betaflight
+                buffer.push(0);
+                // receiver type in RX_CONFIG rather than in BF_CONFIG.features
+                buffer.push(RX_CONFIG.receiver_type);
                 break;
 
             case MSPCodes.MSP_SET_FAILSAFE_CONFIG:
@@ -1715,22 +1734,18 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FAILSAFE_CONFIG.failsafe_procedure);
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
-                    buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                }
-                if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
-                    buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
-                    buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
-                    buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-                }
+                buffer.push(FAILSAFE_CONFIG.failsafe_recovery_delay);
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
                 break;
 
             case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
@@ -1788,15 +1803,15 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP_SET_3D:
-                buffer.push(lowByte(_3D.deadband3d_low));
-                buffer.push(highByte(_3D.deadband3d_low));
-                buffer.push(lowByte(_3D.deadband3d_high));
-                buffer.push(highByte(_3D.deadband3d_high));
-                buffer.push(lowByte(_3D.neutral3d));
-                buffer.push(highByte(_3D.neutral3d));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(highByte(REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(highByte(REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(lowByte(REVERSIBLE_MOTORS.neutral));
+                buffer.push(highByte(REVERSIBLE_MOTORS.neutral));
                 if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                    buffer.push(lowByte(_3D.deadband3d_throttle));
-                    buffer.push(highByte(_3D.deadband3d_throttle));
+                    buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_throttle));
+                    buffer.push(highByte(REVERSIBLE_MOTORS.deadband_throttle));
                 }
                 break;
 
@@ -1805,8 +1820,8 @@ var mspHelper = (function (gui) {
                 buffer.push(RC_deadband.yaw_deadband);
                 buffer.push(RC_deadband.alt_hold_deadband);
                 if (semver.gte(CONFIG.apiVersion, "1.24.0")) {
-                    buffer.push(lowByte(_3D.deadband3d_throttle));
-                    buffer.push(highByte(_3D.deadband3d_throttle));
+                    buffer.push(lowByte(REVERSIBLE_MOTORS.deadband_throttle));
+                    buffer.push(highByte(REVERSIBLE_MOTORS.deadband_throttle));
                 }
                 break;
 
@@ -1814,9 +1829,7 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_ALIGNMENT.align_gyro);
                 buffer.push(SENSOR_ALIGNMENT.align_acc);
                 buffer.push(SENSOR_ALIGNMENT.align_mag);
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    buffer.push(SENSOR_ALIGNMENT.align_opflow);
-                }
+                buffer.push(SENSOR_ALIGNMENT.align_opflow);
                 break;
 
             case MSPCodes.MSP_SET_ADVANCED_CONFIG:
@@ -1908,6 +1921,11 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(CALIBRATION_DATA.magZero.Z));
                 buffer.push(highByte(CALIBRATION_DATA.magZero.Z));
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+                    buffer.push(lowByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                    buffer.push(highByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                }
                 break;
 
             case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
@@ -2007,16 +2025,14 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FILTER_CONFIG.gyroNotchCutoff2));
                 buffer.push(highByte(FILTER_CONFIG.gyroNotchCutoff2));
 
-                if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-                    buffer.push(lowByte(FILTER_CONFIG.accNotchHz));
-                    buffer.push(highByte(FILTER_CONFIG.accNotchHz));
+                buffer.push(lowByte(FILTER_CONFIG.accNotchHz));
+                buffer.push(highByte(FILTER_CONFIG.accNotchHz));
 
-                    buffer.push(lowByte(FILTER_CONFIG.accNotchCutoff));
-                    buffer.push(highByte(FILTER_CONFIG.accNotchCutoff));
+                buffer.push(lowByte(FILTER_CONFIG.accNotchCutoff));
+                buffer.push(highByte(FILTER_CONFIG.accNotchCutoff));
 
-                    buffer.push(lowByte(FILTER_CONFIG.gyroStage2LowpassHz));
-                    buffer.push(highByte(FILTER_CONFIG.gyroStage2LowpassHz));
-                }
+                buffer.push(lowByte(FILTER_CONFIG.gyroStage2LowpassHz));
+                buffer.push(highByte(FILTER_CONFIG.gyroStage2LowpassHz));
 
                 break;
 
@@ -2034,15 +2050,9 @@ var mspHelper = (function (gui) {
                 buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
                 buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
 
-                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    buffer.push(PID_ADVANCED.dtermSetpointWeight);
-                    buffer.push(lowByte(PID_ADVANCED.pidSumLimit));
-                    buffer.push(highByte(PID_ADVANCED.pidSumLimit));
-                } else {
-                    buffer.push(0);
-                    buffer.push(0); // reserved
-                    buffer.push(0); // reserved
-                }
+                buffer.push(PID_ADVANCED.dtermSetpointWeight);
+                buffer.push(lowByte(PID_ADVANCED.pidSumLimit));
+                buffer.push(highByte(PID_ADVANCED.pidSumLimit));
 
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
 
@@ -2155,15 +2165,22 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-        var message = [
-            BLACKBOX.blackboxDevice & 0xFF,
-            BLACKBOX.blackboxRateNum & 0xFF,
-            BLACKBOX.blackboxRateDenom & 0xFF
-        ];
-
+	var buffer = [];
+	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+	if (semver.gte(CONFIG.apiVersion, "2.3.0")) {
+	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
+	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+	} else {
+	    buffer.push(BLACKBOX.blackboxRateNum & 0xFF);
+	    buffer.push(BLACKBOX.blackboxRateDenom & 0xFF);
+	}
         //noinspection JSUnusedLocalSymbols
-        MSP.send_message(MSPCodes.MSP_SET_BLACKBOX_CONFIG, message, false, function (response) {
-            onDataCallback();
+        MSP.send_message(messageId, buffer, false, function (response) {
+	    onDataCallback();
         });
     };
 
@@ -2241,29 +2258,44 @@ var mspHelper = (function (gui) {
 
             var servoRule = SERVO_RULES.get()[servoIndex];
 
-            buffer.push(servoIndex);
-            buffer.push(servoRule.getTarget());
-            buffer.push(servoRule.getInput());
-            buffer.push(servoRule.getRate());
-            buffer.push(servoRule.getSpeed());
-            buffer.push(0);
-            buffer.push(0);
-            buffer.push(0);
+            if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+                buffer.push(servoIndex);
+                buffer.push(servoRule.getTarget());
+                buffer.push(servoRule.getInput());
+                buffer.push(lowByte(servoRule.getRate()));
+                buffer.push(highByte(servoRule.getRate()));
+                buffer.push(servoRule.getSpeed());
+                buffer.push(0);
+                buffer.push(0);
+                buffer.push(0);
 
-            // prepare for next iteration
-            servoIndex++;
-            if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
-                nextFunction = onCompleteCallback;
+                // prepare for next iteration
+                servoIndex++;
+                if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                    nextFunction = onCompleteCallback;
+                }
+                MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
+            } else {
+                //INAV 2.2 uses different MSP frame
+                buffer.push(servoIndex);
+                buffer.push(servoRule.getTarget());
+                buffer.push(servoRule.getInput());
+                buffer.push(lowByte(servoRule.getRate()));
+                buffer.push(highByte(servoRule.getRate()));
+                buffer.push(servoRule.getSpeed());
+                buffer.push(servoRule.getConditionId());
+
+                 // prepare for next iteration
+                 servoIndex++;
+                 if (servoIndex == SERVO_RULES.getServoRulesCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                     nextFunction = onCompleteCallback;
+                 }
+                 MSP.send_message(MSPCodes.MSP2_INAV_SET_SERVO_MIXER, buffer, false, nextFunction);
             }
-            MSP.send_message(MSPCodes.MSP_SET_SERVO_MIX_RULE, buffer, false, nextFunction);
         }
     };
 
     self.sendMotorMixer = function (onCompleteCallback) {
-
-        if (semver.lt(CONFIG.flightControllerVersion, "1.8.1")) {
-            onCompleteCallback();
-        }
 
         var nextFunction = sendMixer,
             servoIndex = 0;
@@ -2307,6 +2339,56 @@ var mspHelper = (function (gui) {
             } else {
                 onCompleteCallback();
             }
+        }
+    };
+
+    self.loadLogicConditions = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS, false, false, callback);
+        } else {
+            callback();
+        }
+    }
+
+    self.sendLogicConditions = function (onCompleteCallback) {
+        let nextFunction = sendCondition,
+            conditionIndex = 0;
+
+        if (LOGIC_CONDITIONS.getCount() == 0 || semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendCondition() {
+
+            let buffer = [];
+
+            // send one at a time, with index, 14 bytes per one condition
+
+            let condition = LOGIC_CONDITIONS.get()[conditionIndex];
+
+            buffer.push(conditionIndex);
+            buffer.push(condition.getEnabled());
+            buffer.push(condition.getOperation());
+            buffer.push(condition.getOperandAType());
+            buffer.push(specificByte(condition.getOperandAValue(), 0));
+            buffer.push(specificByte(condition.getOperandAValue(), 1));
+            buffer.push(specificByte(condition.getOperandAValue(), 2));
+            buffer.push(specificByte(condition.getOperandAValue(), 3));
+            buffer.push(condition.getOperandBType());
+            buffer.push(specificByte(condition.getOperandBValue(), 0));
+            buffer.push(specificByte(condition.getOperandBValue(), 1));
+            buffer.push(specificByte(condition.getOperandBValue(), 2));
+            buffer.push(specificByte(condition.getOperandBValue(), 3));
+            buffer.push(condition.getFlags());
+
+            // prepare for next iteration
+            conditionIndex++;
+            if (conditionIndex == LOGIC_CONDITIONS.getCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                nextFunction = onCompleteCallback;
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS, buffer, false, nextFunction);
         }
     };
 
@@ -2683,7 +2765,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadPidData = function (callback) {
-        MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            MSP.send_message(MSPCodes.MSP2_PID, false, false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_PID, false, false, callback);
+        }
     };
 
     self.loadPidNames = function (callback) {
@@ -2699,10 +2785,7 @@ var mspHelper = (function (gui) {
     };
 
     self.queryFcStatus = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
-            MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
-        else
-            MSP.send_message(MSPCodes.MSP_STATUS_EX, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
     };
 
     self.loadMisc = function (callback) {
@@ -2714,12 +2797,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadOutputMapping = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, '2.0.0'))
-            MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
-        else {
-            OUTPUT_MAPPING.flush();
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 
     self.loadBatteryConfig = function (callback) {
@@ -2747,19 +2825,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadSensorConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SENSOR_CONFIG, false, false, callback);
     };
 
     self.loadSensorStatus = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false, callback);
     };
 
     self.loadRcDeadband = function (callback) {
@@ -2803,7 +2873,11 @@ var mspHelper = (function (gui) {
     };
 
     self.savePidData = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
+            MSP.send_message(MSPCodes.MSP2_SET_PID, mspHelper.crunch(MSPCodes.MSP2_SET_PID), false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_SET_PID, mspHelper.crunch(MSPCodes.MSP_SET_PID), false, callback);
+        }
     };
 
     self.saveRcTuningData = function (callback) {
@@ -2859,105 +2933,54 @@ var mspHelper = (function (gui) {
     };
 
     self.saveSensorConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.5.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_SENSOR_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_SENSOR_CONFIG), false, callback);
     };
 
     self.loadNavPosholdConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            MSP.send_message(MSPCodes.MSP_NAV_POSHOLD, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_NAV_POSHOLD, false, false, callback);
     };
 
     self.saveNavPosholdConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_NAV_POSHOLD, mspHelper.crunch(MSPCodes.MSP_SET_NAV_POSHOLD), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_NAV_POSHOLD, mspHelper.crunch(MSPCodes.MSP_SET_NAV_POSHOLD), false, callback);
     };
 
     self.loadPositionEstimationConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            MSP.send_message(MSPCodes.MSP_POSITION_ESTIMATION_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_POSITION_ESTIMATION_CONFIG, false, false, callback);
     };
 
     self.savePositionEstimationConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
     };
 
     self.loadCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, callback);
     };
 
     self.saveCalibrationData = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_CALIBRATION_DATA, mspHelper.crunch(MSPCodes.MSP_SET_CALIBRATION_DATA), false, callback);
     };
 
     self.loadRthAndLandConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_RTH_AND_LAND_CONFIG, false, false, callback);
     };
 
     self.saveRthAndLandConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG), false, callback);
     };
 
     self.loadFwConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
-            MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_FW_CONFIG, false, false, callback);
     };
 
     self.saveFwConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.7.1")) {
             MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
-        } else {
-            callback();
-        }
     };
 
     self.getMissionInfo = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
     };
 
     self._getSetting = function (name) {
-        if (semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
-            return self._getLegacySetting(name);
-        }
         if (SETTINGS[name]) {
             return Promise.resolve(SETTINGS[name]);
         }
@@ -2975,6 +2998,12 @@ var mspHelper = (function (gui) {
                 6: "string",
             };
             var setting = {};
+
+            // Discard setting name
+            if (semver.gte(CONFIG.apiVersion, "2.4.0")) {
+                result.data.readString();
+            }
+
             // Discard PG ID
             result.data.readU16();
 
@@ -3007,31 +3036,6 @@ var mspHelper = (function (gui) {
             return setting;
         });
     }
-
-
-    self._getLegacySetting = function (name) {
-        var promise;
-        if (SETTINGS) {
-            promise = Promise.resolve(SETTINGS);
-        } else {
-            promise = new Promise(function (resolve, reject) {
-                $.ajax({
-                    url: chrome.runtime.getURL('/resources/settings.json'),
-                    dataType: 'json',
-                    error: function (jqXHR, text, error) {
-                        reject(error);
-                    },
-                    success: function (data) {
-                        SETTINGS = data;
-                        resolve(data);
-                    }
-                });
-            });
-        }
-        return promise.then(function (data) {
-            return data[name];
-        });
-    };
 
     self._encodeSettingReference = function (name, index, data) {
         if (Number.isInteger(index)) {
@@ -3135,31 +3139,23 @@ var mspHelper = (function (gui) {
     };
 
     self.getRTC = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            MSP.send_message(MSPCodes.MSP_RTC, false, false, function (resp) {
-                var seconds = resp.data.read32();
-                var millis = resp.data.readU16();
-                if (callback) {
-                    callback(seconds, millis);
-                }
-            });
-        } else if (callback) {
-            callback(0, 0);
-        }
+        MSP.send_message(MSPCodes.MSP_RTC, false, false, function (resp) {
+            var seconds = resp.data.read32();
+            var millis = resp.data.readU16();
+            if (callback) {
+                callback(seconds, millis);
+            }
+        });
     };
 
     self.setRTC = function (callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.7.3")) {
-            var now = Date.now();
-            var secs = now / 1000;
-            var millis = now % 1000;
-            var data = [];
-            data.push32(secs);
-            data.push16(millis);
-            MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
-        } else if (callback) {
-            callback();
-        }
+        var now = Date.now();
+        var secs = now / 1000;
+        var millis = now % 1000;
+        var data = [];
+        data.push32(secs);
+        data.push16(millis);
+        MSP.send_message(MSPCodes.MSP_SET_RTC, data, false, callback);
     };
 
     self.loadServoConfiguration = function (callback) {
@@ -3167,15 +3163,15 @@ var mspHelper = (function (gui) {
     };
 
     self.loadServoMixRules = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+        if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SERVO_MIXER, false, false, callback);
+        } else {
+            MSP.send_message(MSPCodes.MSP_SERVO_MIX_RULES, false, false, callback);
+        }
     };
 
     self.loadMotorMixRules = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.8.1")) {
-            MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_COMMON_MOTOR_MIXER, false, false, callback);
     };
 
     self.loadMotors = function (callback) {
@@ -3183,94 +3179,70 @@ var mspHelper = (function (gui) {
     };
 
     self.getCraftName = function(callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
-                var name = resp.data.readString();
-                if (callback) {
-                    callback(name);
-                }
-            });
-        } else if (callback) {
-            callback(null);
-        }
+        MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
+            var name = resp.data.readString();
+            if (callback) {
+                callback(name);
+            }
+        });
     };
 
     self.setCraftName = function(name, callback) {
-        if (semver.gt(CONFIG.flightControllerVersion, "1.8.0")) {
-            var data = [];
-            name = name || "";
-            for (var ii = 0; ii < name.length; ii++) {
-                data.push(name.charCodeAt(ii));
-            }
-            MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
-        } else if (callback) {
-            callback();
+        var data = [];
+        name = name || "";
+        for (var ii = 0; ii < name.length; ii++) {
+            data.push(name.charCodeAt(ii));
         }
+        MSP.send_message(MSPCodes.MSP_SET_NAME, data, false, callback);
     };
 
     self.loadMixerConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_MIXER, false, false, callback);
     };
 
     self.saveMixerConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "1.9.1")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_MIXER, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MIXER), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_MIXER, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MIXER), false, callback);
     };
 
     self.loadVTXConfig = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            MSP.send_message(MSPCodes.MSP_VTX_CONFIG, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_VTX_CONFIG, false, false, callback);
     };
 
     self.saveVTXConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
     };
 
     self.loadBrakingConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
     }
 
     self.saveBrakingConfig = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.1.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
     };
 
     self.loadParameterGroups = function(callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.0.0")) {
-            MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {
-                var groups = [];
-                while (resp.data.offset < resp.data.byteLength) {
-                    var id = resp.data.readU16();
-                    var start = resp.data.readU16();
-                    var end = resp.data.readU16();
-                    groups.push({id: id, start: start, end: end});
-                }
-                if (callback) {
-                    callback(groups);
-                }
-            });
-        } else if (callback) {
+        MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {
+            var groups = [];
+            while (resp.data.offset < resp.data.byteLength) {
+                var id = resp.data.readU16();
+                var start = resp.data.readU16();
+                var end = resp.data.readU16();
+                groups.push({id: id, start: start, end: end});
+            }
+            if (callback) {
+                callback(groups);
+            }
+        });
+    };
+
+    self.loadBrakingConfig = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
+    }
+
+    self.loadSensorStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS, false, false, callback);
+        } else {
             callback();
         }
     };

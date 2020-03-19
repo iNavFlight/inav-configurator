@@ -17,6 +17,7 @@ TABS.sensors.initialize = function (callback) {
             SENSOR_DATA.sonar = 0;
             SENSOR_DATA.air_speed = 0;
             SENSOR_DATA.altitude = 0;
+            SENSOR_DATA.temperature[i] = 0;
             SENSOR_DATA.debug[i] = 0;
         }
     }
@@ -181,6 +182,14 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
+    function plot_temperature(enable) {
+        if (enable) {
+            $('.wrapper.temperature').show();
+        } else {
+            $('.wrapper.temperature').hide();
+        }
+    }
+
     function plot_debug(enable) {
         if (enable) {
             $('.wrapper.debug').show();
@@ -189,7 +198,7 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    $('#content').load("./tabs/sensors.html", function load_html() {
+    GUI.load("./tabs/sensors.html", function load_html() {
         // translate to user-selected language
         localize();
 
@@ -202,8 +211,12 @@ TABS.sensors.initialize = function (callback) {
             checkboxes.eq(4).prop('disabled', true);
         }
 
-        if (semver.lt(CONFIG.flightControllerVersion, "1.9.1") || (!bit_check(CONFIG.activeSensors, 6))) { // airspeed
+        if (!bit_check(CONFIG.activeSensors, 6)) { // airspeed
             checkboxes.eq(5).prop('disabled', true);
+        }
+
+        if (!bit_check(CONFIG.activeSensors, 7)) {
+            checkboxes.eq(6).prop('disabled', true);
         }
 
         $('.tab-sensors .info .checkboxes input').change(function () {
@@ -230,6 +243,9 @@ TABS.sensors.initialize = function (callback) {
                     plot_airspeed(enable);
                     break;
                 case 6:
+                    plot_temperature(enable);
+                    break;
+                case 7:
                     plot_debug(enable);
                     break;
             }
@@ -265,13 +281,24 @@ TABS.sensors.initialize = function (callback) {
             samples_altitude_i = 0,
             samples_sonar_i = 0,
             samples_airspeed_i = 0,
+            samples_temperature_i = 0,
             samples_debug_i = 0,
             gyro_data = initDataArray(3),
             accel_data = initDataArray(3),
             mag_data = initDataArray(3),
-            altitude_data = (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) ? initDataArray(2) : initDataArray(1),
+            altitude_data = initDataArray(2),
             sonar_data = initDataArray(1),
             airspeed_data = initDataArray(1),
+            temperature_data = [
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1),
+            initDataArray(1)
+        ];
             debug_data = [
             initDataArray(1),
             initDataArray(1),
@@ -289,6 +316,16 @@ TABS.sensors.initialize = function (callback) {
         var altitudeHelpers = initGraphHelpers('#altitude', samples_altitude_i);
         var sonarHelpers = initGraphHelpers('#sonar', samples_sonar_i);
         var airspeedHelpers = initGraphHelpers('#airspeed', samples_airspeed_i);
+        var temperatureHelpers = [
+            initGraphHelpers('#temperature1', samples_temperature_i),
+            initGraphHelpers('#temperature2', samples_temperature_i),
+            initGraphHelpers('#temperature3', samples_temperature_i),
+            initGraphHelpers('#temperature4', samples_temperature_i),
+            initGraphHelpers('#temperature5', samples_temperature_i),
+            initGraphHelpers('#temperature6', samples_temperature_i),
+            initGraphHelpers('#temperature7', samples_temperature_i),
+            initGraphHelpers('#temperature8', samples_temperature_i)
+        ];
         var debugHelpers = [
             initGraphHelpers('#debug1', samples_debug_i),
             initGraphHelpers('#debug2', samples_debug_i),
@@ -387,7 +424,7 @@ TABS.sensors.initialize = function (callback) {
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
-                helper.interval.add('IMU_pull', function imu_data_pull() {
+                helper.interval.add('IMU_pull', function () {
 
                     /*
                      * Enable balancer
@@ -447,6 +484,21 @@ TABS.sensors.initialize = function (callback) {
             }
 
             if (checkboxes[6]) {
+                helper.interval.add('temperature_pull', function temperature_data_pull() {
+
+                    /*
+                     * Enable balancer
+                     */
+                    if (helper.mspQueue.shouldDrop()) {
+                        update_temperature_graphs();
+                        return;
+                    }
+
+                    MSP.send_message(MSPCodes.MSP2_INAV_TEMPERATURES, false, false, update_temperature_graphs);
+                }, 1000, true);
+            }
+
+            if (checkboxes[7]) {
                 helper.interval.add('debug_pull', function debug_data_pull() {
 
                     /*
@@ -457,11 +509,7 @@ TABS.sensors.initialize = function (callback) {
                         return;
                     }
 
-                    if (semver.gte(CONFIG.flightControllerVersion, '2.1.0')) {
-                        MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
-                    } else {
-                        MSP.send_message(MSPCodes.MSP_DEBUG, false, false, update_debug_graphs);
-                    }
+                    MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
                 }, rates.debug, true);
             }
 
@@ -499,13 +547,7 @@ TABS.sensors.initialize = function (callback) {
 
             function update_altitude_graph() {
                 updateGraphHelperSize(altitudeHelpers);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "1.6.0")) {
-                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
-                }
-                else {
-                    samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude]);
-                }
+                samples_altitude_i = addSampleToData(altitude_data, samples_altitude_i, [SENSOR_DATA.altitude, SENSOR_DATA.barometer]);
                 drawGraph(altitudeHelpers, altitude_data, samples_altitude_i);
                 raw_data_text_ements.x[3].text(SENSOR_DATA.altitude.toFixed(2));
                 raw_data_text_ements.y[3].text(SENSOR_DATA.barometer.toFixed(2));
@@ -527,13 +569,24 @@ TABS.sensors.initialize = function (callback) {
                 raw_data_text_ements.x[5].text(SENSOR_DATA.air_speed);
             }
 
+            function update_temperature_graphs() {
+                for (var i = 0; i < 8; i++) {
+                    updateGraphHelperSize(temperatureHelpers[i]);
+
+                    addSampleToData(temperature_data[i], samples_temperature_i, [SENSOR_DATA.temperature[i]]);
+                    drawGraph(temperatureHelpers[i], temperature_data[i], samples_temperature_i);
+                    raw_data_text_ements.x[6 + i].text(SENSOR_DATA.temperature[i]);
+                }
+                samples_temperature_i++;
+            }
+
             function update_debug_graphs() {
                 for (var i = 0; i < 8; i++) {
                     updateGraphHelperSize(debugHelpers[i]);
 
                     addSampleToData(debug_data[i], samples_debug_i, [SENSOR_DATA.debug[i]]);
                     drawGraph(debugHelpers[i], debug_data[i], samples_debug_i);
-                    raw_data_text_ements.x[6 + i].text(SENSOR_DATA.debug[i]);
+                    raw_data_text_ements.x[6 + 8 + i].text(SENSOR_DATA.debug[i]);
                 }
                 samples_debug_i++;
             }

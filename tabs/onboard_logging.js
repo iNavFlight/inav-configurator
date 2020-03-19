@@ -1,4 +1,4 @@
-/*global MSP,MSPCodes*/
+/*global MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper*/
 'use strict';
 
 var
@@ -8,8 +8,7 @@ TABS.onboard_logging = {
 };
 
 TABS.onboard_logging.initialize = function (callback) {
-    var
-        self = this,
+    let
         saveCancelled, eraseCancelled;
 
     if (GUI.active_tab != 'onboard_logging') {
@@ -21,7 +20,11 @@ TABS.onboard_logging.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
                 MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-                    MSP.send_message(MSPCodes.MSP_BLACKBOX_CONFIG, false, false, load_html);
+		    var messageId = MSPCodes.MSP_BLACKBOX_CONFIG;
+                    if (semver.gte(CONFIG.apiVersion, "2.3.0")) {
+			messageId = MSPCodes.MSP2_BLACKBOX_CONFIG;
+		    }
+		    MSP.send_message(messageId, false, false, load_html);
                 });
             });
         });
@@ -52,26 +55,16 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/onboard_logging.html", function() {
+        GUI.load("./tabs/onboard_logging.html", function() {
             // translate to user-selected language
             localize();
 
             var
                 dataflashPresent = DATAFLASH.totalSize > 0,
-                blackboxSupport;
+                blackboxSupport = false;
 
-            /*
-             * Pre-1.11.0 firmware supported DATAFLASH API (on targets with SPI flash) but not the BLACKBOX config API.
-             *
-             * The best we can do on those targets is check the BLACKBOX feature bit to identify support for Blackbox instead.
-             */
-            if (BLACKBOX.supported || DATAFLASH.supported
-                    || semver.gte(CONFIG.flightControllerVersion, "1.5.0") && semver.lte(CONFIG.flightControllerVersion, "1.10.0") && bit_check(BF_CONFIG.features, 19)) {
-                blackboxSupport = 'yes';
-            } else if (semver.gte(CONFIG.flightControllerVersion, "1.5.0") && semver.lte(CONFIG.flightControllerVersion, "1.10.0")) {
-                blackboxSupport = 'maybe';
-            } else {
-                blackboxSupport = 'no';
+            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(BF_CONFIG.features, 19)) {
+                blackboxSupport = true;
             }
 
             $(".tab-onboard_logging")
@@ -80,10 +73,8 @@ TABS.onboard_logging.initialize = function (callback) {
                 .toggleClass("dataflash-present", dataflashPresent)
                 .toggleClass("sdcard-supported", SDCARD.supported)
                 .toggleClass("blackbox-config-supported", BLACKBOX.supported)
-
-                .toggleClass("blackbox-supported", blackboxSupport == 'yes')
-                .toggleClass("blackbox-maybe-supported", blackboxSupport == 'maybe')
-                .toggleClass("blackbox-unsupported", blackboxSupport == 'no');
+                .toggleClass("blackbox-supported", blackboxSupport)
+                .toggleClass("blackbox-unsupported", !blackboxSupport);
 
             if (dataflashPresent) {
                 // UI hooks
@@ -97,6 +88,12 @@ TABS.onboard_logging.initialize = function (callback) {
                 $('.tab-onboard_logging a.save-flash-dismiss').click(dismiss_saving_dialog);
             }
 
+            $('.save-blackbox-feature').click(function () {
+                helper.features.reset();
+                helper.features.fromUI($('.require-blackbox-unsupported'));
+                helper.features.execute(save_to_eeprom);
+            });
+
             if (BLACKBOX.supported) {
                 $(".tab-onboard_logging a.save-settings").click(function() {
                     var rate = $(".blackboxRate select").val().split('/');
@@ -105,7 +102,11 @@ TABS.onboard_logging.initialize = function (callback) {
                     BLACKBOX.blackboxRateDenom = parseInt(rate[1], 10);
                     BLACKBOX.blackboxDevice = parseInt($(".blackboxDevice select").val(), 10);
 
-                    mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                    helper.features.reset();
+                    helper.features.fromUI($('.require-blackbox-supported'));
+                    helper.features.execute(function () {   
+                        mspHelper.sendBlackboxConfiguration(save_to_eeprom);
+                    });
                 });
             }
 

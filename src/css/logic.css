@@ -1,0 +1,63 @@
+.logic__background {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: black;
+    opacity: 0.75;
+    z-index: 2001;
+}
+
+.logic__content {
+    position: fixed;
+    top: 2em;
+    bottom: 2em;
+    left: 4em;
+    right: 4em;
+    background-color: #efefef;
+    border-radius: 2px;
+    z-index: 2002;
+    padding: 2em;
+}
+
+.logic__content--wrapper {
+    overflow-y: auto;
+    margin-bottom: 30px;
+    position: absolute;
+    left: 2em;
+    right: 2em;
+    top: 65px;
+    bottom: 35px;
+}
+
+input.logic_element__operand--value {
+    float: none;
+    width: 9em;
+}
+
+.logic__content--buttons {
+    left: 0;
+    right: 0;
+}
+
+.logic_cell__operandA,
+.logic_cell__operandB {
+    text-align: left;
+}
+
+.logic_cell__active_marker {
+    border: 1px solid #aaa;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.logic_cell__active_marker--active {
+    background-color:rgb(55, 168, 219);
+}
+
+.logic_cell__active_marker--inactive {
+    background-color:transparent;
+}

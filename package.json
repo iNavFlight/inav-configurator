@@ -1,11 +1,13 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "2.1.0",
+  "version": "2.5.0",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
-    "start": "node_modules/gulp/bin/gulp.js build && node_modules/nw/bin/nw ."
+    "start": "node node_modules/gulp/bin/gulp.js build && node node_modules/nw/bin/nw .",
+    "gulp": "gulp",
+    "nw": "nw"
   },
   "window": {
     "title": "INAV Configurator",
@@ -24,18 +26,24 @@
     "archiver": "^2.0.3",
     "bluebird": "3.4.1",
     "del": "^3.0.0",
-    "graceful-fs": "^4.1.11",
-    "gulp": "^4.0.0",
+    "fs": "0.0.1-security",
+    "graceful-fs": "^4.2.0",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "inflection": "1.12.0",
     "jquery": "2.1.4",
     "jquery-ui-npm": "1.12.0",
     "marked": "^0.3.17",
     "minimist": "^1.2.0",
-    "nw": "^0.31.4-sdk",
-    "nw-builder": "^3.5.4",
+    "nw": "^0.42.2-sdk",
+    "nw-dialog": "^1.0.7",
     "openlayers": "^4.6.5",
     "temp": "^0.8.3",
-    "three": "0.72.0"
+    "three": "0.72.0",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "nw-builder": "^3.5.7",
+    "semver": "6.3.0"
   }
 }

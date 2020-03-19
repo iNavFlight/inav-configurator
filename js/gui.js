@@ -4,7 +4,6 @@
 var TABS = {}; // filled by individual tab js file
 
 var GUI_control = function () {
-    this.auto_connect = false;
     this.connecting_to = false;
     this.connected_to = false;
     this.connect_lock = false;
@@ -14,6 +13,7 @@ var GUI_control = function () {
     this.defaultAllowedTabsWhenDisconnected = [
         'landing',
         'firmware_flasher',
+        'mission_control',
         'help'
     ];
     this.defaultAllowedTabsWhenConnected = [
@@ -28,12 +28,11 @@ var GUI_control = function () {
         'logging',
         'onboard_logging',
         'modes',
-        'motors',
+        'outputs',
         'pid_tuning',
         'ports',
         'receiver',
         'sensors',
-        'servos',
         'calibration',
         'setup',
         'osd',
@@ -129,7 +128,7 @@ GUI_control.prototype.switchery = function() {
 
 
 GUI_control.prototype.content_ready = function (callback) {
-
+    const content = $('#content').removeClass('loading');
     $('.togglesmall').each(function(index, elem) {
         var switchery = new Switchery(elem, {
           size: 'small',
@@ -191,7 +190,13 @@ GUI_control.prototype.content_ready = function (callback) {
         });
     });
 
-    if (callback) callback();
+    const duration = content.data('empty') ? 0 : 400;
+    $('#content .data-loading').fadeOut(duration, function() {
+        $(this).remove();
+    });
+    if (callback) {
+        callback();
+    }
 };
 
 GUI_control.prototype.updateStatusBar = function() {
@@ -243,6 +248,16 @@ GUI_control.prototype.simpleBind = function () {
         $this.attr('data-simple-binded', true);
     });
 };
+
+GUI_control.prototype.load = function(rel, callback) {
+    const content = $('#content').addClass('loading');
+    $.get(rel, function(data) {
+        $(data).appendTo(content);
+        if (callback) {
+            callback();
+        }
+    });
+}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();

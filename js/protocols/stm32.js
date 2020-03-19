@@ -100,25 +100,45 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                 serial.send(bufferOut, function () {
                     serial.disconnect(function (result) {
                         if (result) {
-                            // delay to allow board to boot in bootloader mode
-                            // required to detect if a DFU device appears
-                            setTimeout(function() {
-                                // refresh device list
-                                PortHandler.check_usb_devices(function(dfu_available) {
-                                    if(dfu_available) {
-                                        STM32DFU.connect(usbDevices.STM32DFU, hex, options);
-                                    } else {
-                                        serial.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
-                                            if (openInfo) {
-                                                self.initialize();
-                                            } else {
-                                                GUI.connect_lock = false;
-                                                GUI.log('<span style="color: red">Failed</span> to open serial port');
-                                            }
-                                        });
+                            var intervalMs = 200;
+                            var retries = 0;
+                            var maxRetries = 50; // timeout after intervalMs * 50
+                            var interval = setInterval(function() {
+                                var tryFailed = function() {
+                                    retries++;
+                                    if (retries > maxRetries) {
+                                        clearInterval(interval);
+                                        GUI.log('<span style="color: red">Failed</span> to flash ' + port);
                                     }
+                                }
+                                // Check for DFU devices
+                                PortHandler.check_usb_devices(function(dfu_available) {
+                                    if (dfu_available) {
+                                        clearInterval(interval);
+                                        STM32DFU.connect(usbDevices.STM32DFU, hex, options);
+                                        return;
+                                    }
+                                    // Check for the serial port
+                                    serial.getDevices(function(devices) {
+                                        if (devices && devices.includes(port)) {
+                                            // Serial port might briefly reappear on DFU devices while
+                                            // the FC is rebooting, so we don't clear the interval
+                                            // until we succesfully connect.
+                                            serial.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
+                                                if (openInfo) {
+                                                    clearInterval(interval);
+                                                    self.initialize();
+                                                } else {
+                                                    GUI.connect_lock = false;
+                                                    tryFailed();
+                                                }
+                                            });
+                                            return;
+                                        }
+                                        tryFailed();
+                                    });
                                 });
-                            }, 1000);
+                            }, intervalMs);
                         } else {
                             GUI.connect_lock = false;
                         }

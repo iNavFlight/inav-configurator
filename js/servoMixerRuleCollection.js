@@ -1,11 +1,11 @@
 /*global ServoMixRule*/
 'use strict';
 
-var ServoMixerRuleCollection = function () {
+let ServoMixerRuleCollection = function () {
 
     let self = {},
         data = [],
-        maxServoCount = 8;
+        maxServoCount = 16;
 
     self.setServoCount = function (value) {
         maxServoCount = value;
@@ -70,6 +70,31 @@ var ServoMixerRuleCollection = function () {
             }
         }
         return false;
+    };
+
+    self.getNumberOfConfiguredServos = function () {
+        let count = 0;
+        for (let i = 0; i < self.getServoCount(); i ++) {
+            if (self.isServoConfigured(i)) {
+                count++;
+            }
+        }
+        return count;
+    };
+
+    self.getUsedServoIndexes = function () {
+        let out = [];
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                let rule = data[ruleIndex];
+                out.push(rule.getTarget());
+            }
+        }
+
+        return jQuery.unique(out).sort(function(a, b){
+            return a-b;
+        });
     }
 
     return self;

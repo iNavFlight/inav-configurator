@@ -8,6 +8,7 @@ var minimist = require('minimist');
 var archiver = require('archiver');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var semver = require('semver');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
@@ -49,7 +50,9 @@ sources.css = [
     './src/css/dropdown-lists/css/style_lists.css',
     './js/libraries/switchery/switchery.css',
     './js/libraries/jbox/jBox.css',
-    './node_modules/openlayers/dist/ol.css'
+    './node_modules/openlayers/dist/ol.css',
+    './src/css/logic.css',
+    './src/css/defaults_dialog.css'
 ];
 
 sources.js = [
@@ -60,6 +63,8 @@ sources.js = [
     './js/libraries/d3.min.js',
     './js/libraries/jquery.nouislider.all.min.js',
     './node_modules/three/three.min.js',
+    './js/libraries/nw-dialog.js',
+    './js/libraries/bundle_xml2js.js',
     './js/libraries/Projector.js',
     './js/libraries/CanvasRenderer.js',
     './js/libraries/jquery.flightindicators.js',
@@ -84,6 +89,7 @@ sources.js = [
     './js/serial.js',
     './js/servoMixRule.js',
     './js/motorMixRule.js',
+    './js/logicCondition.js',
     './js/settings.js',
     './js/outputMapping.js',
     './js/model.js',
@@ -95,11 +101,14 @@ sources.js = [
     './js/protocols/stm32usbdfu.js',
     './js/localization.js',
     './js/boards.js',
-    './js/tasks.js',
     './js/servoMixerRuleCollection.js',
     './js/motorMixerRuleCollection.js',
+    './js/logicConditionsCollection.js',
+    './js/logicConditionsStatus.js',
     './js/vtx.js',
     './main.js',
+    './js/tabs.js',
+    './js/preset_definitions.js',
     './tabs/*.js',
     './js/eventFrequencyAnalyzer.js',
     './js/periodicStatusUpdater.js',
@@ -108,6 +117,8 @@ sources.js = [
     './tabs/advanced_tuning.js',
     './js/peripherals.js',
     './js/appUpdater.js',
+    './js/feature_framework.js',
+    './js/defaults_dialog.js',
     './node_modules/openlayers/dist/ol.js'
 ];
 
@@ -152,7 +163,7 @@ function get_task_name(key) {
 }
 
 function getPlatforms() {
-    var defaultPlatforms = ['win32', 'osx64', 'linux32', 'linux64'];
+    var defaultPlatforms = ['win32', 'win64', 'osx64', 'linux32', 'linux64'];
     var argv = minimist(process.argv.slice(2));
     if (argv.platform) {
         if (defaultPlatforms.indexOf(argv.platform) < 0) {
@@ -228,6 +239,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
+        version: get_nw_version()
     });
     builder.on('log', console.log);
     builder.build(function (err) {
@@ -241,6 +253,10 @@ gulp.task('apps', gulp.series('dist', function(done) {
     });
 }));
 
+function get_nw_version() {
+    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
+}
+
 function get_release_filename(platform, ext) {
     var pkg = require('./package.json');
     return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
@@ -250,6 +266,20 @@ gulp.task('release-win32', function() {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'win32');
     var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
+    var archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
+    archive.on('warning', function(err) { throw err; });
+    archive.on('error', function(err) { throw err; });
+    archive.pipe(output);
+    archive.directory(src, 'INAV Configurator');
+    return archive.finalize();
+});
+
+gulp.task('release-win64', function() {
+    var pkg = require('./package.json');
+    var src = path.join(appsDir, pkg.name, 'win64');
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip')));
     var archive = archiver('zip', {
         zlib: { level: 9 }
     });
@@ -284,9 +314,10 @@ function releaseLinux(bits) {
         var dirname = 'linux' + bits;
         var pkg = require('./package.json');
         var src = path.join(appsDir, pkg.name, dirname);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'zip')));
-        var archive = archiver('zip', {
-            zlib: { level: 9 }
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'tar.gz')));
+        var archive = archiver('tar', {
+            zlib: { level: 9 },
+            gzip: true
         });
         archive.on('warning', function(err) { throw err; });
         archive.on('error', function(err) { throw err; });

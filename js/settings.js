@@ -50,6 +50,20 @@ var Settings = (function () {
                     }
                 } else if (s.setting.type == 'string') {
                     input.val(s.value);
+                } else if (s.setting.type == 'float') {
+                    input.attr('type', 'number');
+
+                    let dataStep = input.data("step");
+
+                    if (dataStep !== undefined) {
+                        input.attr('step', dataStep);
+                    } else {
+                        input.attr('step', "0.01");
+                    }
+                    
+                    input.attr('min', s.setting.min);
+                    input.attr('max', s.setting.max);
+                    input.val(s.value.toFixed(2));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
                     input.attr('type', 'number');
@@ -72,6 +86,11 @@ var Settings = (function () {
         var settingName = input.data('setting');
         var setting = input.data('setting-info');
         var value;
+
+        if (typeof setting == 'undefined') {
+            return null;
+        }
+
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;

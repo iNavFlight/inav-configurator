@@ -24,18 +24,17 @@ TABS.receiver.initialize = function (callback) {
         mspHelper.loadRcDeadband
     ];
 
-    if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-        loadChain.push(mspHelper.loadRateProfileData);
-    } else {
-        loadChain.push(mspHelper.loadRcTuningData);
-    }
-
+    loadChain.push(mspHelper.loadRateProfileData);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
 
     function load_html() {
-        $('#content').load("./tabs/receiver.html", process_html);
+        GUI.load("./tabs/receiver.html", Settings.processHtml(process_html));
+    }
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
     }
 
     function drawRollPitchExpo() {
@@ -77,13 +76,20 @@ TABS.receiver.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        if (semver.lt(CONFIG.flightControllerVersion, '1.9.1')) {
-            rcmap_options = $('select[name="rcmap_helper"] option');
-            for (i = 0; i < rcmap_options.length; ++i) {
-                option = rcmap_options[i];
-                option.setAttribute("value", option.getAttribute("value") + "5678");
+        let $receiverMode = $('#receiver_type'),
+            $serialWrapper = $('#serialrx_provider-wrapper');
+
+        $receiverMode.change(function () {
+            if ($(this).find("option:selected").text() == "SERIAL") {
+                $serialWrapper.show();
+                $receiverMode.parent().removeClass("no-bottom-border");
+            } else {
+                $serialWrapper.hide();
+                $receiverMode.parent().addClass("no-bottom-border");
             }
-        }
+        });
+
+        $receiverMode.trigger("change");
 
         // fill in data from RC_tuning
         $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
@@ -264,22 +270,6 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('a.refresh').click(function () {
-            MSP.send_message(MSPCodes.MSP_RC_TUNING, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('receiverDataRefreshed'));
-
-                // fill in data from RC_tuning
-                $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
-                $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
-
-                $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
-
-                // update visual representation
-                $('.tunings .throttle input').change();
-                $('.tunings .rate input').change();
-            });
-        });
-
         $('a.update').click(function () {
             // catch RC_tuning changes
             RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
@@ -319,20 +309,27 @@ TABS.receiver.initialize = function (callback) {
             }
 
             function save_rc_configs() {
-                MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, save_to_eeprom);
+                MSP.send_message(MSPCodes.MSP_SET_RC_DEADBAND, mspHelper.crunch(MSPCodes.MSP_SET_RC_DEADBAND), false, storeSettings);
+            }
+
+            function storeSettings() {
+                saveSettings(save_to_eeprom);
             }
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(chrome.i18n.getMessage('receiverEepromSaved'));
+
+                    GUI.tab_switch_cleanup(function () {
+                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.handleReconnect($('.tab_receiver a'));
+                        });
+                    });
                 });
             }
 
-            if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
-            } else {
-                MSP.send_message(MSPCodes.MSP_SET_RC_TUNING, mspHelper.crunch(MSPCodes.MSP_SET_RC_TUNING), false, save_rc_map);
-            }
+            MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
         });
 
         $("a.sticks").click(function () {
@@ -362,7 +359,11 @@ TABS.receiver.initialize = function (callback) {
         });
 
         // Only show the MSP control sticks if the MSP Rx feature is enabled
-        $(".sticks_btn").toggle(FC.isRxTypeEnabled('RX_MSP'));
+        mspHelper.getSetting("receiver_type").then(function (s) {
+            if (s && s.setting.table && s.setting.table.values) {
+                $(".sticks_btn").toggle(s.setting.table.values[s.value] == 'MSP');
+            }
+        });
 
         function get_rc_data() {
 

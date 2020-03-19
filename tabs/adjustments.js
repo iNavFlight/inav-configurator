@@ -21,7 +21,7 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function load_html() {
-        $('#content').load("./tabs/adjustments.html", process_html);
+        GUI.load("./tabs/adjustments.html", process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
@@ -64,11 +64,7 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 21;
-
-        if (semver.gte(CONFIG.flightControllerVersion, '1.8.1')) {
-           availableFunctionCount = 32;
-        }
+        var availableFunctionCount = 50;
 
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
         functionList.empty().append(functionListOptions);

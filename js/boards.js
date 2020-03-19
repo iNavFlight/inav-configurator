@@ -2,10 +2,6 @@
 
 var BOARD_DEFINITIONS = [
     {
-        name: "CC3D",
-        identifier: "CC3D",
-        vcp: true
-    }, {
         name: "ChebuzzF3",
         identifier: "CHF3",
         vcp: false
@@ -33,64 +29,29 @@ var BOARD_DEFINITIONS = [
         identifier: "103R",
         vcp: false
     }, {
-        name: "Sparky",
-        identifier: "SPKY",
-        vcp: true
-    }, {
-        name: "STM32F3Discovery",
-        identifier: "SDF3",
-        vcp: true
-    }, {
-        name: "Colibri Race",
-        identifier: "CLBR",
-        vcp: true
-    }, {
         name: "SP Racing F3",
         identifier: "SRF3",
         vcp: false
-    }, {
-        name: "SP Racing F3 Mini",
-        identifier: "SRFM",
-        vcp: true
-    }, {
-        name: "MotoLab",
-        identifier: "MOTO",
-        vcp: true
-    }, {
-        name: "Omnibus",
-        identifier: "OMNI",
-        vcp: true
-    }, {
-        name: "Airbot F4",
-        identifier: "ABF4",
-        vcp: true
-    }, {
-        name: "Revolution",
-        identifier: "REVO",
-        vcp: true
-    }, {
-        name: "Omnibus F4",
-        identifier: "OBF4",
-        vcp: true
-    }, {
-        name: "Omnibus F4 Pro",
-        identifier: "OBSD",
-        vcp: true
     }
 ];
 
 var DEFAULT_BOARD_DEFINITION = {
     name: "Unknown",
     identifier: "????",
-    vcp: false
+    vcp: true
 };
 
 var BOARD = {
 };
 
-BOARD.find_board_definition = function (identifier) {
-    for (var i = 0; i < BOARD_DEFINITIONS.length; i++) {
-        var candidate = BOARD_DEFINITIONS[i];
+BOARD.hasVcp = function (identifier) {
+    let board = BOARD.findDefinition(identifier);
+    return !!board.vcp;
+}
+
+BOARD.findDefinition = function (identifier) {
+    for (let i = 0; i < BOARD_DEFINITIONS.length; i++) {
+        let candidate = BOARD_DEFINITIONS[i];
         
         if (candidate.identifier == identifier) {
             return candidate;

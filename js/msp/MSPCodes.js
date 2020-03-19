@@ -194,5 +194,23 @@ var MSPCodes = {
 
     MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018,
 
-    MSP2_INAV_DEBUG:                    0x2019
+    MSP2_INAV_DEBUG:                    0x2019,
+
+    MSP2_BLACKBOX_CONFIG:               0x201A,
+    MSP2_SET_BLACKBOX_CONFIG:           0x201B,
+
+    MSP2_INAV_TEMP_SENSOR_CONFIG:       0x201C,
+    MSP2_INAV_SET_TEMP_SENSOR_CONFIG:   0x201D,
+    MSP2_INAV_TEMPERATURES:             0x201E,
+
+    MSP2_INAV_SERVO_MIXER:              0x2020,
+    MSP2_INAV_SET_SERVO_MIXER:          0x2021,
+    MSP2_INAV_LOGIC_CONDITIONS:         0x2022,
+    MSP2_INAV_SET_LOGIC_CONDITIONS:     0x2023,
+    MSP2_INAV_LOGIC_CONDITIONS_STATUS:  0x2026,
+
+    MSP2_PID:                           0x2030,
+    MSP2_SET_PID:                       0x2031,
+
+    MSP2_INAV_OPFLOW_CALIBRATION:       0x2032
 };

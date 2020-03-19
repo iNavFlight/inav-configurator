@@ -91,20 +91,10 @@ $(document).ready(function () {
             }
         });
 
-        win.setMinimumSize(1024, 800);
+        win.setMinimumSize(800, 600);
 
         win.on('close', function () {
             //Save window size and position
-            // var height = win.height;
-            // var width = win.width;
-            //
-            // if (height < 400) {
-            //     height = 400
-            // }
-            // if (width < 512) {
-            //     width = 512
-            // }
-
             chrome.storage.local.set({'windowSize': {height: win.height, width: win.width, x: win.x, y: win.y}}, function () {
                 // Notify that we saved.
                 console.log('Settings saved');
@@ -123,7 +113,6 @@ $(document).ready(function () {
          }
     });
 
-    //set '1.8.0' for test
     appUpdater.checkRelease(chrome.runtime.getManifest().version);
 
     // log library versions in console to make version tracking easier
@@ -132,6 +121,11 @@ $(document).ready(function () {
     // Tabs
     var ui_tabs = $('#tabs > ul');
     $('a', ui_tabs).click(function () {
+
+        if ($(this).parent().hasClass("tab_help")) {            
+            return;
+        }
+
         if ($(this).parent().hasClass('active') == false && !GUI.tab_switch_in_progress) { // only initialize when the tab isn't already active
             var self = this,
                 tabClass = $(self).parent().prop('class');
@@ -140,12 +134,6 @@ $(document).ready(function () {
 
             var tab = tabClass.substring(4);
             var tabName = $(self).text();
-
-            if (CONFIGURATOR.connectionValid && semver.lt(CONFIG.flightControllerVersion, "2.0.0")) {
-                $('#battery_profile_change').hide();
-                $('#profile_change').css('width', '125px');
-                $('#dataflash_wrapper_global').css('width', '125px');
-            }
 
             if (tabRequiresConnection && !CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('tabSwitchConnectionRequired'));
@@ -173,6 +161,7 @@ $(document).ready(function () {
 
                 // detach listeners and remove element data
                 var content = $('#content');
+                content.data('empty', !!content.is(':empty'));
                 content.empty();
 
                 // display loading screen
@@ -189,10 +178,6 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
-                    case 'help':
-                        TABS.help.initialize(content_ready);
-                        break;
-
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
@@ -244,8 +229,8 @@ $(document).ready(function () {
                     case 'mixer':
                         TABS.mixer.initialize(content_ready);
                         break;
-                    case 'motors':
-                        TABS.motors.initialize(content_ready);
+                    case 'outputs':
+                        TABS.outputs.initialize(content_ready);
                         break;
                     case 'osd':
                         TABS.osd.initialize(content_ready);

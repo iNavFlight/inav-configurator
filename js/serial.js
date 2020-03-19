@@ -300,9 +300,9 @@ var serial = {
      */
     getTimeout: function () {
         if (serial.bitrate >= 57600) {
-            return 1500;
+            return 3000;
         } else {
-            return 2500;
+            return 4000;
         }
     }
 

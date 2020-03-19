@@ -35,7 +35,7 @@
 
 .config-section .number input,
 .tab-configuration .number input {
-    width: 65px;
+    width: 106px;
 }
 
 .config-section .string input,
@@ -75,6 +75,7 @@
 
 .config-section .number,
 .config-section .select,
+.config-section .checkbox,
 .tab-configuration .number,
 .tab-configuration .select,
 .tab-configuration .radio,
@@ -90,6 +91,7 @@ hr {
 
 .config-section .number:last-child,
 .config-section .select:last-child,
+.config-section .checkbox:last-child,
 .tab-configuration .number:last-child,
 .tab-configuration .select:last-child,
 .tab-configuration .radio:last-child,
@@ -154,11 +156,14 @@ hr {
 }
 
 .tab-configuration .alignicon {
+    display: inline-block;
+    position: relative;
     width: 20px;
     height: 20px;
-    float: left;
-    margin-left: -5px;
-    margin-right: 3px;
+    margin-top: 0px;
+    margin-left: 6px;
+    margin-right: 2px;
+    top: 6px;
 }
 
 .tab-configuration .pitch {
@@ -177,24 +182,7 @@ hr {
 }
 
 .tab-configuration .board select {
-    width: 45%;
-    height: 20px;
-    margin: 0 0 2px 0;
-}
-
-.tab-configuration .sensoralignment {
-    width: 50%;
-    float: left;
-}
-
-.tab-configuration .board_align_content {
-    width: 50%;
-    float: left;
-}
-
-.tab-configuration .sensoralignment span {
-    width: 55%;
-    float: left;
+    width: 110px;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
@@ -233,7 +221,7 @@ hr {
 
 .config-section label {
     position: absolute;
-    left: 80px;
+    left: 118px;
 }
 
 .config-section .radio label {
@@ -255,7 +243,7 @@ hr {
 }
 
 .config-section select {
-    width: 70px;
+    width: 110px;
 }
 
 .config-section .helpicon {

@@ -3,13 +3,10 @@
 TABS.ports = {};
 
 TABS.ports.initialize = function (callback) {
-    var board_definition = {};
-
 
     var functionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
          {name: 'GPS',                  groups: ['sensors'], maxPorts: 1},
-         {name: 'RANGEFINDER',          groups: ['sensors'], maxPorts: 1},
          {name: 'TELEMETRY_FRSKY',      groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1},
          {name: 'TELEMETRY_HOTT',       groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1},
          {name: 'TELEMETRY_SMARTPORT',  groups: ['telemetry'], maxPorts: 1},
@@ -37,28 +34,74 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1
     });
 
-    // support configure RunCam Device
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.3")) {
+    functionRules.push({
+        name: 'RANGEFINDER',
+        groups: ['sensors'],
+        maxPorts: 1 }
+    );
+
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
         functionRules.push({
-            name: 'RUNCAM_DEVICE_CONTROL',
+            name: 'GSM_SMS',
+            groups: ['telemetry'],
+            maxPorts: 1 }
+        );
+    }
+
+    // support configure RunCam Device
+    functionRules.push({
+        name: 'RUNCAM_DEVICE_CONTROL',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+
+    functionRules.push({
+        name: 'TBS_SMARTAUDIO',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+    functionRules.push({
+        name: 'IRC_TRAMP',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+    functionRules.push({
+        name: 'VTX_FFPV',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    ); 
+
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
+        functionRules.push({
+            name: 'OPFLOW',
+            groups: ['sensors'],
+            maxPorts: 1 }
+        );
+
+        functionRules.push({
+            name: 'ESC',
             groups: ['peripherals'],
             maxPorts: 1 }
         );
     }
 
-    if (semver.gte(CONFIG.flightControllerVersion, "1.7.4")) {
+    if (semver.gte(CONFIG.flightControllerVersion, "2.2.2")) {
         functionRules.push({
-            name: 'TBS_SMARTAUDIO',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-        functionRules.push({
-            name: 'IRC_TRAMP',
+            name: 'FRSKY_OSD',
             groups: ['peripherals'],
             maxPorts: 1 }
         );
     }
- 
+
+    if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
+        functionRules.push({
+            name: 'DJI_FPV',
+            groups: ['peripherals'],
+            maxPorts: 1 }
+        );
+    }
+
+
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
@@ -122,9 +165,7 @@ TABS.ports.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
 
         function on_configuration_loaded_handler() {
-            $('#content').load("./tabs/ports.html", on_tab_loaded_handler);
-
-            board_definition = BOARD.find_board_definition(CONFIG.boardIdentifier);
+            GUI.load("./tabs/ports.html", on_tab_loaded_handler);
         }
     }
 
@@ -295,7 +336,7 @@ TABS.ports.initialize = function (callback) {
         });
 
         MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
-
+        
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
         }

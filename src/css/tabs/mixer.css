@@ -85,3 +85,7 @@
 .mixer_btn_add {
     margin: 15px 0 10px;
 }
+
+.mixer-fixed-value-col {
+    display: none;
+}
