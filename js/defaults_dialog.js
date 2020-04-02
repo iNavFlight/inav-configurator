@@ -13,6 +13,9 @@ helper.defaultsDialog = (function() {
     let data = [{
             "title": 'Mini Quad with 3"-7" propellers',
             "settings": [
+                /*
+                System
+                */
                 {
                     key: "gyro_hardware_lpf",
                     value: "256HZ"
@@ -21,9 +24,12 @@ helper.defaultsDialog = (function() {
                     key: "looptime",
                     value: 500
                 },
+                /*
+                Filtering
+                */
                 {
                     key: "gyro_lpf_hz",
-                    value: 100
+                    value: 110
                 },
                 {
                     key: "gyro_lpf_type",
@@ -31,15 +37,50 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "gyro_stage2_lowpass_hz",
-                    value: 200
+                    value: 0
                 },
                 {
                     key: "dterm_lpf_hz",
-                    value: 90
+                    value: 110
+                },
+                {
+                    key: "dterm_lpf_type",
+                    value: "PT1"
+                },
+                {
+                    key: "dterm_lpf2_hz",
+                    value: 170
+                },
+                {
+                    key: "dterm_lpf2_type",
+                    value: "PT1"
                 },
                 {
                     key: "use_dterm_fir_filter",
                     value: "OFF"
+                },
+                {
+                    key: "dynamic_gyro_notch_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "dynamic_gyro_notch_q",
+                    value: 250
+                },
+                {
+                    key: "dynamic_gyro_notch_min_hz",
+                    value: 120
+                },
+                /*
+                Mechanics
+                */
+                {
+                    key: "mc_airmode_type",
+                    value: "THROTTLE_THRESHOLD"
+                },
+                {
+                    key: "dterm_setpoint_weight",
+                    value: 0.75
                 },
                 {
                     key: "mc_iterm_relax_type",
@@ -61,6 +102,9 @@ helper.defaultsDialog = (function() {
                     key: "antigravity_accelerator",
                     value: 5
                 },
+                /*
+                Rates
+                */
                 {
                     key: "rc_yaw_expo",
                     value: 70
@@ -81,17 +125,20 @@ helper.defaultsDialog = (function() {
                     key: "yaw_rate",
                     value: 60
                 },
+                /*
+                PIDs
+                */
                 {
                     key: "mc_p_pitch",
                     value: 44
                 },
                 {
                     key: "mc_i_pitch",
-                    value: 60
+                    value: 75
                 },
                 {
                     key: "mc_d_pitch",
-                    value: 25
+                    value: 28
                 },
                 {
                     key: "mc_p_roll",
@@ -99,33 +146,23 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "mc_i_roll",
-                    value: 50
+                    value: 60
                 },
                 {
                     key: "mc_d_roll",
-                    value: 25
+                    value: 28
                 },
                 {
                     key: "mc_p_yaw",
-                    value: 45
+                    value: 35
                 },
                 {
                     key: "mc_i_yaw",
-                    value: 70
-                },
-                {
-                    key: "mc_airmode_type",
-                    value: "THROTTLE_THRESHOLD"
+                    value: 80
                 },
                 {
                     key: "applied_defaults",
                     value: 2
-                }
-            ],
-            "features":[
-                {
-                    bit: 5, // Enable DYNAMIC_FILTERS
-                    state: true
                 }
             ]
         },
@@ -170,7 +207,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Custom UAV - INAV legacy defaults',
+            "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
             "settings": [
                 {
                     key: "applied_defaults",
@@ -179,7 +216,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Keep current settings',
+            "title": 'Keep current settings (Not recommended)',
             "settings": [
                 {
                     key: "applied_defaults",
