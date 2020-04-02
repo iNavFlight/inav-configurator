@@ -203,9 +203,9 @@ TABS.firmware_flasher.initialize = function (callback) {
                         var reader = new FileReader();
 
                         reader.onprogress = function (e) {
-                            if (e.total > 1048576) { // 1 MB
-                                // dont allow reading files bigger then 1 MB
-                                console.log('File limit (1 MB) exceeded, aborting');
+                            if (e.total > 104857600) { // 100 MB
+                                // dont allow reading files bigger then 100 MB
+                                console.log('File limit (100 MB) exceeded, aborting');
                                 reader.abort();
                             }
                         };
