@@ -3304,5 +3304,26 @@
     },
     "dynamic_gyro_notch_enabled_help": {
         "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."
+    },
+    "globalFunctions": {
+        "message": "Global functions"
+    },
+    "functionId": {
+        "message": "#"
+    },
+    "functionEnabled": {
+        "message": "Enabled"
+    },
+    "functionLogicId": {
+        "message": "Activation Logic Condition"
+    },
+    "functionAction": {
+        "message": "Action"
+    },
+    "functionOperand": {
+        "message": "Operand"
+    },
+    "functionFlags": {
+        "message": "Flags"
     }
 }
