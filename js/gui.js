@@ -39,7 +39,8 @@ var GUI_control = function () {
         'profiles',
         'advanced_tuning',
         'mission_control',
-        'mixer'
+        'mixer',
+        'programming'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 

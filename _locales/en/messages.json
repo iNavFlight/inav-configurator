@@ -2225,6 +2225,9 @@
     "accCalibrationProcessing": {
         "message": "Processing..."
     },
+    "tabProgramming": {
+        "message": "Programming"
+    },
     "tabAdvancedTuning": {
         "message": "Advanced tuning"
     },
