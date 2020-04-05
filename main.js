@@ -248,7 +248,6 @@ $(document).ready(function () {
                         TABS.advanced_tuning.initialize(content_ready);
                         break;
                     case 'programming':
-                        console.log(1);
                         TABS.programming.initialize(content_ready);
                         break;
                     case 'cli':

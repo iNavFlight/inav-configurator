@@ -38,13 +38,15 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        console.log(2);
         GUI.load("./tabs/programming.html", processHtml);
     }
 
     function processHtml() {
-        console.log(3);
 
+        LOGIC_CONDITIONS.init($('#logic-wrapper'));
+        LOGIC_CONDITIONS.render();
+
+        localize();
         GUI.content_ready(callback);
     }
 }
