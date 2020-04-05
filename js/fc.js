@@ -20,6 +20,7 @@ var CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
     LOGIC_CONDITIONS,
+    GLOBAL_FUNCTIONS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -169,6 +170,7 @@ var FC = {
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
         LOGIC_CONDITIONS = new LogicConditionsCollection();
+        GLOBAL_FUNCTIONS = new GlobalFunctionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
 
         MIXER_CONFIG = {
