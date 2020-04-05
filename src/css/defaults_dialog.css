@@ -15,7 +15,7 @@
     z-index: 2002;
     position: absolute;
     width: 500px;
-    height: 320px;
+    height: 400px;
     overflow-y: auto;
     top: 0;
     bottom: 0;
@@ -31,6 +31,7 @@
 
 .defaults-dialog__info {
     font-size: 1.3em;
+    margin-bottom: 1em;
 }
 
 .defaults_btn {

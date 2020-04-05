@@ -3281,6 +3281,9 @@
     "defaultsDialogInfo": {
         "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
     },
+    "defaultsDialogInfo2": {
+        "message": "Avoid blindly restoring all PID and filter configuration from the previous version of INAV. The best result can be obtained by retuning from defaults!"
+    },
     "throttleIdle": {
         "message": "Motors IDLE power [%]"
     },
