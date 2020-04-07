@@ -185,6 +185,11 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-left: 5px;
 }
 
+.disabled .switchery {
+    opacity: 0.5 !important;
+    pointer-events: none;
+}
+
 .portsinput__top-element--inline span {
     color: #ddd;
 }

@@ -199,6 +199,9 @@ var serial = {
             callback(devices);
         });
     },
+    allowsOtherDevices: function () {
+        return !chrome.serial._disallows_other_devices;
+    },
     getInfo: function (callback) {
         chrome.serial.getInfo(this.connectionId, callback);
     },

@@ -140,8 +140,12 @@
   text-shadow: 0 1px black;
   /* Fallback for IE 8 */
   background: #444;
-  
 }
+
+.dropdown-dark .dropdown-select.disabled {
+  opacity: 0.5;
+}
+
 .dropdown-dark .dropdown-select:focus {
   color: #fff;
 }
