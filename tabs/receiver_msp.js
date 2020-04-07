@@ -128,7 +128,7 @@ function localizeAxisNames() {
 }
 
 $(document).ready(function() {
-    $(".button-enable").click(function() {
+    $("a.button-enable").click(function() {
         var
             shrinkHeight = $(".warning").height();
         
