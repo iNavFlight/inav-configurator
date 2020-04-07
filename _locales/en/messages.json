@@ -55,7 +55,9 @@
     "configMigrationSuccessful": {
         "message": "Configuration migration complete, migrations applied: $1"
     },
-
+    "documentation": {
+        "message": "Documentation"
+    },
     "tabFirmwareFlasher": {
         "message": "Firmware Flasher"
     },
