@@ -46,6 +46,9 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
         LOGIC_CONDITIONS.render();
 
+        GLOBAL_FUNCTIONS.init($('#functions-wrapper'));
+        GLOBAL_FUNCTIONS.render();
+
         localize();
         GUI.content_ready(callback);
     }

@@ -1069,6 +1069,42 @@ var FC = {
             }
         }
     },
+    getFunctionActions: function () {
+        return {
+            0: {
+                name: "OVERRIDE ARMING SAFETY",
+                hasOperand: false
+            },
+            1: {
+                name: "OVERRIDE THROTTLE SCALE",
+                hasOperand: true
+            },
+            2: {
+                name: "SWAP ROLL & YAW",
+                hasOperand: false
+            },
+            3: {
+                name: "SET VTX POWER LEVEL",
+                hasOperand: true
+            },
+            4: {
+                name: "INVERT ROLL",
+                hasOperand: false
+            },
+            5: {
+                name: "INVERT PITCH",
+                hasOperand: false
+            },
+            6: {
+                name: "INVERT YAW",
+                hasOperand: false
+            },
+            7: {
+                name: "OVERRIDE THROTTLE",
+                hasOperand: true
+            }
+        }
+    },
     getOperandTypes: function () {
         return {
             0: {

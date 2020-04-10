@@ -100,7 +100,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
             self.setOperandBValue(operandMetadata.default);
         }
 
-        self.renderOperandValue($container, operandMetadata, operand, operandMetadata.default);
+        GUI.renderOperandValue($container, operandMetadata, operand, operandMetadata.default, self.onOperatorValueChange);
     };
 
     self.onOperatorValueChange = function (event) {
@@ -112,39 +112,6 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         } else {
             self.setOperandBValue($cT.val());
         }
-    };
-
-    self.renderOperandValue = function ($container, operandMetadata, operand, value) {
-
-        $container.find('.logic_element__operand--value').remove();
-
-        switch (operandMetadata.type) {
-            case "value":
-                $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
-                break;
-            case "range":
-            case "dictionary":
-                $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
-                let $t = $container.find('.logic_element__operand--value');
-                
-                if (operandMetadata.type == "range") {
-                    for (let i = operandMetadata.range[0]; i <= operandMetadata.range[1]; i++) {
-                        $t.append('<option value="' + i + '">' + i + '</option>');
-                    }
-                } else if (operandMetadata.type == "dictionary") {
-                    for (let k in operandMetadata.values) {
-                        if (operandMetadata.values.hasOwnProperty(k)) {
-                            $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
-                        }
-                    }
-                }
-
-                $t.val(value);
-                break;
-        }
-
-        $container.find('.logic_element__operand--value').change(self.onOperatorValueChange);
-
     };
 
     self.renderOperand = function (operand) {
@@ -175,7 +142,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
                         /* 
                          * Render value element depending on type
                          */
-                        self.renderOperandValue($container, op, operand, value);
+                        GUI.renderOperandValue($container, op, operand, value, self.onOperatorValueChange);
 
                     } else {
                         $t.append('<option value="' + k + '">' + op.name + '</option>');

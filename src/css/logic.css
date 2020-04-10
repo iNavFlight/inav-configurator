@@ -41,6 +41,8 @@ input.logic_element__operand--value {
     right: 0;
 }
 
+.function_cell__action,
+.function_cell__operand,
 .logic_cell__operandA,
 .logic_cell__operandB {
     text-align: left;

@@ -260,5 +260,37 @@ GUI_control.prototype.load = function(rel, callback) {
     });
 }
 
+GUI_control.prototype.renderOperandValue = function ($container, operandMetadata, operand, value, onChange) {
+
+    $container.find('.logic_element__operand--value').remove();
+
+    switch (operandMetadata.type) {
+        case "value":
+            $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
+            break;
+        case "range":
+        case "dictionary":
+            $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
+            let $t = $container.find('.logic_element__operand--value');
+            
+            if (operandMetadata.type == "range") {
+                for (let i = operandMetadata.range[0]; i <= operandMetadata.range[1]; i++) {
+                    $t.append('<option value="' + i + '">' + i + '</option>');
+                }
+            } else if (operandMetadata.type == "dictionary") {
+                for (let k in operandMetadata.values) {
+                    if (operandMetadata.values.hasOwnProperty(k)) {
+                        $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
+                    }
+                }
+            }
+
+            $t.val(value);
+            break;
+    }
+
+    $container.find('.logic_element__operand--value').change(onChange);
+};
+
 // initialize object into GUI variable
 var GUI = new GUI_control();
