@@ -49,6 +49,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         GLOBAL_FUNCTIONS.init($('#functions-wrapper'));
         GLOBAL_FUNCTIONS.render();
 
+        helper.tabs.init($('.tab-programming'));
+
         localize();
         GUI.content_ready(callback);
     }

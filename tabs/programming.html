@@ -1,9 +1,12 @@
 <div class="tab-configuration tab-programming toolbar_fixed_bottom">
     <div class="content_wrapper" id="programming-main-content">
-        <div class="tab_title" data-i18n="tabProgramming">Programming</div>
 
-        <div id="logic-wrapper">
-            <div class="tab_subtitle tab_subtitle--no-border" data-i18n="tabLogicConditions"></div>
+        <div class="tab_title subtab__header">
+            <span class="subtab__header_label subtab__header_label--current" for="logic-wrapper" data-i18n="tabLogicConditions"></span>
+            <span class="subtab__header_label" for="functions-wrapper" data-i18n="globalFunctions"></span>
+        </div>
+
+        <div id="logic-wrapper" class="subtab__content subtab__content--current">
             <table class="mixer-table logic__table">
                 <thead>
                     <tr>
@@ -20,8 +23,7 @@
             </table>
         </div>
 
-        <div id="functions-wrapper">
-            <div class="tab_subtitle tab_subtitle--no-border" data-i18n="globalFunctions"></div>
+        <div id="functions-wrapper" class="subtab__content">
             <table class="mixer-table function__table">
                 <thead>
                     <tr>
