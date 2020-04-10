@@ -23,20 +23,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         mspHelper.sendGlobalFunctions,
         mspHelper.saveToEeprom
     ]);
-    saveChainer.setExitPoint(reboot);
-
-    function reboot() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-
-        GUI.tab_switch_cleanup(function() {
-            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect($('.tab_programming a'));
-            });
-        });
-    }
-
+    
     function loadHtml() {
         GUI.load("./tabs/programming.html", processHtml);
     }
@@ -52,6 +39,11 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         helper.tabs.init($('.tab-programming'));
 
         localize();
+
+        $('#save-button').click(function () {
+            saveChainer.execute();
+        });
+
         GUI.content_ready(callback);
     }
 }

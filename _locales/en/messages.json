@@ -3149,6 +3149,9 @@
     "logicClose": {
         "message": "Close"
     },
+    "save": {
+        "message": "Save"
+    },
     "active": {
         "message": "Active"
     },
