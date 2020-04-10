@@ -107,6 +107,7 @@ sources.js = [
     './js/logicConditionsCollection.js',
     './js/globalFunctionsCollection.js',
     './js/logicConditionsStatus.js',
+    './js/globalVariablesStatus.js',
     './js/vtx.js',
     './main.js',
     './js/tabs.js',

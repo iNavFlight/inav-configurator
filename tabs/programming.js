@@ -4,7 +4,8 @@ TABS.programming = {};
 
 TABS.programming.initialize = function (callback, scrollPosition) {
     let loadChainer = new MSPChainerClass(),
-        saveChainer = new MSPChainerClass();
+        saveChainer = new MSPChainerClass(),
+        statusChainer = new MSPChainerClass();
 
     if (GUI.active_tab != 'programming') {
         GUI.active_tab = 'programming';
@@ -24,6 +25,12 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         mspHelper.saveToEeprom
     ]);
     
+    statusChainer.setChain([
+        mspHelper.loadLogicConditionsStatus,
+        mspHelper.loadGlobalVariablesStatus
+    ]);
+    statusChainer.setExitPoint(onStatusPullDone);
+
     function loadHtml() {
         GUI.load("./tabs/programming.html", processHtml);
     }
@@ -45,14 +52,12 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         });
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-            helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
+            helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, function () {
+                statusChainer.execute();
+            });
         }
 
         GUI.content_ready(callback);
-    }
-
-    function getLogicConditionsStatus() {
-        mspHelper.loadSensorStatus(onStatusPullDone);
     }
 
     function onStatusPullDone() {

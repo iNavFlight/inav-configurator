@@ -20,7 +20,9 @@ var CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
     LOGIC_CONDITIONS,
+    LOGIC_CONDITIONS_STATUS,
     GLOBAL_FUNCTIONS,
+    GLOBAL_VARIABLES_STATUS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -172,6 +174,7 @@ var FC = {
         LOGIC_CONDITIONS = new LogicConditionsCollection();
         GLOBAL_FUNCTIONS = new GlobalFunctionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
+        GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,

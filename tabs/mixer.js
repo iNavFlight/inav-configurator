@@ -414,7 +414,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function getLogicConditionsStatus() {
-        mspHelper.loadSensorStatus(onStatusPullDone);
+        mspHelper.loadLogicConditionsStatus(onStatusPullDone);
     }
 
     function onStatusPullDone() {
