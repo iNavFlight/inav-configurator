@@ -1066,6 +1066,34 @@ var FC = {
             13: {
                 name: "STICKY",
                 hasOperand: [true, true]
+            },
+            14: {
+                name: "ADD",
+                hasOperand: [true, true]
+            },
+            15: {
+                name: "SUB",
+                hasOperand: [true, true]
+            },
+            16: {
+                name: "MUL",
+                hasOperand: [true, true]
+            },
+            17: {
+                name: "DIV",
+                hasOperand: [true, true]
+            },
+            18: {
+                name: "GVAR SET",
+                hasOperand: [true, true]
+            },
+            19: {
+                name: "GVAR INC",
+                hasOperand: [true, true]
+            },
+            20: {
+                name: "GVAR DEC",
+                hasOperand: [true, true]
             }
         }
     },
@@ -1176,6 +1204,12 @@ var FC = {
                 range: [0, 15],
                 default: 0
             },
+            5: {
+                name: "Global Variable",
+                type: "range",
+                range: [0, 3],
+                default: 0
+            }
         }
     }
 };
