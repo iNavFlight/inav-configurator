@@ -993,7 +993,11 @@ var FC = {
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
             'Stabilized Yaw-',      // 28,
-            'ONE'                   // 29,
+            'ONE',                  // 29,
+            'GVAR 0',               // 30
+            'GVAR 1',               // 31
+            'GVAR 2',               // 32
+            'GVAR 3',               // 33
         ];
     },
     getServoMixInputName: function (input) {
