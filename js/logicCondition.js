@@ -1,7 +1,7 @@
 /*global $,FC*/
 'use strict';
 
-let LogicCondition = function (enabled, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
+let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
     let $row;
 
@@ -11,6 +11,14 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
 
     self.setEnabled = function (data) {
         enabled = !!data;
+    };
+
+    self.getActivatorId = function () {
+        return activatorId;
+    };
+
+    self.setActivatorId = function (data) {
+        activatorId = data;
     };
 
     self.getOperation = function () {
