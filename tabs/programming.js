@@ -62,6 +62,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     function onStatusPullDone() {
         LOGIC_CONDITIONS.update(LOGIC_CONDITIONS_STATUS);
+        GLOBAL_VARIABLES_STATUS.update($('.tab-programming'));
     }
 }
 

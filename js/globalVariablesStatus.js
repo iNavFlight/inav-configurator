@@ -21,5 +21,13 @@ let GlobalVariablesStatus = function () {
         return data;
     }
 
+    self.update = function ($container) {
+        for (let i in self.getAll()) {
+            if (self.getAll().hasOwnProperty(i)) {
+                $container.find("[data-gvar-index=" + i + "]").html(self.get(i));
+            }
+        }
+    }
+
     return self;
 };
