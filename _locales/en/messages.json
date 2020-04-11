@@ -3143,6 +3143,9 @@
     "logicFlags": {
         "message": "Flags"
     },
+    "logicStatus": {
+        "message": "Status"
+    },
     "logicSave": {
         "message": "Save"
     },

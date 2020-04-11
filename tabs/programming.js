@@ -52,7 +52,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         });
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-            helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, function () {
+            helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
                 statusChainer.execute();
             });
         }

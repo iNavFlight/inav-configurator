@@ -1020,87 +1020,108 @@ var FC = {
         return {
             0: {
                 name: "True",
-                hasOperand: [false, false]
+                hasOperand: [false, false],
+                output: "boolean"
             },
             1: {
                 name: "Equal",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             2: {
                 name: "Greater Than",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             3: {
                 name: "Lower Than",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             4: {
                 name: "Low",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             5: {
                 name: "Mid",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             6: {
                 name: "High",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             7: {
                 name: "AND",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             8: {
                 name: "OR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             9: {
                 name: "XOR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             10: {
                 name: "NAND",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             11: {
                 name: "NOR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             12: {
                 name: "NOT",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             13: {
                 name: "STICKY",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             14: {
                 name: "ADD",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "raw"
             },
             15: {
                 name: "SUB",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "raw"
             },
             16: {
                 name: "MUL",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "raw"
             },
             17: {
                 name: "DIV",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "raw"
             },
             18: {
                 name: "GVAR SET",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "none"
             },
             19: {
                 name: "GVAR INC",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "none"
             },
             20: {
                 name: "GVAR DEC",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "none"
             }
         }
     },
