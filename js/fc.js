@@ -63,10 +63,10 @@ var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
     isRpyFfComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_AIRPLANE;
+        return MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT;
     },
     isRpyDComponentUsed: function () {
-        return MIXER_CONFIG.platformType != PLATFORM_AIRPLANE;
+        return !FC.isRpyFfComponentUsed();
     },
     resetState: function () {
         SENSOR_STATUS = {
