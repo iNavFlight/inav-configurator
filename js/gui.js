@@ -292,5 +292,27 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
     $container.find('.logic_element__operand--value').change(onChange);
 };
 
+/**
+ * @param  {jQuery} $container
+ * @param  {LogicConditionsCollection} logicConditions
+ * @param  {int} current
+ * @param  {function} onChange
+ * @param  {boolean} withAlways
+ */
+GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways) {
+
+    let $select = $container.append('<select class="mix-rule-condition">').find("select"),
+        lcCount = logicConditions.getCount();
+
+    if (withAlways) {
+        $select.append('<option value="-1">Always</option>')
+    }
+    for (let i = 0; i < lcCount ; i++) {
+        $select.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
+    }
+
+    $select.val(current).change(onChange);
+}
+
 // initialize object into GUI variable
 var GUI = new GUI_control();

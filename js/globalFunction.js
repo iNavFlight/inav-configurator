@@ -165,21 +165,13 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
     self.renderLogicId = function($row) {
         
         if (self.getEnabled()) {
-
-            $row.find('.function_cell__logicId').html("<select class='function__logicId' ></select>");
-            let $t = $row.find(".function__logicId");
-            let count = LOGIC_CONDITIONS.getCount();
-
-            console.log(self.getConditionId());
-
-            for (let i = 0; i < count ; i++) {
-                if (i == self.getConditionId()) {
-                    $t.append('<option value="' + i + '" selected>Logic Condition ' + i + ' </option>');
-                } else {
-                    $t.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
-                }
-            }
-            $t.change(self.onLogicIdChange);
+            GUI.renderLogicConditionSelect(
+                $row.find('.function_cell__logicId'), 
+                LOGIC_CONDITIONS, 
+                self.getConditionId(), 
+                self.onLogicIdChange,
+                true
+            );
         } else {
             $row.find('.function_cell__logicId').html("");
         }
