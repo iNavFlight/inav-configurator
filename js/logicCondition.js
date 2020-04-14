@@ -73,6 +73,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         let $cT = $(event.currentTarget);
         self.setEnabled(!!$cT.prop('checked'));
         self.renderStatus();
+        self.renderActivator();
     };
 
     self.getOperatorMetadata = function () {
@@ -205,6 +206,28 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         }
     }
 
+    self.onActivatorChange = function (event) {
+        let $cT = $(event.currentTarget);
+
+        self.setActivatorId($cT.val());
+    }
+
+    self.renderActivator = function () {
+        let $e = $row.find(".logic_cell__activator");
+
+        if (self.getEnabled()) {
+            GUI.renderLogicConditionSelect(
+                $e, 
+                LOGIC_CONDITIONS, 
+                self.getActivatorId, 
+                self.onActivatorChange,
+                true
+            );
+        } else {
+            $e.html("");
+        }
+    }
+
     self.render = function (index, $container) {
 
         $container.find('tbody').append('<tr>\
@@ -213,6 +236,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
                 <td class="logic_cell__operation"></td>\
                 <td class="logic_cell__operandA"></td>\
                 <td class="logic_cell__operandB"></td>\
+                <td class="logic_cell__activator"></div></td>\
                 <td class="logic_cell__flags"></div></td>\
                 <td class="logic_cell__status"></td>\
             </tr>\
@@ -247,6 +271,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         self.renderOperand(0);
         self.renderOperand(1);
         self.renderStatus();
+        self.renderActivator();
     }
 
     return self;

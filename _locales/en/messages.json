@@ -3152,6 +3152,9 @@
     "logicClose": {
         "message": "Close"
     },
+    "logicActivator": {
+        "message": "Active"
+    },
     "save": {
         "message": "Save"
     },
