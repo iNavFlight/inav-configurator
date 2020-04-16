@@ -911,6 +911,9 @@
     "portsFunction_TELEMETRY_SMARTPORT": {
         "message": "SmartPort"
     },
+    "portsFunction_SMARTPORT_MASTER": {
+        "message": "SmartPort Master"
+    },
     "portsFunction_RX_SERIAL": {
         "message": "Serial RX"
     },
