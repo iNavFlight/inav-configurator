@@ -89,15 +89,50 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gui_box grey alarms-container" style="display:none;">
+                    <div class="gui_box grey alarms-container">
                         <div class="gui_box_titlebar">
                             <div class="spacer_box_title">
                               Alarms
                             </div>
                         </div>
                         <div class="spacer_box">
-                            <div class="settings"></div>
-                        </div>
+                            <div>
+                                <input id="imu_temp_alarm_min" data-setting="osd_imu_temp_alarm_min" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="imu_temp_alarm_min">
+                                    <span data-i18n="osd_imu_temp_alarm_min"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <input id="imu_temp_alarm_max" data-setting="osd_imu_temp_alarm_max" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="imu_temp_alarm_max">
+                                    <span data-i18n="osd_imu_temp_alarm_max"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <input id="baro_temp_alarm_min" data-setting="osd_baro_temp_alarm_min" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="baro_temp_alarm_min">
+                                    <span data-i18n="osd_baro_temp_alarm_min"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <input id="baro_temp_alarm_max" data-setting="osd_baro_temp_alarm_max" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="baro_temp_alarm_max">
+                                    <span data-i18n="osd_baro_temp_alarm_max"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <input id="esc_temp_alarm_min" data-setting="osd_esc_temp_alarm_min" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="esc_temp_alarm_min">
+                                    <span data-i18n="osd_baro_temp_alarm_min"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <input id="esc_temp_alarm_max" data-setting="osd_esc_temp_alarm_max" data-setting-multiplier="10" type="number" data-step="0.5" />
+                                <label for="esc_temp_alarm_max">
+                                    <span data-i18n="osd_esc_temp_alarm_max"></span>
+                                </label>
+                            </div>
+                            
                     </div>
                 </div>
             </div>
