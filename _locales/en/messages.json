@@ -2502,7 +2502,7 @@
         "message": "Minimum IMU temperature"
     },
     "osdAlarmIMU_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the IMU temperature is bellow this value"
+        "message": "The temperature indicator will flash when the IMU temperature is below this value"
     },
     "osdAlarmIMU_TEMPERATURE_MAX": {
         "message": "Maximum IMU temperature"
@@ -2514,7 +2514,7 @@
         "message": "Minimum baro temperature"
     },
     "osdAlarmBARO_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
+        "message": "The temperature indicator will flash when the barometer temperature is below this value"
     },
     "osdAlarmBARO_TEMPERATURE_MAX": {
         "message": "Maximum baro temperature"
@@ -2812,6 +2812,12 @@
     },
     "osdElement_BARO_TEMPERATURE_HELP": {
         "message": "Temperature of the barometer"
+    },
+    "osdElement_ESC_TEMPERATURE": {
+        "message": "ESC Temperature"
+    },
+    "osdElement_ESC_TEMPERATURE_HELP": {
+        "message": "Temperature of the ESC read from DSHOT telemetry"
     },
     "osdElement_SENSOR1_TEMPERATURE": {
         "message": "Temperature sensor 1"

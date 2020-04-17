@@ -83,6 +83,7 @@ SYM.GFORCE_X = 0xE7;
 SYM.GFORCE_Y = 0xE8;
 SYM.GFORCE_Z = 0xE9;
 SYM.RPM = 0x8B;
+SYM.ESC_TEMPERATURE = 0xF3;
 
 var FONT = FONT || {};
 
@@ -789,6 +790,19 @@ OSD.constants = {
                         }
                         // Metric, UK
                         return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'ESC_TEMPERATURE',
+                    id: 107,
+                    min_version: '2.5.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 98' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 37' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
