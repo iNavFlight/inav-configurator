@@ -39,7 +39,8 @@ var GUI_control = function () {
         'profiles',
         'advanced_tuning',
         'mission_control',
-        'mixer'
+        'mixer',
+        'programming'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -257,6 +258,60 @@ GUI_control.prototype.load = function(rel, callback) {
             callback();
         }
     });
+}
+
+GUI_control.prototype.renderOperandValue = function ($container, operandMetadata, operand, value, onChange) {
+
+    $container.find('.logic_element__operand--value').remove();
+
+    switch (operandMetadata.type) {
+        case "value":
+            $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
+            break;
+        case "range":
+        case "dictionary":
+            $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
+            let $t = $container.find('.logic_element__operand--value');
+            
+            if (operandMetadata.type == "range") {
+                for (let i = operandMetadata.range[0]; i <= operandMetadata.range[1]; i++) {
+                    $t.append('<option value="' + i + '">' + i + '</option>');
+                }
+            } else if (operandMetadata.type == "dictionary") {
+                for (let k in operandMetadata.values) {
+                    if (operandMetadata.values.hasOwnProperty(k)) {
+                        $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
+                    }
+                }
+            }
+
+            $t.val(value);
+            break;
+    }
+
+    $container.find('.logic_element__operand--value').change(onChange);
+};
+
+/**
+ * @param  {jQuery} $container
+ * @param  {LogicConditionsCollection} logicConditions
+ * @param  {int} current
+ * @param  {function} onChange
+ * @param  {boolean} withAlways
+ */
+GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways) {
+
+    let $select = $container.append('<select class="mix-rule-condition">').find("select"),
+        lcCount = logicConditions.getCount();
+
+    if (withAlways) {
+        $select.append('<option value="-1">Always</option>')
+    }
+    for (let i = 0; i < lcCount ; i++) {
+        $select.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
+    }
+
+    $select.val(current).change(onChange);
 }
 
 // initialize object into GUI variable

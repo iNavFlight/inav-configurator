@@ -1,7 +1,7 @@
 /*global $,FC*/
 'use strict';
 
-let LogicCondition = function (enabled, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
+let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
     let $row;
 
@@ -11,6 +11,14 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
 
     self.setEnabled = function (data) {
         enabled = !!data;
+    };
+
+    self.getActivatorId = function () {
+        return activatorId;
+    };
+
+    self.setActivatorId = function (data) {
+        activatorId = data;
     };
 
     self.getOperation = function () {
@@ -64,6 +72,8 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
     self.onEnabledChange = function (event) {
         let $cT = $(event.currentTarget);
         self.setEnabled(!!$cT.prop('checked'));
+        self.renderStatus();
+        self.renderActivator();
     };
 
     self.getOperatorMetadata = function () {
@@ -84,6 +94,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         self.setOperandBValue(0);
         self.renderOperand(0);
         self.renderOperand(1);
+        self.renderStatus();
     };
 
     self.onOperatorTypeChange = function (event) {
@@ -100,7 +111,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
             self.setOperandBValue(operandMetadata.default);
         }
 
-        self.renderOperandValue($container, operandMetadata, operand, operandMetadata.default);
+        GUI.renderOperandValue($container, operandMetadata, operand, operandMetadata.default, self.onOperatorValueChange);
     };
 
     self.onOperatorValueChange = function (event) {
@@ -112,39 +123,6 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         } else {
             self.setOperandBValue($cT.val());
         }
-    };
-
-    self.renderOperandValue = function ($container, operandMetadata, operand, value) {
-
-        $container.find('.logic_element__operand--value').remove();
-
-        switch (operandMetadata.type) {
-            case "value":
-                $container.append('<input type="number" class="logic_element__operand--value" data-operand="' + operand + '" step="' + operandMetadata.step + '" min="' + operandMetadata.min + '" max="' + operandMetadata.max + '" value="' + value + '" />');
-                break;
-            case "range":
-            case "dictionary":
-                $container.append('<select class="logic_element__operand--value" data-operand="' + operand + '"></select>');
-                let $t = $container.find('.logic_element__operand--value');
-                
-                if (operandMetadata.type == "range") {
-                    for (let i = operandMetadata.range[0]; i <= operandMetadata.range[1]; i++) {
-                        $t.append('<option value="' + i + '">' + i + '</option>');
-                    }
-                } else if (operandMetadata.type == "dictionary") {
-                    for (let k in operandMetadata.values) {
-                        if (operandMetadata.values.hasOwnProperty(k)) {
-                            $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
-                        }
-                    }
-                }
-
-                $t.val(value);
-                break;
-        }
-
-        $container.find('.logic_element__operand--value').change(self.onOperatorValueChange);
-
     };
 
     self.renderOperand = function (operand) {
@@ -175,7 +153,7 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
                         /* 
                          * Render value element depending on type
                          */
-                        self.renderOperandValue($container, op, operand, value);
+                        GUI.renderOperandValue($container, op, operand, value, self.onOperatorValueChange);
 
                     } else {
                         $t.append('<option value="' + k + '">' + op.name + '</option>');
@@ -191,19 +169,62 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
         }
     }
 
+    self.renderStatus = function () {
+        let $e = $row.find('.logic_cell__status'),
+            displayType = FC.getLogicOperators()[self.getOperation()].output;
+        
+        if (self.getEnabled() && displayType == "boolean") {
+            $e.html('<div class="logic_cell__active_marker"></div>');
+        } else if (self.getEnabled() && displayType == "raw") {
+            $e.html('<div class="logic_cell__raw_value"></div>');
+        } else {
+            $e.html('');
+        }
+    }
+
     self.update = function (index, value, $container) {
         if (typeof $row === 'undefined') {
             return;
         }
-        
-        let $marker = $row.find('.logic_cell__active_marker');
 
-        if (!!value) {
-            $marker.addClass("logic_cell__active_marker--active");
-            $marker.removeClass("logic_cell__active_marker--inactive");
+        let displayType = FC.getLogicOperators()[self.getOperation()].output,
+            $marker;
+        
+        if (self.getEnabled() && displayType == "boolean") {
+            $marker = $row.find('.logic_cell__active_marker');
+
+            if (!!value) {
+                $marker.addClass("logic_cell__active_marker--active");
+                $marker.removeClass("logic_cell__active_marker--inactive");
+            } else {
+                $marker.removeClass("logic_cell__active_marker--active");
+                $marker.addClass("logic_cell__active_marker--inactive");
+            }
+        } else if (self.getEnabled() && displayType == "raw") {
+            $marker = $row.find('.logic_cell__raw_value');
+            $marker.html(value);
+        }
+    }
+
+    self.onActivatorChange = function (event) {
+        let $cT = $(event.currentTarget);
+
+        self.setActivatorId($cT.val());
+    }
+
+    self.renderActivator = function () {
+        let $e = $row.find(".logic_cell__activator");
+
+        if (self.getEnabled()) {
+            GUI.renderLogicConditionSelect(
+                $e, 
+                LOGIC_CONDITIONS, 
+                self.getActivatorId, 
+                self.onActivatorChange,
+                true
+            );
         } else {
-            $marker.removeClass("logic_cell__active_marker--active");
-            $marker.addClass("logic_cell__active_marker--inactive");
+            $e.html("");
         }
     }
 
@@ -215,7 +236,9 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
                 <td class="logic_cell__operation"></td>\
                 <td class="logic_cell__operandA"></td>\
                 <td class="logic_cell__operandB"></td>\
-                <td class="logic_cell__flags"><div class="logic_cell__active_marker"></div></td>\
+                <td class="logic_cell__activator"></div></td>\
+                <td class="logic_cell__flags"></div></td>\
+                <td class="logic_cell__status"></td>\
             </tr>\
         ');
 
@@ -247,6 +270,8 @@ let LogicCondition = function (enabled, operation, operandAType, operandAValue, 
 
         self.renderOperand(0);
         self.renderOperand(1);
+        self.renderStatus();
+        self.renderActivator();
     }
 
     return self;

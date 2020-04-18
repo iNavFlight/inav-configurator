@@ -20,6 +20,9 @@ var CONFIG,
     SERVO_RULES,
     MOTOR_RULES,
     LOGIC_CONDITIONS,
+    LOGIC_CONDITIONS_STATUS,
+    GLOBAL_FUNCTIONS,
+    GLOBAL_VARIABLES_STATUS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -169,7 +172,9 @@ var FC = {
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
         LOGIC_CONDITIONS = new LogicConditionsCollection();
+        GLOBAL_FUNCTIONS = new GlobalFunctionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
+        GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -988,7 +993,11 @@ var FC = {
             'Stabilized Pitch-',    // 26
             'Stabilized Yaw+',      // 27
             'Stabilized Yaw-',      // 28,
-            'ONE'                   // 29,
+            'ONE',                  // 29,
+            'GVAR 0',               // 30
+            'GVAR 1',               // 31
+            'GVAR 2',               // 32
+            'GVAR 3',               // 33
         ];
     },
     getServoMixInputName: function (input) {
@@ -1011,59 +1020,144 @@ var FC = {
         return {
             0: {
                 name: "True",
-                hasOperand: [false, false]
+                hasOperand: [false, false],
+                output: "boolean"
             },
             1: {
                 name: "Equal",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             2: {
                 name: "Greater Than",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             3: {
                 name: "Lower Than",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             4: {
                 name: "Low",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             5: {
                 name: "Mid",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             6: {
                 name: "High",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             7: {
                 name: "AND",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             8: {
                 name: "OR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             9: {
                 name: "XOR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             10: {
                 name: "NAND",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             11: {
                 name: "NOR",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
             },
             12: {
                 name: "NOT",
-                hasOperand: [true, false]
+                hasOperand: [true, false],
+                output: "boolean"
             },
             13: {
                 name: "STICKY",
-                hasOperand: [true, true]
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            14: {
+                name: "ADD",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            15: {
+                name: "SUB",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            16: {
+                name: "MUL",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            17: {
+                name: "DIV",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            18: {
+                name: "GVAR SET",
+                hasOperand: [true, true],
+                output: "none"
+            },
+            19: {
+                name: "GVAR INC",
+                hasOperand: [true, true],
+                output: "none"
+            },
+            20: {
+                name: "GVAR DEC",
+                hasOperand: [true, true],
+                output: "none"
+            }
+        }
+    },
+    getFunctionActions: function () {
+        return {
+            0: {
+                name: "OVERRIDE ARMING SAFETY",
+                hasOperand: false
+            },
+            1: {
+                name: "OVERRIDE THROTTLE SCALE",
+                hasOperand: true
+            },
+            2: {
+                name: "SWAP ROLL & YAW",
+                hasOperand: false
+            },
+            3: {
+                name: "SET VTX POWER LEVEL",
+                hasOperand: true
+            },
+            4: {
+                name: "INVERT ROLL",
+                hasOperand: false
+            },
+            5: {
+                name: "INVERT PITCH",
+                hasOperand: false
+            },
+            6: {
+                name: "INVERT YAW",
+                hasOperand: false
+            },
+            7: {
+                name: "OVERRIDE THROTTLE",
+                hasOperand: true
             }
         }
     },
@@ -1138,6 +1232,12 @@ var FC = {
                 range: [0, 15],
                 default: 0
             },
+            5: {
+                name: "Global Variable",
+                type: "range",
+                range: [0, 3],
+                default: 0
+            }
         }
     }
 };
