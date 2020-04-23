@@ -2293,16 +2293,18 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
-
+        Settings.saveInputs().then(onComplete);
         $('a.save').click(function () {
-            var self = this;
-            MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-            GUI.log('OSD settings saved');
-            var oldText = $(this).text();
-            $(this).html("Saved");
-            setTimeout(function () {
-                $(self).html(oldText);
-            }, 2000);
+            Settings.saveInputs().then(function () {
+                var self = this;
+                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
+                GUI.log('OSD settings saved');
+                var oldText = $(this).text();
+                $(this).html("Saved");
+                setTimeout(function () {
+                    $(self).html(oldText);
+                }, 2000);
+            });
         });
 
         // font preview window
