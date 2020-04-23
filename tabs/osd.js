@@ -2293,7 +2293,6 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
-        Settings.saveInputs().then(onComplete);
         $('a.save').click(function () {
             Settings.saveInputs().then(function () {
                 var self = this;
