@@ -253,6 +253,8 @@ helper.defaultsDialog = (function() {
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
+        //Save analytics
+        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
         Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
             return mspHelper.getSetting(input.key);
         }).then(function () {
