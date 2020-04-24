@@ -909,7 +909,7 @@ var FC = {
         ]
     },
     getPidNames: function () {
-        return [
+        let list = [
             'Roll',
             'Pitch',
             'Yaw',
@@ -918,15 +918,18 @@ var FC = {
             'Velocity XY',
             'Surface',
             'Level',
-            'Heading',
+            'Heading Hold',
             'Velocity Z'
         ];
+
+        if (semver.gte(CONFIG.flightControllerVersion, '2.5.0')) {
+            list.push("Nav Heading")
+        }
+
+        return list;
     },
     getRthAltControlMode: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0'))
-            return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
-        else
-            return ["Current", "Extra", "Fixed", "Max", "At least"];
+        return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
     },
     getRthAllowLanding: function() {
         return ["Never", "Always", "Only on failsafe"];
