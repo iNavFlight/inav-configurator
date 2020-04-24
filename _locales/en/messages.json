@@ -2501,29 +2501,23 @@
     "osdAlarmCURRENT_HELP": {
         "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
     },
-    "osdAlarmIMU_TEMPERATURE_MIN": {
+    "osd_imu_temp_alarm_min": {
         "message": "Minimum IMU temperature"
     },
-    "osdAlarmIMU_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the IMU temperature is bellow this value"
-    },
-    "osdAlarmIMU_TEMPERATURE_MAX": {
+    "osd_imu_temp_alarm_max": {
         "message": "Maximum IMU temperature"
     },
-    "osdAlarmIMU_TEMPERATURE_MAX_HELP": {
-        "message": "The temperature indicator will flash when the IMU temperature is above this value"
-    },
-    "osdAlarmBARO_TEMPERATURE_MIN": {
+    "osd_baro_temp_alarm_min": {
         "message": "Minimum baro temperature"
     },
-    "osdAlarmBARO_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
-    },
-    "osdAlarmBARO_TEMPERATURE_MAX": {
+    "osd_baro_temp_alarm_max": {
         "message": "Maximum baro temperature"
     },
-    "osdAlarmBARO_TEMPERATURE_MAX_HELP": {
-        "message": "The temperature indicator will flash when the barometer temperature is above this value"
+    "osd_esc_temp_alarm_min": {
+        "message": "Minimum ESC temperature"
+    },
+    "osd_esc_temp_alarm_max": {
+        "message": "Maximum ESC temperature"
     },
     "osdGroupGeneral": {
         "message": "General"
@@ -2815,6 +2809,12 @@
     },
     "osdElement_BARO_TEMPERATURE_HELP": {
         "message": "Temperature of the barometer"
+    },
+    "osdElement_ESC_TEMPERATURE": {
+        "message": "ESC Temperature"
+    },
+    "osdElement_ESC_TEMPERATURE_HELP": {
+        "message": "Temperature of the ESC read from DSHOT telemetry"
     },
     "osdElement_SENSOR1_TEMPERATURE": {
         "message": "Temperature sensor 1"

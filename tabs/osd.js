@@ -83,6 +83,7 @@ SYM.GFORCE_X = 0xE7;
 SYM.GFORCE_Y = 0xE8;
 SYM.GFORCE_Z = 0xE9;
 SYM.RPM = 0x8B;
+SYM.ESC_TEMPERATURE = 0xF3;
 
 var FONT = FONT || {};
 
@@ -789,6 +790,19 @@ OSD.constants = {
                         }
                         // Metric, UK
                         return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
+                    }
+                },
+                {
+                    name: 'ESC_TEMPERATURE',
+                    id: 107,
+                    min_version: '2.5.0',
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 98' + FONT.symbol(SYM.TEMP_F);
+                        }
+                        // Metric, UK
+                        return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 37' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
@@ -1921,84 +1935,6 @@ OSD.GUI.updateUnits = function() {
     });
 };
 
-OSD.GUI.updateAlarms = function() {
-    // alarms
-    $('.alarms-container').show();
-    var $alarms = $('.alarms-container .settings').empty();
-    for (var kk = 0; kk < OSD.constants.ALL_ALARMS.length; kk++) {
-        var alarm = OSD.constants.ALL_ALARMS[kk];
-        if (alarm.min_version && !semver.gte(CONFIG.flightControllerVersion, alarm.min_version)) {
-            continue;
-        }
-        var value = OSD.data.alarms[alarm.field];
-        if (value === undefined || value === null) {
-            continue;
-        }
-        var label = chrome.i18n.getMessage('osdAlarm' + alarm.name);
-        if (alarm.unit) {
-            var unit = typeof alarm.unit === 'function' ? alarm.unit(OSD.data) : alarm.unit;
-            var suffix = chrome.i18n.getMessage(unit) || unit;
-            label += ' (' + suffix + ')';
-        }
-        var step = 1;
-        if (typeof alarm.step === 'function') {
-            step = alarm.step(OSD.data)
-        } else if (typeof alarm.step !== 'undefined') {
-            step = alarm.step;
-        }
-        var amin = 0;
-        if (typeof alarm.min === 'function') {
-            amin = alarm.min(OSD.data)
-        } else if (typeof alarm.min !== 'undefined') {
-            amin = alarm.min;
-        }
-        var amax = 0;
-        if (typeof alarm.max === 'function') {
-            amax = alarm.max(OSD.data)
-        } else if (typeof alarm.max !== 'undefined') {
-            amax = alarm.max;
-        }
-        var alarmInput = $('<input name="alarm" type="number" step="' + step + '" min="' + amin + '" max="' + amax + '"/>' + label + '</label>');
-        alarmInput.data('alarm', alarm);
-        if (typeof alarm.to_display === 'function') {
-            value = alarm.to_display(OSD.data, value);
-        }
-        alarmInput.val(value);
-        alarmInput.blur(function (e) {
-            var $alarm = $(this);
-            var val = $alarm.val();
-            var alarm = $alarm.data('alarm');
-            if (typeof alarm.from_display === 'function') {
-                val = alarm.from_display(OSD.data, val);
-            }
-            OSD.data.alarms[alarm.field] = val;
-            // We just need to save the config. The field is already
-            // up to date, since it's where the value was changed
-            // by the user.
-            OSD.saveAlarms();
-        });
-        var $input = $('<label/>');
-        var help = chrome.i18n.getMessage('osdAlarm' + alarm.name + '_HELP');
-        if (help) {
-            $('<div class="helpicon cf_tip"></div>')
-                .css('margin-top', '1px')
-                .attr('title', help)
-                .appendTo($input)
-                .jBox('Tooltip', {
-                    delayOpen: 100,
-                    delayClose: 100,
-                    position: {
-                        x: 'right',
-                        y: 'center'
-                    },
-                    outside: 'x'
-                });
-        }
-        $input.append(alarmInput);
-        $alarms.append($input);
-    }
-};
-
 OSD.GUI.updateFields = function() {
     // display fields on/off and position
     var $tmpl = $('#osd_group_template').hide();
@@ -2313,7 +2249,6 @@ OSD.GUI.updateAll = function() {
     $('.supported').fadeIn();
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
-    OSD.GUI.updateAlarms();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
 };
@@ -2333,7 +2268,6 @@ OSD.GUI.saveItem = function(item) {
 OSD.GUI.saveConfig = function() {
     OSD.saveConfig(function() {
         OSD.GUI.updatePreviews();
-        OSD.GUI.updateAlarms();
     });
 };
 
@@ -2359,16 +2293,17 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
-
         $('a.save').click(function () {
-            var self = this;
-            MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-            GUI.log('OSD settings saved');
-            var oldText = $(this).text();
-            $(this).html("Saved");
-            setTimeout(function () {
-                $(self).html(oldText);
-            }, 2000);
+            Settings.saveInputs().then(function () {
+                var self = this;
+                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
+                GUI.log('OSD settings saved');
+                var oldText = $(this).text();
+                $(this).html("Saved");
+                setTimeout(function () {
+                    $(self).html(oldText);
+                }, 2000);
+            });
         });
 
         // font preview window
