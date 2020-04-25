@@ -12,6 +12,7 @@ helper.defaultsDialog = (function() {
 
     let data = [{
             "title": 'Mini Quad with 3"-7" propellers',
+            "notRecommended": false,
             "settings": [
                 /*
                 System
@@ -161,6 +162,10 @@ helper.defaultsDialog = (function() {
                     value: 80
                 },
                 {
+                    key: "platform_type",
+                    value: "MULTIROTOR"
+                },
+                {
                     key: "applied_defaults",
                     value: 2
                 }
@@ -168,6 +173,7 @@ helper.defaultsDialog = (function() {
         },
         {
             "title": 'Airplane',
+            "notRecommended": false,
             "id": 3,
             "settings": [
                 {
@@ -195,6 +201,10 @@ helper.defaultsDialog = (function() {
                     value: 180
                 },
                 {
+                    key: "platform_type",
+                    value: "AIRPLANE"
+                },
+                {
                     key: "applied_defaults",
                     value: 3
                 }
@@ -207,7 +217,54 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
+            "title": 'Rovers & Boats',
+            "notRecommended": false,
+            "settings": [
+                {
+                    key: "applied_defaults",
+                    value: 1
+                },
+                {
+                    key: "failsafe_procedure",
+                    value: "DROP"
+                },
+                {
+                    key: "platform_type",
+                    value: "ROVER"
+                },
+                {
+                    key: "nav_wp_safe_distance",
+                    value: 50000
+                },
+                {
+                    key: "nav_fw_loiter_radius",
+                    value: 100
+                },
+                {
+                    key: "nav_fw_yaw_deadband",
+                    value: 5
+                },
+                {
+                    key: "pidsum_limit_yaw",
+                    value: 500
+                },
+                {
+                    key: "nav_fw_pos_hdg_p",
+                    value: 60
+                },
+                {
+                    key: "nav_fw_pos_hdg_i",
+                    value: 2
+                },
+                {
+                    key: "nav_fw_pos_hdg_d",
+                    value: 0
+                }
+            ]
+        },
+        {
             "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
+            "notRecommended": true,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -217,6 +274,7 @@ helper.defaultsDialog = (function() {
         },
         {
             "title": 'Keep current settings (Not recommended)',
+            "notRecommended": true,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -297,6 +355,10 @@ helper.defaultsDialog = (function() {
                 let $element = $("<div class='default_btn defaults_btn'>\
                         <a class='confirm' href='#'></a>\
                     </div>")
+
+                if (preset.notRecommended) {
+                    $element.addClass("defaults_btn--not-recommended");
+                }
 
                 $element.find("a").html(preset.title);
                 $element.data("index", i).click(privateScope.onPresetClick)
