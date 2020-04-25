@@ -1146,6 +1146,14 @@ var FC = {
                 name: "SET VTX POWER LEVEL",
                 hasOperand: true
             },
+            8: {
+                name: "SET VTX BAND",
+                hasOperand: true
+            },
+            9: {
+                name: "SET VTX CHANNEL",
+                hasOperand: true
+            },
             4: {
                 name: "INVERT ROLL",
                 hasOperand: false
