@@ -569,15 +569,17 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_GLOBAL_FUNCTIONS:
                 GLOBAL_FUNCTIONS.flush();
-                if (data.byteLength % 9 === 0) {
-                    for (i = 0; i < data.byteLength; i += 9) {
+                if (data.byteLength % 14 === 0) {
+                    for (i = 0; i < data.byteLength; i += 14) {
                         GLOBAL_FUNCTIONS.put(new GlobalFunction(
                             data.getInt8(i),
                             data.getInt8(i + 1),
                             data.getInt8(i + 2),
                             data.getInt8(i + 3),
                             data.getInt32(i + 4, true),
-                            data.getInt8(i + 8)
+                            data.getInt8(i + 8),
+                            data.getInt32(i + 9, true),
+                            data.getInt8(i + 13)
                         ));
                     }
                 }
@@ -2473,11 +2475,16 @@ var mspHelper = (function (gui) {
             buffer.push(globalFunction.getEnabled());
             buffer.push(globalFunction.getConditionId());
             buffer.push(globalFunction.getAction());
-            buffer.push(globalFunction.getOperandType());
-            buffer.push(specificByte(globalFunction.getOperandValue(), 0));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 1));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 2));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 3));
+            buffer.push(globalFunction.getOperandAType());
+            buffer.push(specificByte(globalFunction.getOperandAValue(), 0));
+            buffer.push(specificByte(globalFunction.getOperandAValue(), 1));
+            buffer.push(specificByte(globalFunction.getOperandAValue(), 2));
+            buffer.push(specificByte(globalFunction.getOperandAValue(), 3));
+            buffer.push(globalFunction.getOperandBType());
+            buffer.push(specificByte(globalFunction.getOperandBValue(), 0));
+            buffer.push(specificByte(globalFunction.getOperandBValue(), 1));
+            buffer.push(specificByte(globalFunction.getOperandBValue(), 2));
+            buffer.push(specificByte(globalFunction.getOperandBValue(), 3));
             buffer.push(globalFunction.getFlags());
 
             // prepare for next iteration

@@ -1,7 +1,7 @@
 /*global $,FC*/
 'use strict';
 
-let GlobalFunction = function (enabled, conditionId, action, operandType, operandValue, flags) {
+let GlobalFunction = function (enabled, conditionId, action, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
     let $row;
 
@@ -29,20 +29,36 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
         action = data;
     }
 
-    self.getOperandType = function () {
-        return operandType;
+    self.getOperandAType = function () {
+        return operandAType;
     }
 
-    self.setOperandType = function (data) {
-        operandType = data;
+    self.setOperandAType = function (data) {
+        operandAType = data;
     }
 
-    self.getOperandValue = function () {
-        return operandValue;
+    self.getOperandAValue = function () {
+        return operandAValue;
     }
 
-    self.setOperandValue = function (data) {
-        operandValue = data;
+    self.setOperandAValue = function (data) {
+        operandAValue = data;
+    }
+
+    self.getOperandBType = function () {
+        return operandBType;
+    }
+
+    self.setOperandBType = function (data) {
+        operandBType = data;
+    }
+
+    self.getOperandBValue = function () {
+        return operandBValue;
+    }
+
+    self.setOperandBValue = function (data) {
+        operandBValue = data;
     }
 
     self.getFlags = function () {
@@ -54,8 +70,14 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
     };
 
     self.onOperatorValueChange = function (event) {
-        let $cT = $(event.currentTarget);
-        self.setOperandValue($cT.val());
+        let $cT = $(event.currentTarget),
+            operand = $cT.data("operand");
+
+        if (operand == 0) {
+            self.setOperandAValue($cT.val());
+        } else {
+            self.setOperandBValue($cT.val());
+        }
     };
 
     self.onOperatorTypeChange = function (event) {
@@ -64,8 +86,13 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
             $container = $cT.parent(),
             operandMetadata = FC.getOperandTypes()[$cT.val()];
 
-        self.setOperandType($cT.val());
-        self.setOperandValue(operandMetadata.default);
+        if (operand == 0) {
+            self.setOperandAType($cT.val());
+            self.setOperandAValue(operandMetadata.default);
+        } else {
+            self.setOperandBType($cT.val());
+            self.setOperandBValue(operandMetadata.default);
+        }
 
         GUI.renderOperandValue($container, operandMetadata, operand, operandMetadata.default, self.onOperatorValueChange);
     };
@@ -76,7 +103,8 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
         self.setEnabled(!!$cT.prop('checked'));
 
         self.renderAction($parent);
-        self.renderOperand($parent);
+        self.renderOperand($parent, 0);
+        self.renderOperand($parent, 0);
         self.renderLogicId($parent);
     };
 
@@ -88,42 +116,46 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
     self.onActionChange = function (event) {
         let $cT = $(event.currentTarget);
         self.setAction($cT.val());
-        self.renderOperand($cT.closest('tr'));
+        self.renderOperand($cT.closest('tr'), 0);
+        self.renderOperand($cT.closest('tr'), 1);
     };
 
-    self.hasOperand = function () {
-
-        let actions = FC.getFunctionActions();
-
+    self.hasOperand = function (operand) {
         if (!self.getEnabled()) {
             return false;
         }
-
-        return actions[self.getAction()].hasOperand;
+        return FC.getFunctionActions()[self.getAction()].hasOperand[operand];
     };
 
-    self.renderOperand = function ($row) {
-        let $container;
-        
-        $container = $row.find('.function_cell__operand');
+    self.renderOperand = function ($row, operand) {
+        let type, value, $container;
+        if (operand == 0) {
+            type = operandAType;
+            value = operandAValue;
+            $container = $row.find('.function_cell__operandA');
+        } else {
+            type = operandBType;
+            value = operandBValue;
+            $container = $row.find('.function_cell__operandB');
+        }
 
         $container.html('');
-        if (self.hasOperand()) {
+        if (self.hasOperand(operand)) {
             
-            $container.append('<select class="logic_element__operand--type" data-operand="0"></select>');
+            $container.append('<select class="logic_element__operand--type" data-operand="' + operand + '"></select>');
             let $t = $container.find('.logic_element__operand--type');
 
             for (let k in FC.getOperandTypes()) {
                 if (FC.getOperandTypes().hasOwnProperty(k)) {
                     let op = FC.getOperandTypes()[k];
                     
-                    if (operandType == k) {
+                    if (type == k) {
                         $t.append('<option value="' + k + '" selected>' + op.name + '</option>');
 
                         /* 
                          * Render value element depending on type
                          */
-                        GUI.renderOperandValue($container, op, 0, operandValue, self.onOperatorValueChange);
+                        GUI.renderOperandValue($container, op, operand, value, self.onOperatorValueChange);
 
                     } else {
                         $t.append('<option value="' + k + '">' + op.name + '</option>');
@@ -136,6 +168,14 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
              */
             $t.change(self.onOperatorTypeChange);
 
+        } else {
+            if (operand == 0) {
+                self.setOperandAType(0);
+                self.setOperandAValue(FC.getOperandTypes()[0].default);
+            } else {
+                self.setOperandBType(0);
+                self.setOperandBValue(FC.getOperandTypes()[0].default);
+            }
         }
     }
 
@@ -184,7 +224,8 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
                 <td class="function_cell__enabled"></td>\
                 <td class="function_cell__logicId"></td>\
                 <td class="function_cell__action"></td>\
-                <td class="function_cell__operand"></td>\
+                <td class="function_cell__operandA"></td>\
+                <td class="function_cell__operandB"></td>\
                 <td class="function_cell__flags"></td>\
                 <td class="function_cell__status"><div class="logic_cell__active_marker"></div></td>\
             </tr>\
@@ -199,7 +240,8 @@ let GlobalFunction = function (enabled, conditionId, action, operandType, operan
             change(self.onEnabledChange);
         self.renderLogicId($row);
         self.renderAction($row);
-        self.renderOperand($row);
+        self.renderOperand($row, 0);
+        self.renderOperand($row, 1);
     }
 
     

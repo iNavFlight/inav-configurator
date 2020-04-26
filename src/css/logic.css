@@ -42,10 +42,16 @@ input.logic_element__operand--value {
 }
 
 .function_cell__action,
-.function_cell__operand,
+.function_cell__operandA,
+.function_cell__operandB,
 .logic_cell__operandA,
 .logic_cell__operandB {
     text-align: left;
+}
+
+.function_cell__operandA,
+.function_cell__operandB {
+    width: 260px;
 }
 
 .logic_cell__active_marker {

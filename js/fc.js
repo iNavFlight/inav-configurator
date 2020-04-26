@@ -1132,43 +1132,43 @@ var FC = {
         return {
             0: {
                 name: "OVERRIDE ARMING SAFETY",
-                hasOperand: false
+                hasOperand: [false, false]
             },
             1: {
                 name: "OVERRIDE THROTTLE SCALE",
-                hasOperand: true
+                hasOperand: [true, false]
             },
             2: {
                 name: "SWAP ROLL & YAW",
-                hasOperand: false
+                hasOperand: [false, false]
             },
             3: {
                 name: "SET VTX POWER LEVEL",
-                hasOperand: true
+                hasOperand: [true, false]
             },
             8: {
                 name: "SET VTX BAND",
-                hasOperand: true
+                hasOperand: [true, false]
             },
             9: {
                 name: "SET VTX CHANNEL",
-                hasOperand: true
+                hasOperand: [true, false]
             },
             4: {
                 name: "INVERT ROLL",
-                hasOperand: false
+                hasOperand: [false, false]
             },
             5: {
                 name: "INVERT PITCH",
-                hasOperand: false
+                hasOperand: [false, false]
             },
             6: {
                 name: "INVERT YAW",
-                hasOperand: false
+                hasOperand: [false, false]
             },
-            7: {
-                name: "OVERRIDE THROTTLE",
-                hasOperand: true
+            10: {
+                name: "OVERRIDE RC CHANNEL",
+                hasOperand: [true, true]
             }
         }
     },
