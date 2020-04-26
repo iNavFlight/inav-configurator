@@ -246,8 +246,12 @@
                 </div>
                 <div class="spacer_box">
                     <div class="features batteryVoltage"></div>
-                    <!--list of generated features goes here-->
-
+                    <div class="select">
+                        <select id="vbat_meter_type" data-setting="vbat_meter_type" />
+                        <label for="vbat_meter_type">
+                            <span data-i18n="configurationVoltageMeterType"></span>
+                        </label>
+                    </div>
                     <div class="select">
                         <select id="voltagesource" class="voltagesource">
                             <option value="0">Raw</option>
@@ -304,8 +308,12 @@
                 </div>
                 <div class="spacer_box">
                     <div class="features batteryCurrent"></div>
-                    <!--list of generated features goes here-->
-
+                    <div class="select">
+                        <select id="current_meter_type" data-setting="current_meter_type" />
+                        <label for="current_meter_type">
+                            <span data-i18n="configurationCurrentMeterType"></span>
+                        </label>
+                    </div>
                     <div class="number">
                         <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" />
                         <label for="currentscale">

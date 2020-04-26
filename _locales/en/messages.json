@@ -3346,5 +3346,11 @@
     },
     "i2cSpeedTooLow": {
         "message": "This I2C speed is too low!"
+    },
+    "configurationVoltageMeterType": {
+        "message": "Voltage Meter Type"
+    },
+    "configurationCurrentMeterType": {
+        "message": "Current Meter Type"
     }
 }
