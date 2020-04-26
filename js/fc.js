@@ -1210,7 +1210,10 @@ var FC = {
                     22: "Is RTH",
                     23: "Is WP",
                     24: "Is Landing",
-                    25: "Is Failsafe"
+                    25: "Is Failsafe",
+                    26: "Stabilized Roll",
+                    27: "Stabilized Pitch",
+                    28: "Stabilized Yaw"
                 }
             },
             3: {
