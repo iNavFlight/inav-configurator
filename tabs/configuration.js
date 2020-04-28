@@ -289,7 +289,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $i2cSpeed.change(function () {
             let $this = $(this),
                 value = $this.children("option:selected").text();
-            
+
             if (value == "400KHZ") {
 
                 $i2cSpeedInfo.removeClass('ok-box');
@@ -448,12 +448,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
         $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
         $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
-        if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-            $('#3ddeadbandthrottle').val(REVERSIBLE_MOTORS.deadband_throttle);
-        } else {
-            $('#deadband-3d-throttle-container').remove();
-        }
-
+        
         // Craft name
         if (craftName != null) {
             $('.config-personalization').show();
@@ -484,9 +479,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
             REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
             REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
-            if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                REVERSIBLE_MOTORS.deadband_throttle = ($('#3ddeadbandthrottle').val());
-            }
 
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
@@ -496,7 +488,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-            
+
+            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
+            googleAnalytics.sendEvent("Platform", helper.platform.getById(MIXER_CONFIG.platformType).name, "LPF: " + FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label + " | Looptime: " + FC_CONFIG.loopTime);
+
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
