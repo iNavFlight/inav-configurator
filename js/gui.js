@@ -165,12 +165,13 @@ GUI_control.prototype.content_ready = function (callback) {
          $(elem).removeClass('togglemedium');
     });
 
-    if (CONFIGURATOR.connectionValid) {
-        // Build link to in-use CF version documentation
-        var documentationButton = $('div#content #button-documentation');
-        documentationButton.html("Documentation for INAV");
-        documentationButton.attr("href","https://github.com/iNavFlight/inav/wiki");
-    }
+    // Insert a documentation button next to the tab title
+    const tabTitle = $('div#content .tab_title');
+    const documentationDiv = $('<div>').addClass('cf_doc_version_bt');
+    $('<a>').attr('href', 'https://github.com/iNavFlight/inav/wiki')
+        .attr('target', '_blank').attr('id', 'button-documentation')
+        .html(chrome.i18n.getMessage('documentation')).appendTo(documentationDiv);
+    documentationDiv.insertAfter(tabTitle);
 
     // loading tooltip
     jQuery(document).ready(function($) {
