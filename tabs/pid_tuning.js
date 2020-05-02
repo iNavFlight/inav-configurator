@@ -41,11 +41,13 @@ TABS.pid_tuning.initialize = function (callback) {
             var $this = $(this),
                 bankPosition = $this.data('pid-bank-position');
 
-            $this.find('td:first').text(pidNames[bankPosition]);
+            if (pidNames[bankPosition]) {
+                $this.find('td:first').text(pidNames[bankPosition]);
 
-            $this.find('input').each(function (index) {
-               $(this).val(PIDs[bankPosition][index]);
-            });
+                $this.find('input').each(function (index) {
+                $(this).val(PIDs[bankPosition][index]);
+                });
+            }
         });
 
         // Fill in data from RC_tuning object
