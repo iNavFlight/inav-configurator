@@ -13,6 +13,7 @@ helper.defaultsDialog = (function() {
     let data = [{
             "title": 'Mini Quad with 3"-7" propellers',
             "notRecommended": false,
+            "reboot": true,
             "settings": [
                 /*
                 System
@@ -175,6 +176,7 @@ helper.defaultsDialog = (function() {
             "title": 'Airplane',
             "notRecommended": false,
             "id": 3,
+            "reboot": true,
             "settings": [
                 {
                     key: "rc_yaw_expo",
@@ -219,6 +221,7 @@ helper.defaultsDialog = (function() {
         {
             "title": 'Rovers & Boats',
             "notRecommended": false,
+            "reboot": true,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -265,6 +268,7 @@ helper.defaultsDialog = (function() {
         {
             "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
             "notRecommended": true,
+            "reboot": false,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -275,6 +279,7 @@ helper.defaultsDialog = (function() {
         {
             "title": 'Keep current settings (Not recommended)',
             "notRecommended": true,
+            "reboot": false,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -323,13 +328,15 @@ helper.defaultsDialog = (function() {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
             
-                    GUI.tab_switch_cleanup(function() {
-                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            //noinspection JSUnresolvedVariable
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+                    if (selectedDefaultPreset.reboot) {
+                        GUI.tab_switch_cleanup(function() {
+                            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                                //noinspection JSUnresolvedVariable
+                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.handleReconnect();
+                            });
                         });
-                    });
+                    }
                 });
             })
         });
