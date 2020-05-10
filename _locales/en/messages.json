@@ -2452,8 +2452,8 @@
     "osdUnitUKTip": {
         "message": "Use metric units except for the speed, which is displayed in miles per hour."
     },
-    "osdAlarmRSSI": {
-        "message": "RSSI"
+    "osd_rssi_alarm": {
+        "message": "RSSI (%)"
     },
     "osdAlarmBATT_CAP": {
         "message": "Used Battery"
@@ -2461,44 +2461,44 @@
     "osdAlarmBATT_CAP_HELP": {
         "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
     },
-    "osdAlarmFLY_MINUTES": {
-        "message": "Fly Time"
+    "osd_time_alarm": {
+        "message": "Fly Time (minutes)"
     },
-    "osdAlarmMAX_ALTITUDE": {
-        "message": "Altitude"
+    "osd_alt_alarm": {
+        "message": "Altitude (meters)"
     },
-    "osdAlarmDIST": {
-        "message": "Distance"
+    "osd_dist_alarm": {
+        "message": "Distance (meters)"
     },
     "osdAlarmDIST_HELP": {
         "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
     },
-    "osdAlarmMAX_NEG_ALTITUDE": {
-        "message": "Negative Altitude"
+    "osd_neg_alt_alarm": {
+        "message": "Negative Altitude (meters)"
     },
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
-    "osdAlarmGFORCE": {
+    "osd_gforce_alarm": {
         "message": "g force"
     },
     "osdAlarmGFORCE_HELP": {
         "message": "The g force element will start blinking when greater than this value"
     },
-    "osdAlarmGFORCE_AXIS_MIN": {
+    "osd_gforce_axis_alarm_min": {
         "message": "g force axis min"
     },
     "osdAlarmGFORCE_AXIS_MIN_HELP": {
         "message": "The axes g force elements will start blinking when lower than this value"
     },
-    "osdAlarmGFORCE_AXIS_MAX": {
+    "osd_gforce_axis_alarm_max": {
         "message": "g force axis max"
     },
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
         "message": "The axes g force elements will start blinking when greater than this value"
     },
-    "osdAlarmCURRENT": {
-        "message": "Current"
+    "osd_current_alarm": {
+        "message": "Current (A)"
     },
     "osdAlarmCURRENT_HELP": {
         "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
