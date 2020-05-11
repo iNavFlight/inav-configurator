@@ -11,31 +11,6 @@ presets.elementHelper = function (group, field, value) {
 };
 
 presets.defaultValues = {
-    PIDs: {
-        mr: [
-            [40, 30, 23, 0],   //PID_ROLL
-            [40, 30, 23, 0],   //PID_PITCH
-            [85, 45, 0, 0],    //PID_YAW
-            [50, 0, 0, 0],     //PID_POS_Z
-            [65, 120, 10, 0],  //PID_POS_XY
-            [40, 15, 100, 40],  //PID_VEL_XY
-            [0, 0, 0, 0],      //PID_SURFACE
-            [20, 15, 75, 0],   //PID_LEVEL
-            [60, 0, 0, 0],     //PID_HEADING
-            [100, 50, 10, 0]   //PID_VEL_Z
-        ],
-        fw: [
-            [5, 7, 0, 50],     //PID_ROLL
-            [5, 7, 0, 50],     //PID_PITCH
-            [6, 10, 0, 60],    //PID_YAW
-            [40, 5, 10, 0],    //PID_POS_Z
-            [75, 5, 8, 0],     //PID_POS_XY
-            [0, 0, 0, 0],      //PID_VEL_XY
-            [0, 0, 0, 0],      //PID_SURFACE
-            [20, 5, 75, 0],    //PID_LEVEL
-            [60, 0, 0, 0],     //PID_HEADING
-            [0, 0, 0, 0]       //PID_VEL_Z
-        ]},
     INAV_PID_CONFIG: {"asynchronousMode": "0", "accelerometerTaskFrequency": 500, "attitudeTaskFrequency": 250, "magHoldRateLimit": 90, "magHoldErrorLpfFrequency": 2, "yawJumpPreventionLimit": 200, "gyroscopeLpf": "3", "accSoftLpfHz": 15},
     RC_tuning: {"RC_RATE": 1, "RC_EXPO": 0.7, "roll_pitch_rate": 0, "roll_rate": 200, "pitch_rate": 200, "yaw_rate": 200, "dynamic_THR_PID": 0, "throttle_MID": 0.5, "throttle_EXPO": 0, "dynamic_THR_breakpoint": 1500, "RC_YAW_EXPO": 0.2},
     PID_ADVANCED: {"rollPitchItermIgnoreRate": 200, "yawItermIgnoreRate": 50, "yawPLimit": 300, "axisAccelerationLimitRollPitch": 0, "axisAccelerationLimitYaw": 1000},
@@ -71,7 +46,7 @@ presets.presets = [
         name: '3-inch Multirotor Preset',
         description: "INAV Quad X configuration, 3-inch propellers. F4/F7 CPU.",
         features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -241,7 +216,7 @@ presets.presets = [
         name: 'MegaBee Cinewoop',
         description: "iFlight MegaBee Preset",
         features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -419,7 +394,7 @@ presets.presets = [
         name: '5-inch Multirotor Preset',
         description: "INAV Quad X configuration, 5-inch propellers. F4/F7 CPU. GPS and Magnetometer are optional",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -581,7 +556,7 @@ presets.presets = [
         name: '5-inch, 2208 2450KV motors',
         description: "Overpowered freestyle kwad. 5-inch, 3 bladed propellers like HQProp S4, Nepal N1, 2208 2450KV motors, 4S, DSHOT600 ESC protocol. Optimized for smooth, freestyle or acrobatic flight.",
         features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -751,7 +726,7 @@ presets.presets = [
         name: '6-inch, 2207 1700KV motors',
         description: "6-inch, 3 bladed propellers, 2207 1700KV motors, 4S, DSHOT600 ESC protocol. Optimized for smooth, freestyle or acrobatic flight with GPS or not.",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -921,7 +896,7 @@ presets.presets = [
         name: '7-inch Multirotor Preset',
         description: "General configuration for 7-inch propellers. Adjusted rates and filtering.",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -1096,7 +1071,7 @@ presets.presets = [
             "Improved PID defaults",
             "Adjusted filtering"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [],
         settings: [
             {
@@ -1274,7 +1249,7 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
             presets.elementHelper("RC_tuning", "roll_rate", 200),
             presets.elementHelper("RC_tuning", "pitch_rate", 150),
@@ -1298,11 +1273,8 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("PIDs", 0, [2, 15, 0, 30]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [2, 15, 0, 70]),  //PITCH PIDs
-            presets.elementHelper("PIDs", 7, [10, 15, 75, 0]),  //LEVEL PIDs
             presets.elementHelper("RC_tuning", "roll_rate", 350),
             presets.elementHelper("RC_tuning", "pitch_rate", 90),
             presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
@@ -1313,6 +1285,30 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "fw_p_pitch",
+                value: 2
+            },
+            {
+                key: "fw_i_pitch",
+                value: 15
+            },
+            {
+                key: "fw_ff_pitch",
+                value: 70
+            },
+            {
+                key: "fw_p_roll",
+                value: 2
+            },
+            {
+                key: "fw_i_roll",
+                value: 15
+            },
+            {
+                key: "fw_ff_roll",
+                value: 30
             }
         ],
         type: 'flyingwing'
@@ -1325,10 +1321,8 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("PIDs", 0, [6, 6, 0, 49]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [6, 9, 0, 52]),  //PITCH PIDs
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 40),
             presets.elementHelper("RC_tuning", "roll_rate", 280),
@@ -1340,6 +1334,30 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "fw_p_pitch",
+                value: 6
+            },
+            {
+                key: "fw_i_pitch",
+                value: 9
+            },
+            {
+                key: "fw_ff_pitch",
+                value: 52
+            },
+            {
+                key: "fw_p_roll",
+                value: 6
+            },
+            {
+                key: "fw_i_roll",
+                value: 6
+            },
+            {
+                key: "fw_ff_roll",
+                value: 49
             }
         ],
         type: 'flyingwing'
@@ -1352,10 +1370,8 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("PIDs", 0, [7, 7, 0, 25]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [5, 9, 0, 56]),  //PITCH PIDs
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
             presets.elementHelper("RC_tuning", "roll_rate", 260),
@@ -1367,6 +1383,30 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "fw_p_pitch",
+                value: 5
+            },
+            {
+                key: "fw_i_pitch",
+                value: 14
+            },
+            {
+                key: "fw_ff_pitch",
+                value: 56
+            },
+            {
+                key: "fw_p_roll",
+                value: 7
+            },
+            {
+                key: "fw_i_roll",
+                value: 12
+            },
+            {
+                key: "fw_ff_roll",
+                value: 25
             }
         ],
         type: 'flyingwing'
@@ -1379,10 +1419,8 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("PIDs", 0, [9, 12, 0, 15]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [9, 15, 0, 14]),  //PITCH PIDs
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
             presets.elementHelper("RC_tuning", "roll_rate", 360),
@@ -1394,6 +1432,30 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "fw_p_pitch",
+                value: 9
+            },
+            {
+                key: "fw_i_pitch",
+                value: 15
+            },
+            {
+                key: "fw_ff_pitch",
+                value: 14
+            },
+            {
+                key: "fw_p_roll",
+                value: 9
+            },
+            {
+                key: "fw_i_roll",
+                value: 12
+            },
+            {
+                key: "fw_ff_roll",
+                value: 15
             }
         ],
         type: 'flyingwing'
@@ -1406,10 +1468,8 @@ presets.presets = [
             "Adjusted PIDs",
             "Adjusted rates"
         ],
-        applyDefaults: ["PIDs", "INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("PIDs", 0, [8, 16, 0, 64]),  //ROLL PIDs
-            presets.elementHelper("PIDs", 1, [5, 18, 0, 60]),  //PITCH PIDs
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
             presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
             presets.elementHelper("RC_tuning", "roll_rate", 280),
@@ -1419,6 +1479,30 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "fw_p_pitch",
+                value: 5
+            },
+            {
+                key: "fw_i_pitch",
+                value: 18
+            },
+            {
+                key: "fw_ff_pitch",
+                value: 60
+            },
+            {
+                key: "fw_p_roll",
+                value: 8
+            },
+            {
+                key: "fw_i_roll",
+                value: 16
+            },
+            {
+                key: "fw_ff_roll",
+                value: 64
             }
         ],
         type: 'flyingwing'
