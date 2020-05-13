@@ -46,7 +46,7 @@ $(document).ready(function () {
         }
         globalSettings.proxyLayer = result.proxylayer;
     });
-    
+
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
@@ -110,7 +110,7 @@ $(document).ready(function () {
     chrome.storage.local.get('logopen', function (result) {
         if (result.logopen) {
             $("#showlog").trigger('click');
-         }
+        }
     });
 
     appUpdater.checkRelease(chrome.runtime.getManifest().version);
@@ -122,7 +122,7 @@ $(document).ready(function () {
     var ui_tabs = $('#tabs > ul');
     $('a', ui_tabs).click(function () {
 
-        if ($(this).parent().hasClass("tab_help")) {            
+        if ($(this).parent().hasClass("tab_help")) {
             return;
         }
 
@@ -306,7 +306,7 @@ $(document).ready(function () {
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);
-                
+
                 $('#map-provider-type').change(function () {
                     chrome.storage.local.set({
                         'map_provider_type': $(this).val()
@@ -325,7 +325,7 @@ $(document).ready(function () {
                     });
                     globalSettings.proxyURL = $(this).val();
                 });
-				$('#proxylayer').change(function () {
+                $('#proxylayer').change(function () {
                     chrome.storage.local.set({
                         'proxylayer': $(this).val()
                     });
@@ -427,34 +427,34 @@ $(document).ready(function () {
     });
 
     $("#showlog").on('click', function() {
-    var state = $(this).data('state'),
-        $log = $("#log");
+        var state = $(this).data('state'),
+            $log = $("#log");
 
-    if (state) {
-        $log.animate({height: 27}, 200, function() {
-             var command_log = $('div#log');
-             //noinspection JSValidateTypes
-            command_log.scrollTop($('div.wrapper', command_log).height());
-        });
-        $log.removeClass('active');
-        $("#content").removeClass('logopen');
-        $(".tab_container").removeClass('logopen');
-        $("#scrollicon").removeClass('active');
-        chrome.storage.local.set({'logopen': false});
+        if (state) {
+            $log.animate({height: 27}, 200, function() {
+                var command_log = $('div#log');
+                //noinspection JSValidateTypes
+                command_log.scrollTop($('div.wrapper', command_log).height());
+            });
+            $log.removeClass('active');
+            $("#content").removeClass('logopen');
+            $(".tab_container").removeClass('logopen');
+            $("#scrollicon").removeClass('active');
+            chrome.storage.local.set({'logopen': false});
 
-        state = false;
-    }else{
-        $log.animate({height: 111}, 200);
-        $log.addClass('active');
-        $("#content").addClass('logopen');
-        $(".tab_container").addClass('logopen');
-        $("#scrollicon").addClass('active');
-        chrome.storage.local.set({'logopen': true});
+            state = false;
+        }else{
+            $log.animate({height: 111}, 200);
+            $log.addClass('active');
+            $("#content").addClass('logopen');
+            $(".tab_container").addClass('logopen');
+            $("#scrollicon").addClass('active');
+            chrome.storage.local.set({'logopen': true});
 
-        state = true;
-    }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
-    $(this).data('state', state);
+            state = true;
+        }
+        $(this).text(state ? chrome.i18n.getMessage('logActionHide') : chrome.i18n.getMessage('logActionShow'));
+        $(this).data('state', state);
 
     });
 
