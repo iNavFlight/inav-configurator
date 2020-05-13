@@ -81,7 +81,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
                 self.initialize();
             } else {
-                GUI.log('<span style="color: red">Failed</span> to open serial port');
+                GUI.log(chrome.i18n.getMessage('serialPortOpenFail'));
             }
         });
     } else {
@@ -145,7 +145,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                     });
                 });
             } else {
-                GUI.log('<span style="color: red">Failed</span> to open serial port');
+                GUI.log(chrome.i18n.getMessage('serialPortOpenFail'));
             }
         });
     }

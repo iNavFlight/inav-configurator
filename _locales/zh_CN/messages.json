@@ -37,11 +37,63 @@
   "deviceReady": {
     "message": "设备 - <span style=\"color: #37a8db\">已准备</span>"
   },
-
+  "sensorDataFlashNotFound": {
+    "message": "未发现<br>闪存芯片"
+  },
+  "sensorDataFlashFreeSpace": {
+    "message": "闪存芯片：空闲空间"
+  },
+  "sensorStatusGyro": {
+    "message": "陀螺仪"
+  },
+  "sensorStatusGyroShort": {
+    "message": "陀螺仪"
+  },
+  "sensorStatusAccel": {
+    "message": "加速度计"
+  },
+  "sensorStatusAccelShort": {
+    "message": "加速度计"
+  },
+  "sensorStatusMag": {
+    "message": "磁力仪"
+  },
+  "sensorStatusMagShort": {
+    "message": "磁力仪"
+  },
+  "sensorStatusBaro": {
+    "message": "气压计"
+  },
+  "sensorStatusBaroShort": {
+    "message": "气压计"
+  },
+  "sensorStatusGPS": {
+    "message": "GPS"
+  },
+  "sensorStatusGPSShort": {
+    "message": "GPS"
+  },
+  "sensorStatusFlow": {
+    "message": "光流计"
+  },
+  "sensorStatusFlowShort": {
+    "message": "光流"
+  },
+  "sensorStatusAirspeed": {
+    "message": "空速计"
+  },
+  "sensorStatusAirspeedShort": {
+    "message": "空速"
+  },
+  "sensorStatusSonar": {
+    "message": "声呐 / 测距计"
+  },
+  "sensorStatusSonarShort": {
+    "message": "声呐"
+  },
   "backupFileIncompatible": {
     "message": "抱歉，提供的备份文件是为先前版本的配置器生成的，并且与该版本的配置器不兼容。"
   },
-
   "backupFileUnmigratable": {
     "message": "抱歉，提供的备份文件是由配置程序的早期版本生成的，不可迁移。"
   },
@@ -80,7 +132,7 @@
     "message": "端口"
   },
   "tabPidTuning": {
-    "message": "PID调整"
+    "message": "PID调参"
   },
   "tabReceiver": {
     "message": "接收机"
@@ -122,7 +174,7 @@
     "message": "黑盒"
   },
   "tabAdjustments": {
-    "message": "调整"
+    "message": "调参"
   },
   "tabAuxiliary": {
     "message": "模式"
@@ -140,7 +192,9 @@
   "serialPortClosedFail": {
     "message": "关闭串口<span style=\"color: red\">失败</span>"
   },
-
+  "serialUnrecoverable" : {
+    "message": "串口连接<span style=\"color: red\">故障</span> 且无法恢复，正在断开连接……"
+  },
   "usbDeviceOpened": {
     "message": "打开 USB 设备 <span style=\"color: #37a8db\">成功</span> ID: $1"
   },
@@ -148,15 +202,23 @@
     "message": "打开 USB 设备 <span style=\"color: red\">失败</span>"
   },
   "usbDeviceClosed": {
-    "message": "关闭 USB 设备<span style=\"color: #37a8db\">成功</span>"
+    "message": "关闭 USB 设备 <span style=\"color: #37a8db\">成功</span>"
   },
   "usbDeviceCloseFail": {
-    "message": "关闭 USB 设备<span style=\"color: red\">失败</span>"
+    "message": "关闭 USB 设备 <span style=\"color: red\">失败</span>"
   },
   "usbDeviceUdevNotice": {
     "message": "<strong>udev rules</strong>有没有正确安装？详细信息请查阅文档。"
   },
-
+  "stm32NotReadProtected": {
+    "message": "读取保护未启用"
+  },
+  "stm32AddressLoadFailed": {
+    "message": "定位选项字节扇区失败。很可能是因为读取保护造成的。"
+  },
+  "stm32AddressLoadUnknown": {
+    "message": "因未知错误，定位选项字节扇区失败。正在中止。"
+  },
   "noConfigurationReceived": {
     "message": "<span style=\"color: red\">10秒</span>内没有接收到配置信息，飞控通信<span style=\"color: red\">失败</span>"
   },
@@ -247,7 +309,7 @@
   },
 
   "defaultWelcomeText": {
-    "message": "本应用支持所有能运行 INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). 提供了推荐硬件的完整列表 <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">点击</a>.<br /><br />固件源代码可以从以下位置下载<a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">点击</a><br />可用最新的固件地址 <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />最新<strong>CP210x Drivers</strong>从以下位置下载<a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">点击</a><br />最新<strong>STM USB VCP Drivers</strong>从以下位置下载<a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />最新<strong>Zadig</strong>Windows DFU驱动安装可以从从以下位置下载<a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">点击</a><br />"
+    "message": "本应用支持所有能运行 INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> 等诸多)。提供了推荐硬件的完整列表 <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">点击</a>.<br /><br />固件源代码可以从以下位置下载<a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">点击</a><br />可用最新的固件地址 <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">点击</a>.<br /><br />最新<strong>CP210x Drivers</strong>从以下位置下载<a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">点击</a><br />最新<strong>STM USB VCP Drivers</strong>从以下位置下载<a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">点击</a><br />最新<strong>Zadig</strong>Windows DFU驱动安装可以从从以下位置下载<a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">点击</a><br />最新<strong>中文版本InavConfigurator地面站</strong>可以从以下位置下载<a href=\"https://gitee.com/hjjoe1213123/inav-configurator/releases\" title=\"https://gitee.com/hjjoe1213123/inav-configurator/releases\" target=\"_blank\">点击</a><br />"
   },
   "defaultContributingHead": {
     "message": "参与开发"
@@ -702,10 +764,16 @@
     "message": "电池电流"
   },
   "configurationVoltageSource": {
-    "message": "Voltage source to use for alarms and telemetry"
+    "message": "用于报警和遥测的电压电源"
   },
   "configurationVoltageSourceHelp": {
-    "message": "Raw voltage is the voltage read directly from the battery. Sag compensated voltage is the calculated voltage the battery should be at without load (simulates ideal battery and should remove false alarms provoked by high loads)"
+    "message": "原始电压是直接从电池读取的电压。 压降补偿电压是电池在无负载时应达到的计算电压（模拟理想电池，并应消除高负载引起的虚假警报）"
+  },
+  "configurationVoltageSourceRaw": {
+    "message": "原始无修正"
+  },
+  "configurationVoltageSourceSag": {
+    "message": "压降补偿"
   },
   "configurationBatteryCells": {
     "message": "电池电芯数(0 = 自动)"
@@ -996,10 +1064,10 @@
     "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
   },
   "pidTuningTPA": {
-    "message": "Thrust PID Attenuation (TPA)"
+    "message": "推力PID衰减(TPA)"
   },
   "pidTuningTPABreakPoint": {
-    "message": "TPA Breakpoint"
+    "message": "推力PID衰减断点"
   },
   "pidTuningButtonSave": {
     "message": "保存"
@@ -1030,7 +1098,7 @@
     "message": "油门中位"
   },
   "receiverThrottleExpo": {
-    "message": "Throttle EXPO"
+    "message": "Throttle Expo"
   },
   "receiverRcRate": {
     "message": "RC Rate"
@@ -1088,13 +1156,13 @@
   },
 
   "auxiliaryHelp": {
-    "message": "Use ranges to define the switches on your transmitter and corresponding mode assignments.  A receiver channel that gives a reading between a range min/max will activate the mode.  Remember to save your settings using the Save button."
+    "message": "使用范围来定义遥控器上的开关和相应的模式分配，接收机通道给出一个范围最小/最大值之间的读数将激活该模式，记住要使用保存按钮保存设置。"
   },
   "auxiliaryMin": {
-    "message": "Min"
+    "message": "最小"
   },
   "auxiliaryMax": {
-    "message": "Max"
+    "message": "最大"
   },
   "auxiliaryAddRange": {
     "message": "Add Range"
@@ -1119,7 +1187,7 @@
     "message": "Use Slot 2 and a 3POS switch on CH8 to select enable Rate Profile Selection via the same 3POS switch on the same channel."
   },
   "adjustmentsColumnEnable": {
-    "message": "If enabled"
+    "message": "如果启用"
   },
   "adjustmentsColumnUsingSlot": {
     "message": "using slot"
@@ -1131,7 +1199,7 @@
     "message": "is in range"
   },
   "adjustmentsColumnThenApplyFunction": {
-    "message": "then apply"
+    "message": "然后应用"
   },
   "adjustmentsColumnViaChannel": {
     "message": "via channel"
@@ -1158,37 +1226,37 @@
     "message": "不变"
   },
   "adjustmentsFunction1": {
-    "message": "RC Rate 调整"
+    "message": "RC Rate 调参"
   },
   "adjustmentsFunction2": {
-    "message": "RC Expo 调整"
+    "message": "RC Expo 调参"
   },
   "adjustmentsFunction3": {
-    "message": "油门曲线调整"
+    "message": "油门曲线调参"
   },
   "adjustmentsFunction4": {
-    "message": "Pitch & Roll 比率调整"
+    "message": "Pitch & Roll 比率调参"
   },
   "adjustmentsFunction5": {
-    "message": "Yaw Rate 调整"
+    "message": "Yaw Rate 调参"
   },
   "adjustmentsFunction6": {
-    "message": "Pitch & Roll P 调整"
+    "message": "Pitch & Roll P 调参"
   },
   "adjustmentsFunction7": {
-    "message": "Pitch & Roll I 调整"
+    "message": "Pitch & Roll I 调参"
   },
   "adjustmentsFunction8": {
-    "message": "Pitch & Roll D 调整"
+    "message": "Pitch & Roll D 调参"
   },
   "adjustmentsFunction9": {
-    "message": "Yaw P 调整"
+    "message": "Yaw P 调参"
   },
   "adjustmentsFunction10": {
-    "message": "Yaw I 调整"
+    "message": "Yaw I 调参"
   },
   "adjustmentsFunction11": {
-    "message": "Yaw D 调整"
+    "message": "Yaw D 调参"
   },
   "adjustmentsFunction12": {
     "message": "Rate 配置文件选择"
@@ -1200,43 +1268,43 @@
     "message": "Roll 比率"
   },
   "adjustmentsFunction15": {
-    "message": "Pitch P 调整"
+    "message": "Pitch P 调参"
   },
   "adjustmentsFunction16": {
-    "message": "Pitch I 调整"
+    "message": "Pitch I 调参"
   },
   "adjustmentsFunction17": {
-    "message": "Pitch D 调整"
+    "message": "Pitch D 调参"
   },
   "adjustmentsFunction18": {
-    "message": "Roll P 调整"
+    "message": "Roll P 调参"
   },
   "adjustmentsFunction19": {
-    "message": "Roll I 调整"
+    "message": "Roll I 调参"
   },
   "adjustmentsFunction20": {
-    "message": "Roll D 调整"
+    "message": "Roll D 调参"
   },
   "adjustmentsFunction21": {
-    "message": "RC Yaw Expo 调整"
+    "message": "RC Yaw Expo 调参"
   },
   "adjustmentsFunction22": {
-    "message": "手动 RC Expo 调整"
+    "message": "手动 RC Expo 调参"
   },
   "adjustmentsFunction23": {
-    "message": "手动 RC Yaw Expo 调整"
+    "message": "手动 RC Yaw Expo 调参"
   },
   "adjustmentsFunction24": {
-    "message": "手动 Pitch & Roll Rate 调整"
+    "message": "手动 Pitch & Roll Rate 调参"
   },
   "adjustmentsFunction25": {
-    "message": "手动 Roll 比率调整"
+    "message": "手动 Roll 比率调参"
   },
   "adjustmentsFunction26": {
-    "message": "手动 Pitch 比率调整"
+    "message": "手动 Pitch 比率调参"
   },
   "adjustmentsFunction27": {
-    "message": "手动 Yaw 比率调整"
+    "message": "手动 Yaw 比率调参"
   },
   "adjustmentsFunction28": {
     "message": "Navigation FW Cruise Throttle Adjustment"
@@ -1251,58 +1319,58 @@
     "message": "Board Pitch Alignment Adjustment"
   },
   "adjustmentsFunction32": {
-    "message": "Level P 调整"
+    "message": "Level P 调参"
   },
   "adjustmentsFunction33": {
-    "message": "Level I 调整"
+    "message": "Level I 调参"
   },
   "adjustmentsFunction34": {
-    "message": "Level D 调整"
+    "message": "Level D 调参"
   },
   "adjustmentsFunction35": {
-    "message": "Pos XY P 调整"
+    "message": "Pos XY P 调参"
   },
   "adjustmentsFunction36": {
-    "message": "Pos XY I 调整"
+    "message": "Pos XY I 调参"
   },
   "adjustmentsFunction37": {
-    "message": "Pos XY D 调整"
+    "message": "Pos XY D 调参"
   },
   "adjustmentsFunction38": {
-    "message": "Pos Z P 调整"
+    "message": "Pos Z P 调参"
   },
   "adjustmentsFunction39": {
-    "message": "Pos Z I 调整"
+    "message": "Pos Z I 调参"
   },
   "adjustmentsFunction40": {
-    "message": "Pos Z D 调整"
+    "message": "Pos Z D 调参"
   },
   "adjustmentsFunction41": {
-    "message": "Heading P 调整"
+    "message": "Heading P 调参"
   },
   "adjustmentsFunction42": {
-    "message": "Vel XY P 调整"
+    "message": "Vel XY P 调参"
   },
   "adjustmentsFunction43": {
-    "message": "Vel XY I 调整"
+    "message": "Vel XY I 调参"
   },
   "adjustmentsFunction44": {
-    "message": "Vel XY D 调整"
+    "message": "Vel XY D 调参"
   },
   "adjustmentsFunction45": {
-    "message": "Vel Z P 调整"
+    "message": "Vel Z P 调参"
   },
   "adjustmentsFunction46": {
-    "message": "Vel Z I 调整"
+    "message": "Vel Z I 调参"
   },
   "adjustmentsFunction47": {
-    "message": "Vel Z D 调整"
+    "message": "Vel Z D 调参"
   },
   "adjustmentsFunction48": {
     "message": "FW min thr down pitch angle Adjustment"
   },
   "adjustmentsFunction49": {
-    "message": "VTX（图传）功率级别调整"
+    "message": "VTX（图传）功率级别调参"
   },
   "adjustmentsSave": {
     "message": "保存"
@@ -1474,7 +1542,57 @@
   "sensorsScale": {
     "message": "比例:"
   },
-
+  "sensorsGyroSelect": {
+    "message": "陀螺仪"
+  },
+  "sensorsAccelSelect": {
+    "message": "加速度计"
+  },
+  "sensorsMagSelect": {
+    "message": "磁力计"
+  },
+  "sensorsAltitudeSelect": {
+    "message": "高度"
+  },
+  "sensorsBarometerSelect": {
+    "message": "气压计"
+  },
+  "sensorsArispeedSelect": {
+    "message": "空速"
+  },
+  "sensorsTemperatureSelect": {
+    "message": "温度"
+  },
+  "sensorsSonarSelect": {
+    "message": "声呐"
+  },
+  "sensorsDebugSelect": {
+    "message": "调试"
+  },
+  "sensorsGyroTitle": {
+    "message": "陀螺仪 - 度/秒"
+  },
+  "sensorsAccelTitle": {
+    "message": "加速度计 - G"
+  },
+  "sensorsMagTitle": {
+    "message": "磁力计 - Ga"
+  },
+  "sensorsBarometerTitle": {
+    "message": "气压计 - 米"
+  },
+  "sensorsSonarTitle": {
+    "message": "声呐 - 厘米"
+  },
+  "sensorsAirspeedTitle": {
+    "message": "空速 - 厘米/秒"
+  },
+  "sensorsTemperatureTitle": {
+    "message": "温度"
+  },
+  "sensorsDebugTitle": {
+    "message": "调试"
+  },
   "cliInfo": {
     "message": "<strong>注意：</strong>退出 CLI 页面或者点击断开连接将<strong>自动</strong>向飞控发送“<strong>退出</strong>”指令。在最新的固件中这将使飞控<strong>重启</strong>并且未保存的设置将会<strong>丢失</strong>。<p><strong><span class=\"message-negative\">警告：</span></strong>CLI中的某些命令可能导致电机输出引脚发出随机指令。如果连接电池，这有可能导致电机旋转。因此，强烈建议<strong>在 CLI 中输入命令之前确保未连接电池"
   },
@@ -1633,7 +1751,7 @@
     "message": "日期:"
   },
   "firmwareFlasherReleaseStatus": {
-    "message": "State:"
+    "message": "状态:"
   },
   "firmwareFlasherReleaseTarget": {
     "message": "飞控目标:"
@@ -1778,7 +1896,12 @@
   "firmwareFlasherFailedToLoadOnlineFirmware": {
     "message": "加载固件失败"
   },
-
+  "ledStripClearSelectedButton": {
+    "message": "清除已选定"
+  },
+  "ledStripClearAllButton": {
+    "message": "全部清除"
+  },
   "ledStripHelp": {
     "message": "飞控可以控制 LED 灯带上的每一个灯珠的颜色和效果。<br />配置灯珠的位置，连线的顺序，然后按位置将灯带接入。没有设置过接线顺序的灯珠设置不会被保存。<br />在一个颜色上双击可编辑 HSV 值。"
   },
@@ -1788,7 +1911,183 @@
   "ledStripEepromSaved": {
     "message": "EEPROM <span style=\"color: #37a8db\">已保存</span>"
   },
-
+  "ledStripFunctionSection": {
+    "message": "LED 功能"
+  },
+  "ledStripFunctionTitle": {
+    "message": "基本功能"
+  },
+  "ledStripFunctionNoneOption": {
+    "message": "无"
+  },
+  "ledStripFunctionColorOption": {
+    "message": "颜色"
+  },
+  "ledStripFunctionModesOption": {
+    "message": "模式和方向"
+  },
+  "ledStripFunctionArmOption": {
+    "message": "锁定状态"
+  },
+  "ledStripFunctionBatteryOption": {
+    "message": "电池"
+  },
+  "ledStripFunctionRSSIOption": {
+    "message": "RSSI"
+  },
+  "ledStripFunctionGPSOption": {
+    "message": "GPS"
+  },
+  "ledStripFunctionRingOption": {
+    "message": "环"
+  },
+  "ledStripColorModifierTitle": {
+    "message": "颜色修改器"
+  },
+  "ledStripOverlayTitle": {
+    "message": "叠加功能"
+  },
+  "ledStripBlinkTitle": {
+    "message": "闪烁"
+  },
+  "ledStripModeColorsTitle": {
+    "message": "模式颜色"
+  },
+  "ledStripModeColorsModeOrientation": {
+    "message": "方向"
+  },
+  "ledStripModeColorsModeHeadfree": {
+    "message": "无头模式"
+  },
+  "ledStripModeColorsModeHorizon": {
+    "message": "半自稳模式"
+  },
+  "ledStripModeColorsModeAngle": {
+    "message": "自稳模式"
+  },
+  "ledStripModeColorsModeMag": {
+    "message": "磁力计"
+  },
+  "ledStripModeColorsModeBaro": {
+    "message": "气压计"
+  },
+  "ledStripDirN": {
+    "message": "北"
+  },
+  "ledStripDirE": {
+    "message": "东"
+  },
+  "ledStripDirS": {
+    "message": "南"
+  },
+  "ledStripDirW": {
+    "message": "西"
+  },
+  "ledStripDirU": {
+    "message": "上"
+  },
+  "ledStripDirD": {
+    "message": "下"
+  },
+  "ledStripModesOrientationTitle": {
+    "message": "LED 方向（“模式和方向”）和颜色"
+  },
+  "ledStripModesSpecialColorsTitle": {
+    "message": "特殊颜色"
+  },
+  "ledStripModeColorsModeDisarmed": {
+    "message": "已锁定"
+  },
+  "ledStripModeColorsModeArmed": {
+    "message": "已解锁"
+  },
+  "ledStripModeColorsModeAnimation": {
+    "message": "动画"
+  },
+  "ledStripModeColorsModeBlinkBg": {
+    "message": "闪烁背景"
+  },
+  "ledStripModeColorsModeGPSNoSats": {
+    "message": "GPS: 无卫星"
+  },
+  "ledStripModeColorsModeGPSNoLock": {
+    "message": "GPS: 未定位"
+  },
+  "ledStripModeColorsModeGPSLocked": {
+    "message": "GPS: 已定位"
+  },
+  "ledStripWiring": {
+    "message": "LED 灯带布线"
+  },
+  "ledStripWiringMode": {
+    "message": "布线模式"
+  },
+  "ledStripWiringClearControl": {
+    "message": "清除已选定"
+  },
+  "ledStripWiringClearAllControl": {
+    "message": "清除所有布线"
+  },
+  "ledStripWiringMessage": {
+    "message": "没有布线序号的 LED 不会被保存。"
+  },
+  "ledStripVtxFunction": {
+    "message": "跑马灯"
+  },
+  "ledStripThrottleHue": {
+    "message": "油门"
+  },
+  "ledStripBlinkAlwaysOverlay": {
+    "message": "持续闪烁"
+  },
+  "ledStripBlinkLandingOverlay": {
+    "message": "着陆时闪烁"
+  },
+  "ledStripIndecatorOverlay": {
+    "message": "指示灯"
+  },
+  "colorBlack": {
+    "message": "黑色"
+  },
+  "colorWhite": {
+    "message": "白色"
+  },
+  "colorRed": {
+    "message": "红色"
+  },
+  "colorOrange": {
+    "message": "橙色"
+  },
+  "colorYellow": {
+    "message": "黄色"
+  },
+  "colorLimeGreen": {
+    "message": "橙绿色"
+  },
+  "colorGreen": {
+    "message": "绿色"
+  },
+  "colorMintGreen": {
+    "message": "薄荷绿"
+  },
+  "colorCyan": {
+    "message": "青色"
+  },
+  "colorLightBlue": {
+    "message": "浅蓝色"
+  },
+  "colorBlue": {
+    "message": "蓝色"
+  },
+  "colorDarkViolet": {
+    "message": "暗紫色"
+  },
+  "colorMagenta": {
+    "message": "品红色"
+  },
+  "colorDeepPink": {
+    "message": "深粉色"
+  },
   "controlAxisRoll": {
     "message": "横滚 [A]"
   },
@@ -1967,13 +2266,13 @@
     "message" : "舵机必须支持刷新率。 仅在知道舵机支持的情况下进行更改。 刷新率过高可能会损坏伺服！"
   },
   "logPwmOutputDisabled": {
-    "message" : "PWM输出被禁用。 电机和舵机将无法工作。 使用<u>输出</u>标签启用！"
+    "message" : "PWM输出被禁用。 电机和舵机将无法工作。 使用 <u>输出</u> 标签启用！"
   },
   "configurationGyroSyncTitle": {
     "message" : "Synchronize looptime with gyroscope"
   },
   "configurationGyroLpfTitle": {
-    "message" : "Gyroscope LPF cutoff frequency"
+    "message" : "陀螺仪低通滤波器截止频率"
   },
   "configurationGyroSyncDenominator": {
     "message" : "Gyroscope denominator"
@@ -2231,7 +2530,7 @@
     "message": "Programming"
   },
   "tabAdvancedTuning": {
-    "message": "进阶调整"
+    "message": "高级调参"
   },
   "advancedTuningSave": {
     "message": "保存并重启"
@@ -2279,7 +2578,7 @@
     "message": "Defines band of filter. <br><br>Has to be kept below notch filter frequency."
   },
   "multiRotorNavigationConfiguration": {
-    "message": "Multirotor Navigation Settings"
+    "message": "多旋翼导航设置"
   },
   "userControlMode": {
     "message": "用户控制模式"
@@ -2294,7 +2593,7 @@
     "message": "最大导航爬升率 [厘米/秒]"
   },
   "posholdMaxManualClimbRate": {
-    "message": "Max. ALTHOLD climb rate [厘米/秒]"
+    "message": "最大定高上升速率[厘米/秒]"
   },
   "posholdMaxBankAngle": {
     "message": "Multirotor max. banking angle [degrees]"
@@ -2306,7 +2605,7 @@
     "message": "悬停油门"
   },
   "posholdHoverMidThrottle": {
-    "message": "Use mid. throttle for ALTHOLD"
+    "message": "使用油门中点保持定高"
   },
   "positionEstimatorConfiguration": {
     "message": "Position Estimator"
@@ -2414,13 +2713,13 @@
     "message": "最大爬升角[角度]"
   },
   "maxClimbAngleHelp": {
-    "message": "导航模式下的最大爬升角度。 在”PID调整“页面中受最大俯仰角限制。"
+    "message": "导航模式下的最大爬升角度。 在”PID调参“页面中受最大俯仰角限制。"
   },
   "maxDiveAngle": {
     "message": "最大俯冲角[角度]"
   },
   "maxDiveAngleHelp": {
-    "message": "导航模式下的最大俯仰角。 在”PID调整“页面中受最大俯仰角限制."
+    "message": "导航模式下的最大俯仰角。 在”PID调参“页面中受最大俯仰角限制."
   },
   "pitchToThrottle": {
     "message": "Pitch to throttle ratio"
@@ -2612,10 +2911,10 @@
     "message": "mAh drawn"
   },
   "osdElement_EFFICIENCY_MAH": {
-    "message": "Efficiency mAh/Km"
+    "message": "效率 mAh/Km"
   },
   "osdElement_EFFICIENCY_WH": {
-    "message": "Efficiency Wh/Km"
+    "message": "效率 Wh/Km"
   },
   "osdElement_THROTTLE_POSITION_AUTO_THR": {
     "message": "油门位置 / 自动油门"
@@ -2627,7 +2926,7 @@
     "message": "GPS 速度"
   },
   "osdElement_GPS_SPEED_HELP": {
-    "message": "Shows GPS ground speed."
+    "message": "显示GPS地面速度"
   },
   "osdElement_MSL_ALTITUDE": {
     "message": "MSL Altitude"
@@ -2750,19 +3049,19 @@
     "message": "Scale of the currently shown map/radar."
   },
   "osdElement_MAP_REFERENCE": {
-    "message": "Map Reference"
+    "message": "地图参考"
   },
   "osdElement_MAP_REFERENCE_HELP": {
     "message": "Reference (direction that points up) of the current map. N for North and T for takeoff direction."
   },
   "osdElement_WIND_SPEED_HORIZONTAL": {
-    "message": "Horizontal wind speed"
+    "message": "水平风速"
   },
   "osdElement_WIND_SPEED_HORIZONTAL_HELP": {
-    "message": "Shows estimated horizontal wind speed and direction."
+    "message": "显示估计的水平风速和风向"
   },
   "osdElement_WIND_SPEED_VERTICAL": {
-    "message": "Vertical wind speed"
+    "message": "垂直风速"
   },
   "osdElement_WIND_SPEED_VERTICAL_HELP": {
     "message": "Shows estimated vertical wind speed and direction (up or down)."
@@ -2981,13 +3280,13 @@
     "message": "速度 (10µs/s)"
   },
   "mixerPresetTitle": {
-    "message": "Mixer preset"
+    "message": "混控预设"
   },
   "fcFirmwareUpdateRequired": {
     "message": "飞行控制器固件必须更新为最新版本才能使用此功能"
   },
   "mixerNotConfigured": {
-    "message": "Mixer not configured. Use <u>Mixer</u> tab to set it up!"
+    "message": "混控未配置。使用 <u>混控</u> 页面进行设置!"
   },
   "confirm_reset_settings": {
     "message": "您真的要重设所有设置吗？\n注意：所有设置都会丢失！ 完成此操作后，您必须设置整个飞机！"
@@ -3011,7 +3310,7 @@
     "message": "Aircraft"
   },
   "ALTITUDE": {
-    "message": "Altitude"
+    "message": "高度"
   },
   "GROUND_SPEED": {
     "message": "地面速度"
@@ -3284,7 +3583,7 @@
     "message": "Antigravity Cutoff Frequency"
   },
   "ouptputsConfiguration": {
-    "message": "Configuration"
+    "message": "输出配置"
   },
   "vtxDisclaimer": {
     "message": "Use only bands, channels and power levels that are legal in a place you fly! Always refer to VTX user manual and local regulations!"
@@ -3293,10 +3592,10 @@
     "message": "默认值"
   },
   "defaultsDialogInfo": {
-    "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
+    "message": "INAV Configurator想知道您正在配置哪种无人机。 根据此信息，它将修改一些默认值以解锁最佳飞行性能。"
   },
   "defaultsDialogInfo2": {
-    "message": "Avoid blindly restoring all PID and filter configuration from the previous version of INAV. The best result can be obtained by retuning from defaults!"
+    "message": "避免盲目地从先前版本的INAV恢复所有PID和过滤器配置。 通过从默认值重新调整参数可以获得最佳结果！"
   },
   "throttleIdle": {
     "message": "电机怠速功率 [%]"
@@ -3354,5 +3653,11 @@
   },
   "configurationCurrentMeterType": {
     "message": "电流计类型"
+  },
+  "logActionHide": {
+    "message": "隐藏日志"
+  },
+  "logActionShow": {
+    "message": "显示日志"
   }
 }
