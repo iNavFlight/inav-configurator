@@ -2332,12 +2332,6 @@
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
     },
-    "use_gps_velned": {
-        "message": "Use GPS data for velocity calculation"
-    },
-    "use_gps_velned_help": {
-        "message": "Defined if iNav should use velocity data provided by GPS module for doing position and speed estimation. If set to OFF iNav will fallback to calculating velocity from GPS coordinates. Using native velocity data may improve performance on some GPS modules. Some GPS modules introduce significant delay and using native velocity may actually result in much worse performance."
-    },
     "w_z_baro_p_help": {
         "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
     },
