@@ -1456,14 +1456,18 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
-                BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
-                BRAKING_CONFIG.disengageSpeed = data.getUint16(2, true);
-                BRAKING_CONFIG.timeout = data.getUint16(4, true);
-                BRAKING_CONFIG.boostFactor = data.getInt8(6);
-                BRAKING_CONFIG.boostTimeout = data.getUint16(7, true);
-                BRAKING_CONFIG.boostSpeedThreshold = data.getUint16(9, true);
-                BRAKING_CONFIG.boostDisengageSpeed = data.getUint16(11, true);
-                BRAKING_CONFIG.bankAngle = data.getInt8(13);
+                try {
+                    BRAKING_CONFIG.speedThreshold = data.getUint16(0, true);
+                    BRAKING_CONFIG.disengageSpeed = data.getUint16(2, true);
+                    BRAKING_CONFIG.timeout = data.getUint16(4, true);
+                    BRAKING_CONFIG.boostFactor = data.getInt8(6);
+                    BRAKING_CONFIG.boostTimeout = data.getUint16(7, true);
+                    BRAKING_CONFIG.boostSpeedThreshold = data.getUint16(9, true);
+                    BRAKING_CONFIG.boostDisengageSpeed = data.getUint16(11, true);
+                    BRAKING_CONFIG.bankAngle = data.getInt8(13);
+                } catch (e) {
+                    console.log("MC_BRAKING MODE is not supported by the hardware");
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
