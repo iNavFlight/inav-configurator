@@ -162,6 +162,17 @@ helper.defaultsDialog = (function() {
                     key: "mc_i_yaw",
                     value: 80
                 },
+                /*
+                 * TPA
+                 */
+                {
+                    key: "tpa_rate",
+                    value: 20
+                },
+                {
+                    key: "tpa_breakpoint",
+                    value: 1200
+                },
                 {
                     key: "platform_type",
                     value: "MULTIROTOR"
