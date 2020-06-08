@@ -758,6 +758,45 @@
     "configurationBatteryCapacityUnit": {
         "message": "Battery Capacity Unit"
     },
+    "configurationLaunch": {
+        "message": "Auto Launch Configuration"
+    },
+    "configurationLaunchVelocity": {
+        "message": "Velocity"
+    },
+    "configurationLaunchAccel": {
+        "message": "Acceleration"
+    },
+    "configurationLaunchMaxAngle": {
+        "message": "Max Angle"
+    },
+    "configurationLaunchDetectTime": {
+        "message": "Detect Time"
+    },
+    "configurationLaunchThr": {
+        "message": "Throttle"
+    },
+    "configurationLaunchIdleThr": {
+        "message": "Idle Throttle"
+    },
+    "configurationLaunchMotorDelay": {
+        "message": "Motor Delay"
+    },
+    "configurationLaunchSpinupTime": {
+        "message": "Spinup Time"
+    },
+    "configurationLaunchMinTime": {
+        "message": "Min Time"
+    },
+    "configurationLaunchTimeout": {
+        "message": "Time Out"
+    },
+    "configurationLaunchMaxAltitude": {
+        "message": "Max Altitude"
+    },
+     "configurationLaunchClimbAngle": {
+        "message": "Climb Angle"
+    },
     "configuration3d": {
         "message": "Reversible motors"
     },

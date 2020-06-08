@@ -1339,6 +1339,20 @@ var mspHelper = (function (gui) {
                 FW_CONFIG.maxDiveAngle = data.getUint8(8);
                 FW_CONFIG.pitchToThrottle = data.getUint8(9);
                 FW_CONFIG.loiterRadius = data.getUint16(10, true);
+                //launch
+                FW_CONFIG.launch_velocity = data.getUint16(12,true);
+                FW_CONFIG.launch_accel = data.getUint16(14, true);
+                FW_CONFIG.launch_max_angle = data.getUint16(16, true);
+                FW_CONFIG.launch_detect_time = data.getUint16(18, true);
+                FW_CONFIG.launch_thr = data.getUint16(20, true);
+                FW_CONFIG.launch_idle_thr = data.getUint16(22, true);
+                FW_CONFIG.launch_motor_delay = data.getUint16(24, true);
+                FW_CONFIG.launch_spinup_time = data.getUint16(26, true);
+                FW_CONFIG.launch_min_time = data.getUint16(28, true);
+                FW_CONFIG.launch_timeout = data.getUint16(30, true);
+                FW_CONFIG.launch_max_altitude = data.getUint16(32, true);
+                FW_CONFIG.launch_climb_angle = data.getUint16(34, true);
+                
                 break;
 
             case MSPCodes.MSP_SET_FW_CONFIG:
