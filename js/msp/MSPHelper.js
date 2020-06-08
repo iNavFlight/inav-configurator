@@ -1340,18 +1340,18 @@ var mspHelper = (function (gui) {
                 FW_CONFIG.pitchToThrottle = data.getUint8(9);
                 FW_CONFIG.loiterRadius = data.getUint16(10, true);
                 //launch
-                FW_CONFIG.launch_velocity = data.getUint16(12,true);
-                FW_CONFIG.launch_accel = data.getUint16(14, true);
-                FW_CONFIG.launch_max_angle = data.getUint16(16, true);
-                FW_CONFIG.launch_detect_time = data.getUint16(18, true);
-                FW_CONFIG.launch_thr = data.getUint16(20, true);
-                FW_CONFIG.launch_idle_thr = data.getUint16(22, true);
-                FW_CONFIG.launch_motor_delay = data.getUint16(24, true);
-                FW_CONFIG.launch_spinup_time = data.getUint16(26, true);
-                FW_CONFIG.launch_min_time = data.getUint16(28, true);
-                FW_CONFIG.launch_timeout = data.getUint16(30, true);
-                FW_CONFIG.launch_max_altitude = data.getUint16(32, true);
-                FW_CONFIG.launch_climb_angle = data.getUint16(34, true);
+                FW_CONFIG.launchVelocity = data.getUint16(12,true);
+                FW_CONFIG.launchAccel = data.getUint16(14, true);
+                FW_CONFIG.launchMaxAngle = data.getUint16(16, true);
+                FW_CONFIG.launchDetectTime = data.getUint16(18, true);
+                FW_CONFIG.launchThr = data.getUint16(20, true);
+                FW_CONFIG.launchIdleThr = data.getUint16(22, true);
+                FW_CONFIG.launchMotorDelay = data.getUint16(24, true);
+                FW_CONFIG.launchSpinupTime = data.getUint16(26, true);
+                FW_CONFIG.launchMinTime = data.getUint16(28, true);
+                FW_CONFIG.launchTimeout = data.getUint16(30, true);
+                FW_CONFIG.launchMaxAltitude = data.getUint16(32, true);
+                FW_CONFIG.launchClimbAngle = data.getUint16(34, true);
                 
                 break;
 
@@ -2022,7 +2022,31 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(FW_CONFIG.loiterRadius));
                 buffer.push(highByte(FW_CONFIG.loiterRadius));
-
+                //launch
+                buffer.push(lowByte(FW_CONFIG.launchVelocity));
+                buffer.push(highByte(FW_CONFIG.launchVelocity));
+                buffer.push(lowByte(FW_CONFIG.launchAccel));
+                buffer.push(highByte(FW_CONFIG.launchAccel));
+                buffer.push(lowByte(FW_CONFIG.launchMaxAngle));
+                buffer.push(highByte(FW_CONFIG.launchMaxAngle));
+                buffer.push(lowByte(FW_CONFIG.launchDetectTime));
+                buffer.push(highByte(FW_CONFIG.launchDetectTime));
+                buffer.push(lowByte(FW_CONFIG.launchThr));
+                buffer.push(highByte(FW_CONFIG.launchThr));
+                buffer.push(lowByte(FW_CONFIG.launchIdleThr));
+                buffer.push(highByte(FW_CONFIG.launchIdleThr));
+                buffer.push(lowByte(FW_CONFIG.launchMotorDelay));
+                buffer.push(highByte(FW_CONFIG.launchMotorDelay));
+                buffer.push(lowByte(FW_CONFIG.launchSpinupTime));
+                buffer.push(highByte(FW_CONFIG.launchSpinupTime));
+                buffer.push(lowByte(FW_CONFIG.launchMinTime));
+                buffer.push(highByte(FW_CONFIG.launchMinTime));
+                buffer.push(lowByte(FW_CONFIG.launchTimeout));
+                buffer.push(highByte(FW_CONFIG.launchTimeout));
+                buffer.push(lowByte(FW_CONFIG.launchMaxAltitude));
+                buffer.push(highByte(FW_CONFIG.launchMaxAltitude));
+                buffer.push(lowByte(FW_CONFIG.launchClimbAngle));
+                buffer.push(highByte(FW_CONFIG.launchClimbAngle));
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:

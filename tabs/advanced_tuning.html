@@ -150,6 +150,97 @@
                     </div>
                 </div>
             </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationLaunch"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="number">
+                        <input type="number" id="launchvelocity" name="launchvelocity" data-simple-bind="FW_CONFIG.launchVelocity" step="1" min="100" max="10000" />
+                        <label for="launchvelocity">
+                            <span data-i18n="configurationLaunchVelocity"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
+                    </div>
+                     <div class="number">
+                        <input type="number" id="launchaccel" name="launchaccel" data-simple-bind="FW_CONFIG.launchAccel" step="1" min="1000" max="2000" />
+                        <label for="launchaccel">
+                            <span data-i18n="configurationLaunchAccel"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchmaxangle" name="launchmaxangle" data-simple-bind="FW_CONFIG.launchMaxAngle" step="1" min="5" max="180" />
+                        <label for="launchmaxangle">
+                            <span data-i18n="configurationLaunchMaxAngle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAngleHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchdetecttime" name="launchdetecttime" data-simple-bind="FW_CONFIG.launchDetectTime" step="1" min="10" max="1000" />
+                        <label for="launchdetecttime">
+                            <span data-i18n="configurationLaunchDetectTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchDetectTimeHelp"></div>
+                    </div>
+                     <div class="number">
+                        <input type="number" id="launchthr" name="launchthr" data-simple-bind="FW_CONFIG.launchThr" step="1" min="1000" max="2000" />
+                        <label for="launchthr">
+                            <span data-i18n="configurationLaunchThr"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchThrHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchidlethr" name="launchidlethr" data-simple-bind="FW_CONFIG.launchIdleThr" step="1" min="1000" max="2000" />
+                        <label for="launchidlethr">
+                            <span data-i18n="configurationLaunchIdleThr"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleThrHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchmotordelay" name="launchmotordelay" data-simple-bind="FW_CONFIG.launchMotorDelay" step="1" min="0" max="5000" />
+                        <label for="launchmotordelay">
+                            <span data-i18n="configurationLaunchMotorDelay"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMotorDelayHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchspinuptime" name="launchspinuptime" data-simple-bind="FW_CONFIG.launchSpinupTime" step="1" min="0" max="1000" />
+                        <label for="launchspinuptime">
+                            <span data-i18n="configurationLaunchSpinupTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchSpinupTimeHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchmintime" name="launchmintime" data-simple-bind="FW_CONFIG.launchMinTime" step="1" min="0" max="60000" />
+                        <label for="launchmintime">
+                            <span data-i18n="configurationLaunchMinTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMinTimeHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchtimeout" name="launchtimeout" data-simple-bind="FW_CONFIG.launchTimeout" step="1" min="0" max="60000" />
+                        <label for="launchtimeout">
+                            <span data-i18n="configurationLaunchTimeout"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchTimeoutHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchmaxaltitude" name="launchmaxaltitude" data-simple-bind="FW_CONFIG.launchMaxAltitude" step="1" min="0" max="60000" />
+                        <label for="launchmaxaltitude">
+                            <span data-i18n="configurationLaunchMaxAltitude"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAltitudeHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchclimbangle" name="launchclimbangle" data-simple-bind="FW_CONFIG.launchClimbAngle" step="1" min="0" max="60000" />
+                        <label for="launchclimbangle">
+                            <span data-i18n="configurationLaunchClimbAngle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchClimbAngleHelp"></div>
+                    </div>
+                </div>
+            </div>
 
         </div>
 

@@ -797,6 +797,42 @@
      "configurationLaunchClimbAngle": {
         "message": "Climb Angle"
     },
+    "configurationLaunchVelocityHelp": {
+        "message": "Forward velocity threshold for swing-launch detection [cm/s]"
+    },
+    "configurationLaunchAccelHelp": {
+        "message": "Forward acceleration threshold for bungee launch of throw launch [cm/s/s], 1G = 981 cm/s/s"
+    },
+    "configurationLaunchMaxAngleHelp": {
+        "message": "Max tilt angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely [deg]"
+    },
+    "configurationLaunchDetectTimeHelp": {
+        "message": "Time for which thresholds have to breached to consider launch happened [ms]"
+    },
+    "configurationLaunchThrHelp": {
+        "message": "Launch throttle - throttle to be set during launch sequence (pwm units)"
+    },
+    "configurationLaunchIdleThrHelp": {
+        "message": "Launch idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position)"
+    },
+    "configurationLaunchMotorDelayHelp": {
+        "message": "Delay between detected launch and launch sequence start and throttling up (ms)"
+    },
+    "configurationLaunchSpinupTimeHelp": {
+        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr - to avoid big stress on ESC and large torque from propeller"
+    },
+    "configurationLaunchMinTimeHelp": {
+        "message": "Allow launch mode to execute at least this time (ms) and ignore stick movements [0-60000]."
+    },
+    "configurationLaunchTimeoutHelp": {
+        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over (ms)"
+    },
+    "configurationLaunchMaxAltitudeHelp": {
+        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. [cm]"
+    },
+     "configurationLaunchClimbAngleHelp": {
+        "message": "Climb angle for launch sequence (degrees), is also restrained by global max_angle_inclination_pit"
+    },
     "configuration3d": {
         "message": "Reversible motors"
     },

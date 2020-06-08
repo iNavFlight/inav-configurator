@@ -41,8 +41,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
         loadCraftName,
-        mspHelper.loadMiscV2,
-        mspHelper.loadFwConfig
+        mspHelper.loadMiscV2
     ];
 
     loadChainer.setChain(loadChain);
@@ -458,20 +457,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             // craft name not supported by the firmware
             $('.config-personalization').hide();
         }
-
-        //AutoLaunch
-        $('#launchvelocity').val(FW_CONFIG.launch_velocity);
-        $('#launchaccel').val(FW_CONFIG.launch_accel);
-        $('#launchmaxangle').val(FW_CONFIG.launch_max_angle);
-        $('#launchdetecttime').val(FW_CONFIG.launch_detect_time);
-        $('#launchthr').val(FW_CONFIG.launch_thr);
-        $('#launchidlethr').val(FW_CONFIG.launch_idle_thr);
-        $('#launchmotordelay').val(FW_CONFIG.launch_motor_delay);
-        $('#launchspinuptime').val(FW_CONFIG.launch_spinup_time);
-        $('#launchmintime').val(FW_CONFIG.launch_min_time);
-        $('#launchtimeout').val(FW_CONFIG.launch_timeout);
-        $('#launchmaxaltitude').val(FW_CONFIG.launch_max_altitude);
-        $('#launchclimbangle').val(FW_CONFIG.launch_climb_angle);
 
         $('a.save').click(function () {
             MISC.mag_declination = parseFloat($('#mag_declination').val());
