@@ -783,7 +783,7 @@
         "message": "Motor Delay"
     },
     "configurationLaunchSpinupTime": {
-        "message": "Spinup Time"
+        "message": "Motor Spinup Time"
     },
     "configurationLaunchMinTime": {
         "message": "Min Time"
