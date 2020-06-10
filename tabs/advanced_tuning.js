@@ -33,26 +33,9 @@ TABS.advanced_tuning.initialize = function (callback) {
     saveChainer.setExitPoint(reboot);
 
     function loadHtml() {
-        GUI.load("./tabs/advanced_tuning.html", processHtml);
-    }
+        GUI.load("./tabs/advanced_tuning.html", Settings.processHtml(function () {
 
-    function reboot() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-        GUI.tab_switch_cleanup(function () {
-            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
-        });
-    }
-
-    function reinitialize() {
-        //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-        GUI.handleReconnect($('.tab_advanced_tuning a'));
-    }
-
-    function processHtml() {
-
-        var $userControlMode = $('#user-control-mode'),
+             var $userControlMode = $('#user-control-mode'),
             $useMidThrottle = $("#use-mid-throttle"),
             $rthClimbFirst = $('#rth-climb-first'),
             $rthClimbIgnoreEmergency = $('#rthClimbIgnoreEmergency'),
@@ -124,9 +107,39 @@ TABS.advanced_tuning.initialize = function (callback) {
         $('#advanced-tuning-save-button').click(function () {
             saveChainer.execute();
         });
-
+        
+        $('a.save').click(function () {
+            Settings.saveInputs().then(function () {
+                var self = this;
+                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
+                GUI.log('OSD settings saved');
+                var oldText = $(this).text();
+                $(this).html("Saved");
+                setTimeout(function () {
+                    $(self).html(oldText);
+                }, 2000);
+            });
+        });
         GUI.content_ready(callback);
+
+        }));
     }
+
+    function reboot() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.tab_switch_cleanup(function () {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+        });
+    }
+
+    function reinitialize() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.handleReconnect($('.tab_advanced_tuning a'));
+    }
+
+
 };
 
 TABS.advanced_tuning.cleanup = function (callback) {

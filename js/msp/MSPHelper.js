@@ -1339,20 +1339,6 @@ var mspHelper = (function (gui) {
                 FW_CONFIG.maxDiveAngle = data.getUint8(8);
                 FW_CONFIG.pitchToThrottle = data.getUint8(9);
                 FW_CONFIG.loiterRadius = data.getUint16(10, true);
-                //launch
-                FW_CONFIG.launchVelocity = data.getUint16(12,true);
-                FW_CONFIG.launchAccel = data.getUint16(14, true);
-                FW_CONFIG.launchMaxAngle = data.getUint8(16, true);
-                FW_CONFIG.launchDetectTime = data.getUint16(17, true);
-                FW_CONFIG.launchThr = data.getUint16(19, true);
-                FW_CONFIG.launchIdleThr = data.getUint16(21, true);
-                FW_CONFIG.launchMotorDelay = data.getUint16(23, true);
-                FW_CONFIG.launchSpinupTime = data.getUint16(25, true);
-                FW_CONFIG.launchMinTime = data.getUint16(27, true);
-                FW_CONFIG.launchTimeout = data.getUint16(29, true);
-                FW_CONFIG.launchMaxAltitude = data.getUint16(31, true);
-                FW_CONFIG.launchClimbAngle = data.getUint8(33, true);
-                
                 break;
 
             case MSPCodes.MSP_SET_FW_CONFIG:
@@ -2022,29 +2008,6 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(FW_CONFIG.loiterRadius));
                 buffer.push(highByte(FW_CONFIG.loiterRadius));
-                //launch
-                buffer.push(lowByte(FW_CONFIG.launchVelocity));
-                buffer.push(highByte(FW_CONFIG.launchVelocity));
-                buffer.push(lowByte(FW_CONFIG.launchAccel));
-                buffer.push(highByte(FW_CONFIG.launchAccel));
-                buffer.push(FW_CONFIG.launchMaxAngle);
-                buffer.push(lowByte(FW_CONFIG.launchDetectTime));
-                buffer.push(highByte(FW_CONFIG.launchDetectTime));
-                buffer.push(lowByte(FW_CONFIG.launchThr));
-                buffer.push(highByte(FW_CONFIG.launchThr));
-                buffer.push(lowByte(FW_CONFIG.launchIdleThr));
-                buffer.push(highByte(FW_CONFIG.launchIdleThr));
-                buffer.push(lowByte(FW_CONFIG.launchMotorDelay));
-                buffer.push(highByte(FW_CONFIG.launchMotorDelay));
-                buffer.push(lowByte(FW_CONFIG.launchSpinupTime));
-                buffer.push(highByte(FW_CONFIG.launchSpinupTime));
-                buffer.push(lowByte(FW_CONFIG.launchMinTime));
-                buffer.push(highByte(FW_CONFIG.launchMinTime));
-                buffer.push(lowByte(FW_CONFIG.launchTimeout));
-                buffer.push(highByte(FW_CONFIG.launchTimeout));
-                buffer.push(lowByte(FW_CONFIG.launchMaxAltitude));
-                buffer.push(highByte(FW_CONFIG.launchMaxAltitude));
-                buffer.push(FW_CONFIG.launchClimbAngle);
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
