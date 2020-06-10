@@ -759,16 +759,16 @@
         "message": "Battery Capacity Unit"
     },
     "configurationLaunch": {
-        "message": "Auto Launch Configuration"
+        "message": "Fixed Wing Auto Launch Settings"
     },
     "configurationLaunchVelocity": {
-        "message": "Velocity"
+        "message": "Threshold Velocity"
     },
     "configurationLaunchAccel": {
-        "message": "Acceleration"
+        "message": "Threshold Acceleration"
     },
     "configurationLaunchMaxAngle": {
-        "message": "Max Angle"
+        "message": "Max Tilt Angle"
     },
     "configurationLaunchDetectTime": {
         "message": "Detect Time"
