@@ -2500,6 +2500,12 @@
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
+     "controlSmoothness": {
+        "message": "Control Smoothness"
+    },
+     "controlSmoothnessHelp": {
+        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]"
+    },
     "fixedWingNavigationConfiguration": {
       "message": "Fixed Wing Navigation Settings"
     },
