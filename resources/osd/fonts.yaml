@@ -2,9 +2,6 @@
 # for every generated font unless it comes
 # from a png already
 previews: true
-# Shared extra data for all fonts
-extra:
-  - all.yaml
 
 # Default font comes from from this directory
 # (could be a .png too). Missing characters
@@ -22,7 +19,9 @@ fonts:
   - source: clarity_medium
     extra: true
   - source: default
-    extra: true
+    extra:
+      - font_version.yaml # This gets inherited by all the fonts
+      - default.yaml
   - source: impact
     extra: true
   - source: impact_mini

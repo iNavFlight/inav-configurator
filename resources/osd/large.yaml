@@ -1,7 +1,6 @@
-45: # Width of the '-' character in pixels
-    metadata:
-        - s: s
-        - u8: 8 # it's actually 7, but we can't draw half pixels
+# 45 (-) is inherited from default
+# 46 (.) is inherited by default, but it needs a different
+# aligment offset becase the digits are different
 46: # Offset of the '.' character to align it with other digits
     metadata:
         - s: o
