@@ -44,28 +44,28 @@
     "message": "闪存芯片：空闲空间"
   },
   "sensorStatusGyro": {
-    "message": "陀螺仪"
+    "message": "陀螺"
   },
   "sensorStatusGyroShort": {
-    "message": "陀螺仪"
+    "message": "陀螺"
   },
   "sensorStatusAccel": {
-    "message": "加速度计"
+    "message": "重力加速度计"
   },
   "sensorStatusAccelShort": {
-    "message": "加速度计"
+    "message": "重力"
   },
   "sensorStatusMag": {
     "message": "磁力仪"
   },
   "sensorStatusMagShort": {
-    "message": "磁力仪"
+    "message": "磁力"
   },
   "sensorStatusBaro": {
     "message": "气压计"
   },
   "sensorStatusBaroShort": {
-    "message": "气压计"
+    "message": "气压"
   },
   "sensorStatusGPS": {
     "message": "GPS"
