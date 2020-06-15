@@ -140,7 +140,7 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "mc_d_pitch",
-                    value: 28
+                    value: 25
                 },
                 {
                     key: "mc_p_roll",
@@ -152,7 +152,7 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "mc_d_roll",
-                    value: 28
+                    value: 23
                 },
                 {
                     key: "mc_p_yaw",
@@ -161,6 +161,17 @@ helper.defaultsDialog = (function() {
                 {
                     key: "mc_i_yaw",
                     value: 80
+                },
+                /*
+                 * TPA
+                 */
+                {
+                    key: "tpa_rate",
+                    value: 20
+                },
+                {
+                    key: "tpa_breakpoint",
+                    value: 1200
                 },
                 {
                     key: "platform_type",

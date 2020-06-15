@@ -17,24 +17,13 @@ presets.model = (function () {
             if (toApply.hasOwnProperty(settingToApply)) {
 
                 var settingName = toApply[settingToApply],
-                    values;
-
-                if (settingName == 'PIDs') {
-                    if (mixerType == 'multirotor') {
-                        values = defaults[settingName]['mr'];
-                    } else {
-                        values = defaults[settingName]['fw'];
-                    }
-                } else {
                     values = defaults[settingName];
-                }
 
                 for (var key in values) {
                     if (values.hasOwnProperty(key)) {
                         window[settingName][key] = values[key];
                     }
                 }
-
             }
         }
         if (mixerType == 'airplane' || mixerType == 'flyingwing') {
@@ -106,27 +95,29 @@ TABS.profiles.initialize = function (callback, scrollPosition) {
     }
     
     function applySettings() {
-        Promise.mapSeries(currentPreset.settings, function (input, ii) {
-            return mspHelper.getSetting(input.key);
-        }).then(function () {
+        if (currentPreset.settings && currentPreset.settings.length > 0) {
             Promise.mapSeries(currentPreset.settings, function (input, ii) {
-                console.log('applying', input.key, input.value);
-                return mspHelper.setSetting(input.key, input.value);
+                return mspHelper.getSetting(input.key);
             }).then(function () {
-                mspHelper.saveToEeprom(function () {
-                    //noinspection JSUnresolvedVariable
-                    GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-            
-                    GUI.tab_switch_cleanup(function() {
-                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            //noinspection JSUnresolvedVariable
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+                Promise.mapSeries(currentPreset.settings, function (input, ii) {
+                    console.log('applying', input.key, input.value);
+                    return mspHelper.setSetting(input.key, input.value);
+                }).then(function () {
+                    mspHelper.saveToEeprom(function () {
+                        //noinspection JSUnresolvedVariable
+                        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+                
+                        GUI.tab_switch_cleanup(function() {
+                            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                                //noinspection JSUnresolvedVariable
+                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.handleReconnect();
+                            });
                         });
                     });
-                });
-            })
-        });
+                })
+            });
+        }
     } 
 
     function applyAndSave() {
