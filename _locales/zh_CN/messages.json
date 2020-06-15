@@ -50,13 +50,13 @@
     "message": "陀螺"
   },
   "sensorStatusAccel": {
-    "message": "重力加速度计"
+    "message": "加速度计"
   },
   "sensorStatusAccelShort": {
     "message": "重力"
   },
   "sensorStatusMag": {
-    "message": "罗盘磁力仪"
+    "message": "磁力仪"
   },
   "sensorStatusMagShort": {
     "message": "罗盘"
