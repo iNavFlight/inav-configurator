@@ -468,7 +468,7 @@
     "message": "$1"
   },
   "initialSetup_Wh_drawn": {
-    "message": "Capacity drawn:"
+    "message": "容量:"
   },
   "initialSetup_Wh_drawnValue": {
     "message": "$1 Wh"
@@ -477,13 +477,13 @@
     "message": "$1 V"
   },
   "initialSetupDrawn": {
-    "message": "Capacity drawn:"
+    "message": "容量:"
   },
   "initialSetupCurrentDraw": {
-    "message": "Current draw:"
+    "message": "电流消耗:"
   },
   "initialSetupPowerDraw": {
-    "message": "Power draw:"
+    "message": "功率消耗:"
   },
   "initialSetupPowerDrawValue": {
     "message": "$1 W"
@@ -908,10 +908,10 @@
     "message": "功率"
   },
   "configurationVTXPowerHelp": {
-    "message": "VTX power level. The exact power in mw (or dBm) will depend on the specific hardware. Check your VTX manual."
+    "message": "VTX功率等级。 以mw（或dBm）为单位的确切功率将取决于特定的硬件。 查看您的VTX手册."
   },
   "configurationVTXLowerPowerDisarm": {
-    "message": "Use low power while the craft is disarmed"
+    "message": "撤防时使用低功率"
   },
   "configurationVTXLowerPowerDisarmHelp": {
     "message": "Enabling this option will make the VTX use its lowest power while the craft is disarmed. Use 'Until first arm' to make it use the lowest power only until you arm for the first time."
@@ -1007,16 +1007,16 @@
     "message": "名称"
   },
   "pidTuningProportional": {
-    "message": "Proportional"
+    "message": "比例"
   },
   "pidTuningIntegral": {
-    "message": "Integral"
+    "message": "积分"
   },
   "pidTuningDerivative": {
-    "message": "Derivative"
+    "message": "微分"
   },
   "pidTuningFeedForward": {
-    "message": "FeedForward"
+    "message": "前馈"
   },
   "dtermSetpointWeight": {
     "message": "Dterm setpoint weight"
@@ -1131,13 +1131,13 @@
     "message": "Channel Map"
   },
   "receiverChannelMapTitle": {
-    "message": "You can define your own channel map by clicking inside the box"
+    "message": "您可以通过在框内单击来定义自己的频道地图"
   },
   "receiverRssiChannel": {
     "message": "RSSI 通道"
   },
   "receiverRefreshRateTitle": {
-    "message": "Graph refresh rate"
+    "message": "图形刷新率"
   },
   "receiverButtonSave": {
     "message": "保存"
@@ -1146,7 +1146,7 @@
     "message": "刷新"
   },
   "receiverButtonSticks": {
-    "message": "Control sticks"
+    "message": "控制棒"
   },
   "receiverDataRefreshed": {
     "message": "RC Tuning data <strong>已刷新</strong>"
@@ -2631,12 +2631,6 @@
   "gps_min_sats": {
     "message": "Min. GPS satellites for a valid fix"
   },
-  "use_gps_velned": {
-    "message": "Use GPS data for velocity calculation"
-  },
-  "use_gps_velned_help": {
-    "message": "Defined if iNav should use velocity data provided by GPS module for doing position and speed estimation. If set to OFF iNav will fallback to calculating velocity from GPS coordinates. Using native velocity data may improve performance on some GPS modules. Some GPS modules introduce significant delay and using native velocity may actually result in much worse performance."
-  },
   "w_z_baro_p_help": {
     "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
   },
@@ -2751,8 +2745,8 @@
   "osdUnitUKTip": {
     "message": "Use metric units except for the speed, which is displayed in miles per hour."
   },
-  "osdAlarmRSSI": {
-    "message": "RSSI"
+  "osd_rssi_alarm": {
+    "message": "RSSI (%)"
   },
   "osdAlarmBATT_CAP": {
     "message": "电池已使用"
@@ -2760,44 +2754,44 @@
   "osdAlarmBATT_CAP_HELP": {
     "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
   },
-  "osdAlarmFLY_MINUTES": {
-    "message": "飞行时间"
+  "osd_time_alarm": {
+    "message": "飞行时间(分钟)"
   },
-  "osdAlarmMAX_ALTITUDE": {
-    "message": "高度"
+  "osd_alt_alarm": {
+    "message": "高度(米)"
   },
-  "osdAlarmDIST": {
-    "message": "距离"
+  "osd_dist_alarm": {
+    "message": "距离(米)"
   },
   "osdAlarmDIST_HELP": {
-    "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
+    "message": "当距离大于此值时，“到达原点的距离”指示灯将闪烁。 0禁用此警报。"
   },
-  "osdAlarmMAX_NEG_ALTITUDE": {
+  "osd_neg_alt_alarm": {
     "message": "Negative Altitude"
   },
   "osdAlarmMAX_NEG_ALTITUDE_HELP": {
     "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
   },
-  "osdAlarmGFORCE": {
+  "osd_gforce_alarm": {
     "message": "g force"
   },
   "osdAlarmGFORCE_HELP": {
     "message": "The g force element will start blinking when greater than this value"
   },
-  "osdAlarmGFORCE_AXIS_MIN": {
+  "osd_gforce_axis_alarm_min": {
     "message": "g force axis min"
   },
   "osdAlarmGFORCE_AXIS_MIN_HELP": {
     "message": "The axes g force elements will start blinking when lower than this value"
   },
-  "osdAlarmGFORCE_AXIS_MAX": {
+  "osd_gforce_axis_alarm_max": {
     "message": "g force axis max"
   },
   "osdAlarmGFORCE_AXIS_MAX_HELP": {
     "message": "The axes g force elements will start blinking when greater than this value"
   },
-  "osdAlarmCURRENT": {
-    "message": "电流"
+  "osd_current_alarm": {
+    "message": "电流(A)"
   },
   "osdAlarmCURRENT_HELP": {
     "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
@@ -2833,13 +2827,13 @@
     "message": "G force"
   },
   "osdGroupTemperature": {
-    "message": "Temperature"
+    "message": "温度"
   },
   "osdGroupAttitude": {
-    "message": "Attitude"
+    "message": "姿态"
   },
   "osdGroupCurrentMeter": {
-    "message": "Current Meter"
+    "message": "电流"
   },
   "osdGroupGPS": {
     "message": "GPS"
@@ -2860,7 +2854,7 @@
     "message": "只要地图和雷达不与预览中可见的任何地图部分重叠，地图和雷达便可以在其上方布置其他元素。"
   },
   "osdElement_ONTIME_FLYTIME": {
-    "message": "On Time / Fly Time"
+    "message": "准时/飞行时间"
   },
   "osdElement_RSSI_VALUE": {
     "message": "RSSI (信号强度)"
@@ -2935,22 +2929,22 @@
     "message": "Altitude above Mean Sea Level"
   },
   "osdElement_3D_SPEED": {
-    "message": "3D Speed"
+    "message": "3D速度"
   },
   "osdElement_3D_SPEED_HELP": {
     "message": "Shows 3D speed considering both horizontal and vertical speed."
   },
   "osdElement_GPS_SATS": {
-    "message": "GPS Satellites"
+    "message": "GPS卫星"
   },
   "osdElement_GPS_SATS_HELP": {
     "message": "Shows the number of GPS satellites located by the GPS receiver."
   },
   "osdElement_GPS_HDOP": {
-    "message": "GPS HDOP"
+    "message": "GPS水平精度稀释"
   },
   "osdElement_GPS_HDOP_HELP": {
-    "message": "Shows the Horizontal Dilution Of Precision from the GPS. The lower, the more accurate the GPS fix is."
+    "message": "显示GPS的水平精度稀释。 越低，GPS定位越准确"
   },
   "osdElement_PLUS_CODE": {
     "message": "Plus Code (latitude + longitude)"
