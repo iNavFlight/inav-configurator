@@ -44,7 +44,7 @@
     "message": "闪存芯片：空闲空间"
   },
   "sensorStatusGyro": {
-    "message": "陀螺"
+    "message": "陀螺仪"
   },
   "sensorStatusGyroShort": {
     "message": "陀螺"
@@ -56,10 +56,10 @@
     "message": "重力"
   },
   "sensorStatusMag": {
-    "message": "磁力仪"
+    "message": "罗盘磁力仪"
   },
   "sensorStatusMagShort": {
-    "message": "磁力"
+    "message": "罗盘"
   },
   "sensorStatusBaro": {
     "message": "气压计"
