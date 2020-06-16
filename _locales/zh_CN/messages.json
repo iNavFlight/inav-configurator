@@ -92,17 +92,17 @@
     "message": "声呐"
   },
   "backupFileIncompatible": {
-    "message": "抱歉，提供的备份文件是为先前版本的配置器生成的，并且与该版本的配置器不兼容。"
+    "message": "抱歉，提供的备份文件是为先前版本的配置工具生成的，并且与该版本的配置工具不兼容。"
   },
   "backupFileUnmigratable": {
-    "message": "抱歉，提供的备份文件是由配置程序的早期版本生成的，不可迁移。"
+    "message": "抱歉，提供的备份文件是由配置工具的早期版本生成的，不可迁移。"
   },
 
   "configMigrationFrom": {
-    "message": "迁移配置器生成的配置文件: $1"
+    "message": "迁移配置工具生成的配置文件: $1"
   },
   "configMigratedTo": {
-    "message": "将配置迁移到配置器: $1"
+    "message": "将配置迁移到配置工具: $1"
   },
   "configMigrationSuccessful": {
     "message": "配置迁移完成，迁移已应用: $1"
@@ -179,7 +179,9 @@
   "tabAuxiliary": {
     "message": "模式"
   },
-
+  "tabFailsafe": {
+    "message": "失控保护"
+  },
   "serialPortOpened": {
     "message": "打开串口<span style=\"color: #37a8db\">成功</span> ID: $1"
   },
@@ -214,7 +216,7 @@
     "message": "读取保护未启用"
   },
   "stm32AddressLoadFailed": {
-    "message": "定位选项字节扇区失败。很可能是因为读取保护造成的。"
+    "message": "定位选项字节扇区失败，很可能是因为读取保护造成的。"
   },
   "stm32AddressLoadUnknown": {
     "message": "因未知错误，定位选项字节扇区失败。正在中止。"
@@ -237,7 +239,7 @@
   },
 
   "tabSwitchUpgradeRequired": {
-    "message": "需要<strong>更新</strong>到最新版本的 inavFlight 固件才能使用 $1 页面."
+    "message": "需要<strong>更新</strong>到最新版本的 InavFlight 固件才能使用 $1 页面."
   },
   "firmwareVersion": {
     "message": "固件版本：<strong>$1</strong>"
@@ -318,10 +320,10 @@
     "message": "如果您想帮助提高INAV的水平，则可以通过多种方式提供帮助，包括:<br /><ul><li>在论坛和IRC上回答其他用户的问题。</li><li>向 固件和配置程序-新功能，修复，改进</li><li>测试<a href=\"https://github.com/iNavFlight/inav/pulls\" target=\"_blank\">新功能/修复</a> and providing feedback.</li><li>帮助解决 <a href=\"https://github.com/iNavFlight/inav/issues\" target=\"_blank\">对问题和功能请求进行评论</a></li></ul>"
   },
   "defaultChangelogHead": {
-    "message": "Configurator - Changelog"
+    "message": "配置工具 - 变更日志"
   },
   "defaultButtonFirmwareFlasher": {
-    "message": "Firmware Flasher"
+    "message": "固件烧写器"
   },
   "defaultDonateHead": {
     "message": "开源/捐赠通知"
@@ -725,7 +727,7 @@
     "message": "偏航 度"
   },
   "configurationSensorAlignmentMag": {
-    "message": "磁力计方向"
+    "message": "罗盘方向"
   },
   "configurationAccelTrims": {
     "message": "加速度计微调"
@@ -740,7 +742,7 @@
     "message": "磁偏角 [度]"
   },
   "configurationAutoDisarmDelay": {
-    "message": "[seconds] 秒后锁定电机（需要启用 MOTOR_STOP）"
+    "message": "[秒] 后锁定电机（需要启用 MOTOR_STOP）"
   },
   "configurationAutoDisarmDelayHelp": {
     "message": "仅用于摇杆布防（即不使用开关）"
@@ -890,7 +892,7 @@
     "message": "保存并重启"
   },
   "configurationVTX": {
-    "message": "VTX"
+    "message": "图传"
   },
   "configurationVTXBand": {
     "message": "频段"
@@ -908,7 +910,7 @@
     "message": "功率"
   },
   "configurationVTXPowerHelp": {
-    "message": "VTX功率等级。 以mw（或dBm）为单位的确切功率将取决于特定的硬件。 查看您的VTX手册."
+    "message": "图传功率等级。 以mw（或dBm）为单位的确切功率将取决于特定的硬件。 查看您的图传说明手册."
   },
   "configurationVTXLowerPowerDisarm": {
     "message": "撤防时使用低功率"
@@ -995,13 +997,13 @@
     "message": "图传(IRC Tramp)"
   },
   "portsFunction_VTX_FFPV": {
-    "message": "FuriousFPV Vtx"
+    "message": "FuriousFPV 图传"
   },
   "portsFunction_FRSKY_OSD": {
     "message": "FrSky OSD"
   },
   "portsFunction_DJI_FPV": {
-    "message": "DJI FPV VTX"
+    "message": "大疆图传"
   },
   "pidTuningName": {
     "message": "名称"

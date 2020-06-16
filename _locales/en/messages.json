@@ -179,7 +179,9 @@
     "tabAuxiliary": {
         "message": "Modes"
     },
-
+    "tabFailsafe": {
+        "message": "Failsafe"
+    },
     "serialPortOpened": {
         "message": "Serial port <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
