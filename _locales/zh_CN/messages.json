@@ -239,7 +239,7 @@
   },
 
   "tabSwitchUpgradeRequired": {
-    "message": "需要<strong>更新</strong>到最新版本的 InavFlight 固件才能使用 $1 页面."
+    "message": "需要<strong>更新</strong>到最新版本的 iNavFlight 固件才能使用 $1 页面."
   },
   "firmwareVersion": {
     "message": "固件版本：<strong>$1</strong>"
