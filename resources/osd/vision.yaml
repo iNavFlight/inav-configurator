@@ -1,0 +1,25 @@
+45: # Width of the '-' character in pixels
+    metadata:
+        - s: s
+        - u8: 8
+46: # Offset of the '.' character to align it with other digits
+    metadata:
+        - s: o
+        - i8: 0 # x offset
+        - i8: 1 # y offset
+150:
+    metadata:
+        # Rectangle to fill with battery percentage
+        - s: r
+        - u8: 5
+        - u8: 4
+        - u8: 3
+        - u8: 12
+        # Offset to indicate the direction of the
+        # rectangle to full
+        - s: o
+        - i8: 0
+        - i8: -1
+        # Colors to use the for the filled/unfilled region
+        - s: c
+        - c: WHITE, BLACK
