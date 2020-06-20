@@ -863,6 +863,9 @@
     "configurationGPSProtocol": {
         "message": "Protocol"
     },
+     "configurationGPSUseGalileo": {
+        "message": "Gps use Galileo Satellites"
+    },
     "configurationGPSBaudrate": {
         "message": "Baudrate"
     },
