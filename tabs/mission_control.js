@@ -19,7 +19,7 @@ MWNP.WPTYPE = {
 TABS.mission_control = {};
 TABS.mission_control.isYmapLoad = false;
 TABS.mission_control.initialize = function (callback) {
-  
+
     let cursorInitialized = false;
     let curPosStyle;
     let curPosGeo;
@@ -86,7 +86,7 @@ TABS.mission_control.initialize = function (callback) {
             $('#notLoadMap').show();
         }
         localize();
-        
+
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
         }
@@ -94,28 +94,28 @@ TABS.mission_control.initialize = function (callback) {
         function get_comp_gps_data() {
             MSP.send_message(MSPCodes.MSP_COMP_GPS, false, false, get_altitude_data);
         }
-        
+
         function get_altitude_data() {
              MSP.send_message(MSPCodes.MSP_ALTITUDE, false, false, get_attitude_data);
-         
+
         }
         function get_attitude_data() {
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, update_gpsTrack);
         }
 
-        
+
         function update_gpsTrack() {
 
           let lat = GPS_DATA.lat / 10000000;
           let lon = GPS_DATA.lon / 10000000;
-      
+
           //Update map
           if (GPS_DATA.fix >= 2) {
-      
+
               if (!cursorInitialized) {
                   cursorInitialized = true;
-      
-                  
+
+
                   /////////////////////////////////////
                   //create layer for current position
                   curPosStyle = new ol.style.Style({
@@ -126,23 +126,23 @@ TABS.mission_control.initialize = function (callback) {
                           src: '../images/icons/icon_mission_airplane.png'
                       }))
                   });
-                  
+
                   let currentPositionLayer;
                   curPosGeo = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
-        
+
                   let curPosFeature = new ol.Feature({
                       geometry: curPosGeo
                   });
-          
+
                   curPosFeature.setStyle(curPosStyle);
-          
+
                   let vectorSource = new ol.source.Vector({
                       features: [curPosFeature]
                   });
                   currentPositionLayer = new ol.layer.Vector({
                       source: vectorSource
                   });
-                  
+
                   ///////////////////////////
                   //create layer for RTH Marker
                   let rthStyle = new ol.style.Style({
@@ -153,53 +153,53 @@ TABS.mission_control.initialize = function (callback) {
                           src: '../images/icons/cf_icon_RTH.png'
                       }))
                   });
-                  
+
                   rthGeo = new ol.geom.Point(ol.proj.fromLonLat([90, 0]));
-        
+
                   let rthFeature = new ol.Feature({
                       geometry: rthGeo
                   });
-          
+
                   rthFeature.setStyle(rthStyle);
-          
+
                   let rthVector = new ol.source.Vector({
                       features: [rthFeature]
                   });
                   let rthLayer = new ol.layer.Vector({
                       source: rthVector
                   });
-          
-                  
+
+
                   //////////////////////////////
                   //create layer for bread crumbs
                   breadCrumbLS = new ol.geom.LineString([ol.proj.fromLonLat([lon, lat]), ol.proj.fromLonLat([lon, lat])]);
-                  
+
                   breadCrumbStyle = new ol.style.Style({
                     stroke: new ol.style.Stroke({
                       color: '#ffcc33',
                       width: 6
                     })
                   });
-                  
+
                   breadCrumbFeature = new ol.Feature({
                     geometry: breadCrumbLS
                   });
-                  
+
                   breadCrumbFeature.setStyle(breadCrumbStyle);
-                  
+
                   breadCrumbSource = new ol.source.Vector({
                     features: [breadCrumbFeature]
                   });
-                  
+
                   breadCrumbVector = new ol.layer.Vector({
                     source: breadCrumbSource
                   });
-                  
-                  
+
+
                   /////////////////////////////
                   //create layer for heading, alt, groundspeed
                   textGeom = new ol.geom.Point([0,0]);
-                  
+
                   textStyle = new ol.style.Style({
                     text: new ol.style.Text({
                       font: 'bold 35px Calibri,sans-serif',
@@ -214,32 +214,32 @@ TABS.mission_control.initialize = function (callback) {
                       text: 'H: XXX\nAlt: XXXm\nSpeed: XXXcm/s'
                     })
                   });
-                  
-                  
+
+
                   textFeature = new ol.Feature({
                     geometry: textGeom
                   });
-                  
+
                   textFeature.setStyle(textStyle);
-                  
+
                   var textSource = new ol.source.Vector({
                     features: [textFeature]
                   });
-                  
+
                   var textVector = new ol.layer.Vector({
                     source: textSource
                   });
-                  
+
                   map.addLayer(rthLayer);
                   map.addLayer(breadCrumbVector);
                   map.addLayer(currentPositionLayer);
                   map.addControl(textVector);
-                  
+
               }
-      
+
               let gpsPos = ol.proj.fromLonLat([lon, lat]);
               curPosGeo.setCoordinates(gpsPos);
-              
+
               breadCrumbLS.appendCoordinate(gpsPos);
 
               var coords = breadCrumbLS.getCoordinates();
@@ -248,9 +248,9 @@ TABS.mission_control.initialize = function (callback) {
                 coords.shift();
                 breadCrumbLS.setCoordinates(coords);
               }
-            
+
               curPosStyle.getImage().setRotation((SENSOR_DATA.kinematics[2]/360.0) * 6.28318);
-              
+
               //update data text
               textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
               let tmpText = textStyle.getText();
@@ -259,8 +259,8 @@ TABS.mission_control.initialize = function (callback) {
                               '\nAlt: ' + SENSOR_DATA.altitude +
                               'm\nSpeed: ' + GPS_DATA.speed + 'cm/s\n' +
                               'Dist: ' + GPS_DATA.distanceToHome + 'm');
-              
-              
+
+
               //update RTH every 5th GPS update since it really shouldn't change
               if(rthUpdateInterval >= 5)
               {
@@ -274,7 +274,7 @@ TABS.mission_control.initialize = function (callback) {
               rthUpdateInterval++;
           }
         }
-        
+
                /*
          * enable data pulling if not offline
          * Refreshing data at 5Hz...  Could slow this down if we have performance issues
@@ -287,11 +287,11 @@ TABS.mission_control.initialize = function (callback) {
                   update_gpsTrack();
                   return;
               }
-  
+
               if (helper.mspQueue.shouldDrop()) {
                   return;
               }
-  
+
               get_raw_gps_data();
           });
         }
@@ -626,7 +626,7 @@ TABS.mission_control.initialize = function (callback) {
             target: document.getElementById('missionMap'),
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
-                zoom: 14
+                zoom: 2
             })
         });
 
@@ -678,12 +678,12 @@ TABS.mission_control.initialize = function (callback) {
                     if (markers[i] == tempMarker)
                     {
                       selectedMarker = tempMarker;
-                      
+
                       var geometry = selectedFeature.getGeometry();
                       var coord = ol.proj.toLonLat(geometry.getCoordinates());
-      
+
                       selectedFeature.setStyle(getPointIcon(true));
-      
+
                       $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
                       $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                       $('#pointAlt').val(selectedMarker.alt);
@@ -1113,8 +1113,8 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#saveMissionButton').removeClass('disabled');
     }
-    
-    
+
+
 };
 
 TABS.mission_control.cleanup = function (callback) {
