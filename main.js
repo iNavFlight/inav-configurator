@@ -247,6 +247,9 @@ $(document).ready(function () {
                     case 'advanced_tuning':
                         TABS.advanced_tuning.initialize(content_ready);
                         break;
+                    case 'programming':
+                        TABS.programming.initialize(content_ready);
+                        break;
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;

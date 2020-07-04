@@ -103,21 +103,22 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     <td class="mixer-fixed-value-col"><input type="number" class="mix-rule-fixed-value" min="875" max="2125" disabled /></td> \
                     <td><input type="number" class="mix-rule-rate" step="1" min="-125" max="125" /></td>\
                     <td><input type="number" class="mix-rule-speed" step="1" min="0" max="255" /></td>\
-                    <td><select class="mix-rule-condition"></td>\
+                    <td class="mixer-table__condition"></td>\
                     <td><span class="btn default_btn narrow red"><a href="#" data-role="role-servo-delete" data-i18n="servoMixerDelete"></a></span></td>\
                     </tr>\
                 ');
 
                 const $row = $servoMixTableBody.find('tr:last');
-                const $conditions = $row.find('.mix-rule-condition');
 
-                $conditions.append('<option value="-1">Always</option>')
-                for (let i = 0; i < 16 ; i++) {
-                    $conditions.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
-                }
-                $conditions.val(servoRule.getConditionId()).change(function () {
-                    servoRule.setConditionId($(this).val());
-                });
+                GUI.renderLogicConditionSelect(
+                    $row.find('.mixer-table__condition'), 
+                    LOGIC_CONDITIONS, 
+                    servoRule.getConditionId(), 
+                    function () {
+                        servoRule.setConditionId($(this).val());
+                    },
+                    true
+                );
 
                 GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
 
@@ -414,7 +415,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function getLogicConditionsStatus() {
-        mspHelper.loadSensorStatus(onStatusPullDone);
+        mspHelper.loadLogicConditionsStatus(onStatusPullDone);
     }
 
     function onStatusPullDone() {

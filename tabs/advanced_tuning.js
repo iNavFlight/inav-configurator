@@ -54,7 +54,6 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         var $userControlMode = $('#user-control-mode'),
             $useMidThrottle = $("#use-mid-throttle"),
-            $useGpsVelned = $('#use_gps_velned'),
             $rthClimbFirst = $('#rth-climb-first'),
             $rthClimbIgnoreEmergency = $('#rthClimbIgnoreEmergency'),
             $rthTailFirst = $('#rthTailFirst'),
@@ -117,16 +116,6 @@ TABS.advanced_tuning.initialize = function (callback) {
             }
         });
         $useMidThrottle.change();
-
-        $useGpsVelned.prop("checked", POSITION_ESTIMATOR.use_gps_velned);
-        $useGpsVelned.change(function () {
-            if ($(this).is(":checked")) {
-                POSITION_ESTIMATOR.use_gps_velned = 1;
-            } else {
-                POSITION_ESTIMATOR.use_gps_velned = 0;
-            }
-        });
-        $useGpsVelned.change();
 
         GUI.simpleBind();
 

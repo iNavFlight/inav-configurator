@@ -12,7 +12,12 @@ helper.defaultsDialog = (function() {
 
     let data = [{
             "title": 'Mini Quad with 3"-7" propellers',
+            "notRecommended": false,
+            "reboot": true,
             "settings": [
+                /*
+                System
+                */
                 {
                     key: "gyro_hardware_lpf",
                     value: "256HZ"
@@ -21,9 +26,12 @@ helper.defaultsDialog = (function() {
                     key: "looptime",
                     value: 500
                 },
+                /*
+                Filtering
+                */
                 {
                     key: "gyro_lpf_hz",
-                    value: 100
+                    value: 110
                 },
                 {
                     key: "gyro_lpf_type",
@@ -31,15 +39,50 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "gyro_stage2_lowpass_hz",
-                    value: 200
+                    value: 0
                 },
                 {
                     key: "dterm_lpf_hz",
-                    value: 90
+                    value: 110
+                },
+                {
+                    key: "dterm_lpf_type",
+                    value: "PT1"
+                },
+                {
+                    key: "dterm_lpf2_hz",
+                    value: 170
+                },
+                {
+                    key: "dterm_lpf2_type",
+                    value: "PT1"
                 },
                 {
                     key: "use_dterm_fir_filter",
                     value: "OFF"
+                },
+                {
+                    key: "dynamic_gyro_notch_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "dynamic_gyro_notch_q",
+                    value: 250
+                },
+                {
+                    key: "dynamic_gyro_notch_min_hz",
+                    value: 120
+                },
+                /*
+                Mechanics
+                */
+                {
+                    key: "mc_airmode_type",
+                    value: "THROTTLE_THRESHOLD"
+                },
+                {
+                    key: "dterm_setpoint_weight",
+                    value: 0.75
                 },
                 {
                     key: "mc_iterm_relax_type",
@@ -61,6 +104,9 @@ helper.defaultsDialog = (function() {
                     key: "antigravity_accelerator",
                     value: 5
                 },
+                /*
+                Rates
+                */
                 {
                     key: "rc_yaw_expo",
                     value: 70
@@ -81,13 +127,16 @@ helper.defaultsDialog = (function() {
                     key: "yaw_rate",
                     value: 60
                 },
+                /*
+                PIDs
+                */
                 {
                     key: "mc_p_pitch",
                     value: 44
                 },
                 {
                     key: "mc_i_pitch",
-                    value: 60
+                    value: 75
                 },
                 {
                     key: "mc_d_pitch",
@@ -99,39 +148,46 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "mc_i_roll",
-                    value: 50
+                    value: 60
                 },
                 {
                     key: "mc_d_roll",
-                    value: 25
+                    value: 23
                 },
                 {
                     key: "mc_p_yaw",
-                    value: 45
+                    value: 35
                 },
                 {
                     key: "mc_i_yaw",
-                    value: 70
+                    value: 80
+                },
+                /*
+                 * TPA
+                 */
+                {
+                    key: "tpa_rate",
+                    value: 20
                 },
                 {
-                    key: "mc_airmode_type",
-                    value: "THROTTLE_THRESHOLD"
+                    key: "tpa_breakpoint",
+                    value: 1200
+                },
+                {
+                    key: "platform_type",
+                    value: "MULTIROTOR"
                 },
                 {
                     key: "applied_defaults",
                     value: 2
                 }
-            ],
-            "features":[
-                {
-                    bit: 5, // Enable DYNAMIC_FILTERS
-                    state: true
-                }
             ]
         },
         {
             "title": 'Airplane',
+            "notRecommended": false,
             "id": 3,
+            "reboot": true,
             "settings": [
                 {
                     key: "rc_yaw_expo",
@@ -158,6 +214,10 @@ helper.defaultsDialog = (function() {
                     value: 180
                 },
                 {
+                    key: "platform_type",
+                    value: "AIRPLANE"
+                },
+                {
                     key: "applied_defaults",
                     value: 3
                 }
@@ -170,7 +230,56 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Custom UAV - INAV legacy defaults',
+            "title": 'Rovers & Boats',
+            "notRecommended": false,
+            "reboot": true,
+            "settings": [
+                {
+                    key: "applied_defaults",
+                    value: 1
+                },
+                {
+                    key: "failsafe_procedure",
+                    value: "DROP"
+                },
+                {
+                    key: "platform_type",
+                    value: "ROVER"
+                },
+                {
+                    key: "nav_wp_safe_distance",
+                    value: 50000
+                },
+                {
+                    key: "nav_fw_loiter_radius",
+                    value: 100
+                },
+                {
+                    key: "nav_fw_yaw_deadband",
+                    value: 5
+                },
+                {
+                    key: "pidsum_limit_yaw",
+                    value: 500
+                },
+                {
+                    key: "nav_fw_pos_hdg_p",
+                    value: 60
+                },
+                {
+                    key: "nav_fw_pos_hdg_i",
+                    value: 2
+                },
+                {
+                    key: "nav_fw_pos_hdg_d",
+                    value: 0
+                }
+            ]
+        },
+        {
+            "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
+            "notRecommended": true,
+            "reboot": false,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -179,7 +288,9 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Keep current settings',
+            "title": 'Keep current settings (Not recommended)',
+            "notRecommended": true,
+            "reboot": false,
             "settings": [
                 {
                     key: "applied_defaults",
@@ -216,6 +327,8 @@ helper.defaultsDialog = (function() {
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
+        //Save analytics
+        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
         Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
             return mspHelper.getSetting(input.key);
         }).then(function () {
@@ -226,13 +339,15 @@ helper.defaultsDialog = (function() {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
             
-                    GUI.tab_switch_cleanup(function() {
-                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            //noinspection JSUnresolvedVariable
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+                    if (selectedDefaultPreset.reboot) {
+                        GUI.tab_switch_cleanup(function() {
+                            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                                //noinspection JSUnresolvedVariable
+                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.handleReconnect();
+                            });
                         });
-                    });
+                    }
                 });
             })
         });
@@ -258,6 +373,10 @@ helper.defaultsDialog = (function() {
                 let $element = $("<div class='default_btn defaults_btn'>\
                         <a class='confirm' href='#'></a>\
                     </div>")
+
+                if (preset.notRecommended) {
+                    $element.addClass("defaults_btn--not-recommended");
+                }
 
                 $element.find("a").html(preset.title);
                 $element.data("index", i).click(privateScope.onPresetClick)

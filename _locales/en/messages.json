@@ -55,7 +55,9 @@
     "configMigrationSuccessful": {
         "message": "Configuration migration complete, migrations applied: $1"
     },
-
+    "documentation": {
+        "message": "Documentation"
+    },
     "tabFirmwareFlasher": {
         "message": "Firmware Flasher"
     },
@@ -245,7 +247,7 @@
     },
 
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>CP210x Drivers</strong> can be downloaded from <a href=\"http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx\" title=\"http://www.silabs.com\" target=\"_blank\">here</a><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -2225,6 +2227,9 @@
     "accCalibrationProcessing": {
         "message": "Processing..."
     },
+    "tabProgramming": {
+        "message": "Programming"
+    },
     "tabAdvancedTuning": {
         "message": "Advanced tuning"
     },
@@ -2326,12 +2331,6 @@
     },
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
-    },
-    "use_gps_velned": {
-        "message": "Use GPS data for velocity calculation"
-    },
-    "use_gps_velned_help": {
-        "message": "Defined if iNav should use velocity data provided by GPS module for doing position and speed estimation. If set to OFF iNav will fallback to calculating velocity from GPS coordinates. Using native velocity data may improve performance on some GPS modules. Some GPS modules introduce significant delay and using native velocity may actually result in much worse performance."
     },
     "w_z_baro_p_help": {
         "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
@@ -2447,8 +2446,8 @@
     "osdUnitUKTip": {
         "message": "Use metric units except for the speed, which is displayed in miles per hour."
     },
-    "osdAlarmRSSI": {
-        "message": "RSSI"
+    "osd_rssi_alarm": {
+        "message": "RSSI (%)"
     },
     "osdAlarmBATT_CAP": {
         "message": "Used Battery"
@@ -2456,71 +2455,65 @@
     "osdAlarmBATT_CAP_HELP": {
         "message": "The battery capacity used indicator (mah drawn) will flash when the total consumed mah are greater than this value. Requires a current sensor. Zero disables this alarm."
     },
-    "osdAlarmFLY_MINUTES": {
-        "message": "Fly Time"
+    "osd_time_alarm": {
+        "message": "Fly Time (minutes)"
     },
-    "osdAlarmMAX_ALTITUDE": {
-        "message": "Altitude"
+    "osd_alt_alarm": {
+        "message": "Altitude (meters)"
     },
-    "osdAlarmDIST": {
-        "message": "Distance"
+    "osd_dist_alarm": {
+        "message": "Distance (meters)"
     },
     "osdAlarmDIST_HELP": {
         "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
     },
-    "osdAlarmMAX_NEG_ALTITUDE": {
-        "message": "Negative Altitude"
+    "osd_neg_alt_alarm": {
+        "message": "Negative Altitude (meters)"
     },
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
-    "osdAlarmGFORCE": {
+    "osd_gforce_alarm": {
         "message": "g force"
     },
     "osdAlarmGFORCE_HELP": {
         "message": "The g force element will start blinking when greater than this value"
     },
-    "osdAlarmGFORCE_AXIS_MIN": {
+    "osd_gforce_axis_alarm_min": {
         "message": "g force axis min"
     },
     "osdAlarmGFORCE_AXIS_MIN_HELP": {
         "message": "The axes g force elements will start blinking when lower than this value"
     },
-    "osdAlarmGFORCE_AXIS_MAX": {
+    "osd_gforce_axis_alarm_max": {
         "message": "g force axis max"
     },
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
         "message": "The axes g force elements will start blinking when greater than this value"
     },
-    "osdAlarmCURRENT": {
-        "message": "Current"
+    "osd_current_alarm": {
+        "message": "Current (A)"
     },
     "osdAlarmCURRENT_HELP": {
         "message": "The current draw element will start blinking when the consumption is greater than this value. Zero disables this alarm."
     },
-    "osdAlarmIMU_TEMPERATURE_MIN": {
+    "osd_imu_temp_alarm_min": {
         "message": "Minimum IMU temperature"
     },
-    "osdAlarmIMU_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the IMU temperature is bellow this value"
-    },
-    "osdAlarmIMU_TEMPERATURE_MAX": {
+    "osd_imu_temp_alarm_max": {
         "message": "Maximum IMU temperature"
     },
-    "osdAlarmIMU_TEMPERATURE_MAX_HELP": {
-        "message": "The temperature indicator will flash when the IMU temperature is above this value"
-    },
-    "osdAlarmBARO_TEMPERATURE_MIN": {
+    "osd_baro_temp_alarm_min": {
         "message": "Minimum baro temperature"
     },
-    "osdAlarmBARO_TEMPERATURE_MIN_HELP": {
-        "message": "The temperature indicator will flash when the barometer temperature is bellow this value"
-    },
-    "osdAlarmBARO_TEMPERATURE_MAX": {
+    "osd_baro_temp_alarm_max": {
         "message": "Maximum baro temperature"
     },
-    "osdAlarmBARO_TEMPERATURE_MAX_HELP": {
-        "message": "The temperature indicator will flash when the barometer temperature is above this value"
+    "osd_esc_temp_alarm_min": {
+        "message": "Minimum ESC temperature"
+    },
+    "osd_esc_temp_alarm_max": {
+        "message": "Maximum ESC temperature"
     },
     "osdGroupGeneral": {
         "message": "General"
@@ -2812,6 +2805,12 @@
     },
     "osdElement_BARO_TEMPERATURE_HELP": {
         "message": "Temperature of the barometer"
+    },
+    "osdElement_ESC_TEMPERATURE": {
+        "message": "ESC Temperature"
+    },
+    "osdElement_ESC_TEMPERATURE_HELP": {
+        "message": "Temperature of the ESC read from DSHOT telemetry"
     },
     "osdElement_SENSOR1_TEMPERATURE": {
         "message": "Temperature sensor 1"
@@ -3140,11 +3139,20 @@
     "logicFlags": {
         "message": "Flags"
     },
+    "logicStatus": {
+        "message": "Status"
+    },
     "logicSave": {
         "message": "Save"
     },
     "logicClose": {
         "message": "Close"
+    },
+    "logicActivator": {
+        "message": "Active"
+    },
+    "save": {
+        "message": "Save"
     },
     "active": {
         "message": "Active"
@@ -3281,6 +3289,9 @@
     "defaultsDialogInfo": {
         "message": "INAV Configurator would like to know which kind of UAV you are configuring. Based on this information it will modify some default values to unlock the best flying performance. "
     },
+    "defaultsDialogInfo2": {
+        "message": "Avoid blindly restoring all PID and filter configuration from the previous version of INAV. The best result can be obtained by retuning from defaults!"
+    },
     "throttleIdle": {
         "message": "Motors IDLE power [%]"
     },
@@ -3298,5 +3309,44 @@
     },
     "dynamic_gyro_notch_enabled_help": {
         "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."
+    },
+    "globalFunctions": {
+        "message": "Global functions"
+    },
+    "functionId": {
+        "message": "#"
+    },
+    "functionEnabled": {
+        "message": "Enabled"
+    },
+    "functionLogicId": {
+        "message": "Activation Logic Condition"
+    },
+    "functionAction": {
+        "message": "Action"
+    },
+    "functionOperand": {
+        "message": "Operand"
+    },
+    "functionFlags": {
+        "message": "Flags"
+    },
+    "configurationI2cSpeed": {
+        "message": "I2C Speed"
+    },
+    "configurationI2cSpeedHelp": {
+        "message": "I2C speed should be kept at the highest level that allows for all connected devices to work. Default 400kHz is a save value and it is suggested to switch to 800kHz in case of Multirotors."
+    },
+    "i2cSpeedSuggested800khz": {
+        "message": "Please switch to 800kHz if connected hardware allows for it"
+    },
+    "i2cSpeedTooLow": {
+        "message": "This I2C speed is too low!"
+    },
+    "configurationVoltageMeterType": {
+        "message": "Voltage Meter Type"
+    },
+    "configurationCurrentMeterType": {
+        "message": "Current Meter Type"
     }
 }

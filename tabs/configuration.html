@@ -1,9 +1,6 @@
 <div class="tab-configuration toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabConfiguration">Configuration</div>
-        <div class="cf_doc_version_bt">
-            <a id="button-documentation" href="https://github.com/iNavFlight/inav/releases" target="_blank"></a>
-        </div>
         <div class="note" style="margin-bottom: 20px;">
             <div class="note_spacer">
                 <p data-i18n="configurationFeaturesHelp"></p>
@@ -30,6 +27,16 @@
                                 </label>
                                 <div class="helpicon cf_tip" data-i18n_title="configurationLoopTimeHelp"></div>
                             </div>
+
+                            <div id="i2c_speed-info" class="info-box"></div>
+                            <div class="select">
+                                <select id="i2c_speed" data-setting="i2c_speed" />
+                                <label for="looptime">
+                                    <span data-i18n="configurationI2cSpeed"></span>
+                                </label>
+                                <div class="helpicon cf_tip" data-i18n_title="configurationI2cSpeedHelp"></div>
+                            </div>
+                            
                         </div>
                     </div>
             <div class="config-section sensors gui_box grey">
@@ -162,12 +169,6 @@
                             <span data-i18n="configuration3dNeutral"></span>
                         </label>
                     </div>
-                    <div id="deadband-3d-throttle-container" class="number">
-                        <input type="number" id="3ddeadbandthrottle" name="3ddeadbandthrottle" step="1" min="0" max="1000" />
-                        <label for="3ddeadbandthrottle">
-                            <span data-i18n="configuration3dDeadbandThrottle"></span>
-                        </label>
-                    </div>
                 </div>
             </div>
 
@@ -236,8 +237,12 @@
                 </div>
                 <div class="spacer_box">
                     <div class="features batteryVoltage"></div>
-                    <!--list of generated features goes here-->
-
+                    <div class="select">
+                        <select id="vbat_meter_type" data-setting="vbat_meter_type" />
+                        <label for="vbat_meter_type">
+                            <span data-i18n="configurationVoltageMeterType"></span>
+                        </label>
+                    </div>
                     <div class="select">
                         <select id="voltagesource" class="voltagesource">
                             <option value="0">Raw</option>
@@ -294,8 +299,12 @@
                 </div>
                 <div class="spacer_box">
                     <div class="features batteryCurrent"></div>
-                    <!--list of generated features goes here-->
-
+                    <div class="select">
+                        <select id="current_meter_type" data-setting="current_meter_type" />
+                        <label for="current_meter_type">
+                            <span data-i18n="configurationCurrentMeterType"></span>
+                        </label>
+                    </div>
                     <div class="number">
                         <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" />
                         <label for="currentscale">

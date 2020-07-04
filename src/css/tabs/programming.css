@@ -1,0 +1,31 @@
+.gvar__container {
+    width: 100%;
+    margin: 1em 0 1em 0;
+    padding: 0;
+    position: relative;
+}
+
+.gvar__wrapper {
+    position: relative;
+    float: left;
+    width: 25%;
+    margin: 0;
+    padding: 0;
+}
+
+.gvar__cell {
+    margin: 1em;
+    padding: 1em;
+    background-color: rgb(55, 168, 219);
+}
+
+.gvar__cell h2 {
+    font-size: 1em;
+    color: #eee;
+}
+
+.gvar__value {
+    font-size: 2em;
+    color:#fff;
+    font-weight: bold;
+}

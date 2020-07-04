@@ -63,8 +63,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveVTXConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
+        saveSettings,
         mspHelper.saveToEeprom
     ];
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
+    }
 
     saveChainer.setChain(saveChain);
     saveChainer.setExitPoint(reboot);
@@ -85,7 +90,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load("./tabs/configuration.html", process_html);
+        GUI.load("./tabs/configuration.html", Settings.processHtml(process_html));
     }
 
     function process_html() {
@@ -278,6 +283,39 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#battery_capacity_critical').val(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
+        let $i2cSpeed = $('#i2c_speed'),
+            $i2cSpeedInfo = $('#i2c_speed-info');
+
+        $i2cSpeed.change(function () {
+            let $this = $(this),
+                value = $this.children("option:selected").text();
+
+            if (value == "400KHZ") {
+
+                $i2cSpeedInfo.removeClass('ok-box');
+                $i2cSpeedInfo.addClass('info-box');
+                $i2cSpeedInfo.removeClass('warning-box');
+
+                $i2cSpeedInfo.html(chrome.i18n.getMessage('i2cSpeedSuggested800khz'));
+                $i2cSpeedInfo.show();
+
+            } else if (value == "800KHZ") {
+                $i2cSpeedInfo.removeClass('ok-box');
+                $i2cSpeedInfo.removeClass('info-box');
+                $i2cSpeedInfo.removeClass('warning-box');
+                $i2cSpeedInfo.hide();
+            } else {
+                $i2cSpeedInfo.removeClass('ok-box');
+                $i2cSpeedInfo.removeClass('info-box');
+                $i2cSpeedInfo.addClass('warning-box');
+                $i2cSpeedInfo.html(chrome.i18n.getMessage('i2cSpeedTooLow'));
+                $i2cSpeedInfo.show();
+            }
+
+        });
+
+        $i2cSpeed.change();
+
         var $looptime = $("#looptime");
 
         var $gyroLpf = $("#gyro-lpf"),
@@ -410,12 +448,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
         $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
         $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
-        if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-            $('#3ddeadbandthrottle').val(REVERSIBLE_MOTORS.deadband_throttle);
-        } else {
-            $('#deadband-3d-throttle-container').remove();
-        }
-
+        
         // Craft name
         if (craftName != null) {
             $('.config-personalization').show();
@@ -446,9 +479,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
             REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
             REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
-            if (semver.lt(CONFIG.apiVersion, "1.17.0")) {
-                REVERSIBLE_MOTORS.deadband_throttle = ($('#3ddeadbandthrottle').val());
-            }
 
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
@@ -458,14 +488,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
                 googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
             }
-            
-            googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
 
-            /*
-             * send gyro LPF and async_mode tracking
-             */
+            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
+            googleAnalytics.sendEvent("Platform", helper.platform.getById(MIXER_CONFIG.platformType).name, "LPF: " + FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label + " | Looptime: " + FC_CONFIG.loopTime);
+
+            googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
-            googleAnalytics.sendEvent('Setting', 'AsyncMode', FC.getAsyncModes()[INAV_PID_CONFIG.asynchronousMode]);
+            googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
             googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
             googleAnalytics.sendEvent('Board', 'Magnetometer', FC.getMagnetometerNames()[SENSOR_CONFIG.magnetometer]);
@@ -478,6 +507,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                     googleAnalytics.sendEvent('Setting', 'Feature', featureName);
                 }
             }
+
 
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));

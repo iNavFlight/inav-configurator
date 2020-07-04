@@ -90,6 +90,7 @@ sources.js = [
     './js/servoMixRule.js',
     './js/motorMixRule.js',
     './js/logicCondition.js',
+    './js/globalFunction.js',
     './js/settings.js',
     './js/outputMapping.js',
     './js/model.js',
@@ -104,7 +105,9 @@ sources.js = [
     './js/servoMixerRuleCollection.js',
     './js/motorMixerRuleCollection.js',
     './js/logicConditionsCollection.js',
+    './js/globalFunctionsCollection.js',
     './js/logicConditionsStatus.js',
+    './js/globalVariablesStatus.js',
     './js/vtx.js',
     './main.js',
     './js/tabs.js',
@@ -162,16 +165,29 @@ function get_task_name(key) {
     return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
 }
 
+function getArguments() {
+    return minimist(process.argv.slice(2));
+}
+
 function getPlatforms() {
-    var defaultPlatforms = ['win32', 'win64', 'osx64', 'linux32', 'linux64'];
-    var argv = minimist(process.argv.slice(2));
-    if (argv.platform) {
-        if (defaultPlatforms.indexOf(argv.platform) < 0) {
-            throw "Invalid platform '" + argv.platform + "'. Available ones are: " + defaultPlatforms;
+    const defaultPlatforms = ['win32', 'win64', 'osx64', 'linux32', 'linux64'];
+    const platform = getArguments().platform;
+    if (platform) {
+        if (defaultPlatforms.indexOf(platform) < 0) {
+            throw new Error(`Invalid platform "${platform}". Available ones are: ${defaultPlatforms}`)
         }
-        return [argv.platform];
+        return [platform];
     }
     return defaultPlatforms;
+}
+
+function execSync() {
+    const cmd = arguments[0];
+    const args = Array.prototype.slice.call(arguments, 1);
+    const result = child_process.spawnSync(cmd, args, {stdio: 'inherit'});
+    if (result.error) {
+        throw result.error;
+    }
 }
 
 // Define build tasks dynamically based on the sources
@@ -290,15 +306,28 @@ gulp.task('release-win64', function() {
     return archive.finalize();
 });
 
-gulp.task('release-osx64', function() {
+gulp.task('release-osx64', function(done) {
     var pkg = require('./package.json');
     var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
     // Check if we want to sign the .app bundle
-    if (process.env.CODESIGN_IDENTITY) {
-        var sign_cmd = 'codesign --verbose --force --sign "' + process.env.CODESIGN_IDENTITY + '" ' + src;
-        child_process.execSync(sign_cmd);
+    if (getArguments().codesign) {
+        // macapptool can be downloaded from
+        // https://github.com/fiam/macapptool
+        //
+        // Make sure the bundle is well formed
+        execSync('macapptool', '-v', '1', 'fix', src);
+        // Sign
+        const codesignArgs = ['macapptool', '-v', '1', 'sign'];
+        const codesignIdentity = getArguments()['codesign-identity'];
+        if (codesignIdentity) {
+            codesignArgs.push('-i', codesignIdentity);
+        }
+        codesignArgs.push('-e', 'entitlements.plist');
+        codesignArgs.push(src)
+        execSync.apply(this, codesignArgs);
     }
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('macOS', 'zip')));
+    const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
+    var output = fs.createWriteStream(zipFilename);
     var archive = archiver('zip', {
         zlib: { level: 9 }
     });
@@ -306,7 +335,23 @@ gulp.task('release-osx64', function() {
     archive.on('error', function(err) { throw err; });
     archive.pipe(output);
     archive.directory(src, 'INAV Configurator.app');
-    return archive.finalize();
+    output.on('close', function() {
+        if (getArguments().notarize) {
+            const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
+            const notarizationUsername = getArguments()['notarization-username'];
+            if (notarizationUsername) {
+                notarizeArgs.push('-u', notarizationUsername)
+            }
+            const notarizationPassword = getArguments()['notarization-password'];
+            if (notarizationPassword) {
+                notarizeArgs.push('-p', notarizationPassword)
+            }
+            notarizeArgs.push(zipFilename)
+            execSync.apply(this, notarizeArgs);
+        }
+        done();
+    });
+    archive.finalize();
 });
 
 function releaseLinux(bits) {

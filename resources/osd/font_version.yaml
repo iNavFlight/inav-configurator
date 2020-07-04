@@ -1,0 +1,7 @@
+# These are used in all fonts to indicate the
+# INAV font version.
+255: &fontmeta
+  data:
+    - s: "INAV"
+    - u8: 1
+256: *fontmeta
