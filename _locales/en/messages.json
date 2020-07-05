@@ -2653,6 +2653,12 @@
     "osdElement_PLUS_CODE_HELP": {
         "message": "Plus codes encode both latitude and longitude on a single value that can be entered directly in Google Maps. It provides the same level of precision than latitude and longitude while using less screen space."
     },
+    "osdElement_AZIMUTH": {
+        "message": "Azimuth"
+    },
+    "osdElement_AZIMUTH_HELP": {
+        "message": "Azimuth is the direction of the aircraft in relation to the home point. It's useful to keep the aircraft on the correct course or to keep the aircraft in front of a fixed directional antenna."
+    },
     "osdElement_TRIP_DIST": {
         "message": "Trip distance"
     },
