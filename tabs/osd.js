@@ -18,6 +18,7 @@ SYM.AH_CENTER_LINE = 0x26;
 SYM.AH_CENTER_LINE_RIGHT = 0x27;
 SYM.AH_CENTER = 0x7E;
 SYM.AH_BAR9_0 = 0x80;
+SYM.AZIMUTH = 0x8D; // 141
 SYM.AH_DECORATION = 0x13;
 SYM.AMP = 0x9A;
 SYM.MAH = 0x07;
@@ -1189,6 +1190,11 @@ OSD.constants = {
                     name: 'HOME_HEADING_ERROR',
                     id: 50,
                     preview: FONT.symbol(SYM.HOME) + FONT.symbol(SYM.HEADING) + ' -10' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'AZIMUTH',
+                    id: 108,
+                    preview: FONT.symbol(SYM.AZIMUTH) + ' 20'
                 },
                 {
                     name: 'DISTANCE_TO_HOME',
