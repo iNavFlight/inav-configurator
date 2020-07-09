@@ -157,9 +157,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function updateFixedValueVisibility(row, $mixRuleInput) {
 
-        // Show the fixed value input box if "ONE" input was selected for this servo
+        // Show the fixed value input box if "MAX" input was selected for this servo
         const $fixedValueCalcInput = row.find(".mix-rule-fixed-value");
-        if (FC.getServoMixInputNames()[$mixRuleInput.val()] === 'ONE') {
+        if (FC.getServoMixInputNames()[$mixRuleInput.val()] === 'MAX') {
             $fixedValueCalcInput.show();
             row.find(".mix-rule-speed").prop('disabled', true);
         } else {
@@ -167,12 +167,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             row.find(".mix-rule-speed").prop('disabled', false);
         }
 
-        // Show the Fixed Value column if at least one servo has the "ONE" input assigned
+        // Show the Fixed Value column if at least one servo has the "MAX" input assigned
         const $fixedValueCol = $("#servo-mix-table").find(".mixer-fixed-value-col");
         const rules = SERVO_RULES.get();
         for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
-                if (FC.getServoMixInputNames()[rules[servoRuleIndex].getInput()] === 'ONE') {
+                if (FC.getServoMixInputNames()[rules[servoRuleIndex].getInput()] === 'MAX') {
                     $fixedValueCol.show();
                     return;
                 }
