@@ -1125,6 +1125,11 @@ var FC = {
                 name: "GVAR DEC",
                 hasOperand: [true, true],
                 output: "none"
+            },
+            128: {
+                name: "IO PORT SET",
+                hasOperand: [true, true],
+                output: "none"
             }
         }
     },
