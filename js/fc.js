@@ -1127,7 +1127,7 @@ var FC = {
                 output: "none"
             },
             128: {
-                name: "IO SET",
+                name: "IO PORT SET",
                 hasOperand: [true, true],
                 output: "none"
             }
