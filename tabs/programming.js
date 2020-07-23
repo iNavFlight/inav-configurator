@@ -13,15 +13,13 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 
     loadChainer.setChain([
-        mspHelper.loadLogicConditions,
-        mspHelper.loadGlobalFunctions
+        mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
 
     saveChainer.setChain([
         mspHelper.sendLogicConditions,
-        mspHelper.sendGlobalFunctions,
         mspHelper.saveToEeprom
     ]);
     
@@ -37,11 +35,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     function processHtml() {
 
-        LOGIC_CONDITIONS.init($('#logic-wrapper'));
+        LOGIC_CONDITIONS.init($('#programming-main-content'));
         LOGIC_CONDITIONS.render();
-
-        GLOBAL_FUNCTIONS.init($('#functions-wrapper'));
-        GLOBAL_FUNCTIONS.render();
 
         helper.tabs.init($('.tab-programming'));
 

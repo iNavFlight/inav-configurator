@@ -172,7 +172,6 @@ var FC = {
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
         LOGIC_CONDITIONS = new LogicConditionsCollection();
-        GLOBAL_FUNCTIONS = new GlobalFunctionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
 
@@ -1185,54 +1184,6 @@ var FC = {
                 name: "SET OSD LAYOUT",
                 hasOperand: [true, false],
                 output: "none"
-            }
-        }
-    },
-    getFunctionActions: function () {
-        return {
-            0: {
-                name: "OVERRIDE ARMING SAFETY",
-                hasOperand: false
-            },
-            1: {
-                name: "OVERRIDE THROTTLE SCALE",
-                hasOperand: true
-            },
-            2: {
-                name: "SWAP ROLL & YAW",
-                hasOperand: false
-            },
-            3: {
-                name: "SET VTX POWER LEVEL",
-                hasOperand: true
-            },
-            8: {
-                name: "SET VTX BAND",
-                hasOperand: true
-            },
-            9: {
-                name: "SET VTX CHANNEL",
-                hasOperand: true
-            },
-            4: {
-                name: "INVERT ROLL",
-                hasOperand: false
-            },
-            5: {
-                name: "INVERT PITCH",
-                hasOperand: false
-            },
-            6: {
-                name: "INVERT YAW",
-                hasOperand: false
-            },
-            7: {
-                name: "OVERRIDE THROTTLE",
-                hasOperand: true
-            },
-            10: {
-                name: "SET OSD LAYOUT",
-                hasOperand: true
             }
         }
     },
