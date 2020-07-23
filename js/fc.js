@@ -1180,6 +1180,11 @@ var FC = {
                 name: "OVERRIDE THROTTLE",
                 hasOperand: [true, false],
                 output: "none"
+            },
+            32: {
+                name: "SET OSD LAYOUT",
+                hasOperand: [true, false],
+                output: "none"
             }
         }
     },
