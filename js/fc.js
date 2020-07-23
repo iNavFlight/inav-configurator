@@ -1133,57 +1133,57 @@ var FC = {
             22: {
                 name: "OVERRIDE ARMING SAFETY",
                 hasOperand: [false, false],
-                output: "none"
+                output: "boolean"
             },
             23: {
                 name: "OVERRIDE THROTTLE SCALE",
                 hasOperand: [true, false],
-                output: "none"
-            },
-            24: {
-                name: "SWAP ROLL & YAW",
-                hasOperand: [false, false],
-                output: "none"
-            },
-            25: {
-                name: "SET VTX POWER LEVEL",
-                hasOperand: [true, false],
-                output: "none"
-            },
-            30: {
-                name: "SET VTX BAND",
-                hasOperand: [true, false],
-                output: "none"
-            },
-            31: {
-                name: "SET VTX CHANNEL",
-                hasOperand: [true, false],
-                output: "none"
-            },
-            26: {
-                name: "INVERT ROLL",
-                hasOperand: [false, false],
-                output: "none"
-            },
-            27: {
-                name: "INVERT PITCH",
-                hasOperand: [false, false],
-                output: "none"
-            },
-            28: {
-                name: "INVERT YAW",
-                hasOperand: [false, false],
-                output: "none"
+                output: "boolean"
             },
             29: {
                 name: "OVERRIDE THROTTLE",
                 hasOperand: [true, false],
-                output: "none"
+                output: "boolean"
+            },
+            24: {
+                name: "SWAP ROLL & YAW",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            25: {
+                name: "SET VTX POWER LEVEL",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            30: {
+                name: "SET VTX BAND",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            31: {
+                name: "SET VTX CHANNEL",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            26: {
+                name: "INVERT ROLL",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            27: {
+                name: "INVERT PITCH",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            28: {
+                name: "INVERT YAW",
+                hasOperand: [false, false],
+                output: "boolean"
             },
             32: {
                 name: "SET OSD LAYOUT",
                 hasOperand: [true, false],
-                output: "none"
+                output: "boolean"
             }
         }
     },
