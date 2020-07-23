@@ -1224,6 +1224,10 @@ var FC = {
             7: {
                 name: "OVERRIDE THROTTLE",
                 hasOperand: true
+            },
+            10: {
+                name: "SET OSD LAYOUT",
+                hasOperand: true
             }
         }
     },
