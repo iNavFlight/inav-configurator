@@ -1126,9 +1126,59 @@ var FC = {
                 hasOperand: [true, true],
                 output: "none"
             },
-            128: {
+            21: {
                 name: "IO PORT SET",
                 hasOperand: [true, true],
+                output: "none"
+            },
+            22: {
+                name: "OVERRIDE ARMING SAFETY",
+                hasOperand: [false, false],
+                output: "none"
+            },
+            23: {
+                name: "OVERRIDE THROTTLE SCALE",
+                hasOperand: [true, false],
+                output: "none"
+            },
+            24: {
+                name: "SWAP ROLL & YAW",
+                hasOperand: [false, false],
+                output: "none"
+            },
+            25: {
+                name: "SET VTX POWER LEVEL",
+                hasOperand: [true, false],
+                output: "none"
+            },
+            30: {
+                name: "SET VTX BAND",
+                hasOperand: [true, false],
+                output: "none"
+            },
+            31: {
+                name: "SET VTX CHANNEL",
+                hasOperand: [true, false],
+                output: "none"
+            },
+            26: {
+                name: "INVERT ROLL",
+                hasOperand: [false, false],
+                output: "none"
+            },
+            27: {
+                name: "INVERT PITCH",
+                hasOperand: [false, false],
+                output: "none"
+            },
+            28: {
+                name: "INVERT YAW",
+                hasOperand: [false, false],
+                output: "none"
+            },
+            29: {
+                name: "OVERRIDE THROTTLE",
+                hasOperand: [true, false],
                 output: "none"
             }
         }
