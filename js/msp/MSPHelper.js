@@ -1270,6 +1270,12 @@ var mspHelper = (function (gui) {
                 CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
                 CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
                 CALIBRATION_DATA.opflow.Scale = (data.getInt16(19, true) / 256.0);
+                
+                if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+                    CALIBRATION_DATA.magGain.X = data.getInt16(21, true);
+                    CALIBRATION_DATA.magGain.Y = data.getInt16(23, true);
+                    CALIBRATION_DATA.magGain.Z = data.getInt16(25, true);
+                }
 
                 break;
 
@@ -1917,8 +1923,20 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(CALIBRATION_DATA.magZero.Z));
                 buffer.push(highByte(CALIBRATION_DATA.magZero.Z));
 
-                    buffer.push(lowByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
-                    buffer.push(highByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                buffer.push(lowByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+                buffer.push(highByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
+
+                if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+                    buffer.push(lowByte(CALIBRATION_DATA.magGain.X));
+                    buffer.push(highByte(CALIBRATION_DATA.magGain.X));
+
+                    buffer.push(lowByte(CALIBRATION_DATA.magGain.Y));
+                    buffer.push(highByte(CALIBRATION_DATA.magGain.Y));
+
+                    buffer.push(lowByte(CALIBRATION_DATA.magGain.Z));
+                    buffer.push(highByte(CALIBRATION_DATA.magGain.Z));
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:

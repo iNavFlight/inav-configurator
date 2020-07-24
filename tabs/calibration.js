@@ -103,6 +103,7 @@ TABS.calibration.initialize = function (callback) {
             $('[name=accGain' + item + ']').val(CALIBRATION_DATA.accGain[item]);
             $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accZero[item]);
             $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
+            $('[name=MagGain' + item + ']').val(CALIBRATION_DATA.magGain[item]);
         });
         $('[name=OpflowScale]').val(CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
