@@ -112,7 +112,6 @@ TABS.advanced_tuning.initialize = function (callback) {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log('OSD settings saved');
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
