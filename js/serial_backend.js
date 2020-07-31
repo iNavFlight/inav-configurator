@@ -199,9 +199,7 @@ function onValidFirmware()
                 GUI.allowedTabs = GUI.defaultAllowedTabsWhenConnected.slice();
                 onConnect();
 
-                if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-                    helper.defaultsDialog.init();
-                }
+                helper.defaultsDialog.init();
 
                 $('#tabs ul.mode-connected .tab_setup a').click();
             });

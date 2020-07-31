@@ -1000,6 +1000,10 @@ var FC = {
             'GVAR 1',               // 31
             'GVAR 2',               // 32
             'GVAR 3',               // 33
+            'GVAR 4',               // 34
+            'GVAR 5',               // 35
+            'GVAR 6',               // 36
+            'GVAR 7',               // 37
         ];
     },
     getServoMixInputName: function (input) {

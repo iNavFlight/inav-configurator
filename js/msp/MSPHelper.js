@@ -495,37 +495,21 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS:
                 LOGIC_CONDITIONS.flush();
-                if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-                    if (data.byteLength % 14 === 0) {
-                        for (i = 0; i < data.byteLength; i += 14) {
-                            LOGIC_CONDITIONS.put(new LogicCondition(
-                                data.getInt8(i),
-                                data.getUint8(i + 1),
-                                data.getUint8(i + 2),
-                                data.getUint8(i + 3),
-                                data.getInt32(i + 4, true),
-                                data.getUint8(i + 8),
-                                data.getInt32(i + 9, true),
-                                data.getInt8(i + 13)
-                            ));
-                        }
-                    }
-                } else {
-                    if (data.byteLength % 13 === 0) {
-                        for (i = 0; i < data.byteLength; i += 13) {
-                            LOGIC_CONDITIONS.put(new LogicCondition(
-                                data.getInt8(i),
-                                -1,
-                                data.getInt8(i + 1),
-                                data.getInt8(i + 2),
-                                data.getInt32(i + 3, true),
-                                data.getInt8(i + 7),
-                                data.getInt32(i + 8, true),
-                                data.getInt8(i + 12)
-                            ));
-                        }
+                if (data.byteLength % 14 === 0) {
+                    for (i = 0; i < data.byteLength; i += 14) {
+                        LOGIC_CONDITIONS.put(new LogicCondition(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getUint8(i + 2),
+                            data.getUint8(i + 3),
+                            data.getInt32(i + 4, true),
+                            data.getUint8(i + 8),
+                            data.getInt32(i + 9, true),
+                            data.getInt8(i + 13)
+                        ));
                     }
                 }
+                
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:

@@ -13,7 +13,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 
     loadChainer.setChain([
-        mspHelper.loadLogicConditions
+        mspHelper.loadLogicConditions,
+        mspHelper.loadGlobalVariablesStatus
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -38,6 +39,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
         LOGIC_CONDITIONS.init($('#programming-main-content'));
         LOGIC_CONDITIONS.render();
 
+        GLOBAL_VARIABLES_STATUS.init($(".gvar__container"));
+
         helper.tabs.init($('.tab-programming'));
 
         localize();
@@ -46,11 +49,9 @@ TABS.programming.initialize = function (callback, scrollPosition) {
             saveChainer.execute();
         });
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.3.0")) {
-            helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
-                statusChainer.execute();
-            });
-        }
+        helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
+            statusChainer.execute();
+        });
 
         GUI.content_ready(callback);
     }
