@@ -29,5 +29,25 @@ let GlobalVariablesStatus = function () {
         }
     }
 
+    self.init = function ($container) {
+
+        let count = self.getAll().length;
+        let template = $container.find(".gvar__wrapper:first").prop("outerHTML");
+        
+        $container.find(".gvar__wrapper").remove();
+
+        for (let i = 0; i < count; i++) {
+            $container.append(template);
+            let $last = $container.find(".gvar__wrapper:last");
+
+            $last.find("h2").html("GVAR " + i);
+            $last.find("label").attr("data-gvar-index", i);
+            $last.find("label").html("0");
+        }
+
+        $container.find(".gvar__wrapper").css("width", (100 / count) + "%");
+
+    }
+
     return self;
 };

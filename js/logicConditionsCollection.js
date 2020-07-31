@@ -23,11 +23,6 @@ let LogicConditionsCollection = function () {
     };
 
     self.open = function () {
-
-        if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
-            return;
-        }
-
         self.render();
         $container.show();
     };
@@ -61,11 +56,6 @@ let LogicConditionsCollection = function () {
     };
 
     self.init = function ($element) {
-
-        if (semver.lt(CONFIG.flightControllerVersion, "2.2.0")) {
-            return;
-        }
-
         $container = $element;
 
         $container.find('.logic__save').click(self.onSave);
