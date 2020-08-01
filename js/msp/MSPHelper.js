@@ -495,37 +495,21 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS:
                 LOGIC_CONDITIONS.flush();
-                if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-                    if (data.byteLength % 14 === 0) {
-                        for (i = 0; i < data.byteLength; i += 14) {
-                            LOGIC_CONDITIONS.put(new LogicCondition(
-                                data.getInt8(i),
-                                data.getInt8(i + 1),
-                                data.getInt8(i + 2),
-                                data.getInt8(i + 3),
-                                data.getInt32(i + 4, true),
-                                data.getInt8(i + 8),
-                                data.getInt32(i + 9, true),
-                                data.getInt8(i + 13)
-                            ));
-                        }
-                    }
-                } else {
-                    if (data.byteLength % 13 === 0) {
-                        for (i = 0; i < data.byteLength; i += 13) {
-                            LOGIC_CONDITIONS.put(new LogicCondition(
-                                data.getInt8(i),
-                                -1,
-                                data.getInt8(i + 1),
-                                data.getInt8(i + 2),
-                                data.getInt32(i + 3, true),
-                                data.getInt8(i + 7),
-                                data.getInt32(i + 8, true),
-                                data.getInt8(i + 12)
-                            ));
-                        }
+                if (data.byteLength % 14 === 0) {
+                    for (i = 0; i < data.byteLength; i += 14) {
+                        LOGIC_CONDITIONS.put(new LogicCondition(
+                            data.getInt8(i),
+                            data.getInt8(i + 1),
+                            data.getUint8(i + 2),
+                            data.getUint8(i + 3),
+                            data.getInt32(i + 4, true),
+                            data.getUint8(i + 8),
+                            data.getInt32(i + 9, true),
+                            data.getInt8(i + 13)
+                        ));
                     }
                 }
+                
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
@@ -550,26 +534,6 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS:
                 console.log("Logic conditions saved");
-                break;
-
-            case MSPCodes.MSP2_INAV_GLOBAL_FUNCTIONS:
-                GLOBAL_FUNCTIONS.flush();
-                if (data.byteLength % 9 === 0) {
-                    for (i = 0; i < data.byteLength; i += 9) {
-                        GLOBAL_FUNCTIONS.put(new GlobalFunction(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt8(i + 2),
-                            data.getInt8(i + 3),
-                            data.getInt32(i + 4, true),
-                            data.getInt8(i + 8)
-                        ));
-                    }
-                }
-                break;
-                
-            case MSPCodes.MSP2_INAV_SET_GLOBAL_FUNCTIONS:
-                console.log("Global functions saved");
                 break;
 
             case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
@@ -2377,48 +2341,6 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS, buffer, false, nextFunction);
-        }
-    };
-
-    self.loadGlobalFunctions = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_GLOBAL_FUNCTIONS, false, false, callback);
-    }
-
-    self.sendGlobalFunctions = function (onCompleteCallback) {
-        let nextFunction = sendGlobalFunction,
-            functionIndex = 0;
-
-        if (GLOBAL_FUNCTIONS.getCount() == 0) {
-            onCompleteCallback();
-        } else {
-            nextFunction();
-        }
-
-        function sendGlobalFunction() {
-
-            let buffer = [];
-
-            // send one at a time, with index, 14 bytes per one condition
-
-            let globalFunction = GLOBAL_FUNCTIONS.get()[functionIndex];
-
-            buffer.push(functionIndex);
-            buffer.push(globalFunction.getEnabled());
-            buffer.push(globalFunction.getConditionId());
-            buffer.push(globalFunction.getAction());
-            buffer.push(globalFunction.getOperandType());
-            buffer.push(specificByte(globalFunction.getOperandValue(), 0));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 1));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 2));
-            buffer.push(specificByte(globalFunction.getOperandValue(), 3));
-            buffer.push(globalFunction.getFlags());
-
-            // prepare for next iteration
-            functionIndex++;
-            if (functionIndex == GLOBAL_FUNCTIONS.getCount()) { //This is the last rule. Not pretty, but we have to send all rules
-                nextFunction = onCompleteCallback;
-            }
-            MSP.send_message(MSPCodes.MSP2_INAV_SET_GLOBAL_FUNCTIONS, buffer, false, nextFunction);
         }
     };
 

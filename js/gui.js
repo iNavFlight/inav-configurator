@@ -193,7 +193,7 @@ GUI_control.prototype.content_ready = function (callback) {
     });
 
     const duration = content.data('empty') ? 0 : 400;
-    $('#content .data-loading').fadeOut(duration, function() {
+    $('#content .data-loading:first').fadeOut(duration, function() {
         $(this).remove();
     });
     if (callback) {

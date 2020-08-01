@@ -1,0 +1,4 @@
+45: # Width of the '-' character in pixels
+    metadata:
+        - s: s
+        - u8: 8

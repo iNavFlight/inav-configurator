@@ -66,10 +66,10 @@ var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
     isRpyFfComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT;
+        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
     isRpyDComponentUsed: function () {
-        return !FC.isRpyFfComponentUsed();
+        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -172,7 +172,6 @@ var FC = {
         SERVO_RULES = new ServoMixerRuleCollection();
         MOTOR_RULES = new MotorMixerRuleCollection();
         LOGIC_CONDITIONS = new LogicConditionsCollection();
-        GLOBAL_FUNCTIONS = new GlobalFunctionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
 
@@ -1001,6 +1000,10 @@ var FC = {
             'GVAR 1',               // 31
             'GVAR 2',               // 32
             'GVAR 3',               // 33
+            'GVAR 4',               // 34
+            'GVAR 5',               // 35
+            'GVAR 6',               // 36
+            'GVAR 7',               // 37
         ];
     },
     getServoMixInputName: function (input) {
@@ -1125,50 +1128,66 @@ var FC = {
                 name: "GVAR DEC",
                 hasOperand: [true, true],
                 output: "none"
-            }
-        }
-    },
-    getFunctionActions: function () {
-        return {
-            0: {
+            },
+            21: {
+                name: "IO PORT SET",
+                hasOperand: [true, true],
+                output: "none"
+            },
+            22: {
                 name: "OVERRIDE ARMING SAFETY",
-                hasOperand: false
+                hasOperand: [false, false],
+                output: "boolean"
             },
-            1: {
+            23: {
                 name: "OVERRIDE THROTTLE SCALE",
-                hasOperand: true
+                hasOperand: [true, false],
+                output: "boolean"
             },
-            2: {
-                name: "SWAP ROLL & YAW",
-                hasOperand: false
-            },
-            3: {
-                name: "SET VTX POWER LEVEL",
-                hasOperand: true
-            },
-            8: {
-                name: "SET VTX BAND",
-                hasOperand: true
-            },
-            9: {
-                name: "SET VTX CHANNEL",
-                hasOperand: true
-            },
-            4: {
-                name: "INVERT ROLL",
-                hasOperand: false
-            },
-            5: {
-                name: "INVERT PITCH",
-                hasOperand: false
-            },
-            6: {
-                name: "INVERT YAW",
-                hasOperand: false
-            },
-            7: {
+            29: {
                 name: "OVERRIDE THROTTLE",
-                hasOperand: true
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            24: {
+                name: "SWAP ROLL & YAW",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            25: {
+                name: "SET VTX POWER LEVEL",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            30: {
+                name: "SET VTX BAND",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            31: {
+                name: "SET VTX CHANNEL",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            26: {
+                name: "INVERT ROLL",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            27: {
+                name: "INVERT PITCH",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            28: {
+                name: "INVERT YAW",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
+            32: {
+                name: "SET OSD LAYOUT",
+                hasOperand: [true, false],
+                output: "boolean"
             }
         }
     },

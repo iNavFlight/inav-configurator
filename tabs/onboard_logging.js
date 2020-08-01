@@ -20,11 +20,7 @@ TABS.onboard_logging.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
                 MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
-		    var messageId = MSPCodes.MSP_BLACKBOX_CONFIG;
-                    if (semver.gte(CONFIG.apiVersion, "2.3.0")) {
-			messageId = MSPCodes.MSP2_BLACKBOX_CONFIG;
-		    }
-		    MSP.send_message(messageId, false, false, load_html);
+		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
                 });
             });
         });

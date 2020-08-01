@@ -1,0 +1,8 @@
+# 45 (-) is inherited from default
+# 46 (.) is inherited by default, but it needs a different
+# aligment offset becase the digits are different
+46: # Offset of the '.' character to align it with other digits
+    metadata:
+        - s: o
+        - i8: 0 # x offset
+        - i8: 0 # y offset

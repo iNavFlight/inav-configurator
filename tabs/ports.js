@@ -40,13 +40,11 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1 }
     );
 
-    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
-        functionRules.push({
-            name: 'GSM_SMS',
-            groups: ['telemetry'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'GSM_SMS',
+        groups: ['telemetry'],
+        maxPorts: 1 }
+    );
 
     // support configure RunCam Device
     functionRules.push({
@@ -71,36 +69,29 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1 }
     ); 
 
-    if (semver.gte(CONFIG.flightControllerVersion, "2.2.0")) {
-        functionRules.push({
-            name: 'OPFLOW',
-            groups: ['sensors'],
-            maxPorts: 1 }
-        );
+    functionRules.push({
+        name: 'OPFLOW',
+        groups: ['sensors'],
+        maxPorts: 1 }
+    );
 
-        functionRules.push({
-            name: 'ESC',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'ESC',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
 
-    if (semver.gte(CONFIG.flightControllerVersion, "2.2.2")) {
-        functionRules.push({
-            name: 'FRSKY_OSD',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-    }
+    functionRules.push({
+        name: 'FRSKY_OSD',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
 
-    if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
-        functionRules.push({
-            name: 'DJI_FPV',
-            groups: ['peripherals'],
-            maxPorts: 1 }
-        );
-    }
-
+    functionRules.push({
+        name: 'DJI_FPV',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
 
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
