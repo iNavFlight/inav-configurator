@@ -1466,6 +1466,11 @@ OSD.constants = {
                     id: 77,
                     preview: '0TP  ' + FONT.embed_dot('4.5')
                 },
+                {
+                    name: 'THRUST_PID_ATTENUATION',
+                    id: 109,
+                    preview: 'TPA    0\nBP  1500'
+                },
             ]
         },
         {

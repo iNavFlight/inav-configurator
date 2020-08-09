@@ -1304,6 +1304,12 @@
     "adjustmentsFunction49": {
         "message": "VTX power level Adjustment"
     },
+    "adjustmentsFunction50": {
+        "message": "Thrust PID Attenuation (TPA) Adjustment"
+    },
+    "adjustmentsFunction51": {
+        "message": "TPA Breakpoint Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },

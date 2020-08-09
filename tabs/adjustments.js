@@ -64,7 +64,7 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 50;
+        var availableFunctionCount = 52;
 
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
         functionList.empty().append(functionListOptions);
