@@ -96,8 +96,9 @@ TABS.outputs.initialize = function (callback) {
         let escProtocols = FC.getEscProtocols(),
             servoRates = FC.getServoRates(),
             $idlePercent = $('#throttle_idle'),
-            $idleInfoBox = $("#throttle_idle-info");
-        $motorStopWarningBox = $("#motor-stop-warning");
+            $idleInfoBox = $("#throttle_idle-info"),
+            $motorStopWarningBox = $("#motor-stop-warning"),
+            $reversibleMotorBox = $("#reversible-esc-info")
 
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
@@ -194,6 +195,21 @@ TABS.outputs.initialize = function (callback) {
 
         helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
         GUI.simpleBind();
+
+        let $reversibleMotorCheckbox = $('#feature-12');
+        function showHideReversibleMotorInfo() {
+            const reversibleMotorEnabled = $reversibleMotorCheckbox.is(':checked');
+
+            console.log(reversibleMotorEnabled);
+
+            if (reversibleMotorEnabled) {
+                $reversibleMotorBox.show();
+            } else {
+                $reversibleMotorBox.hide();
+            }
+        }
+        $reversibleMotorCheckbox.change(showHideReversibleMotorInfo);
+        showHideReversibleMotorInfo();
 
         let $motorStopCheckbox = $('#feature-4');
         function showHideMotorStopWarning() {
