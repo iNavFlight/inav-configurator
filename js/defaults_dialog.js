@@ -77,6 +77,14 @@ helper.defaultsDialog = (function() {
                     key: "dynamic_gyro_notch_min_hz",
                     value: 120
                 },
+                {
+                    key: "setpoint_kalman_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "setpoint_kalman_q",
+                    value: 200
+                },
                 /*
                 Mechanics
                 */
