@@ -401,6 +401,11 @@ var FC = {
             },
             opflow: {
                 Scale: null
+            },
+            magGain: {
+                X: null,
+                Y: null,
+                Z: null
             }
         };
 
