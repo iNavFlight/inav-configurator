@@ -1348,25 +1348,25 @@ OSD.constants = {
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',
-                    id: 78,
+                    id: 109,
                     positionable: true,
                     preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
                 },
                 {
                     name: 'CRSF_LQ',
-                    id: 109,
+                    id: 110,
                     positionable: true,
                     preview: '2:100%',
                 },
                 {
                     name: 'CRSF_SNR_DB',
-                    id: 110,
+                    id: 111,
                     positionable: true,
                     preview: FONT.symbol(SYM.SNR) + ' -12' + FONT.symbol(SYM.DB)
                 },
                 {
                     name: 'CRSF_TX_POWER',
-                    id: 111,
+                    id: 112,
                     positionable: true,
                     preview: '10' + FONT.symbol(SYM.MW)
                 },
