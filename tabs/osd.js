@@ -85,6 +85,11 @@ SYM.GFORCE_Y = 0xE8;
 SYM.GFORCE_Z = 0xE9;
 SYM.RPM = 0x8B;
 SYM.ESC_TEMPERATURE = 0xF3;
+SYM.RSS2 = 0xEA;
+SYM.DB = 0xEB;
+SYM.DBM = 0xEC;
+SYM.MW = 0xED;
+SYM.SNR = 0xEE;
 
 var FONT = FONT || {};
 
@@ -1335,6 +1340,35 @@ OSD.constants = {
                     name: 'VTX_POWER',
                     id: 105,
                     preview: '1'
+                },
+            ]
+        },
+        {
+            name: 'osdGroupCRSF',
+            items: [
+                {
+                    name: 'CRSF_RSSI_DBM',
+                    id: 109,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
+                },
+                {
+                    name: 'CRSF_LQ',
+                    id: 110,
+                    positionable: true,
+                    preview: ' 2:100%',
+                },
+                {
+                    name: 'CRSF_SNR_DB',
+                    id: 111,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.SNR) + ' -12' + FONT.symbol(SYM.DB)
+                },
+                {
+                    name: 'CRSF_TX_POWER',
+                    id: 112,
+                    positionable: true,
+                    preview: '  10' + FONT.symbol(SYM.MW)
                 },
             ]
         },

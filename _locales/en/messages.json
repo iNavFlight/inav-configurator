@@ -2515,6 +2515,9 @@
     "osd_esc_temp_alarm_max": {
         "message": "Maximum ESC temperature"
     },
+    "osd_snr_alarm": {
+        "message": "SNR Alarm Level"
+    },
     "osdGroupGeneral": {
         "message": "General"
     },
@@ -2547,6 +2550,9 @@
     },
     "osdGroupVTX": {
         "message": "VTX"
+    },
+    "osdGroupCRSF": {
+    "message": "CRSF RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps and Radars"
@@ -2733,6 +2739,24 @@
     },
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
+    },
+    "osdElement_CRSF_RSSI_DBM": {
+        "message": "RX RSSI in dBm"
+    },
+    "osdElement_CRSF_LQ": {
+        "message": "RF Mode and LQ%"
+    },
+    "osdElement_CRSF_LQ_HELP": {
+        "message": "RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and Link Quality % [0..100%]"
+    },
+    "osdElement_CRSF_SNR_DB": {
+        "message": "RX Uplink SNR in dB"
+    },
+    "osdElement_CRSF_SNR_DB_HELP": {
+        "message": "Shown only when SNR goes below alarm level. At 0dB, received signal level equals noise floor level."
+    },
+    "osdElement_CRSF_TX_POWER": {
+        "message": "TX power in mW"
     },
     "osdElement_MAP_NORTH": {
         "message": "Map (Up is north)"
