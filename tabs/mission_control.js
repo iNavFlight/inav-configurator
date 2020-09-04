@@ -103,7 +103,7 @@ TABS.mission_control.initialize = function (callback) {
         function get_attitude_data() {
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, update_gpsTrack);
         }
-
+      
         function update_gpsTrack() {
 
           let lat = GPS_DATA.lat / 10000000;
@@ -630,7 +630,7 @@ TABS.mission_control.initialize = function (callback) {
             target: document.getElementById('missionMap'),
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
-                zoom: 14
+                zoom: 2
             })
         });
 
@@ -688,7 +688,8 @@ TABS.mission_control.initialize = function (callback) {
 
                       selectedFeature.setStyle(getPointIcon(true));
 
-                      let altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.alt);
+                      var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.alt);
+                      
                       $('#altitudeInMeters').text(` ${altitudeMeters}m`);
                       $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
                       $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);

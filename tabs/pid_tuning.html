@@ -327,6 +327,24 @@
                                 <div class="helpicon cf_tip" title="The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended"></div>
                             </td>
                         </tr>
+                        <tr class="requires-v2_5">
+                            <th>Unicorn Filter</th>
+                            <td>
+                                <select data-setting="setpoint_kalman_enabled" />
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_6">
+                            <th>Unicorn Filter Q Factor</th>
+                            <td>
+                                <input data-setting="setpoint_kalman_q" type="number" class="rate-tpa_input" />
+                            </td>
+                        </tr>
+                        <tr class="requires-v2_6">
+                            <th>Unicorn Filter Window Size</th>
+                            <td>
+                                <input data-setting="setpoint_kalman_w" type="number" class="rate-tpa_input" />
+                            </td>
+                        </tr>
                         <tr>
                             <th data-i18n="gyro_lpf_type"></th>
                             <td>

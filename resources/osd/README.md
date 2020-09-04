@@ -2,25 +2,33 @@
 
 This directory contains one directory per font. In each
 directory, each character is named `%d%d%d.png`, where
-the digits represent the character number found in the
-filename.
+the digits represent the decimal character number found
+in the filename without the extension.
 
-Don't alter the .mcm files directly, those should be
-only modified by altering the .png files found in its
+Don't alter the `.mcm` files directly, those should be
+only modified by altering the `.png` files found in its
 correspondant font directory.
 
-Character map files (.mcm) are built from the .png files
-representing the characters using
+Character map files (`.mcm`) are built from the `.png` files
+in each directory representing the font, using
 [max7456toool](https://github.com/fiam/max7456tool).
 
-The Makefile found in this directory can be used to
-re-generate all character maps. It only requires
-max7456toool to be found in ${PATH}. After modifying,
-deleting or altering a character .png file, just run
-`make` and it will automatically rebuild the affected
-character sets as well as generate a preview file
-named `$charset_name.png`.
+After changing any source `.png` files, run:
 
-Note that .mcm files MUST be manually added and committed
-to the repo, while .png files MUST NOT (.gitignore is
-set up to ignore them to help avoid mistakes).
+```sh
+max7456tool -f generate fonts.yaml
+```
+
+to update the `.mcm` files.
+
+Note that `.mcm` files MUST be manually regenerated with
+the aforementioned command, added and committed to the
+repo, while preview `.png` files (the ones contained directly
+in this directory, not the ones in the source subdirectories)
+MUST NOT, they're generated only for convenience to quickly
+review fonts at a glance (.gitignore is set up to ignore them
+to help avoid mistakes).
+
+To add a new font, create its directory with source `.png` files,
+add it to the list in `fonts.yaml` and rerun `max7456tool` to
+regenerate the `.mcm`.

@@ -911,6 +911,9 @@
     "portsFunction_TELEMETRY_SMARTPORT": {
         "message": "SmartPort"
     },
+    "portsFunction_SMARTPORT_MASTER": {
+        "message": "SmartPort Master"
+    },
     "portsFunction_RX_SERIAL": {
         "message": "Serial RX"
     },
@@ -2515,6 +2518,9 @@
     "osd_esc_temp_alarm_max": {
         "message": "Maximum ESC temperature"
     },
+    "osd_snr_alarm": {
+        "message": "SNR Alarm Level"
+    },
     "osdGroupGeneral": {
         "message": "General"
     },
@@ -2547,6 +2553,9 @@
     },
     "osdGroupVTX": {
         "message": "VTX"
+    },
+    "osdGroupCRSF": {
+    "message": "CRSF RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps and Radars"
@@ -2653,6 +2662,12 @@
     "osdElement_PLUS_CODE_HELP": {
         "message": "Plus codes encode both latitude and longitude on a single value that can be entered directly in Google Maps. It provides the same level of precision than latitude and longitude while using less screen space."
     },
+    "osdElement_AZIMUTH": {
+        "message": "Azimuth"
+    },
+    "osdElement_AZIMUTH_HELP": {
+        "message": "Azimuth is the direction of the aircraft in relation to the home point. It's useful to keep the aircraft on the correct course or to keep the aircraft in front of a fixed directional antenna."
+    },
     "osdElement_TRIP_DIST": {
         "message": "Trip distance"
     },
@@ -2727,6 +2742,24 @@
     },
     "osdElement_VTX_CHANNEL_HELP": {
         "message": "Shows the current band and channel of the VTX. Requires either a VTX with SmartAudio or Tramp or either a VTX integrated in the flight controller."
+    },
+    "osdElement_CRSF_RSSI_DBM": {
+        "message": "RX RSSI in dBm"
+    },
+    "osdElement_CRSF_LQ": {
+        "message": "RF Mode and LQ%"
+    },
+    "osdElement_CRSF_LQ_HELP": {
+        "message": "RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and Link Quality % [0..100%]"
+    },
+    "osdElement_CRSF_SNR_DB": {
+        "message": "RX Uplink SNR in dB"
+    },
+    "osdElement_CRSF_SNR_DB_HELP": {
+        "message": "Shown only when SNR goes below alarm level. At 0dB, received signal level equals noise floor level."
+    },
+    "osdElement_CRSF_TX_POWER": {
+        "message": "TX power in mW"
     },
     "osdElement_MAP_NORTH": {
         "message": "Map (Up is north)"
@@ -3306,6 +3339,9 @@
     },
     "motorStopWarning": {
         "message": "Should be enabled on Airplanes, Rovers and Boats. Should not be enabled on Multirotors! On Multirotors, when Airmode is active, motors will not stop."
+    },
+    "reversibleEscWarning": {
+        "message": "When Reversible Motors are used, set Motors IDLE power ot 0%"
     },
     "dynamic_gyro_notch_enabled_help": {
         "message": "Matrix Gyro Filter is the new generation of dynamic gyro notches available in INAV. It is recommended to enable it on all Multirotor builds on F4 and F7 flight controllers."

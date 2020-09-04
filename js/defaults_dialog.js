@@ -26,6 +26,10 @@ helper.defaultsDialog = (function() {
                     key: "looptime",
                     value: 500
                 },
+                {
+                    key: "motor_pwm_protocol",
+                    value: "ONESHOT125"
+                },
                 /*
                 Filtering
                 */
@@ -72,6 +76,14 @@ helper.defaultsDialog = (function() {
                 {
                     key: "dynamic_gyro_notch_min_hz",
                     value: 120
+                },
+                {
+                    key: "setpoint_kalman_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "setpoint_kalman_q",
+                    value: 200
                 },
                 /*
                 Mechanics
@@ -190,6 +202,10 @@ helper.defaultsDialog = (function() {
             "reboot": true,
             "settings": [
                 {
+                    key: "motor_pwm_protocol",
+                    value: "STANDARD"
+                },
+                {
                     key: "rc_yaw_expo",
                     value: 70
                 },
@@ -234,6 +250,10 @@ helper.defaultsDialog = (function() {
             "notRecommended": false,
             "reboot": true,
             "settings": [
+                {
+                    key: "motor_pwm_protocol",
+                    value: "STANDARD"
+                },
                 {
                     key: "applied_defaults",
                     value: 1
@@ -281,6 +301,10 @@ helper.defaultsDialog = (function() {
             "notRecommended": true,
             "reboot": false,
             "settings": [
+                {
+                    key: "motor_pwm_protocol",
+                    value: "STANDARD"
+                },
                 {
                     key: "applied_defaults",
                     value: 1
