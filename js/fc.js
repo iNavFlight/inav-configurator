@@ -1193,6 +1193,31 @@ var FC = {
                 name: "SET OSD LAYOUT",
                 hasOperand: [true, false],
                 output: "boolean"
+            },
+            33: {
+                name: "SIN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            34: {
+                name: "COS",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            35: {
+                name: "TAN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            36: {
+                name: "MAP INPUT",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            37: {
+                name: "MAP OUTPUT",
+                hasOperand: [true, true],
+                output: "raw"
             }
         }
     },
