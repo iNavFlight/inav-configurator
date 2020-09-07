@@ -1182,7 +1182,7 @@
         "message": "Pitch & Roll I Adjustment"
     },
     "adjustmentsFunction8": {
-        "message": "Pitch & Roll D Adjustment"
+        "message": "Pitch & Roll D/FF Adjustment"
     },
     "adjustmentsFunction9": {
         "message": "Yaw P Adjustment"
@@ -1191,7 +1191,7 @@
         "message": "Yaw I Adjustment"
     },
     "adjustmentsFunction11": {
-        "message": "Yaw D Adjustment"
+        "message": "Yaw D/FF Adjustment"
     },
     "adjustmentsFunction12": {
         "message": "Rate Profile Selection"
@@ -1209,7 +1209,7 @@
         "message": "Pitch I Adjustment"
     },
     "adjustmentsFunction17": {
-        "message": "Pitch D Adjustment"
+        "message": "Pitch D/FF Adjustment"
     },
     "adjustmentsFunction18": {
         "message": "Roll P Adjustment"
@@ -1218,7 +1218,7 @@
         "message": "Roll I Adjustment"
     },
     "adjustmentsFunction20": {
-        "message": "Roll D Adjustment"
+        "message": "Roll D/FF Adjustment"
     },
     "adjustmentsFunction21": {
         "message": "RC Yaw Expo Adjustment"
