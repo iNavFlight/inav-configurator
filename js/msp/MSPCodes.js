@@ -155,6 +155,8 @@ var MSPCodes = {
     MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
 
     // INAV specific codes
+    MSP2_COMMON_TZ:                     0x1001,
+    MSP2_COMMON_SET_TZ:                 0x1002,
     MSPV2_SETTING:                      0x1003,
     MSPV2_SET_SETTING:                  0x1004,
 

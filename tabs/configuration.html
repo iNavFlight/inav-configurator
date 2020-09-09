@@ -137,6 +137,22 @@
                             <span data-i18n="configurationGPSubxSbas"></span>
                         </label>
                     </div>
+                    <div class="select">
+                        <select id="tz_dst_areas" class="tz_dst_areas">
+                            <!-- list generated here -->
+                        </select>
+                        <label for="tz_dst_areas">
+                            <span data-i18n="configurationTzAutoDst"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationTzAutoDstHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="tz_offset" name="tz_offset" step="0.25" min="-12" max="14" />
+                        <label for="tz_offset">
+                            <span data-i18n="configurationTzOffset"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationTzOffsetHelp"></div>
+                    </div>
                     <div class="number is-hidden">
                         <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180" max="180" />
                         <label for="mag_declination">

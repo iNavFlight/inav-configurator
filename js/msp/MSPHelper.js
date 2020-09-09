@@ -1444,6 +1444,16 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
                 console.log('Braking config saved');
                 break;
+
+            case MSPCodes.MSP2_COMMON_TZ:
+                TZ_CONFIG.tz_offset = data.getInt16(0, true);
+                TZ_CONFIG.tz_automatic_dst = data.getUint8(2);
+                break;
+
+            case MSPCodes.MSP2_COMMON_SET_TZ:
+                console.log('Time Zone config saved');
+                break;
+
             case MSPCodes.MSP2_BLACKBOX_CONFIG:
                 BLACKBOX.supported = (data.getUint8(0) & 1) != 0;
                 BLACKBOX.blackboxDevice = data.getUint8(1);
@@ -2137,6 +2147,12 @@ var mspHelper = (function (gui) {
                 buffer.push(BRAKING_CONFIG.bankAngle);
                 break;
 
+            case MSPCodes.MSP2_COMMON_SET_TZ:
+                buffer.push(lowByte(TZ_CONFIG.tz_offset));
+                buffer.push(highByte(TZ_CONFIG.tz_offset));
+                buffer.push(TZ_CONFIG.tz_automatic_dst);
+                break;
+
             default:
                 return false;
         }
@@ -2161,17 +2177,17 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-	var buffer = [];
-	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
-	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
-	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
-	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
-	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+        var buffer = [];
+        var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+        buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+        messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+        buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+        buffer.push(highByte(BLACKBOX.blackboxRateNum));
+        buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+        buffer.push(highByte(BLACKBOX.blackboxRateDenom));
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
-	    onDataCallback();
+            onDataCallback();
         });
     };
 
@@ -2737,7 +2753,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBatteryConfig = function (callback) {
-	MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
     self.loadArmingConfig = function (callback) {
@@ -3169,6 +3185,14 @@ var mspHelper = (function (gui) {
         } else {
             callback();
         }
+    };
+
+    self.loadTzConfig = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_COMMON_TZ, false, false, callback);
+    };
+
+    self.saveTzConfig = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_COMMON_SET_TZ, mspHelper.crunch(MSPCodes.MSP2_COMMON_SET_TZ), false, callback);
     };
 
     return self;

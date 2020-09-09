@@ -60,7 +60,8 @@ var CONFIG,
     BATTERY_CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
-    BRAKING_CONFIG;
+    BRAKING_CONFIG,
+    TZ_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -532,13 +533,18 @@ var FC = {
             boostSpeedThreshold: null,
             boostDisengageSpeed: null,
             bankAngle: null
-        }
+        };
 
         RXFAIL_CONFIG = [];
 
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
+
+        TZ_CONFIG = {
+            tz_offset: 0,
+            tz_automatic_dst: 'OFF'
+        };
     },
     getOutputUsages: function() {
         return {
@@ -705,6 +711,13 @@ var FC = {
             'Japanese MSAS',
             'Indian GAGAN',
             'Disabled'
+        ];
+    },
+    getTzDstAreas: function () {
+        return [
+            'Disabled',
+            'EU',
+            'USA'
         ];
     },
     getSensorAlignments: function () {

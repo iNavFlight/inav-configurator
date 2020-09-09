@@ -3384,5 +3384,17 @@
     },
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
+    },
+    "configurationTzOffset": {
+        "message": "Time Zone Offset"
+    },
+    "configurationTzAutoDst": {
+        "message": "DST Region"
+    },
+    "configurationTzOffsetHelp": {
+        "message": "Time zone offset from UTC in hours, ranging from -12 to +14 with 15 minute increments. This is applied to the GPS time for logging and time-stamping of Blackbox logs."
+    },
+    "configurationTzAutoDstHelp": {
+        "message": "Automatically add Daylight Saving Time to the GPS time. If you live outside the available regions it is suggested to manage DST manually via Time Zone Offset."
     }
 }

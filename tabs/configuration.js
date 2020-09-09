@@ -39,6 +39,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadSensorConfig,
         mspHelper.loadVTXConfig,
+        mspHelper.loadTzConfig,
         mspHelper.loadMixerConfig,
         loadCraftName,
         mspHelper.loadMiscV2
@@ -61,6 +62,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveINAVPidConfig,
         mspHelper.saveSensorConfig,
         mspHelper.saveVTXConfig,
+        mspHelper.saveTzConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
         saveSettings,
@@ -255,6 +257,23 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         // code below is a temporary fix, which we will be able to remove in the future (hopefully)
         //noinspection JSValidateTypes
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
+
+        // Time Zone config
+        $('input[name="tz_offset"]').val((TZ_CONFIG.tz_offset / 60.0).toFixed(2));
+
+        var tzDstAreas = FC.getTzDstAreas();
+
+        var tz_dst_areas_e = $('#tz_dst_areas');
+        for (i = 0; i < tzDstAreas.length; i++) {
+            tz_dst_areas_e.append('<option value="' + i + '">' + tzDstAreas[i] + '</option>');
+        }
+
+        tz_dst_areas_e.change(function () {
+            TZ_CONFIG.tz_automatic_dst = parseInt($(this).val());
+        });
+
+        tz_dst_areas_e.val(TZ_CONFIG.tz_automatic_dst);
+
 
         // fill board alignment
         $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));
@@ -483,6 +502,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             craftName = $('input[name="craft_name"]').val();
+
+            TZ_CONFIG.tz_offset = Math.round(parseFloat($('#tz_offset').val()) * 60);
 
             if (FC.isFeatureEnabled('GPS', features)) {
                 googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
