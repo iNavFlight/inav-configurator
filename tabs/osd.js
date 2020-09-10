@@ -1356,13 +1356,13 @@ OSD.constants = {
                     name: 'CRSF_LQ',
                     id: 110,
                     positionable: true,
-                    preview: ' 2:100%',
+                    preview: '2:100%',
                 },
                 {
                     name: 'CRSF_SNR_DB',
                     id: 111,
                     positionable: true,
-                    preview: FONT.symbol(SYM.SNR) + ' -12' + FONT.symbol(SYM.DB)
+                    preview: FONT.symbol(SYM.SNR) + '-12' + FONT.symbol(SYM.DB)
                 },
                 {
                     name: 'CRSF_TX_POWER',
