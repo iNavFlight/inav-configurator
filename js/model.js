@@ -486,7 +486,7 @@ const mixerList = [
         id: 29,
         name: 'Skyhunter Nano (no rudder)',
         model: 'custom',
-        image: 'custom',
+        image: 'airplane_norudder',
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
