@@ -1260,6 +1260,14 @@ presets.presets = [
             {
                 key: "platform_type",
                 value: "AIRPLANE"
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
+                value: 30
             }
         ],
         type: 'airplane'
@@ -1308,6 +1316,14 @@ presets.presets = [
             },
             {
                 key: "fw_ff_roll",
+                value: 30
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
                 value: 30
             }
         ],
@@ -1358,6 +1374,14 @@ presets.presets = [
             {
                 key: "fw_ff_roll",
                 value: 49
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
+                value: 30
             }
         ],
         type: 'flyingwing'
@@ -1407,6 +1431,14 @@ presets.presets = [
             {
                 key: "fw_ff_roll",
                 value: 25
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
+                value: 30
             }
         ],
         type: 'flyingwing'
@@ -1456,6 +1488,14 @@ presets.presets = [
             {
                 key: "fw_ff_roll",
                 value: 15
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
+                value: 30
             }
         ],
         type: 'flyingwing'
@@ -1503,6 +1543,14 @@ presets.presets = [
             {
                 key: "fw_ff_roll",
                 value: 64
+            },
+            {
+                key: "rc_expo",
+                value: 30
+            },
+            {
+                key: "manual_rc_expo",
+                value: 30
             }
         ],
         type: 'flyingwing'
