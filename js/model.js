@@ -53,10 +53,10 @@ const mixerList = [
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.333333, 0.0),     // REAR
             new MotorMixRule(1.0, -1.0, -0.666667, 0.0),   // RIGHT
-            new MotorMixRule(1.0, 1.0, -0.666667, 0.0)     // LEFT
+            new MotorMixRule(1.0, 1.0, -0.666667, 0.0),    // LEFT
         ],
         servoMixer: [
-            new ServoMixRule(SERVO_RUDDER, INPUT_STABILIZED_YAW, 100, 0)
+            new ServoMixRule(SERVO_RUDDER, INPUT_STABILIZED_YAW, 100, 0),
         ]
     },            // 1
     {
@@ -71,7 +71,7 @@ const mixerList = [
             new MotorMixRule(1.0, -1.0, 1.0, -1.0),          // REAR_R
             new MotorMixRule(1.0, -1.0, -1.0, 1.0),          // FRONT_R
             new MotorMixRule(1.0, 1.0, 1.0, 1.0),            // REAR_L
-            new MotorMixRule(1.0, 1.0, -1.0, -1.0)           // FRONT_L
+            new MotorMixRule(1.0, 1.0, -1.0, -1.0),          // FRONT_L
         ],
         servoMixer: []
     },               // 3
@@ -86,8 +86,8 @@ const mixerList = [
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
             new MotorMixRule(1.0, -1.0, 0.0, 1.0),          // RIGHT
-            new MotorMixRule(1.0, 1.0, 0.0, 1.0),          // LEFT
-            new MotorMixRule(1.0, 0.0, -1.0, -1.0)          // FRONT
+            new MotorMixRule(1.0, 1.0, 0.0, 1.0),           // LEFT
+            new MotorMixRule(1.0, 0.0, -1.0, -1.0),         // FRONT
         ],
         servoMixer: []
     },               // 2
@@ -122,12 +122,12 @@ const mixerList = [
         legacy: true,
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [
-            new MotorMixRule(1.0, 0.0, 1.333333, 1.0),     // REAR
-            new MotorMixRule(1.0, -1.0, -0.666667, -1.0),     // RIGHT
-            new MotorMixRule(1.0, 1.0, -0.666667, -1.0),     // LEFT
+            new MotorMixRule(1.0, 0.0, 1.333333, 1.0),      // REAR
+            new MotorMixRule(1.0, -1.0, -0.666667, -1.0),   // RIGHT
+            new MotorMixRule(1.0, 1.0, -0.666667, -1.0),    // LEFT
             new MotorMixRule(1.0, 0.0, 1.333333, -1.0),     // UNDER_REAR
-            new MotorMixRule(1.0, -1.0, -0.666667, 1.0),     // UNDER_RIGHT
-            new MotorMixRule(1.0, 1.0, -0.666667, 1.0)     // UNDER_LEFT
+            new MotorMixRule(1.0, -1.0, -0.666667, 1.0),    // UNDER_RIGHT
+            new MotorMixRule(1.0, 1.0, -0.666667, 1.0),     // UNDER_LEFT
         ],
         servoMixer: []
     },                           // 6
@@ -141,11 +141,11 @@ const mixerList = [
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [
             new MotorMixRule(1.0, -0.866025, 0.5, 1.0),     // REAR_R
-            new MotorMixRule(1.0, -0.866025, -0.5, -1.0),     // FRONT_R
-            new MotorMixRule(1.0, 0.866025, 0.5, 1.0),     // REAR_L
-            new MotorMixRule(1.0, 0.866025, -0.5, -1.0),     // FRONT_L
-            new MotorMixRule(1.0, 0.0, -1.0, 1.0),     // FRONT
-            new MotorMixRule(1.0, 0.0, 1.0, -1.0)     // REAR
+            new MotorMixRule(1.0, -0.866025, -0.5, -1.0),   // FRONT_R
+            new MotorMixRule(1.0, 0.866025, 0.5, 1.0),      // REAR_L
+            new MotorMixRule(1.0, 0.866025, -0.5, -1.0),    // FRONT_L
+            new MotorMixRule(1.0, 0.0, -1.0, 1.0),          // FRONT
+            new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
         ],
         servoMixer: []
     },               // 7
@@ -165,7 +165,7 @@ const mixerList = [
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0)
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
         ]
     },     // 8
     {
@@ -184,7 +184,7 @@ const mixerList = [
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0)
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
         ]
     },     // 27
     {
@@ -299,7 +299,7 @@ const mixerList = [
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
-            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0)
+            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
         ]
     },           // 14
     {
@@ -458,12 +458,12 @@ const mixerList = [
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
-            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0)
+            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
         ]
     },
     {
         id: 28,
-        name: 'Airplane V-tail (Mini Talon and similar)',
+        name: 'Airplane V-tail (individual aileron servos)',
         model: 'custom',
         image: 'custom',
         enabled: true,
@@ -471,11 +471,10 @@ const mixerList = [
         platform: PLATFORM_AIRPLANE,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  -100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  -100, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  100, 0),
             new ServoMixRule(4, INPUT_STABILIZED_PITCH, 50, 0),
             new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
             new ServoMixRule(5, INPUT_STABILIZED_PITCH, -50, 0),
@@ -484,7 +483,7 @@ const mixerList = [
     },
     {
         id: 29,
-        name: 'Skyhunter Nano (no rudder)',
+        name: 'Airplane V-tail (single aileron servo)',
         model: 'custom',
         image: 'custom',
         enabled: true,
@@ -494,14 +493,16 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(2, INPUT_STABILIZED_PITCH,  -100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  -100, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_ROLL,  -100, 0)
+            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
         ]
     },
     {
         id: 30,
-        name: 'Nano Talon V-tail',
+        name: 'Airplane without rudder',
         model: 'custom',
         image: 'custom',
         enabled: true,
@@ -511,11 +512,9 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(2, INPUT_STABILIZED_ROLL, -100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_PITCH, -50, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_YAW,  50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,  50, 0),
+            new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
         ]
     },
     {
