@@ -1356,7 +1356,7 @@ OSD.constants = {
                     name: 'CRSF_LQ',
                     id: 110,
                     positionable: true,
-                    preview: '2:100%',
+                    preview: '300%',
                 },
                 {
                     name: 'CRSF_SNR_DB',
