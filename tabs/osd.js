@@ -90,6 +90,7 @@ SYM.DB = 0xEB;
 SYM.DBM = 0xEC;
 SYM.MW = 0xED;
 SYM.SNR = 0xEE;
+SYM.ADSB= 0xFD
 
 var FONT = FONT || {};
 
@@ -768,7 +769,13 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
-                }
+                },
+                {
+                    name: 'ADSB',
+                    id: 113,
+                    min_version: '2.6.0',
+                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                }                
             ]
         },
         {
