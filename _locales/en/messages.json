@@ -1793,16 +1793,16 @@
     },
 
     "controlAxisRoll": {
-        "message": "Roll"
+        "message": "Roll [A]"
     },
     "controlAxisPitch": {
-        "message": "Pitch"
+        "message": "Pitch [E]"
     },
     "controlAxisYaw": {
-        "message": "Yaw"
+        "message": "Yaw [R]"
     },
     "controlAxisThrottle": {
-        "message": "Throttle"
+        "message": "Throttle [T]"
     },
     "radioChannelShort": {
         "message": "CH "
