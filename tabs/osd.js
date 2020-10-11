@@ -1345,6 +1345,9 @@ OSD.constants = {
         },
         {
             name: 'osdGroupCRSF',
+            // enabled: function() {
+            //     return RX_CONFIG.serialrx_provider == 9;
+            // },
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',

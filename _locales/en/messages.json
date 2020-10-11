@@ -2519,7 +2519,7 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "SNR Alarm Level"
+        "message": "Crossfire SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
