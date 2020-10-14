@@ -2750,10 +2750,10 @@
         "message": "RX RSSI in dBm"
     },
     "osdElement_CRSF_LQ": {
-        "message": "RF Mode and LQ%"
+        "message": "RX Link Quality%"
     },
     "osdElement_CRSF_LQ_HELP": {
-        "message": "RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and Link Quality % [0..100%]"
+        "message": "STYLE1 shows LQ% as used by TBS. STYLE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and Link Quality % [0..100%]"
     },
     "osdElement_CRSF_SNR_DB": {
         "message": "RX Uplink SNR in dB"

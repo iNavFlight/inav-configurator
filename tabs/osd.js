@@ -1345,9 +1345,6 @@ OSD.constants = {
         },
         {
             name: 'osdGroupCRSF',
-            // enabled: function() {
-            //     return RX_CONFIG.serialrx_provider == 9;
-            // },
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',
@@ -1356,18 +1353,18 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
                 },
                 {
-                                    name: 'CRSF_LQ',
-                                    id: 110,
-                                    positionable: true,
-                                    preview: function(osd_data) {
-                                        var crsflqformat;
-                                        if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
-                                            crsflqformat = '2:100%';
-                                        } else {
-                                            crsflqformat = '  300%';
-                                        }
-                                        return crsflqformat;
-                                    }
+                    name: 'CRSF_LQ',
+                    id: 110,
+                    positionable: true,
+                    preview: function(osd_data) {
+                    var crsflqformat;
+                    if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
+                        crsflqformat = '2:100%';
+                    } else {
+                        crsflqformat = '  300%';
+                    }
+                    return crsflqformat;
+                    }
                 },
                 {
                     name: 'CRSF_SNR_DB',
