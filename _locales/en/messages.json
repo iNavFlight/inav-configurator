@@ -1793,16 +1793,16 @@
     },
 
     "controlAxisRoll": {
-        "message": "Roll"
+        "message": "Roll [A]"
     },
     "controlAxisPitch": {
-        "message": "Pitch"
+        "message": "Pitch [E]"
     },
     "controlAxisYaw": {
-        "message": "Yaw"
+        "message": "Yaw [R]"
     },
     "controlAxisThrottle": {
-        "message": "Throttle"
+        "message": "Throttle [T]"
     },
     "radioChannelShort": {
         "message": "CH "
@@ -2558,7 +2558,7 @@
         "message": "VTX"
     },
     "osdGroupCRSF": {
-    "message": "CRSF RX Statistics"
+        "message": "CRSF RX Statistics"
     },
     "osdGroupMapsAndRadars": {
         "message": "Maps and Radars"
@@ -2847,6 +2847,21 @@
     },
     "osdElement_ESC_TEMPERATURE_HELP": {
         "message": "Temperature of the ESC read from DSHOT telemetry"
+    },
+    "osdGroupGVars": {
+        "message": "Global Variables"
+    },
+    "osdElement_GVAR_0": {
+        "message": "Global Variable 0"
+    },
+    "osdElement_GVAR_1": {
+        "message": "Global Variable 1"
+    },
+    "osdElement_GVAR_2": {
+        "message": "Global Variable 2"
+    },
+    "osdElement_GVAR_3": {
+        "message": "Global Variable 3"
     },
     "osdElement_SENSOR1_TEMPERATURE": {
         "message": "Temperature sensor 1"
