@@ -85,6 +85,15 @@ SYM.GFORCE_Y = 0xE8;
 SYM.GFORCE_Z = 0xE9;
 SYM.RPM = 0x8B;
 SYM.ESC_TEMPERATURE = 0xF3;
+SYM.RSS2 = 0xEA;
+SYM.DB = 0xEB;
+SYM.DBM = 0xEC;
+SYM.MW = 0xED;
+SYM.SNR = 0xEE;
+SYM.GVAR_1 = 0xEF;
+SYM.GVAR_2 = 0xF0;
+SYM.GVAR_3 = 0xF1;
+SYM.GVAR_4 = 0xF2;
 
 var FONT = FONT || {};
 
@@ -1336,6 +1345,64 @@ OSD.constants = {
                     id: 105,
                     preview: '1'
                 },
+            ]
+        },
+        {
+            name: 'osdGroupCRSF',
+            items: [
+                {
+                    name: 'CRSF_RSSI_DBM',
+                    id: 109,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.RSSI) + '-100' + FONT.symbol(SYM.DBM)
+                },
+                {
+                    name: 'CRSF_LQ',
+                    id: 110,
+                    positionable: true,
+                    preview: '2:100%',
+                },
+                {
+                    name: 'CRSF_SNR_DB',
+                    id: 111,
+                    positionable: true,
+                    preview: FONT.symbol(SYM.SNR) + '-12' + FONT.symbol(SYM.DB)
+                },
+                {
+                    name: 'CRSF_TX_POWER',
+                    id: 112,
+                    positionable: true,
+                    preview: '  10' + FONT.symbol(SYM.MW)
+                },
+            ]
+        },
+        {
+            name: 'osdGroupGVars',
+            items: [
+                {
+                    name: 'GVAR_0',
+                    id: 113,
+                    positionable: true,
+                    preview: 'G0:01337'
+                },
+                {
+                    name: 'GVAR_1',
+                    id: 114,
+                    positionable: true,
+                    preview: 'G1:31415'
+                },
+                {
+                    name: 'GVAR_2',
+                    id: 115,
+                    positionable: true,
+                    preview: 'G2:01611'
+                },
+                {
+                    name: 'GVAR_3',
+                    id: 116,
+                    positionable: true,
+                    preview: 'G3:30126'
+                }
             ]
         },
         {
