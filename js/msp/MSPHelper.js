@@ -42,6 +42,7 @@ var mspHelper = (function (gui) {
         'GSM_SMS': 19,
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
+        'SMARTPORT_MASTER': 23,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting

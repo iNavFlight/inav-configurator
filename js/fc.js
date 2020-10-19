@@ -1193,6 +1193,31 @@ var FC = {
                 name: "SET OSD LAYOUT",
                 hasOperand: [true, false],
                 output: "boolean"
+            },
+            33: {
+                name: "SIN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            34: {
+                name: "COS",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            35: {
+                name: "TAN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            36: {
+                name: "MAP INPUT",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            37: {
+                name: "MAP OUTPUT",
+                hasOperand: [true, true],
+                output: "raw"
             }
         }
     },
@@ -1245,7 +1270,9 @@ var FC = {
                     25: "Is Failsafe",
                     26: "Stabilized Roll",
                     27: "Stabilized Pitch",
-                    28: "Stabilized Yaw"
+                    28: "Stabilized Yaw",
+                    29: "Current Waypoint Index",
+                    30: "Current Waypoint Action"
                 }
             },
             3: {
@@ -1273,7 +1300,7 @@ var FC = {
             5: {
                 name: "Global Variable",
                 type: "range",
-                range: [0, 3],
+                range: [0, 7],
                 default: 0
             }
         }

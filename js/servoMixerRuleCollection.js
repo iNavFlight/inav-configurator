@@ -92,7 +92,9 @@ let ServoMixerRuleCollection = function () {
             }
         }
 
-        return jQuery.unique(out).sort(function(a, b){
+        let unique = [...new Set(out)];
+
+        return unique.sort(function(a, b) {
             return a-b;
         });
     }
