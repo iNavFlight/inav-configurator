@@ -1272,7 +1272,8 @@ var FC = {
                     27: "Stabilized Pitch",
                     28: "Stabilized Yaw",
                     29: "Current Waypoint Index",
-                    30: "Current Waypoint Action"
+                    30: "Current Waypoint Action",
+                    31: "3D home distance [m]"
                 }
             },
             3: {
