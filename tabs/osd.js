@@ -1360,7 +1360,15 @@ OSD.constants = {
                     name: 'CRSF_LQ',
                     id: 110,
                     positionable: true,
-                    preview: '2:100%',
+                    preview: function(osd_data) {
+                    var crsflqformat;
+                    if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
+                        crsflqformat = '2:100%';
+                    } else {
+                        crsflqformat = '  300%';
+                    }
+                    return crsflqformat;
+                    }
                 },
                 {
                     name: 'CRSF_SNR_DB',
