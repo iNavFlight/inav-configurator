@@ -2537,7 +2537,7 @@ TABS.osd.cleanup = function (callback) {
     $(document).off('click', 'span.progressLabel a');
 
     delete OSD.GUI.jbox;
-    $('.jBox-wrapper').remove()
+    $('.jBox-wrapper').remove();
 
     if (callback) callback();
 };

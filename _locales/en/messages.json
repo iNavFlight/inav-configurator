@@ -1383,6 +1383,9 @@
     "mixerSaved": {
         "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
     },
+    "mixerWizard": {
+        "message": "Motor wizard"
+    },
     "gpsHead": {
         "message": "GPS"
     },
@@ -3003,6 +3006,30 @@
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
+    },
+    "mixerWizardModalTitle" : {
+        "message": "Quadcopter Mixer Wizard"
+    },
+    "mixerWizardModalApply" : {
+        "message": "Apply"
+    },
+    "motorWizard0": {
+        "message": "Real-Right"
+    },
+    "motorWizard1": {
+        "message": "Front-Right"
+    },
+    "motorWizard2": {
+        "message": "Real-Left"
+    },
+    "motorWizard3": {
+        "message": "Front-Left"
+    },
+    "mixerWizardMotorPosition": {
+        "message": "Motor position"
+    },
+    "mixerWizardMotorIndex": {
+        "message": "Motor index"
     },
     "settings": {
         "message": "Settings"

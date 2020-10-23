@@ -5,6 +5,16 @@ TABS.mixer = {};
 
 TABS.mixer.initialize = function (callback, scrollPosition) {
 
+    function wizardSelectCompare(a, b) {
+                
+        let aid = $(a).attr("data-motor"),
+        bid = $(a).attr("data-motor");
+        
+        if (aid > bid) return 1;
+        if (bid > aid) return -1;
+        return 0;
+    }
+
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
         currentPlatform,
@@ -12,7 +22,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $servoMixTable,
         $servoMixTableBody,
         $motorMixTable,
-        $motorMixTableBody;
+        $motorMixTableBody,
+        modal,
+        motorWizardModal;
 
     if (GUI.active_tab != 'mixer') {
         GUI.active_tab = 'mixer';
@@ -273,7 +285,49 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $hasFlapsWrapper = $('#has-flaps-wrapper'),
             $hasFlaps = $('#has-flaps'),
             $mixerPreset = $('#mixer-preset'),
-            modal;
+            $wizardButton = $("#mixer-wizard");
+
+        motorWizardModal = new jBox('Modal', {
+            width: 480,
+            height: 320,
+            closeButton: 'title',
+            animation: false,
+            attach: $wizardButton,
+            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
+            content: $('#mixerWizardContent')
+        });
+
+        $("#wizard-execute-button").click(function () {
+            MOTOR_RULES.flush();
+
+            const motorSelects = $(".wizard-motor-select").get();
+            motorSelects.sort(wizardSelectCompare);
+            
+            for (let element in motorSelects) {
+                if (motorSelects.hasOwnProperty(element)) {
+                    const $select = $(motorSelects[element]),
+                        ruleToApply = $(':selected', $select).attr('id');
+                    
+                    const r = currentMixerPreset.motorMixer[ruleToApply];
+
+                    MOTOR_RULES.put(
+                        new MotorMixRule(
+                            r.getThrottle(),
+                            r.getRoll(),
+                            r.getPitch(),
+                            r.getYaw()
+                        )
+                    );
+
+                }
+            };
+
+            renderMotorMixRules();
+            renderOutputMapping();
+
+            motorWizardModal.close();
+            // $('.jBox-wrapper').remove();
+        });
 
         $platformSelect.find("*").remove();
 
@@ -320,6 +374,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             currentMixerPreset = helper.mixer.getById(presetId);
 
             MIXER_CONFIG.appliedMixerPreset = presetId;
+
+            if (currentMixerPreset.id == 3) {
+                $wizardButton.parent().removeClass("is-hidden");
+            } else {
+                $wizardButton.parent().addClass("is-hidden");
+            }
 
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
@@ -423,5 +483,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 };
 
 TABS.mixer.cleanup = function (callback) {
+    delete modal;
+    delete motorWizardModal;
+    $('.jBox-wrapper').remove();
     if (callback) callback();
 };
