@@ -297,7 +297,33 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             content: $('#mixerWizardContent')
         });
 
+        function validateMixerWizard() {
+            let errorCount = 0;
+            for (let i = 0; i < 4; i++) {
+                const $elements = $('[data-motor] option:selected[id=' + i + ']'),
+                    assignedRulesCount = $elements.length;
+
+                if (assignedRulesCount != 1) {
+                    errorCount++;
+                    $elements.closest('tr').addClass("red-background");
+                } else {
+                    $elements.closest('tr').removeClass("red-background");
+                }
+
+            }
+
+            return (errorCount == 0);
+        }
+
+        $(".wizard-motor-select").change(validateMixerWizard);
+
         $("#wizard-execute-button").click(function () {
+
+            // Validate mixer settings
+            if (!validateMixerWizard()) {
+                return;
+            }
+
             MOTOR_RULES.flush();
 
             const motorSelects = $(".wizard-motor-select").get();
@@ -326,7 +352,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             renderOutputMapping();
 
             motorWizardModal.close();
-            // $('.jBox-wrapper').remove();
         });
 
         $platformSelect.find("*").remove();

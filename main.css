@@ -2158,3 +2158,9 @@ ol li {
     padding-left: 0.5em;
     margin-left: 1em;
 }
+
+.red-background,
+.red-background td,
+.red-background th {
+    background-color: tomato !important;
+}
