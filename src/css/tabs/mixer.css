@@ -44,7 +44,8 @@
     height: 2.5em;
 }
 
-.mixer-table tr:nth-child(even) td {
+.mixer-table tr:nth-child(even) td,
+.mixer-table tr:nth-child(even) th {
     background-color: #ebe7e7;
 }
 

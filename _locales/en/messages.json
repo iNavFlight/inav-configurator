@@ -1383,6 +1383,12 @@
     "mixerSaved": {
         "message": "Mixer <span style=\"color: #37a8db\">saved</span>"
     },
+    "mixerWizard": {
+        "message": "Mixer wizard"
+    },
+    "mixerWizardInfo": {
+        "message":"<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
+    },
     "gpsHead": {
         "message": "GPS"
     },
@@ -3003,6 +3009,30 @@
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
+    },
+    "mixerWizardModalTitle" : {
+        "message": "Quadcopter Mixer Wizard"
+    },
+    "mixerWizardModalApply" : {
+        "message": "Apply"
+    },
+    "motorWizard0": {
+        "message": "Rear-Right"
+    },
+    "motorWizard1": {
+        "message": "Front-Right"
+    },
+    "motorWizard2": {
+        "message": "Rear-Left"
+    },
+    "motorWizard3": {
+        "message": "Front-Left"
+    },
+    "mixerWizardMotorPosition": {
+        "message": "Motor position"
+    },
+    "mixerWizardMotorIndex": {
+        "message": "Motor index"
     },
     "settings": {
         "message": "Settings"

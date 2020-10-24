@@ -38,6 +38,9 @@
                                 <select id="mixer-preset"></select>
                             </div>
                             <div class="mixer-load-button">
+                                <div class="btn default_btn narrow green is-hidden">
+                                    <a id="mixer-wizard" href="#" data-i18n="mixerWizard"></a>
+                                </div>
                                 <div class="btn default_btn narrow red">
                                     <a id="load-and-apply-mixer-button" href="#" data-i18n="mixerLoadAndApplyPresetRules"></a>
                                 </div>
@@ -164,6 +167,69 @@
         </div>
         <div class="modal__buttons">
             <a id="execute-button" class="modal__button modal__button--main" data-i18n="mixerButtonSaveAndReboot"></a>
+        </div>
+    </div>
+    <div id="mixerWizardContent" class="is-hidden">
+        <div class="modal__content">
+            <h1 class="modal__title modal__title--warning" data-i18n="mixerWizardModalTitle"></h1>
+            <div class="modal__text">
+                <p data-i18n="mixerWizardInfo"></p>
+                <table style="margin-top: 1em;" class="mixer-table">
+                    <thead>
+                        <th data-i18n="mixerWizardMotorPosition"></th>
+                        <th data-i18n="mixerWizardMotorIndex"></th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th data-i18n="motorWizard0"></th>
+                            <td>
+                                <select class="wizard-motor-select" data-motor="0">
+                                    <option id="0" selected="selected">Motor #1</option>
+                                    <option id="1">Motor #2</option>
+                                    <option id="2">Motor #3</option>
+                                    <option id="3">Motor #4</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="motorWizard1"></th>
+                            <td>
+                                <select class="wizard-motor-select" data-motor="1">
+                                    <option id="0">Motor #1</option>
+                                    <option id="1" selected="selected">Motor #2</option>
+                                    <option id="2">Motor #3</option>
+                                    <option id="3">Motor #4</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="motorWizard2"></th>
+                            <td>
+                                <select class="wizard-motor-select" data-motor="2">
+                                    <option id="0">Motor #1</option>
+                                    <option id="1">Motor #2</option>
+                                    <option id="2" selected="selected">Motor #3</option>
+                                    <option id="3">Motor #4</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="motorWizard3"></th>
+                            <td>
+                                <select class="wizard-motor-select" data-motor="3">
+                                    <option id="0">Motor #1</option>
+                                    <option id="1">Motor #2</option>
+                                    <option id="2">Motor #3</option>
+                                    <option id="3" selected="selected">Motor #4</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal__buttons">
+            <a id="wizard-execute-button" class="modal__button modal__button--main" data-i18n="mixerWizardModalApply"></a>
         </div>
     </div>
     <div class="content_toolbar">
