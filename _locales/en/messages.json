@@ -3017,13 +3017,13 @@
         "message": "Apply"
     },
     "motorWizard0": {
-        "message": "Real-Right"
+        "message": "Rear-Right"
     },
     "motorWizard1": {
         "message": "Front-Right"
     },
     "motorWizard2": {
-        "message": "Real-Left"
+        "message": "Rear-Left"
     },
     "motorWizard3": {
         "message": "Front-Left"
