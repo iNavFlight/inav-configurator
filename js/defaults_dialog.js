@@ -230,6 +230,30 @@ helper.defaultsDialog = (function() {
                     value: 180
                 },
                 {
+                    key: "nav_fw_control_smoothness",
+                    value: 2
+                },
+                {
+                    key: "failsafe_procedure",
+                    value: "RTH"
+                },
+                {
+                    key: "nav_rth_allow_landing",
+                    value: "NEVER"
+                },
+                {
+                    key: "nav_rth_altitude",
+                    value: 5000
+                },
+                {
+                    key: "failsafe_mission",
+                    value: "OFF"
+                },
+                {
+                    key: "nav_wp_radius",
+                    value: 3000
+                },
+                {
                     key: "platform_type",
                     value: "AIRPLANE"
                 },
