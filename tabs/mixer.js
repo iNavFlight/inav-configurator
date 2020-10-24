@@ -289,7 +289,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         motorWizardModal = new jBox('Modal', {
             width: 480,
-            height: 320,
+            height: 410,
             closeButton: 'title',
             animation: false,
             attach: $wizardButton,
