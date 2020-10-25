@@ -5,16 +5,6 @@ TABS.mixer = {};
 
 TABS.mixer.initialize = function (callback, scrollPosition) {
 
-    function wizardSelectCompare(a, b) {
-                
-        let aid = $(a).attr("data-motor"),
-        bid = $(a).attr("data-motor");
-        
-        if (aid > bid) return 1;
-        if (bid > aid) return -1;
-        return 0;
-    }
-
     let loadChainer = new MSPChainerClass(),
         saveChainer = new MSPChainerClass(),
         currentPlatform,
@@ -326,27 +316,28 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             MOTOR_RULES.flush();
 
-            const motorSelects = $(".wizard-motor-select").get();
-            motorSelects.sort(wizardSelectCompare);
-            
-            for (let element in motorSelects) {
-                if (motorSelects.hasOwnProperty(element)) {
-                    const $select = $(motorSelects[element]),
-                        ruleToApply = $(':selected', $select).attr('id');
-                    
-                    const r = currentMixerPreset.motorMixer[ruleToApply];
+            for (let i = 0; i < 4; i++) {
+                const $selects = $(".wizard-motor-select");
+                let rule = -1;
 
-                    MOTOR_RULES.put(
-                        new MotorMixRule(
-                            r.getThrottle(),
-                            r.getRoll(),
-                            r.getPitch(),
-                            r.getYaw()
-                        )
-                    );
+                $selects.each(function () {
+                    if (parseInt($(this).find(":selected").attr("id"), 10) == i) {
+                        rule = parseInt($(this).attr("data-motor"), 10);
+                    }
+                });
 
-                }
-            };
+                const r = currentMixerPreset.motorMixer[rule];
+
+                MOTOR_RULES.put(
+                    new MotorMixRule(
+                        r.getThrottle(),
+                        r.getRoll(),
+                        r.getPitch(),
+                        r.getYaw()
+                    )
+                );
+                
+            }
 
             renderMotorMixRules();
             renderOutputMapping();
