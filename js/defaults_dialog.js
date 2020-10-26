@@ -234,12 +234,8 @@ helper.defaultsDialog = (function() {
                     value: 2
                 },
                 {
-                    key: "failsafe_procedure",
-                    value: "RTH"
-                },
-                {
                     key: "nav_rth_allow_landing",
-                    value: "NEVER"
+                    value: "FS_ONLY"
                 },
                 {
                     key: "nav_rth_altitude",
