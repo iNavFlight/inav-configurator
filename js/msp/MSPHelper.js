@@ -1295,6 +1295,7 @@ var mspHelper = (function (gui) {
                 RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(13, true);
                 RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(15, true);
                 RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(17, true);
+		RTH_AND_LAND_CONFIG.rthHomeAltitude = data.getUint16(19, true);
                 break;
 
             case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
@@ -1971,6 +1972,9 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
                 buffer.push(highByte(RTH_AND_LAND_CONFIG.emergencyDescentRate));
+			
+		buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthHomeAltitude));
+		buffer.push(highByte(RTH_AND_LAND_CONFIG.rthHomeAltitude));
                 break;
 
             case MSPCodes.MSP_SET_FW_CONFIG:
