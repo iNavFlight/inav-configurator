@@ -2386,6 +2386,12 @@
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
+    "rthHomeAltitude": {
+        "message": "RTH Home altitude [cm]"
+    },
+    "rthHomeAltitudeHelp": {
+        "message": "Used when not landing at home point. Upon arriving at home, the plane will loiter and change altitude to the Home Altitude. Default is 0, which is feature disabled."
+    },
     "landDescentRate": {
         "message": "Landing vertical speed [cm/s]"
     },
