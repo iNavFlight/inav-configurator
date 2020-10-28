@@ -421,7 +421,8 @@ var FC = {
              landDescentRate: null,
              landSlowdownMinAlt: null,
              landSlowdownMaxAlt: null,
-             emergencyDescentRate: null
+             emergencyDescentRate: null,
+             rthHomeAltitude: null
         };
 
         REVERSIBLE_MOTORS = {
