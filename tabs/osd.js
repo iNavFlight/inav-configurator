@@ -1468,7 +1468,7 @@ OSD.constants = {
                 },
                 {
                     name: 'THRUST_PID_ATTENUATION',
-                    id: 109,
+                    id: 117,
                     preview: 'TPA    0\nBP  1500'
                 },
             ]
