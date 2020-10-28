@@ -1289,7 +1289,7 @@ var FC = {
                     5: "Altitude Hold",
                     6: "Angle",
                     7: "Horizon",
-                    8: "Air"
+                    8: "Acro"
                 }
             },
             4: {
