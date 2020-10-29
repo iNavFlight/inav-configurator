@@ -1444,7 +1444,7 @@ presets.presets = [
     },
     {
         name: "ZOHD Dart 250g",
-        description: "3x5x3 propeller, 1406 2600kV motor, 3S LiPo. 570mm wingspan, AUW potentially under 250g on 2S.<br />Please set the Stabilised Roll's weight to 80, and the Stabilised Pitch weight to 65.",
+        description: "3x5x3 propeller, 1406 2600kV motor, 3S LiPo. 570mm wingspan, AUW potentially under 250g on 2S.<br /><br /><strong>Please set the Stabilised Roll weight to 80, and the Stabilised Pitch weight to 65.</strong>",
         features: [
             "Adjusted gyro filtering",
             "Adjusted PIDs",
