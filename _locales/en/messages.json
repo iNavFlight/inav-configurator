@@ -2464,7 +2464,7 @@
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
-    "rthHomeAltitude": {
+    "rthHomeAltitudeLabel": {
         "message": "RTH Home altitude [cm]"
     },
     "rthHomeAltitudeHelp": {
