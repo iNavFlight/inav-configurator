@@ -313,6 +313,22 @@
                     </div>
 
                     <div class="number">
+                        <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
+                        <label for="cruiseYawRate">
+                            <span data-i18n="cruiseYawRateLabel"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
+                    </div>
+
+                    <div class="select">
+                        <select id="cruiseManualThrottle" data-setting="nav_fw_allow_manual_thr_increase"></select>
+                        <label for="cruiseManualThrottle">
+                            <span data-i18n="cruiseManualThrottleLabel"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="cruiseManualThrottleHelp"></div>
+                    </div>
+
+                    <div class="number">
                         <input id="minThrottle" type="number" data-simple-bind="FW_CONFIG.minThrottle" step="1" min="1000" max="2000">
                         <label for="minThrottle">
                             <span data-i18n="minThrottle"></span>
@@ -364,12 +380,46 @@
                             <span data-i18n="loiterRadius"></span>
                         </label>
                     </div>
+
+                    <div class="select">
+                        <select id="loiterDirection" data-setting="fw_loiter_direction"></select>
+                        <label for="loiterDirection">
+                            <span data-i18n="loiterDirectionLabel"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="loiterDirectionHelp"></div>
+                    </div>
+
                     <div class="number">
                         <input type="number" id="controlSmoothness" data-setting="nav_fw_control_smoothness" data-setting-multiplier="1" step="1" min="0" max="9" />
                         <label for="controlSmoothness">
                             <span data-i18n="controlSmoothness"></span>
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="controlSmoothnessHelp"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="waypointConfiguration"></div>
+                </div>
+                <div class="spacer_box">
+
+                    <div class="number">
+                        <input type="number" id="waypointRadius" data-setting="nav_wp_radius" data-setting-multiplier="1" step="1" min="10" max="10000" />
+                        <label for="waypointRadius">
+                            <span data-i18n="waypointRadius"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="waypointRadiusHelp"></div>
+                    </div>
+
+                    <div class="number">
+                        <input type="number" id="waypointSafeDistance" data-setting="nav_wp_safe_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                        <label for="waypointSafeDistance">
+                            <span data-i18n="waypointSafeDistance"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="waypointSafeDistanceHelp"></div>
                     </div>
 
                 </div>

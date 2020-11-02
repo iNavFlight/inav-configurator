@@ -2479,6 +2479,18 @@
     "cruiseThrottle": {
         "message": "Cruise throttle"
     },
+    "cruiseYawRateLabel": {
+        "message": "Cruise Yaw Rate"
+    },
+    "cruiseYawRateHelp": {
+        "message": "This is the turning rate in Cruise and 3D Cruise."
+    },
+    "cruiseManualThrottleLabel": {
+        "message": "Allow manual throttle increase"
+    },
+    "cruiseManualThrottleHelp": {
+        "message": "Turning this on, will allow you to override automatic throttle control in all navigation modes. You cannot go below the automatic throttle value, except with motor stop on zero throttle."
+    },
     "minThrottle": {
         "message": "Min. throttle"
     },
@@ -2512,11 +2524,32 @@
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
+    "loiterDirectionLabel": {
+        "message": "Loiter direction"
+    },
+    "loiterDirectionHelp": {
+        "message": "This setting allows you to choose the loiter direction. Selecting YAW allows you to change the loiter direction with the yaw stick."
+    },
      "controlSmoothness": {
         "message": "Control Smoothness"
     },
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]"
+    },
+    "waypointConfiguration": {
+        "message": "Waypoint Navigation Settings"
+    },
+    "waypointRadius": {
+        "message": "Waypoint radius [cm]"
+    },
+    "waypointRadiusHelp": {
+        "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
+    },
+    "waypointSafeDistance": {
+        "message": "Waypoint safe distance [cm]"
+    },
+    "waypointSafeDistanceHelp": {
+        "message": "The maximum distance between the home point and the first waypoint."
     },
     "fixedWingNavigationConfiguration": {
       "message": "Fixed Wing Navigation Settings"
