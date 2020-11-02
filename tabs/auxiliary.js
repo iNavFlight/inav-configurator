@@ -33,7 +33,7 @@ TABS.auxiliary.initialize = function (callback) {
     }
     
     function sort_modes_for_display() {
-        // This array defines the order that the modes are displayed in the configurator modes page.
+        // This array defines the order that the modes are displayed in the configurator modes page
         configuratorBoxOrder = [
             "ARM",                                                                                  // Arming
             "ANGLE", "HORIZON", "MANUAL",                                                           // Flight modes
@@ -49,23 +49,43 @@ TABS.auxiliary.initialize = function (callback) {
         ];
 
         // Sort the modes
-        tmpAUX_CONFIG =[];
-        tmpAUX_CONFIG_IDS = [];
-        for (i=0;i<AUX_CONFIG.length;i++) {
-            tmpAUX_CONFIG[i] = AUX_CONFIG[i]; // MSP_BOXNAMES
-            tmpAUX_CONFIG_IDS[i] = AUX_CONFIG_IDS[i];
-            
+        var tmpAUX_CONFIG = [];
+        var tmpAUX_CONFIG_IDS =[];
+        var found = false;
+        var sortedID = 0;
+
+        for (i=0; i<AUX_CONFIG.length; i++) {
+            tmpAUX_CONFIG[i] = AUX_CONFIG[i];
+            tmpAUX_CONFIG_IDS[i] = AUX_CONFIG_IDS[i];   
         }
 
-        sortedID = 0;
+        AUX_CONFIG = [];
+        AUX_CONFIG_IDS = [];
 
         for (i=0; i<configuratorBoxOrder.length; i++) {
             for(j=0; j<tmpAUX_CONFIG.length; j++) {
                 if (configuratorBoxOrder[i] === tmpAUX_CONFIG[j]) {
                     AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
-                    AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
-                    sortedID++;
+                    AUX_CONFIG_IDS[sortedID++] = tmpAUX_CONFIG_IDS[j];
                     break;
+                }
+            }
+        }
+
+        // There are modes that are missing from the configuratorBoxOrder array. Add them to the end until they are ordered correctly.
+        if (tmpAUX_CONFIG.length > AUX_CONFIG.length) {
+            for (i=0; i<tmpAUX_CONFIG.length; i++) {
+                found = false;
+                for (j=0; j<AUX_CONFIG.length; j++) {
+                    if (tmpAUX_CONFIG[i] === AUX_CONFIG[j]) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    AUX_CONFIG[sortedID] = tmpAUX_CONFIG[i];
+                    AUX_CONFIG_IDS[sortedID++] = tmpAUX_CONFIG_IDS[i];
                 }
             }
         }
