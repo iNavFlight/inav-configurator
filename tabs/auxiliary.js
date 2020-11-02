@@ -28,7 +28,47 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function load_html() {
+        sort_modes_for_display();
         GUI.load("./tabs/auxiliary.html", process_html);
+    }
+    
+    function sort_modes_for_display() {
+        // This array defines the order that the modes are displayed in the configurator modes page.
+        configuratorBoxOrder = [
+            "ARM",                                                                                  // Arming
+            "ANGLE", "HORIZON", "MANUAL",                                                           // Flight modes
+            "NAV RTH", "NAV POSHOLD", "NAV CRUISE",                                                 // Navigation mode
+            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                              // Flight mode modifiers
+            "NAV WP", "GCS NAV", "HOME RESET",                                                      // Navigation
+            "SERVO AUTOTRIM", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",               // Fixed wing specific
+            "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",         // Multi-rotor specific
+            "BEEPER", "LEDLOW", "LIGHTS",                                                           // Feedback
+            "OSD SW", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                        // OSD
+            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                  // FPV Camera
+            "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"  // Misc
+        ];
+
+        // Sort the modes
+        tmpAUX_CONFIG =[];
+        tmpAUX_CONFIG_IDS = [];
+        for (i=0;i<AUX_CONFIG.length;i++) {
+            tmpAUX_CONFIG[i] = AUX_CONFIG[i]; // MSP_BOXNAMES
+            tmpAUX_CONFIG_IDS[i] = AUX_CONFIG_IDS[i];
+            
+        }
+
+        sortedID = 0;
+
+        for (i=0; i<configuratorBoxOrder.length; i++) {
+            for(j=0; j<tmpAUX_CONFIG.length; j++) {
+                if (configuratorBoxOrder[i] === tmpAUX_CONFIG[j]) {
+                    AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
+                    AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
+                    sortedID++;
+                    break;
+                }
+            }
+        }
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
