@@ -873,7 +873,11 @@ var FC = {
         }
     },
     getPitotNames: function () {
-        return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE", "MSP"];
+        } else {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        }
     },
     getRangefinderNames: function () {
         return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
