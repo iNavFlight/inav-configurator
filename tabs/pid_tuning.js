@@ -112,6 +112,11 @@ TABS.pid_tuning.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        if (FC.isCdComponentUsed()) {
+            $('th.feedforward').html(chrome.i18n.getMessage('pidTuningControlDerivative'));
+            $('th.feedforward').attr('title', chrome.i18n.getMessage('pidTuningControlDerivative'));
+        }
+
         if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
             $('.requires-v2_4').show();
         } else {
