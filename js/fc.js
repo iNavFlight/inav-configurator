@@ -1276,7 +1276,9 @@ var FC = {
                     28: "Stabilized Yaw",
                     29: "Current Waypoint Index",
                     30: "Current Waypoint Action",
-                    31: "3D home distance [m]"
+                    31: "3D home distance [m]",
+                    32: "CRSF LQ",
+                    33: "CRSF SNR",
                 }
             },
             3: {
@@ -1292,7 +1294,9 @@ var FC = {
                     5: "Altitude Hold",
                     6: "Angle",
                     7: "Horizon",
-                    8: "Air"
+                    8: "Air",
+                    9: "USER 1",
+                    10: "USER 2"
                 }
             },
             4: {
