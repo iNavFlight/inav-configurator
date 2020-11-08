@@ -1031,11 +1031,8 @@
     "pidTuningFeedForward": {
         "message": "FeedForward"
     },
-    "dtermSetpointWeight": {
-        "message": "Dterm setpoint weight"
-    },
-    "dtermSetpointWeightHelp": {
-        "message": "The lower the value, the more damped all the maneuvers are. 0 mean Dterm is computed from gyro, 1 from error and 2 from setpoint. For gentler feel lower the value. For sharper response, raise it"
+    "pidTuningControlDerivative": {
+        "message": "Constrol Derivative"
     },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
@@ -2647,6 +2644,12 @@
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
+    "osd_link_quality_alarm": {
+        "message": "Crossfire Link Quality Alarm"
+    },
+    "osdalarmLQ_HELP": {
+        "message": "For Crossfire use 70%. For Tracer use 50%."
+    },
     "osdGroupGeneral": {
         "message": "General"
     },
@@ -2873,10 +2876,10 @@
         "message": "RX RSSI in dBm"
     },
     "osdElement_CRSF_LQ": {
-        "message": "RX Link Quality%"
+        "message": "RX Link Quality %"
     },
     "osdElement_CRSF_LQ_HELP": {
-        "message": "STYLE1 shows LQ% as used by TBS. STYLE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and Link Quality % [0..100%]"
+        "message": "STYLE1 shows LQ% as used by TBS hardware. STYLE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 and LQ [0..100%]."
     },
     "osdElement_CRSF_SNR_DB": {
         "message": "RX Uplink SNR in dB"
@@ -3360,12 +3363,6 @@
     },
     "itermRelaxHelp": {
         "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
-    },
-    "itermRelaxType": {
-        "message": "Iterm Relax Type"
-    },
-    "itermRelaxTypeHelp": {
-        "message": "GYRO mode is more clinical and complete in suppressing iTerm, SETPOINT mode is a bit smoother with slightly softer landings after flips."
     },
     "itermRelaxCutoff": {
         "message": "Iterm Relax Cutoff Frequency"

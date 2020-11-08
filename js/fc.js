@@ -66,10 +66,13 @@ var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
     isRpyFfComponentUsed: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
+        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
     isRpyDComponentUsed: function () {
         return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
+    },
+    isCdComponentUsed: function () {
+        return FC.isRpyDComponentUsed();
     },
     resetState: function () {
         SENSOR_STATUS = {
