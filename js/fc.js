@@ -688,7 +688,8 @@ var FC = {
             'I2C-NAV',
             'DJI NAZA',
             'UBLOX7',
-            'MTK'
+            'MTK',
+            'MSP'
         ];
     },
     getGpsBaudRates: function () {
@@ -862,17 +863,21 @@ var FC = {
         return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
     },
     getMagnetometerNames: function () {
-        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "FAKE"];
+        return ["NONE", "AUTO", "HMC5883", "AK8975", "GPSMAG", "MAG3110", "AK8963", "IST8310", "QMC5883", "MPU9250", "IST8308", "LIS3MDL", "MSP", "FAKE"];
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "DPS310", "FAKE"];
+            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "DPS310", "MSP", "FAKE"];
         } else {
             return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "FAKE"];
         }
     },
     getPitotNames: function () {
-        return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE", "MSP"];
+        } else {
+            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
+        }
     },
     getRangefinderNames: function () {
         return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
