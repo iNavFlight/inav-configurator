@@ -866,6 +866,18 @@
      "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites"
     },
+    "tzOffset": {
+        "message": "Timezone Offset [Mins]"
+    },
+    "tzOffsetHelp": {
+        "message": "Time zone offset from UTC, in minutes. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0)"
+    },
+    "tzAutomaticDST": {
+        "message": "Automatic Daylight Savings Time"
+    },
+    "tzAutomaticDSTHelp": {
+        "message": "Automatically add Daylight Saving Time to the GPS time when needed or simply ignore it. Includes presets for EU and the USA - if you live outside these areas it is suggested to manage DST manually via tz_offset. (Default = Off)"
+    },
     "configurationGPSBaudrate": {
         "message": "Baudrate"
     },
