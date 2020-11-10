@@ -149,6 +149,20 @@
                             <span data-i18n="configurationGPSUseGalileo"></span>
                         </label>
                     </div>
+                    <div class="number">
+                        <input type="number" id="tzOffset" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-1440" max="1440" />
+                        <label for="tzOffset">
+                            <span data-i18n="tzOffset"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="tzOffsetHelp"></div>
+                    </div>
+                    <div class="select">
+                        <select id="tzAutomaticDST" data-setting="tz_automatic_dst"></select>
+                        <label for="tzAutomaticDST">
+                            <span data-i18n="tzAutomaticDST"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="tzAutomaticDSTHelp"></div>
+                    </div>
                 </div>
             </div>
 
