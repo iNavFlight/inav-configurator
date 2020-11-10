@@ -207,23 +207,23 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "rc_yaw_expo",
-                    value: 70
-                },
-                {
-                    key: "rc_expo",
-                    value: 70
-                },
-                {
-                    key: "roll_rate",
                     value: 30
                 },
                 {
-                    key: "pitch_rate",
+                    key: "rc_expo",
+                    value: 30
+                },
+                {
+                    key: "roll_rate",
                     value: 20
                 },
                 {
+                    key: "pitch_rate",
+                    value: 15
+                },
+                {
                     key: "yaw_rate",
-                    value: 10
+                    value: 9
                 },
                 {
                     key: "small_angle",
