@@ -164,39 +164,11 @@
                 </div>
                 <div class="spacer_box settings">
                     <div class="number">
-                        <input type="number" id="launchVelocity" data-setting="nav_fw_launch_velocity" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                        <label for="launchVelocity">
-                            <span data-i18n="configurationLaunchVelocity"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
-                    </div>
-                     <div class="number">
-                        <input type="number" id="launchAccel" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                        <label for="launchAccel">
-                            <span data-i18n="configurationLaunchAccel"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchAccelHelp"></div>
-                    </div>
-                    <div class="number">
                         <input type="number" id="launchMaxAngle" data-setting="nav_fw_launch_max_angle" data-setting-multiplier="1" step="1" min="5" max="180" />
                         <label for="launchMaxAngle">
                             <span data-i18n="configurationLaunchMaxAngle"></span>
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAngleHelp"></div>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="launchDetectTime" data-setting="nav_fw_launch_detect_time" data-setting-multiplier="1" step="1" min="10" max="1000" />
-                        <label for="launchDetectTime">
-                            <span data-i18n="configurationLaunchDetectTime"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchDetectTimeHelp"></div>
-                    </div>
-                     <div class="number">
-                        <input type="number" id="launchThr" data-setting="nav_fw_launch_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                        <label for="launchThr">
-                            <span data-i18n="configurationLaunchThr"></span>
-                        </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchThrHelp"></div>
                     </div>
                     <div class="number">
                         <input type="number" id="launchIdleThr" data-setting="nav_fw_launch_idle_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
@@ -206,11 +178,39 @@
                         <div class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleThrHelp"></div>
                     </div>
                     <div class="number">
+                        <input type="number" id="launchVelocity" data-setting="nav_fw_launch_velocity" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                        <label for="launchVelocity">
+                            <span data-i18n="configurationLaunchVelocity"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchAccel" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                        <label for="launchAccel">
+                            <span data-i18n="configurationLaunchAccel"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchAccelHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchDetectTime" data-setting="nav_fw_launch_detect_time" data-setting-multiplier="1" step="1" min="10" max="1000" />
+                        <label for="launchDetectTime">
+                            <span data-i18n="configurationLaunchDetectTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchDetectTimeHelp"></div>
+                    </div>
+                    <div class="number">
                         <input type="number" id="launchMotorDelay" data-setting="nav_fw_launch_motor_delay" data-setting-multiplier="1" step="1" min="0" max="5000" />
                         <label for="launchMotorDelay">
                             <span data-i18n="configurationLaunchMotorDelay"></span>
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMotorDelayHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchMinTime" data-setting="nav_fw_launch_min_time" data-setting-multiplier="1" step="1" min="0" max="60000" />
+                        <label for="launchMinTime">
+                            <span data-i18n="configurationLaunchMinTime"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMinTimeHelp"></div>
                     </div>
                     <div class="number">
                         <input type="number" id="launchSpinupTime" data-setting="nav_fw_launch_spinup_time" data-setting-multiplier="1" step="1" min="0" max="1000" />
@@ -219,12 +219,19 @@
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationLaunchSpinupTimeHelp"></div>
                     </div>
-                    <div class="number">
-                        <input type="number" id="launchMinTime" data-setting="nav_fw_launch_min_time" data-setting-multiplier="1" step="1" min="0" max="60000" />
-                        <label for="launchMinTime">
-                            <span data-i18n="configurationLaunchMinTime"></span>
+                     <div class="number">
+                        <input type="number" id="launchThr" data-setting="nav_fw_launch_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                        <label for="launchThr">
+                            <span data-i18n="configurationLaunchThr"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMinTimeHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchThrHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="launchClimbAngle" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="60000" />
+                        <label for="launchClimbAngle">
+                            <span data-i18n="configurationLaunchClimbAngle"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchClimbAngleHelp"></div>
                     </div>
                     <div class="number">
                         <input type="number" id="launchTimeout" data-setting="nav_fw_launch_timeout" data-setting-multiplier="1" step="1" min="0" max="60000" />
@@ -241,16 +248,14 @@
                         <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAltitudeHelp"></div>
                     </div>
                     <div class="number">
-                        <input type="number" id="launchClimbAngle" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="60000" />
-                        <label for="launchClimbAngle">
-                            <span data-i18n="configurationLaunchClimbAngle"></span>
+                        <input type="number" id="launchEndTime" data-setting="nav_fw_launch_end_time" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                        <label for="launchEndTime">
+                            <span data-i18n="configurationLaunchEndTime"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchClimbAngleHelp"></div>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationLaunchEndTimeHelp"></div>
                     </div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="rightWrapper">
