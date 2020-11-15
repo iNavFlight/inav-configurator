@@ -2554,6 +2554,18 @@
     "pitchToThrottleHelp": {
         "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
     },
+    "pitchToThrottleSmoothing": {
+        "message": "Throttle smoothing"
+    },
+    "pitchToThrottleSmoothingHelp": {
+        "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
+    },
+    "pitchToThrottleThreshold": {
+        "message": "Instantaneous pitch adjustment threshold [centidegrees]"
+    },
+    "pitchToThrottleThresholdHelp": {
+        "message": "The autopilot will instantly adjust the throttle level according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
+    }
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
@@ -2567,7 +2579,7 @@
         "message": "Control Smoothness"
     },
      "controlSmoothnessHelp": {
-        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]"
+        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
@@ -2579,7 +2591,7 @@
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
     "waypointSafeDistance": {
-        "message": "Waypoint safe distance [cm]"
+        "message": "Waypoint safe distance [cm]."
     },
     "waypointSafeDistanceHelp": {
         "message": "The maximum distance between the home point and the first waypoint."
