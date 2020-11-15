@@ -791,6 +791,9 @@
     "configurationLaunchTimeout": {
         "message": "Time Out"
     },
+    "configurationLaunchEndTime": {
+        "message": "Transition Time"
+    },
     "configurationLaunchMaxAltitude": {
         "message": "Max Altitude"
     },
@@ -826,6 +829,9 @@
     },
     "configurationLaunchTimeoutHelp": {
         "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over (ms)"
+    },
+    "configurationLaunchEndTimeHelp": {
+        "message": "Smooth transition time at the end of the launch (ms). Default: 2000 [0-5000]."
     },
     "configurationLaunchMaxAltitudeHelp": {
         "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. [cm]"
