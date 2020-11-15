@@ -866,6 +866,18 @@
      "configurationGPSUseGalileo": {
         "message": "Gps use Galileo Satellites"
     },
+    "tzOffset": {
+        "message": "Timezone Offset [Mins]"
+    },
+    "tzOffsetHelp": {
+        "message": "Time zone offset from UTC, in minutes. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0)"
+    },
+    "tzAutomaticDST": {
+        "message": "Automatic Daylight Savings Time"
+    },
+    "tzAutomaticDSTHelp": {
+        "message": "Automatically add Daylight Saving Time to the GPS time when needed or simply ignore it. Includes presets for EU and the USA - if you live outside these areas it is suggested to manage DST manually via tz_offset. (Default = Off)"
+    },
     "configurationGPSBaudrate": {
         "message": "Baudrate"
     },
@@ -2460,6 +2472,12 @@
     },
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
+    },
+    "rthHomeAltitudeLabel": {
+        "message": "RTH Home altitude [cm]"
+    },
+    "rthHomeAltitudeHelp": {
+        "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
     "landDescentRate": {
         "message": "Landing vertical speed [cm/s]"

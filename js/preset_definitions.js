@@ -1444,7 +1444,7 @@ presets.presets = [
     },
     {
         name: "ZOHD Dart 250g",
-        description: "3x5x3 propeller, 1406 2600kV motor, 3S LiPo. 570mm wingspan, AUW potentially under 250g on 2S.",
+        description: "3x5x3 propeller, 1406 2600kV motor, 3S LiPo. 570mm wingspan, AUW potentially under 250g on 2S.<br /><br /><strong>Please set the Stabilised Roll weight to 80, and the Stabilised Pitch weight to 65.</strong>",
         features: [
             "Adjusted gyro filtering",
             "Adjusted PIDs",
@@ -1452,8 +1452,8 @@ presets.presets = [
         ],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
         settingsMSP: [
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
+            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 3),
+            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 30),
             presets.elementHelper("RC_tuning", "roll_rate", 360),
             presets.elementHelper("RC_tuning", "pitch_rate", 130),
             presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
@@ -1466,35 +1466,39 @@ presets.presets = [
             },
             {
                 key: "fw_p_pitch",
-                value: 9
+                value: 3
             },
             {
                 key: "fw_i_pitch",
-                value: 15
+                value: 7
             },
             {
                 key: "fw_ff_pitch",
-                value: 14
+                value: 40
             },
             {
                 key: "fw_p_roll",
-                value: 9
+                value: 2
             },
             {
                 key: "fw_i_roll",
-                value: 12
+                value: 4
             },
             {
                 key: "fw_ff_roll",
-                value: 15
+                value: 18
             },
             {
                 key: "rc_expo",
-                value: 30
+                value: 70
             },
             {
                 key: "manual_rc_expo",
-                value: 30
+                value: 70
+            },
+            {
+                key: "rc_yaw_expo",
+                value: 20
             }
         ],
         type: 'flyingwing'
