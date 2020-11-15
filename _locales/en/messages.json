@@ -762,79 +762,79 @@
         "message": "Fixed Wing Auto Launch Settings"
     },
     "configurationLaunchVelocity": {
-        "message": "Threshold Velocity"
+        "message": "Threshold Velocity [cm/s]"
     },
     "configurationLaunchVelocityHelp": {
         "message": "Forward velocity threshold for swing-launch detection [cm/s]"
     },
     "configurationLaunchAccel": {
-        "message": "Threshold Acceleration"
+        "message": "Threshold Acceleration [cm/s/s]"
     },
     "configurationLaunchAccelHelp": {
         "message": "Forward acceleration threshold for bungee launch of throw launch [cm/s/s], 1G = 981 cm/s/s"
     },
     "configurationLaunchMaxAngle": {
-        "message": "Max Throw Angle"
+        "message": "Max Throw Angle [&deg;]"
     },
     "configurationLaunchMaxAngleHelp": {
         "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely [deg]"
     },
     "configurationLaunchDetectTime": {
-        "message": "Detect Time"
+        "message": "Detect Time [ms]"
     },
     "configurationLaunchDetectTimeHelp": {
         "message": "Time for which thresholds have to breached to consider launch happened [ms]"
     },
     "configurationLaunchThr": {
-        "message": "Launch Throttle"
+        "message": "Launch Throttle [uS]"
     },
     "configurationLaunchThrHelp": {
         "message": "Launch throttle - throttle to be set during launch sequence (pwm units)"
     },
     "configurationLaunchIdleThr": {
-        "message": "Idle Throttle"
+        "message": "Idle Throttle [uS]"
     },
     "configurationLaunchIdleThrHelp": {
         "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position)"
     },
     "configurationLaunchMotorDelay": {
-        "message": "Motor Delay"
+        "message": "Motor Delay [ms]"
     },
     "configurationLaunchMotorDelayHelp": {
         "message": "Delay between detected launch and launch sequence start and throttling up (ms)"
     },
     "configurationLaunchSpinupTime": {
-        "message": "Motor Spinup Time"
+        "message": "Motor Spinup Time [ms]"
     },
     "configurationLaunchSpinupTimeHelp": {
         "message": "Time to bring power from minimum throttle to nav_fw_launch_thr - to avoid big stress on ESC and large torque from propeller"
     },
     "configurationLaunchMinTime": {
-        "message": "Minimum Launch Time"
+        "message": "Minimum Launch Time [ms]"
     },
     "configurationLaunchMinTimeHelp": {
         "message": "Allow launch mode to execute at least this time (ms) and ignore stick movements [0-60000]."
     },
     "configurationLaunchTimeout": {
-        "message": "Launch Timeout"
+        "message": "Launch Timeout [ms]"
     },
     "configurationLaunchTimeoutHelp": {
         "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over (ms)"
     },
     "configurationLaunchEndTime": {
-        "message": "End Transition Time"
+        "message": "End Transition Time [ms]"
     },
     "configurationLaunchEndTimeHelp": {
         "message": "Smooth transition time at the end of the launch (ms). Default: 2000 [0-5000]. This is added to the Launch Timeout."
     },
     "configurationLaunchMaxAltitude": {
-        "message": "Maximum Altitude"
+        "message": "Maximum Altitude [cm]"
     },
     "configurationLaunchMaxAltitudeHelp": {
         "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. [cm]"
     },
     "configurationLaunchClimbAngle": {
-        "message": "Climb Angle"
+        "message": "Climb Angle [&deg;]"
     },
     "configurationLaunchClimbAngleHelp": {
         "message": "Climb angle for launch sequence (degrees), is also restrained by global max_angle_inclination_pit"
