@@ -1400,6 +1400,9 @@
     "adjustmentsFunction51": {
         "message": "TPA Breakpoint Adjustment"
     },
+    "adjustmentsFunction52": {
+        "message": "Control Smoothness Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
