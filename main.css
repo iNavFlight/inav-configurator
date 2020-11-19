@@ -2159,12 +2159,6 @@ ol li {
     margin-left: 1em;
 }
 
-.red-background,
-.red-background td,
-.red-background th {
-    background-color: tomato !important;
-}
-
 .mixer-wizard * {
     user-select: none;
 }
