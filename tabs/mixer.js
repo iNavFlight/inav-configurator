@@ -277,15 +277,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
-        motorWizardModal = new jBox('Modal', {
-            width: 480,
-            height: 410,
-            closeButton: 'title',
-            animation: false,
-            attach: $wizardButton,
-            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
-            content: $('#mixerWizardContent')
-        });
+        motorWizardModal = helper.openMixerWizard(
+            $wizardButton,
+            "#mixerWizardTemplate",
+            chrome.i18n.getMessage("mixerWizardModalTitle")
+        );
 
         function validateMixerWizard() {
             let errorCount = 0;
@@ -299,7 +295,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 } else {
                     $elements.closest('tr').removeClass("red-background");
                 }
-
             }
 
             return (errorCount == 0);

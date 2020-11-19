@@ -2164,3 +2164,19 @@ ol li {
 .red-background th {
     background-color: tomato !important;
 }
+
+.mixer-wizard * {
+    user-select: none;
+}
+
+.drop-zone {
+    border: solid 2px transparent;
+}
+
+.drop-zone.drop-active {
+    border: dashed 2px black;
+}
+
+.drop-zone.drop-active * {
+    pointer-events: none;
+}
