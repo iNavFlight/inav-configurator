@@ -170,30 +170,34 @@
         </div>
     </div>
     <script id="mixerWizardTemplate" type="text/x-jsrender">
-        <div class="modal__content mixer-wizard">
-            <h1 class="modal__title modal__title--warning">{{i18n: "mixerWizardModalTitle"}}</h1>
-            <div class="modal__text">
-                <p>{{i18n: "mixerWizardInfo"}}</p>
-                <table style="margin-top: 1em;" class="mixer-table">
-                    <thead>
-                        <th>{{i18n: "mixerWizardMotorPosition"}}</th>
-                        <th>{{i18n: "mixerWizardMotorIndex"}}</th>
-                    </thead>
-                    <tbody>
-                        {{for mappings}}
-                        <tr>
-                            <th>{{i18n: positionText}}</th>
-                            <td class="wizard-motor-mapping drop-zone">
-                                <div data-motor-index="{{> motorIndex}}" draggable="true">Motor #{{> motorIndex + 1}}</div>
-                            </td>
-                        </tr>
-                        {{/for}}
-                    </tbody>
-                </table>
+        <div class="mixer-wizard">
+            <div class="modal__content">
+                <h1 class="modal__title modal__title--warning">{{i18n: "mixerWizardModalTitle"}}</h1>
+                <div class="modal__text">
+                    <p>{{i18n: "mixerWizardInfo"}}</p>
+                    <table style="margin-top: 1em;" class="mixer-table">
+                        <thead>
+                            <th>{{i18n: "mixerWizardMotorPosition"}}</th>
+                            <th>{{i18n: "mixerWizardMotorIndex"}}</th>
+                        </thead>
+                        <tbody>
+                            {{for mappings}}
+                            <tr>
+                                <th>{{i18n: positionText}}</th>
+                                <td class="position drop-zone" data-position-index="{{> positionIndex}}">
+                                    <div data-motor-index="{{> motorIndex}}" draggable="true">
+                                        <span>Motor #{{> motorIndex + 1}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{/for}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="modal__buttons">
-            <a id="wizard-execute-button" class="modal__button modal__button--main">{{i18n: "mixerWizardModalApply"}}</a>
+            <div class="modal__buttons">
+                <a id="wizard-execute-button" class="modal__button modal__button--main">{{i18n: "mixerWizardModalApply"}}</a>
+            </div>
         </div>
     </script>
     <div class="content_toolbar">

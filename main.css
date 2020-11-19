@@ -2163,6 +2163,13 @@ ol li {
     user-select: none;
 }
 
+.mixer-wizard .position [draggable] {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .drop-zone {
     border: solid 2px transparent;
 }

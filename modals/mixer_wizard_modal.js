@@ -4,7 +4,7 @@ var helper = helper || {};
 
 const templateCache = {};
 
-helper.openModal = function ($trigger, templateId, title, model, onOpen, onClose) {
+helper.setupModal = function ($trigger, templateId, title, model, onOpen, onClose) {
     if (!templateCache[templateId]) {
         templateCache[templateId] = $.templates(templateId);
         $.views.converters("i18n", chrome.i18n.getMessage, templateCache[templateId]);
@@ -25,23 +25,27 @@ helper.openModal = function ($trigger, templateId, title, model, onOpen, onClose
     });
 };
 
-helper.openMixerWizard = function ($trigger, templateId, title) {
+helper.setupMixerWizard = function ($trigger, templateId, title) {
     const model = {
         mappings: [
             {
                 positionText: "motorWizard0",
+                positionIndex: 0,
                 motorIndex: 0,
             },
             {
                 positionText: "motorWizard1",
+                positionIndex: 1,
                 motorIndex: 1,
             },
             {
                 positionText: "motorWizard2",
+                positionIndex: 2,
                 motorIndex: 2,
             },
             {
                 positionText: "motorWizard3",
+                positionIndex: 3,
                 motorIndex: 3,
             }
         ]
@@ -49,14 +53,13 @@ helper.openMixerWizard = function ($trigger, templateId, title) {
 
     const dropZoneSelector = ".drop-zone";
     const draggableSelector = "[draggable]";
-    return helper.openModal(
+    return helper.setupModal(
         $trigger,
         templateId,
         title,
         model,
         function () {
             const $container = this.container;
-            console.log("opened", $container);
 
             $container.on("dragstart", draggableSelector, function (event) {
                 const $target = $(event.target);
@@ -105,8 +108,6 @@ helper.openMixerWizard = function ($trigger, templateId, title) {
         },
         function () {
             const $container = this.container;
-            console.log("closed", $container);
-
             $container.off();
         }
     );
