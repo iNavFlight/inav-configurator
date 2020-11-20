@@ -2884,8 +2884,14 @@
     "osdElement_VTX_POWER": {
         "message": "Video TX power level"
     },
+    "osdElement_VTX_POWER_MW": {
+        "message": "Video TX power level in mW"
+    },
     "osdElement_VTX_POWER_HELP": {
         "message": "Shows the current VTX power level. Blinks when the corresponding RC adjustment is selected"
+    },
+    "osdElement_VTX_POWER_MW_HELP": {
+        "message": "Shows the current VTX power level in mW. Blinks when the corresponding RC adjustment is selected"
     },
     "osdElement_ESC_RPM": {
         "message": "Motor RPM from ESC telemetry"
