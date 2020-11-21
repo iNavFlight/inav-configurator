@@ -1347,7 +1347,7 @@ OSD.constants = {
                 },
                 {
                     name: 'VTX_POWER_MW',
-                    id: 118,
+                    id: 119,
                     preview: '  25'
                 },
             ]
