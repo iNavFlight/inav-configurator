@@ -772,6 +772,11 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
+                },
+                {
+                    name: 'VERSION',
+                    id: 119,
+                    preview: 'INAV: 2.7.0'
                 }
             ]
         },
