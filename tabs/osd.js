@@ -776,7 +776,7 @@ OSD.constants = {
                 {
                     name: 'VERSION',
                     id: 119,
-                    preview: 'INAV: 2.7.0'
+                    preview: 'INAV 2.7.0'
                 }
             ]
         },
