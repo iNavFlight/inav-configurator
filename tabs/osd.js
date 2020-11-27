@@ -1546,6 +1546,11 @@ OSD.constants = {
                     id: 117,
                     preview: 'TPA    0\nBP  1500'
                 },
+                {
+                    name: 'CONTROL_SMOOTHNESS',
+                    id: 118,
+                    preview: 'CTL S 3'
+                },
             ]
         },
         {
