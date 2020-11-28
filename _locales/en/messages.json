@@ -37,6 +37,9 @@
     "deviceReady": {
         "message": "Device - <span style=\"color: #37a8db\">Ready</span>"
     },
+    "fcNotConnected": {
+        "message": "Not connected"
+    },
 
     "backupFileIncompatible": {
         "message": "Backup file provided was generated for previous version of the configurator and is incompatible with this version of configurator. Sorry"
@@ -1399,6 +1402,9 @@
     },
     "adjustmentsFunction51": {
         "message": "TPA Breakpoint Adjustment"
+    },
+    "adjustmentsFunction52": {
+        "message": "Control Smoothness Adjustment"
     },
     "adjustmentsSave": {
         "message": "Save"

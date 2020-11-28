@@ -202,6 +202,8 @@ function onValidFirmware()
                 helper.defaultsDialog.init();
 
                 $('#tabs ul.mode-connected .tab_setup a').click();
+
+                updateFirmwareVersion();
             });
         });
     });
@@ -367,6 +369,8 @@ function onClosed(result) {
     $('#portsinput').show();
     $('#dataflash_wrapper_global').hide();
     $('#quad-status_wrapper').hide();
+
+    updateFirmwareVersion();
 }
 
 function read_serial(info) {
