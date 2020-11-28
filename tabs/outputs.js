@@ -80,16 +80,22 @@ TABS.outputs.initialize = function (callback) {
         finalize();
     }
 
-    function getMotorOutputValue(value) {
+    function getMotorOutputValue(value, isSlider) {
+        var outputValue = "";
 
         if (!self.feature3DEnabled) {
             let valueNormalized = value - MISC.mincommand;
             let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;
 
-            return Math.round(100 * valueNormalized / maxThrottleNormalized) + "%";
+            outputValue = Math.round(100 * valueNormalized / maxThrottleNormalized) + "%";
+            if (!isSlider) {
+                outputValue += "<br />" + value + " &#181;S";
+            }
         } else {
-            return value;
+            outputValue = value;
         }
+
+        return outputValue;
     }
 
     function processConfiguration() {
@@ -520,7 +526,7 @@ TABS.outputs.initialize = function (callback) {
             ');
             $motorTitles.append('<li title="Motor - ' + motorNumber + '">' + motorNumber + '</li>');
             $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled"/></div>');
-            $motorValues.append('<li>0%</li>');
+            $motorValues.append('<li>0%<br />1000 &#181;S</li>');
         }
 
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
@@ -575,7 +581,7 @@ TABS.outputs.initialize = function (callback) {
                     buffer = [],
                     i;
 
-                $('div.values li').eq(index).text(getMotorOutputValue($(this).val()));
+                $('div.values li').eq(index).html(getMotorOutputValue($(this).val(), false));
 
                 for (i = 0; i < 8; i++) {
                     var val = parseInt($('div.sliders input').eq(i).val());
@@ -602,7 +608,7 @@ TABS.outputs.initialize = function (callback) {
         $('div.sliders input.master').on('input', function () {
             var val = $(this).val();
             $('div.sliders input:not(:disabled, :last)').val(val);
-            $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).text(getMotorOutputValue(val));
+            $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).html(getMotorOutputValue($(this).val(), false));
             $('div.sliders input:not(:last):first').trigger('input');
         });
 
@@ -711,7 +717,7 @@ TABS.outputs.initialize = function (callback) {
                 height = (data * (block_height / full_block_scale)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
 
-                $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
+                $('.motor-' + i + ' .label', motors_wrapper).html(getMotorOutputValue(MOTOR_DATA[i], true));
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
             }
 
