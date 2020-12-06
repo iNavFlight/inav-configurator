@@ -1315,6 +1315,12 @@ var FC = {
                 type: "range",
                 range: [0, 7],
                 default: 0
+            },
+            6: {
+                name: "Programming PID",
+                type: "range",
+                range: [0, 3],
+                default: 0
             }
         }
     }
