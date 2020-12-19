@@ -202,6 +202,18 @@ helper.defaultsDialog = (function() {
             "reboot": true,
             "settings": [
                 {
+                    key: "gyro_hardware_lpf",
+                    value: "256HZ"
+                },
+                {
+                    key: "gyro_lpf_hz",
+                    value: 40
+                },
+                {
+                    key: "gyro_lpf_type",
+                    value: "BIQUAD"
+                },
+                {
                     key: "motor_pwm_protocol",
                     value: "STANDARD"
                 },
@@ -270,6 +282,18 @@ helper.defaultsDialog = (function() {
             "notRecommended": false,
             "reboot": true,
             "settings": [
+                {
+                    key: "gyro_hardware_lpf",
+                    value: "256HZ"
+                },
+                {
+                    key: "gyro_lpf_hz",
+                    value: 10
+                },
+                {
+                    key: "gyro_lpf_type",
+                    value: "BIQUAD"
+                },
                 {
                     key: "motor_pwm_protocol",
                     value: "STANDARD"

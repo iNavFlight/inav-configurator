@@ -1258,6 +1258,18 @@ presets.presets = [
         ],
         settings: [
             {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
+            {
                 key: "platform_type",
                 value: "AIRPLANE"
             },
@@ -1289,6 +1301,18 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1347,6 +1371,18 @@ presets.presets = [
         ],
         settings: [
             {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
+            {
                 key: "platform_type",
                 value: "AIRPLANE"
             },
@@ -1404,6 +1440,18 @@ presets.presets = [
         ],
         settings: [
             {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
+            {
                 key: "platform_type",
                 value: "AIRPLANE"
             },
@@ -1460,6 +1508,18 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1500)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1519,6 +1579,18 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 120)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 40
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
