@@ -195,11 +195,23 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "gyro_lpf_hz",
-                    value: 40
+                    value: 25
                 },
                 {
                     key: "gyro_lpf_type",
                     value: "BIQUAD"
+                },
+                {
+                    key: "dynamic_gyro_notch_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "dynamic_gyro_notch_q",
+                    value: 250
+                },
+                {
+                    key: "dynamic_gyro_notch_min_hz",
+                    value: 30
                 },
                 {
                     key: "motor_pwm_protocol",
@@ -256,6 +268,10 @@ helper.defaultsDialog = (function() {
                 {
                     key: "applied_defaults",
                     value: 3
+                },
+                {
+                    key: "imu_acc_ignore_rate",
+                    value: 10
                 }
             ],
             "features":[
