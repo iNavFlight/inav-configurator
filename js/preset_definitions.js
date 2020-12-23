@@ -98,14 +98,6 @@ presets.presets = [
                 value: "PT1"
             },
             {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
-            },
-            {
                 key: "mc_iterm_relax",
                 value: "RP"
             },
@@ -204,10 +196,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.500
             }
         ],
         type: 'multirotor'
@@ -258,14 +246,6 @@ presets.presets = [
             {
                 key: "dterm_lpf_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -366,10 +346,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.850
             }
         ],
         type: 'multirotor'
@@ -428,14 +404,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -536,10 +504,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.800
             }
         ],
         type: 'multirotor'
@@ -603,14 +567,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -713,10 +669,6 @@ presets.presets = [
                 value: 12
             },
             {
-                key: "dterm_setpoint_weight",
-                value: 0.300
-            },
-            {
                 key: "heading_hold_rate_limit",
                 value: 30
             }
@@ -785,14 +737,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "GYRO"
             },
             {
                 key: "mc_iterm_relax",
@@ -893,10 +837,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.400
             }
         ],
         type: 'multirotor'
@@ -955,14 +895,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -1063,10 +995,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.850
             }
         ],
         type: 'multirotor'
@@ -1125,14 +1053,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -1233,10 +1153,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.700
             }
         ],
         type: 'multirotor'
