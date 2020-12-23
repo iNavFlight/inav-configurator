@@ -62,10 +62,6 @@ helper.defaultsDialog = (function() {
                     value: "PT1"
                 },
                 {
-                    key: "use_dterm_fir_filter",
-                    value: "OFF"
-                },
-                {
                     key: "dynamic_gyro_notch_enabled",
                     value: "ON"
                 },
@@ -91,14 +87,6 @@ helper.defaultsDialog = (function() {
                 {
                     key: "mc_airmode_type",
                     value: "THROTTLE_THRESHOLD"
-                },
-                {
-                    key: "dterm_setpoint_weight",
-                    value: 0.75
-                },
-                {
-                    key: "mc_iterm_relax_type",
-                    value: "SETPOINT"
                 },
                 {
                     key: "mc_iterm_relax",
