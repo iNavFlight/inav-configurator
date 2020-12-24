@@ -23,6 +23,7 @@ var CONFIG,
     LOGIC_CONDITIONS_STATUS,
     GLOBAL_FUNCTIONS,
     GLOBAL_VARIABLES_STATUS,
+    PROGRAMMING_PID,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -177,6 +178,7 @@ var FC = {
         LOGIC_CONDITIONS = new LogicConditionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
+        PROGRAMMING_PID = new ProgrammingPidCollection();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
