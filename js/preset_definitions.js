@@ -1179,7 +1179,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1196,6 +1208,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'airplane'
@@ -1223,7 +1239,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1264,6 +1292,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1292,7 +1324,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1333,6 +1377,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1361,7 +1409,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1402,6 +1462,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1430,7 +1494,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1475,6 +1551,10 @@ presets.presets = [
             {
                 key: "rc_yaw_expo",
                 value: 20
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1501,7 +1581,19 @@ presets.presets = [
             },
             {
                 key: "gyro_lpf_hz",
-                value: 40
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
             },
             {
                 key: "gyro_lpf_type",
@@ -1542,6 +1634,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
