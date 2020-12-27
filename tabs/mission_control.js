@@ -304,13 +304,15 @@ TABS.mission_control.initialize = function (callback) {
     var map;
     var selectedMarker = null;
     var pointForSend = 0;
-    var settings = { speed: 0, alt: 5000 };
+    var settings = { speed: 0, alt: 5000};
 
     function clearEditForm() {
         $('#pointLat').val('');
         $('#pointLon').val('');
         $('#pointAlt').val('');
-        $('#pointSpeed').val('');
+        $('#pointP1').val('');
+		$('#pointP2').val('');
+		$('#pointP3').val('');
         $('[name=pointNumber]').val('');
         $('#MPeditPoint').fadeOut(300);
     }
@@ -388,14 +390,31 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function getPointIcon(isEdit) {
+    function getPointIcon(_action, isEdit) {
+		var dictofPoint = {
+			1: 	  '',
+			2:    '',
+			3:    '',
+			4:    '',
+			5:    '_poi',
+			6:    '',
+			7:    '_head',
+			8:    ''
+		};
+		
         return new ol.style.Style({
-            image: new ol.style.Icon(({
+			image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_position' + dictofPoint[_action] + (isEdit ? '_edit' : '')+ '.png'
+            }))
+            /*image: new ol.style.Icon(({
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
                 src: '../images/icons/cf_icon_position' + (isEdit ? '_edit' : '') + '.png'
-            }))
+            }))*/
             /*
             text: new ol.style.Text({
                 text: '10',
@@ -409,7 +428,7 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-    function addMarker(_pos, _alt, _action, _speed) {
+    function addMarker(_pos, _alt, _action, _parameter1='', _parameter2='', _parameter3='') {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -417,7 +436,7 @@ TABS.mission_control.initialize = function (callback) {
             rainfall: 500
         });
 
-        iconFeature.setStyle(getPointIcon());
+        iconFeature.setStyle(getPointIcon(_action));
 
         var vectorSource = new ol.source.Vector({
             features: [iconFeature]
@@ -430,7 +449,9 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.alt = _alt;
         vectorLayer.number = markers.length;
         vectorLayer.action = _action;
-        vectorLayer.speedValue = _speed;
+        vectorLayer.parameter1 = _parameter1;
+		vectorLayer.parameter2 = _parameter2;
+		vectorLayer.parameter3 = _parameter3;
 
         markers.push(vectorLayer);
 
@@ -659,7 +680,7 @@ TABS.mission_control.initialize = function (callback) {
         map.on('click', function (evt) {
             if (selectedMarker != null) {
                 try {
-                    selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon());
+                    selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action));
                     selectedMarker = null;
                     clearEditForm();
                 } catch (e) {
@@ -675,6 +696,18 @@ TABS.mission_control.initialize = function (callback) {
                 function (feature, layer) {
                     return layer;
                 });
+				
+			var dictOfLabelParameterPoint = {
+				1: 	  {parameter1: 'speed (cm/s)', parameter2: '', parameter3: ''},
+				2:    {parameter1: '', parameter2: '', parameter3: ''},
+				3:    {parameter1: 'wait time (s)', parameter2: 'speed (cm/s)', parameter3: ''},
+				4:    {parameter1: 'force land (non zero)', parameter2: '', parameter3: ''},
+				5:    {parameter1: '', parameter2: '', parameter3: ''},
+				6:    {parameter1: 'target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
+				7:    {parameter1: 'heading (deg)', parameter2: '', parameter3: ''},
+				8:    {parameter1: '', parameter2: '', parameter3: ''}
+			};
+			
             if (selectedFeature)
             {
                 for (var i in markers)
@@ -686,7 +719,7 @@ TABS.mission_control.initialize = function (callback) {
                       var geometry = selectedFeature.getGeometry();
                       var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
-                      selectedFeature.setStyle(getPointIcon(true));
+                      selectedFeature.setStyle(getPointIcon(selectedMarker.action, true));
 
                       var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.alt);
                       
@@ -695,7 +728,19 @@ TABS.mission_control.initialize = function (callback) {
                       $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                       $('#pointAlt').val(selectedMarker.alt);
                       $('#pointType').val(selectedMarker.action);
-                      $('#pointSpeed').val(selectedMarker.speedValue);
+                      $('#pointP1').val(selectedMarker.parameter1);
+					  $('#pointP2').val(selectedMarker.parameter2);
+					  $('#pointP3').val(selectedMarker.parameter3);
+					  for (var j in dictOfLabelParameterPoint[selectedMarker.action])
+					  {
+						if (dictOfLabelParameterPoint[selectedMarker.action][j] != '') 
+						{
+							$('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+							$('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.action][j]);
+							
+						}
+						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+					  }
                       $('#MPeditPoint').fadeIn(300);
                     }
                 }
@@ -762,11 +807,13 @@ TABS.mission_control.initialize = function (callback) {
                         geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLon').val()), parseFloat($('#pointLat').val())]));
                         t.alt = $('#pointAlt').val();
                         t.action = $('#pointType').val();
-                        t.speedValue = $('#pointSpeed').val();
+                        t.P1Value = $('#pointP1').val();
+						t.P2Value = $('#pointP2').val();
+						t.P3Value = $('#pointP3').val();
                     }
                 });
 
-                selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon());
+                selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action));
                 selectedMarker = null;
                 clearEditForm();
                 repaint();
@@ -1009,7 +1056,7 @@ TABS.mission_control.initialize = function (callback) {
                 'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
                 'alt': (markers[i].alt / 100)
             } };
-            if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].speedValue > 0)) point.$['parameter1'] = markers[i].speedValue;
+            if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].parameter1 > 0)) point.$['parameter1'] = markers[i].parameter1; /*parameter1 = SpeedValue in this case*/
             data.missionitem.push(point);
         }
 
@@ -1107,7 +1154,7 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
         MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
         MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-        MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].speedValue;
+        MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
         pointForSend++;
         if (pointForSend >= markers.length && !isRTH) {
             MISSION_PLANER.bufferPoint.endMission = 0xA5;
