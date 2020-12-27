@@ -15,6 +15,17 @@ MWNP.WPTYPE = {
     LAND:         8
 };
 
+// Dictionary of Parameter1,2,3 depending on type of action selected (refer to MWNP.WPTYPE)
+var dictOfLabelParameterPoint = {
+	1: 	  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: ''},
+	2:    {parameter1: '', parameter2: '', parameter3: ''},
+	3:    {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: ''},
+	4:    {parameter1: 'Force land (non zero)', parameter2: '', parameter3: ''},
+	5:    {parameter1: '', parameter2: '', parameter3: ''},
+	6:    {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
+	7:    {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
+	8:    {parameter1: '', parameter2: '', parameter3: ''}
+};
 
 TABS.mission_control = {};
 TABS.mission_control.isYmapLoad = false;
@@ -428,7 +439,7 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-    function addMarker(_pos, _alt, _action, _parameter1='', _parameter2='', _parameter3='') {
+    function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -696,17 +707,7 @@ TABS.mission_control.initialize = function (callback) {
                 function (feature, layer) {
                     return layer;
                 });
-				
-			var dictOfLabelParameterPoint = {
-				1: 	  {parameter1: 'speed (cm/s)', parameter2: '', parameter3: ''},
-				2:    {parameter1: '', parameter2: '', parameter3: ''},
-				3:    {parameter1: 'wait time (s)', parameter2: 'speed (cm/s)', parameter3: ''},
-				4:    {parameter1: 'force land (non zero)', parameter2: '', parameter3: ''},
-				5:    {parameter1: '', parameter2: '', parameter3: ''},
-				6:    {parameter1: 'target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
-				7:    {parameter1: 'heading (deg)', parameter2: '', parameter3: ''},
-				8:    {parameter1: '', parameter2: '', parameter3: ''}
-			};
+			
 			
             if (selectedFeature)
             {
@@ -728,16 +729,17 @@ TABS.mission_control.initialize = function (callback) {
                       $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                       $('#pointAlt').val(selectedMarker.alt);
                       $('#pointType').val(selectedMarker.action);
+					  // Change SpeedValue to Parameter1, 2, 3
                       $('#pointP1').val(selectedMarker.parameter1);
 					  $('#pointP2').val(selectedMarker.parameter2);
 					  $('#pointP3').val(selectedMarker.parameter3);
+					  // Selection box update depending on choice of type of waypoint
 					  for (var j in dictOfLabelParameterPoint[selectedMarker.action])
 					  {
 						if (dictOfLabelParameterPoint[selectedMarker.action][j] != '') 
 						{
 							$('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
 							$('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.action][j]);
-							
 						}
 						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 					  }
@@ -884,6 +886,22 @@ TABS.mission_control.initialize = function (callback) {
         $('#cancelSettings').on('click', function () {
             loadSettings();
             closeSettingsPanel();
+        });
+		
+		// Add function to update parameter i field in the selected Edit WP Box
+		$('#pointType').on('change', function () {
+			console.log(dictOfLabelParameterPoint[selectedMarker.action])
+			selectedMarker.action = $('#pointType').val();
+			console.log(dictOfLabelParameterPoint[selectedMarker.action])
+            for (var j in dictOfLabelParameterPoint[selectedMarker.action])
+				{
+				if (dictOfLabelParameterPoint[selectedMarker.action][j] != '') 
+				{
+					$('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+					$('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.action][j]);
+				}
+				else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+				}
         });
 
         updateTotalInfo();
