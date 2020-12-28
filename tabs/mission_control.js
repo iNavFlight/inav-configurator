@@ -349,21 +349,42 @@ TABS.mission_control.initialize = function (callback) {
 
     function repaint() {
         var oldPos;
+		var oldAction;
+		var lastPoiNumber;
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
         lines = [];
         $('#missionDistance').text(0);
+		//console.log(markers)
 
         map.getLayers().forEach(function (t) {
             //feature.getGeometry().getType()
+			console.log(t)
             if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined') {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
-                if (typeof oldPos !== 'undefined') {
-                    paintLine(oldPos, geometry.getCoordinates());
-                }
+				var action = t.action;
+				var number = t.number;
+				if (action == 5) {
+					// If action is Set_POI, increment counter of POI
+					lastPoiNumber = number;
+				}
+				else if (action == 6) {
+					// If action is Jump
+					if (typeof oldPos !== 'undefined') {
+						paintLine(oldPos, markers[t.number].getCoordinates(), '#ffb725', 5);
+					}
+				}
+				else {
+					if (typeof oldPos !== 'undefined' && (typeof lastPoiNumber == 'undefined' || number < lastPoiNumber )) {
+						paintLine(oldPos, geometry.getCoordinates());
+					}
+					else if (typeof oldPos !== 'undefined' && number >= lastPoiNumber) {
+						paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+					}
+					oldPos = geometry.getCoordinates();
+				}
 
-                oldPos = geometry.getCoordinates();
             }
         });
         //reset text position
@@ -372,7 +393,7 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
-    function paintLine(pos1, pos2) {
+    function paintLine(pos1, pos2, color='#1497f1', lineDash=0) {
         var line = new ol.geom.LineString([pos1, pos2]);
 
         var feature = new ol.Feature({
@@ -380,8 +401,9 @@ TABS.mission_control.initialize = function (callback) {
         });
         feature.setStyle(new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: '#1497f1',
-                width: 3
+                color: color,
+                width: 3,
+				lineDash: lineDash
             })
         }));
 
@@ -420,22 +442,6 @@ TABS.mission_control.initialize = function (callback) {
                 scale: 0.5,
                 src: '../images/icons/cf_icon_position' + dictofPoint[_action] + (isEdit ? '_edit' : '')+ '.png'
             }))
-            /*image: new ol.style.Icon(({
-                anchor: [0.5, 1],
-                opacity: 1,
-                scale: 0.5,
-                src: '../images/icons/cf_icon_position' + (isEdit ? '_edit' : '') + '.png'
-            }))*/
-            /*
-            text: new ol.style.Text({
-                text: '10',
-                offsetX: -1,
-                offsetY: -30,
-                overflow: true,
-                scale: 2,
-                fill: new ol.style.Fill({ color: 'black' })
-            })
-            */
         });
     }
 
