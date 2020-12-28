@@ -2565,7 +2565,7 @@
     },
     "pitchToThrottleThresholdHelp": {
         "message": "The autopilot will instantly adjust the throttle level according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
-    }
+    },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
