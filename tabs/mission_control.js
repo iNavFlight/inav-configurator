@@ -350,24 +350,28 @@ TABS.mission_control.initialize = function (callback) {
     function repaint() {
         var oldPos;
 		var oldAction;
-		var lastPoiNumber;
+		var poiNumber;
+		var poiList;
+		var lengthPoiList;
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
         lines = [];
+		poiList = [];
         $('#missionDistance').text(0);
 		//console.log(markers)
 
         map.getLayers().forEach(function (t) {
             //feature.getGeometry().getType()
-			console.log(t)
             if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined') {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
 				var action = t.action;
 				var number = t.number;
 				if (action == 5) {
 					// If action is Set_POI, increment counter of POI
-					lastPoiNumber = number;
+					poiNumber = number;
+					lengthPoiList = poiList.push(poiNumber);
+					console.log(lengthPoiList)
 				}
 				else if (action == 6) {
 					// If action is Jump
@@ -376,11 +380,16 @@ TABS.mission_control.initialize = function (callback) {
 					}
 				}
 				else {
-					if (typeof oldPos !== 'undefined' && (typeof lastPoiNumber == 'undefined' || number < lastPoiNumber )) {
+					if (typeof oldPos !== 'undefined' && (typeof poiNumber == 'undefined' || number < poiNumber )) {
 						paintLine(oldPos, geometry.getCoordinates());
 					}
-					else if (typeof oldPos !== 'undefined' && number >= lastPoiNumber) {
-						paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+					else if (typeof oldPos !== 'undefined' && number >= poiNumber) {
+						if ((lengthPoiList % 2) == 0) {
+							paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
+						}
+						else {
+							paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+						}
 					}
 					oldPos = geometry.getCoordinates();
 				}
@@ -403,7 +412,7 @@ TABS.mission_control.initialize = function (callback) {
             stroke: new ol.style.Stroke({
                 color: color,
                 width: 3,
-				lineDash: lineDash
+				lineDash: [lineDash]
             })
         }));
 
