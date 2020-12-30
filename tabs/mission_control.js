@@ -324,6 +324,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP1').val('');
 		$('#pointP2').val('');
 		$('#pointP3').val('');
+		$('[name=Options]').filter('[value=None]').prop('checked', true);
         $('[name=pointNumber]').val('');
         $('#MPeditPoint').fadeOut(300);
     }
@@ -454,7 +455,7 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-    function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0) {
+    function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0, _options={key: "None"}) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -478,6 +479,7 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.parameter1 = _parameter1;
 		vectorLayer.parameter2 = _parameter2;
 		vectorLayer.parameter3 = _parameter3;
+		vectorLayer.options = _options;
 
         markers.push(vectorLayer);
 
@@ -748,6 +750,7 @@ TABS.mission_control.initialize = function (callback) {
                       $('#pointP1').val(selectedMarker.parameter1);
 					  $('#pointP2').val(selectedMarker.parameter2);
 					  $('#pointP3').val(selectedMarker.parameter3);
+					  $('[name=Options]').filter('[value='+selectedMarker.options['key']+']').prop('checked', true);
 					  // Selection box update depending on choice of type of waypoint
 					  for (var j in dictOfLabelParameterPoint[selectedMarker.action])
 					  {
@@ -758,6 +761,10 @@ TABS.mission_control.initialize = function (callback) {
 						}
 						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 					  }
+					  if ([1,2,3].includes(selectedMarker.action)) {
+						  $('#pointOptionclass').fadeIn(300);
+					  }
+					  else {$('#pointOptionclass').fadeIn(300);}
                       $('#MPeditPoint').fadeIn(300);
                     }
                 }
@@ -827,6 +834,26 @@ TABS.mission_control.initialize = function (callback) {
                         t.P1Value = $('#pointP1').val();
 						t.P2Value = $('#pointP2').val();
 						t.P3Value = $('#pointP3').val();
+						if ($('input[name=Options]:checked').val() == "RTH") {
+							t.options = {key: $('input[name=Options]:checked').val(),
+										 landAfter: $('Options_LandRTH').val()
+										};
+						}
+						else if ($('input[name=Options]:checked').val() == "JUMP") {
+							t.options = {key: $('input[name=Options]:checked').val(),
+										 targetWP: $('Options_TargetJUMP').val(),
+										 numRepeat: $('Options_NumberJUMP').val()
+										};
+						}
+						else if ($('input[name=Options]:checked').val() == "SET_HEAD") {
+							t.options = {key: $('input[name=Options]:checked').val(),
+										 heading: $('Options_HeadingHead').val()
+										};
+						}
+						else {
+							t.options = {key: $('input[name=Options]:checked').val()}
+						}
+						console.log(t.options);
                     }
                 });
 
@@ -905,9 +932,7 @@ TABS.mission_control.initialize = function (callback) {
 		
 		// Add function to update parameter i field in the selected Edit WP Box
 		$('#pointType').on('change', function () {
-			console.log(dictOfLabelParameterPoint[selectedMarker.action])
 			selectedMarker.action = $('#pointType').val();
-			console.log(dictOfLabelParameterPoint[selectedMarker.action])
             for (var j in dictOfLabelParameterPoint[selectedMarker.action])
 				{
 				if (dictOfLabelParameterPoint[selectedMarker.action][j] != '') 
@@ -917,6 +942,10 @@ TABS.mission_control.initialize = function (callback) {
 				}
 				else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 				}
+			if (["1","2","3"].includes(selectedMarker.action)) {
+				$('#pointOptionclass').fadeIn(300);
+			}
+			else {$('#pointOptionclass').fadeOut(300);}
         });
 
         updateTotalInfo();

@@ -115,7 +115,26 @@
     width: 60px;
     display: inline-block;
 }
+.tab-mission-control input[type=radio], input.radio {
+    width: 20px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+}
+/*
+.tab-mission-control .radio-options {
+    display: inline-block;
+}
 
+.tab-mission-control input[type=radio], input.radio {
+      float: left;
+    }
+*/
 .mission-control-settings {
     top: 65px;
     left: .5em;
