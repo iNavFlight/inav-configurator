@@ -354,6 +354,7 @@ TABS.mission_control.initialize = function (callback) {
 		var poiNumber;
 		var poiList;
 		var lengthPoiList;
+		var activatePoi = false;
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
@@ -368,30 +369,45 @@ TABS.mission_control.initialize = function (callback) {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
 				var action = t.action;
 				var number = t.number;
+				var options = t.options;
 				if (action == 5) {
 					// If action is Set_POI, increment counter of POI
 					poiNumber = number;
 					lengthPoiList = poiList.push(poiNumber);
+					activatePoi = true;
 					console.log(lengthPoiList)
 				}
-				else if (action == 6) {
-					// If action is Jump
-					if (typeof oldPos !== 'undefined') {
-						paintLine(oldPos, markers[t.number].getCoordinates(), '#ffb725', 5);
-					}
-				}
+				
 				else {
-					if (typeof oldPos !== 'undefined' && (typeof poiNumber == 'undefined' || number < poiNumber )) {
-						paintLine(oldPos, geometry.getCoordinates());
+					
+					
+					if (options.key == "JUMP") {
+						paintLine(geometry.getCoordinates(), markers[options.targetWP].getSource().getFeatures()[0].getGeometry().getCoordinates(), '#e935d6', 5, "Repeat x"+String(options.numRepeat));
 					}
-					else if (typeof oldPos !== 'undefined' && number >= poiNumber) {
-						if ((lengthPoiList % 2) == 0) {
-							paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
+					else if (options.key == "SET_HEAD") {
+						if (options.heading == -1) {
+							activatePoi = false;
+							paintLine(oldPos, geometry.getCoordinates());
 						}
-						else {
-							paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+						else if (typeof options.heading != 'undefined' && options.heading != -1) {
+							paintLine(oldPos, geometry.getCoordinates(), lineText=String(options.heading)+" °");
 						}
 					}
+					else if (options.key == "None") {
+						if (typeof oldPos !== 'undefined' && activatePoi != true){ //(typeof poiNumber == 'undefined' || number < poiNumber || options.heading == '-1')) {
+							paintLine(oldPos, geometry.getCoordinates());
+							
+						}
+						else if (typeof oldPos !== 'undefined' && activatePoi == true) {
+							if ((lengthPoiList % 2) == 0) {
+								paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
+							}
+							else {
+								paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+							}
+						}
+					}
+					
 					oldPos = geometry.getCoordinates();
 				}
 
@@ -403,7 +419,7 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
-    function paintLine(pos1, pos2, color='#1497f1', lineDash=0) {
+    function paintLine(pos1, pos2, color='#1497f1', lineDash=0, lineText="") {
         var line = new ol.geom.LineString([pos1, pos2]);
 
         var feature = new ol.Feature({
@@ -414,7 +430,15 @@ TABS.mission_control.initialize = function (callback) {
                 color: color,
                 width: 3,
 				lineDash: [lineDash]
-            })
+            }),
+			text: new ol.style.Text({
+                text: lineText,
+				placement : 'line',
+				textBaseline: 'ideographic',
+				stroke: new ol.style.Stroke({
+					color: color
+				}),
+            }),
         }));
 
         var vectorSource = new ol.source.Vector({
@@ -438,10 +462,10 @@ TABS.mission_control.initialize = function (callback) {
 			1: 	  '',
 			2:    '',
 			3:    '',
-			4:    '',
+			//4:    '',
 			5:    '_poi',
-			6:    '',
-			7:    '_head',
+			//6:    '',
+			//7:    '_head',
 			8:    ''
 		};
 		
@@ -836,18 +860,18 @@ TABS.mission_control.initialize = function (callback) {
 						t.P3Value = $('#pointP3').val();
 						if ($('input[name=Options]:checked').val() == "RTH") {
 							t.options = {key: $('input[name=Options]:checked').val(),
-										 landAfter: $('Options_LandRTH').val()
+										 landAfter: $('#Options_LandRTH').val()
 										};
 						}
 						else if ($('input[name=Options]:checked').val() == "JUMP") {
 							t.options = {key: $('input[name=Options]:checked').val(),
-										 targetWP: $('Options_TargetJUMP').val(),
-										 numRepeat: $('Options_NumberJUMP').val()
+										 targetWP: $('#Options_TargetJUMP').val(),
+										 numRepeat: $('#Options_NumberJUMP').val()
 										};
 						}
 						else if ($('input[name=Options]:checked').val() == "SET_HEAD") {
 							t.options = {key: $('input[name=Options]:checked').val(),
-										 heading: $('Options_HeadingHead').val()
+										 heading: $('#Options_HeadingHead').val()
 										};
 						}
 						else {

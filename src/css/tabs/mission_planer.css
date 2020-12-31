@@ -115,7 +115,19 @@
     width: 60px;
     display: inline-block;
 }
-.tab-mission-control input[type=radio], input.radio {
+.tab-mission-control .point-radio input{
+    width: 25px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+	display: inline-block;
+}
+.tab-mission-control .point-radio input[type=radio], input.radio{
     width: 20px;
     padding-left: 3px;
     height: 20px;
@@ -125,6 +137,12 @@
     border-radius: 3px;
     font-size: 12px;
     font-weight: normal;
+	display: inline-block;
+}
+.tab-mission-control .radio-options{
+    width: 40px;
+    display: inline-block;
+	margin-right:7px;
 }
 /*
 .tab-mission-control .radio-options {
