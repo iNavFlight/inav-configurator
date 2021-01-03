@@ -253,7 +253,7 @@
         <div class="rightWrapper">
             <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationBatteryVoltage"></div>
+                    <div class="spacer_box_title" data-i18n="configurationVoltageCurrentSensor"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="features batteryVoltage"></div>
@@ -273,6 +273,53 @@
                         </label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
                     </div>
+                    
+                    <div class="number">
+                        <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="65535" />
+                        <label for="voltagescale">
+                            <span data-i18n="configurationBatteryScale"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="text" id="batteryvoltage" name="batteryvoltage" readonly class="disabled" />
+                        <label for="batteryvoltage">
+                            <span data-i18n="configurationBatteryVoltage"></span>
+                        </label>
+                    </div>
+                    <div class="features batteryCurrent"></div>
+                    <div class="select">
+                        <select id="current_meter_type" data-setting="current_meter_type" />
+                        <label for="current_meter_type">
+                            <span data-i18n="configurationCurrentMeterType"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" />
+                        <label for="currentscale">
+                            <span data-i18n="configurationCurrentScale"></span>
+                        </label>
+                        <div class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
+                        <label for="currentoffset">
+                            <span data-i18n="configurationCurrentOffset"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="text" id="batterycurrent" name="batterycurrent" readonly class="disabled" />
+                        <label for="batterycurrent">
+                            <span data-i18n="configurationBatteryCurrent"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationBatterySettings"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="configurationBatterySettingsHelp"></div>
+                </div>
+                <div class="spacer_box">
                     <div class="number">
                         <input type="number" id="cells" name="cells" step="1" min="0" max="8" />
                         <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>
@@ -299,62 +346,14 @@
                             <span data-i18n="configurationBatteryWarning"></span>
                         </label>
                     </div>
-                    <div class="number">
-                        <input type="number" id="voltagescale" name="voltagescale" step="1" min="10" max="65535" />
-                        <label for="voltagescale">
-                            <span data-i18n="configurationBatteryScale"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="text" id="batteryvoltage" name="batteryvoltage" readonly class="disabled" />
-                        <label for="batteryvoltage">
-                            <span data-i18n="configurationBatteryVoltage"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationCurrent"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="features batteryCurrent"></div>
-                    <div class="select">
-                        <select id="current_meter_type" data-setting="current_meter_type" />
-                        <label for="current_meter_type">
-                            <span data-i18n="configurationCurrentMeterType"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" />
-                        <label for="currentscale">
-                            <span data-i18n="configurationCurrentScale"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
-                        <label for="currentoffset">
-                            <span data-i18n="configurationCurrentOffset"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="text" id="batterycurrent" name="batterycurrent" readonly class="disabled" />
-                        <label for="batterycurrent">
-                            <span data-i18n="configurationBatteryCurrent"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="config-section gui_box grey">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationBatteryCapacity"></div>
-                </div>
-                <div class="spacer_box">
                     <div class="select">
                         <select id="battery_capacity_unit">
                             <option value="mAh">mAh</option>
                             <option value="mWh">mWh</option>
                         </select>
+                        <label for="warningcellvoltage">
+                            <span data-i18n="configurationBatteryCapacityUnit"></span>
+                        </label>
                     </div>
                     <div class="number">
                         <input type="number" id="battery_capacity" name="battery_capacity" step="1" min="0" max="4294967296" />
