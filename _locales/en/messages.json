@@ -3523,6 +3523,12 @@
     "antigravityCutoff": {
         "message": "Antigravity Cutoff Frequency"
     },
+    "itermBankAngleFreeze": {
+        "message": "Yaw Iterm freeze bank angle"
+    },
+    "itermBankAngleFreezeHelp": {
+        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
+    },
     "ouptputsConfiguration": {
         "message": "Configuration"
     },
