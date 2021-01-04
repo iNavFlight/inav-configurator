@@ -15,6 +15,17 @@ MWNP.WPTYPE = {
     LAND:         8
 };
 
+MWNP.WPTYPE.REV = {
+    1:     'WAYPOINT',
+    2:     'PH_UNLIM',
+    3:      'PH_TIME',
+    4:          'RTH',
+    5:      'SET_POI',
+    6:         'JUMP',
+    7:     'SET_HEAD',
+    8:         'LAND'
+};
+
 // Dictionary of Parameter1,2,3 depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
 	1: 	  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: ''},
@@ -325,6 +336,10 @@ TABS.mission_control.initialize = function (callback) {
 		$('#pointP2').val('');
 		$('#pointP3').val('');
 		$('[name=Options]').filter('[value=None]').prop('checked', true);
+		$('#Options_LandRTH').prop('checked', false);
+		$('#Options_TargetJUMP').val(0);
+		$('#Options_NumberJUMP').val(0);
+		$('#Options_HeadingHead').val(-1);
         $('[name=pointNumber]').val('');
         $('#MPeditPoint').fadeOut(300);
     }
@@ -355,6 +370,9 @@ TABS.mission_control.initialize = function (callback) {
 		var poiList;
 		var lengthPoiList;
 		var activatePoi = false;
+		var activateHead = false;
+		var oldHeading;
+		var xmlItemNumber = 0;
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
@@ -368,43 +386,44 @@ TABS.mission_control.initialize = function (callback) {
             if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined') {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
 				var action = t.action;
-				var number = t.number;
+				var markerNumber = t.number;
 				var options = t.options;
 				if (action == 5) {
 					// If action is Set_POI, increment counter of POI
-					poiNumber = number;
+					poiNumber = markerNumber;
 					lengthPoiList = poiList.push(poiNumber);
 					activatePoi = true;
-					console.log(lengthPoiList)
 				}
-				
 				else {
+					if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead != true){
+						paintLine(oldPos, geometry.getCoordinates());
+					}
+					else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
+						if ((lengthPoiList % 2) == 0) {
+							paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
+						}
+						else {
+							paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
+						}
+					}
+					else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
+						console.log(oldHeading);
+						paintLine(oldPos, geometry.getCoordinates(), '#1497f1', 0, lineText=String(oldHeading)+"°");
+					}
 					
 					
 					if (options.key == "JUMP") {
-						paintLine(geometry.getCoordinates(), markers[options.targetWP].getSource().getFeatures()[0].getGeometry().getCoordinates(), '#e935d6', 5, "Repeat x"+String(options.numRepeat));
+						paintLine(geometry.getCoordinates(), markers[options.targetWP-1].getSource().getFeatures()[0].getGeometry().getCoordinates(), '#e935d6', 5, "Repeat x"+String(options.numRepeat));
 					}
 					else if (options.key == "SET_HEAD") {
-						if (options.heading == -1) {
+						if (options.heading == "-1") {
 							activatePoi = false;
-							paintLine(oldPos, geometry.getCoordinates());
+							activateHead = false;
+							oldHeading = 'undefined'
 						}
-						else if (typeof options.heading != 'undefined' && options.heading != -1) {
-							paintLine(oldPos, geometry.getCoordinates(), lineText=String(options.heading)+" °");
-						}
-					}
-					else if (options.key == "None") {
-						if (typeof oldPos !== 'undefined' && activatePoi != true){ //(typeof poiNumber == 'undefined' || number < poiNumber || options.heading == '-1')) {
-							paintLine(oldPos, geometry.getCoordinates());
-							
-						}
-						else if (typeof oldPos !== 'undefined' && activatePoi == true) {
-							if ((lengthPoiList % 2) == 0) {
-								paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
-							}
-							else {
-								paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
-							}
+						else if (typeof options.heading != 'undefined' && options.heading != "-1") {
+							activateHead = true;
+							oldHeading = options.heading
 						}
 					}
 					
@@ -457,16 +476,16 @@ TABS.mission_control.initialize = function (callback) {
         map.addLayer(vectorLayer);
     }
 
-    function getPointIcon(_action, isEdit) {
+    function getPointIcon(_action, isEdit, markerNumber='') {
 		var dictofPoint = {
-			1: 	  '',
-			2:    '',
-			3:    '',
+			1: 	  'WP',
+			2:    'PH',
+			3:    'PH',
 			//4:    '',
-			5:    '_poi',
+			5:    'POI',
 			//6:    '',
-			//7:    '_head',
-			8:    ''
+			//7:    'head',
+			8:    'LDG'
 		};
 		
         return new ol.style.Style({
@@ -474,7 +493,19 @@ TABS.mission_control.initialize = function (callback) {
                 anchor: [0.5, 1],
                 opacity: 1,
                 scale: 0.5,
-                src: '../images/icons/cf_icon_position' + dictofPoint[_action] + (isEdit ? '_edit' : '')+ '.png'
+                src: '../images/icons/cf_icon_position' + (dictofPoint[_action] != '' ? '_'+dictofPoint[_action] : '') + (isEdit ? '_edit' : '')+ '.png'
+            })),
+			text: new ol.style.Text(({
+                text: String(Number(markerNumber)+1),
+				font: '12px sans-serif',
+				offsetY: -15,
+				offsetX: -2,
+				fill: new ol.style.Fill({
+					color: '#FFFFFF'
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#FFFFFF'
+				}),
             }))
         });
     }
@@ -487,7 +518,7 @@ TABS.mission_control.initialize = function (callback) {
             rainfall: 500
         });
 
-        iconFeature.setStyle(getPointIcon(_action));
+        iconFeature.setStyle(getPointIcon(_action, false, String(markers.length)));
 
         var vectorSource = new ol.source.Vector({
             features: [iconFeature]
@@ -732,7 +763,7 @@ TABS.mission_control.initialize = function (callback) {
         map.on('click', function (evt) {
             if (selectedMarker != null) {
                 try {
-                    selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action));
+                    selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action, false, selectedMarker.number));
                     selectedMarker = null;
                     clearEditForm();
                 } catch (e) {
@@ -761,7 +792,7 @@ TABS.mission_control.initialize = function (callback) {
                       var geometry = selectedFeature.getGeometry();
                       var coord = ol.proj.toLonLat(geometry.getCoordinates());
 
-                      selectedFeature.setStyle(getPointIcon(selectedMarker.action, true));
+                      selectedFeature.setStyle(getPointIcon(selectedMarker.action, true, selectedMarker.number));
 
                       var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.alt);
                       
@@ -775,6 +806,16 @@ TABS.mission_control.initialize = function (callback) {
 					  $('#pointP2').val(selectedMarker.parameter2);
 					  $('#pointP3').val(selectedMarker.parameter3);
 					  $('[name=Options]').filter('[value='+selectedMarker.options['key']+']').prop('checked', true);
+					  if (selectedMarker.options.key == "RTH") {
+						  $('#Options_LandRTH').prop('checked', selectedMarker.options.landAfter);
+					  }
+					  else if (selectedMarker.options.key == "JUMP") {
+						  $('#Options_TargetJUMP').val(selectedMarker.options.targetWP);
+						  $('#Options_NumberJUMP').val(selectedMarker.options.numRepeat);
+					  }
+					  else if (selectedMarker.options.key == "SET_HEAD") {
+						  $('#Options_HeadingHead').val(selectedMarker.options.heading);
+					  }
 					  // Selection box update depending on choice of type of waypoint
 					  for (var j in dictOfLabelParameterPoint[selectedMarker.action])
 					  {
@@ -785,10 +826,10 @@ TABS.mission_control.initialize = function (callback) {
 						}
 						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 					  }
-					  if ([1,2,3].includes(selectedMarker.action)) {
+					  if ([1,2,3,8].includes(selectedMarker.action)) {
 						  $('#pointOptionclass').fadeIn(300);
 					  }
-					  else {$('#pointOptionclass').fadeIn(300);}
+					  else {$('#pointOptionclass').fadeOut(300);}
                       $('#MPeditPoint').fadeIn(300);
                     }
                 }
@@ -881,7 +922,7 @@ TABS.mission_control.initialize = function (callback) {
                     }
                 });
 
-                selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action));
+                selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action, false, selectedMarker.number));
                 selectedMarker = null;
                 clearEditForm();
                 repaint();
@@ -1131,19 +1172,80 @@ TABS.mission_control.initialize = function (callback) {
             'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 'cy': (Math.round(center[1] * 10000000) / 10000000), 'zoom': zoom } },
             'missionitem': []
         };
-
+		// init secondary counter for real marker numbers taking into account JUMP, SET_HEAD, RTH insertion
+		var j = 1;
+		var nonMarkerPoint = [];
         for (var i = 0; i < markers.length; i++) {
             var geometry = markers[i].getSource().getFeatures()[0].getGeometry();
             var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
-            var point = { $: {
+            /*var point = { $: {
                 'no': (i + 1),
                 'action': ((markers[i].action == MWNP.WPTYPE.WAYPOINT) ? 'WAYPOINT' : markers[i].action),
                 'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
                 'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
                 'alt': (markers[i].alt / 100)
+            } };*/
+			var point = { $: {
+                'no': (j),
+                'action': MWNP.WPTYPE.REV[markers[i].action],
+                'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
+                'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
+                'alt': (markers[i].alt / 100),
+				'parameter1': markers[i].parameter1,
+				'parameter2': markers[i].parameter2,
+				'parameter3': markers[i].parameter3,
             } };
-            if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].parameter1 > 0)) point.$['parameter1'] = markers[i].parameter1; /*parameter1 = SpeedValue in this case*/
-            data.missionitem.push(point);
+            //if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].parameter1 > 0)) point.$['parameter1'] = markers[i].parameter1; /*parameter1 = SpeedValue in this case*/
+           data.missionitem.push(point);
+		   j++;
+		   if (markers[i].options.key == "JUMP") {
+			    nonMarkerPoint.push(i);
+			    console.log(nonMarkerPoint);
+				console.log(Number(markers[i].options.targetWP));
+			    console.log(getNumberOfNonMarkerForJump(nonMarkerPoint, Number(markers[i].options.targetWP)-1));
+				point = { $: {
+					'no': (j),
+					'action': 'JUMP',
+					'lon': 0,
+					'lat': 0,
+					'alt': 0,
+					'parameter1': String(Number(markers[i].options.targetWP)+getNumberOfNonMarkerForJump(nonMarkerPoint, Number(markers[i].options.targetWP)-1)),
+					'parameter2': markers[i].options.numRepeat,
+					'parameter3': 0
+				} };
+				data.missionitem.push(point);
+				j++;
+			}
+			else if (markers[i].options.key == "SET_HEAD") {
+				point = { $: {
+					'no': (j),
+					'action': 'SET_HEAD',
+					'lon': 0,
+					'lat': 0,
+					'alt': 0,
+					'parameter1': markers[i].options.heading,
+					'parameter2': 0,
+					'parameter3': 0
+				} };
+				data.missionitem.push(point);
+				nonMarkerPoint.push(i);
+				j++;
+			}
+			else if (markers[i].options.key == "RTH") {
+				point = { $: {
+					'no': (j),
+					'action': 'RTH',
+					'lon': 0,
+					'lat': 0,
+					'alt': (markers[i].alt / 100),
+					'parameter1': (markers[i].options.landAfter) ? 1: 0,
+					'parameter2': 0,
+					'parameter3': 0
+				} };
+				data.missionitem.push(point);
+				nonMarkerPoint.push(i);
+				j++;
+			};
         }
 
         // add last RTH point
@@ -1161,6 +1263,20 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log('File saved');
         });
     }
+
+	function getNumberOfNonMarkerForJump(nonMarkerPointList, numTargetMarker) {
+		console.log(nonMarkerPointList.length);
+		for (i = 0; i < nonMarkerPointList.length; i++) {
+			console.log(String(nonMarkerPointList[i+1])+" "+String(nonMarkerPointList[i]));
+		    if (numTargetMarker<=nonMarkerPointList[i+1] && numTargetMarker>nonMarkerPointList[i]) {
+				console.log(i+1);
+			    return i+1;
+		    }
+			else {
+				return 0;
+			}
+		}
+	}
 
     function getPointsFromEprom() {
         pointForSend = 0;
