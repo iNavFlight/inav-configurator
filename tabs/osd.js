@@ -1190,15 +1190,10 @@ OSD.constants = {
                     name: 'PLUS_CODE',
                     id: 97,
                     preview: function() {
-                        var pluscodeformat;
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digitsRemoved = parseInt(Settings.getInputValue('osd_plus_code_type')) * 2;
                         console.log("DITIS", digits);
-                        if (Settings.getInputValue('osd_plus_code_type') == 0) {
-                            pluscodeformat = '9547X6PM+VWCCC'.substr(0, digits);
-                        } else {
-                            pluscodeformat = 'X6PM+VWCCC'.substr(0, digits-4);
-                        }
-                        return pluscodeformat;
+                        return '9547X6PM+VWCCC'.substr(digitsRemoved, digits-digitsRemoved);
                     }
                 },
                 {
