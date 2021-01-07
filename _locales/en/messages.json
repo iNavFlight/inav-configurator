@@ -698,8 +698,8 @@
     "configurationThrottleMinimumCommand": {
         "message": "Minimum Command"
     },
-    "configurationBatteryVoltage": {
-        "message": "Battery Voltage"
+    "configurationVoltageCurrentSensor": {
+        "message": "Voltage and Current Sensors"
     },
     "configurationBatteryCurrent": {
         "message": "Battery Current"
@@ -734,10 +734,13 @@
     "configurationBatteryScale": {
         "message": "Voltage Scale"
     },
-    "configurationCurrent": {
-        "message": "Current Sensor"
+    "configurationBatteryVoltage": {
+        "message": "Battery Voltage"
     },
     "configurationCurrentScale": {
+        "message": "Current Meter Scale"
+    },
+    "configurationCurrentScaleHelp": {
         "message": "Scale the output voltage to milliamps [1/10th mV/A]"
     },
     "configurationCurrentOffset": {
@@ -746,8 +749,11 @@
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
-    "configurationBatteryCapacity": {
-        "message": "Battery Capacity"
+    "configurationBatterySettings": {
+        "message": "Battery Settings"
+    },
+    "configurationBatterySettingsHelp": {
+        "message": "These settings apply to the currently selected battery profile "
     },
     "configurationBatteryCapacityValue": {
         "message": "Capacity"
