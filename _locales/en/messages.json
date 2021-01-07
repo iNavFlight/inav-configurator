@@ -2561,10 +2561,10 @@
         "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
     },
     "pitchToThrottleThreshold": {
-        "message": "Instantaneous pitch adjustment threshold [centidegrees]"
+        "message": "Instantaneous throttle adjustment threshold [centidegrees]"
     },
     "pitchToThrottleThresholdHelp": {
-        "message": "The autopilot will instantly adjust the throttle level according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
+        "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
     },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
