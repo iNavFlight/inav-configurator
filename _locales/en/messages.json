@@ -3585,5 +3585,11 @@
     },
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
+    },
+	"MissionPlannerJumpSettingsCheck": {
+        "message": "JUMP settings incorrect : Check it again !"
+    },
+	"MissionPlannerHeadSettingsCheck": {
+        "message": "Heading value is incorrect : Check it again !"
     }
 }

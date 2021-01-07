@@ -15,6 +15,7 @@ MWNP.WPTYPE = {
     LAND:         8
 };
 
+// Reverse WayPoint type dictionary
 MWNP.WPTYPE.REV = {
     1:     'WAYPOINT',
     2:     'PH_UNLIM',
@@ -26,7 +27,7 @@ MWNP.WPTYPE.REV = {
     8:         'LAND'
 };
 
-// Dictionary of Parameter1,2,3 depending on type of action selected (refer to MWNP.WPTYPE)
+// Dictionary of Parameter1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
 	1: 	  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: ''},
 	2:    {parameter1: '', parameter2: '', parameter3: ''},
@@ -328,6 +329,7 @@ TABS.mission_control.initialize = function (callback) {
     var pointForSend = 0;
     var settings = { speed: 0, alt: 5000};
 
+	// Function to clear/reinit Jquery variable 
     function clearEditForm() {
         $('#pointLat').val('');
         $('#pointLon').val('');
@@ -349,7 +351,6 @@ TABS.mission_control.initialize = function (callback) {
             if (result.missionPlanerSettings) {
                 settings = result.missionPlanerSettings;
             }
-
             refreshSettings();
         });
     }
@@ -363,6 +364,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#MPdefaultPointSpeed').val(settings.speed);
     }
 
+	// Function to repaint lines between markers 
     function repaint() {
         var oldPos;
 		var oldAction;
@@ -373,16 +375,15 @@ TABS.mission_control.initialize = function (callback) {
 		var activateHead = false;
 		var oldHeading;
 		var xmlItemNumber = 0;
+		
         for (var i in lines) {
             map.removeLayer(lines[i]);
         }
         lines = [];
 		poiList = [];
         $('#missionDistance').text(0);
-		//console.log(markers)
 
         map.getLayers().forEach(function (t) {
-            //feature.getGeometry().getType()
             if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined') {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
 				var action = t.action;
@@ -395,9 +396,11 @@ TABS.mission_control.initialize = function (callback) {
 					activatePoi = true;
 				}
 				else {
+					// If classic WPs, draw standard line in-between 
 					if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead != true){
 						paintLine(oldPos, geometry.getCoordinates());
 					}
+					// If one is POI, draw orange line in-between and modulate dashline each time a new POI is defined
 					else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
 						if ((lengthPoiList % 2) == 0) {
 							paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
@@ -406,15 +409,17 @@ TABS.mission_control.initialize = function (callback) {
 							paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
 						}
 					}
+					// If one is SET_HEAD, draw labelled line in-between with heading value
 					else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
 						console.log(oldHeading);
 						paintLine(oldPos, geometry.getCoordinates(), '#1497f1', 0, lineText=String(oldHeading)+"°");
 					}
 					
-					
+					// If classic WPs is defined with a JUMP options, draw pink dashed line in-between 
 					if (options.key == "JUMP") {
 						paintLine(geometry.getCoordinates(), markers[options.targetWP-1].getSource().getFeatures()[0].getGeometry().getCoordinates(), '#e935d6', 5, "Repeat x"+String(options.numRepeat));
 					}
+					// If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
 					else if (options.key == "SET_HEAD") {
 						if (options.heading == "-1") {
 							activatePoi = false;
@@ -426,10 +431,8 @@ TABS.mission_control.initialize = function (callback) {
 							oldHeading = options.heading
 						}
 					}
-					
 					oldPos = geometry.getCoordinates();
 				}
-
             }
         });
         //reset text position
@@ -437,7 +440,8 @@ TABS.mission_control.initialize = function (callback) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
     }
-
+	
+	// function modified to tale into account optional arguement such color, linedash and line label 
     function paintLine(pos1, pos2, color='#1497f1', lineDash=0, lineText="") {
         var line = new ol.geom.LineString([pos1, pos2]);
 
@@ -475,7 +479,8 @@ TABS.mission_control.initialize = function (callback) {
 
         map.addLayer(vectorLayer);
     }
-
+	
+	// Function modified to add action name and marker numbering to help changing icon depending on those items
     function getPointIcon(_action, isEdit, markerNumber='') {
 		var dictofPoint = {
 			1: 	  'WP',
@@ -510,6 +515,7 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
+	// Function modified by adding parameter 1,2,3 needed in MSP, plus options dictionary to take into account WP behavior changer such as JUMP, SET_HEAD, RTH
     function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0, _options={key: "None"}) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
@@ -826,7 +832,9 @@ TABS.mission_control.initialize = function (callback) {
 						}
 						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 					  }
-					  if ([1,2,3,8].includes(selectedMarker.action)) {
+					  console.log(selectedMarker.action);
+					  console.log(typeof selectedMarker.action);
+					  if ([1,2,3,8].includes(selectedMarker.action) || ['1','2','3','8'].includes(selectedMarker.action)) {
 						  $('#pointOptionclass').fadeIn(300);
 					  }
 					  else {$('#pointOptionclass').fadeOut(300);}
@@ -905,15 +913,30 @@ TABS.mission_control.initialize = function (callback) {
 										};
 						}
 						else if ($('input[name=Options]:checked').val() == "JUMP") {
-							t.options = {key: $('input[name=Options]:checked').val(),
+							console.log(Array.from({length: markers.length}, (v, i) => i+1));
+							console.log($('#Options_TargetJUMP').val());
+							console.log(typeof $('#Options_TargetJUMP').val());
+							if (!Array.from({length: markers.length}, (v, i) => i+1).includes(Number($('#Options_TargetJUMP').val())) || (Number($('#Options_NumberJUMP').val())<0 || Number($('#Options_NumberJUMP').val())>99)) {
+								alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'))
+								t.options = {key: 'None'}
+							}
+							else {
+								t.options = {key: $('input[name=Options]:checked').val(),
 										 targetWP: $('#Options_TargetJUMP').val(),
 										 numRepeat: $('#Options_NumberJUMP').val()
 										};
+							}
 						}
 						else if ($('input[name=Options]:checked').val() == "SET_HEAD") {
-							t.options = {key: $('input[name=Options]:checked').val(),
+							if ($('#Options_HeadingHead').val()>360 || ($('#Options_HeadingHead').val()<0 && $('#Options_HeadingHead').val() !=-1)) {
+								alert(chrome.i18n.getMessage('MissionPlannerHeadSettingsCheck'))
+								t.options = {key: 'None'}
+							}
+							else {
+								t.options = {key: $('input[name=Options]:checked').val(),
 										 heading: $('#Options_HeadingHead').val()
 										};
+							}
 						}
 						else {
 							t.options = {key: $('input[name=Options]:checked').val()}
@@ -1128,22 +1151,45 @@ TABS.mission_control.initialize = function (callback) {
 
                 // draw actual mission
                 removeAllPoints();
+				console.log(mission);
                 for (var i = 0; i < mission.points.length; i++) {
-                    //if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND].includes(mission.points[i].action)) {
-                    if (mission.points[i].action == MWNP.WPTYPE.WAYPOINT) {
-                        var coord = ol.proj.fromLonLat([mission.points[i].lon, mission.points[i].lat]);
-                        map.addLayer(addMarker(coord, mission.points[i].alt, mission.points[i].action, mission.points[i].p1));
-                        if (i == 0) {
-                            map.getView().setCenter(coord);
-                            map.getView().setZoom(16);
-                        }
-                    } else if (mission.points[i].action == MWNP.WPTYPE.RTH) {
-                        $('#rthEndMission').prop('checked', true);
-                        $('#rthSettings').fadeIn(300);
-                        if (mission.points[i].p1 > 0) {
-                            $('#rthLanding').prop('checked', true);
-                        }
-                    }
+                    if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND, MWNP.WPTYPE.SET_POI].includes(mission.points[i].action)) {
+						if (i < mission.points.length-1) {
+							var coord = ol.proj.fromLonLat([mission.points[i].lon, mission.points[i].lat]);
+							if (mission.points[i+1].action == MWNP.WPTYPE.SET_HEAD) {
+								var options = {key: 'SET_HEAD',
+											 heading: mission.points[i+1].p1
+											};
+							}
+							else if (mission.points[i+1].action == MWNP.WPTYPE.JUMP) {
+								var options = {key: 'JUMP',
+										 targetWP: mission.points[i+1].p1,
+										 numRepeat: mission.points[i+1].p2
+										};
+							}
+							else if (mission.points[i+1].action == MWNP.WPTYPE.RTH) {
+								var options = {key: 'RTH',
+										 landAfter: mission.points[i+1].p1
+										};
+							}
+							else {
+								var options = {key: 'None'};
+							}
+							map.addLayer(addMarker(coord, mission.points[i].alt, mission.points[i].action, mission.points[i].p1, mission.points[i].p2, mission.points[i].p3, options));
+							if (i == 0) {
+								map.getView().setCenter(coord);
+								map.getView().setZoom(16);
+							}
+						}
+						else {
+							var coord = ol.proj.fromLonLat([mission.points[i].lon, mission.points[i].lat]);
+							map.addLayer(addMarker(coord, mission.points[i].alt, mission.points[i].action, mission.points[i].p1, mission.points[i].p2, mission.points[i].p3));
+							if (i == 0) {
+								map.getView().setCenter(coord);
+								map.getView().setZoom(16);
+							}
+						}
+					}
                 }
 
                 if (mission.center) {
