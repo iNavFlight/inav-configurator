@@ -1191,8 +1191,9 @@ OSD.constants = {
                     id: 97,
                     preview: function() {
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digitsRemoved = parseInt(Settings.getInputValue('osd_plus_code_short')) * 2;
                         console.log("DITIS", digits);
-                        return '9547X6PM+VWCCC'.substr(0, digits);
+                        return '9547X6PM+VWCCC'.substr(digitsRemoved, digits-digitsRemoved);
                     }
                 },
                 {
