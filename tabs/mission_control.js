@@ -626,7 +626,41 @@ TABS.mission_control.initialize = function (callback) {
 
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
+		
+		 /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerTemplateControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
 
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#MPeditPoint, #missionPalnerTotalInfo', '#missionPlanerSettings').hide();
+                $('#missionPlanerSettings').fadeIn(300);
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-template ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP Template';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerTemplateControl, ol.control.Control);
+
+		
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `true` to start the drag sequence.
@@ -729,7 +763,8 @@ TABS.mission_control.initialize = function (callback) {
                     collapsible: false
                 }
             }).extend([
-                new app.PlannerSettingsControl()
+                new app.PlannerSettingsControl(),
+				new app.PlannerTemplateControl()
             ]),
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
@@ -813,6 +848,7 @@ TABS.mission_control.initialize = function (callback) {
 					  $('#pointP3').val(selectedMarker.parameter3);
 					  $('[name=Options]').filter('[value='+selectedMarker.options['key']+']').prop('checked', true);
 					  if (selectedMarker.options.key == "RTH") {
+						  console.log(selectedMarker.options.landAfter);
 						  $('#Options_LandRTH').prop('checked', selectedMarker.options.landAfter);
 					  }
 					  else if (selectedMarker.options.key == "JUMP") {
@@ -909,7 +945,7 @@ TABS.mission_control.initialize = function (callback) {
 						t.P3Value = $('#pointP3').val();
 						if ($('input[name=Options]:checked').val() == "RTH") {
 							t.options = {key: $('input[name=Options]:checked').val(),
-										 landAfter: $('#Options_LandRTH').val()
+										 landAfter: $('#Options_LandRTH').prop('checked')
 										};
 						}
 						else if ($('input[name=Options]:checked').val() == "JUMP") {
@@ -999,13 +1035,13 @@ TABS.mission_control.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
         });
 
-        $('#rthEndMission').on('change', function () {
+        /*$('#rthEndMission').on('change', function () {
             if ($(this).is(':checked')) {
                 $('#rthSettings').fadeIn(300);
             } else {
                 $('#rthSettings').fadeOut(300);
             }
-        });
+        });*/
 
         $('#saveSettings').on('click', function () {
             settings = { speed: $('#MPdefaultPointSpeed').val(), alt: $('#MPdefaultPointAlt').val() };
@@ -1054,9 +1090,9 @@ TABS.mission_control.initialize = function (callback) {
         markers = [];
         clearEditForm();
         updateTotalInfo();
-        $('#rthEndMission').prop('checked', false);
+        /*$('#rthEndMission').prop('checked', false);
         $('#rthSettings').fadeOut(300);
-        $('#rthLanding').prop('checked', false);
+        $('#rthLanding').prop('checked', false);*/
         repaint();
     }
 
@@ -1295,9 +1331,9 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         // add last RTH point
-        if ($('#rthEndMission').is(':checked')) {
+        /*if ($('#rthEndMission').is(':checked')) {
             data.missionitem.push({ $: { 'no': (markers.length + 1), 'action': 'RTH', 'lon': 0, 'lat': 0, 'alt': (settings.alt / 100), 'parameter1': ($('#rthLanding').is(':checked') ? 1 : 0) } });
-        }
+        }*/
 
         var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
@@ -1347,7 +1383,7 @@ TABS.mission_control.initialize = function (callback) {
             // console.log(MISSION_PLANER.bufferPoint.lat);
             // console.log(MISSION_PLANER.bufferPoint.alt);
             // console.log(MISSION_PLANER.bufferPoint.action);
-            if (MISSION_PLANER.bufferPoint.action == 4) {
+            /*if (MISSION_PLANER.bufferPoint.action == 4) {
                 $('#rthEndMission').prop('checked', true);
                 $('#rthSettings').fadeIn(300);
                 if (MISSION_PLANER.bufferPoint.p1 > 0) {
@@ -1359,7 +1395,12 @@ TABS.mission_control.initialize = function (callback) {
                 if (pointForSend === 1) {
                     map.getView().setCenter(coord);
                 }
-            }
+            */
+			var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+			map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action, MISSION_PLANER.bufferPoint.p1));
+			if (pointForSend === 1) {
+				map.getView().setCenter(coord);
+			}
         }
 
         if (pointForSend >= MISSION_PLANER.countBusyPoints) {
@@ -1375,10 +1416,10 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function sendNextPoint() {
-        var isRTH = $('#rthEndMission').is(':checked');
-
+        //var isRTH = $('#rthEndMission').is(':checked');
+		console.log(pointForSend);
         if (pointForSend >= markers.length) {
-            if (isRTH) {
+            /*if (isRTH) {
                 MISSION_PLANER.bufferPoint.number = pointForSend + 1;
                 MISSION_PLANER.bufferPoint.action = 4;
                 MISSION_PLANER.bufferPoint.lon = 0;
@@ -1389,7 +1430,8 @@ TABS.mission_control.initialize = function (callback) {
                 MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, endSendPoint);
             } else {
                 endSendPoint();
-            }
+            }*/
+			endSendPoint();
 
             return;
         }
@@ -1403,6 +1445,8 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
         MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
         MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
+		MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].parameter2;
+		MISSION_PLANER.bufferPoint.p3 = markers[pointForSend].parameter3;
         pointForSend++;
         if (pointForSend >= markers.length && !isRTH) {
             MISSION_PLANER.bufferPoint.endMission = 0xA5;

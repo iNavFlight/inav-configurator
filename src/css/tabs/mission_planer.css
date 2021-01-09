@@ -18,7 +18,7 @@
     line-height: 28px;
     margin: 5px;
     float: left;
-    width: 90px;
+    width: 80px;
     text-align: center;
 }
 
@@ -43,7 +43,12 @@
     opacity: 0.5;
 }
 
-.tab-mission-control .btn-danger a {
+.tab-mission-control .btn-danger_long a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+	width: 100%;
+}
+.tab-mission-control .btn-danger_short a {
     background-color: #db250e;
     border: 1px solid #b5480e;
 }
@@ -159,6 +164,14 @@
 }
 .ol-touch .mission-control-settings {
     top: 80px;
+}
+
+.mission-control-template {
+    top: 85px;
+    left: .5em;
+}
+.ol-touch .mission-control-template {
+    top: 100px;
 }
 
 .tab-mission-control .missionTable {
