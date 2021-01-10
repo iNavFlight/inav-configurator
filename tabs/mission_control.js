@@ -607,7 +607,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#MPeditPoint, #missionPalnerTotalInfo').hide();
+                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate').hide();
                 $('#missionPlanerSettings').fadeIn(300);
             };
 
@@ -627,25 +627,26 @@ TABS.mission_control.initialize = function (callback) {
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
 		
+		
 		 /**
          * @constructor
          * @extends {ol.control.Control}
          * @param {Object=} opt_options Control options.
          */
-        app.PlannerTemplateControl = function (opt_options) {
+        /*app.PlannerTemplateControl = function (opt_options) {
             var options = opt_options || {};
             var button = document.createElement('button');
 
             button.innerHTML = ' ';
-            button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+            button.style = 'background: url(\'../images/CF_template_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
-            var handleShowSettings = function () {
-                $('#MPeditPoint, #missionPalnerTotalInfo', '#missionPlanerSettings').hide();
-                $('#missionPlanerSettings').fadeIn(300);
+            var handleShowTemplate = function () {
+                $('#MPeditPoint, #missionPlanerTotalInfo', '#missionPlanerSettings').hide();
+                $('#missionPlanerTemplate').fadeIn(300);
             };
 
-            button.addEventListener('click', handleShowSettings, false);
-            button.addEventListener('touchstart', handleShowSettings, false);
+            button.addEventListener('click', handleShowTemplate, false);
+            button.addEventListener('touchstart', handleShowTemplate, false);
 
             var element = document.createElement('div');
             element.className = 'mission-control-template ol-unselectable ol-control';
@@ -659,7 +660,7 @@ TABS.mission_control.initialize = function (callback) {
 
         };
         ol.inherits(app.PlannerTemplateControl, ol.control.Control);
-
+		*/
 		
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
@@ -764,7 +765,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
             }).extend([
                 new app.PlannerSettingsControl(),
-				new app.PlannerTemplateControl()
+				//new app.PlannerTemplateControl()
             ]),
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
@@ -847,6 +848,7 @@ TABS.mission_control.initialize = function (callback) {
 					  $('#pointP2').val(selectedMarker.parameter2);
 					  $('#pointP3').val(selectedMarker.parameter3);
 					  $('[name=Options]').filter('[value='+selectedMarker.options['key']+']').prop('checked', true);
+					  // Manage RTH, JUMP, SET_HEAD options for WP
 					  if (selectedMarker.options.key == "RTH") {
 						  console.log(selectedMarker.options.landAfter);
 						  $('#Options_LandRTH').prop('checked', selectedMarker.options.landAfter);
@@ -868,8 +870,6 @@ TABS.mission_control.initialize = function (callback) {
 						}
 						else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
 					  }
-					  console.log(selectedMarker.action);
-					  console.log(typeof selectedMarker.action);
 					  if ([1,2,3,8].includes(selectedMarker.action) || ['1','2','3','8'].includes(selectedMarker.action)) {
 						  $('#pointOptionclass').fadeIn(300);
 					  }
@@ -931,7 +931,8 @@ TABS.mission_control.initialize = function (callback) {
                 repaint();
             }
         });
-
+		
+		// SavePoint function updated to take into account P1 to P3 parameter and JUMP,RTH, SET_HEAD options for WP
         $('#savePoint').on('click', function () {
             if (selectedMarker) {
                 map.getLayers().forEach(function (t) {
@@ -940,18 +941,23 @@ TABS.mission_control.initialize = function (callback) {
                         geometry.setCoordinates(ol.proj.fromLonLat([parseFloat($('#pointLon').val()), parseFloat($('#pointLat').val())]));
                         t.alt = $('#pointAlt').val();
                         t.action = $('#pointType').val();
-                        t.P1Value = $('#pointP1').val();
-						t.P2Value = $('#pointP2').val();
-						t.P3Value = $('#pointP3').val();
+						console.log(typeof t.action);
+						if (t.action == '5' || t.action == '2' || t.action == '8') {
+							t.P1Value = 0;
+							t.P2Value = 0;
+							t.P3Value = 0;
+						}
+						else {
+							t.P1Value = $('#pointP1').val();
+							t.P2Value = $('#pointP2').val();
+							t.P3Value = $('#pointP3').val();
+						}
 						if ($('input[name=Options]:checked').val() == "RTH") {
 							t.options = {key: $('input[name=Options]:checked').val(),
 										 landAfter: $('#Options_LandRTH').prop('checked')
 										};
 						}
 						else if ($('input[name=Options]:checked').val() == "JUMP") {
-							console.log(Array.from({length: markers.length}, (v, i) => i+1));
-							console.log($('#Options_TargetJUMP').val());
-							console.log(typeof $('#Options_TargetJUMP').val());
 							if (!Array.from({length: markers.length}, (v, i) => i+1).includes(Number($('#Options_TargetJUMP').val())) || (Number($('#Options_NumberJUMP').val())<0 || Number($('#Options_NumberJUMP').val())>99)) {
 								alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'))
 								t.options = {key: 'None'}
@@ -977,7 +983,6 @@ TABS.mission_control.initialize = function (callback) {
 						else {
 							t.options = {key: $('input[name=Options]:checked').val()}
 						}
-						console.log(t.options);
                     }
                 });
 
@@ -1034,7 +1039,8 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
             MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
         });
-
+		
+		// RTH missions commented as integrated into WP options direclty
         /*$('#rthEndMission').on('change', function () {
             if ($(this).is(':checked')) {
                 $('#rthSettings').fadeIn(300);
@@ -1053,6 +1059,7 @@ TABS.mission_control.initialize = function (callback) {
             loadSettings();
             closeSettingsPanel();
         });
+		
 		
 		// Add function to update parameter i field in the selected Edit WP Box
 		$('#pointType').on('change', function () {
@@ -1077,7 +1084,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function closeSettingsPanel() {
         $('#missionPlanerSettings').hide();
-        $('#missionPalnerTotalInfo').fadeIn(300);
+        $('#missionPlanerTotalInfo').fadeIn(300);
         if (selectedMarker !== null) {
             $('#MPeditPoint').fadeIn(300);
         }
@@ -1090,6 +1097,7 @@ TABS.mission_control.initialize = function (callback) {
         markers = [];
         clearEditForm();
         updateTotalInfo();
+		// RTH section commented as RTH options is integrated into WP box
         /*$('#rthEndMission').prop('checked', false);
         $('#rthSettings').fadeOut(300);
         $('#rthLanding').prop('checked', false);*/
@@ -1187,7 +1195,7 @@ TABS.mission_control.initialize = function (callback) {
 
                 // draw actual mission
                 removeAllPoints();
-				console.log(mission);
+				// Updated code to take into account WP options (JUMP, SET_HEAD, RTH)
                 for (var i = 0; i < mission.points.length; i++) {
                     if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND, MWNP.WPTYPE.SET_POI].includes(mission.points[i].action)) {
 						if (i < mission.points.length-1) {
@@ -1260,31 +1268,36 @@ TABS.mission_control.initialize = function (callback) {
         for (var i = 0; i < markers.length; i++) {
             var geometry = markers[i].getSource().getFeatures()[0].getGeometry();
             var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
-            /*var point = { $: {
-                'no': (i + 1),
-                'action': ((markers[i].action == MWNP.WPTYPE.WAYPOINT) ? 'WAYPOINT' : markers[i].action),
-                'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
-                'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
-                'alt': (markers[i].alt / 100)
-            } };*/
-			var point = { $: {
-                'no': (j),
-                'action': MWNP.WPTYPE.REV[markers[i].action],
-                'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
-                'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
-                'alt': (markers[i].alt / 100),
-				'parameter1': markers[i].parameter1,
-				'parameter2': markers[i].parameter2,
-				'parameter3': markers[i].parameter3,
-            } };
-            //if ((markers[i].action == MWNP.WPTYPE.WAYPOINT) && (markers[i].parameter1 > 0)) point.$['parameter1'] = markers[i].parameter1; /*parameter1 = SpeedValue in this case*/
-           data.missionitem.push(point);
-		   j++;
+			if (markers[i].action == '5' || markers[i].action == '2'  || markers[i].action == '8'  ) {
+				var point = { $: {
+					'no': (j),
+					'action': MWNP.WPTYPE.REV[markers[i].action],
+					'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
+					'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
+					'alt': (markers[i].alt / 100),
+					'parameter1': 0,
+					'parameter2': 0,
+					'parameter3': 0,
+				} };
+			   data.missionitem.push(point);
+			   j++;
+			}
+			else {
+				var point = { $: {
+					'no': (j),
+					'action': MWNP.WPTYPE.REV[markers[i].action],
+					'lon': (Math.round(coordinate[0] * 10000000) / 10000000),
+					'lat': (Math.round(coordinate[1] * 10000000) / 10000000),
+					'alt': (markers[i].alt / 100),
+					'parameter1': markers[i].parameter1,
+					'parameter2': markers[i].parameter2,
+					'parameter3': markers[i].parameter3,
+				} };
+			   data.missionitem.push(point);
+			   j++;
+			}
 		   if (markers[i].options.key == "JUMP") {
 			    nonMarkerPoint.push(i);
-			    console.log(nonMarkerPoint);
-				console.log(Number(markers[i].options.targetWP));
-			    console.log(getNumberOfNonMarkerForJump(nonMarkerPoint, Number(markers[i].options.targetWP)-1));
 				point = { $: {
 					'no': (j),
 					'action': 'JUMP',
@@ -1330,7 +1343,7 @@ TABS.mission_control.initialize = function (callback) {
 			};
         }
 
-        // add last RTH point
+        // add last RTH point - Section commented as RTH is directly integrated as a WP options
         /*if ($('#rthEndMission').is(':checked')) {
             data.missionitem.push({ $: { 'no': (markers.length + 1), 'action': 'RTH', 'lon': 0, 'lat': 0, 'alt': (settings.alt / 100), 'parameter1': ($('#rthLanding').is(':checked') ? 1 : 0) } });
         }*/
@@ -1345,13 +1358,10 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log('File saved');
         });
     }
-
+	// New function to get number of Non Marker point such as JUMP, SET_HEAD and RTH
 	function getNumberOfNonMarkerForJump(nonMarkerPointList, numTargetMarker) {
-		console.log(nonMarkerPointList.length);
 		for (i = 0; i < nonMarkerPointList.length; i++) {
-			console.log(String(nonMarkerPointList[i+1])+" "+String(nonMarkerPointList[i]));
 		    if (numTargetMarker<=nonMarkerPointList[i+1] && numTargetMarker>nonMarkerPointList[i]) {
-				console.log(i+1);
 			    return i+1;
 		    }
 			else {
