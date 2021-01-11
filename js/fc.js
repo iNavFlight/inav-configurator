@@ -1309,7 +1309,7 @@ var FC = {
             4: {
                 name: "Logic Condition",
                 type: "range",
-                range: [0, 15],
+                range: [0, 31],
                 default: 0
             },
             5: {
