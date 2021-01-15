@@ -1448,17 +1448,73 @@ TABS.mission_control.initialize = function (callback) {
 
         var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
         var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
-
-        MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-        MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
-        MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
-        MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
-        MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-        MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
-		MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].parameter2;
-		MISSION_PLANER.bufferPoint.p3 = markers[pointForSend].parameter3;
-        pointForSend++;
-        if (pointForSend >= markers.length && !isRTH) {
+		
+		
+		if (markers[pointForSend].action == '5' || markers[pointForSend].action == '2'  || markers[pointForSend].action == '8'  ) {
+			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+			MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
+			MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
+			MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
+			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+			MISSION_PLANER.bufferPoint.p1 = 0;
+			MISSION_PLANER.bufferPoint.p2 = 0;
+			MISSION_PLANER.bufferPoint.p3 = 0;
+			pointForSend++;
+		}
+		else {
+			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+			MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
+			MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
+			MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
+			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+			MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
+			MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].parameter2;
+			MISSION_PLANER.bufferPoint.p3 = markers[pointForSend].parameter3;
+			pointForSend++;
+		}
+		if (markers[pointForSend].options.key == "JUMP") {
+			nonMarkerPoint.push(pointForSend);
+			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
+			MISSION_PLANER.bufferPoint.lon = 0;
+			MISSION_PLANER.bufferPoint.lat = 0;
+			MISSION_PLANER.bufferPoint.alt = 0;
+			MISSION_PLANER.bufferPoint.p1 = Number(markers[pointForSend].options.targetWP)+getNumberOfNonMarkerForJump(nonMarkerPoint, Number(markers[pointForSend].options.targetWP)-1);
+			MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].options.numRepeat;
+			MISSION_PLANER.bufferPoint.p3 = 0;
+			pointForSend++;
+		}
+		else if (markers[pointForSend].options.key == "SET_HEAD") {
+			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
+			MISSION_PLANER.bufferPoint.lon = 0;
+			MISSION_PLANER.bufferPoint.lat = 0;
+			MISSION_PLANER.bufferPoint.alt = 0;
+			MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].options.heading;
+			MISSION_PLANER.bufferPoint.p2 = 0;
+			MISSION_PLANER.bufferPoint.p3 = 0;
+			pointForSend++;
+			nonMarkerPoint.push(pointForSend);
+		}
+		else if (markers[pointForSend].options.key == "RTH") {
+			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
+			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
+			MISSION_PLANER.bufferPoint.lon = 0;
+			MISSION_PLANER.bufferPoint.lat = 0;
+			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+			MISSION_PLANER.bufferPoint.p1 = (markers[pointForSend].options.landAfter) ? 1: 0;
+			MISSION_PLANER.bufferPoint.p2 = 0;
+			MISSION_PLANER.bufferPoint.p3 = 0;
+			pointForSend++;
+			nonMarkerPoint.push(pointForSend);
+		};
+		
+/*         if (pointForSend >= markers.length && !isRTH) {
+            MISSION_PLANER.bufferPoint.endMission = 0xA5;
+        } else {
+            MISSION_PLANER.bufferPoint.endMission = 0;
+        } */
+		if (pointForSend >= markers.length && !isRTH) {
             MISSION_PLANER.bufferPoint.endMission = 0xA5;
         } else {
             MISSION_PLANER.bufferPoint.endMission = 0;
