@@ -11,7 +11,7 @@ helper.defaultsDialog = (function() {
     let $container;
 
     let data = [{
-            "title": 'Mini Quad with 3"-7" propellers',
+            "title": chrome.i18n.getMessage('defaultsQuadTitle'),
             "notRecommended": false,
             "reboot": true,
             "settings": [
@@ -184,7 +184,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Airplane',
+            "title": chrome.i18n.getMessage('defaultsAirplaneTitle'),
             "notRecommended": false,
             "id": 3,
             "reboot": true,
@@ -282,7 +282,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Rovers & Boats',
+            "title": chrome.i18n.getMessage('defaultsRoversBoatsTitle'),
             "notRecommended": false,
             "reboot": true,
             "settings": [
@@ -345,7 +345,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
+            "title": chrome.i18n.getMessage('defaultsCustomUAVTitle'),
             "notRecommended": true,
             "reboot": false,
             "settings": [
@@ -360,7 +360,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Keep current settings (Not recommended)',
+            "title": chrome.i18n.getMessage('defaultsKeepCurrentTitle'),
             "notRecommended": true,
             "reboot": false,
             "settings": [

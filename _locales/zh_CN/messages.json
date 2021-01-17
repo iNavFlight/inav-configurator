@@ -3655,5 +3655,20 @@
   },
   "logActionShow": {
     "message": "显示日志"
+  },
+  "defaultsQuadTitle": {
+    "message": "迷你四轴飞行器，3“-7”螺旋桨"
+  },
+  "defaultsAirplaneTitle": {
+    "message": "飞机"
+  },
+  "defaultsRoversBoatsTitle": {
+    "message": "探测器和船"
+  },
+  "defaultsCustomUAVTitle": {
+    "message": "自定义无人机- INAV遗留默认值(不推荐)"
+  },
+  "defaultsKeepCurrentTitle": {
+    "message": "保持当前设置(不推荐)"
   }
 }

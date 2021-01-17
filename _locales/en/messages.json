@@ -3609,5 +3609,20 @@
     },
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
+    },
+    "defaultsQuadTitle": {
+        "message": "Mini Quad with 3'-7' propellers"
+    },
+    "defaultsAirplaneTitle": {
+        "message": "Airplane"
+    },
+    "defaultsRoversBoatsTitle": {
+        "message": "Rovers & Boats"
+    },
+    "defaultsCustomUAVTitle": {
+        "message": "Custom UAV - INAV legacy defaults (Not recommended)"
+    },
+    "defaultsKeepCurrentTitle": {
+        "message": "Keep current settings (Not recommended)"
     }
 }
