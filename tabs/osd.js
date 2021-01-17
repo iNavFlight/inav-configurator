@@ -772,6 +772,11 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
+                },
+                {
+                    name: 'VERSION',
+                    id: 119,
+                    preview: 'INAV 2.7.0'
                 }
             ]
         },
@@ -1186,8 +1191,9 @@ OSD.constants = {
                     id: 97,
                     preview: function() {
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digitsRemoved = parseInt(Settings.getInputValue('osd_plus_code_short')) * 2;
                         console.log("DITIS", digits);
-                        return '9547X6PM+VWCCC'.substr(0, digits);
+                        return '9547X6PM+VWCCC'.substr(digitsRemoved, digits-digitsRemoved);
                     }
                 },
                 {
@@ -1360,7 +1366,15 @@ OSD.constants = {
                     name: 'CRSF_LQ',
                     id: 110,
                     positionable: true,
-                    preview: '2:100%',
+                    preview: function(osd_data) {
+                    var crsflqformat;
+                    if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
+                        crsflqformat = '2:100%';
+                    } else {
+                        crsflqformat = '  300%';
+                    }
+                    return crsflqformat;
+                    }
                 },
                 {
                     name: 'CRSF_SNR_DB',
@@ -1532,6 +1546,16 @@ OSD.constants = {
                     name: 'FW_MIN_THROTTLE_DOWN_PITCH_ANGLE',
                     id: 77,
                     preview: '0TP  ' + FONT.embed_dot('4.5')
+                },
+                {
+                    name: 'THRUST_PID_ATTENUATION',
+                    id: 117,
+                    preview: 'TPA    0\nBP  1500'
+                },
+                {
+                    name: 'CONTROL_SMOOTHNESS',
+                    id: 118,
+                    preview: 'CTL S 3'
                 },
             ]
         },
@@ -2529,7 +2553,7 @@ TABS.osd.cleanup = function (callback) {
     $(document).off('click', 'span.progressLabel a');
 
     delete OSD.GUI.jbox;
-    $('.jBox-wrapper').remove()
+    $('.jBox-wrapper').remove();
 
     if (callback) callback();
 };

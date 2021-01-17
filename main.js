@@ -54,6 +54,7 @@ $(document).ready(function () {
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
+    updateFirmwareVersion();
 
     // notification messages for various operating systems
     switch (GUI.operating_system) {
@@ -524,10 +525,16 @@ String.prototype.format = function () {
     });
 };
 
-
-
 function updateActivatedTab() {
     var activeTab = $('#tabs > ul li.active');
     activeTab.removeClass('active');
     $('a', activeTab).trigger('click');
+}
+
+function updateFirmwareVersion() {
+    if (CONFIGURATOR.connectionValid) {
+        $('#logo .firmware_version').text(CONFIG.flightControllerVersion);
+    } else {
+        $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
+    }
 }

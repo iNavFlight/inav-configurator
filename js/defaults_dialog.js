@@ -62,10 +62,6 @@ helper.defaultsDialog = (function() {
                     value: "PT1"
                 },
                 {
-                    key: "use_dterm_fir_filter",
-                    value: "OFF"
-                },
-                {
                     key: "dynamic_gyro_notch_enabled",
                     value: "ON"
                 },
@@ -91,14 +87,6 @@ helper.defaultsDialog = (function() {
                 {
                     key: "mc_airmode_type",
                     value: "THROTTLE_THRESHOLD"
-                },
-                {
-                    key: "dterm_setpoint_weight",
-                    value: 0.75
-                },
-                {
-                    key: "mc_iterm_relax_type",
-                    value: "SETPOINT"
                 },
                 {
                     key: "mc_iterm_relax",
@@ -202,32 +190,76 @@ helper.defaultsDialog = (function() {
             "reboot": true,
             "settings": [
                 {
+                    key: "gyro_hardware_lpf",
+                    value: "256HZ"
+                },
+                {
+                    key: "gyro_lpf_hz",
+                    value: 25
+                },
+                {
+                    key: "gyro_lpf_type",
+                    value: "BIQUAD"
+                },
+                {
+                    key: "dynamic_gyro_notch_enabled",
+                    value: "ON"
+                },
+                {
+                    key: "dynamic_gyro_notch_q",
+                    value: 250
+                },
+                {
+                    key: "dynamic_gyro_notch_min_hz",
+                    value: 30
+                },
+                {
                     key: "motor_pwm_protocol",
                     value: "STANDARD"
                 },
                 {
                     key: "rc_yaw_expo",
-                    value: 70
-                },
-                {
-                    key: "rc_expo",
-                    value: 70
-                },
-                {
-                    key: "roll_rate",
                     value: 30
                 },
                 {
-                    key: "pitch_rate",
+                    key: "rc_expo",
+                    value: 30
+                },
+                {
+                    key: "roll_rate",
                     value: 20
                 },
                 {
+                    key: "pitch_rate",
+                    value: 15
+                },
+                {
                     key: "yaw_rate",
-                    value: 10
+                    value: 9
                 },
                 {
                     key: "small_angle",
                     value: 180
+                },
+                {
+                    key: "nav_fw_control_smoothness",
+                    value: 2
+                },
+                {
+                    key: "nav_rth_allow_landing",
+                    value: "FS_ONLY"
+                },
+                {
+                    key: "nav_rth_altitude",
+                    value: 5000
+                },
+                {
+                    key: "failsafe_mission",
+                    value: "OFF"
+                },
+                {
+                    key: "nav_wp_radius",
+                    value: 3000
                 },
                 {
                     key: "platform_type",
@@ -236,6 +268,10 @@ helper.defaultsDialog = (function() {
                 {
                     key: "applied_defaults",
                     value: 3
+                },
+                {
+                    key: "imu_acc_ignore_rate",
+                    value: 10
                 }
             ],
             "features":[
@@ -250,6 +286,18 @@ helper.defaultsDialog = (function() {
             "notRecommended": false,
             "reboot": true,
             "settings": [
+                {
+                    key: "gyro_hardware_lpf",
+                    value: "256HZ"
+                },
+                {
+                    key: "gyro_lpf_hz",
+                    value: 10
+                },
+                {
+                    key: "gyro_lpf_type",
+                    value: "BIQUAD"
+                },
                 {
                     key: "motor_pwm_protocol",
                     value: "STANDARD"

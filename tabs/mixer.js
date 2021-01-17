@@ -12,7 +12,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $servoMixTable,
         $servoMixTableBody,
         $motorMixTable,
-        $motorMixTableBody;
+        $motorMixTableBody,
+        modal,
+        motorWizardModal;
 
     if (GUI.active_tab != 'mixer') {
         GUI.active_tab = 'mixer';
@@ -273,7 +275,75 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $hasFlapsWrapper = $('#has-flaps-wrapper'),
             $hasFlaps = $('#has-flaps'),
             $mixerPreset = $('#mixer-preset'),
-            modal;
+            $wizardButton = $("#mixer-wizard");
+
+        motorWizardModal = new jBox('Modal', {
+            width: 480,
+            height: 410,
+            closeButton: 'title',
+            animation: false,
+            attach: $wizardButton,
+            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
+            content: $('#mixerWizardContent')
+        });
+
+        function validateMixerWizard() {
+            let errorCount = 0;
+            for (let i = 0; i < 4; i++) {
+                const $elements = $('[data-motor] option:selected[id=' + i + ']'),
+                    assignedRulesCount = $elements.length;
+
+                if (assignedRulesCount != 1) {
+                    errorCount++;
+                    $elements.closest('tr').addClass("red-background");
+                } else {
+                    $elements.closest('tr').removeClass("red-background");
+                }
+
+            }
+
+            return (errorCount == 0);
+        }
+
+        $(".wizard-motor-select").change(validateMixerWizard);
+
+        $("#wizard-execute-button").click(function () {
+
+            // Validate mixer settings
+            if (!validateMixerWizard()) {
+                return;
+            }
+
+            MOTOR_RULES.flush();
+
+            for (let i = 0; i < 4; i++) {
+                const $selects = $(".wizard-motor-select");
+                let rule = -1;
+
+                $selects.each(function () {
+                    if (parseInt($(this).find(":selected").attr("id"), 10) == i) {
+                        rule = parseInt($(this).attr("data-motor"), 10);
+                    }
+                });
+
+                const r = currentMixerPreset.motorMixer[rule];
+
+                MOTOR_RULES.put(
+                    new MotorMixRule(
+                        r.getThrottle(),
+                        r.getRoll(),
+                        r.getPitch(),
+                        r.getYaw()
+                    )
+                );
+                
+            }
+
+            renderMotorMixRules();
+            renderOutputMapping();
+
+            motorWizardModal.close();
+        });
 
         $platformSelect.find("*").remove();
 
@@ -320,6 +390,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             currentMixerPreset = helper.mixer.getById(presetId);
 
             MIXER_CONFIG.appliedMixerPreset = presetId;
+
+            if (currentMixerPreset.id == 3) {
+                $wizardButton.parent().removeClass("is-hidden");
+            } else {
+                $wizardButton.parent().addClass("is-hidden");
+            }
 
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
@@ -423,5 +499,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 };
 
 TABS.mixer.cleanup = function (callback) {
+    delete modal;
+    delete motorWizardModal;
+    $('.jBox-wrapper').remove();
     if (callback) callback();
 };

@@ -99,11 +99,11 @@ TABS.mission_control.initialize = function (callback) {
              MSP.send_message(MSPCodes.MSP_ALTITUDE, false, false, get_attitude_data);
 
         }
+
         function get_attitude_data() {
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, update_gpsTrack);
         }
-
-
+      
         function update_gpsTrack() {
 
           let lat = GPS_DATA.lat / 10000000;
@@ -480,6 +480,10 @@ TABS.mission_control.initialize = function (callback) {
         };
         ol.inherits(app.Drag, ol.interaction.Pointer);
 
+        app.ConvertCentimetersToMeters = function (val) {
+            return parseInt(val) / 100;
+        };
+
         /**
          * @constructor
          * @extends {ol.control.Control}
@@ -684,6 +688,9 @@ TABS.mission_control.initialize = function (callback) {
 
                       selectedFeature.setStyle(getPointIcon(true));
 
+                      var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.alt);
+                      
+                      $('#altitudeInMeters').text(` ${altitudeMeters}m`);
                       $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
                       $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                       $('#pointAlt').val(selectedMarker.alt);
@@ -717,6 +724,11 @@ TABS.mission_control.initialize = function (callback) {
             if ((map.width_ != width) || (map.height_ != height)) map.updateSize();
             map.width_ = width; map.height_ = height;
         }, 200);
+
+        $('#pointAlt').keyup(function(){
+            let altitudeMeters = app.ConvertCentimetersToMeters($(this).val());
+            $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+        });
 
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {

@@ -68,8 +68,13 @@
                                 <label>
                                     <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select> Coordinate Digits
                                 </label>
+                                <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
                                 <label>
                                     <select class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select> Plus Code Digits
+                                </label>
+                                <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select> Plus Code Remove Leading Digits 
                                 </label>
                                 <label>
                                     <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select> Crosshairs Style
@@ -80,8 +85,15 @@
                                 <label>
                                     <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select> Right Sidebar Scroll
                                 </label>
+                                <div class="helpicon cf_tip" data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
+                                <label>
+                                    <select class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select> Crossfire LQ Format
+                                </label>
                                 <label>
                                     <input type="checkbox" class="toggle update_preview" data-setting="osd_sidebar_scroll_arrows" data-live="true"> Sidebar Scroll Arrows
+                                </label>
+                                <label>
+                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_home_position_arm_screen" data-live="true"> Home Position on Arming Screen
                                 </label>
                             </div>
                         </div>
@@ -159,9 +171,15 @@
                                 <input id="esc_temp_alarm_max" data-setting="osd_esc_temp_alarm_max" data-setting-multiplier="10" type="number" data-step="0.5" />
                                 <span data-i18n="osd_esc_temp_alarm_max"></span>
                             </label>
+                            <div class="helpicon cf_tip" data-i18n_title="osdalarmSNR_HELP"></div>
                             <label for="snr_alarm">
                                 <input id="snr_alarm" data-setting="osd_snr_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                                 <span data-i18n="osd_snr_alarm"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="osdalarmLQ_HELP"></div>
+                            <label for="link_quality_alarm">
+                                <input id="link_quality_alarm" data-setting="osd_link_quality_alarm" data-setting-multiplier="1" type="number" data-step="1" />
+                                <span data-i18n="osd_link_quality_alarm"></span>
                             </label>
                         </div>
                     </div>

@@ -150,6 +150,20 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-left: 1em;
 }
 
+.logo_text_firmware {
+    position: absolute;
+    height: 20px;
+    left: 0;
+    top: 80px;
+    color: #949494;
+    opacity: 0.5;
+}
+
+.logo_text_firmware .firmware_version {
+    float: right;
+    margin-left: 2.1em;
+}
+
 #port-picker {
     position: relative;
     width: 100%;
@@ -2151,4 +2165,16 @@ select {
 
 .subtab__content--current {
     display: block;
+}
+
+ol li {
+    list-style: decimal;
+    padding-left: 0.5em;
+    margin-left: 1em;
+}
+
+.red-background,
+.red-background td,
+.red-background th {
+    background-color: tomato !important;
 }
