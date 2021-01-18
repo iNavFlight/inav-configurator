@@ -1059,7 +1059,7 @@
         "message": "FeedForward"
     },
     "pidTuningControlDerivative": {
-        "message": "Constrol Derivative"
+        "message": "Control Derivative"
     },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
