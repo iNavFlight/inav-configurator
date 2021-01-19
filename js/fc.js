@@ -1228,6 +1228,11 @@ var FC = {
                 name: "MAP OUTPUT",
                 hasOperand: [true, true],
                 output: "raw"
+            },
+            38: {
+                name: "RC CHANNEL OVERRIDE",
+                hasOperand: [true, true],
+                output: "boolean"
             }
         }
     },
