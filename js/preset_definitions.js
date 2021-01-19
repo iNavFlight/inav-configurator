@@ -98,14 +98,6 @@ presets.presets = [
                 value: "PT1"
             },
             {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
-            },
-            {
                 key: "mc_iterm_relax",
                 value: "RP"
             },
@@ -204,10 +196,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.500
             }
         ],
         type: 'multirotor'
@@ -258,14 +246,6 @@ presets.presets = [
             {
                 key: "dterm_lpf_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -366,10 +346,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.850
             }
         ],
         type: 'multirotor'
@@ -428,14 +404,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -536,10 +504,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.800
             }
         ],
         type: 'multirotor'
@@ -603,14 +567,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -713,10 +669,6 @@ presets.presets = [
                 value: 12
             },
             {
-                key: "dterm_setpoint_weight",
-                value: 0.300
-            },
-            {
                 key: "heading_hold_rate_limit",
                 value: 30
             }
@@ -785,14 +737,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "GYRO"
             },
             {
                 key: "mc_iterm_relax",
@@ -893,10 +837,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.400
             }
         ],
         type: 'multirotor'
@@ -955,14 +895,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -1063,10 +995,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.850
             }
         ],
         type: 'multirotor'
@@ -1125,14 +1053,6 @@ presets.presets = [
             {
                 key: "dterm_lpf2_type",
                 value: "PT1"
-            },
-            {
-                key: "use_dterm_fir_filter",
-                value: "OFF"
-            },
-            {
-                key: "mc_iterm_relax_type",
-                value: "SETPOINT"
             },
             {
                 key: "mc_iterm_relax",
@@ -1233,10 +1153,6 @@ presets.presets = [
             {
                 key: "throttle_idle",
                 value: 12
-            },
-            {
-                key: "dterm_setpoint_weight",
-                value: 0.700
             }
         ],
         type: 'multirotor'
@@ -1258,6 +1174,30 @@ presets.presets = [
         ],
         settings: [
             {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
+            {
                 key: "platform_type",
                 value: "AIRPLANE"
             },
@@ -1268,6 +1208,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'airplane'
@@ -1289,6 +1233,30 @@ presets.presets = [
             presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1324,6 +1292,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1346,6 +1318,30 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1600)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1381,6 +1377,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1403,6 +1403,30 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1550)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1438,6 +1462,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1460,6 +1488,30 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1500)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1499,6 +1551,10 @@ presets.presets = [
             {
                 key: "rc_yaw_expo",
                 value: 20
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'
@@ -1519,6 +1575,30 @@ presets.presets = [
             presets.elementHelper("RC_tuning", "pitch_rate", 120)
         ],
         settings: [
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "gyro_lpf_hz",
+                value: 25
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+            },
+            {
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -1554,6 +1634,10 @@ presets.presets = [
             {
                 key: "manual_rc_expo",
                 value: 30
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 10
             }
         ],
         type: 'flyingwing'

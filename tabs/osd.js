@@ -772,6 +772,11 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
+                },
+                {
+                    name: 'VERSION',
+                    id: 119,
+                    preview: 'INAV 2.7.0'
                 }
             ]
         },
@@ -1186,8 +1191,9 @@ OSD.constants = {
                     id: 97,
                     preview: function() {
                         let digits = parseInt(Settings.getInputValue('osd_plus_code_digits')) + 1;
+                        let digitsRemoved = parseInt(Settings.getInputValue('osd_plus_code_short')) * 2;
                         console.log("DITIS", digits);
-                        return '9547X6PM+VWCCC'.substr(0, digits);
+                        return '9547X6PM+VWCCC'.substr(digitsRemoved, digits-digitsRemoved);
                     }
                 },
                 {
