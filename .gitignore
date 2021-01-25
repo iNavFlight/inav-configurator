@@ -11,6 +11,9 @@ inav-configurator.iml
 /cache
 # Where we put the final app directory structure
 /dist
+/release
+/debug
+/cache
 # Path where the NW.js apps get built
 /apps
 /.vscode/
