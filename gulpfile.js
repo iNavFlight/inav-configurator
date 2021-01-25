@@ -1,387 +1,751 @@
 'use strict';
 
-var child_process = require('child_process');
-var fs = require('fs');
-var path = require('path');
-var minimist = require('minimist');
+const pkg = require('./package.json');
 
-var archiver = require('archiver');
-var del = require('del');
-var NwBuilder = require('nw-builder');
-var semver = require('semver');
+const child_process = require('child_process');
+const fs = require('fs');
+const fse = require('fs-extra');
+const https = require('follow-redirects').https;
+const path = require('path');
 
-var gulp = require('gulp');
-var concat = require('gulp-concat');
+const zip = require('gulp-zip');
+const del = require('del');
+const NwBuilder = require('nw-builder');
+const innoSetup = require('@quanle94/innosetup');
+const deb = require('gulp-debian');
+const buildRpm = require('rpm-builder');
+const commandExistsSync = require('command-exists').sync;
+const targz = require('targz');
 
-// Each key in the *sources* variable must be an array of
-// the source files that will be combined into a single
-// file and stored in *outputDir*. Each key in *sources*
-// must be also present in *output*, whose value indicates
-// the filename for the output file which combines the
-// contents of the source files.
-//
-// Keys must be camel cased and end with either 'Css' or
-// 'Js' (e.g. someSourcesCss or someSourcesJs). For each
-// key, a build task will be generated named by prepending
-// 'build-' and converting the key to dash-separated words
-// (e.g. someSourcesCss will generate build-some-sources-css).
-//
-// Tasks with names ending with '-js' will be executed by the
-// build-all-js task, while the ones ending with '-css' will
-// be done by build-all-css. There's also a build task which
-// runs both build-all-css and build-all-js.
-//
-// The watch task will monitor any files mentioned in the *sources*
-// variable and regenerate the corresponding output file when
-// they change.
-//
-// See README.md for details on the other tasks.
+const gulp = require('gulp');
+const yarn = require("gulp-yarn");
+const rename = require('gulp-rename');
+const os = require('os');
+const git = require('gulp-git');
+const source = require('vinyl-source-stream');
+const stream = require('stream');
 
-var sources = {};
+const DIST_DIR = './dist/';
+const APPS_DIR = './apps/';
+const DEBUG_DIR = './debug/';
+const RELEASE_DIR = './release/';
 
-sources.css = [
-    './main.css',
-    './js/libraries/jquery.nouislider.min.css',
-    './js/libraries/jquery.nouislider.pips.min.css',
-    './js/libraries/flightindicators.css',
-    './src/css/tabs/*.css',
-    './src/css/opensans_webfontkit/fonts.css',
-    './src/css/font-awesome/css/font-awesome.css',
-    './src/css/dropdown-lists/css/style_lists.css',
-    './js/libraries/switchery/switchery.css',
-    './js/libraries/jbox/jBox.css',
-    './node_modules/openlayers/dist/ol.css',
-    './src/css/logic.css',
-    './src/css/defaults_dialog.css'
-];
+const LINUX_INSTALL_DIR = '/opt/iNav';
 
-sources.js = [
-    './js/libraries/google-analytics-bundle.js',
-    './node_modules/jquery/dist/jquery.min.js',
-    './node_modules/jquery-ui-npm/jquery-ui.min.js',
-    './node_modules/marked/lib/marked.js',
-    './js/libraries/d3.min.js',
-    './js/libraries/jquery.nouislider.all.min.js',
-    './node_modules/three/three.min.js',
-    './js/libraries/nw-dialog.js',
-    './js/libraries/bundle_xml2js.js',
-    './js/libraries/Projector.js',
-    './js/libraries/CanvasRenderer.js',
-    './js/libraries/jquery.flightindicators.js',
-    './js/libraries/semver.js',
-    './js/libraries/jbox/jBox.min.js',
-    './js/libraries/switchery/switchery.js',
-    './js/libraries/jquery.ba-throttle-debounce.js',
-    './js/helpers.js',
-    './node_modules/inflection/inflection.min.js',
-    './node_modules/bluebird/js/browser/bluebird.min.js',
-    './js/injected_methods.js',
-    './js/intervals.js',
-    './js/timeouts.js',
-    './js/pid_controller.js',
-    './js/simple_smooth_filter.js',
-    './js/walking_average_filter.js',
-    './js/gui.js',
-    './js/msp/MSPCodes.js',
-    './js/msp/MSPHelper.js',
-    './js/msp/MSPchainer.js',
-    './js/port_handler.js',
-    './js/serial.js',
-    './js/servoMixRule.js',
-    './js/motorMixRule.js',
-    './js/logicCondition.js',
-    './js/settings.js',
-    './js/outputMapping.js',
-    './js/model.js',
-    './js/serial_backend.js',
-    './js/data_storage.js',
-    './js/fc.js',
-    './js/msp.js',
-    './js/protocols/stm32.js',
-    './js/protocols/stm32usbdfu.js',
-    './js/localization.js',
-    './js/boards.js',
-    './js/servoMixerRuleCollection.js',
-    './js/motorMixerRuleCollection.js',
-    './js/logicConditionsCollection.js',
-    './js/logicConditionsStatus.js',
-    './js/globalVariablesStatus.js',
-    './js/programmingPid.js',
-    './js/programmingPidCollection.js',
-    './js/vtx.js',
-    './main.js',
-    './js/tabs.js',
-    './js/preset_definitions.js',
-    './tabs/*.js',
-    './js/eventFrequencyAnalyzer.js',
-    './js/periodicStatusUpdater.js',
-    './js/serial_queue.js',
-    './js/msp_balanced_interval.js',
-    './tabs/advanced_tuning.js',
-    './js/peripherals.js',
-    './js/appUpdater.js',
-    './js/feature_framework.js',
-    './js/defaults_dialog.js',
-    './node_modules/openlayers/dist/ol.js'
-];
+const NODE_ENV = process.env.NODE_ENV || 'production';
 
-sources.receiverCss = [
-    './src/css/tabs/receiver_msp.css',
-    './src/css/opensans_webfontkit/fonts.css',
-    './js/libraries/jquery.nouislider.min.css',
-    './js/libraries/jquery.nouislider.pips.min.css',
-];
+// Global variable to hold the change hash from when we get it, to when we use it.
+let gitChangeSetId;
 
-sources.receiverJs = [
-    './node_modules/jquery/dist/jquery.min.js',
-    './node_modules/jquery-ui-npm/jquery-ui.min.js',
-    './js/libraries/jquery.nouislider.all.min.js',
-    './tabs/receiver_msp.js'
-];
-
-sources.debugTraceJs = [
-    './js/debug_trace.js'
-];
-
-sources.hexParserJs = [
-    './js/workers/hex_parser.js',
-];
-
-var output = {
-    css: 'styles.css',
-    js: 'script.js',
-    receiverCss: 'receiver-msp.css',
-    receiverJs: 'receiver-msp.js',
-    debugTraceJs: 'debug-trace.js',
-    hexParserJs: 'hex_parser.js',
+const nwBuilderOptions = {
+    version: '0.50.2',
+    files: `${DIST_DIR}**/*`,
+    macIcns: './src/images/inav.icns',
+    macPlist: { 'CFBundleDisplayName': 'iNav Configurator'},
+    winIco: './src/images/inav.ico',
+    zip: false,
 };
 
+const nwArmVersion = '0.27.6';
 
-var outputDir = './build/';
-var distDir = './dist/';
-var appsDir = './apps/';
+//-----------------
+//Pre tasks operations
+//-----------------
+const SELECTED_PLATFORMS = getInputPlatforms();
 
-function get_task_name(key) {
-    return 'build-' + key.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();});
+//-----------------
+//Tasks
+//-----------------
+
+gulp.task('clean', gulp.parallel(clean_dist, clean_apps, clean_debug, clean_release));
+
+gulp.task('clean-dist', clean_dist);
+
+gulp.task('clean-apps', clean_apps);
+
+gulp.task('clean-debug', clean_debug);
+
+gulp.task('clean-release', clean_release);
+
+gulp.task('clean-cache', clean_cache);
+
+// Function definitions are processed before function calls.
+const getChangesetId = gulp.series(getHash, writeChangesetId);
+gulp.task('get-changeset-id', getChangesetId);
+
+// dist_yarn MUST be done after dist_src
+const distBuild = gulp.series(dist_src, dist_yarn, dist_locale, dist_libraries, dist_resources, getChangesetId);
+const distRebuild = gulp.series(clean_dist, distBuild);
+gulp.task('dist', distRebuild);
+
+const appsBuild = gulp.series(gulp.parallel(clean_apps, distRebuild), apps, gulp.parallel(listPostBuildTasks(APPS_DIR)));
+gulp.task('apps', appsBuild);
+
+const debugAppsBuild = gulp.series(gulp.parallel(clean_debug, distRebuild), debug, gulp.parallel(listPostBuildTasks(DEBUG_DIR)));
+
+const debugBuild = gulp.series(distBuild, debug, gulp.parallel(listPostBuildTasks(DEBUG_DIR)), start_debug);
+gulp.task('debug', debugBuild);
+
+const releaseBuild = gulp.series(gulp.parallel(clean_release, appsBuild), gulp.parallel(listReleaseTasks(APPS_DIR)));
+gulp.task('release', releaseBuild);
+
+const debugReleaseBuild = gulp.series(gulp.parallel(clean_release, debugAppsBuild), gulp.parallel(listReleaseTasks(DEBUG_DIR)));
+gulp.task('debug-release', debugReleaseBuild);
+
+gulp.task('default', debugBuild);
+
+// -----------------
+// Helper functions
+// -----------------
+
+// Get platform from commandline args
+// #
+// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --armv7, --osx64, --win32, --win64, or --android)
+// #
+function getInputPlatforms() {
+    const supportedPlatforms = ['linux64', 'linux32', 'armv7', 'osx64', 'win32', 'win64'];
+    const platforms = [];
+    const regEx = /--(\w+)/;
+
+    for (let i = 3; i < process.argv.length; i++) {
+        const arg = process.argv[i].match(regEx)[1];
+        if (supportedPlatforms.indexOf(arg) > -1) {
+            platforms.push(arg);
+        } else if (arg === 'nowinicon') {
+            console.log('ignoring winIco');
+            delete nwBuilderOptions['winIco'];
+        } else {
+            console.log(`Unknown platform: ${arg}`);
+            process.exit();
+        }
+    }
+
+    if (platforms.length === 0) {
+        const defaultPlatform = getDefaultPlatform();
+        if (supportedPlatforms.indexOf(defaultPlatform) > -1) {
+            platforms.push(defaultPlatform);
+        } else {
+            console.error(`Your current platform (${os.platform()}) is not a supported build platform. Please specify platform to build for on the command line.`);
+            process.exit();
+        }
+    }
+
+    if (platforms.length > 0) {
+        console.log(`Building for platform(s): ${platforms}.`);
+    } else {
+        console.error('No suitables platforms found.');
+        process.exit();
+    }
+
+    return platforms;
 }
 
-function getArguments() {
-    return minimist(process.argv.slice(2));
+// Gets the default platform to be used
+function getDefaultPlatform() {
+    let defaultPlatform;
+    switch (os.platform()) {
+    case 'darwin':
+        defaultPlatform = 'osx64';
+
+        break;
+    case 'linux':
+        defaultPlatform = 'linux64';
+
+        break;
+    case 'win32':
+        defaultPlatform = 'win32';
+
+        break;
+
+    default:
+        defaultPlatform = '';
+
+        break;
+    }
+    return defaultPlatform;
 }
+
 
 function getPlatforms() {
-    const defaultPlatforms = ['win32', 'win64', 'osx64', 'linux32', 'linux64'];
-    const platform = getArguments().platform;
-    if (platform) {
-        if (defaultPlatforms.indexOf(platform) < 0) {
-            throw new Error(`Invalid platform "${platform}". Available ones are: ${defaultPlatforms}`)
-        }
-        return [platform];
-    }
-    return defaultPlatforms;
+    return SELECTED_PLATFORMS.slice();
 }
 
-function execSync() {
-    const cmd = arguments[0];
-    const args = Array.prototype.slice.call(arguments, 1);
-    const result = child_process.spawnSync(cmd, args, {stdio: 'inherit'});
-    if (result.error) {
-        throw result.error;
+function removeItem(platforms, item) {
+    const index = platforms.indexOf(item);
+    if (index >= 0) {
+        platforms.splice(index, 1);
     }
 }
 
-// Define build tasks dynamically based on the sources
-// and output variables.
-var buildCssTasks = [];
-var buildJsTasks = [];
-(function() {
-    // Convers fooBarBaz to foo-bar-baz
-    for (var k in output) {
-        (function (key) {
-            var name = get_task_name(key);
-            if (name.endsWith('-css')) {
-                buildCssTasks.push(name);
-            } else if (name.endsWith('-js')) {
-                buildJsTasks.push(name);
-            } else {
-                throw 'Invalid task name: "' + name + '": must end with -css or -js';
-            }
-            gulp.task(name, function() {
-                return gulp.src(sources[key])
-                    .pipe(concat(output[key]))
-                    .pipe(gulp.dest(outputDir));
-            });
-        })(k);
+function getRunDebugAppCommand(arch) {
+
+    let command;
+
+    switch (arch) {
+    case 'osx64':
+        const pkgName = `${pkg.name}.app`;
+        command = `open ${path.join(DEBUG_DIR, pkg.name, arch, pkgName)}`;
+
+        break;
+
+    case 'linux64':
+    case 'linux32':
+    case 'armv7':
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
+
+        break;
+
+    case 'win32':
+    case 'win64':
+        command = path.join(DEBUG_DIR, pkg.name, arch, `${pkg.name}.exe`);
+
+        break;
+
+    default:
+        command =  '';
+
+        break;
     }
-})();
 
-gulp.task('build-all-js', gulp.parallel(buildJsTasks))
-gulp.task('build-all-css', gulp.parallel(buildCssTasks));
-gulp.task('build', gulp.parallel('build-all-css', 'build-all-js'));
+    return command;
+}
 
-gulp.task('clean', function() { return del(['./build/**', './dist/**'], {force: true}); });
+function getReleaseFilename(platform, ext) {
+    return `${pkg.name}_${pkg.version}_${platform}.${ext}`;
+}
+
+function clean_dist() {
+    return del([`${DIST_DIR}**`], { force: true });
+}
+
+function clean_apps() {
+    return del([`${APPS_DIR}**`], { force: true });
+}
+
+function clean_debug() {
+    return del([`${DEBUG_DIR}**`], { force: true });
+}
+
+function clean_release() {
+    return del([`${RELEASE_DIR}**`], { force: true });
+}
+
+function clean_cache() {
+    return del(['./cache/**'], { force: true });
+}
 
 // Real work for dist task. Done in another task to call it via
 // run-sequence.
-gulp.task('dist-build', gulp.series('build', function() {
-    var distSources = [
-        './package.json', // For NW.js
-        './manifest.json', // For Chrome app
-        './eventPage.js',
-        './*.html',
-        './tabs/*.html',
-        './images/**/*',
-        './_locales/**/*',
-        './build/*',
-        './src/css/font-awesome/fonts/*',
-        './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
-        './resources/*.json',
-        './resources/models/*',
-        './resources/osd/*.mcm',
-        './resources/motor_order/*.svg',
+function dist_src() {
+    const distSources = [
+        './src/**/*',
+        '!./src/css/dropdown-lists/LICENSE',
+        '!./src/support/**',
     ];
-    return gulp.src(distSources, { base: '.' })
-        .pipe(gulp.dest(distDir));
-}));
+    const packageJson = new stream.Readable;
+    packageJson.push(JSON.stringify(pkg,undefined,2));
+    packageJson.push(null);
 
-gulp.task('dist',  gulp.series('clean', 'dist-build'));
-
-// Create app directories in ./apps
-gulp.task('apps', gulp.series('dist', function(done) {
-    var builder = new NwBuilder({
-        files: './dist/**/*',
-        buildDir: appsDir,
-        platforms: getPlatforms(),
-        flavor: 'normal',
-        macIcns: './images/inav.icns',
-        winIco: './images/inav.ico',
-        version: get_nw_version()
-    });
-    builder.on('log', console.log);
-    builder.build(function (err) {
-        if (err) {
-            console.log("Error building NW apps:" + err);
-            done();
-            return;
-        }
-        // Package apps as .zip files
-        done();
-    });
-}));
-
-function get_nw_version() {
-    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
+    return packageJson
+        .pipe(source('package.json'))
+        .pipe(gulp.src(distSources, { base: 'src' }))
+        .pipe(gulp.src('yarn.lock'))
+        .pipe(gulp.dest(DIST_DIR));
 }
 
-function get_release_filename(platform, ext) {
-    var pkg = require('./package.json');
-    return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+
+// This function relies on files from the dist_src function
+function dist_yarn() {
+    return gulp.src([`${DIST_DIR}package.json`, `${DIST_DIR}yarn.lock`])
+        .pipe(gulp.dest(DIST_DIR))
+        .pipe(yarn({
+            production: true,
+        }));
 }
 
-gulp.task('release-win32', function() {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'win32');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
-});
+function dist_locale() {
+    return gulp.src('./locales/**/*', { base: 'locales'})
+        .pipe(gulp.dest(`${DIST_DIR}_locales`));
+}
 
-gulp.task('release-win64', function() {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'win64');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
-});
+function dist_libraries() {
+    return gulp.src('./libraries/**/*', { base: '.'})
+        .pipe(gulp.dest(`${DIST_DIR}js`));
+}
 
-gulp.task('release-osx64', function(done) {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'osx64', pkg.name + '.app');
-    // Check if we want to sign the .app bundle
-    if (getArguments().codesign) {
-        // macapptool can be downloaded from
-        // https://github.com/fiam/macapptool
-        //
-        // Make sure the bundle is well formed
-        execSync('macapptool', '-v', '1', 'fix', src);
-        // Sign
-        const codesignArgs = ['macapptool', '-v', '1', 'sign'];
-        const codesignIdentity = getArguments()['codesign-identity'];
-        if (codesignIdentity) {
-            codesignArgs.push('-i', codesignIdentity);
-        }
-        codesignArgs.push('-e', 'entitlements.plist');
-        codesignArgs.push(src)
-        execSync.apply(this, codesignArgs);
-    }
-    const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
-    var output = fs.createWriteStream(zipFilename);
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator.app');
-    output.on('close', function() {
-        if (getArguments().notarize) {
-            const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
-            const notarizationUsername = getArguments()['notarization-username'];
-            if (notarizationUsername) {
-                notarizeArgs.push('-u', notarizationUsername)
-            }
-            const notarizationPassword = getArguments()['notarization-password'];
-            if (notarizationPassword) {
-                notarizeArgs.push('-p', notarizationPassword)
-            }
-            notarizeArgs.push(zipFilename)
-            execSync.apply(this, notarizeArgs);
-        }
-        done();
-    });
-    archive.finalize();
-});
+function dist_resources() {
+    return gulp.src(['./resources/**/*', '!./resources/osd/**/*.png'], { base: '.'})
+        .pipe(gulp.dest(DIST_DIR));
+}
 
-function releaseLinux(bits) {
-    return function() {
-        var dirname = 'linux' + bits;
-        var pkg = require('./package.json');
-        var src = path.join(appsDir, pkg.name, dirname);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(dirname, 'tar.gz')));
-        var archive = archiver('tar', {
-            zlib: { level: 9 },
-            gzip: true
+// Create runable app directories in ./apps
+function apps(done) {
+    const platforms = getPlatforms();
+    buildNWAppsWrapper(platforms, 'normal', APPS_DIR, done);
+}
+
+function listPostBuildTasks(folder) {
+
+    const platforms = getPlatforms();
+
+    const postBuildTasks = [];
+
+    if (platforms.indexOf('linux32') !== -1) {
+        postBuildTasks.push(function post_build_linux32(done) {
+            return post_build('linux32', folder, done);
         });
-        archive.on('warning', function(err) { throw err; });
-        archive.on('error', function(err) { throw err; });
-        archive.pipe(output);
-        archive.directory(src, 'INAV Configurator');
-        return archive.finalize();
+    }
+
+    if (platforms.indexOf('linux64') !== -1) {
+        postBuildTasks.push(function post_build_linux64(done) {
+            return post_build('linux64', folder, done);
+        });
+    }
+
+    if (platforms.indexOf('armv7') !== -1) {
+        postBuildTasks.push(function post_build_armv7(done) {
+            return post_build('armv7', folder, done);
+        });
+    }
+
+    // We need to return at least one task, if not gulp will throw an error
+    if (postBuildTasks.length === 0) {
+        postBuildTasks.push(function post_build_none(done) {
+            done();
+        });
+    }
+    return postBuildTasks;
+}
+
+function post_build(arch, folder, done) {
+
+    if ((arch === 'linux32') || (arch === 'linux64')) {
+        // Copy Ubuntu launcher scripts to destination dir
+        const launcherDir = path.join(folder, pkg.name, arch);
+        console.log(`Copy Ubuntu launcher scripts to ${launcherDir}`);
+        return gulp.src('assets/linux/**')
+                   .pipe(gulp.dest(launcherDir));
+    }
+
+    if (arch === 'armv7') {
+        console.log('Moving ARMv7 build from "linux32" to "armv7" directory...');
+        fse.moveSync(path.join(folder, pkg.name, 'linux32'), path.join(folder, pkg.name, 'armv7'));
+    }
+
+    return done();
+}
+
+// Create debug app directories in ./debug
+function debug(done) {
+    const platforms = getPlatforms();
+    buildNWAppsWrapper(platforms, 'sdk', DEBUG_DIR, done);
+}
+
+function injectARMCache(flavor, callback) {
+    const flavorPostfix = `-${flavor}`;
+    const flavorDownloadPostfix = flavor !== 'normal' ? `-${flavor}` : '';
+    clean_cache().then(function() {
+        if (!fs.existsSync('./cache')) {
+            fs.mkdirSync('./cache');
+        }
+        fs.closeSync(fs.openSync('./cache/_ARMv7_IS_CACHED', 'w'));
+        const versionFolder = `./cache/${nwBuilderOptions.version}${flavorPostfix}`;
+        if (!fs.existsSync(versionFolder)) {
+            fs.mkdirSync(versionFolder);
+        }
+        const linux32Folder = `${versionFolder}/linux32`;
+        if (!fs.existsSync(linux32Folder)) {
+            fs.mkdirSync(linux32Folder);
+        }
+        const downloadedArchivePath = `${versionFolder}/nwjs${flavorPostfix}-v${nwArmVersion}-linux-arm.tar.gz`;
+        const downloadUrl = `https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/v${nwArmVersion}/nwjs${flavorDownloadPostfix}-v${nwArmVersion}-linux-arm.tar.gz`;
+        if (fs.existsSync(downloadedArchivePath)) {
+            console.log('Prebuilt ARMv7 binaries found in /tmp');
+            downloadDone(flavorDownloadPostfix, downloadedArchivePath, versionFolder);
+        } else {
+            console.log(`Downloading prebuilt ARMv7 binaries from "${downloadUrl}"...`);
+            process.stdout.write('> Starting download...\r');
+            const armBuildBinary = fs.createWriteStream(downloadedArchivePath);
+            https.get(downloadUrl, function(res) {
+                const totalBytes = res.headers['content-length'];
+                let downloadedBytes = 0;
+                res.pipe(armBuildBinary);
+                res.on('data', function (chunk) {
+                    downloadedBytes += chunk.length;
+                    process.stdout.write(`> ${parseInt((downloadedBytes * 100) / totalBytes)}% done             \r`);
+                });
+                armBuildBinary.on('finish', function() {
+                    process.stdout.write('> 100% done             \n');
+                    armBuildBinary.close(function() {
+                        downloadDone(flavorDownloadPostfix, downloadedArchivePath, versionFolder);
+                    });
+                });
+            });
+        }
+    });
+
+    function downloadDone(flavorDownload, downloadedArchivePath, versionFolder) {
+        console.log('Injecting prebuilt ARMv7 binaries into Linux32 cache...');
+        targz.decompress({
+            src: downloadedArchivePath,
+            dest: versionFolder,
+        }, function(err) {
+            if (err) {
+                console.log(err);
+                clean_debug();
+                process.exit(1);
+            } else {
+                fs.rename(
+                    `${versionFolder}/nwjs${flavorDownload}-v${nwArmVersion}-linux-arm`,
+                    `${versionFolder}/linux32`,
+                    (renameErr) => {
+                        if (renameErr) {
+                            console.log(renameErr);
+                            clean_debug();
+                            process.exit(1);
+                        }
+                        callback();
+                    }
+                );
+            }
+        });
     }
 }
 
-gulp.task('release-linux32', releaseLinux(32));
-gulp.task('release-linux64', releaseLinux(64));
-
-// Create distributable .zip files in ./apps
-gulp.task('release', gulp.series('apps',  getPlatforms().map(function(v) { return 'release-' + v; })));
-
-gulp.task('watch', function () {
-    for(var k in output) {
-        gulp.watch(sources[k], gulp.series(get_task_name(k)));
+function buildNWAppsWrapper(platforms, flavor, dir, done) {
+    function buildNWAppsCallback() {
+        buildNWApps(platforms, flavor, dir, done);
     }
-});
 
-gulp.task('default', gulp.series('build'));
+    if (platforms.indexOf('armv7') !== -1) {
+        if (platforms.indexOf('linux32') !== -1) {
+            console.log('Cannot build ARMv7 and Linux32 versions at the same time!');
+            clean_debug();
+            process.exit(1);
+        }
+        removeItem(platforms, 'armv7');
+        platforms.push('linux32');
+
+        if (!fs.existsSync('./cache/_ARMv7_IS_CACHED', 'w')) {
+            console.log('Purging cache because it needs to be overwritten...');
+            clean_cache().then(() => {
+                injectARMCache(flavor, buildNWAppsCallback);
+            });
+        } else {
+            buildNWAppsCallback();
+        }
+    } else {
+        if (platforms.indexOf('linux32') !== -1 && fs.existsSync('./cache/_ARMv7_IS_CACHED')) {
+            console.log('Purging cache because it was previously overwritten...');
+            clean_cache().then(buildNWAppsCallback);
+        } else {
+            buildNWAppsCallback();
+        }
+    }
+}
+
+function buildNWApps(platforms, flavor, dir, done) {
+    if (platforms.length > 0) {
+        const builder = new NwBuilder(Object.assign({
+            buildDir: dir,
+            platforms,
+            flavor,
+        }, nwBuilderOptions));
+        builder.on('log', console.log);
+        builder.build(function (err) {
+            if (err) {
+                console.log(`Error building NW apps: ${err}`);
+                clean_debug();
+                process.exit(1);
+            }
+            done();
+        });
+    } else {
+        console.log('No platform suitable for NW Build');
+        done();
+    }
+}
+
+function getHash(cb) {
+    git.revParse({args: '--short HEAD'}, function (err, hash) {
+        if (err) {
+            gitChangeSetId = 'unsupported';
+        } else {
+            gitChangeSetId = hash;
+        }
+        cb();
+    });
+}
+
+function writeChangesetId() {
+    const versionJson = new stream.Readable;
+    versionJson.push(JSON.stringify({
+        gitChangesetId: gitChangeSetId,
+        version: pkg.version,
+        }, undefined, 2));
+    versionJson.push(null);
+    return versionJson
+        .pipe(source('version.json'))
+        .pipe(gulp.dest(DIST_DIR));
+}
+
+function start_debug(done) {
+
+    const platforms = getPlatforms();
+
+    if (platforms.length === 1) {
+        const run = getRunDebugAppCommand(platforms[0]);
+        console.log(`Starting debug app (${run})...`);
+        child_process.exec(run);        
+    } else {
+        console.log('More than one platform specified, not starting debug app');
+    }
+    done();
+}
+
+// Create installer package for windows platforms
+function release_win(arch, appDirectory, done) {
+
+    // Parameters passed to the installer script
+    const parameters = [];
+
+    // Extra parameters to replace inside the iss file
+    parameters.push(`/Dversion=${pkg.version}`);
+    parameters.push(`/DarchName=${arch}`);
+    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+    parameters.push(`/DsourceFolder=${appDirectory}`);
+    parameters.push(`/DtargetFolder=${RELEASE_DIR}`);
+
+    // Show only errors in console
+    parameters.push(`/Q`);
+
+    // Script file to execute
+    parameters.push("assets/windows/installer.iss");
+
+    innoSetup(parameters, {},
+    function(error) {
+        if (error != null) {
+            console.error(`Installer for platform ${arch} finished with error ${error}`);
+        } else {
+            console.log(`Installer for platform ${arch} finished`);
+        }
+        done();
+    });
+}
+
+// Create distribution package (zip) for windows and linux platforms
+function release_zip(arch, appDirectory) {
+    const src = path.join(appDirectory, pkg.name, arch, '**');
+    const output = getReleaseFilename(arch, 'zip');
+    const base = path.join(appDirectory, pkg.name, arch);
+
+    return compressFiles(src, base, output, 'iNav Configurator');
+}
+
+// Compress files from srcPath, using basePath, to outputFile in the RELEASE_DIR
+function compressFiles(srcPath, basePath, outputFile, zipFolder) {
+    return gulp.src(srcPath, { base: basePath })
+               .pipe(rename(function(actualPath) {
+                   actualPath.dirname = path.join(zipFolder, actualPath.dirname);
+               }))
+               .pipe(zip(outputFile))
+               .pipe(gulp.dest(RELEASE_DIR));
+}
+
+function release_deb(arch, appDirectory, done) {
+
+    // Check if dpkg-deb exists
+    if (!commandExistsSync('dpkg-deb')) {
+        console.warn(`dpkg-deb command not found, not generating deb package for ${arch}`);
+        return done();
+    }
+
+    return gulp.src([path.join(appDirectory, pkg.name, arch, '*')])
+        .pipe(deb({
+            package: pkg.name,
+            version: pkg.version,
+            section: 'base',
+            priority: 'optional',
+            architecture: getLinuxPackageArch('deb', arch),
+            maintainer: pkg.author,
+            description: pkg.description,
+            preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${pkg.name}`],
+            postinst: [
+                `chown root:root ${LINUX_INSTALL_DIR}`,
+                `chown -R root:root ${LINUX_INSTALL_DIR}/${pkg.name}`,
+                `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}.desktop`,
+            ],
+            prerm: [`xdg-desktop-menu uninstall ${pkg.name}.desktop`],
+            depends: 'libgconf-2-4',
+            changelog: [],
+            _target: `${LINUX_INSTALL_DIR}/${pkg.name}`,
+            _out: RELEASE_DIR,
+            _copyright: 'assets/linux/copyright',
+            _clean: true,
+    }));
+}
+
+function release_rpm(arch, appDirectory, done) {
+
+    // Check if dpkg-deb exists
+    if (!commandExistsSync('rpmbuild')) {
+        console.warn(`rpmbuild command not found, not generating rpm package for ${arch}`);
+        return done();
+    }
+
+    // The buildRpm does not generate the folder correctly, manually
+    createDirIfNotExists(RELEASE_DIR);
+
+    const regex = /-/g;
+
+    const options = {
+            name: pkg.name,
+            version: pkg.version.replace(regex, '_'), // RPM does not like release candidate versions
+            buildArch: getLinuxPackageArch('rpm', arch),
+            vendor: pkg.author,
+            summary: pkg.description,
+            license: 'GNU General Public License v3.0',
+            requires: 'libgconf-2-4',
+            prefix: '/opt',
+            files: [{
+                cwd: path.join(appDirectory, pkg.name, arch),
+                src: '*',
+                dest: `${LINUX_INSTALL_DIR}/${pkg.name}`,
+            }],
+            postInstallScript: [`xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}.desktop`],
+            preUninstallScript: [`xdg-desktop-menu uninstall ${pkg.name}.desktop`],
+            tempDir: path.join(RELEASE_DIR, `tmp-rpm-build-${arch}`),
+            keepTemp: false,
+            verbose: false,
+            rpmDest: RELEASE_DIR,
+            execOpts: { maxBuffer: 1024 * 1024 * 16 },
+    };
+
+    buildRpm(options, function(err) {
+        if (err) {
+          console.error(`Error generating rpm package: ${err}`);
+        }
+        done();
+    });
+}
+
+function getLinuxPackageArch(type, arch) {
+    let packArch;
+
+    switch (arch) {
+    case 'linux32':
+        packArch = 'i386';
+        break;
+    case 'linux64':
+        if (type === 'rpm') {
+            packArch = 'x86_64';
+        } else {
+            packArch = 'amd64';
+        }
+        break;
+    default:
+        console.error(`Package error, arch: ${arch}`);
+        process.exit(1);
+        break;
+    }
+
+    return packArch;
+}
+// Create distribution package for macOS platform
+function release_osx64(appDirectory) {
+    const appdmg = require('gulp-appdmg');
+
+    // The appdmg does not generate the folder correctly, manually
+    createDirIfNotExists(RELEASE_DIR);
+
+    // The src pipe is not used
+    return gulp.src(['.'])
+        .pipe(appdmg({
+            target: path.join(RELEASE_DIR, getReleaseFilename('macOS', 'dmg')),
+            basepath: path.join(appDirectory, pkg.name, 'osx64'),
+            specification: {
+                title: 'iNav Configurator',
+                contents: [
+                    { 'x': 448, 'y': 342, 'type': 'link', 'path': '/Applications' },
+                    { 'x': 192, 'y': 344, 'type': 'file', 'path': `${pkg.name}.app`, 'name': 'iNav Configurator.app' },
+                ],
+                background: path.join(__dirname, 'assets/osx/dmg-background.png'),
+                format: 'UDZO',
+                window: {
+                    size: {
+                        width: 638,
+                        height: 479,
+                    },
+                },
+            },
+        })
+    );
+}
+
+// Create the dir directory, with write permissions
+function createDirIfNotExists(dir) {
+    fs.mkdir(dir, '0775', function(err) {
+        if (err && err.code !== 'EEXIST') {
+            throw err;
+        }
+    });
+}
+
+// Create a list of the gulp tasks to execute for release
+function listReleaseTasks(appDirectory) {
+
+    const platforms = getPlatforms();
+
+    const releaseTasks = [];
+
+    if (platforms.indexOf('linux64') !== -1) {
+        releaseTasks.push(function release_linux64_zip() {
+            return release_zip('linux64', appDirectory);
+        });
+        releaseTasks.push(function release_linux64_deb(done) {
+            return release_deb('linux64', appDirectory, done);
+        });
+        releaseTasks.push(function release_linux64_rpm(done) {
+            return release_rpm('linux64', appDirectory, done);
+        });
+    }
+
+    if (platforms.indexOf('linux32') !== -1) {
+        releaseTasks.push(function release_linux32_zip() {
+            return release_zip('linux32', appDirectory);
+        });
+        releaseTasks.push(function release_linux32_deb(done) {
+            return release_deb('linux32', appDirectory, done);
+        });
+        releaseTasks.push(function release_linux32_rpm(done) {
+            return release_rpm('linux32', appDirectory, done);
+        });
+    }
+
+    if (platforms.indexOf('armv7') !== -1) {
+        releaseTasks.push(function release_armv7_zip() {
+            return release_zip('armv7', appDirectory);
+        });
+    }
+
+    if (platforms.indexOf('osx64') !== -1) {
+        releaseTasks.push(function () {
+            return release_osx64(appDirectory);
+        });
+    }
+
+    if (platforms.indexOf('win32') !== -1) {
+        releaseTasks.push(function release_win32(done) {
+            return release_win('win32', appDirectory, done);
+        });
+    }
+
+    if (platforms.indexOf('win64') !== -1) {
+        releaseTasks.push(function release_win64(done) {
+            return release_win('win64', appDirectory, done);
+        });
+    }
+   
+    return releaseTasks;
+}
