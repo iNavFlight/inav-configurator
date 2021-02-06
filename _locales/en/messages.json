@@ -698,8 +698,8 @@
     "configurationThrottleMinimumCommand": {
         "message": "Minimum Command"
     },
-    "configurationBatteryVoltage": {
-        "message": "Battery Voltage"
+    "configurationVoltageCurrentSensor": {
+        "message": "Voltage and Current Sensors"
     },
     "configurationBatteryCurrent": {
         "message": "Battery Current"
@@ -734,10 +734,13 @@
     "configurationBatteryScale": {
         "message": "Voltage Scale"
     },
-    "configurationCurrent": {
-        "message": "Current Sensor"
+    "configurationBatteryVoltage": {
+        "message": "Battery Voltage"
     },
     "configurationCurrentScale": {
+        "message": "Current Meter Scale"
+    },
+    "configurationCurrentScaleHelp": {
         "message": "Scale the output voltage to milliamps [1/10th mV/A]"
     },
     "configurationCurrentOffset": {
@@ -746,8 +749,11 @@
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
-    "configurationBatteryCapacity": {
-        "message": "Battery Capacity"
+    "configurationBatterySettings": {
+        "message": "Battery Settings"
+    },
+    "configurationBatterySettingsHelp": {
+        "message": "These settings apply to the currently selected battery profile "
     },
     "configurationBatteryCapacityValue": {
         "message": "Capacity"
@@ -1053,7 +1059,7 @@
         "message": "FeedForward"
     },
     "pidTuningControlDerivative": {
-        "message": "Constrol Derivative"
+        "message": "Control Derivative"
     },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
@@ -2561,11 +2567,11 @@
         "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
     },
     "pitchToThrottleThreshold": {
-        "message": "Instantaneous pitch adjustment threshold [centidegrees]"
+        "message": "Instantaneous throttle adjustment threshold [centidegrees]"
     },
     "pitchToThrottleThresholdHelp": {
-        "message": "The autopilot will instantly adjust the throttle level according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
-    }
+        "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
+    },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
     },
@@ -3063,6 +3069,12 @@
     },
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
+    },
+    "osdSettingPLUS_CODE_DIGITS_HELP": {
+        "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
+    }, 
+    "osdSettingPLUS_CODE_SHORT_HELP": {
+        "message": "Removing 2, 4 and 6 leading digits requires a reference location within, respectively, ~800km, ~40km and ~2km to recover the original coordinates."
     },
     "osdSettingCRSF_LQ_FORMAT_HELP": {
         "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
