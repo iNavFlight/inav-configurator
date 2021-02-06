@@ -85,7 +85,7 @@ helper.defaultsDialog = (function() {
                 Mechanics
                 */
                 {
-                    key: "mc_airmode_type",
+                    key: "airmode_type",
                     value: "THROTTLE_THRESHOLD"
                 },
                 {
@@ -272,6 +272,10 @@ helper.defaultsDialog = (function() {
                 {
                     key: "imu_acc_ignore_rate",
                     value: 10
+                },
+                {
+                    key: "airmode_type",
+                    value: "STICK_CENTER_ONCE"
                 }
             ],
             "features":[

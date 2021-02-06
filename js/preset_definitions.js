@@ -174,7 +174,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -324,7 +324,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -482,7 +482,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -645,7 +645,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -815,7 +815,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -973,7 +973,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
@@ -1131,7 +1131,7 @@ presets.presets = [
                 value: 70
             },
             {
-                key: "mc_airmode_type",
+                key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
             },
             {
