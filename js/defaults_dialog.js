@@ -259,7 +259,7 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "nav_wp_radius",
-                    value: 3000
+                    value: 7500
                 },
                 {
                     key: "platform_type",
