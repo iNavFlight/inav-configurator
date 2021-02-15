@@ -326,7 +326,12 @@ TABS.mission_control.initialize = function (callback) {
     var lines = [];
     var map;
     var selectedMarker = null;
+	var nonMarkerPoint = [];
+	var isOptions = false;
+	var oldMarkers = null;
+	var pointFromBuffer = {};
     var pointForSend = 0;
+	var actionPointForSend = 0;
     var settings = { speed: 0, alt: 5000};
 
 	// Function to clear/reinit Jquery variable 
@@ -943,14 +948,15 @@ TABS.mission_control.initialize = function (callback) {
                         t.action = $('#pointType').val();
 						console.log(typeof t.action);
 						if (t.action == '5' || t.action == '2' || t.action == '8') {
-							t.P1Value = 0;
-							t.P2Value = 0;
-							t.P3Value = 0;
+							t.parameter1 = 0;
+							t.parameter2 = 0;
+							t.parameter3 = 0;
 						}
 						else {
-							t.P1Value = $('#pointP1').val();
-							t.P2Value = $('#pointP2').val();
-							t.P3Value = $('#pointP3').val();
+							console.log("$('#pointP1').val() : ",$('#pointP1').val());
+							t.parameter1 = $('#pointP1').val();
+							t.parameter2 = $('#pointP2').val();
+							t.parameter3 = $('#pointP3').val();
 						}
 						if ($('input[name=Options]:checked').val() == "RTH") {
 							t.options = {key: $('input[name=Options]:checked').val(),
@@ -987,6 +993,7 @@ TABS.mission_control.initialize = function (callback) {
                 });
 
                 selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action, false, selectedMarker.number));
+				console.log("selectedMarker", selectedMarker);
                 selectedMarker = null;
                 clearEditForm();
                 repaint();
@@ -1017,6 +1024,10 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log('Start get point');
 
             pointForSend = 0;
+			actionPointForSend = 0;
+			var nonMarkerPoint = [];
+			var isOptions = false;
+			var oldMarkers = null;
             getNextPoint();
         });
 
@@ -1025,6 +1036,10 @@ TABS.mission_control.initialize = function (callback) {
             GUI.log('Start send point');
 
             pointForSend = 0;
+			actionPointForSend = 0;
+			var nonMarkerPoint = [];
+			var isOptions = false;
+			var oldMarkers = null;
             sendNextPoint();
         });
 
@@ -1268,6 +1283,7 @@ TABS.mission_control.initialize = function (callback) {
         for (var i = 0; i < markers.length; i++) {
             var geometry = markers[i].getSource().getFeatures()[0].getGeometry();
             var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
+			console.log("markers[i].parameter1 : ", markers[i].parameter1);
 			if (markers[i].action == '5' || markers[i].action == '2'  || markers[i].action == '8'  ) {
 				var point = { $: {
 					'no': (j),
@@ -1372,6 +1388,11 @@ TABS.mission_control.initialize = function (callback) {
 
     function getPointsFromEprom() {
         pointForSend = 0;
+		actionPointForSend = 0;
+		nonMarkerPoint = [];
+		isOptions = false;
+		oldMarkers = null;
+		pointFromBuffer = {};
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getNextPoint);
     }
 
@@ -1387,38 +1408,69 @@ TABS.mission_control.initialize = function (callback) {
             endGetPoint();
             return;
         }
-
+		console.log("countBusyPoints : "+MISSION_PLANER.countBusyPoints);
+		console.log("POINT : "+pointForSend);
+		console.log("Mission : "+MISSION_PLANER.bufferPoint.number);
+		
         if (pointForSend > 0) {
-            // console.log(MISSION_PLANER.bufferPoint.lon);
-            // console.log(MISSION_PLANER.bufferPoint.lat);
-            // console.log(MISSION_PLANER.bufferPoint.alt);
-            // console.log(MISSION_PLANER.bufferPoint.action);
-            /*if (MISSION_PLANER.bufferPoint.action == 4) {
-                $('#rthEndMission').prop('checked', true);
-                $('#rthSettings').fadeIn(300);
-                if (MISSION_PLANER.bufferPoint.p1 > 0) {
-                    $('#rthLanding').prop('checked', true);
-                }
-            } else {
-                var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
-                map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action, MISSION_PLANER.bufferPoint.p1));
-                if (pointForSend === 1) {
-                    map.getView().setCenter(coord);
-                }
-            */
-			var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
-			map.addLayer(addMarker(coord, MISSION_PLANER.bufferPoint.alt, MISSION_PLANER.bufferPoint.action, MISSION_PLANER.bufferPoint.p1));
-			if (pointForSend === 1) {
-				map.getView().setCenter(coord);
-			}
+			pointFromBuffer[MISSION_PLANER.bufferPoint.number] = {
+																	number : MISSION_PLANER.bufferPoint.number,
+																	lon : MISSION_PLANER.bufferPoint.lon,
+																	lat : MISSION_PLANER.bufferPoint.lat,
+																	action : MISSION_PLANER.bufferPoint.action,
+																	alt : MISSION_PLANER.bufferPoint.alt,
+																	p1 : MISSION_PLANER.bufferPoint.p1,
+																	p2 : MISSION_PLANER.bufferPoint.p2,
+																	p3 : MISSION_PLANER.bufferPoint.p3
+																};
         }
-
+		console.log(pointFromBuffer);
         if (pointForSend >= MISSION_PLANER.countBusyPoints) {
+			Object.keys(pointFromBuffer).forEach(function(key) {
+				console.log(pointFromBuffer[key]);
+				console.log("Key : "+key);
+				if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.PH_TIME,MWNP.WPTYPE.LAND, MWNP.WPTYPE.SET_POI].includes(pointFromBuffer[key].action)) {
+						if ((Number(key)+1) <= MISSION_PLANER.countBusyPoints) {
+							var coord = ol.proj.fromLonLat([pointFromBuffer[key].lon, pointFromBuffer[key].lat]);
+							if (pointFromBuffer[Number(key)+1].action == MWNP.WPTYPE.SET_HEAD) {
+								var options = {key: 'SET_HEAD',
+											 heading: pointFromBuffer[Number(key)+1].p1
+											};
+							}
+							else if (pointFromBuffer[Number(key)+1].action == MWNP.WPTYPE.JUMP) {
+								var options = {key: 'JUMP',
+										 targetWP: pointFromBuffer[Number(key)+1].p1,
+										 numRepeat: pointFromBuffer[Number(key)+1].p2
+										};
+							}
+							else if (pointFromBuffer[Number(key)+1].action == MWNP.WPTYPE.RTH) {
+								var options = {key: 'RTH',
+										 landAfter: pointFromBuffer[Number(key)+1].p1
+										};
+							}
+							else {
+								var options = {key: 'None'};
+							}
+							map.addLayer(addMarker(coord, pointFromBuffer[key].alt, pointFromBuffer[key].action, pointFromBuffer[key].p1, pointFromBuffer[key].p2, pointFromBuffer[key].p3, options));
+							if (key == 1) {
+								map.getView().setCenter(coord);
+							}
+						}
+						else {
+							var coord = ol.proj.fromLonLat([pointFromBuffer[key].lon, pointFromBuffer[key].lat]);
+							map.addLayer(addMarker(coord, pointFromBuffer[key].alt, pointFromBuffer[key].action, pointFromBuffer[key].p1, pointFromBuffer[key].p2, pointFromBuffer[key].p3));
+							if (key == 1) {
+								map.getView().setCenter(coord);
+							}
+						}
+				}
+			});
             endGetPoint();
             return;
         }
 
         MISSION_PLANER.bufferPoint.number = pointForSend;
+		
 
         pointForSend++;
 
@@ -1427,8 +1479,87 @@ TABS.mission_control.initialize = function (callback) {
 
     function sendNextPoint() {
         //var isRTH = $('#rthEndMission').is(':checked');
-		console.log(pointForSend);
-        if (pointForSend >= markers.length) {
+		console.log("Point : "+ (pointForSend+actionPointForSend));
+
+		if ((pointForSend) < markers.length) {
+			var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
+			var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
+			if (isOptions == false) {
+				if (markers[pointForSend].action == '5' || markers[pointForSend].action == '2'  || markers[pointForSend].action == '8'  ) {
+					MISSION_PLANER.bufferPoint.number = pointForSend + actionPointForSend + 1;
+					MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
+					MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
+					MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
+					MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+					MISSION_PLANER.bufferPoint.p1 = 0;
+					MISSION_PLANER.bufferPoint.p2 = 0;
+					MISSION_PLANER.bufferPoint.p3 = 0;
+				}
+				else {
+					MISSION_PLANER.bufferPoint.number = pointForSend + actionPointForSend + 1;
+					MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
+					MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
+					MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
+					MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
+					MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
+					MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].parameter2;
+					MISSION_PLANER.bufferPoint.p3 = markers[pointForSend].parameter3;
+				}
+				if (markers[pointForSend].options.key != "None") {
+					isOptions = true
+				}
+				else {
+					isOptions = false
+					pointForSend++;
+				}
+				oldMarkers = markers[pointForSend]
+				MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, sendNextPoint);
+			}
+			else if (isOptions == true) {
+				if ((pointForSend) < markers.length) {
+					if (oldMarkers.options.key == "JUMP") {
+						actionPointForSend++;
+						nonMarkerPoint.push(pointForSend);
+						MISSION_PLANER.bufferPoint.number = pointForSend + actionPointForSend + 1;
+						MISSION_PLANER.bufferPoint.action = String(MWNP.WPTYPE[oldMarkers.options.key]);
+						MISSION_PLANER.bufferPoint.lon = 0;
+						MISSION_PLANER.bufferPoint.lat = 0;
+						MISSION_PLANER.bufferPoint.alt = 0;
+						MISSION_PLANER.bufferPoint.p1 = Number(oldMarkers.options.targetWP)+getNumberOfNonMarkerForJump(nonMarkerPoint, Number(oldMarkers.options.targetWP)-2);
+						MISSION_PLANER.bufferPoint.p2 = Number(oldMarkers.options.numRepeat);
+						MISSION_PLANER.bufferPoint.p3 = 0;
+					}
+					else if (oldMarkers.options.key == "SET_HEAD") {
+						actionPointForSend++;
+						MISSION_PLANER.bufferPoint.number = pointForSend + actionPointForSend + 1;
+						MISSION_PLANER.bufferPoint.action = String(MWNP.WPTYPE[oldMarkers.options.key]);
+						MISSION_PLANER.bufferPoint.lon = 0;
+						MISSION_PLANER.bufferPoint.lat = 0;
+						MISSION_PLANER.bufferPoint.alt = 0;
+						MISSION_PLANER.bufferPoint.p1 = Number(oldMarkers.options.heading);
+						MISSION_PLANER.bufferPoint.p2 = 0;
+						MISSION_PLANER.bufferPoint.p3 = 0;
+						nonMarkerPoint.push(pointForSend);
+					}
+					else if (oldMarkers.options.key == "RTH") {
+						actionPointForSend++;
+						MISSION_PLANER.bufferPoint.number = pointForSend + actionPointForSend + 1;
+						MISSION_PLANER.bufferPoint.action = String(MWNP.WPTYPE[oldMarkers.options.key]);
+						MISSION_PLANER.bufferPoint.lon = 0;
+						MISSION_PLANER.bufferPoint.lat = 0;
+						MISSION_PLANER.bufferPoint.alt = Number(oldMarkers.alt);
+						MISSION_PLANER.bufferPoint.p1 = (Number(oldMarkers.options.landAfter)) ? 1: 0;
+						MISSION_PLANER.bufferPoint.p2 = 0;
+						MISSION_PLANER.bufferPoint.p3 = 0;
+						nonMarkerPoint.push(pointForSend);
+					}
+					isOptions = false;
+					pointForSend++;
+					MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, sendNextPoint);
+				}
+			}
+		}
+		else {
             /*if (isRTH) {
                 MISSION_PLANER.bufferPoint.number = pointForSend + 1;
                 MISSION_PLANER.bufferPoint.action = 4;
@@ -1441,86 +1572,12 @@ TABS.mission_control.initialize = function (callback) {
             } else {
                 endSendPoint();
             }*/
+			MISSION_PLANER.bufferPoint.endMission = 0xA5;
+			console.log("EndSendPoint");
 			endSendPoint();
 
             return;
         }
-
-        var geometry = markers[pointForSend].getSource().getFeatures()[0].getGeometry();
-        var coordinate = ol.proj.toLonLat(geometry.getCoordinates());
-		
-		
-		if (markers[pointForSend].action == '5' || markers[pointForSend].action == '2'  || markers[pointForSend].action == '8'  ) {
-			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-			MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
-			MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
-			MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
-			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-			MISSION_PLANER.bufferPoint.p1 = 0;
-			MISSION_PLANER.bufferPoint.p2 = 0;
-			MISSION_PLANER.bufferPoint.p3 = 0;
-			pointForSend++;
-		}
-		else {
-			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-			MISSION_PLANER.bufferPoint.action = markers[pointForSend].action;
-			MISSION_PLANER.bufferPoint.lon = parseInt(coordinate[0] * 10000000);
-			MISSION_PLANER.bufferPoint.lat = parseInt(coordinate[1] * 10000000);
-			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-			MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].parameter1;
-			MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].parameter2;
-			MISSION_PLANER.bufferPoint.p3 = markers[pointForSend].parameter3;
-			pointForSend++;
-		}
-		if (markers[pointForSend].options.key == "JUMP") {
-			nonMarkerPoint.push(pointForSend);
-			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
-			MISSION_PLANER.bufferPoint.lon = 0;
-			MISSION_PLANER.bufferPoint.lat = 0;
-			MISSION_PLANER.bufferPoint.alt = 0;
-			MISSION_PLANER.bufferPoint.p1 = Number(markers[pointForSend].options.targetWP)+getNumberOfNonMarkerForJump(nonMarkerPoint, Number(markers[pointForSend].options.targetWP)-1);
-			MISSION_PLANER.bufferPoint.p2 = markers[pointForSend].options.numRepeat;
-			MISSION_PLANER.bufferPoint.p3 = 0;
-			pointForSend++;
-		}
-		else if (markers[pointForSend].options.key == "SET_HEAD") {
-			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
-			MISSION_PLANER.bufferPoint.lon = 0;
-			MISSION_PLANER.bufferPoint.lat = 0;
-			MISSION_PLANER.bufferPoint.alt = 0;
-			MISSION_PLANER.bufferPoint.p1 = markers[pointForSend].options.heading;
-			MISSION_PLANER.bufferPoint.p2 = 0;
-			MISSION_PLANER.bufferPoint.p3 = 0;
-			pointForSend++;
-			nonMarkerPoint.push(pointForSend);
-		}
-		else if (markers[pointForSend].options.key == "RTH") {
-			MISSION_PLANER.bufferPoint.number = pointForSend + 1;
-			MISSION_PLANER.bufferPoint.action = MWNP.WPTYPE[markers[pointForSend].options.key];
-			MISSION_PLANER.bufferPoint.lon = 0;
-			MISSION_PLANER.bufferPoint.lat = 0;
-			MISSION_PLANER.bufferPoint.alt = markers[pointForSend].alt;
-			MISSION_PLANER.bufferPoint.p1 = (markers[pointForSend].options.landAfter) ? 1: 0;
-			MISSION_PLANER.bufferPoint.p2 = 0;
-			MISSION_PLANER.bufferPoint.p3 = 0;
-			pointForSend++;
-			nonMarkerPoint.push(pointForSend);
-		};
-		
-/*         if (pointForSend >= markers.length && !isRTH) {
-            MISSION_PLANER.bufferPoint.endMission = 0xA5;
-        } else {
-            MISSION_PLANER.bufferPoint.endMission = 0;
-        } */
-		if (pointForSend >= markers.length && !isRTH) {
-            MISSION_PLANER.bufferPoint.endMission = 0xA5;
-        } else {
-            MISSION_PLANER.bufferPoint.endMission = 0;
-        }
-
-        MSP.send_message(MSPCodes.MSP_SET_WP, mspHelper.crunch(MSPCodes.MSP_SET_WP), false, sendNextPoint);
     }
 
     function endSendPoint() {

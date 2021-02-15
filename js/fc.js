@@ -245,7 +245,9 @@ var FC = {
                 lon: 0,
                 alt: 0,
                 endMission: 0,
-                p1: 0
+                p1: 0,
+				p2: 0,
+				p3: 0
             }
         };
 

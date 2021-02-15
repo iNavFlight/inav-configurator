@@ -447,6 +447,8 @@ var mspHelper = (function (gui) {
                 MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
                 MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
                 MISSION_PLANER.bufferPoint.p1 = data.getInt16(14, true);
+				MISSION_PLANER.bufferPoint.p2 = data.getInt16(16, true);
+				MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true);
 
                 break;
             case MSPCodes.MSP_BOXIDS:
@@ -2085,10 +2087,10 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));
                 buffer.push(lowByte(MISSION_PLANER.bufferPoint.p1)); //sbufReadU16(src);       // P1 speed or landing
                 buffer.push(highByte(MISSION_PLANER.bufferPoint.p1));
-                buffer.push(lowByte(0)); //sbufReadU16(src);       // P2
-                buffer.push(highByte(0));
-                buffer.push(lowByte(0)); //sbufReadU16(src);       // P3
-                buffer.push(highByte(0));
+                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p2)); //sbufReadU16(src);       // P2
+                buffer.push(highByte(MISSION_PLANER.bufferPoint.p2));
+                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p3)); //sbufReadU16(src);       // P3
+                buffer.push(highByte(MISSION_PLANER.bufferPoint.p3));
                 buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
                 break;
             case MSPCodes.MSP_WP:
