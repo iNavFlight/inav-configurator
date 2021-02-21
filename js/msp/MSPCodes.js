@@ -213,6 +213,7 @@ var MSPCodes = {
     MSP2_INAV_GVAR_STATUS:              0x2027,
     MSP2_INAV_PROGRAMMING_PID:          0x2028,
     MSP2_INAV_SET_PROGRAMMING_PID:      0x2029,
+    MSP2_INAV_PROGRAMMING_PID_STATUS:   0x202A,
 
     MSP2_PID:                           0x2030,
     MSP2_SET_PID:                       0x2031,
