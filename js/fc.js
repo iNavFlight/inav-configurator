@@ -24,6 +24,7 @@ var CONFIG,
     GLOBAL_FUNCTIONS,
     GLOBAL_VARIABLES_STATUS,
     PROGRAMMING_PID,
+    PROGRAMMING_PID_STATUS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -173,12 +174,13 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = new ServoMixerRuleCollection();
-        MOTOR_RULES = new MotorMixerRuleCollection();
-        LOGIC_CONDITIONS = new LogicConditionsCollection();
+        SERVO_RULES             = new ServoMixerRuleCollection();
+        MOTOR_RULES             = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS        = new LogicConditionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
-        PROGRAMMING_PID = new ProgrammingPidCollection();
+        PROGRAMMING_PID         = new ProgrammingPidCollection();
+        PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,

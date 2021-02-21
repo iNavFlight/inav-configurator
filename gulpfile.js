@@ -108,6 +108,7 @@ sources.js = [
     './js/globalVariablesStatus.js',
     './js/programmingPid.js',
     './js/programmingPidCollection.js',
+    './js/programmingPidStatus.js',
     './js/vtx.js',
     './main.js',
     './js/tabs.js',
