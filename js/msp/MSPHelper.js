@@ -447,8 +447,8 @@ var mspHelper = (function (gui) {
                 MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
                 MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
                 MISSION_PLANER.bufferPoint.p1 = data.getInt16(14, true);
-				MISSION_PLANER.bufferPoint.p2 = data.getInt16(16, true);
-				MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true);
+                MISSION_PLANER.bufferPoint.p2 = data.getInt16(16, true);
+                MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true);
 
                 break;
             case MSPCodes.MSP_BOXIDS:
@@ -2163,17 +2163,17 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-	var buffer = [];
-	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
-	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
-	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
-	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
-	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+    var buffer = [];
+    var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+    buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+        messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+        buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+        buffer.push(highByte(BLACKBOX.blackboxRateNum));
+        buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+        buffer.push(highByte(BLACKBOX.blackboxRateDenom));
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
-	    onDataCallback();
+        onDataCallback();
         });
     };
 
@@ -2739,7 +2739,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBatteryConfig = function (callback) {
-	MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
+    MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
     self.loadArmingConfig = function (callback) {

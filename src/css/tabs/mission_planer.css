@@ -14,7 +14,7 @@
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 9px;
+    padding: 0 0 0 20px;
     line-height: 28px;
     margin: 5px;
     float: left;
@@ -22,10 +22,16 @@
     text-align: center;
 }
 
+
 .tab-mission-control .btn a:hover {
     background-color: #3394b5;
     transition: all ease 0.2s;
 }
+
+.tab-mission-control .ic_save {
+    background-image: url(../images/icons/cf_icon_mission_white.svg);
+}
+
 
 .tab-mission-control .btn a:active {
     background-color: #37a8db;
@@ -199,3 +205,4 @@
 .tab-mission-control .missionTable tr:nth-child(even) th {
     background-color: #ebe7e7;
 }
+

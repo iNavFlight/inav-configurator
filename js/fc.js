@@ -246,8 +246,8 @@ var FC = {
                 alt: 0,
                 endMission: 0,
                 p1: 0,
-				p2: 0,
-				p3: 0
+                p2: 0,
+                p3: 0
             }
         };
 
