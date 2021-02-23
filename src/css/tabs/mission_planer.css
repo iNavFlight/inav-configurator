@@ -14,7 +14,7 @@
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 0 0 20px;
+    padding: 0 9px;
     line-height: 28px;
     margin: 5px;
     float: left;
@@ -26,10 +26,6 @@
 .tab-mission-control .btn a:hover {
     background-color: #3394b5;
     transition: all ease 0.2s;
-}
-
-.tab-mission-control .ic_save {
-    background-image: url(../images/icons/cf_icon_mission_white.svg);
 }
 
 
