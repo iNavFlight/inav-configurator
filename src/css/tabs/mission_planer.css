@@ -8,26 +8,67 @@
     border: 1px solid #3394b5;
     color: #fff;
     /*float: right;*/
-    font-family: 'open_sansbold', Arial, serif;
-    font-size: 12px;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 9px;
-    line-height: 28px;
+    padding: 0px;
     margin: 5px;
     float: left;
-    width: 80px;
-    text-align: center;
+    height: 28px;
+    line-height: 28px;
+    width: 28px;
 }
 
-
+.tab-mission-control .btn-text{
+   display: none;
+   font-family: 'open_sansbold', Arial, serif;
+   font-size: 12px;
+   text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+   line-height: 28px;
+   width: 80px;
+   text-align: center;
+}
 .tab-mission-control .btn a:hover {
     background-color: #3394b5;
     transition: all ease 0.2s;
 }
 
+.tab-mission-control .ic_save2FC {
+    background-image: url(../images/icons/cf_icon_MP_save2FC_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromFC {
+    background-image: url(../images/icons/cf_icon_MP_loadfromFC_grey.svg);
+}
+
+.tab-mission-control .ic_save2File {
+    background-image: url(../images/icons/cf_icon_MP_saveFile_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromFile {
+    background-image: url(../images/icons/cf_icon_MP_loadFile_grey.svg);
+}
+
+.tab-mission-control .ic_save2Eprom {
+    background-image: url(../images/icons/cf_icon_MP_save2Eprom_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromEprom {
+    background-image: url(../images/icons/cf_icon_MP_loadfromEprom_grey.svg);
+}
+
+.tab-mission-control .ic_removeAll {
+    background-image: url(../images/icons/cf_icon_MP_removeAll_grey.svg);
+}
+
+.tab-mission-control .ic_save {
+    background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
+}
+
+.tab-mission-control .btnicon {
+    background-repeat: no-repeat;
+    background-position: center;
+}
 
 .tab-mission-control .btn a:active {
     background-color: #37a8db;
@@ -48,7 +89,10 @@
 .tab-mission-control .btn-danger_long a {
     background-color: #db250e;
     border: 1px solid #b5480e;
-	width: 100%;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
 }
 .tab-mission-control .btn-danger_short a {
     background-color: #db250e;
