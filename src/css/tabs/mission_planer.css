@@ -104,7 +104,12 @@
     border: 1px solid #b5480e;
 }
 
-.tab-mission-control .btn-danger a:hover {
+.tab-mission-control .btn-danger_long a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-danger_short a:hover {
     background-color: #b5480e;
     transition: all ease 0.2s;
 }
