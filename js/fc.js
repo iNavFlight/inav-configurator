@@ -24,6 +24,7 @@ var CONFIG,
     GLOBAL_FUNCTIONS,
     GLOBAL_VARIABLES_STATUS,
     PROGRAMMING_PID,
+    PROGRAMMING_PID_STATUS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -173,12 +174,13 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = new ServoMixerRuleCollection();
-        MOTOR_RULES = new MotorMixerRuleCollection();
-        LOGIC_CONDITIONS = new LogicConditionsCollection();
+        SERVO_RULES             = new ServoMixerRuleCollection();
+        MOTOR_RULES             = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS        = new LogicConditionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
-        PROGRAMMING_PID = new ProgrammingPidCollection();
+        PROGRAMMING_PID         = new ProgrammingPidCollection();
+        PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -570,7 +572,6 @@ var FC = {
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
             {bit: 26, group: 'other', name: 'SOFTSPI'},
-            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},

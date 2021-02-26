@@ -14,7 +14,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     loadChainer.setChain([
         mspHelper.loadLogicConditions,
-        mspHelper.loadGlobalVariablesStatus
+        mspHelper.loadGlobalVariablesStatus,
+        mspHelper.loadProgrammingPidStatus
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -26,7 +27,8 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     
     statusChainer.setChain([
         mspHelper.loadLogicConditionsStatus,
-        mspHelper.loadGlobalVariablesStatus
+        mspHelper.loadGlobalVariablesStatus,
+        mspHelper.loadProgrammingPidStatus
     ]);
     statusChainer.setExitPoint(onStatusPullDone);
 
