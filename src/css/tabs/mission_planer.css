@@ -65,9 +65,14 @@
     background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
 }
 
+.tab-mission-control .ic_cancel {
+    background-image: url(../images/icons/cf_icon_MP_cancel_grey.svg);
+}
+
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
+    background-size: 24px;
 }
 
 .tab-mission-control .btn a:active {
