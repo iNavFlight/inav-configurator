@@ -60,7 +60,8 @@ var CONFIG,
     BATTERY_CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
-    BRAKING_CONFIG;
+    BRAKING_CONFIG,
+    SAFEHOME;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -544,6 +545,13 @@ var FC = {
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
+        
+        SAFEHOME = {
+                number: 0,
+                enabled: 0,
+                lon: 0,
+                lat: 0
+        };
     },
     getOutputUsages: function() {
         return {

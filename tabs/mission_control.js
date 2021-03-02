@@ -378,6 +378,17 @@ TABS.mission_control.initialize = function (callback) {
     }    
     
     /////////////////////////////////////////////
+    // Manage Safehome
+    /////////////////////////////////////////////
+    function getSafeHomePointFromFC() {
+        console.log("Test");
+    }
+    
+    function loadSafehome() {
+        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, false, false, getSafeHomePointFromFC);
+    }
+    
+    /////////////////////////////////////////////
     // Manage Plotting functions
     /////////////////////////////////////////////
     // Function to repaint lines between markers 
@@ -624,7 +635,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate').hide();
+                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSafeHome').hide();
                 $('#missionPlanerSettings').fadeIn(300);
             };
 
@@ -643,6 +654,41 @@ TABS.mission_control.initialize = function (callback) {
 
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
+        
+        
+        /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerSafehomeControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSafehome = function () {
+                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSettings').hide();
+                $('#missionPlanerSafeHome').fadeIn(300);
+                loadSafehome();
+            };
+
+            button.addEventListener('click', handleShowSafehome, false);
+            button.addEventListener('touchstart', handleShowSafehome, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-safehome ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP Safehome';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerSafehomeControl, ol.control.Control);
         
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
@@ -739,16 +785,24 @@ TABS.mission_control.initialize = function (callback) {
         } else {
             mapLayer = new ol.source.OSM();
         }
-
+        
+        if (CONFIGURATOR.connectionValid) {
+            control_list = [
+                new app.PlannerSettingsControl(),
+                new app.PlannerSafehomeControl()
+            ]
+        }
+        else {
+            control_list = [
+                new app.PlannerSettingsControl()
+            ]
+        }
         map = new ol.Map({
             controls: ol.control.defaults({
                 attributionOptions: {
                     collapsible: false
                 }
-            }).extend([
-                new app.PlannerSettingsControl(),
-                //new app.PlannerTemplateControl()
-            ]),
+            }).extend(control_list),
             interactions: ol.interaction.defaults().extend([new app.Drag()]),
             layers: [
                 new ol.layer.Tile({

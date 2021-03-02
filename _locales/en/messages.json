@@ -3124,6 +3124,9 @@
     "missionDefaultSettingsHead": {
         "message": "Default settings"
     },
+    "missionSafehomeHead": {
+        "message": "Safe Home manager"
+    },
     "missionTemplateHead": {
         "message": "Mission template"
     },
@@ -3594,5 +3597,20 @@
     },
     "MissionPlannerHeadSettingsCheck": {
         "message": "Heading value is incorrect : Check it again !"
+    },
+    "SafehomeSelected": {
+        "message": ""
+    },
+    "SafehomeId": {
+        "message": "#"
+    },
+    "SafehomeEnabled": {
+        "message": "Enabled"
+    },
+    "SafehomeLon": {
+        "message": "Lon"
+    },
+    "SafehomeLat": {
+        "message": "Lat"
     }
 }

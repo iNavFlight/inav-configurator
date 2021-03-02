@@ -221,7 +221,13 @@
 .ol-touch .mission-control-settings {
     top: 80px;
 }
-
+.mission-control-safehome {
+    top: 85px;
+    left: .5em;
+}
+.ol-touch .mission-control-safehome {
+    top: 100px;
+}
 .mission-control-template {
     top: 85px;
     left: .5em;

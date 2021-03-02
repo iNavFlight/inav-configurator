@@ -65,8 +65,7 @@ var mspHelper = (function (gui) {
             flags,
             colorCount,
             color;
-
-        if (!dataHandler.unsupported) switch (dataHandler.code) {
+        if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
                 //FIXME remove this frame when proven not needed
                 console.log('Using deprecated msp command: MSP_IDENT');
@@ -1462,7 +1461,13 @@ var mspHelper = (function (gui) {
                     SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
                 }
                 break;
-
+            case MSPCodes.MSP2_INAV_SAFEHOME:
+                console.log(MSPCodes.MSP2_INAV_SAFEHOME);
+                SAFEHOME.number = data.getUint8(0);
+                SAFEHOME.enable = data.getUint8(1);
+                SAFEHOME.lon = data.getInt32(2);
+                SAFEHOME.lat = data.getInt32(3);
+                break;
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2137,6 +2142,9 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(BRAKING_CONFIG.boostDisengageSpeed));
 
                 buffer.push(BRAKING_CONFIG.bankAngle);
+                break;
+                
+            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 break;
 
             default:
