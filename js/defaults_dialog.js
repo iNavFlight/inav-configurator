@@ -335,7 +335,7 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "failsafe_mission",
-                    value: "OFF"
+                    value: "ON"
                 },
                 {
                     key: "nav_wp_radius",
@@ -501,7 +501,7 @@ helper.defaultsDialog = (function() {
                 },
                 {
                     key: "failsafe_mission",
-                    value: "OFF"
+                    value: "ON"
                 },
                 {
                     key: "nav_wp_radius",
