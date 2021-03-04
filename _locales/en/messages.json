@@ -3490,6 +3490,18 @@
     "dTermMechanics": {
         "message": "D-term mechanics"
     },
+    "tpaMechanics": {
+        "message": "Thrust PID attenuation"
+    },
+    "fw_level_pitch_trim": {
+        "message": "Level Trim [deg]"
+    },
+    "fw_level_pitch_trim_help": {
+        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
+    },
+    "fwLevelTrimMechanics": {
+        "message": "Fixed Wing Level Trim"
+    },
     "d_boost_factor": {
         "message": "D-Boost Factor"
     },
