@@ -257,8 +257,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         // fill board alignment
-        $('input[name="board_align_roll"]').val((BF_CONFIG.board_align_roll / 10.0).toFixed(1));
-        $('input[name="board_align_pitch"]').val((BF_CONFIG.board_align_pitch / 10.0).toFixed(1));
         $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
 
         // fill magnetometer
@@ -316,12 +314,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $i2cSpeed.change();
 
-        var $looptime = $("#looptime");
-
-        var $gyroLpf = $("#gyro-lpf"),
-            $gyroLpfMessage = $('#gyrolpf-info');
-
-        var values = FC.getGyroLpfValues();
+        let $looptime = $("#looptime"),
+            $gyroLpf = $("#gyro-lpf"),
+            values = FC.getGyroLpfValues();
 
         for (i in values) {
             if (values.hasOwnProperty(i)) {
@@ -343,43 +338,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             );
             $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
             $looptime.change();
-
-            $gyroLpfMessage.hide();
-            $gyroLpfMessage.removeClass('ok-box');
-            $gyroLpfMessage.removeClass('info-box');
-            $gyroLpfMessage.removeClass('warning-box');
-
-            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                switch (parseInt(INAV_PID_CONFIG.gyroscopeLpf, 10)) {
-                    case 0:
-                        $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfSuggestedMessage'));
-                        $gyroLpfMessage.addClass('ok-box');
-                        $gyroLpfMessage.show();
-                        break;
-                    case 1:
-                        $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfWhyNotHigherMessage'));
-                        $gyroLpfMessage.addClass('info-box');
-                        $gyroLpfMessage.show();
-                        break;
-                    case 2:
-                        $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfWhyNotSlightlyHigherMessage'));
-                        $gyroLpfMessage.addClass('info-box');
-                        $gyroLpfMessage.show();
-                        break
-                    case 3:
-                        $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfNotAdvisedMessage'));
-                        $gyroLpfMessage.addClass('info-box');
-                        $gyroLpfMessage.show();
-                        break;
-                    case 4:
-                    case 5:
-                        $gyroLpfMessage.html(chrome.i18n.getMessage('gyroLpfNotFlyableMessage'));
-                        $gyroLpfMessage.addClass('warning-box');
-                        $gyroLpfMessage.show();
-                        break;
-                }
-
-            }
         });
 
         $gyroLpf.change();
@@ -392,11 +350,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $('#looptime-warning').show();
             } else {
                 $('#looptime-warning').hide();
-            }
-
-            if (INAV_PID_CONFIG.asynchronousMode == 0) {
-                //All task running together
-                ADVANCED_CONFIG.gyroSyncDenominator = Math.floor(FC_CONFIG.loopTime / FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick);
             }
         });
         $looptime.change();
@@ -512,8 +465,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
-                BF_CONFIG.board_align_roll = Math.round(parseFloat($('input[name="board_align_roll"]').val()) * 10);
-                BF_CONFIG.board_align_pitch = Math.round(parseFloat($('input[name="board_align_pitch"]').val()) * 10);
                 BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
                 BF_CONFIG.currentscale = parseInt($('#currentscale').val());
                 BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
