@@ -1157,359 +1157,328 @@ presets.presets = [
         ],
         type: 'multirotor'
     },
-    {
-        name: "Generic Airplane",
-        description: "General setup for airplanes with Tails and Elevator.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIFFs",
-            "Adjusted rates",
-			"Navigation PIDs"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("RC_tuning", "roll_rate", 200),
-            presets.elementHelper("RC_tuning", "pitch_rate", 150),
-            presets.elementHelper("RC_tuning", "yaw_rate", 90),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ],
-        settings: [
-            {
-               key: "gyro_hardware_lpf",
-               value: "256HZ"
-            },
-			{ 
-				key: "gyro_lpf_hz"
-				value: "25"
-			},
-			{ 
-				key: "gyro_lpf_type"
-				value: "BIQUAD"
-			},
-			{ 
-				key: "dynamic_gyro_notch_enabled"
-				value: "ON"
-			},
-			{ 
-				key: "dynamic_gyro_notch_q"
-				value: "250"
-			},
-			{ 
-				key: "dynamic_gyro_notch_min_hz"
-				value: "30"
-			},
-			{ 
-				key: "motor_pwm_protocol"
-				value: "STANDARD"
-			},
-			{ 
-				key: "rc_yaw_expo"
-				value: "30"
-			},
-			{ 
-				key: "rc_expo"
-				value: "30"
-			},
-			{ 
-				key: "roll_rate"
-				value: "18"
-			},
-			{ 
-				key: "pitch_rate"
-				value: "9"
-			},
-			{ 
-				key: "yaw_rate"
-				value: "3"
-			},
-			{ 
-				key: "nav_fw_pos_z_p"
-				value: "20"
-			},
-			{ 
-				key: "nav_fw_pos_z_d"
-				value: "5"
-			},
-			{ 
-				key: "nav_fw_pos_xy_p"
-				value: "50"
-			},
-			{ 
-				key: "small_angle"
-				value: "180"
-			},
-			{ 
-				key: "nav_rth_allow_landing"
-				value: "FS_ONLY"
-			},
-			{ 
-				key: "nav_rth_altitude"
-				value: "5000"
-			},
-			{ 
-				key: "nav_wp_radius"
-				value: "1500"
-			},
-			{ 
-				key: "throttle_idle"
-				value: "5.000"
-			},
-			{ 
-				key: "applied_defaults"
-				value: "3"
-			},
-			{ 
-				key: "imu_acc_ignore_rate"
-				value: "10"
-			},
-			{ 
-				key: "airmode_type"
-				value: "STICK_CENTER_ONCE"
-			},
-			{ 
-				key: "airmode_type"
-				value: "STICK_CENTER_ONCE"
-			},
-			{ 
-				key: "nav_rth_climb_first"
-				value: "OFF"
-			},
-			{ 
-				key: "fw_turn_assist_pitch_gain"
-				value: "0.5"
-			},
-			{ 
-				key: "max_angle_inclination_rll"
-				value: "35"
-			},
-			{ 
-				key: "nav_fw_bank_angle"
-				value: "35"
-			},
-			{ 
-				key: "fw_p_pitch"
-				value: "15"
-			},
-			{ 
-				key: "fw_i_pitch"
-				value: "10"
-			},
-			{ 
-				key: "fw_ff_pitch"
-				value: "60"
-			},
-			{ 
-				key: "fw_p_roll"
-				value: "10"
-			},
-			{ 
-				key: "fw_i_roll"
-				value: "8"
-			},
-			{ 
-				key: "fw_ff_roll"
-				value: "40"
-			},
-			{ 
-				key: "roll_rate"
-				value: "18"
-			},
-			{ 
-				key: "pitch_rate
-				value: "9"
-			},
-			{ 
-				key: "fw_p_yaw"
-				value: "20"
-			},
-			{ 
-				key: "fw_i_yaw"
-				value: "0"
-			},
-			{ 
-				key: "fw_ff_yaw"
-				value: "100"
-			},
-            ],
-        ],
-        type: 'airplane'
-    },
 	{
-        name: "Flying Wing, Delta, etc.",
-        description: "General setup for airplanes with Tails and Elevator.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIFFs",
-            "Adjusted rates",
-			"Navigation PIDs"
-        ],
+		name: 'Airplane with a tail',
+        description: "General setup for airplanes with tails.",
+        features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("RC_tuning", "roll_rate", 200),
-            presets.elementHelper("RC_tuning", "pitch_rate", 150),
-            presets.elementHelper("RC_tuning", "yaw_rate", 90),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ],
+        settingsMSP: [],
+		type: 'airplane',
         settings: [
-            {
-               key: "gyro_hardware_lpf",
-               value: "256HZ"
-            },
-			{ 
-				key: "gyro_lpf_hz"
-				value: "25"
-			},
-			{ 
-				key: "gyro_lpf_type"
-				value: "BIQUAD"
-			},
-			{ 
-				key: "dynamic_gyro_notch_enabled"
-				value: "ON"
-			},
-			{ 
-				key: "dynamic_gyro_notch_q"
-				value: "250"
-			},
-			{ 
-				key: "dynamic_gyro_notch_min_hz"
-				value: "30"
-			},
-			{ 
-				key: "motor_pwm_protocol"
-				value: "STANDARD"
-			},
-			{ 
-				key: "rc_yaw_expo"
-				value: "30"
-			},
-			{ 
-				key: "rc_expo"
-				value: "30"
-			},
-			{ 
-				key: "roll_rate"
-				value: "18"
-			},
-			{ 
-				key: "pitch_rate"
-				value: "9"
-			},
-			{ 
-				key: "yaw_rate"
-				value: "3"
-			},
-			{ 
-				key: "nav_fw_pos_z_p"
-				value: "20"
-			},
-			{ 
-				key: "nav_fw_pos_z_d"
-				value: "5"
-			},
-			{ 
-				key: "nav_fw_pos_xy_p"
-				value: "50"
-			},
-			{ 
-				key: "small_angle"
-				value: "180"
-			},
-			{ 
-				key: "nav_rth_allow_landing"
-				value: "FS_ONLY"
-			},
-			{ 
-				key: "nav_rth_altitude"
-				value: "5000"
-			},
-			{ 
-				key: "nav_wp_radius"
-				value: "1500"
-			},
-			{ 
-				key: "throttle_idle"
-				value: "5.000"
-			},
-			{ 
-				key: "applied_defaults"
-				value: "3"
-			},
-			{ 
-				key: "imu_acc_ignore_rate"
-				value: "10"
-			},
-			{ 
-				key: "airmode_type"
-				value: "STICK_CENTER_ONCE"
-			},
-			{ 
-				key: "airmode_type"
-				value: "STICK_CENTER_ONCE"
-			},
-			{ 
-				key: "nav_rth_climb_first"
-				value: "OFF"
-			},
-			{ 
-				key: "fw_turn_assist_pitch_gain"
-				value: "0.2"
-			},
-			{ 
-				key: "max_angle_inclination_rll"
-				value: "45"
-			},
-			{ 
-				key: "nav_fw_bank_angle"
-				value: "45"
-			},
-			{ 
-				key: "fw_p_pitch"
-				value: "10"
-			},
-			{ 
-				key: "fw_i_pitch"
-				value: "15"
-			},
-			{ 
-				key: "fw_ff_pitch"
-				value: "70"
-			},
-			{ 
-				key: "fw_p_roll"
-				value: "5"
-			},
-			{ 
-				key: "fw_i_roll"
-				value: "8"
-			},
-			{ 
-				key: "fw_ff_roll"
-				value: "35"
-			},
-			{ 
-				key: "roll_rate"
-				value: "18"
-			},
-			{ 
-				key: "pitch_rate
-				value: "9"
-			},
-			{ 
-				key: "fw_p_yaw"
-				value: "20"
-			},
-			{ 
-				key: "fw_i_yaw"
-				value: "0"
-			},
-			{ 
-				key: "fw_ff_yaw"
-				value: "100"
-			},
-            ],
-        ],
-        type: 'airplane'
+	{
+                key: "platform_type",
+                value: "AIRPLANE"
+	},
+	{
+                key: "applied_defaults",
+                value: 3
+	},
+	{
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+	},
+	{
+                key: "gyro_lpf_hz",
+                value: 25
+	},
+	{
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+	},
+	{
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+	},
+	{
+                key: "dynamic_gyro_notch_q",
+                value: 250
+	},
+	{
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+	},
+	{
+                key: "motor_pwm_protocol",
+                value: "STANDARD"
+	},
+	{ 
+                key: "throttle_idle",
+                value: 5.0
+	},
+	{
+                key: "rc_yaw_expo",
+                value: 30
+	},
+	{
+                key: "rc_expo",
+                value: 30
+	},
+	{
+                key: "roll_rate",
+                value: 18
+	},
+	{
+                key: "pitch_rate",
+                value: 9
+	},
+	{
+                key: "yaw_rate",
+                value: 3
+	},
+	{ 
+                key: "nav_fw_pos_z_p",
+				value: 20
+	},
+	{ 
+                key: "nav_fw_pos_z_d",
+                value: 5
+	},
+	{ 
+                key: "nav_fw_pos_xy_p",
+                value: 50
+	},
+	{ 
+                key: "fw_turn_assist_pitch_gain",
+                value: 0.5
+	},
+	{ 
+                key: "max_angle_inclination_rll",
+                value: 350
+	},
+	{ 
+                key: "nav_fw_bank_angle",
+                value: 35
+	},
+	{ 
+                key: "fw_p_pitch",
+                value: 15
+	},
+	{ 
+                key: "fw_i_pitch",
+                value: 10
+	},
+	{ 
+                key: "fw_ff_pitch",
+                value: 60
+	},
+	{ 
+                key: "fw_p_roll",
+                value: 10
+	},
+	{ 
+                key: "fw_i_roll",
+                value: 8
+	},
+	{ 
+                key: "fw_ff_roll",
+                value: 40
+	},
+	{ 
+                key: "fw_p_yaw",
+                value: 20
+	},
+	{ 
+                key: "fw_i_yaw",
+                value: 0
+	},
+	{ 
+                key: "fw_ff_yaw",
+                value: 100
+	},
+	{
+                key: "imu_acc_ignore_rate",
+                value: 10
+	},
+	{
+                key: "airmode_type",
+                value: "STICK_CENTER_ONCE"
+	},
+	{
+                key: "small_angle",
+                value: 180
+	},
+	{
+                key: "nav_fw_control_smoothness",
+                value: 2
+	},
+	{
+                key: "nav_rth_allow_landing",
+                value: "FS_ONLY"
+	},
+	{
+                key: "nav_rth_altitude",
+                value: 5000
+	},
+	{
+                key: "failsafe_mission",
+		value: "ON"
+	},
+	{
+                key: "nav_wp_radius",
+                value: 1500
+	},
+		],
     },
-    
+    {
+        name: "Airplane without tail",
+        description: "General setup for airplanes without tails: Flying Wing, Delta, etc.",
+		features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        settingsMSP: [],
+		type: 'flyingwing',
+        settings: [
+	{
+                key: "platform_type",
+                value: "AIRPLANE"
+	},
+	{
+                key: "applied_defaults",
+                value: 3
+	},
+	{
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+	},
+	{
+                 key: "gyro_lpf_hz",
+                value: 25
+	},
+	{
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+	},
+	{
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+	},
+	{
+                key: "dynamic_gyro_notch_q",
+                value: 250
+	},
+	{
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+	},
+	{
+                key: "motor_pwm_protocol",
+                value: "STANDARD"
+	},
+	{ 
+                key: "throttle_idle",
+                value: 5.0
+	},
+	{
+                key: "rc_yaw_expo",
+                value: 30
+	},
+	{
+                key: "rc_expo",
+                value: 30
+	},
+	{
+                key: "roll_rate",
+                value: 18
+	},
+	{
+                key: "pitch_rate",
+                value: 9
+	},
+	{
+                key: "yaw_rate",
+                value: 3
+	},
+	{ 
+                key: "nav_fw_pos_z_p",
+                value: 20
+	},
+	{ 
+                key: "nav_fw_pos_z_d",
+                value: 5
+	},
+	{ 
+                key: "nav_fw_pos_xy_p",
+                value: 50
+	},
+	{ 
+                key: "fw_turn_assist_pitch_gain",
+                value: 0.2
+	},
+	{ 
+                key: "max_angle_inclination_rll",
+                value: 450
+	},
+	{ 
+                key: "nav_fw_bank_angle",
+                value: 45
+	},
+	{ 
+                key: "fw_p_pitch",
+                value: 10
+	},
+	{ 
+                key: "fw_i_pitch",
+                value: 15
+	},
+	{ 
+                key: "fw_ff_pitch",
+                value: 70
+	},
+	{ 
+                key: "fw_p_roll",
+                value: 5
+	},
+	{ 
+                key: "fw_i_roll",
+                value: 8
+	},
+	{ 
+                key: "fw_ff_roll",
+                value: 35
+	},
+	{ 
+                key: "fw_p_yaw",
+                value: 20
+	},
+	{ 
+                key: "fw_i_yaw",
+                value: 0
+	},
+	{ 
+                key: "fw_ff_yaw",
+                value: 100
+	},
+	{
+                key: "imu_acc_ignore_rate",
+                value: 10
+	},
+	{
+                key: "airmode_type",
+                value: "STICK_CENTER_ONCE"
+	},
+	{
+                key: "small_angle",
+                value: 180
+	},
+	{
+                key: "nav_fw_control_smoothness",
+                value: 2
+	},
+	{
+                key: "nav_rth_allow_landing",
+                value: "FS_ONLY"
+	},
+	{
+                key: "nav_rth_altitude",
+                value: 5000
+	},
+	{
+                key: "failsafe_mission",
+                value: "ON"
+	},
+	{
+                key: "nav_wp_radius",
+                value: 1500
+	},
+	],
+    },
 ];
