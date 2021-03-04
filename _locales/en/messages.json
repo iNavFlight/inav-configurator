@@ -3615,5 +3615,8 @@
     },
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
+    },
+    "rollPitchAdjustmentsMoved": {
+        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use <strong>fw_level_pitch_trim</strong> instead"
     }
 }
