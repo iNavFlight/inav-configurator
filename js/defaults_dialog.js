@@ -303,7 +303,7 @@ helper.defaultsDialog = (function() {
 		},
 		{ 
                     key: "fw_i_yaw",
-                    value: 0
+                    value: 5
 		},
 		{ 
                     key: "fw_ff_yaw",
@@ -469,7 +469,7 @@ helper.defaultsDialog = (function() {
 		},
 		{ 
                     key: "fw_i_yaw",
-                    value: 0
+                    value: 5
 		},
 		{ 
                     key: "fw_ff_yaw",
