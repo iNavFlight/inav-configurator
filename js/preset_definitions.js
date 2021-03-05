@@ -1279,7 +1279,7 @@ presets.presets = [
 	},
 	{ 
                 key: "fw_i_yaw",
-                value: 0
+                value: 5
 	},
 	{ 
                 key: "fw_ff_yaw",
@@ -1441,7 +1441,7 @@ presets.presets = [
 	},
 	{ 
                 key: "fw_i_yaw",
-                value: 0
+                value: 5
 	},
 	{ 
                 key: "fw_ff_yaw",
