@@ -2455,8 +2455,8 @@
     "w_z_baro_p_help": {
         "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
     },
-    "w_z_gos_p_help": {
-        "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
+    "w_z_gps_p_help": {
+        "message": "This setting is only used when no barometer is installed and <strong>inav_use_gps_no_baro</strong> is configured."
     },
     "wirelessModeSwitch": {
         "message": "Wireless mode"
