@@ -1182,6 +1182,10 @@ presets.presets = [
                 value: 25
 	},
 	{
+                  key: "dterm_lpf_hz",
+                  value: 10
+        },
+	{
                 key: "gyro_lpf_type",
                 value: "BIQUAD"
 	},
@@ -1341,8 +1345,12 @@ presets.presets = [
 	},
 	{
                  key: "gyro_lpf_hz",
-                value: 25
+                 value: 25
 	},
+	{
+                  key: "dterm_lpf_hz",
+                  value: 10
+        },
 	{
                 key: "gyro_lpf_type",
                 value: "BIQUAD"
