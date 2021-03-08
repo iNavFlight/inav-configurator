@@ -205,6 +205,10 @@ helper.defaultsDialog = (function() {
                     key: "gyro_lpf_hz",
                     value: 25
                 },
+		{
+                    key: "dterm_lpf_hz",
+                    value: 10
+                },
                 {
                     key: "gyro_lpf_type",
                     value: "BIQUAD"
@@ -370,6 +374,10 @@ helper.defaultsDialog = (function() {
                 {
                     key: "gyro_lpf_hz",
                     value: 25
+                },
+		{
+                    key: "dterm_lpf_hz",
+                    value: 10
                 },
                 {
                     key: "gyro_lpf_type",
