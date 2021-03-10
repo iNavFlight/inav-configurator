@@ -603,12 +603,8 @@ var FC = {
     getLooptimes: function () {
         return {
             125: {
-                defaultLooptime: 1000,
+                defaultLooptime: 500,
                 looptimes: {
-                    4000: "250Hz",
-                    3000: "334Hz",
-                    2000: "500Hz",
-                    1500: "667Hz",
                     1000: "1kHz",
                     500: "2kHz",
                     250: "4kHz",
@@ -618,8 +614,6 @@ var FC = {
             1000: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    2000: "500Hz",
                     1000: "1kHz"
                 }
             }
@@ -630,10 +624,6 @@ var FC = {
             125: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    3000: "334Hz",
-                    2000: "500Hz",
-                    1500: "667Hz",
                     1000: "1kHz",
                     500: "2kHz",
                     250: "4kHz",
@@ -643,8 +633,6 @@ var FC = {
             1000: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    2000: "500Hz",
                     1000: "1kHz"
                 }
             }
@@ -654,32 +642,26 @@ var FC = {
         return [
             {
                 tick: 125,
-                defaultDenominator: 16,
                 label: "256Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "188Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "98Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "42Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "20Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "10Hz"
             }
         ];
@@ -1262,8 +1244,8 @@ var FC = {
                     1: "Home distance [m]",
                     2: "Trip distance [m]",
                     3: "RSSI",
-                    4: "Vbat [deci-Volt] [1V = 10]",
-                    5: "Cell voltage [deci-Volt] [1V = 10]",
+                    4: "Vbat [centi-Volt] [1V = 100]",
+                    5: "Cell voltage [centi-Volt] [1V = 100]",
                     6: "Current [centi-Amp] [1A = 100]",
                     7: "Current drawn [mAh]",
                     8: "GPS Sats",
