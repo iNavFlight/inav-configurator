@@ -1113,106 +1113,111 @@ var FC = {
                 output: "raw"
             },
             18: {
+                name: "MOD",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            19: {
                 name: "GVAR SET",
                 hasOperand: [true, true],
                 output: "none"
             },
-            19: {
+            20: {
                 name: "GVAR INC",
                 hasOperand: [true, true],
                 output: "none"
             },
-            20: {
+            21: {
                 name: "GVAR DEC",
                 hasOperand: [true, true],
                 output: "none"
             },
-            21: {
+            22: {
                 name: "IO PORT SET",
                 hasOperand: [true, true],
                 output: "none"
             },
-            22: {
+            23: {
                 name: "OVERRIDE ARMING SAFETY",
                 hasOperand: [false, false],
                 output: "boolean"
             },
-            23: {
+            24: {
                 name: "OVERRIDE THROTTLE SCALE",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            29: {
+            30: {
                 name: "OVERRIDE THROTTLE",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            24: {
+            25: {
                 name: "SWAP ROLL & YAW",
                 hasOperand: [false, false],
                 output: "boolean"
             },
-            25: {
+            26: {
                 name: "SET VTX POWER LEVEL",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            30: {
+            31: {
                 name: "SET VTX BAND",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            31: {
+            32: {
                 name: "SET VTX CHANNEL",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            26: {
+            27: {
                 name: "INVERT ROLL",
                 hasOperand: [false, false],
                 output: "boolean"
             },
-            27: {
+            28: {
                 name: "INVERT PITCH",
                 hasOperand: [false, false],
                 output: "boolean"
             },
-            28: {
+            29: {
                 name: "INVERT YAW",
                 hasOperand: [false, false],
                 output: "boolean"
             },
-            32: {
+            33: {
                 name: "SET OSD LAYOUT",
                 hasOperand: [true, false],
                 output: "boolean"
             },
-            33: {
+            34: {
                 name: "SIN",
                 hasOperand: [true, true],
                 output: "raw"
             },
-            34: {
+            35: {
                 name: "COS",
                 hasOperand: [true, true],
                 output: "raw"
             },
-            35: {
+            36: {
                 name: "TAN",
                 hasOperand: [true, true],
                 output: "raw"
             },
-            36: {
+            37: {
                 name: "MAP INPUT",
                 hasOperand: [true, true],
                 output: "raw"
             },
-            37: {
+            38: {
                 name: "MAP OUTPUT",
                 hasOperand: [true, true],
                 output: "raw"
             },
-            38: {
+            39: {
                 name: "RC CHANNEL OVERRIDE",
                 hasOperand: [true, true],
                 output: "boolean"
