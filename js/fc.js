@@ -1112,6 +1112,11 @@ var FC = {
                 hasOperand: [true, true],
                 output: "raw"
             },
+            40: {
+                name: "MOD",
+                hasOperand: [true, true],
+                output: "raw"
+            },
             18: {
                 name: "GVAR SET",
                 hasOperand: [true, true],
@@ -1216,7 +1221,7 @@ var FC = {
                 name: "RC CHANNEL OVERRIDE",
                 hasOperand: [true, true],
                 output: "boolean"
-            }
+            },
         }
     },
     getOperandTypes: function () {
