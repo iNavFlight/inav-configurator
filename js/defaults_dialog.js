@@ -207,7 +207,7 @@ helper.defaultsDialog = (function() {
                 },
 		{
                     key: "dterm_lpf_hz",
-                    value: 10
+                    value: 40
                 },
                 {
                     key: "gyro_lpf_type",
@@ -377,7 +377,7 @@ helper.defaultsDialog = (function() {
                 },
 		{
                     key: "dterm_lpf_hz",
-                    value: 10
+                    value: 40
                 },
                 {
                     key: "gyro_lpf_type",
