@@ -1183,7 +1183,7 @@ presets.presets = [
 	},
 	{
                   key: "dterm_lpf_hz",
-                  value: 10
+                  value: 40
         },
 	{
                 key: "gyro_lpf_type",
@@ -1349,7 +1349,7 @@ presets.presets = [
 	},
 	{
                   key: "dterm_lpf_hz",
-                  value: 10
+                  value: 40
         },
 	{
                 key: "gyro_lpf_type",
