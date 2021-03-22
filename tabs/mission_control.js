@@ -385,7 +385,16 @@ TABS.mission_control.initialize = function (callback) {
     
     /////////////////////////////////////////////
     // Manage Safehome
-    /////////////////////////////////////////////    
+    /////////////////////////////////////////////  
+
+    function closeSafehomePanel() {
+        $('#missionPlanerSafehome').hide();
+        $('#missionPlanerTotalInfo').fadeIn(300);
+        if (selectedMarker !== null) {
+            $('#MPeditPoint').fadeIn(300);
+        }
+    } 
+    
     function renderSafehomesTable() {
         /*
          * Process safehome table UI
@@ -399,11 +408,11 @@ TABS.mission_control.initialize = function (callback) {
 
                 $safehomesTableBody.append('\
                     <tr>\
-                    <td><input type="checkbox" class="toggle safehome-view-value"/></td> \
+                    <td></td> \
                     <td><span class="safehome-number"/></td>\
-                    <td class="safehome-enabled"><input type="checkbox" class="toggle safehome-enabled-value"/></td> \
-                    <td><input type="number" class="safehome-lon" step="1e-7"/></td>\
-                    <td><input type="number" class="safehome-lat" step="1e-7"/></td>\
+                    <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
+                    <td><input type="text" class="safehome-lon" /></td>\
+                    <td><input type="text" class="safehome-lat" /></td>\
                     </tr>\
                 ');
 
@@ -440,9 +449,56 @@ TABS.mission_control.initialize = function (callback) {
          * Process safehome on Map
          */
         safehomes.get().forEach(function (safehome) {
-            console.log(safehome.getNumber());
             map.addLayer(addSafeHomeMarker(safehome));
         });
+    }
+    
+        function getSafehomeIcon(safehome) {       
+        return new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
+            })),
+            text: new ol.style.Text(({
+                text: String(Number(safehome.getNumber())+1),
+                font: '12px sans-serif',
+                offsetY: -15,
+                offsetX: -2,
+                fill: new ol.style.Fill({
+                    color: '#FFFFFF'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#FFFFFF'
+                }),
+            }))
+        });
+    }
+    
+    function addSafeHomeMarker(safehome) {
+        var coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
+        console.log(coord);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+
+        iconFeature.setStyle(getSafehomeIcon(safehome));
+
+        var vectorSource = new ol.source.Vector({
+            features: [iconFeature]
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+
+        vectorLayer.kind = "safehome";
+        
+        return vectorLayer;
     }
     /////////////////////////////////////////////
     // Manage Plotting functions
@@ -629,54 +685,7 @@ TABS.mission_control.initialize = function (callback) {
         return vectorLayer;
     }
     
-    function getSafehomeIcon(safehome) {       
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
-                anchor: [0.5, 1],
-                opacity: 1,
-                scale: 0.5,
-                src: '../images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
-            })),
-            text: new ol.style.Text(({
-                text: String(Number(safehome.getNumber())+1),
-                font: '12px sans-serif',
-                offsetY: -15,
-                offsetX: -2,
-                fill: new ol.style.Fill({
-                    color: '#FFFFFF'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: '#FFFFFF'
-                }),
-            }))
-        });
-    }
-    
-    function addSafeHomeMarker(safehome) {
-        
-        var coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
-        console.log(coord);
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
-        });
 
-        iconFeature.setStyle(getSafehomeIcon(safehome));
-
-        var vectorSource = new ol.source.Vector({
-            features: [iconFeature]
-        });
-
-        var vectorLayer = new ol.layer.Vector({
-            source: vectorSource
-        });
-
-        vectorLayer.kind = "safehome";
-        
-        return vectorLayer;
-    }
     
     /////////////////////////////////////////////
     // Manage Map construction
@@ -741,7 +750,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSafeHome').hide();
+                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSafehome').hide();
                 $('#missionPlanerSettings').fadeIn(300);
             };
 
@@ -776,7 +785,7 @@ TABS.mission_control.initialize = function (callback) {
 
             var handleShowSafehome = function () {
                 $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSettings').hide();
-                $('#missionPlanerSafeHome').fadeIn(300);
+                $('#missionPlanerSafehome').fadeIn(300);
                 renderSafehomesTable();
                 renderSafehomesOnMap(SAFEHOMES);
             };
@@ -1212,8 +1221,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#cancelSafehome').on('click', function () {
-            loadSettings();
-            closeSettingsPanel();
+            closeSafehomePanel();
         });
         
         
