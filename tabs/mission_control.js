@@ -66,7 +66,8 @@ TABS.mission_control.initialize = function (callback) {
     if (CONFIGURATOR.connectionValid) {
         var loadChainer = new MSPChainerClass();
         loadChainer.setChain([
-            mspHelper.getMissionInfo
+            mspHelper.getMissionInfo,
+            mspHelper.loadSafehomes
         ]);
         loadChainer.setExitPoint(loadHtml);
         loadChainer.execute();
@@ -92,6 +93,10 @@ TABS.mission_control.initialize = function (callback) {
             $('#saveEepromMissionButton').hide();
             isOffline = true;
         }
+        
+        $safehomesTable = $('.safehomesTable');
+        $safehomesTableBody = $safehomesTable.find('tbody');
+        
 
         if (typeof require !== "undefined") {
             loadSettings();
@@ -327,6 +332,7 @@ TABS.mission_control.initialize = function (callback) {
     var pointForSend = 0;
     var actionPointForSend = 0;
     var settings = { speed: 0, alt: 5000};
+    var safehomeFromBuffer = [];
     
     /////////////////////////////////////////////
     // Reinit Form
@@ -379,15 +385,65 @@ TABS.mission_control.initialize = function (callback) {
     
     /////////////////////////////////////////////
     // Manage Safehome
-    /////////////////////////////////////////////
-    function getSafeHomePointFromFC() {
-        console.log("Test");
+    /////////////////////////////////////////////    
+    function renderSafehomesTable() {
+        /*
+         * Process safehome table UI
+         */
+        let safehomes = SAFEHOMES.get();
+        $safehomesTableBody.find("*").remove();
+        for (let safehomeIndex in safehomes) {
+            if (safehomes.hasOwnProperty(safehomeIndex)) {
+                const safehome = safehomes[safehomeIndex];
+                console.log(safehome.getEnabled());
+
+                $safehomesTableBody.append('\
+                    <tr>\
+                    <td><input type="checkbox" class="toggle safehome-view-value"/></td> \
+                    <td><span class="safehome-number"/></td>\
+                    <td class="safehome-enabled"><input type="checkbox" class="toggle safehome-enabled-value"/></td> \
+                    <td><input type="number" class="safehome-lon" step="1e-7"/></td>\
+                    <td><input type="number" class="safehome-lat" step="1e-7"/></td>\
+                    </tr>\
+                ');
+
+                const $row = $safehomesTableBody.find('tr:last');
+                
+/*                 $row.find(".safehome-view-value").prop('checked',true)).change(function () {
+                    
+                }); */
+                
+                $row.find(".safehome-number").text(safehome.getNumber()+1);
+
+                $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
+                    safehome.setEnabled($(this).val());
+                });
+
+                $row.find(".safehome-lon").val(safehome.getLon()).change(function () {
+                    safehome.setLon($(this).val());
+                });
+                
+                $row.find(".safehome-lat").val(safehome.getLat()).change(function () {
+                    safehome.setLat($(this).val());
+                });
+
+                $row.find("[data-role='role-servo-delete']").attr("data-index", safehomeIndex);
+            }
+        }
+        GUI.switchery();
+        localize();
     }
     
-    function loadSafehome() {
-        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, false, false, getSafeHomePointFromFC);
-    }
     
+    function renderSafehomesOnMap(safehomes) {
+        /*
+         * Process safehome on Map
+         */
+        safehomes.get().forEach(function (safehome) {
+            console.log(safehome.getNumber());
+            map.addLayer(addSafeHomeMarker(safehome));
+        });
+    }
     /////////////////////////////////////////////
     // Manage Plotting functions
     /////////////////////////////////////////////
@@ -411,7 +467,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#missionDistance').text(0);
 
         map.getLayers().forEach(function (t) {
-            if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined') {
+            if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined' && t.kind == "marker") {
                 var geometry = t.getSource().getFeatures()[0].getGeometry();
                 var action = t.action;
                 var markerNumber = t.number;
@@ -548,7 +604,7 @@ TABS.mission_control.initialize = function (callback) {
             population: 4000,
             rainfall: 500
         });
-
+        console.log(_pos);
         iconFeature.setStyle(getPointIcon(_action, false, String(markers.length)));
 
         var vectorSource = new ol.source.Vector({
@@ -558,7 +614,8 @@ TABS.mission_control.initialize = function (callback) {
         var vectorLayer = new ol.layer.Vector({
             source: vectorSource
         });
-
+        
+        vectorLayer.kind = "marker";
         vectorLayer.alt = _alt;
         vectorLayer.number = markers.length;
         vectorLayer.action = _action;
@@ -569,6 +626,55 @@ TABS.mission_control.initialize = function (callback) {
 
         markers.push(vectorLayer);
 
+        return vectorLayer;
+    }
+    
+    function getSafehomeIcon(safehome) {       
+        return new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_safehome' + (safehome.isUsed() ? '_used' : '')+ '.png'
+            })),
+            text: new ol.style.Text(({
+                text: String(Number(safehome.getNumber())+1),
+                font: '12px sans-serif',
+                offsetY: -15,
+                offsetX: -2,
+                fill: new ol.style.Fill({
+                    color: '#FFFFFF'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#FFFFFF'
+                }),
+            }))
+        });
+    }
+    
+    function addSafeHomeMarker(safehome) {
+        
+        var coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
+        console.log(coord);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+
+        iconFeature.setStyle(getSafehomeIcon(safehome));
+
+        var vectorSource = new ol.source.Vector({
+            features: [iconFeature]
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+
+        vectorLayer.kind = "safehome";
+        
         return vectorLayer;
     }
     
@@ -671,7 +777,8 @@ TABS.mission_control.initialize = function (callback) {
             var handleShowSafehome = function () {
                 $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSettings').hide();
                 $('#missionPlanerSafeHome').fadeIn(300);
-                loadSafehome();
+                renderSafehomesTable();
+                renderSafehomesOnMap(SAFEHOMES);
             };
 
             button.addEventListener('click', handleShowSafehome, false);
@@ -1094,6 +1201,17 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#cancelSettings').on('click', function () {
+            loadSettings();
+            closeSettingsPanel();
+        });
+        
+        $('#saveSafehome').on('click', function () {
+            //settings = { speed: $('#MPdefaultPointSpeed').val(), alt: $('#MPdefaultPointAlt').val() };
+            //saveSettings();
+            //closeSettingsPanel();
+        });
+
+        $('#cancelSafehome').on('click', function () {
             loadSettings();
             closeSettingsPanel();
         });

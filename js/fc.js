@@ -61,7 +61,7 @@ var CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
     BRAKING_CONFIG,
-    SAFEHOME;
+    SAFEHOMES;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -546,12 +546,15 @@ var FC = {
 
         SETTINGS = {};
         
-        SAFEHOME = {
+/*         SAFEHOME = {
+            bufferPoint : {
                 number: 0,
                 enabled: 0,
                 lon: 0,
                 lat: 0
-        };
+            }
+        }; */
+        SAFEHOMES = new SafehomeCollection();
     },
     getOutputUsages: function() {
         return {

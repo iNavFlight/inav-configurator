@@ -440,6 +440,7 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
+                console.log("data : ",data);
                 MISSION_PLANER.bufferPoint.number = data.getUint8(0);
                 MISSION_PLANER.bufferPoint.action = data.getUint8(1);
                 MISSION_PLANER.bufferPoint.lat = data.getInt32(2, true) / 10000000;
@@ -1461,13 +1462,21 @@ var mspHelper = (function (gui) {
                     SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
                 }
                 break;
+            /* case MSPCodes.MSP2_INAV_SAFEHOME:
+                SAFEHOME.bufferPoint.number = data.getUint8(0);
+                SAFEHOME.bufferPoint.enabled = data.getUint8(1);
+                SAFEHOME.bufferPoint.lon = data.getInt32(2, true);
+                SAFEHOME.bufferPoint.lat = data.getInt32(6, true);
+                break; */
             case MSPCodes.MSP2_INAV_SAFEHOME:
-                console.log(MSPCodes.MSP2_INAV_SAFEHOME);
-                SAFEHOME.number = data.getUint8(0);
-                SAFEHOME.enable = data.getUint8(1);
-                SAFEHOME.lon = data.getInt32(2);
-                SAFEHOME.lat = data.getInt32(3);
-                break;
+                SAFEHOMES.put(new Safehome(
+                    data.getUint8(0),
+                    data.getUint8(1),
+                    data.getInt32(2, true) / 1e7,
+                    data.getInt32(6, true) / 1e7
+                ));
+                break;    
+            
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2099,8 +2108,9 @@ var mspHelper = (function (gui) {
                 buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
                 break;
             case MSPCodes.MSP_WP:
-                console.log(MISSION_PLANER.bufferPoint.number);
+                console.log("MISSION_PLANER.bufferPoint.number : ",MISSION_PLANER.bufferPoint.number);
                 buffer.push(MISSION_PLANER.bufferPoint.number+1);
+                console.log("buffer ", buffer);
 
                 break;
             case MSPCodes.MSP_WP_MISSION_SAVE:
@@ -2144,8 +2154,12 @@ var mspHelper = (function (gui) {
                 buffer.push(BRAKING_CONFIG.bankAngle);
                 break;
                 
-            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
+/*             case MSPCodes.MSP2_INAV_SAFEHOME:
+                console.log("SAFEHOME.bufferPoint.number : ",SAFEHOME.bufferPoint.number);
+                buffer.push(SAFEHOME.bufferPoint.number+1);
                 break;
+            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
+                break; */
 
             default:
                 return false;
@@ -2912,6 +2926,26 @@ var mspHelper = (function (gui) {
 
     self.getMissionInfo = function (callback) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
+    };
+    
+/*     self.getSafehomeInfo = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, false, false, callback);
+    }; */
+    
+    self.loadSafehomes = function (callback) {
+        SAFEHOMES.flush();
+        let safehomeId = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
+        
+        function nextSafehome() {
+            safehomeId++;
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, callback);
+            }
+        };
     };
 
     self._getSetting = function (name) {
