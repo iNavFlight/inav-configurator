@@ -16,16 +16,15 @@ MWNP.WPTYPE = {
 };
 
 // Reverse WayPoint type dictionary
-MWNP.WPTYPE.REV = {
-    1:     'WAYPOINT',
-    2:     'PH_UNLIM',
-    3:      'PH_TIME',
-    4:          'RTH',
-    5:      'SET_POI',
-    6:         'JUMP',
-    7:     'SET_HEAD',
-    8:         'LAND'
-};
+function swap(dict) {
+    let rev_dict = {};
+    for (let key in dict) {
+        rev_dict[dict[key]] = key;
+    }
+    return rev_dict;
+}
+
+MWNP.WPTYPE.REV = swap(MWNP.WPTYPE);
 
 // Dictionary of Parameter1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
@@ -67,6 +66,7 @@ TABS.mission_control.initialize = function (callback) {
         var loadChainer = new MSPChainerClass();
         loadChainer.setChain([
             mspHelper.getMissionInfo,
+            //mspHelper.loadWaypoints,
             mspHelper.loadSafehomes
         ]);
         loadChainer.setExitPoint(loadHtml);
@@ -345,12 +345,12 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP1').val('');
         $('#pointP2').val('');
         $('#pointP3').val('');
-        $('[name=Options]').filter('[value=None]').prop('checked', true);
+/*         $('[name=Options]').filter('[value=None]').prop('checked', true);
         $('#Options_LandRTH').prop('checked', false);
         $('#Options_TargetJUMP').val(0);
         $('#Options_NumberJUMP').val(0);
         $('#Options_HeadingHead').val(-1);
-        $('[name=pointNumber]').val('');
+        $('[name=pointNumber]').val(''); */
         $('#MPeditPoint').fadeOut(300);
     }
     
@@ -386,7 +386,6 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     // Manage Safehome
     /////////////////////////////////////////////  
-
     function closeSafehomePanel() {
         $('#missionPlanerSafehome').hide();
         $('#missionPlanerTotalInfo').fadeIn(300);
@@ -453,7 +452,10 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
     
-        function getSafehomeIcon(safehome) {       
+    function getSafehomeIcon(safehome) {
+        /*
+         * Process Safehome Icon
+         */
         return new ol.style.Style({
             image: new ol.style.Icon(({
                 anchor: [0.5, 1],
@@ -477,6 +479,9 @@ TABS.mission_control.initialize = function (callback) {
     }
     
     function addSafeHomeMarker(safehome) {
+        /*
+         * add safehome on Map
+         */
         var coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
         console.log(coord);
         var iconFeature = new ol.Feature({

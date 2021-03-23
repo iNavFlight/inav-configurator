@@ -1,0 +1,89 @@
+/*global $*/
+'use strict';
+
+let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true) {
+
+    var self = {};
+
+    self.getNumber = function () {
+        return number;
+    };
+
+    self.setNumber = function (data) {
+        number = data;
+    };
+    
+    self.isUsed = function () {
+        return isUsed;
+    };
+
+    self.setUsed = function (data) {
+        isUsed = data;
+    };
+
+    self.getLon = function () {
+        return lon;
+    };
+
+    self.setLon = function (data) {
+        lon = data;
+    };
+
+    self.getLat = function () {
+        return lat;
+    };
+
+    self.setLat = function (data) {
+        lat = data;
+    };
+    
+    self.getAction = function () {
+        return action;
+    };
+    
+    self.setAction = function (data) {
+        action = data;
+    };
+    
+    self.getAlt = function () {
+        return alt;
+    };
+    
+    self.setAlt = function (data) {
+        alt = data;
+    };
+    
+    self.getP1 = function () {
+        return p1;
+    };
+    
+    self.setP1 = function (data) {
+        p1 = data;
+    };
+    
+    self.getP2 = function () {
+        return p2;
+    };
+    
+    self.setP2 = function (data) {
+        p2 = data;
+    };
+    
+    self.getP3 = function () {
+        return p3;
+    };
+    
+    self.setP3 = function (data) {
+        p3 = data;
+    };
+    
+    self.getEndMission = function () {
+        return endMission;
+    };
+    
+    self.setEndMission = function (data) {
+        endMission = data;
+    };
+
+    return self;
+};

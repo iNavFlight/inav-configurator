@@ -1,4 +1,3 @@
-/*global ServoMixRule*/
 'use strict';
 
 let SafehomeCollection = function () {

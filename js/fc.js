@@ -235,7 +235,7 @@ var FC = {
             packetCount: 0
         };
 
-        MISSION_PLANER = {
+        /* MISSION_PLANER = {
             maxWaypoints: 0,
             isValidMission: 0,
             countBusyPoints: 0,
@@ -250,7 +250,9 @@ var FC = {
                 p2: 0,
                 p3: 0
             }
-        };
+        }; */
+        
+        MISSION_PLANER = new waypointCollection();
 
         ANALOG = {
             voltage: 0,

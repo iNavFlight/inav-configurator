@@ -441,14 +441,24 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_WP:
                 console.log("data : ",data);
-                MISSION_PLANER.bufferPoint.number = data.getUint8(0);
+                MISSION_PLANER.put(new Waypoint(
+                    data.getUint8(0),
+                    data.getUint8(1),
+                    data.getInt32(2, true) / 10000000,
+                    data.getInt32(6, true) / 10000000,
+                    data.getInt32(10, true),
+                    data.getInt16(14, true),
+                    data.getInt16(16, true),
+                    data.getInt16(18, true)
+                ));
+                /* MISSION_PLANER.bufferPoint.number = data.getUint8(0);
                 MISSION_PLANER.bufferPoint.action = data.getUint8(1);
                 MISSION_PLANER.bufferPoint.lat = data.getInt32(2, true) / 10000000;
                 MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
                 MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
                 MISSION_PLANER.bufferPoint.p1 = data.getInt16(14, true);
                 MISSION_PLANER.bufferPoint.p2 = data.getInt16(16, true);
-                MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true);
+                MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true); */
 
                 break;
             case MSPCodes.MSP_BOXIDS:
@@ -1380,9 +1390,9 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_WP_GETINFO:
                 // Reserved for waypoint capabilities data.getUint8(0);
-                MISSION_PLANER.maxWaypoints = data.getUint8(1);
-                MISSION_PLANER.isValidMission = data.getUint8(2);
-                MISSION_PLANER.countBusyPoints = data.getUint8(3);
+                MISSION_PLANER.setMaxWaypoints(data.getUint8(1));
+                MISSION_PLANER.setValidMission(data.getUint8(2));
+                MISSION_PLANER.setCountBusyPoints(data.getUint8(3));
                 break;
             case MSPCodes.MSP_SET_WP:
                 console.log('Point saved');
@@ -1462,12 +1472,6 @@ var mspHelper = (function (gui) {
                     SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
                 }
                 break;
-            /* case MSPCodes.MSP2_INAV_SAFEHOME:
-                SAFEHOME.bufferPoint.number = data.getUint8(0);
-                SAFEHOME.bufferPoint.enabled = data.getUint8(1);
-                SAFEHOME.bufferPoint.lon = data.getInt32(2, true);
-                SAFEHOME.bufferPoint.lat = data.getInt32(6, true);
-                break; */
             case MSPCodes.MSP2_INAV_SAFEHOME:
                 SAFEHOMES.put(new Safehome(
                     data.getUint8(0),
@@ -2928,9 +2932,22 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
     };
     
-/*     self.getSafehomeInfo = function (callback) {
-        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, false, false, callback);
-    }; */
+    self.loadWaypoints = function (callback) {
+        MISSION_PLANER.flush();
+        getMissionInfo();
+        let waypointId = 0;
+        MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
+        
+        function nextWaypoint() {
+            waypointId++;
+            if (waypointId < SAFEHOMES.getMaxSafehomeCount()-1) {
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
+            }
+        };
+    };
     
     self.loadSafehomes = function (callback) {
         SAFEHOMES.flush();
