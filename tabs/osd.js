@@ -1430,7 +1430,7 @@ OSD.constants = {
                 {
                     name: 'PITCH_PIDS',
                     id: 17,
-                    preview: 'ROL  40  30  20  23'
+                    preview: 'PIT  40  30  20  23'
                 },
                 {
                     name: 'YAW_PIDS',

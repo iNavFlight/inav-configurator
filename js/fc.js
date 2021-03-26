@@ -71,7 +71,7 @@ var FC = {
         return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
     isRpyDComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
+        return true; // Currently all platforms use D term
     },
     isCdComponentUsed: function () {
         return FC.isRpyDComponentUsed();
@@ -1112,6 +1112,11 @@ var FC = {
                 hasOperand: [true, true],
                 output: "raw"
             },
+            40: {
+                name: "MOD",
+                hasOperand: [true, true],
+                output: "raw"
+            },
             18: {
                 name: "GVAR SET",
                 hasOperand: [true, true],
@@ -1216,7 +1221,7 @@ var FC = {
                 name: "RC CHANNEL OVERRIDE",
                 hasOperand: [true, true],
                 output: "boolean"
-            }
+            },
         }
     },
     getOperandTypes: function () {

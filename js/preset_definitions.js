@@ -1157,489 +1157,336 @@ presets.presets = [
         ],
         type: 'multirotor'
     },
-    {
-        name: "Generic Airplane",
-        description: "General setup for airplanes.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
+	{
+		name: 'Airplane with a tail',
+        description: "General setup for airplanes with tails.",
+        features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("RC_tuning", "roll_rate", 200),
-            presets.elementHelper("RC_tuning", "pitch_rate", 150),
-            presets.elementHelper("RC_tuning", "yaw_rate", 90),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 1)
-        ],
+        settingsMSP: [],
+		type: 'airplane',
         settings: [
-            {
-                key: "gyro_hardware_lpf",
-                value: "256HZ"
-            },
-            {
-                key: "gyro_lpf_hz",
-                value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
-                key: "gyro_lpf_type",
-                value: "BIQUAD"
-            },
-            {
+	{
                 key: "platform_type",
                 value: "AIRPLANE"
-            },
-            {
-                key: "rc_expo",
-                value: 30
-            },
-            {
-                key: "manual_rc_expo",
-                value: 30
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 10
-            }
-        ],
-        type: 'airplane'
-    },
-    {
-        name: "Flying Wing Z84",
-        description: "Small flying wing on multirotor racer parts. 3S/4S battery, AUW under 500g.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("RC_tuning", "roll_rate", 350),
-            presets.elementHelper("RC_tuning", "pitch_rate", 90),
-            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 33),
-            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1300),
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 4)
-        ],
-        settings: [
-            {
-                key: "gyro_hardware_lpf",
-                value: "256HZ"
-            },
-            {
-                key: "gyro_lpf_hz",
-                value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
-                key: "gyro_lpf_type",
-                value: "BIQUAD"
-            },
-            {
-                key: "platform_type",
-                value: "AIRPLANE"
-            },
-            {
-                key: "fw_p_pitch",
-                value: 2
-            },
-            {
-                key: "fw_i_pitch",
-                value: 15
-            },
-            {
-                key: "fw_ff_pitch",
-                value: 70
-            },
-            {
-                key: "fw_p_roll",
-                value: 2
-            },
-            {
-                key: "fw_i_roll",
-                value: 15
-            },
-            {
-                key: "fw_ff_roll",
-                value: 30
-            },
-            {
-                key: "rc_expo",
-                value: 30
-            },
-            {
-                key: "manual_rc_expo",
-                value: 30
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 10
-            }
-        ],
-        type: 'flyingwing'
-    },
-    {
-        name: "Flying Wing S800 Sky Shadow",
-        description: "Flying wing on multirotor racer parts. 3S/4S battery and FPV equipment. AUW under 1000g.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 40),
-            presets.elementHelper("RC_tuning", "roll_rate", 280),
-            presets.elementHelper("RC_tuning", "pitch_rate", 140),
-            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 20),
-            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1600)
-        ],
-        settings: [
-            {
-                key: "gyro_hardware_lpf",
-                value: "256HZ"
-            },
-            {
-                key: "gyro_lpf_hz",
-                value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
-                key: "gyro_lpf_type",
-                value: "BIQUAD"
-            },
-            {
-                key: "platform_type",
-                value: "AIRPLANE"
-            },
-            {
-                key: "fw_p_pitch",
-                value: 6
-            },
-            {
-                key: "fw_i_pitch",
-                value: 9
-            },
-            {
-                key: "fw_ff_pitch",
-                value: 52
-            },
-            {
-                key: "fw_p_roll",
-                value: 6
-            },
-            {
-                key: "fw_i_roll",
-                value: 6
-            },
-            {
-                key: "fw_ff_roll",
-                value: 49
-            },
-            {
-                key: "rc_expo",
-                value: 30
-            },
-            {
-                key: "manual_rc_expo",
-                value: 30
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 10
-            }
-        ],
-        type: 'flyingwing'
-    },
-    {
-        name: "Ritewing Mini Drak",
-        description: "8x6 propeller, 2216 1400kV motor, 4S LiPo. AUW above 1200g.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
-            presets.elementHelper("RC_tuning", "roll_rate", 260),
-            presets.elementHelper("RC_tuning", "pitch_rate", 140),
-            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
-            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1550)
-        ],
-        settings: [
-            {
-                key: "gyro_hardware_lpf",
-                value: "256HZ"
-            },
-            {
-                key: "gyro_lpf_hz",
-                value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
-                key: "gyro_lpf_type",
-                value: "BIQUAD"
-            },
-            {
-                key: "platform_type",
-                value: "AIRPLANE"
-            },
-            {
-                key: "fw_p_pitch",
-                value: 5
-            },
-            {
-                key: "fw_i_pitch",
-                value: 14
-            },
-            {
-                key: "fw_ff_pitch",
-                value: 56
-            },
-            {
-                key: "fw_p_roll",
-                value: 7
-            },
-            {
-                key: "fw_i_roll",
-                value: 12
-            },
-            {
-                key: "fw_ff_roll",
-                value: 25
-            },
-            {
-                key: "rc_expo",
-                value: 30
-            },
-            {
-                key: "manual_rc_expo",
-                value: 30
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 10
-            }
-        ],
-        type: 'flyingwing'
-    },
-    {
-        name: "ZOHD Dart 250g",
-        description: "3x5x3 propeller, 1406 2600kV motor, 3S LiPo. 570mm wingspan, AUW potentially under 250g on 2S.<br /><br /><strong>Please set the Stabilised Roll weight to 80, and the Stabilised Pitch weight to 65.</strong>",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 3),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 30),
-            presets.elementHelper("RC_tuning", "roll_rate", 360),
-            presets.elementHelper("RC_tuning", "pitch_rate", 130),
-            presets.elementHelper("RC_tuning", "dynamic_THR_PID", 30),
-            presets.elementHelper("RC_tuning", "dynamic_THR_breakpoint", 1500)
-        ],
-        settings: [
-            {
-                key: "gyro_hardware_lpf",
-                value: "256HZ"
-            },
-            {
-                key: "gyro_lpf_hz",
-                value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
-                key: "gyro_lpf_type",
-                value: "BIQUAD"
-            },
-            {
-                key: "platform_type",
-                value: "AIRPLANE"
-            },
-            {
-                key: "fw_p_pitch",
+	},
+	{
+                key: "applied_defaults",
                 value: 3
-            },
-            {
-                key: "fw_i_pitch",
-                value: 7
-            },
-            {
-                key: "fw_ff_pitch",
-                value: 40
-            },
-            {
-                key: "fw_p_roll",
-                value: 2
-            },
-            {
-                key: "fw_i_roll",
-                value: 4
-            },
-            {
-                key: "fw_ff_roll",
-                value: 18
-            },
-            {
-                key: "rc_expo",
-                value: 70
-            },
-            {
-                key: "manual_rc_expo",
-                value: 70
-            },
-            {
-                key: "rc_yaw_expo",
-                value: 20
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 10
-            }
-        ],
-        type: 'flyingwing'
-    },
-    {
-        name: "SonicModell Mini AR Wing",
-        description: "5x4.5 propeller, 1805 2400kV motor, 3S LiPo. 600mm wingspan, AUW under 400g.",
-        features: [
-            "Adjusted gyro filtering",
-            "Adjusted PIDs",
-            "Adjusted rates"
-        ],
-        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
-        settingsMSP: [
-            presets.elementHelper("INAV_PID_CONFIG", "gyroscopeLpf", 0),
-            presets.elementHelper("FILTER_CONFIG", "gyroSoftLpfHz", 35),
-            presets.elementHelper("RC_tuning", "roll_rate", 280),
-            presets.elementHelper("RC_tuning", "pitch_rate", 120)
-        ],
-        settings: [
-            {
+	},
+	{
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
-            },
-            {
+	},
+	{
                 key: "gyro_lpf_hz",
                 value: 25
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 30
-            },
-            {
+	},
+	{
+                  key: "dterm_lpf_hz",
+                  value: 40
+        },
+	{
                 key: "gyro_lpf_type",
                 value: "BIQUAD"
-            },
-            {
-                key: "platform_type",
-                value: "AIRPLANE"
-            },
-            {
-                key: "fw_p_pitch",
-                value: 5
-            },
-            {
-                key: "fw_i_pitch",
+	},
+	{
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+	},
+	{
+                key: "dynamic_gyro_notch_q",
+                value: 250
+	},
+	{
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+	},
+	{
+                key: "motor_pwm_protocol",
+                value: "STANDARD"
+	},
+	{ 
+                key: "throttle_idle",
+                value: 5.0
+	},
+	{
+                key: "rc_yaw_expo",
+                value: 30
+	},
+	{
+                key: "rc_expo",
+                value: 30
+	},
+	{
+                key: "roll_rate",
                 value: 18
-            },
-            {
+	},
+	{
+                key: "pitch_rate",
+                value: 9
+	},
+	{
+                key: "yaw_rate",
+                value: 3
+	},
+	{ 
+                key: "nav_fw_pos_z_p",
+				value: 20
+	},
+	{ 
+                key: "nav_fw_pos_z_d",
+                value: 5
+	},
+	{ 
+                key: "nav_fw_pos_xy_p",
+                value: 50
+	},
+	{ 
+                key: "fw_turn_assist_pitch_gain",
+                value: 0.5
+	},
+	{ 
+                key: "max_angle_inclination_rll",
+                value: 350
+	},
+	{ 
+                key: "nav_fw_bank_angle",
+                value: 35
+	},
+	{ 
+                key: "fw_p_pitch",
+                value: 15
+	},
+	{ 
+                key: "fw_i_pitch",
+                value: 10
+	},
+	{ 
                 key: "fw_ff_pitch",
                 value: 60
-            },
-            {
+	},
+	{ 
                 key: "fw_p_roll",
-                value: 8
-            },
-            {
+                value: 10
+	},
+	{ 
                 key: "fw_i_roll",
-                value: 16
-            },
-            {
+                value: 8
+	},
+	{ 
                 key: "fw_ff_roll",
-                value: 64
-            },
-            {
-                key: "rc_expo",
-                value: 30
-            },
-            {
-                key: "manual_rc_expo",
-                value: 30
-            },
-            {
+                value: 40
+	},
+	{ 
+                key: "fw_p_yaw",
+                value: 20
+	},
+	{ 
+                key: "fw_i_yaw",
+                value: 5
+	},
+	{ 
+                key: "fw_ff_yaw",
+                value: 100
+	},
+	{
                 key: "imu_acc_ignore_rate",
                 value: 10
-            }
-        ],
-        type: 'flyingwing'
-    }
+	},
+	{
+                key: "airmode_type",
+                value: "STICK_CENTER_ONCE"
+	},
+	{
+                key: "small_angle",
+                value: 180
+	},
+	{
+                key: "nav_fw_control_smoothness",
+                value: 2
+	},
+	{
+                key: "nav_rth_allow_landing",
+                value: "FS_ONLY"
+	},
+	{
+                key: "nav_rth_altitude",
+                value: 5000
+	},
+	{
+                key: "failsafe_mission",
+		value: "ON"
+	},
+	{
+                key: "nav_wp_radius",
+                value: 1500
+	},
+		],
+    },
+    {
+        name: "Airplane without tail",
+        description: "General setup for airplanes without tails: Flying Wing, Delta, etc.",
+		features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
+        applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
+        settingsMSP: [],
+		type: 'flyingwing',
+        settings: [
+	{
+                key: "platform_type",
+                value: "AIRPLANE"
+	},
+	{
+                key: "applied_defaults",
+                value: 3
+	},
+	{
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+	},
+	{
+                 key: "gyro_lpf_hz",
+                 value: 25
+	},
+	{
+                  key: "dterm_lpf_hz",
+                  value: 40
+        },
+	{
+                key: "gyro_lpf_type",
+                value: "BIQUAD"
+	},
+	{
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+	},
+	{
+                key: "dynamic_gyro_notch_q",
+                value: 250
+	},
+	{
+                key: "dynamic_gyro_notch_min_hz",
+                value: 30
+	},
+	{
+                key: "motor_pwm_protocol",
+                value: "STANDARD"
+	},
+	{ 
+                key: "throttle_idle",
+                value: 5.0
+	},
+	{
+                key: "rc_yaw_expo",
+                value: 30
+	},
+	{
+                key: "rc_expo",
+                value: 30
+	},
+	{
+                key: "roll_rate",
+                value: 18
+	},
+	{
+                key: "pitch_rate",
+                value: 9
+	},
+	{
+                key: "yaw_rate",
+                value: 3
+	},
+	{ 
+                key: "nav_fw_pos_z_p",
+                value: 20
+	},
+	{ 
+                key: "nav_fw_pos_z_d",
+                value: 5
+	},
+	{ 
+                key: "nav_fw_pos_xy_p",
+                value: 50
+	},
+	{ 
+                key: "fw_turn_assist_pitch_gain",
+                value: 0.2
+	},
+	{ 
+                key: "max_angle_inclination_rll",
+                value: 450
+	},
+	{ 
+                key: "nav_fw_bank_angle",
+                value: 45
+	},
+	{ 
+                key: "fw_p_pitch",
+                value: 10
+	},
+	{ 
+                key: "fw_i_pitch",
+                value: 15
+	},
+	{ 
+                key: "fw_ff_pitch",
+                value: 70
+	},
+	{ 
+                key: "fw_p_roll",
+                value: 5
+	},
+	{ 
+                key: "fw_i_roll",
+                value: 8
+	},
+	{ 
+                key: "fw_ff_roll",
+                value: 35
+	},
+	{ 
+                key: "fw_p_yaw",
+                value: 20
+	},
+	{ 
+                key: "fw_i_yaw",
+                value: 5
+	},
+	{ 
+                key: "fw_ff_yaw",
+                value: 100
+	},
+	{
+                key: "imu_acc_ignore_rate",
+                value: 10
+	},
+	{
+                key: "airmode_type",
+                value: "STICK_CENTER_ONCE"
+	},
+	{
+                key: "small_angle",
+                value: 180
+	},
+	{
+                key: "nav_fw_control_smoothness",
+                value: 2
+	},
+	{
+                key: "nav_rth_allow_landing",
+                value: "FS_ONLY"
+	},
+	{
+                key: "nav_rth_altitude",
+                value: 5000
+	},
+	{
+                key: "failsafe_mission",
+                value: "ON"
+	},
+	{
+                key: "nav_wp_radius",
+                value: 1500
+	},
+	],
+    },
 ];
