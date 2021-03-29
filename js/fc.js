@@ -1279,6 +1279,7 @@ var FC = {
                     31: "3D home distance [m]",
                     32: "CRSF LQ",
                     33: "CRSF SNR",
+                    34: "GPS Valid Fix",
                 }
             },
             3: {
