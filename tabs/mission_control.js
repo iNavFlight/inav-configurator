@@ -1,4 +1,6 @@
 'use strict';
+//import { MWNP.WPTYPE, MWNP.WPTYPE.REV  } from './js/mission_control_module.mjs';
+//const { MWNP } = require('./js/mission_control_module.mjs')
 
 // MultiWii NAV Protocol
 var MWNP = MWNP || {};
@@ -333,6 +335,7 @@ TABS.mission_control.initialize = function (callback) {
     var actionPointForSend = 0;
     var settings = { speed: 0, alt: 5000};
     var safehomeFromBuffer = [];
+    var mission = new WaypointCollection();
     
     /////////////////////////////////////////////
     // Reinit Form
@@ -482,7 +485,7 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * add safehome on Map
          */
-        var coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
+        let coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
         console.log(coord);
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(coord),
@@ -509,7 +512,7 @@ TABS.mission_control.initialize = function (callback) {
     // Manage Plotting functions
     /////////////////////////////////////////////
     // Function to repaint lines between markers 
-    function repaint() {
+/*     function repaint() {
         var oldPos;
         var oldAction;
         var poiNumber;
@@ -582,48 +585,12 @@ TABS.mission_control.initialize = function (callback) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
     }
-    
+     */
     // function modified to take into account optional argument such color, linedash and line label 
-    function paintLine(pos1, pos2, color='#1497f1', lineDash=0, lineText="") {
-        var line = new ol.geom.LineString([pos1, pos2]);
 
-        var feature = new ol.Feature({
-            geometry: line
-        });
-        feature.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: color,
-                width: 3,
-                lineDash: [lineDash]
-            }),
-            text: new ol.style.Text({
-                text: lineText,
-                placement : 'line',
-                textBaseline: 'ideographic',
-                stroke: new ol.style.Stroke({
-                    color: color
-                }),
-            }),
-        }));
-
-        var vectorSource = new ol.source.Vector({
-            features: [feature]
-        });
-
-        var vectorLayer = new ol.layer.Vector({
-            source: vectorSource
-        });
-
-        lines.push(vectorLayer);
-
-        var length = ol.Sphere.getLength(line) + parseFloat($('#missionDistance').text());
-        $('#missionDistance').text(length.toFixed(3));
-
-        map.addLayer(vectorLayer);
-    }
     
     // Function modified to add action name and marker numbering to help changing icon depending on those items
-    function getPointIcon(_action, isEdit, markerNumber='') {
+/*     function getPointIcon(_action, isEdit, markerNumber='') {
         var dictofPoint = {
             1:    'WP',
             2:    'PH',
@@ -655,10 +622,10 @@ TABS.mission_control.initialize = function (callback) {
                 }),
             }))
         });
-    }
+    } */
 
     // Function modified by adding parameter 1,2,3 needed in MSP, plus options dictionary to take into account WP behavior changer such as JUMP, SET_HEAD, RTH
-    function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0, _options={key: "None"}) {
+/*     function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0, _options={key: "None"}) {
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(_pos),
             name: 'Null Island',
@@ -688,9 +655,229 @@ TABS.mission_control.initialize = function (callback) {
         markers.push(vectorLayer);
 
         return vectorLayer;
+    } */
+    
+    /////////////////////////////////////////////
+    // Manage Waypoint
+    /////////////////////////////////////////////
+    
+    function removeAllWaypoints() {
+        mission = new WaypointCollection(); 
+        cleanLayers();
+        clearEditForm();
+        updateTotalInfo();
     }
     
+    function addWaypointMarker(waypoint) {
 
+        let coord = ol.proj.fromLonLat([waypoint.getLon(), waypoint.getLat()]);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+        iconFeature.setStyle(getWaypointIcon(waypoint, false));
+        var vectorSource = new ol.source.Vector({
+            features: [iconFeature]
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+        
+        vectorLayer.kind = "waypoint";
+        vectorLayer.number = waypoint.getNumber();
+        vectorLayer.layerNumber = waypoint.getLayerNumber();
+/*         vectorLayer.alt = _alt;
+        vectorLayer.number = markers.length;
+        vectorLayer.action = _action;
+        vectorLayer.parameter1 = _parameter1;
+        vectorLayer.parameter2 = _parameter2;
+        vectorLayer.parameter3 = _parameter3;
+        vectorLayer.options = _options;*/
+
+        markers.push(vectorLayer);
+
+        return vectorLayer;
+    }
+
+    function getWaypointIcon(waypoint, isEdit) {
+        var dictofPointIcon = {
+            1:    'WP',
+            2:    'PH',
+            3:    'PH',
+            5:    'POI',
+            8:    'LDG'
+        };
+        
+        return new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_position' + (dictofPointIcon[waypoint.getAction()] != '' ? '_'+dictofPointIcon[waypoint.getAction()] : '') + (isEdit ? '_edit' : '')+ '.png'
+            })),
+            text: new ol.style.Text(({
+                text: String(Number(waypoint.getLayerNumber()+1)),
+                font: '12px sans-serif',
+                offsetY: -15,
+                offsetX: -2,
+                fill: new ol.style.Fill({
+                    color: '#FFFFFF'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#FFFFFF'
+                }),
+            }))
+        });
+    }
+    
+    
+    function repaintLine4Waypoints(mission) {
+        let oldPos,
+            oldAction,
+            poiList = [],
+            oldHeading;
+        let activatePoi = false;
+        let activateHead = false;
+        $('#missionDistance').text(0);
+        cleanLines();
+        mission.get().forEach(function (element) {
+            console.log(element.getNumber());
+            if (!element.isAttached()) {
+                /* console.log("Not Attached");
+                console.log("element.getAction() : ",MWNP.WPTYPE.REV[element.getAction()]);
+                console.log("element.getP1() : ",element.getP1()); */
+                let coord = ol.proj.fromLonLat([element.getLon(), element.getLat()]);                
+                if (element.getAction() == 5) {
+                    // If action is Set_POI, increment counter of POI
+                    poiList.push(element.getNumber());
+                    activatePoi = true;
+                }
+                else {
+                    // If classic WPs, draw standard line in-between 
+                    if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead != true){
+                        paintLine(oldPos, coord, element.getNumber());
+                    }
+                    // If one is POI, draw orange line in-between and modulate dashline each time a new POI is defined
+                    else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
+                        if ((poiList % 2) == 0) {
+                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725', lineDash=5);
+                        }
+                        else {
+                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725');
+                        }
+                    }
+                    // If one is SET_HEAD, draw labelled line in-between with heading value
+                    else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
+                        paintLine(oldPos, coord, element.getNumber(), color='#1497f1', lineDash=0, lineText=String(oldHeading)+"°");
+                    }
+                    oldPos = coord;
+                }
+            }
+            else if (element.isAttached()) {
+                /* console.log("Attached");
+                console.log("element.getAction() : ",MWNP.WPTYPE.REV[element.getAction()]);
+                console.log("e lement.getP1() : ",element.getP1());*/
+                // If classic WPs is defined with a JUMP options, draw pink dashed line in-between 
+                if (element.getAction() == MWNP.WPTYPE.JUMP) {
+                    let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLon(), mission.getWaypoint(element.getP1()).getLat()]);  
+                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+String(element.getP2()), selection=false);
+                }
+                // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
+                else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
+                    if (element.getP1() == -1) {
+                        activatePoi = false;
+                        activateHead = false;
+                        oldHeading = 'undefined'
+                    }
+                    else if (typeof element.getP1() != 'undefined' && element.getP1() != -1) {
+                        activateHead = true;
+                        oldHeading = String(element.getP1());
+                    }
+                }
+            }
+        });
+        //reset text position
+        if (textGeom) {
+            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
+        }
+    }
+    
+    function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true) {
+        var line = new ol.geom.LineString([pos1, pos2]);
+
+        var feature = new ol.Feature({
+            geometry: line
+        });
+        feature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: color,
+                width: 3,
+                lineDash: [lineDash]
+            }),
+            text: new ol.style.Text({
+                text: lineText,
+                placement : 'line',
+                textBaseline: 'ideographic',
+                stroke: new ol.style.Stroke({
+                    color: color
+                }),
+            }),
+        }));
+
+        var vectorSource = new ol.source.Vector({
+            features: [feature]
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+
+
+        vectorLayer.kind = "line";
+        vectorLayer.selection = selection;
+        vectorLayer.number = pos2ID;
+        //console.log("pos2ID : ",pos2ID);
+        
+        lines.push(vectorLayer);
+
+        var length = ol.Sphere.getLength(line) + parseFloat($('#missionDistance').text());
+        $('#missionDistance').text(length.toFixed(3));
+
+        map.addLayer(vectorLayer);
+    }
+    
+    function cleanLayers() {       
+        for (var i in lines) {
+            map.removeLayer(lines[i]);
+        }
+        lines = [];
+        
+        for (var i in markers) {
+            map.removeLayer(markers[i]);
+        }
+        markers = [];
+    }
+    
+    function cleanLines() {       
+        for (var i in lines) {
+            map.removeLayer(lines[i]);
+        }
+        lines = [];
+    }
+        
+    function redrawLayers() {
+        if (!mission.isEmpty()) {
+            mission.get().forEach(function (element) {
+                if (!element.isAttached()) {
+                    map.addLayer(addWaypointMarker(element));
+                }
+            });
+        }
+        repaintLine4Waypoints(mission);
+    }
     
     /////////////////////////////////////////////
     // Manage Map construction
@@ -841,6 +1028,10 @@ TABS.mission_control.initialize = function (callback) {
                 function (feature, layer) {
                     return feature;
                 });
+            var tempMarker = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return layer;
+                });
 
             var deltaX = evt.coordinate[0] - this.coordinate_[0];
             var deltaY = evt.coordinate[1] - this.coordinate_[1];
@@ -851,7 +1042,15 @@ TABS.mission_control.initialize = function (callback) {
 
             this.coordinate_[0] = evt.coordinate[0];
             this.coordinate_[1] = evt.coordinate[1];
-            repaint();
+            
+            let coord = ol.proj.toLonLat(geometry.getCoordinates());
+            if (tempMarker.kind == "waypoint") {
+                let tempWp = mission.getWaypoint(tempMarker.number);
+                tempWp.setLon(coord[0]);
+                tempWp.setLat(coord[1]);
+                mission.updateWaypoint(tempWp);
+            }
+            repaintLine4Waypoints(mission);
         };
 
         /**
@@ -962,6 +1161,66 @@ TABS.mission_control.initialize = function (callback) {
         map.on('click', function (evt) {
             if (selectedMarker != null) {
                 try {
+                    //selectedFeature.getSource().getFeatures()[0].setStyle(getWaypointIcon(selectedMarker, false));
+                    selectedMarker = null;
+                    clearEditForm();
+                } catch (e) {
+                    GUI.log(e);
+                }
+            }
+            var selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return feature;
+                });
+            var tempMarker = map.forEachFeatureAtPixel(evt.pixel,
+                function (feature, layer) {
+                    return layer;
+                });
+            if (selectedFeature && tempMarker.kind == "waypoint") {
+                selectedMarker = mission.getWaypoint(tempMarker.number);
+                var geometry = selectedFeature.getGeometry();
+                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+
+                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+
+                var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+
+                $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+                $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
+                $('#pointAlt').val(selectedMarker.getAlt());
+                $('#pointType').val(selectedMarker.getAction());
+                // Change SpeedValue to Parameter1, 2, 3
+                $('#pointP1').val(selectedMarker.getP1());
+                $('#pointP2').val(selectedMarker.getP2());
+                $('#pointP3').val(selectedMarker.getP3());
+                $('#MPeditPoint').fadeIn(300);
+            }
+            else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection) {
+                let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
+                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, tempWpCoord[1], tempWpCoord[0], alt=settings.alt, p1=settings.speed);
+                //console.log("tempMarker.number : ",tempMarker.number);
+                //console.log("mission : ",mission.getWaypoint(tempMarker.number), mission.getWaypoint(tempMarker.number));
+                mission.insertWaypoint(tempWp, tempMarker.number);
+                mission.update();
+                cleanLayers();
+                redrawLayers();
+            }
+            else {
+                let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
+                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, tempWpCoord[1], tempWpCoord[0], alt=settings.alt, p1=settings.speed);
+                mission.put(tempWp);
+                mission.update();
+                cleanLayers();
+                redrawLayers();
+            }
+            
+        });
+
+
+        /* map.on('click', function (evt) {
+            if (selectedMarker != null) {
+                try {
                     selectedMarker.getSource().getFeatures()[0].setStyle(getPointIcon(selectedMarker.action, false, selectedMarker.number));
                     selectedMarker = null;
                     clearEditForm();
@@ -1033,7 +1292,7 @@ TABS.mission_control.initialize = function (callback) {
                 map.addLayer(addMarker(evt.coordinate, settings.alt, MWNP.WPTYPE.WAYPOINT, settings.speed));
                 repaint();
             }
-        });
+        }); */
 
         // change mouse cursor when over marker
         $(map.getViewport()).on('mousemove', function (e) {
@@ -1062,25 +1321,18 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
-                removeAllPoints();
+                removeAllWaypoints();
             }
         });
 
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
-
-                var tmp = [];
-                for (var i in markers) {
-                    if (markers[i] !== selectedMarker && typeof markers[i].action !== "undefined") {
-                        tmp.push(markers[i]);
-                    }
-                }
-                map.removeLayer(selectedMarker);
-                markers = tmp;
+                mission.dropWaypoint(selectedMarker);
                 selectedMarker = null;
-
+                mission.update();
+                cleanLayers();
+                redrawLayers();
                 clearEditForm();
-                repaint();
             }
         });
         
@@ -1154,7 +1406,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadFileMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
-            removeAllPoints();
+            removeAllWaypoints();
             nwdialog.setContext(document);
             nwdialog.openFileDialog(function(result) {
                 loadMissionFile(result);
@@ -1170,7 +1422,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
-            removeAllPoints();
+            removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
             // Reinit some internal parameters
@@ -1198,7 +1450,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
-            removeAllPoints();
+            removeAllWaypoints();
             GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
 
             MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getPointsFromEprom);
@@ -1252,15 +1504,7 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     // Manage Buttons toolbox
     /////////////////////////////////////////////
-    function removeAllPoints() {
-        for (var i in markers) {
-            map.removeLayer(markers[i]);
-        }
-        markers = [];
-        clearEditForm();
-        updateTotalInfo();
-        repaint();
-    }
+
 
     function loadMissionFile(filename) {
         const fs = require('fs');
@@ -1279,7 +1523,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 // parse mission file
-                var mission = { points: [] };
+                removeAllWaypoints();
                 var node = null;
                 var nodemission = null;
                 for (var noderoot in result) {
@@ -1291,69 +1535,85 @@ TABS.mission_control.initialize = function (callback) {
                                 if (node['#name'].match(/version/i) && node.$) {
                                     for (var attr in node.$) {
                                         if (attr.match(/value/i)) {
-                                            mission.version = node.$[attr]
+                                            mission.setVersion(node.$[attr]);
                                         }
                                     }
                                 } else if (node['#name'].match(/mwp/i) && node.$) {
-                                    mission.center = {};
                                     for (var attr in node.$) {
                                         if (attr.match(/zoom/i)) {
-                                            mission.center.zoom = parseInt(node.$[attr]);
+                                            mission.setCenterZoom(parseInt(node.$[attr]));
                                         } else if (attr.match(/cx/i)) {
-                                            mission.center.lon = parseFloat(node.$[attr]);
+                                            mission.setCenterLon(parseFloat(node.$[attr]));
                                         } else if (attr.match(/cy/i)) {
-                                            mission.center.lat = parseFloat(node.$[attr]);
+                                            mission.setCenterLat(parseFloat(node.$[attr]));
                                         }
                                     }
                                 } else if (node['#name'].match(/missionitem/i) && node.$) {
-                                    var point = {};
+                                    //var point = {};
+                                    var point = new Waypoint(0,0,0,0);
                                     for (var attr in node.$) {
                                         if (attr.match(/no/i)) {
-                                            point.index = parseInt(node.$[attr]);
+                                            point.setNumber(parseInt(node.$[attr]));
                                         } else if (attr.match(/action/i)) {
                                             if (node.$[attr].match(/WAYPOINT/i)) {
-                                                point.action = MWNP.WPTYPE.WAYPOINT;
+                                                point.setAction(MWNP.WPTYPE.WAYPOINT);
                                             } else if (node.$[attr].match(/PH_UNLIM/i) || node.$[attr].match(/POSHOLD_UNLIM/i)) {
-                                                point.action = MWNP.WPTYPE.PH_UNLIM;
+                                                point.setAction(MWNP.WPTYPE.PH_UNLIM);
                                             } else if (node.$[attr].match(/PH_TIME/i) || node.$[attr].match(/POSHOLD_TIME/i)) {
-                                                point.action = MWNP.WPTYPE.PH_TIME;
+                                                point.setAction(MWNP.WPTYPE.PH_TIME);
                                             } else if (node.$[attr].match(/RTH/i)) {
-                                                point.action = MWNP.WPTYPE.RTH;
+                                                point.setAction(MWNP.WPTYPE.RTH);
                                             } else if (node.$[attr].match(/SET_POI/i)) {
-                                                point.action = MWNP.WPTYPE.SET_POI;
+                                                point.setAction(MWNP.WPTYPE.SET_POI);
                                             } else if (node.$[attr].match(/JUMP/i)) {
-                                                point.action = MWNP.WPTYPE.JUMP;
+                                                point.setAction(MWNP.WPTYPE.JUMP);
                                             } else if (node.$[attr].match(/SET_HEAD/i)) {
-                                                point.action = MWNP.WPTYPE.SET_HEAD;
+                                                point.setAction(MWNP.WPTYPE.SET_HEAD);
                                             } else if (node.$[attr].match(/LAND/i)) {
-                                                point.action = MWNP.WPTYPE.LAND;
+                                                point.setAction(MWNP.WPTYPE.LAND);
                                             } else {
-                                                point.action = 0;
+                                                point.setAction(0);
                                             }
                                         } else if (attr.match(/lat/i)) {
-                                            point.lat = parseFloat(node.$[attr]);
+                                            point.setLat(parseFloat(node.$[attr]));
                                         } else if (attr.match(/lon/i)) {
-                                            point.lon = parseFloat(node.$[attr]);
+                                            point.setLon(parseFloat(node.$[attr]));
                                         } else if (attr.match(/alt/i)) {
-                                            point.alt = (parseInt(node.$[attr]) * 100);
+                                            point.setAlt((parseInt(node.$[attr]) * 100));
                                         } else if (attr.match(/parameter1/i)) {
-                                            point.p1 = parseInt(node.$[attr]);
+                                            point.setP1(parseInt(node.$[attr]));
                                         } else if (attr.match(/parameter2/i)) {
-                                            point.p2 = parseInt(node.$[attr]);
+                                            point.setP2(parseInt(node.$[attr]));
                                         } else if (attr.match(/parameter3/i)) {
-                                            point.p3 = parseInt(node.$[attr]);
+                                            point.setP3(parseInt(node.$[attr]));
                                         }
                                     }
-                                    mission.points.push(point);
+                                    mission.put(point);
                                 }
                             }
                         }
                     }
                 }
 
-                // draw actual mission
-                removeAllPoints();
-                // Create nonMarkerPointListRead list to store index of non marker point (i.e RTH, SET_HEAD, JUMP) => useful for JUMP part
+                
+                
+                // update Attached Waypoints (i.e non Map Markers)
+                mission.update(true);
+                if (mission.getCenter() != {}) {
+                    var coord = ol.proj.fromLonLat([mission.getCenter().lon, mission.getCenter().lat]);
+                    map.getView().setCenter(coord);
+                    if (mission.getCenter().zoom) map.getView().setZoom(mission.getCenter().zoom);
+                }
+                else {
+                    var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getCenter().lon, mission.getWaypoint(0).getCenter().lat]);
+                    map.getView().setCenter(coord);
+                    map.getView().setZoom(16);
+                }
+                
+                redrawLayers();
+                updateTotalInfo();
+                
+               /*  // Create nonMarkerPointListRead list to store index of non marker point (i.e RTH, SET_HEAD, JUMP) => useful for JUMP part
                 var nonMarkerPointListRead =[]
                 for (var i = 0; i < mission.points.length; i++) {
                     if ([MWNP.WPTYPE.JUMP,MWNP.WPTYPE.SET_HEAD,MWNP.WPTYPE.RTH].includes(mission.points[i].action)) {nonMarkerPointListRead.push(mission.points[i].index);};
@@ -1403,10 +1663,10 @@ TABS.mission_control.initialize = function (callback) {
                     var coord = ol.proj.fromLonLat([mission.center.lon, mission.center.lat]);
                     map.getView().setCenter(coord);
                     if (mission.center.zoom) map.getView().setZoom(mission.center.zoom);
-                }
+                } */
 
-                repaint();
-                updateTotalInfo();
+                //repaint();
+                //updateTotalInfo();
 
             });
 

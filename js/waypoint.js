@@ -1,9 +1,10 @@
 /*global $*/
 'use strict';
 
-let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true) {
+let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true, isAttached=false, attachedId="") {
 
     var self = {};
+    let layerNumber = "undefined";
 
     self.getNumber = function () {
         return number;
@@ -13,12 +14,28 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
         number = data;
     };
     
+    self.getLayerNumber = function () {
+        return layerNumber;
+    };
+
+    self.setLayerNumber = function (data) {
+        layerNumber = data;
+    };
+    
     self.isUsed = function () {
         return isUsed;
     };
 
     self.setUsed = function (data) {
         isUsed = data;
+    };
+    
+    self.isAttached = function () {
+        return isAttached;
+    };
+
+    self.setAttached = function (data) {
+        isAttached = data;
     };
 
     self.getLon = function () {
@@ -83,6 +100,14 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     
     self.setEndMission = function (data) {
         endMission = data;
+    };
+    
+    self.getAttachedId = function () {
+        return attachedId;
+    };
+
+    self.setAttachedId = function (data) {
+        attachedId = data;
     };
 
     return self;
