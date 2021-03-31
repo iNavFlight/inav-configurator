@@ -868,7 +868,11 @@ var FC = {
         return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
     },
     getOpticalFlowNames: function () {
-        return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
+        if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
+            return [ "NONE", "CXOF", "MSP", "FAKE" ];
+        } else {
+            return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
+        }
     },
     getArmingFlags: function () {
         return {
