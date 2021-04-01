@@ -3612,5 +3612,20 @@
     },
     "SafehomeLat": {
         "message": "Lat"
+    },
+    "WaypointOptionSelected": {
+        "message": ""
+    },
+    "WaypointOptionId": {
+        "message": "#"
+    },
+    "WaypointOptionAction": {
+        "message": "Type"
+    },
+    "WaypointOptionP1": {
+        "message": "P1"
+    },
+    "WaypointOptionP2": {
+        "message": "P2"
     }
 }

@@ -100,7 +100,7 @@
                             <select name="type" id="pointType">
                                 <!--<option value="1">Home</option>-->
                                 <option value="1">Waypoint</option>
-								<option value="2">PH_UNLIM</option>
+								<!-- <option value="2">PH_UNLIM</option> -->
 								<option value="3">PH_TIME</option>
 								<!--<option value="4">RTH</option>-->
 								<option value="5">Point of Interest</option>
@@ -121,7 +121,7 @@
                             <label class="point-label" for="pointAlt">Alt (cm): </label>
                             <input id="pointAlt" type="text" value="0" required><span id="altitudeInMeters"></span>
                         </div>
-                        <div class="point" id="pointP1class" style="display: none">
+                        <!-- <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
                             <input id="pointP1" type="text" value="0" required>
                         </div>
@@ -132,8 +132,24 @@
 						<div class="point" id="pointP3class" style="display: none">
                             <label class="point-label" for="pointP3">Parameter 3: </label>
                             <input id="pointP3" type="text" value="0" required>
+                        </div> -->
+                        <div>
+                        <table class="waypointOptionsTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px" data-i18n="WaypointOptionSelected"></th>
+                                    <th style="width: 50px" data-i18n="WaypointOptionId"></th>
+                                    <th style="width: 80px" data-i18n="WaypointOptionAction"></th>
+                                    <th style="width: 120px" data-i18n="WaypointOptionP1"></th>
+                                    <th style="width: 120px" data-i18n="WaypointOptionP2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="waypointOptionsTableBody">
+                            </tbody>
+                        </table>
                         </div>
-						<div class="point-radio" id="pointOptionclass" style="display: none">
+                        
+						<!-- <div class="point-radio" id="pointOptionclass" style="display: none">
 							<div class="radio-line">
 								<input type="radio" id="Options_None" name="Options" value="None" checked>
 								<label class="radio-options" for="Options_None">None</label><br>
@@ -158,7 +174,7 @@
 								<label for="Options_HeadingHead">Heading: </label>
 								<input id="Options_HeadingHead" type="text" value="-1" required><br>
 							</div>
-                        </div>
+                        </div> -->
 						
                         <div style="padding-top: 10px; display: block">
                             <div id="savePoint" class="btn save_btn">

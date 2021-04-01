@@ -97,17 +97,16 @@ let WaypointCollection = function () {
     
     self.dropWaypoint = function(newWaypoint) {
         self.getWaypoint(newWaypoint.getNumber()).setUsed(false);
-        var tmpData = [];
-        let idx = 0;
-        data.forEach(function (element) {
-            if (element.isUsed()) {
-                element.setNumber(idx)
-                tmpData.push(element);
-                idx++;
+        let indexId = newWaypoint.getNumber()
+        data.forEach(function (wp) {
+            if (wp.getNumber() >= indexId) {
+                wp.setNumber(wp.getNumber()-1);
+            }
+            if (wp.getAction() == MWNP.WPTYPE.JUMP && wp.getP1()>=indexId) {
+                wp.setP1(wp.getP1()-1);
             }
         });
-        
-        data = tmpData;
+        data.splice(indexId, 1);
 
     };
     
@@ -176,6 +175,16 @@ let WaypointCollection = function () {
         return tmpData;
     } 
     
+    self.getAttachedFromWaypoint = function (waypoint) {
+        let tmpData = [];
+        data.forEach(function (element) {
+            if (element.isAttached() && element.getAttachedId() == waypoint.getNumber()) {
+                tmpData.push(element);
+            }
+        });
+
+        return tmpData;
+    } 
 
     return self;
 };
