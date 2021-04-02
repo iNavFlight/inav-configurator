@@ -40,6 +40,8 @@ var dictOfLabelParameterPoint = {
     8:    {parameter1: '', parameter2: '', parameter3: ''}
 };
 
+var waypointOptions = ['JUMP','SET_HEAD','RTH'];
+
 TABS.mission_control = {};
 TABS.mission_control.isYmapLoad = false;
 TABS.mission_control.initialize = function (callback) {
@@ -887,12 +889,14 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * Process Waypoint Options table UI
          */
-        //$waypointOptionsTableBody.find("*").remove();
         $waypointOptionsTableBody.empty();
         mission.getAttachedFromWaypoint(waypoint).forEach(function (element) {
-            $waypointOptionsTable.append('\
+            $waypointOptionsTableBody.append('\
                 <tr>\
-                <td></td> \
+                <td><div id="deleteOptionsPoint" class="btn waypointOptionsTable_btn-danger"> \
+                        <a class="btnicon ic_cancel" href="#" style="float: center" title="Delete"></a> \
+                    </div>\
+                </td> \
                 <td><span class="waypointOptions-number"/></td>\
                 <td><select class="waypointOptions-action"></select></td> \
                 <td><input type="text" class="waypointOptions-p1"/></td>\
@@ -900,11 +904,17 @@ TABS.mission_control.initialize = function (callback) {
                 </tr>\
             ');
 
-            const $row = $waypointOptionsTable.find('tr:last');
+            const $row = $waypointOptionsTableBody.find('tr:last');
             
-            //GUI.fillSelect($row.find(".waypointOptions-action"), , );
+            console.log(MWNP.WPTYPE.REV[element.getAction()]);
+            console.log(typeof MWNP.WPTYPE.REV[element.getAction()]);
+            GUI.fillSelect($row.find(".waypointOptions-action"), waypointOptions, waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()]));
             
-            $row.find(".waypointOptions-number").text(element.getNumber()+1);
+            $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).change(function () {
+                    element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
+                });
+            
+            $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
             $row.find(".waypointOptions-p1").val(element.getP1()).change(function () {
                 element.setP1($(this).val());
@@ -914,7 +924,7 @@ TABS.mission_control.initialize = function (callback) {
                 element.setP2($(this).val());
             });
 
-            //$row.find("[data-role='role-servo-delete']").attr("data-index", safehomeIndex);
+            $row.find("[data-role='waypointOptions-delete']").attr("data-index", element.getAttachedNumber()+1);
             
         });
         GUI.switchery();

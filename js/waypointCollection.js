@@ -140,6 +140,7 @@ let WaypointCollection = function () {
     
     self.update = function (bMWPfile=false) {
         let oldWPNumber = 0;
+        let optionIdx = 0;
         let idx = 0;
         data.forEach(function (element) {
             if (element.isUsed()) {
@@ -151,11 +152,14 @@ let WaypointCollection = function () {
                 }
                 if ([MWNP.WPTYPE.JUMP,MWNP.WPTYPE.SET_HEAD,MWNP.WPTYPE.RTH].includes(element.getAction())) {
                     element.setAttachedId(oldWPNumber);
+                    element.setAttachedNumber(optionIdx);
                     element.setAttached(true);
+                    optionIdx++;
                 }
                 else {
                     oldWPNumber = element.getNumber();
                     element.setLayerNumber(idx);
+                    optionIdx = 0;
                     idx++;
                 }
             }

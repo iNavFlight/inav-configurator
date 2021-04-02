@@ -69,6 +69,10 @@
     background-image: url(../images/icons/cf_icon_MP_cancel_grey.svg);
 }
 
+.tab-mission-control .ic_add {
+    background-image: url(../images/icons/cf_icon_MP_add_grey.svg);
+}
+
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
@@ -298,4 +302,34 @@
 .tab-mission-control .waypointOptionsTable tr:nth-child(even) td,
 .tab-mission-control .waypointOptionsTable tr:nth-child(even) th {
     background-color: #ebe7e7;
+}
+
+.tab-mission-control .waypointOptionsTable .btnicon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 11px;
+}
+
+.tab-mission-control .waypointOptionsTable_btn-danger a {
+    background-color: #db250e;
+    height: 11px;
+    margin: 1px;
+    line-height: 11px;
+    width: 11px;
+}
+.tab-mission-control .waypointOptionsTable_btn-danger a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .waypointOptionsTable_btn-success a {
+    background-color: #28a745;
+    height: 11px;
+    margin: 1px;
+    line-height: 11px;
+    width: 11px;
+}
+.tab-mission-control .waypointOptionsTable_btn-success a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
 }

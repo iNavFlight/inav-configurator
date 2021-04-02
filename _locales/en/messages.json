@@ -3614,7 +3614,7 @@
         "message": "Lat"
     },
     "WaypointOptionSelected": {
-        "message": ""
+        "message": "+"
     },
     "WaypointOptionId": {
         "message": "#"
