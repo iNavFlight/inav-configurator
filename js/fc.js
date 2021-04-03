@@ -74,7 +74,7 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     isCdComponentUsed: function () {
-        return FC.isRpyDComponentUsed();
+        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
     },
     resetState: function () {
         SENSOR_STATUS = {
