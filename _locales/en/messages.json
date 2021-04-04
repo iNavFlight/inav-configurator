@@ -3130,6 +3130,9 @@
     "missionTemplateHead": {
         "message": "Mission template"
     },
+    "missionActionMenuHead": {
+        "message": "Action Menu"
+    },
     "useOnlyStandalone": {
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
@@ -3593,10 +3596,13 @@
         "message": "Current Meter Type"
     },
     "MissionPlannerJumpSettingsCheck": {
-        "message": "JUMP settings incorrect : Check it again !"
+        "message": "JUMP settings incorrect : Check it again!"
     },
     "MissionPlannerHeadSettingsCheck": {
-        "message": "Heading value is incorrect : Check it again !"
+        "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"
+    },
+    "MissionPlannerRTHSettingsCheck": {
+        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! Being forced by default to 0, i.e no LAND after RTH!"
     },
     "SafehomeSelected": {
         "message": ""

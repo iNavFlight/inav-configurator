@@ -73,6 +73,14 @@
     background-image: url(../images/icons/cf_icon_MP_add_grey.svg);
 }
 
+.tab-mission-control .ic_show {
+    background-image: url(../images/icons/cf_icon_MP_show_grey.svg);
+}
+
+.tab-mission-control .ic_hide {
+    background-image: url(../images/icons/cf_icon_MP_hide_grey.svg);
+}
+
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
@@ -283,6 +291,23 @@
     width: 100%;
 }
 
+.tab-mission-control .waypointOptionsTable input[type="select"] {
+    font-size: 12px;
+    width: 100%;
+}
+
+.tab-mission-control .waypointOptionsTable input[type="number"] {
+    font-size: 8px;
+    width: 100%;
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.tab-mission-control .waypointOptionsTable input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .tab-mission-control .waypointOptionsTable thead {
     display: table-header-group !important;
 }
@@ -304,32 +329,97 @@
     background-color: #ebe7e7;
 }
 
-.tab-mission-control .waypointOptionsTable .btnicon {
+
+.tab-mission-control .btnMenu a {
+    /*  common styles for content toolbar buttons */
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-right: 20px;*/
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    /*float: right;*/
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    margin: 5px;
+    float: right;
+    height: 14px;
+    line-height: 14px;
+    width: 14px;
+}
+
+.tab-mission-control .btnMenu a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btnMenuIcon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px;
+}
+
+.tab-mission-control .btnMenu-danger a {
+    background-color: #db250e;
+        border: 1px solid #b5480e;
+
+}
+
+.tab-mission-control .btnMenu-danger a:hover {
+    background-color: #b5480e;
+}
+
+.tab-mission-control .btnTable a {
+    /*  common styles for content toolbar buttons */
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-right: 20px;*/
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    /*float: right;*/
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    margin: 5px;
+    float: right;
+    height: 11px;
+    line-height: 11px;
+    width: 11px;
+}
+
+.tab-mission-control .btnTable a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btnTableIcon {
     background-repeat: no-repeat;
     background-position: center;
     background-size: 11px;
 }
 
-.tab-mission-control .waypointOptionsTable_btn-danger a {
+.tab-mission-control .btnTable-danger a {
     background-color: #db250e;
-    height: 11px;
-    margin: 1px;
-    line-height: 11px;
-    width: 11px;
-}
-.tab-mission-control .waypointOptionsTable_btn-danger a:hover {
-    background-color: #b5480e;
-    transition: all ease 0.2s;
+    border: 1px solid #b5480e;
+
 }
 
-.tab-mission-control .waypointOptionsTable_btn-success a {
-    background-color: #28a745;
-    height: 11px;
-    margin: 1px;
-    line-height: 11px;
-    width: 11px;
-}
-.tab-mission-control .waypointOptionsTable_btn-success a:hover {
+.tab-mission-control .btnTable-danger a:hover {
     background-color: #b5480e;
-    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btnTable-success a {
+    background-color: #28a745;
+    border: 1px solid #218838;
+
+}
+
+.tab-mission-control .btnTable-success a:hover {
+    background-color: #218838;
 }

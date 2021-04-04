@@ -5,9 +5,60 @@
     <div class="content_wrapper">
         <div class="cf_column fourth" id="missionControls">
             <div class="spacer_right">
+                <div id="missionPlanerAction" class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionActionMenuHead">Action Menu</div>
+                        <div class="btnMenu btnMenuIcon show_btn"  id="showHideActionButton">
+                            <a class="ic_hide" href="#" title="Hide"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="ActionContent">
+                        
+                        <div class="btn save_btn">
+                            <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" title="Load Mission File"></a>
+                            <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" title="Save Mission File"></a>
+                        </div>
+                        <div class="btn save_btn">
+                            <a id="loadMissionButton" class="btnicon ic_loadFromFC" href="#" title="Load mission from FC"</a>
+                            <a id="saveMissionButton" class="btnicon ic_save2FC" href="#" title="Save mission to FC"</a>
+                            <a id="loadEepromMissionButton" class="btnicon ic_loadFromEprom" href="#" title="Load Eeprom mission"></a>
+                            <a id="saveEepromMissionButton" class="btnicon ic_save2Eprom" href="#" title="Save Eeprom mission"></a>
+                        </div>
+                        <hr>
+                        <div id="removeAllPoints" class="btn btn-danger_long" style="padding-top: 1px; display: inline-block">
+                            <a class="btnicon ic_removeAll" href="#" title="Remove all"></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="missionPlanerTotalInfo" class="gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
+                        <div class="btnMenu btnMenuIcon show_btn"  id="showHideInfoButton">
+                            <a class="ic_hide" href="#" title="Hide"></a>
+                        </div>
+                    </div>
+                    <div class="spacer"  id="InfoContent">
+                        <div id="infoMissionDistance" style="padding-bottom: 2px;">
+                            <span>Distance (m):</span>
+                            <span id="missionDistance"></span>
+                        </div>
+                        <div id="infoAvailablePoints" style="padding-bottom: 2px;">
+                            <span>Available Points</span>
+                            <span id="availablePoints">0/0</span>
+                        </div>
+                        <div id="infoMissionValid" style="padding-bottom: 2px;">
+                            <span>Mission valid</span>
+                            <div id="missionValid" style="display: inline-block"></div>
+                        </div>
+                    </div>
+                </div>
                 <div id="missionPlanerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
+                        <div class="btnMenu btnMenuIcon  save_btn">
+                                <a id="cancelSettings" class="ic_cancel" href="#" title="Cancel"></a>
+                                <a id="saveSettings" class="ic_save" href="#" title="Save"></a>
+                        </div>
                     </div>
                     <div class="spacer">
                         <div class="point">
@@ -17,12 +68,6 @@
                         <div class="point">
                             <label class="point-label" for="MPdefaultPointSpeed">Speed (cm/s): </label>
                             <input id="MPdefaultPointSpeed" type="text" value="0" required>
-                        </div>
-                        <div>
-                            <div class="btn save_btn" style="padding-top: 10px;">
-                                <a id="saveSettings" class="btnicon ic_save" href="#" title="Save" style="float: left"></a>
-                                <a id="cancelSettings" class="btnicon ic_cancel" href="#" style="float: left" title="Cancel"></a>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,44 +99,13 @@
                         </div>
                     </div>
                 </div>
-                <div id="missionPlanerTotalInfo" class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
-                    </div>
-                    <div class="spacer">
-                        <div id="infoMissionDistance" style="padding-bottom: 2px;">
-                            <span>Distance (m):</span>
-                            <span id="missionDistance"></span>
-                        </div>
-                        <div id="infoAvailablePoints" style="padding-bottom: 2px;">
-                            <span>Available Points</span>
-                            <span id="availablePoints">0/0</span>
-                        </div>
-                        <div id="infoMissionValid" style="padding-bottom: 2px;">
-                            <span>Mission valid</span>
-                            <div id="missionValid" style="display: inline-block"></div>
-                        </div>
-                        <br>
-                        <hr>
-                        <div class="btn save_btn">
-                            <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" title="Load Mission File"></a>
-                            <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" title="Save Mission File"></a>
-                        </div>
-                        <div class="btn save_btn">
-                            <a id="loadMissionButton" class="btnicon ic_loadFromFC" href="#" title="Load mission from FC"</a>
-                            <a id="saveMissionButton" class="btnicon ic_save2FC" href="#" title="Save mission to FC"</a>
-                            <a id="loadEepromMissionButton" class="btnicon ic_loadFromEprom" href="#" title="Load Eeprom mission"></a>
-                            <a id="saveEepromMissionButton" class="btnicon ic_save2Eprom" href="#" title="Save Eeprom mission"></a>
-                        </div>
-                        <hr>
-                        <div id="removeAllPoints" class="btn btn-danger_long" style="padding-top: 1px; display: inline-block">
-                            <a class="btnicon ic_removeAll" href="#" title="Remove all"></a>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead">Edit point</div>
+                        <div id="removePoint" class="btnMenu btnMenuIcon btnMenu-danger">
+                            <a class="ic_removeAll" href="#" title="Remove"></a>
+                        </div>
                     </div>
                     <div class="spacer">
                         <input type="hidden" name="pointNumber" value="">
@@ -121,7 +135,7 @@
                             <label class="point-label" for="pointAlt">Alt (cm): </label>
                             <input id="pointAlt" type="text" value="0" required><span id="altitudeInMeters"></span>
                         </div>
-                        <!-- <div class="point" id="pointP1class" style="display: none">
+                        <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
                             <input id="pointP1" type="text" value="0" required>
                         </div>
@@ -132,14 +146,14 @@
 						<div class="point" id="pointP3class" style="display: none">
                             <label class="point-label" for="pointP3">Parameter 3: </label>
                             <input id="pointP3" type="text" value="0" required>
-                        </div> -->
+                        </div>
                         <div>
                         <table class="waypointOptionsTable">
                             <thead>
                                 <tr>
                                     <th style="width: 30px">
-                                        <div id="addOptionsPoint" class="btn waypointOptionsTable_btn-success">
-                                            <a class="btnicon ic_add" href="#" style="float: center" title="Add"></a>
+                                        <div id="addOptionsPoint" class="btnTable btnTableIcon btnTable-success">
+                                            <a class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
                                         </div>
                                     </th>
                                     <th style="width: 50px" data-i18n="WaypointOptionId"></th>
@@ -180,14 +194,6 @@
 							</div>
                         </div> -->
 						
-                        <div style="padding-top: 10px; display: block">
-                            <div id="savePoint" class="btn save_btn">
-                                <a class="btnicon ic_save" href="#" style="float: left" title="Save"></a>
-                            </div>
-                            <div id="removePoint" class="btn btn-danger_short">
-                                <a class="btnicon ic_removeAll" href="#" style="float: left" title="Remove"></a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -418,8 +418,8 @@ TABS.mission_control.initialize = function (callback) {
                     <td></td> \
                     <td><span class="safehome-number"/></td>\
                     <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
-                    <td><input type="text" class="safehome-lon" /></td>\
-                    <td><input type="text" class="safehome-lat" /></td>\
+                    <td><input type="number" class="safehome-lon" /></td>\
+                    <td><input type="number" class="safehome-lat" /></td>\
                     </tr>\
                 ');
 
@@ -673,7 +673,7 @@ TABS.mission_control.initialize = function (callback) {
         updateTotalInfo();
     }
     
-    function addWaypointMarker(waypoint) {
+    function addWaypointMarker(waypoint, isEdit=false) {
 
         let coord = ol.proj.fromLonLat([waypoint.getLon(), waypoint.getLat()]);
         var iconFeature = new ol.Feature({
@@ -682,7 +682,7 @@ TABS.mission_control.initialize = function (callback) {
             population: 4000,
             rainfall: 500
         });
-        iconFeature.setStyle(getWaypointIcon(waypoint, false));
+        iconFeature.setStyle(getWaypointIcon(waypoint, isEdit));
         var vectorSource = new ol.source.Vector({
             features: [iconFeature]
         });
@@ -749,7 +749,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#missionDistance').text(0);
         cleanLines();
         mission.get().forEach(function (element) {
-            console.log(element.getNumber());
+            //console.log(element.getNumber());
             if (!element.isAttached()) {
                 /* console.log("Not Attached");
                 console.log("element.getAction() : ",MWNP.WPTYPE.REV[element.getAction()]);
@@ -884,6 +884,13 @@ TABS.mission_control.initialize = function (callback) {
         repaintLine4Waypoints(mission);
     }
     
+    function redrawLayer() {
+        if (selectedFeature && selectedMarker) {
+            selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+        }
+        repaintLine4Waypoints(mission);
+    }
+    
     
     function renderWaypointOptionsTable(waypoint) {
         /*
@@ -893,35 +900,76 @@ TABS.mission_control.initialize = function (callback) {
         mission.getAttachedFromWaypoint(waypoint).forEach(function (element) {
             $waypointOptionsTableBody.append('\
                 <tr>\
-                <td><div id="deleteOptionsPoint" class="btn waypointOptionsTable_btn-danger"> \
-                        <a class="btnicon ic_cancel" href="#" style="float: center" title="Delete"></a> \
+                <td><div id="deleteOptionsPoint" class="btnTable btnTableIcon btnTable-danger"> \
+                        <a class="ic_cancel" data-role="waypointOptions-delete" href="#" style="float: center" title="Delete"></a> \
                     </div>\
                 </td> \
                 <td><span class="waypointOptions-number"/></td>\
                 <td><select class="waypointOptions-action"></select></td> \
-                <td><input type="text" class="waypointOptions-p1"/></td>\
-                <td><input type="text" class="waypointOptions-p2" /></td>\
+                <td><input type="number" class="waypointOptions-p1"/></td>\
+                <td><input type="number" class="waypointOptions-p2" /></td>\
                 </tr>\
             ');
 
             const $row = $waypointOptionsTableBody.find('tr:last');
             
-            console.log(MWNP.WPTYPE.REV[element.getAction()]);
-            console.log(typeof MWNP.WPTYPE.REV[element.getAction()]);
+            for (var i = 1; i <= 3; i++) {
+                if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
+                    $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
+                }
+                else {
+                    $row.find(".waypointOptions-p"+String(i)).prop("disabled", true);
+                }
+            }
+            
+            /* console.log(MWNP.WPTYPE.REV[element.getAction()]);
+            console.log(typeof MWNP.WPTYPE.REV[element.getAction()]); */
             GUI.fillSelect($row.find(".waypointOptions-action"), waypointOptions, waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()]));
             
             $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).change(function () {
                     element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
+                    for (var i = 1; i <= 3; i++) {
+                        if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
+                            $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
+                        }
+                        else {
+                            $row.find(".waypointOptions-p"+String(i)).prop("disabled", true);
+                        }
+                    }
+                    mission.updateWaypoint(element);
+                    cleanLayers();
+                    redrawLayers();
                 });
             
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
+
             $row.find(".waypointOptions-p1").val(element.getP1()).change(function () {
-                element.setP1($(this).val());
+                if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
+                    if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
+                    {
+                      $(this).val(-1);
+                      alert(chrome.i18n.getMessage('MissionPlannerHeadSettingsCheck'));
+                    }
+                }
+                else if (MWNP.WPTYPE.REV[element.getAction()] == "RTH") {
+                    if ($(this).val() != 0 && $(this).val() != 1)
+                    {
+                      $(this).val(0);
+                      alert(chrome.i18n.getMessage('MissionPlannerRTHSettingsCheck'));
+                    }
+                }
+                element.setP1(Number($(this).val()));
+                mission.updateWaypoint(element);
+                cleanLayers();
+                redrawLayers();
             });
             
             $row.find(".waypointOptions-p2").val(element.getP2()).change(function () {
-                element.setP2($(this).val());
+                element.setP2(Number($(this).val()));
+                mission.updateWaypoint(element);
+                cleanLayers();
+                redrawLayers();
             });
 
             $row.find("[data-role='waypointOptions-delete']").attr("data-index", element.getAttachedNumber()+1);
@@ -1250,14 +1298,20 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
                 $('#pointP3').val(selectedMarker.getP3());
+                // Selection box update depending on choice of type of waypoint
+                for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+                    if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
+                        $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                        $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
+                    }
+                    else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
+                }
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
                 $('#MPeditPoint').fadeIn(300);
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, tempWpCoord[1], tempWpCoord[0], alt=settings.alt, p1=settings.speed);
-                //console.log("tempMarker.number : ",tempMarker.number);
-                //console.log("mission : ",mission.getWaypoint(tempMarker.number), mission.getWaypoint(tempMarker.number));
                 mission.insertWaypoint(tempWp, tempMarker.number);
                 mission.update();
                 cleanLayers();
@@ -1375,7 +1429,157 @@ TABS.mission_control.initialize = function (callback) {
             let altitudeMeters = app.ConvertCentimetersToMeters($(this).val());
             $('#altitudeInMeters').text(` ${altitudeMeters}m`);
         });
+        
+        /////////////////////////////////////////////
+        // Callback to show/hide menu boxes
+        /////////////////////////////////////////////
+        
+        $('#showHideActionButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#ActionContent').fadeIn(300);
+            }
+            else {
+                $('#ActionContent').fadeOut(300);
+            }
+        });
+        
+        $('#showHideInfoButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#InfoContent').fadeIn(300);
+            }
+            else {
+                $('#InfoContent').fadeOut(300);
+            }
+        });
+        
+        /////////////////////////////////////////////
+        // Callback for Waypoint edition
+        /////////////////////////////////////////////
+        $('#pointType').change(function () {
+            if (selectedMarker) {
+                selectedMarker.setAction($('#pointType').val());
+                if ([MWNP.WPTYPE.SET_POI,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.LAND].includes(selectedMarker.getAction())) {
+                    selectedMarker.setP1(0);
+                    selectedMarker.setP2(0);
+                    selectedMarker.setP3(0);
+                }
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointLat').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setLat($('#pointLat').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointLon').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setLon($('#pointLon').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointAlt').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setAlt($('#pointAlt').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointP1').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setP1($('#pointP1').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointP2').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setP2($('#pointP2').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        $('#pointP3').on('keypress', function (event) {
+            if (selectedMarker && event.which == 13) {
+                selectedMarker.setP3($('#pointP3').val());
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
+                //cleanLayers();
+                //redrawLayers();
+            }
+        });
+        
+        /////////////////////////////////////////////
+        // Callback for Waypoint Options Table
+        /////////////////////////////////////////////
+        $waypointOptionsTableBody.on('click', "[data-role='waypointOptions-delete']", function (event) {
+            //console.log($(event.currentTarget).attr("data-index"));
+            if (selectedMarker) {
+                mission.dropAttachedFromWaypoint(selectedMarker, $(event.currentTarget).attr("data-index")-1);
+                renderWaypointOptionsTable(selectedMarker);
+                cleanLayers();
+                redrawLayers();
+            }
+        });
+        
+        $("[data-role='waypointOptions-add']").click(function () {
+            if (selectedMarker) {
+                /* let tmpListWP = mission.getAttachedFromWaypoint(selectedMarker);
+                console.log("1 ", mission.getAttachedFromWaypoint(selectedMarker));
+                if (tmpListWP.length !=0) {
+                    console.log("1.1 ", tmpListWP[tmpListWP.length-1].getAttachedNumber());
+                }
+                else {
+                    console.log("tmpListWP empty");
+                } */
+                mission.addAttachedFromWaypoint(selectedMarker);
+                //console.log("2 ", mission.getAttachedFromWaypoint(selectedMarker));
+                renderWaypointOptionsTable(selectedMarker);
+                cleanLayers();
+                redrawLayers();
+            }
+        });
 
+
+        /////////////////////////////////////////////
+        // Callback for Remove buttons
+        /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
                 removeAllWaypoints();
@@ -1392,6 +1596,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayers();
             }
         });
+        
         
         // SavePoint function updated to take into account P1 to P3 parameter and JUMP,RTH, SET_HEAD options for WP
         $('#savePoint').on('click', function () {

@@ -189,6 +189,30 @@ let WaypointCollection = function () {
 
         return tmpData;
     } 
+    
+    self.addAttachedFromWaypoint = function (waypoint) {
+        let tmpNumber = 0;
+        let tmpData = self.getAttachedFromWaypoint(waypoint);
+        if (tmpData != 'undefined' && tmpData.length !=0) {
+            tmpNumber = tmpData.length;
+        }
+        console.log("tmpNumber : ",tmpNumber);
+        let tempWp = new Waypoint(waypoint.getNumber()+tmpNumber+1, MWNP.WPTYPE.JUMP, 0, 0);
+        tempWp.setAttached(true);
+        tempWp.setAttachedId(waypoint.getNumber());
+        self.insertWaypoint(tempWp, waypoint.getNumber()+tmpNumber+1);
+        self.update();
+    } 
+    
+    self.dropAttachedFromWaypoint = function (waypoint, waypointAttachedNumber) {
+        data.forEach(function (element) {
+            if (element.isAttached() && element.getAttachedId() == waypoint.getNumber() && element.getAttachedNumber() == waypointAttachedNumber) {
+                self.dropWaypoint(element);
+                self.update();
+            }
+        });
+        
+    } 
 
     return self;
 };
