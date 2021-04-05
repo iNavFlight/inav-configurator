@@ -44,5 +44,15 @@ let ProgrammingPidCollection = function () {
         GUI.switchery();
     };
 
+    self.update = function(statuses) {
+        let $table = $container.find(".pid__table")
+
+        for (let k in self.get()) {
+            if (self.get().hasOwnProperty(k)) {
+                self.get()[k].update(k, statuses.get(k), $table);
+            }
+        }
+    }
+
     return self;
 };

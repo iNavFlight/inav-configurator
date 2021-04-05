@@ -3,6 +3,7 @@
 
 let ProgrammingPid = function (enabled, setpointType, setpointValue, measurementType, measurementValue, gainP, gainI, gainD, gainFF) {
     let self = {};
+    let $row;
 
     self.getEnabled = function () {
         return !!enabled;
@@ -209,6 +210,14 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         */
         $t.change(self.onOperatorTypeChange);
 
+    }
+
+    self.update = function (index, value, $container) {
+        if (typeof $row === 'undefined') {
+            return;
+        }
+
+        $row.find('.pid_cell__output').html(value);
     }
 
     return self;
