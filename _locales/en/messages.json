@@ -3642,5 +3642,32 @@
     },
     "rollPitchAdjustmentsMoved": {
         "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use <strong>fw_level_pitch_trim</strong> instead"
+    },
+    "pidId": {
+        "message": "#"
+    },
+    "pidEnabled": {
+        "message": "Enabled"
+    },
+    "pidSetpoint": {
+        "message": "Setpoint"
+    },
+    "pidMeasurement": {
+        "message": "Measurement"
+    },
+    "pidP": {
+        "message": "P-gain"
+    },
+    "pidI": {
+        "message": "I-gain"
+    },
+    "pidD": {
+        "message": "D-gain"
+    },
+    "pidFF": {
+        "message": "FF-gain"
+    },
+    "pidOutput": {
+        "message": "Output"
     }
 }

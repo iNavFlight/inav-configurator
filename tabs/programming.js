@@ -15,13 +15,15 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     loadChainer.setChain([
         mspHelper.loadLogicConditions,
         mspHelper.loadGlobalVariablesStatus,
-        mspHelper.loadProgrammingPidStatus
+        mspHelper.loadProgrammingPidStatus,
+        mspHelper.loadProgrammingPid
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
 
     saveChainer.setChain([
         mspHelper.sendLogicConditions,
+        mspHelper.sendProgrammingPid,
         mspHelper.saveToEeprom
     ]);
     
@@ -38,8 +40,11 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     function processHtml() {
 
-        LOGIC_CONDITIONS.init($('#programming-main-content'));
+        LOGIC_CONDITIONS.init($('#subtab-lc'));
         LOGIC_CONDITIONS.render();
+
+        PROGRAMMING_PID.init($('#subtab-pid'));
+        PROGRAMMING_PID.render();
 
         GLOBAL_VARIABLES_STATUS.init($(".gvar__container"));
 
@@ -61,6 +66,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     function onStatusPullDone() {
         LOGIC_CONDITIONS.update(LOGIC_CONDITIONS_STATUS);
         GLOBAL_VARIABLES_STATUS.update($('.tab-programming'));
+        PROGRAMMING_PID.update(PROGRAMMING_PID_STATUS);
     }
 }
 
