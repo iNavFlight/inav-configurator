@@ -714,13 +714,13 @@
         "message": "Number of cells (0 = auto)"
     },
     "configurationBatteryCellsHelp": {
-        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible"
+        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible. 7S, 9S and 11S batteries cannot be autodetected."
     },
     "configurationBatteryCellDetectVoltage": {
         "message": "Maximum cell voltage for cell count detection"
     },
     "configurationBatteryCellDetectVoltageHelp": {
-        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate"
+        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate."
     },
     "configurationBatteryMinimum": {
         "message": "Minimum Cell Voltage"
