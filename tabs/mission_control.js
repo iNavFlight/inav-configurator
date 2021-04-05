@@ -42,6 +42,7 @@ var dictOfLabelParameterPoint = {
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
 
+
 TABS.mission_control = {};
 TABS.mission_control.isYmapLoad = false;
 TABS.mission_control.initialize = function (callback) {
@@ -99,7 +100,7 @@ TABS.mission_control.initialize = function (callback) {
         }
         
         $safehomesTable = $('.safehomesTable');
-        $safehomesTableBody = $safehomesTable.find('tbody');
+        $safehomesTableBody = $('#safehomesTableBody');
         $waypointOptionsTable = $('.waypointOptionsTable');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
 
@@ -327,6 +328,8 @@ TABS.mission_control.initialize = function (callback) {
 
     var markers = [];
     var lines = [];
+    var safehomeMarkers =[];
+    
     var map;
     var selectedMarker = null;
     var selectedFeature = null;
@@ -340,6 +343,11 @@ TABS.mission_control.initialize = function (callback) {
     var settings = { speed: 0, alt: 5000};
     var safehomeFromBuffer = [];
     var mission = new WaypointCollection();
+    
+    var SAFEHOMES = new SafehomeCollection(); // TO DELETE FOR SAFEHOMES RELEASE
+    SAFEHOMES.inflate(); // TO DELETE FOR SAFEHOMES RELEASE
+    var safehomeRangeRadius = 200; //meters
+    var safehomeSafeRadius = 50; //meters
     
     /////////////////////////////////////////////
     // Reinit Form
@@ -385,10 +393,6 @@ TABS.mission_control.initialize = function (callback) {
     
     function closeSettingsPanel() {
         $('#missionPlanerSettings').hide();
-        $('#missionPlanerTotalInfo').fadeIn(300);
-        if (selectedMarker !== null) {
-            $('#MPeditPoint').fadeIn(300);
-        }
     }    
     
     /////////////////////////////////////////////
@@ -396,10 +400,7 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////  
     function closeSafehomePanel() {
         $('#missionPlanerSafehome').hide();
-        $('#missionPlanerTotalInfo').fadeIn(300);
-        if (selectedMarker !== null) {
-            $('#MPeditPoint').fadeIn(300);
-        }
+        cleanSafehomeLayers();
     } 
     
     function renderSafehomesTable() {
@@ -415,7 +416,11 @@ TABS.mission_control.initialize = function (callback) {
 
                 $safehomesTableBody.append('\
                     <tr>\
-                    <td></td> \
+                    <td><div id="viewSafomePoint" class="btnTable btnTableIcon"> \
+                            <a class="ic_cancel" data-role="safehome-view" href="#"  title="View"></a> \
+                            <a class="ic_center" data-role="safehome-center" href="#"  title="move to center view"></a> \
+                        </div>\
+                    </td> \
                     <td><span class="safehome-number"/></td>\
                     <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
                     <td><input type="number" class="safehome-lon" /></td>\
@@ -430,20 +435,30 @@ TABS.mission_control.initialize = function (callback) {
                 }); */
                 
                 $row.find(".safehome-number").text(safehome.getNumber()+1);
-
+                
                 $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
-                    safehome.setEnabled($(this).val());
+                    safehome.setEnabled((($(this).prop('checked')) ? true : false));
+                    SAFEHOMES.updateSafehome(safehome);
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
                 });
 
                 $row.find(".safehome-lon").val(safehome.getLon()).change(function () {
-                    safehome.setLon($(this).val());
+                    safehome.setLon(Number($(this).val()));
+                    SAFEHOMES.updateSafehome(safehome);
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
                 });
                 
                 $row.find(".safehome-lat").val(safehome.getLat()).change(function () {
-                    safehome.setLat($(this).val());
+                    safehome.setLat(Number($(this).val()));
+                    SAFEHOMES.updateSafehome(safehome);
+                    cleanSafehomeLayers();
+                    renderSafehomesOnMap();
                 });
 
-                $row.find("[data-role='role-servo-delete']").attr("data-index", safehomeIndex);
+                $row.find("[data-role='safehome-view']").attr("data-index", safehomeIndex);
+                $row.find("[data-role='safehome-center']").attr("data-index", safehomeIndex);
             }
         }
         GUI.switchery();
@@ -451,13 +466,20 @@ TABS.mission_control.initialize = function (callback) {
     }
     
     
-    function renderSafehomesOnMap(safehomes) {
+    function renderSafehomesOnMap() {
         /*
          * Process safehome on Map
          */
-        safehomes.get().forEach(function (safehome) {
+        SAFEHOMES.get().forEach(function (safehome) {
             map.addLayer(addSafeHomeMarker(safehome));
         });
+    }
+    
+    function cleanSafehomeLayers() {       
+        for (var i in safehomeMarkers) {
+            map.removeLayer(safehomeMarkers[i]);
+        }
+        safehomeMarkers = [];
     }
     
     function getSafehomeIcon(safehome) {
@@ -499,168 +521,67 @@ TABS.mission_control.initialize = function (callback) {
             rainfall: 500
         });
 
-        iconFeature.setStyle(getSafehomeIcon(safehome));
-
-        var vectorSource = new ol.source.Vector({
-            features: [iconFeature]
+        iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
+        
+        var circleFeature = new ol.Feature({
+            geometry: new ol.geom.Circle(coord, safehomeRangeRadius),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
         });
+        
+        circleFeature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(255, 163, 46, 1)',
+                width: 3,
+                lineDash : [10]
+            }),
+            // fill: new ol.style.Fill({
+                // color: 'rgba(251, 225, 155, 0.1)'
+            // })
+        }));
+        
+        var circleSafeFeature = new ol.Feature({
+            geometry: new ol.geom.Circle(coord, safehomeSafeRadius),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+        
+        circleSafeFeature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(136, 204, 62, 1)',
+                width: 3,
+                lineDash : [10]
+            }),
+/*             fill: new ol.style.Fill({
+                color: 'rgba(136, 204, 62, 0.1)'
+            }) */
+        }));
+           
+        if (safehome.isUsed()) {
+            var vectorSource = new ol.source.Vector({
+                features: [iconFeature, circleFeature, circleSafeFeature]
+            });
+        }
+        else {
+            var vectorSource = new ol.source.Vector({
+                features: [iconFeature]
+            });
+        }
 
         var vectorLayer = new ol.layer.Vector({
             source: vectorSource
         });
 
         vectorLayer.kind = "safehome";
+        vectorLayer.number = safehome.getNumber();
+        
+        safehomeMarkers.push(vectorLayer);
         
         return vectorLayer;
     }
-    /////////////////////////////////////////////
-    // Manage Plotting functions
-    /////////////////////////////////////////////
-    // Function to repaint lines between markers 
-/*     function repaint() {
-        var oldPos;
-        var oldAction;
-        var poiNumber;
-        var poiList;
-        var lengthPoiList;
-        var activatePoi = false;
-        var activateHead = false;
-        var oldHeading;
-        var xmlItemNumber = 0;
-        
-        for (var i in lines) {
-            map.removeLayer(lines[i]);
-        }
-        lines = [];
-        poiList = [];
-        $('#missionDistance').text(0);
 
-        map.getLayers().forEach(function (t) {
-            if (t instanceof ol.layer.Vector && typeof t.alt !== 'undefined' && t.kind == "marker") {
-                var geometry = t.getSource().getFeatures()[0].getGeometry();
-                var action = t.action;
-                var markerNumber = t.number;
-                var options = t.options;
-                if (action == 5) {
-                    // If action is Set_POI, increment counter of POI
-                    poiNumber = markerNumber;
-                    lengthPoiList = poiList.push(poiNumber);
-                    activatePoi = true;
-                }
-                else {
-                    // If classic WPs, draw standard line in-between 
-                    if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead != true){
-                        paintLine(oldPos, geometry.getCoordinates());
-                    }
-                    // If one is POI, draw orange line in-between and modulate dashline each time a new POI is defined
-                    else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
-                        if ((lengthPoiList % 2) == 0) {
-                            paintLine(oldPos, geometry.getCoordinates(), '#ffb725', 5);
-                        }
-                        else {
-                            paintLine(oldPos, geometry.getCoordinates(), '#ffb725');
-                        }
-                    }
-                    // If one is SET_HEAD, draw labelled line in-between with heading value
-                    else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
-                        paintLine(oldPos, geometry.getCoordinates(), '#1497f1', 0, lineText=String(oldHeading)+"°");
-                    }
-                    // If classic WPs is defined with a JUMP options, draw pink dashed line in-between 
-                    if (options.key == "JUMP") {
-                        paintLine(geometry.getCoordinates(), markers[options.targetWP-1].getSource().getFeatures()[0].getGeometry().getCoordinates(), '#e935d6', 5, "Repeat x"+String(options.numRepeat));
-                    }
-                    // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
-                    else if (options.key == "SET_HEAD") {
-                        if (options.heading == "-1") {
-                            activatePoi = false;
-                            activateHead = false;
-                            oldHeading = 'undefined'
-                        }
-                        else if (typeof options.heading != 'undefined' && options.heading != "-1") {
-                            activateHead = true;
-                            oldHeading = options.heading
-                        }
-                    }
-                    oldPos = geometry.getCoordinates();
-                }
-            }
-        });
-        //reset text position
-        if (textGeom) {
-            textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
-        }
-    }
-     */
-    // function modified to take into account optional argument such color, linedash and line label 
-
-    
-    // Function modified to add action name and marker numbering to help changing icon depending on those items
-/*     function getPointIcon(_action, isEdit, markerNumber='') {
-        var dictofPoint = {
-            1:    'WP',
-            2:    'PH',
-            3:    'PH',
-            //4:    '',
-            5:    'POI',
-            //6:    '',
-            //7:    'head',
-            8:    'LDG'
-        };
-        
-        return new ol.style.Style({
-            image: new ol.style.Icon(({
-                anchor: [0.5, 1],
-                opacity: 1,
-                scale: 0.5,
-                src: '../images/icons/cf_icon_position' + (dictofPoint[_action] != '' ? '_'+dictofPoint[_action] : '') + (isEdit ? '_edit' : '')+ '.png'
-            })),
-            text: new ol.style.Text(({
-                text: String(Number(markerNumber)+1),
-                font: '12px sans-serif',
-                offsetY: -15,
-                offsetX: -2,
-                fill: new ol.style.Fill({
-                    color: '#FFFFFF'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: '#FFFFFF'
-                }),
-            }))
-        });
-    } */
-
-    // Function modified by adding parameter 1,2,3 needed in MSP, plus options dictionary to take into account WP behavior changer such as JUMP, SET_HEAD, RTH
-/*     function addMarker(_pos, _alt, _action, _parameter1=0, _parameter2=0, _parameter3=0, _options={key: "None"}) {
-        var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(_pos),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
-        });
-        console.log(_pos);
-        iconFeature.setStyle(getPointIcon(_action, false, String(markers.length)));
-
-        var vectorSource = new ol.source.Vector({
-            features: [iconFeature]
-        });
-
-        var vectorLayer = new ol.layer.Vector({
-            source: vectorSource
-        });
-        
-        vectorLayer.kind = "marker";
-        vectorLayer.alt = _alt;
-        vectorLayer.number = markers.length;
-        vectorLayer.action = _action;
-        vectorLayer.parameter1 = _parameter1;
-        vectorLayer.parameter2 = _parameter2;
-        vectorLayer.parameter3 = _parameter3;
-        vectorLayer.options = _options;
-
-        markers.push(vectorLayer);
-
-        return vectorLayer;
-    } */
     
     /////////////////////////////////////////////
     // Manage Waypoint
@@ -937,8 +858,8 @@ TABS.mission_control.initialize = function (callback) {
                         }
                     }
                     mission.updateWaypoint(element);
-                    cleanLayers();
-                    redrawLayers();
+                    cleanLines();
+                    redrawLayer();
                 });
             
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
@@ -959,17 +880,31 @@ TABS.mission_control.initialize = function (callback) {
                       alert(chrome.i18n.getMessage('MissionPlannerRTHSettingsCheck'));
                     }
                 }
+                else if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
+                    if ($(this).val() > mission.get().length || $(this).val() < 0)
+                    {
+                      $(this).val(0);
+                      alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'));
+                    }
+                }
                 element.setP1(Number($(this).val()));
                 mission.updateWaypoint(element);
-                cleanLayers();
-                redrawLayers();
+                cleanLines();
+                redrawLayer();
             });
             
             $row.find(".waypointOptions-p2").val(element.getP2()).change(function () {
+                if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
+                    if ($(this).val() > 10 || $(this).val() < 0)
+                    {
+                      $(this).val(0);
+                      alert(chrome.i18n.getMessage('MissionPlannerJump2SettingsCheck'));
+                    }
+                }
                 element.setP2(Number($(this).val()));
                 mission.updateWaypoint(element);
-                cleanLayers();
-                redrawLayers();
+                cleanLines();
+                redrawLayer();
             });
 
             $row.find("[data-role='waypointOptions-delete']").attr("data-index", element.getAttachedNumber()+1);
@@ -1079,8 +1014,9 @@ TABS.mission_control.initialize = function (callback) {
             var handleShowSafehome = function () {
                 $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSettings').hide();
                 $('#missionPlanerSafehome').fadeIn(300);
+                cleanSafehomeLayers();
                 renderSafehomesTable();
-                renderSafehomesOnMap(SAFEHOMES);
+                renderSafehomesOnMap();
             };
 
             button.addEventListener('click', handleShowSafehome, false);
@@ -1152,8 +1088,20 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                 mission.updateWaypoint(tempWp);
+                repaintLine4Waypoints(mission);
             }
-            repaintLine4Waypoints(mission);
+            else if (tempMarker.kind == "safehome") {
+                let tempSH = SAFEHOMES.getSafehome(tempMarker.number);
+                tempSH.setLon(coord[0]);
+                tempSH.setLat(coord[1]);
+                SAFEHOMES.updateSafehome(tempSH);
+                //renderSafehomesTable();
+/*                 cleanSafehomeLayers();
+                renderSafehomesOnMap(); */
+                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+            }
+            
         };
 
         /**
@@ -1217,7 +1165,8 @@ TABS.mission_control.initialize = function (callback) {
         }
         else {
             control_list = [
-                new app.PlannerSettingsControl()
+                new app.PlannerSettingsControl(),
+                new app.PlannerSafehomeControl() // TO DELETE FOR RELEASE SAFEHOMES
             ]
         }
         map = new ol.Map({
@@ -1308,6 +1257,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
                 $('#MPeditPoint').fadeIn(300);
+                redrawLayer();
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
@@ -1316,6 +1266,14 @@ TABS.mission_control.initialize = function (callback) {
                 mission.update();
                 cleanLayers();
                 redrawLayers();
+            }
+            else if (selectedFeature && tempMarker.kind == "safehome") {
+                selectedMarker = SAFEHOMES.getSafehome(tempMarker.number);
+                var geometry = selectedFeature.getGeometry();
+                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-enabled-value').val(selectedMarker.isUsed());
+                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
             else {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
@@ -1460,6 +1418,19 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
+        $('#showHideSafehomeButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#SafehomeContent').fadeIn(300);
+            }
+            else {
+                $('#SafehomeContent').fadeOut(300);
+            }
+        });
+        
         /////////////////////////////////////////////
         // Callback for Waypoint edition
         /////////////////////////////////////////////
@@ -1553,26 +1524,41 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedMarker) {
                 mission.dropAttachedFromWaypoint(selectedMarker, $(event.currentTarget).attr("data-index")-1);
                 renderWaypointOptionsTable(selectedMarker);
-                cleanLayers();
-                redrawLayers();
+                cleanLines();
+                redrawLayer();
             }
         });
         
         $("[data-role='waypointOptions-add']").click(function () {
             if (selectedMarker) {
-                /* let tmpListWP = mission.getAttachedFromWaypoint(selectedMarker);
-                console.log("1 ", mission.getAttachedFromWaypoint(selectedMarker));
-                if (tmpListWP.length !=0) {
-                    console.log("1.1 ", tmpListWP[tmpListWP.length-1].getAttachedNumber());
-                }
-                else {
-                    console.log("tmpListWP empty");
-                } */
                 mission.addAttachedFromWaypoint(selectedMarker);
-                //console.log("2 ", mission.getAttachedFromWaypoint(selectedMarker));
                 renderWaypointOptionsTable(selectedMarker);
-                cleanLayers();
-                redrawLayers();
+                cleanLines();
+                redrawLayer();
+            }
+        });
+        
+        /////////////////////////////////////////////
+        // Callback for SAFEHOMES Table
+        /////////////////////////////////////////////
+        $safehomesTableBody.on('click', "[data-role='safehome-center']", function (event) {
+            let mapCenter = map.getView().getCenter();
+            let tmpSH = SAFEHOMES.getSafehome($(event.currentTarget).attr("data-index"));
+            tmpSH.setLon(ol.proj.toLonLat(mapCenter)[0]);
+            tmpSH.setLat(ol.proj.toLonLat(mapCenter)[1]);
+            SAFEHOMES.updateSafehome(tmpSH);
+            renderSafehomesTable();
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+            
+        });
+        
+        $safehomesTableBody.on('click', "[data-role='safehome-view']", function (event) {
+            if (selectedMarker) {
+                mission.addAttachedFromWaypoint(selectedMarker);
+                renderWaypointOptionsTable(selectedMarker);
+                cleanLines();
+                redrawLayer();
             }
         });
 

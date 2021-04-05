@@ -81,6 +81,18 @@
     background-image: url(../images/icons/cf_icon_MP_hide_grey.svg);
 }
 
+.tab-mission-control .ic_play {
+    background-image: url(../images/icons/cf_icon_MP_play_grey.svg);
+}
+
+.tab-mission-control .ic_stop {
+    background-image: url(../images/icons/cf_icon_MP_stop_grey.svg);
+}
+
+.tab-mission-control .ic_center {
+    background-image: url(../images/icons/cf_icon_MP_center_grey.svg);
+}
+
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
@@ -123,6 +135,33 @@
 
 .tab-mission-control .btn-danger_short a:hover {
     background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
+}
+.tab-mission-control .btn-danger a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-success a {
+    background-color: #28a745;
+    border: 1px solid #218838;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
+}
+
+.tab-mission-control .btn-success a:hover {
+    background-color: #218838;
     transition: all ease 0.2s;
 }
 
@@ -259,6 +298,18 @@
     width: 100%;
 }
 
+.tab-mission-control .safehomesTable input[type="number"] {
+    font-size: 8px;
+    width: 100%;
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.tab-mission-control .safehomesTable input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .tab-mission-control .safehomesTable thead {
     display: table-header-group !important;
 }
@@ -386,8 +437,8 @@
     cursor: pointer;
     transition: all ease 0.2s;
     padding: 0px;
-    margin: 5px;
-    float: right;
+    margin: 2px;
+    float: left;
     height: 11px;
     line-height: 11px;
     width: 11px;

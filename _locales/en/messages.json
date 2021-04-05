@@ -3596,7 +3596,10 @@
         "message": "Current Meter Type"
     },
     "MissionPlannerJumpSettingsCheck": {
-        "message": "JUMP settings incorrect : Check it again!"
+        "message": "JUMP settings incorrect : Check it again! Being forced to WP 1!"
+    },
+    "MissionPlannerJump2SettingsCheck": {
+        "message": "JUMP settings incorrect : Repeat should not exceed 10! Check it again! Being forced to number of repeat equal 0!"
     },
     "MissionPlannerHeadSettingsCheck": {
         "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"

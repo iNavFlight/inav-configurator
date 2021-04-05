@@ -32,7 +32,7 @@ let SafehomeCollection = function () {
 
     self.inflate = function () {
         while (self.hasFreeSlots()) {
-            self.put(new Safehome(0, 0, 0, 0));
+            self.put(new Safehome(data.length, 0, 0, 0));
         }
     };
 
@@ -80,6 +80,21 @@ let SafehomeCollection = function () {
             return a-b;
         });
     }
+    
+    self.getSafehome = function(safehomeId) {
+        for (let safehomeIndex in data) {
+            if (data.hasOwnProperty(safehomeIndex)) {
+                let safehome = data[safehomeIndex];
+                if (safehome.getNumber() == safehomeId ) {
+                    return safehome;
+                }
+            }
+        }
+    };
+    
+    self.updateSafehome = function(newSafehome) {
+        data[newSafehome.getNumber()] = newSafehome;
+    };
 
     return self;
 };
