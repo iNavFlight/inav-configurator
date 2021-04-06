@@ -1,6 +1,4 @@
 'use strict';
-//import { MWNP.WPTYPE, MWNP.WPTYPE.REV } from '/js/mission_control_module.mjs';
-//const { MWNP } = require('./js/mission_control_module.mjs')
 
 
 let WaypointCollection = function () {

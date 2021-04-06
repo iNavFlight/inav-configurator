@@ -15,22 +15,22 @@
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="cf_icon_position.svg"
-   inkscape:export-filename="C:\Users\arnau\Documents\GitHub\inav-configurator\images\icons\cf_icon_safehome_used.png"
+   inkscape:export-filename="C:\Users\arnau\Documents\GitHub\inav-configurator\images\icons\cf_icon_safehome.png"
    inkscape:export-xdpi="74.705879"
    inkscape:export-ydpi="74.705879">
   <defs
      id="defs2">
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient2690">
+       id="linearGradient1488">
       <stop
-         style="stop-color:#808080;stop-opacity:1;"
+         style="stop-color:#b3b3b3;stop-opacity:1;"
          offset="0"
-         id="stop1479" />
+         id="stop1484" />
       <stop
-         style="stop-color:#808080;stop-opacity:0;"
+         style="stop-color:#b3b3b3;stop-opacity:0;"
          offset="1"
-         id="stop1481" />
+         id="stop1486" />
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
@@ -171,13 +171,13 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient2690"
-       id="linearGradient1472"
-       gradientUnits="userSpaceOnUse"
-       x1="33.759918"
-       y1="20.197287"
-       x2="33.759918"
-       y2="53.721268" />
+       xlink:href="#linearGradient1488"
+       id="linearGradient1490"
+       x1="21.733617"
+       y1="37.017226"
+       x2="45.786218"
+       y2="37.017226"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -367,7 +367,7 @@
      transform="translate(-18.709808,-20.180163)">
     <path
        id="path1464"
-       style="fill:url(#linearGradient1472);fill-opacity:1.0;fill-rule:nonzero;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
+       style="fill:url(#linearGradient1490);fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
        d="m 33.759918,20.312455 c -2.337999,0 -5.082476,0.475277 -8.084778,3.140377 -4.086081,3.627155 -3.911291,8.043803 -3.741891,10.624157 0.156873,2.389534 1.246556,4.650933 2.271696,6.815087 1.375534,2.903871 4.383434,7.604098 6.420798,10.08879 2.163382,2.638385 3.134175,2.740403 3.134175,2.740403 0,0 0.970793,-0.102018 3.134175,-2.740403 2.037363,-2.484692 5.045262,-7.184919 6.420797,-10.08879 1.025138,-2.164154 2.114822,-4.425553 2.271696,-6.815087 0.1694,-2.580354 0.344192,-6.997002 -3.741891,-10.624157 -3.002301,-2.6651 -5.746781,-3.140377 -8.084777,-3.140377 z"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
