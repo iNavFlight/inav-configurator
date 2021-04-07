@@ -3082,6 +3082,9 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
     },
+    "osdElement_OSD_RANGEFINDER": {
+        "message": "Rangefinder distance"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     }, 

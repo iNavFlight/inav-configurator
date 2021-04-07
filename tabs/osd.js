@@ -963,6 +963,11 @@ OSD.constants = {
                         }
                         return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                     }
+                },
+                {
+                    name: 'OSD_RANGEFINDER',
+                    id: 120,
+                    preview: "2" + FONT.symbol(SYM.DIST_KM)
                 }
             ]
         },
