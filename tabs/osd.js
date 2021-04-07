@@ -1286,12 +1286,12 @@ OSD.constants = {
                     }
                 },
                 {
-                    name: 'CRUISE_HEADING_ERROR',
+                    name: 'COURSE_HOLD_ERROR',
                     id: 51,
                     preview: FONT.symbol(SYM.HEADING) + '  5' + FONT.symbol(SYM.DEGREES)
                 },
                 {
-                    name: 'CRUISE_HEADING_ADJUSTMENT',
+                    name: 'COURSE_HOLD_ADJUSTMENT',
                     id: 52,
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
                 },

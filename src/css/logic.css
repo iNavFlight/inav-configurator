@@ -44,7 +44,9 @@ input.logic_element__operand--value {
 .function_cell__action,
 .function_cell__operand,
 .logic_cell__operandA,
-.logic_cell__operandB {
+.logic_cell__operandB,
+.pid_cell__setpoint,
+.pid_cell__measurement {
     text-align: left;
 }
 
