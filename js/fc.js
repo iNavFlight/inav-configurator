@@ -252,7 +252,7 @@ var FC = {
             }
         }; */
         
-        MISSION_PLANER = new waypointCollection();
+        MISSION_PLANER = new WaypointCollection();
 
         ANALOG = {
             voltage: 0,

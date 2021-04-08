@@ -2934,19 +2934,43 @@ var mspHelper = (function (gui) {
     
     self.loadWaypoints = function (callback) {
         MISSION_PLANER.flush();
-        getMissionInfo();
+        mspHelper.getMissionInfo();
         let waypointId = 0;
         MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
         
         function nextWaypoint() {
             waypointId++;
-            if (waypointId < SAFEHOMES.getMaxSafehomeCount()-1) {
+            if (waypointId < MISSION_PLANER.get().length-1) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
             }
             else {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
+    };
+    
+    self.saveWaypoints = function (callback) {
+        let waypointId = 0;
+        console.log("saveWaypoints legth ",MISSION_PLANER.get().length);
+        console.log("WP Number : ",MISSION_PLANER.getWaypoint(waypointId).getNumber());
+        MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
+
+        function nextWaypoint() {
+            waypointId++;
+            console.log("WP Number : ",MISSION_PLANER.getWaypoint(waypointId).getNumber());
+            console.log("End mission : ",MISSION_PLANER.getWaypoint(waypointId).getEndMission());
+            if (waypointId < MISSION_PLANER.get().length-1) {
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, endMission);
+            }
+        };
+        
+        function endMission() {
+            GUI.log('End send point');
+            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
+        }
     };
     
     self.loadSafehomes = function (callback) {

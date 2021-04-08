@@ -5,7 +5,7 @@ let WaypointCollection = function () {
 
     let self = {},
         data = [],
-        maxWaypoints = 0,
+        maxWaypoints = 60,
         isValidMission = 0,
         countBusyPoints = 0,
         version = 0,
@@ -160,6 +160,12 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
+                if (element.getNumber() == self.get().length-1) {
+                    element.setEndMission(0xA5);
+                }
+                else {
+                    element.setEndMission(0);
+                }
             }
         });
     };
@@ -194,7 +200,6 @@ let WaypointCollection = function () {
         if (tmpData != 'undefined' && tmpData.length !=0) {
             tmpNumber = tmpData.length;
         }
-        console.log("tmpNumber : ",tmpNumber);
         let tempWp = new Waypoint(waypoint.getNumber()+tmpNumber+1, MWNP.WPTYPE.JUMP, 0, 0);
         tempWp.setAttached(true);
         tempWp.setAttachedId(waypoint.getNumber());
@@ -211,6 +216,35 @@ let WaypointCollection = function () {
         });
         
     } 
+    
+    self.extractBuffer = function(waypointId) {
+        let buffer = [];
+        let waypoint = self.getWaypoint(waypointId);
+        console.log("waypoint.getNumber() ",waypoint.getNumber());
+        buffer.push(waypoint.getNumber());    // sbufReadU8(src);    // number
+        buffer.push(waypoint.getAction());    // sbufReadU8(src);    // action
+        buffer.push(specificByte(waypoint.getLat(), 0));    // sbufReadU32(src);      // lat
+        buffer.push(specificByte(waypoint.getLat(), 1));
+        buffer.push(specificByte(waypoint.getLat(), 2));
+        buffer.push(specificByte(waypoint.getLat(), 3));
+        buffer.push(specificByte(waypoint.getLon(), 0));    // sbufReadU32(src);      // lon
+        buffer.push(specificByte(waypoint.getLon(), 1));
+        buffer.push(specificByte(waypoint.getLon(), 2));
+        buffer.push(specificByte(waypoint.getLon(), 3));
+        buffer.push(specificByte(waypoint.getAlt(), 0));    // sbufReadU32(src);      // to set altitude (cm)
+        buffer.push(specificByte(waypoint.getAlt(), 1));
+        buffer.push(specificByte(waypoint.getAlt(), 2));
+        buffer.push(specificByte(waypoint.getAlt(), 3));
+        buffer.push(lowByte(waypoint.getP1())); //sbufReadU16(src);       // P1 speed or landing
+        buffer.push(highByte(waypoint.getP1()));
+        buffer.push(lowByte(waypoint.getP2())); //sbufReadU16(src);       // P2
+        buffer.push(highByte(waypoint.getP2()));
+        buffer.push(lowByte(waypoint.getP3())); //sbufReadU16(src);       // P3
+        buffer.push(highByte(waypoint.getP3()));
+        buffer.push(waypoint.getEndMission()); //sbufReadU8(src);      // future: to set nav flag
+        
+        return buffer;
+    }
 
     return self;
 };

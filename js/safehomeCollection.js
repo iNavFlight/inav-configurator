@@ -95,6 +95,7 @@ let SafehomeCollection = function () {
     self.updateSafehome = function(newSafehome) {
         data[newSafehome.getNumber()] = newSafehome;
     };
+    
 
     return self;
 };
