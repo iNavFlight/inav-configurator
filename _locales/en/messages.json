@@ -2363,13 +2363,16 @@
         "message": "Programming"
     },
     "tabAdvancedTuning": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
     },
     "advancedTuningSave": {
         "message": "Save and Reboot"
     },
     "tabAdvancedTuningTitle": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningGenericTitle": {
+        "message": "Advanced Tuning: Generic settings"
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
@@ -2549,19 +2552,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. navigation bank angle [degrees]"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle [degrees]"
+        "message": "Max. navigation climb angle [degrees]"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
+    "navManualClimbRate": {
+        "message": "Max. Alt-hold climb rate [cm/s]"
+    },
+    "navManualClimbRateHelp": {
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+    },
+    "navAutoClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "navAutoClimbRateHelp": {
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+    },
     "maxDiveAngle": {
-        "message": "Max. dive angle [degrees]"
+        "message": "Max. navigation dive angle [degrees]"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2598,6 +2613,36 @@
     },
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+    },
+    "powerConfiguration": {
+        "message": "Battery Estimation Settings"
+    },
+    "idlePower": {
+        "message": "Idle power [cW]"
+    },
+    "idlePowerHelp": {
+        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruisePower": {
+        "message": "Cruise power [cW]"
+    },
+    "cruisePowerHelp": {
+        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruiseSpeed": {
+        "message": "Cruise speed [cm/s]"
+    },
+    "cruiseSpeedHelp": {
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+    },
+    "rthEnergyMargin": {
+        "message": "RTH energy margin [%]"
+    },
+    "rthEnergyMarginHelp": {
+        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+    },
+    "generalNavigationSettings": {
+        "message": "General Navigation Settings"
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
