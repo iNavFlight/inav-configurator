@@ -306,24 +306,6 @@
         <div class="tab_subtitle" data-i18n="tabAdvancedTuningGenericTitle">Advanced Tuning: Generic settings</div>
         <div>
             <div class="leftWrapper">
-                <div class="config-setion gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="generalNavigationSettings"></div>
-                    </div>
-                    <div class="spacer_box">
-                        <div class="number">
-                            <input type="number" id="navManualClimbRate" data-setting="nav_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
-                            <div class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="navAutoClimbRate" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
-                            <div class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
@@ -406,6 +388,25 @@
 
             <div class="rightWrapper">
 
+                <div class="config-setion gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="generalNavigationSettings"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input type="number" id="navManualClimbRate" data-setting="nav_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="navAutoClimbRate" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="waypointConfiguration"></div>
@@ -427,45 +428,6 @@
                     </div>
                 </div>
 
-                <div class="config-section gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="positionEstimatorConfiguration"></div>
-                    </div>
-
-                    <div class="spacer_box">
-                        <div class="note spacebottom">
-                            <div class="note_spacer" >
-                                <p data-i18n="positionEstimatorConfigurationDisclaimer"></p>
-                            </div>
-                        </div>
-                        <div class="number">
-                            <input id="w_z_baro_p" type="number" data-setting="inav_w_z_baro_p" data-setting-multiplier="1" step="0.01" min="0" max="10" />
-                            <label for="w_z_baro_p"><span data-i18n="w_z_baro_p"></span></label>
-                            <div class="helpicon cf_tip" data-i18n_title="w_z_baro_p_help"></div>
-                        </div>
-                        <div class="number">
-                            <input id="w_z_gps_p" type="number" data-setting="inav_w_z_gps_p" data-setting-multiplier="1" step="0.01" min="0" max="10" />
-                            <label for="w_z_gps_p"><span data-i18n="w_z_gps_p"></span></label>
-                            <div class="helpicon cf_tip" data-i18n_title="w_z_gps_p_help"></div>
-                        </div>
-                        <div class="number">
-                            <input id="w_z_gps_v" type="number" data-setting="inav_w_z_gps_v" data-setting-multiplier="1" step="0.01" min="0" max="10" />
-                            <label for="w_z_gps_v"><span data-i18n="w_z_gps_v"></span></label>
-                        </div>
-                        <div class="number">
-                            <input id="w_xy_gps_p" type="number" data-setting="inav_w_xy_gps_p" data-setting-multiplier="1" step="0.01" min="0" max="10" />
-                            <label for="w_xy_gps_p"><span data-i18n="w_xy_gps_p"></span></label>
-                        </div>
-                        <div class="number">
-                            <input id="w_xy_gps_v" type="number" data-setting="inav_w_xy_gps_v" data-setting-multiplier="1" step="0.01" min="0" max="10" />
-                            <label for="w_xy_gps_v"><span data-i18n="w_xy_gps_v"></span></label>
-                        </div>
-                        <div class="number">
-                            <input id="gps_min_sats" type="number" data-setting="gps_min_sats" data-setting-multiplier="1" step="1" min="5" max="10" />
-                            <label for="gps_min_sats"><span data-i18n="gps_min_sats"></span></label>
-                        </div>
-                    </div>
-                </div>
             </div> <!-- Right wrapper -->
 
         </div> <!-- Common tuning -->
