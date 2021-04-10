@@ -42,6 +42,10 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     self.getLon = function () {
         return lon;
     };
+    
+    self.getLonMap = function () {
+        return lon / 10000000;
+    };
 
     self.setLon = function (data) {
         lon = data;
@@ -49,6 +53,10 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
 
     self.getLat = function () {
         return lat;
+    };
+    
+    self.getLatMap = function () {
+        return lat / 10000000;
     };
 
     self.setLat = function (data) {

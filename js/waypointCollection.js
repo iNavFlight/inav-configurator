@@ -19,8 +19,8 @@ let WaypointCollection = function () {
         maxWaypoints = data;
     };
     
-    self.isValidMission = function () {
-        return maxWaypoints == 1;
+    self.getValidMission = function () {
+        return isValidMission;
     };
     
     self.setValidMission = function (data) {
@@ -73,6 +73,15 @@ let WaypointCollection = function () {
 
     self.flush = function () {
         data = [];
+    };
+    
+    self.reinit = function () {
+        data = [];
+        maxWaypoints = 60;
+        isValidMission = 0;
+        countBusyPoints = 0;
+        version = 0;
+        center = {};
     };
 
     self.getWaypoint = function(waypointId) {
@@ -220,7 +229,6 @@ let WaypointCollection = function () {
     self.extractBuffer = function(waypointId) {
         let buffer = [];
         let waypoint = self.getWaypoint(waypointId);
-        console.log("waypoint.getNumber() ",waypoint.getNumber());
         buffer.push(waypoint.getNumber());    // sbufReadU8(src);    // number
         buffer.push(waypoint.getAction());    // sbufReadU8(src);    // action
         buffer.push(specificByte(waypoint.getLat(), 0));    // sbufReadU32(src);      // lat
@@ -244,6 +252,20 @@ let WaypointCollection = function () {
         buffer.push(waypoint.getEndMission()); //sbufReadU8(src);      // future: to set nav flag
         
         return buffer;
+    }
+    
+    self.missionDisplayDebug = function() {
+        data.forEach(function (element) {
+            console.log("N° : ", element.getNumber(),
+                        "Action : ", element.getAction(),
+                        "Lon : ", element.getLon(),
+                        "Lat : ", element.getLat(),
+                        "Alt : ", element.getAlt(),
+                        "P1 : ", element.getP1(),
+                        "P2 : ", element.getP2(),
+                        "P3 : ", element.getP3(),
+                        "EndMission : ", element.getEndMission());
+        });
     }
 
     return self;

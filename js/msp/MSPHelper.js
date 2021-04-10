@@ -440,25 +440,16 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
-                console.log("data : ",data);
                 MISSION_PLANER.put(new Waypoint(
                     data.getUint8(0),
                     data.getUint8(1),
-                    data.getInt32(2, true) / 10000000,
-                    data.getInt32(6, true) / 10000000,
+                    data.getInt32(2, true),
+                    data.getInt32(6, true),
                     data.getInt32(10, true),
                     data.getInt16(14, true),
                     data.getInt16(16, true),
                     data.getInt16(18, true)
                 ));
-                /* MISSION_PLANER.bufferPoint.number = data.getUint8(0);
-                MISSION_PLANER.bufferPoint.action = data.getUint8(1);
-                MISSION_PLANER.bufferPoint.lat = data.getInt32(2, true) / 10000000;
-                MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
-                MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
-                MISSION_PLANER.bufferPoint.p1 = data.getInt16(14, true);
-                MISSION_PLANER.bufferPoint.p2 = data.getInt16(16, true);
-                MISSION_PLANER.bufferPoint.p3 = data.getInt16(18, true); */
 
                 break;
             case MSPCodes.MSP_BOXIDS:
@@ -2933,32 +2924,30 @@ var mspHelper = (function (gui) {
     };
     
     self.loadWaypoints = function (callback) {
-        MISSION_PLANER.flush();
+        MISSION_PLANER.reinit();
         mspHelper.getMissionInfo();
         let waypointId = 0;
         MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
         
         function nextWaypoint() {
             waypointId++;
+            console.log("Display for LoadInternal");
+            MISSION_PLANER.missionDisplayDebug();
             if (waypointId < MISSION_PLANER.get().length-1) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
             }
             else {
-                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false);
             }
         };
     };
     
     self.saveWaypoints = function (callback) {
         let waypointId = 0;
-        console.log("saveWaypoints legth ",MISSION_PLANER.get().length);
-        console.log("WP Number : ",MISSION_PLANER.getWaypoint(waypointId).getNumber());
         MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
 
         function nextWaypoint() {
             waypointId++;
-            console.log("WP Number : ",MISSION_PLANER.getWaypoint(waypointId).getNumber());
-            console.log("End mission : ",MISSION_PLANER.getWaypoint(waypointId).getEndMission());
             if (waypointId < MISSION_PLANER.get().length-1) {
                 MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint);
             }

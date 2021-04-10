@@ -446,7 +446,6 @@ TABS.mission_control.initialize = function (callback) {
         for (let safehomeIndex in safehomes) {
             if (safehomes.hasOwnProperty(safehomeIndex)) {
                 const safehome = safehomes[safehomeIndex];
-                console.log(safehome.getEnabled());
 
                 $safehomesTableBody.append('\
                     <tr>\
@@ -474,14 +473,14 @@ TABS.mission_control.initialize = function (callback) {
                 });
 
                 $row.find(".safehome-lon").val(safehome.getLon()).change(function () {
-                    safehome.setLon(Number($(this).val()));
+                    safehome.setLon(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
                 
                 $row.find(".safehome-lat").val(safehome.getLat()).change(function () {
-                    safehome.setLat(Number($(this).val()));
+                    safehome.setLat(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
@@ -543,7 +542,6 @@ TABS.mission_control.initialize = function (callback) {
          * add safehome on Map
          */
         let coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
-        console.log(coord);
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(coord),
             name: 'Null Island',
@@ -628,7 +626,7 @@ TABS.mission_control.initialize = function (callback) {
     
     function addWaypointMarker(waypoint, isEdit=false) {
 
-        let coord = ol.proj.fromLonLat([waypoint.getLon(), waypoint.getLat()]);
+        let coord = ol.proj.fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(coord),
             name: 'Null Island',
@@ -696,7 +694,7 @@ TABS.mission_control.initialize = function (callback) {
         cleanLines();
         mission.get().forEach(function (element) {
             if (!element.isAttached()) {
-                let coord = ol.proj.fromLonLat([element.getLon(), element.getLat()]);                
+                let coord = ol.proj.fromLonLat([element.getLonMap(), element.getLatMap()]);                
                 if (element.getAction() == 5) {
                     // If action is Set_POI, increment counter of POI
                     poiList.push(element.getNumber());
@@ -725,7 +723,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
-                    let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLon(), mission.getWaypoint(element.getP1()).getLat()]);  
+                    let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLonMap(), mission.getWaypoint(element.getP1()).getLatMap()]);  
                     paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+String(element.getP2()), selection=false);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
@@ -1105,8 +1103,8 @@ TABS.mission_control.initialize = function (callback) {
             let coord = ol.proj.toLonLat(geometry.getCoordinates());
             if (tempMarker.kind == "waypoint") {
                 let tempWp = mission.getWaypoint(tempMarker.number);
-                tempWp.setLon(coord[0]);
-                tempWp.setLat(coord[1]);
+                tempWp.setLon(Math.round(coord[0] * 10000000));
+                tempWp.setLat(Math.round(coord[1] * 10000000));
                 $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $('#pointLat').val(Math.round(coord[1] * 10000000) / 10000000);
                 mission.updateWaypoint(tempWp);
@@ -1114,8 +1112,8 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (tempMarker.kind == "safehome") {                
                 let tempSH = SAFEHOMES.getSafehome(tempMarker.number);
-                tempSH.setLon(coord[0]);
-                tempSH.setLat(coord[1]);
+                tempSH.setLon(Math.round(coord[0] * 10000000));
+                tempSH.setLat(Math.round(coord[1] * 10000000));
                 SAFEHOMES.updateSafehome(tempSH);
                 /* if (tempSH.isUsed()) {
                     this.layer_.getSource().getFeatures()[1].getGeometry().translate(deltaX, deltaY);
@@ -1244,7 +1242,6 @@ TABS.mission_control.initialize = function (callback) {
         // Map on-click behavior definition 
         //////////////////////////////////////////////////////////////////////////
         map.on('click', function (evt) {
-            console.log("click");
             if (selectedMarker != null && selectedFeature != null) {
                 try {
                     selectedFeature.setStyle(getWaypointIcon(selectedMarker, false));
@@ -1295,7 +1292,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, tempWpCoord[1], tempWpCoord[0], alt=settings.alt, p1=settings.speed);
+                let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
                 mission.insertWaypoint(tempWp, tempMarker.number);
                 mission.update();
                 cleanLayers();
@@ -1311,12 +1308,13 @@ TABS.mission_control.initialize = function (callback) {
             }
             else {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
-                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, tempWpCoord[1], tempWpCoord[0], alt=settings.alt, p1=settings.speed);
+                let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
                 mission.put(tempWp);
                 mission.update();
                 cleanLayers();
                 redrawLayers();
             }
+            mission.missionDisplayDebug();
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -1425,7 +1423,7 @@ TABS.mission_control.initialize = function (callback) {
         
         $('#pointLat').on('keypress', function (event) {
             if (selectedMarker && event.which == 13) {
-                selectedMarker.setLat(Number($('#pointLat').val()));
+                selectedMarker.setLat(Math.round(Number($('#pointLat').val()) * 10000000));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
@@ -1434,7 +1432,7 @@ TABS.mission_control.initialize = function (callback) {
         
         $('#pointLon').on('keypress', function (event) {
             if (selectedMarker && event.which == 13) {
-                selectedMarker.setLon(Number($('#pointLon').val()));
+                selectedMarker.setLon(Math.round(Number($('#pointLon').val()) * 10000000));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
@@ -1504,8 +1502,8 @@ TABS.mission_control.initialize = function (callback) {
         $safehomesTableBody.on('click', "[data-role='safehome-center']", function (event) {
             let mapCenter = map.getView().getCenter();
             let tmpSH = SAFEHOMES.getSafehome($(event.currentTarget).attr("data-index"));
-            tmpSH.setLon(ol.proj.toLonLat(mapCenter)[0]);
-            tmpSH.setLat(ol.proj.toLonLat(mapCenter)[1]);
+            tmpSH.setLon(ol.proj.toLonLat(Math.round(mapCenter)[0] * 10000000));
+            tmpSH.setLat(ol.proj.toLonLat(Math.round(mapCenter)[1] * 10000000));
             SAFEHOMES.updateSafehome(tmpSH);
             renderSafehomesTable();
             cleanSafehomeLayers();
@@ -1571,6 +1569,8 @@ TABS.mission_control.initialize = function (callback) {
             mspHelper.loadWaypoints();
             mission = MISSION_PLANER
             mission.update();
+            console.log("Display for Load");
+            mission.missionDisplayDebug();
             redrawLayers();
             GUI.log('End get point');
             $('#loadMissionButton').removeClass('disabled');
@@ -1581,9 +1581,11 @@ TABS.mission_control.initialize = function (callback) {
             $(this).addClass('disabled');
             MISSION_PLANER = mission ;
             GUI.log('Start send point');
-            console.log("MISSION_PLANER.get().length ",MISSION_PLANER.get().length);
             mspHelper.saveWaypoints();
+            console.log("MISSION_PLANER.isValidMission ",MISSION_PLANER.getValidMission());
             mission = MISSION_PLANER;
+            console.log("Display for save");
+            mission.missionDisplayDebug();
             $('#saveMissionButton').removeClass('disabled');
             updateTotalInfo();
             // Reinit some internal parameters
@@ -1671,9 +1673,9 @@ TABS.mission_control.initialize = function (callback) {
                                         if (attr.match(/zoom/i)) {
                                             mission.setCenterZoom(parseInt(node.$[attr]));
                                         } else if (attr.match(/cx/i)) {
-                                            mission.setCenterLon(parseFloat(node.$[attr]));
+                                            mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
                                         } else if (attr.match(/cy/i)) {
-                                            mission.setCenterLat(parseFloat(node.$[attr]));
+                                            mission.setCenterLat(parseFloat(node.$[attr]) * 10000000);
                                         }
                                     }
                                 } else if (node['#name'].match(/missionitem/i) && node.$) {
@@ -1703,9 +1705,9 @@ TABS.mission_control.initialize = function (callback) {
                                                 point.setAction(0);
                                             }
                                         } else if (attr.match(/lat/i)) {
-                                            point.setLat(parseFloat(node.$[attr]));
+                                            point.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
                                         } else if (attr.match(/lon/i)) {
-                                            point.setLon(parseFloat(node.$[attr]));
+                                            point.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
                                         } else if (attr.match(/alt/i)) {
                                             point.setAlt((parseInt(node.$[attr]) * 100));
                                         } else if (attr.match(/parameter1/i)) {
@@ -1725,12 +1727,12 @@ TABS.mission_control.initialize = function (callback) {
                 // update Attached Waypoints (i.e non Map Markers)
                 mission.update(true);
                 if (mission.getCenter() != {}) {
-                    var coord = ol.proj.fromLonLat([mission.getCenter().lon, mission.getCenter().lat]);
+                    var coord = ol.proj.fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
                     map.getView().setCenter(coord);
                     if (mission.getCenter().zoom) map.getView().setZoom(mission.getCenter().zoom);
                 }
                 else {
-                    var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getCenter().lon, mission.getWaypoint(0).getCenter().lat]);
+                    var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getCenter().lon / 10000000, mission.getWaypoint(0).getCenter().lat / 10000000]);
                     map.getView().setCenter(coord);
                     map.getView().setZoom(16);
                 }
@@ -1758,8 +1760,8 @@ TABS.mission_control.initialize = function (callback) {
             var point = { $: {
                         'no': waypoint.getNumber()+1,
                         'action': MWNP.WPTYPE.REV[waypoint.getAction()],
-                        'lat': (Math.round(waypoint.getLat() * 10000000) / 10000000),
-                        'lon': (Math.round(waypoint.getLon() * 10000000) / 10000000),
+                        'lat': Math.round(waypoint.getLatMap()),
+                        'lon': Math.round(waypoint.getLonMap()),
                         'alt': (waypoint.getAlt() / 100),
                         'parameter1': (MWNP.WPTYPE.REV[waypoint.getAction()] == "JUMP" ? waypoint.getP1()+1 : waypoint.getP1()),
                         'parameter2': waypoint.getP2(),
@@ -1822,6 +1824,8 @@ TABS.mission_control.initialize = function (callback) {
         mspHelper.loadWaypoints();
         mission = MISSION_PLANER
         mission.update();
+        console.log("Display for getfromEprom");
+        mission.missionDisplayDebug();
         redrawLayers();
         GUI.log('End get point');
         $('#loadMissionButton').removeClass('disabled');
@@ -2029,7 +2033,7 @@ TABS.mission_control.initialize = function (callback) {
     function updateTotalInfo() {
         if (CONFIGURATOR.connectionValid) {
             $('#availablePoints').text(mission.getCountBusyPoints() + '/' + mission.getMaxWaypoints());
-            $('#missionValid').html(mission.isValidMission() ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
+            $('#missionValid').html(mission.getValidMission() ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
         }
     }    
 
