@@ -35,7 +35,7 @@ TABS.auxiliary.initialize = function (callback) {
     function sort_modes_for_display() {
         // This array defines the order that the modes are displayed in the configurator modes page
         configuratorBoxOrder = [
-            "ARM",                                                                                  // Arming
+            "ARM", "PREARM",                                                                        // Arming
             "ANGLE", "HORIZON", "MANUAL",                                                           // Flight modes
             "NAV RTH", "NAV POSHOLD", "NAV CRUISE",                                                 // Navigation mode
             "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                              // Flight mode modifiers
