@@ -3643,8 +3643,8 @@
     "defaultsQuadTitle": {
         "message": "Mini Quad with 3'-7' propellers"
     },
-    "defaultsAirplaneTitle": {
-        "message": "Airplane"
+    "defaultsAirplaneWithoutaTailTitle": {
+        "message": "Airplane without a Tail (Wing, Delta, etc)"
     },
     "defaultsRoversBoatsTitle": {
         "message": "Rovers & Boats"
@@ -3684,5 +3684,29 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "presets3Quad": {
+        "message": "Generic 3\" Quadcopter"
+    },
+    "presets5Quad": {
+        "message": "Generic 5\" Quadcopter"
+    },
+    "presets7Quad": {
+        "message": "Generic 7\" Quadcopter"
+    },
+    "presets10Quad": {
+        "message": "Generic 10\" Multirotor"
+    },
+    "presets5FreestyleQuad": {
+        "message": "5\" Freestyle Quadcopter, 2208 2450kV motors"
+    },
+    "presets6FreestyleQuad": {
+        "message": "6\" Freestyle Quadcopter, 2207 1700kV motors"
+    },
+    "presetsAirplaneTail": {
+        "message": "Airplane with a tail"
+    },
+    "presetsAirplaneOutTail": {
+        "message": "Airplane without tail"
     }
 }

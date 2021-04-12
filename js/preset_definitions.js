@@ -43,7 +43,7 @@ presets.settings = {
  */
 presets.presets = [
     {
-        name: 'Generic 3" Quadcopter',
+        name: chrome.i18n.getMessage('presets3Quad'),
         description: "Quad X, 3\" propellers. F4/F7 CPU.",
         features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -201,7 +201,7 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: 'Generic 5" Quadcopter',
+        name: chrome.i18n.getMessage('presets5Quad'),
         description: "Quad X, 5\" propellers. F4/F7 CPU.",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -351,7 +351,7 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: 'Generic 7" Quadcopter',
+        name: chrome.i18n.getMessage('presets7Quad'),
         description: "Quad X, 7\" propellers. F4/F7 CPU.",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -509,7 +509,7 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: 'Generic 10" Multirotor',
+        name: chrome.i18n.getMessage('presets10Quad'),
         description: "General purpose 450-600 class multirotor with 10\", 2-bladed propellers.",
         features: [
             "DSHOT600",
@@ -842,7 +842,7 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: '5" Freestyle Quadcopter, 2208 2450kV motors',
+        name: chrome.i18n.getMessage('presets5FreestyleQuad'),
         description: "Overpowered freestyle quad. 5\", 3 bladed propellers like HQProp S4, Nepal N1, 2208 2450KV motors, 4S, DSHOT600 ESC protocol.<br>Optimized for smooth, freestyle or acrobatic flight.",
         features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -1000,7 +1000,7 @@ presets.presets = [
         type: 'multirotor'
     },
     {
-        name: '6" Freestyle Quadcopter, 2207 1700kV motors',
+        name: chrome.i18n.getMessage('presets6FreestyleQuad'),
         description: "6\", 3 bladed propellers, 2207 1700kV motors, 4S, DSHOT600 ESC protocol.<br>Optimized for smooth, freestyle or acrobatic flight with GPS or not.",
         features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -1158,7 +1158,7 @@ presets.presets = [
         type: 'multirotor'
     },
 	{
-		name: 'Airplane with a tail',
+		name: chrome.i18n.getMessage('presetsAirplaneTail'),
         description: "General setup for airplanes with tails.",
         features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
@@ -1324,7 +1324,7 @@ presets.presets = [
 		],
     },
     {
-        name: "Airplane without tail",
+        name: chrome.i18n.getMessage('presetsAirplaneOutTail'),
         description: "General setup for airplanes without tails: Flying Wing, Delta, etc.",
 		features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],
         applyDefaults: ["INAV_PID_CONFIG", "RC_tuning", "PID_ADVANCED", "FILTER_CONFIG"],
