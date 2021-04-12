@@ -12,7 +12,6 @@
                             <div class="spacer_box_title" data-i18n="configurationSystem"></div>
                         </div>
                         <div class="spacer_box">
-                            <div id="gyrolpf-info" class="info-box is-hidden"></div>
                             <div class="select  is-hidden">
                                 <select id="gyro-lpf"></select>
                                 <label for="gyro-lpf"> <span data-i18n="configurationGyroLpfTitle"></span></label>
@@ -82,16 +81,7 @@
                     <div class="helpicon cf_tip" data-i18n_title="configHelp2"></div>
                 </div>
                 <div class="spacer_box">
-                    <div class="number">
-                        <input type="number" id="board_align_roll" name="board_align_roll" step="0.1" min="-180" max="360" />
-                        <div class="alignicon roll"></div>
-                        <label for="board_align_roll" data-i18n="configurationBoardAlignmentRoll"></label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="board_align_pitch" name="board_align_pitch" step="0.1" min="-180" max="360" />
-                        <div class="alignicon pitch"></div>
-                        <label for="board_align_pitch" data-i18n="configurationBoardAlignmentPitch"></label>
-                    </div>
+                    <div class="info-box" data-i18n="rollPitchAdjustmentsMoved"></div>
                     <div class="number">
                         <input id="board_align_yaw" type="number" name="board_align_yaw" step="0.1" min="-180" max="360" />
                         <div class="alignicon yaw"></div>
@@ -321,7 +311,7 @@
                 </div>
                 <div class="spacer_box">
                     <div class="number">
-                        <input type="number" id="cells" name="cells" step="1" min="0" max="8" />
+                        <input type="number" id="cells" name="cells" step="1" min="0" max="12" />
                         <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>
                         <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
                     </div>

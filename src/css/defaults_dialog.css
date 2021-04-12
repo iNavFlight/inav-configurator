@@ -15,8 +15,8 @@
     z-index: 2002;
     position: absolute;
     width: 500px;
-    height: 450px;
-    overflow-y: auto;
+    height: 485px;
+    overflow: none;
     top: 0;
     bottom: 0;
     left: 0;

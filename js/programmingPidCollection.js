@@ -27,7 +27,32 @@ let ProgrammingPidCollection = function () {
         $container.show();
     };
 
-    
+    self.init = function ($element) {
+        $container = $element;
+    };
+
+    self.render = function () {
+        let $table = $container.find(".pid__table")
+        $table.find("tbody tr").remove();
+
+        for (let k in self.get()) {
+            if (self.get().hasOwnProperty(k)) {
+                self.get()[k].render(k, $table);
+            }
+        }
+
+        GUI.switchery();
+    };
+
+    self.update = function(statuses) {
+        let $table = $container.find(".pid__table")
+
+        for (let k in self.get()) {
+            if (self.get().hasOwnProperty(k)) {
+                self.get()[k].update(k, statuses.get(k), $table);
+            }
+        }
+    }
 
     return self;
 };

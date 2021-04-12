@@ -24,6 +24,7 @@ var CONFIG,
     GLOBAL_FUNCTIONS,
     GLOBAL_VARIABLES_STATUS,
     PROGRAMMING_PID,
+    PROGRAMMING_PID_STATUS,
     SERIAL_CONFIG,
     SENSOR_DATA,
     MOTOR_DATA,
@@ -70,10 +71,10 @@ var FC = {
         return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
     isRpyDComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
+        return true; // Currently all platforms use D term
     },
     isCdComponentUsed: function () {
-        return FC.isRpyDComponentUsed();
+        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -173,12 +174,13 @@ var FC = {
         ADJUSTMENT_RANGES = [];
 
         SERVO_CONFIG = [];
-        SERVO_RULES = new ServoMixerRuleCollection();
-        MOTOR_RULES = new MotorMixerRuleCollection();
-        LOGIC_CONDITIONS = new LogicConditionsCollection();
+        SERVO_RULES             = new ServoMixerRuleCollection();
+        MOTOR_RULES             = new MotorMixerRuleCollection();
+        LOGIC_CONDITIONS        = new LogicConditionsCollection();
         LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
         GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
-        PROGRAMMING_PID = new ProgrammingPidCollection();
+        PROGRAMMING_PID         = new ProgrammingPidCollection();
+        PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
 
         MIXER_CONFIG = {
             yawMotorDirection: 0,
@@ -570,7 +572,6 @@ var FC = {
             {bit: 19, group: 'other', name: 'BLACKBOX', haveTip: true, showNameInTip: true},
             {bit: 28, group: 'other', name: 'PWM_OUTPUT_ENABLE', haveTip: true},
             {bit: 26, group: 'other', name: 'SOFTSPI'},
-            {bit: 27, group: 'other', name: 'PWM_SERVO_DRIVER', haveTip: true, showNameInTip: true},
             {bit: 29, group: 'other', name: 'OSD', haveTip: false, showNameInTip: false},
             {bit: 22, group: 'other', name: 'AIRMODE', haveTip: false, showNameInTip: false},
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
@@ -602,12 +603,8 @@ var FC = {
     getLooptimes: function () {
         return {
             125: {
-                defaultLooptime: 1000,
+                defaultLooptime: 500,
                 looptimes: {
-                    4000: "250Hz",
-                    3000: "334Hz",
-                    2000: "500Hz",
-                    1500: "667Hz",
                     1000: "1kHz",
                     500: "2kHz",
                     250: "4kHz",
@@ -617,8 +614,6 @@ var FC = {
             1000: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    2000: "500Hz",
                     1000: "1kHz"
                 }
             }
@@ -629,10 +624,6 @@ var FC = {
             125: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    3000: "334Hz",
-                    2000: "500Hz",
-                    1500: "667Hz",
                     1000: "1kHz",
                     500: "2kHz",
                     250: "4kHz",
@@ -642,8 +633,6 @@ var FC = {
             1000: {
                 defaultLooptime: 1000,
                 looptimes: {
-                    4000: "250Hz",
-                    2000: "500Hz",
                     1000: "1kHz"
                 }
             }
@@ -653,32 +642,26 @@ var FC = {
         return [
             {
                 tick: 125,
-                defaultDenominator: 16,
                 label: "256Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "188Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "98Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "42Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "20Hz"
             },
             {
                 tick: 1000,
-                defaultDenominator: 2,
                 label: "10Hz"
             }
         ];
@@ -885,7 +868,11 @@ var FC = {
         return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
     },
     getOpticalFlowNames: function () {
-        return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
+        if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
+            return [ "NONE", "CXOF", "MSP", "FAKE" ];
+        } else {
+            return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
+        }
     },
     getArmingFlags: function () {
         return {
@@ -1129,6 +1116,11 @@ var FC = {
                 hasOperand: [true, true],
                 output: "raw"
             },
+            40: {
+                name: "MOD",
+                hasOperand: [true, true],
+                output: "raw"
+            },
             18: {
                 name: "GVAR SET",
                 hasOperand: [true, true],
@@ -1228,7 +1220,12 @@ var FC = {
                 name: "MAP OUTPUT",
                 hasOperand: [true, true],
                 output: "raw"
-            }
+            },
+            38: {
+                name: "RC CHANNEL OVERRIDE",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1256,8 +1253,8 @@ var FC = {
                     1: "Home distance [m]",
                     2: "Trip distance [m]",
                     3: "RSSI",
-                    4: "Vbat [deci-Volt] [1V = 10]",
-                    5: "Cell voltage [deci-Volt] [1V = 10]",
+                    4: "Vbat [centi-Volt] [1V = 100]",
+                    5: "Cell voltage [centi-Volt] [1V = 100]",
                     6: "Current [centi-Amp] [1A = 100]",
                     7: "Current drawn [mAh]",
                     8: "GPS Sats",
@@ -1286,6 +1283,7 @@ var FC = {
                     31: "3D home distance [m]",
                     32: "CRSF LQ",
                     33: "CRSF SNR",
+                    34: "GPS Valid Fix",
                 }
             },
             3: {

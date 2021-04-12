@@ -1286,12 +1286,12 @@ OSD.constants = {
                     }
                 },
                 {
-                    name: 'CRUISE_HEADING_ERROR',
+                    name: 'COURSE_HOLD_ERROR',
                     id: 51,
                     preview: FONT.symbol(SYM.HEADING) + '  5' + FONT.symbol(SYM.DEGREES)
                 },
                 {
-                    name: 'CRUISE_HEADING_ADJUSTMENT',
+                    name: 'COURSE_HOLD_ADJUSTMENT',
                     id: 52,
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
                 },
@@ -1425,17 +1425,17 @@ OSD.constants = {
                 {
                     name: 'ROLL_PIDS',
                     id: 16,
-                    preview: 'ROL  40  30  23'
+                    preview: 'ROL  40  30  20  23'
                 },
                 {
                     name: 'PITCH_PIDS',
                     id: 17,
-                    preview: 'PIT  40  30  23'
+                    preview: 'PIT  40  30  20  23'
                 },
                 {
                     name: 'YAW_PIDS',
                     id: 18,
-                    preview: 'YAW  85  45   0'
+                    preview: 'YAW  85  45   0  20'
                 },
                 {
                     name: 'LEVEL_PIDS',

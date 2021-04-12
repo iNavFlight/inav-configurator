@@ -556,6 +556,16 @@ var mspHelper = (function (gui) {
                 }
                 break;
 
+            case MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS:
+                if (data.byteLength % 4 === 0) {
+                    let index = 0;
+                    for (i = 0; i < data.byteLength; i += 4) {
+                        PROGRAMMING_PID_STATUS.set(index, data.getInt32(i, true));
+                        index++;
+                    }
+                }
+                break;
+
             case MSPCodes.MSP2_INAV_SET_PROGRAMMING_PID:
                 console.log("Programming PID saved");
                 break;
@@ -3241,6 +3251,14 @@ var mspHelper = (function (gui) {
     self.loadGlobalVariablesStatus = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
             MSP.send_message(MSPCodes.MSP2_INAV_GVAR_STATUS, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadProgrammingPidStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
         } else {
             callback();
         }
