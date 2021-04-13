@@ -96,6 +96,38 @@ let SafehomeCollection = function () {
         data[newSafehome.getNumber()] = newSafehome;
     };
     
+    self.extractBuffer = function(safehomeId) {
+        let buffer = [];
+        let safehome = self.getSafehome(safehomeId);
+        buffer.push(safehome.getNumber());    // sbufReadU8(src);    // number
+        buffer.push(safehome.getEnabled());    // sbufReadU8(src);    // action
+        buffer.push(specificByte(safehome.getLat(), 0));    // sbufReadU32(src);      // lat
+        buffer.push(specificByte(safehome.getLat(), 1));
+        buffer.push(specificByte(safehome.getLat(), 2));
+        buffer.push(specificByte(safehome.getLat(), 3));
+        buffer.push(specificByte(safehome.getLon(), 0));    // sbufReadU32(src);      // lon
+        buffer.push(specificByte(safehome.getLon(), 1));
+        buffer.push(specificByte(safehome.getLon(), 2));
+        buffer.push(specificByte(safehome.getLon(), 3));
+        
+        return buffer;
+    }
+    
+    self.safehomeDisplayDebug = function() {
+        if (data && data.length != 0) {
+            data.forEach(function (element) {
+                console.log("N° : ", element.getNumber(),
+                            "Enabled : ", element.getEnabled(),
+                            "Lon : ", element.getLon(),
+                            "Lat : ", element.getLat(),
+                           );
+            });
+        }
+        else {
+            console.log("Data empty");
+        }
+    }
+    
 
     return self;
 };

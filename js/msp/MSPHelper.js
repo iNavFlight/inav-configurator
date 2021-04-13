@@ -440,7 +440,6 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
-                console.log("data : ", data);
                 MISSION_PLANER.put(new Waypoint(
                     data.getUint8(0),
                     data.getUint8(1),
@@ -1467,9 +1466,12 @@ var mspHelper = (function (gui) {
                 SAFEHOMES.put(new Safehome(
                     data.getUint8(0),
                     data.getUint8(1),
-                    data.getInt32(2, true) / 1e7,
-                    data.getInt32(6, true) / 1e7
+                    data.getInt32(2, true),
+                    data.getInt32(6, true)
                 ));
+                break;
+            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
+                console.log('Safehome points saved');
                 break;    
             
             default:
@@ -2148,13 +2150,6 @@ var mspHelper = (function (gui) {
 
                 buffer.push(BRAKING_CONFIG.bankAngle);
                 break;
-                
-/*             case MSPCodes.MSP2_INAV_SAFEHOME:
-                console.log("SAFEHOME.bufferPoint.number : ",SAFEHOME.bufferPoint.number);
-                buffer.push(SAFEHOME.bufferPoint.number+1);
-                break;
-            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
-                break; */
 
             default:
                 return false;
@@ -2925,33 +2920,36 @@ var mspHelper = (function (gui) {
     
     self.loadWaypoints = function (callback) {
         MISSION_PLANER.reinit();
-        mspHelper.getMissionInfo();
-        console.log("MISSION_PLANER.getCountBusyPoints() ", MISSION_PLANER.getCountBusyPoints());
-        let waypointId = 0;
-        MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
+        let waypointId = 1;
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getFirstWP);
+        
+        function getFirstWP() {
+            console.log("MISSION_PLANER.getCountBusyPoints() ", MISSION_PLANER.getCountBusyPoints());
+            MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint)
+        };
         
         function nextWaypoint() {
             waypointId++;
-            console.log("Display for LoadInternal");
-            MISSION_PLANER.missionDisplayDebug();
-            if (waypointId < MISSION_PLANER.get().length-1) {
-                console.log("waypointId if ", waypointId);
+            if (waypointId < MISSION_PLANER.getCountBusyPoints()) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
             }
             else {
-                console.log("waypointId else ", waypointId);
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
+        };
+        
+        function endMission() {
+            console.log("End");
         };
     };
     
     self.saveWaypoints = function (callback) {
-        let waypointId = 0;
+        let waypointId = 1;
         MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
 
         function nextWaypoint() {
             waypointId++;
-            if (waypointId < MISSION_PLANER.get().length-1) {
+            if (waypointId < MISSION_PLANER.get().length) {
                 MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint);
             }
             else {
@@ -2960,7 +2958,6 @@ var mspHelper = (function (gui) {
         };
         
         function endMission() {
-            GUI.log('End send point');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };
@@ -2978,6 +2975,25 @@ var mspHelper = (function (gui) {
             else {
                 MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, callback);
             }
+        };
+    };
+    
+    self.saveSafehomes = function (callback) {
+        let safehomeId = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
+        
+        function nextSendSafehome() {
+            safehomeId++;
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, callback);
+            }
+        };
+        
+        function endSendSafehome() {
+            console.log("end sending safehome");
         };
     };
 

@@ -21,12 +21,8 @@ let Safehome = function (number, enabled, lat, lon) {
         lon = data;
     };
     
-    self.getLonToMap = function () {
+    self.getLonMap = function () {
         return lon / 1e7;
-    };
-
-    self.setLonFromMap = function (data) {
-        lon = data * 1e7;
     };
 
     self.getLat = function () {
@@ -37,12 +33,8 @@ let Safehome = function (number, enabled, lat, lon) {
         lat = data;
     };
     
-     self.getLatToMap = function () {
+     self.getLatMap = function () {
         return lat / 1e7;
-    };
-
-    self.setLatFromMap = function (data) {
-        lat = data * 1e7;
     };
 
     self.isUsed = function () {

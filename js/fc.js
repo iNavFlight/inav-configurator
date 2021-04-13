@@ -548,14 +548,6 @@ var FC = {
 
         SETTINGS = {};
         
-/*         SAFEHOME = {
-            bufferPoint : {
-                number: 0,
-                enabled: 0,
-                lon: 0,
-                lat: 0
-            }
-        }; */
         SAFEHOMES = new SafehomeCollection();
     },
     getOutputUsages: function() {

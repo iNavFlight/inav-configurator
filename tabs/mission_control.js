@@ -82,7 +82,7 @@ TABS.mission_control.initialize = function (callback) {
         loadChainer.setChain([
             mspHelper.getMissionInfo,
             //mspHelper.loadWaypoints,
-            mspHelper.loadSafehomes
+            //mspHelper.loadSafehomes
         ]);
         loadChainer.setExitPoint(loadHtml);
         loadChainer.execute();
@@ -379,8 +379,8 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Safehome parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
-    var SAFEHOMES = new SafehomeCollection(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
-    SAFEHOMES.inflate(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+    //var SAFEHOMES = new SafehomeCollection(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+    //SAFEHOMES.inflate(); // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
     var safehomeRangeRadius = 200; //meters
     var safehomeSafeRadius = 50; //meters
     
@@ -466,27 +466,26 @@ TABS.mission_control.initialize = function (callback) {
                 $row.find(".safehome-number").text(safehome.getNumber()+1);
                 
                 $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
-                    safehome.setEnabled((($(this).prop('checked')) ? true : false));
+                    safehome.setEnabled((($(this).prop('checked')) ? 1 : 0));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
 
-                $row.find(".safehome-lon").val(safehome.getLon()).change(function () {
+                $row.find(".safehome-lon").val(safehome.getLonMap()).change(function () {
                     safehome.setLon(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
                 
-                $row.find(".safehome-lat").val(safehome.getLat()).change(function () {
+                $row.find(".safehome-lat").val(safehome.getLatMap()).change(function () {
                     safehome.setLat(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
 
-                $row.find("[data-role='safehome-view']").attr("data-index", safehomeIndex);
                 $row.find("[data-role='safehome-center']").attr("data-index", safehomeIndex);
             }
         }
@@ -541,7 +540,7 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * add safehome on Map
          */
-        let coord = ol.proj.fromLonLat([safehome.getLon(), safehome.getLat()]);
+        let coord = ol.proj.fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(coord),
             name: 'Null Island',
@@ -549,16 +548,9 @@ TABS.mission_control.initialize = function (callback) {
             rainfall: 500
         });
 
-        iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
+        //iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
         
-        var circleFeature = new ol.Feature({
-            geometry: new ol.geom.Circle(coord, safehomeRangeRadius),
-            name: 'circleFeature',
-            population: 4000,
-            rainfall: 500
-        });
-        
-        circleFeature.setStyle(new ol.style.Style({
+        let circleStyle = new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'rgba(255, 163, 46, 1)',
                 width: 3,
@@ -567,16 +559,9 @@ TABS.mission_control.initialize = function (callback) {
             // fill: new ol.style.Fill({
                 // color: 'rgba(251, 225, 155, 0.1)'
             // })
-        }));
-        
-        var circleSafeFeature = new ol.Feature({
-            geometry: new ol.geom.Circle(coord, safehomeSafeRadius),
-            name: 'circleSafeFeature',
-            population: 4000,
-            rainfall: 500
         });
         
-        circleSafeFeature.setStyle(new ol.style.Style({
+        let circleSafeStyle = new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'rgba(136, 204, 62, 1)',
                 width: 3,
@@ -585,21 +570,22 @@ TABS.mission_control.initialize = function (callback) {
             /* fill: new ol.style.Fill({
                 color: 'rgba(136, 204, 62, 0.1)'
             }) */
-        }));
+        });
         
-        if (safehome.isUsed()) {
-            var vectorSource = new ol.source.Vector({
-                features: [iconFeature]//, circleFeature, circleSafeFeature]
-            });
-        }
-        else {
-            var vectorSource = new ol.source.Vector({
-                features: [iconFeature]
-            });
-        }
-
         var vectorLayer = new ol.layer.Vector({
-            source: vectorSource
+            source: new ol.source.Vector({
+                        features: [iconFeature]
+                    }),
+            style : function(iconFeature) {
+                let styles = [getSafehomeIcon(safehome)];
+                /* console.log(iconFeature.getGeometry().getType());
+                if (safehome.isUsed()) {
+                    circleStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), safehomeRangeRadius));
+                    //circleSafeStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCenter(), safehomeSafeRadius));
+                    styles.push(circleStyle);
+                } */
+                return styles;
+            }
         });
 
         vectorLayer.kind = "safehome";
@@ -996,7 +982,6 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSafehome').hide();
                 $('#missionPlanerSettings').fadeIn(300);
             };
 
@@ -1030,8 +1015,9 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSafehome = function () {
-                $('#MPeditPoint, #missionPlanerTotalInfo','#missionPlanerTemplate', '#missionPlanerSettings').hide();
                 $('#missionPlanerSafehome').fadeIn(300);
+                //SAFEHOMES.flush();
+                //mspHelper.loadSafehomes();
                 cleanSafehomeLayers();
                 renderSafehomesTable();
                 renderSafehomesOnMap();
@@ -1115,10 +1101,6 @@ TABS.mission_control.initialize = function (callback) {
                 tempSH.setLon(Math.round(coord[0] * 10000000));
                 tempSH.setLat(Math.round(coord[1] * 10000000));
                 SAFEHOMES.updateSafehome(tempSH);
-                /* if (tempSH.isUsed()) {
-                    this.layer_.getSource().getFeatures()[1].getGeometry().translate(deltaX, deltaY);
-                    this.layer_.getSource().getFeatures()[0].getGeometry().translate(deltaX, deltaY);
-                } */
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
@@ -1187,7 +1169,7 @@ TABS.mission_control.initialize = function (callback) {
         else {
             control_list = [
                 new app.PlannerSettingsControl(),
-                new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+                //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
 
@@ -1314,7 +1296,7 @@ TABS.mission_control.initialize = function (callback) {
                 cleanLayers();
                 redrawLayers();
             }
-            mission.missionDisplayDebug();
+            //mission.missionDisplayDebug();
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -1502,8 +1484,8 @@ TABS.mission_control.initialize = function (callback) {
         $safehomesTableBody.on('click', "[data-role='safehome-center']", function (event) {
             let mapCenter = map.getView().getCenter();
             let tmpSH = SAFEHOMES.getSafehome($(event.currentTarget).attr("data-index"));
-            tmpSH.setLon(ol.proj.toLonLat(Math.round(mapCenter)[0] * 10000000));
-            tmpSH.setLat(ol.proj.toLonLat(Math.round(mapCenter)[1] * 10000000));
+            tmpSH.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
+            tmpSH.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
             SAFEHOMES.updateSafehome(tmpSH);
             renderSafehomesTable();
             cleanSafehomeLayers();
@@ -1513,6 +1495,31 @@ TABS.mission_control.initialize = function (callback) {
         $('#cancelSafehome').on('click', function () {
             closeSafehomePanel();
         });
+        
+        $('#loadEepromSafehomeButton').on('click', function () {
+            $(this).addClass('disabled');
+            GUI.log('Start of getting Safehome points');
+            mspHelper.loadSafehomes();
+            setTimeout(function(){
+                console.log("debug Safehome after loading");
+                SAFEHOMES.safehomeDisplayDebug();
+                renderSafehomesTable();
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+                GUI.log('End of getting Safehome points');
+                $('#loadEepromSafehomeButton').removeClass('disabled');
+            }, 500);
+            
+        });
+        
+        $('#saveEepromSafehomeButton').on('click', function () {
+            $(this).addClass('disabled');
+            GUI.log('Start of sending Safehome points');
+            mspHelper.saveSafehomes();
+            GUI.log('End of sending Safehome points');
+            $('#saveEepromSafehomeButton').removeClass('disabled');
+        });
+        
         /////////////////////////////////////////////
         // Callback for Remove buttons
         /////////////////////////////////////////////
@@ -1558,51 +1565,33 @@ TABS.mission_control.initialize = function (callback) {
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
-            // Reinit some internal parameters
-/*             pointForSend = 0;
-            actionPointForSend = 0;
-            nonMarkerPoint = [];
-            nonMarkerPointListRead = [];
-            var isOptions = false;
-            var oldMarkers = null; */
-            //getNextPoint();
-            mspHelper.loadWaypoints();
-            mission = MISSION_PLANER
-            mission.update();
-            console.log("Display for Load");
-            mission.missionDisplayDebug();
-            redrawLayers();
+            getWaypoints();
             GUI.log('End get point');
             $('#loadMissionButton').removeClass('disabled');
-            updateTotalInfo();
         });
 
         $('#saveMissionButton').on('click', function () {
             $(this).addClass('disabled');
-            MISSION_PLANER = mission ;
             GUI.log('Start send point');
+            MISSION_PLANER.reinit();
+            MISSION_PLANER.copy(mission);
+            MISSION_PLANER.update(true, true);
             mspHelper.saveWaypoints();
-            console.log("MISSION_PLANER.isValidMission ",MISSION_PLANER.getValidMission());
-            mission = MISSION_PLANER;
-            console.log("Display for save");
-            mission.missionDisplayDebug();
-            $('#saveMissionButton').removeClass('disabled');
-            updateTotalInfo();
-            // Reinit some internal parameters
-/*             pointForSend = 0;
-            actionPointForSend = 0;
-            nonMarkerPoint = [];
-            nonMarkerPointListRead = [];
-            var isOptions = false;
-            var oldMarkers = null; */
-            //sendNextPoint();
+            setTimeout(function(){
+                GUI.log('End send point');
+                $('#saveMissionButton').removeClass('disabled');
+                mission.setMaxWaypoints(MISSION_PLANER.getMaxWaypoints());
+                mission.setValidMission(MISSION_PLANER.getValidMission());
+                mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());
+                updateTotalInfo();
+            }, 2000);
         });
 
         $('#loadEepromMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllWaypoints();
             GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getPointsFromEprom);
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypoints);
         });
         
         $('#saveEepromMissionButton').on('click', function () {
@@ -1786,51 +1775,21 @@ TABS.mission_control.initialize = function (callback) {
     // Load/Save FC mission Toolbox
     //
     /////////////////////////////////////////////
-    // New: function to get number of Non Marker points such as JUMP, SET_HEAD and RTH
-    function getNumberOfNonMarkerForJump2(nonMarkerPointList, numTargetMarker) {
-        for (i = 1; i < nonMarkerPointList.length; i++) {
-            if (numTargetMarker>=nonMarkerPointList[i-1]) {
-                numTargetMarker++;
-            }
-            else {
-                return numTargetMarker;
-            }
-        }
-    }
-    
-    // New: Reversed function to get number of Non Marker points such as JUMP, SET_HEAD and RTH
-    function getNumberOfNonMarkerForJumpReversed(nonMarkerPointList, numTargetMarker) {
-        var numTargetMarkerOut = 0;
-        for (i = 1; i < nonMarkerPointList.length; i++) {
-            if (numTargetMarker>=nonMarkerPointList[i-1]) {
-                numTargetMarkerOut++;
-            }
-            else {
-                return numTargetMarker-numTargetMarkerOut;
-            }
-        }
+    function getWaypoints() {
+        mspHelper.loadWaypoints();
+        setTimeout(function(){
+            console.log("getWaypoint MISSION_PLANER 0 ");
+            console.log(MISSION_PLANER.missionDisplayDebug());
+            mission.reinit();
+            mission.copy(MISSION_PLANER);
+            mission.update(true);
+            console.log("getWaypoint 0 ");
+            console.log(mission.missionDisplayDebug());
+            redrawLayers();
+            updateTotalInfo();
+        }, 2000);
     }
 
-    function getPointsFromEprom() {
-/*         pointForSend = 0;
-        actionPointForSend = 0;
-        nonMarkerPoint = [];
-        nonMarkerPointListRead = [];
-        isOptions = false;
-        oldMarkers = null;
-        pointFromBuffer = {}; */
-        //MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getNextPoint);
-        mspHelper.getMissionInfo();
-        mspHelper.loadWaypoints();
-        mission = MISSION_PLANER
-        mission.update();
-        console.log("Display for getfromEprom");
-        mission.missionDisplayDebug();
-        redrawLayers();
-        GUI.log('End get point');
-        $('#loadMissionButton').removeClass('disabled');
-        updateTotalInfo();
-    }
 
     function endGetPoint() {
         GUI.log('End get point');

@@ -46,6 +46,10 @@ let WaypointCollection = function () {
     self.getCenter = function () {
         return center;
     };
+    
+    self.setCenter = function (data) {
+        center = data;
+    };
 
     self.setCenterZoom = function (data) {
         center.zoom = data;
@@ -145,18 +149,25 @@ let WaypointCollection = function () {
         data = tmpData;
     };
     
-    self.update = function (bMWPfile=false) {
+    self.update = function (bMWPfile=false, bReverse=false) {
         let oldWPNumber = 0;
         let optionIdx = 0;
         let idx = 0;
         data.forEach(function (element) {
             if (element.isUsed()) {
-                if (bMWPfile) {
+                if (bMWPfile && !bReverse) {
                     element.setNumber(element.getNumber()-1);
                     if (element.getAction() == MWNP.WPTYPE.JUMP) {
                         element.setP1(element.getP1()-1);
                     }
                 }
+                else if (bMWPfile && bReverse) {
+                    element.setNumber(element.getNumber()+1);
+                    if (element.getAction() == MWNP.WPTYPE.JUMP) {
+                        element.setP1(element.getP1()+1);
+                    }
+                }
+                
                 if ([MWNP.WPTYPE.JUMP,MWNP.WPTYPE.SET_HEAD,MWNP.WPTYPE.RTH].includes(element.getAction())) {
                     element.setAttachedId(oldWPNumber);
                     element.setAttachedNumber(optionIdx);
@@ -169,7 +180,8 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                if (element.getNumber() == self.get().length-1) {
+                console.log(((bMWPfile && bReverse) ? self.get().length : self.get().length-1));
+                if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
                     element.setEndMission(0xA5);
                 }
                 else {
@@ -255,17 +267,30 @@ let WaypointCollection = function () {
     }
     
     self.missionDisplayDebug = function() {
-        data.forEach(function (element) {
-            console.log("N° : ", element.getNumber(),
-                        "Action : ", element.getAction(),
-                        "Lon : ", element.getLon(),
-                        "Lat : ", element.getLat(),
-                        "Alt : ", element.getAlt(),
-                        "P1 : ", element.getP1(),
-                        "P2 : ", element.getP2(),
-                        "P3 : ", element.getP3(),
-                        "EndMission : ", element.getEndMission());
+        if (data && data.length != 0) {
+            data.forEach(function (element) {
+                console.log("N° : ", element.getNumber(),
+                            "Action : ", element.getAction(),
+                            "Lon : ", element.getLon(),
+                            "Lat : ", element.getLat(),
+                            "Alt : ", element.getAlt(),
+                            "P1 : ", element.getP1(),
+                            "P2 : ", element.getP2(),
+                            "P3 : ", element.getP3(),
+                            "EndMission : ", element.getEndMission());
+            });
+        }
+    }
+    
+    self.copy = function(mission){
+        mission.get().forEach(function (element) {
+            self.put(element);
         });
+        self.setMaxWaypoints(mission.getMaxWaypoints());
+        self.setValidMission(mission.getValidMission());
+        self.setCountBusyPoints(mission.getCountBusyPoints());
+        self.setVersion(mission.getVersion());
+        self.setCenter(mission.getCenter());
     }
 
     return self;
