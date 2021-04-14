@@ -2081,35 +2081,7 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_CONFIG.opflow);
                 break;
 
-            case MSPCodes.MSP_SET_WP:
-                buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
-                buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 3));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 0));    // sbufReadU32(src);      // lon
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 3));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 0));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));
-                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p1)); //sbufReadU16(src);       // P1 speed or landing
-                buffer.push(highByte(MISSION_PLANER.bufferPoint.p1));
-                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p2)); //sbufReadU16(src);       // P2
-                buffer.push(highByte(MISSION_PLANER.bufferPoint.p2));
-                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p3)); //sbufReadU16(src);       // P3
-                buffer.push(highByte(MISSION_PLANER.bufferPoint.p3));
-                buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
-                break;
-            case MSPCodes.MSP_WP:
-                console.log("MISSION_PLANER.bufferPoint.number : ",MISSION_PLANER.bufferPoint.number);
-                buffer.push(MISSION_PLANER.bufferPoint.number+1);
-                console.log("buffer ", buffer);
-
-                break;
+            
             case MSPCodes.MSP_WP_MISSION_SAVE:
                 // buffer.push(0);
                 console.log(buffer);
@@ -2924,7 +2896,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getFirstWP);
         
         function getFirstWP() {
-            console.log("MISSION_PLANER.getCountBusyPoints() ", MISSION_PLANER.getCountBusyPoints());
             MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint)
         };
         
@@ -2936,10 +2907,6 @@ var mspHelper = (function (gui) {
             else {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
-        };
-        
-        function endMission() {
-            console.log("End");
         };
     };
     
@@ -2990,10 +2957,6 @@ var mspHelper = (function (gui) {
             else {
                 MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, callback);
             }
-        };
-        
-        function endSendSafehome() {
-            console.log("end sending safehome");
         };
     };
 

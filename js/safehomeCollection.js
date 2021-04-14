@@ -123,9 +123,6 @@ let SafehomeCollection = function () {
                            );
             });
         }
-        else {
-            console.log("Data empty");
-        }
     }
     
 

@@ -180,7 +180,6 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                console.log(((bMWPfile && bReverse) ? self.get().length : self.get().length-1));
                 if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
                     element.setEndMission(0xA5);
                 }
@@ -191,7 +190,16 @@ let WaypointCollection = function () {
         });
     };
     
+    self.getNonAttachedList = function () {
+        let tmpData = [];
+        data.forEach(function (element) {
+            if (!element.isAttached()) {
+                tmpData.push(element);
+            }
+        });
 
+        return tmpData;
+    } 
     
     self.getAttachedList = function () {
         let tmpData = [];
@@ -291,6 +299,16 @@ let WaypointCollection = function () {
         self.setCountBusyPoints(mission.getCountBusyPoints());
         self.setVersion(mission.getVersion());
         self.setCenter(mission.getCenter());
+    }
+    
+    self.convertJumpNumberToWaypoint = function(jumpId) {
+        let outputNumber = 0;
+        self.getNonAttachedList().forEach(function (element) {
+            if (element.getLayerNumber() == jumpId) {
+                outputNumber = element.getNumber();
+            }
+        });
+        return outputNumber;
     }
 
     return self;
