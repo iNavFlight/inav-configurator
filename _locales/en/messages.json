@@ -2443,6 +2443,12 @@
     "posholdHoverMidThrottle": {
         "message": "Use mid. throttle for ALTHOLD"
     },
+    "mcWpSlowdown": {
+        "message": "Slow down when approaching waypoint"
+    },
+    "mcWpSlowdownHelp": {
+        "message": "When enabled, NAV engine will slow down when switching to the next waypoint. This prioritizes turning over forward movement. When disabled, NAV engine will continue to the next waypoint and turn as it goes."
+    },
     "positionEstimatorConfiguration": {
         "message": "Position Estimator"
     },
