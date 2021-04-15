@@ -67,6 +67,12 @@ var CONFIG,
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
+    isAirplane: function () {
+        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE);
+    },
+    isMultirotor: function () {
+        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+    },
     isRpyFfComponentUsed: function () {
         return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
@@ -74,7 +80,7 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     isCdComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
+        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     resetState: function () {
         SENSOR_STATUS = {
