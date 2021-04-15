@@ -12,14 +12,14 @@ var MWNP = MWNP || {};
 
 // WayPoint type
 MWNP.WPTYPE = {
-    WAYPOINT:     1,
-    PH_UNLIM:     2,
-    PH_TIME:      3,
-    RTH:          4,
-    SET_POI:      5,
-    JUMP:         6,
-    SET_HEAD:     7,
-    LAND:         8
+    WAYPOINT:           1,
+    POSHOLD_UNLIM:      2,
+    POSHOLD_TIME:       3,
+    RTH:                4,
+    SET_POI:            5,
+    JUMP:               6,
+    SET_HEAD:           7,
+    LAND:               8
 };
 
 // Reverse WayPoint type dictionary
@@ -745,6 +745,7 @@ TABS.mission_control.initialize = function (callback) {
             }),
             text: new ol.style.Text({
                 text: lineText,
+                font: '14px sans-serif',
                 placement : 'line',
                 textBaseline: 'ideographic',
                 stroke: new ol.style.Stroke({
@@ -1674,9 +1675,9 @@ TABS.mission_control.initialize = function (callback) {
                                             if (node.$[attr].match(/WAYPOINT/i)) {
                                                 point.setAction(MWNP.WPTYPE.WAYPOINT);
                                             } else if (node.$[attr].match(/PH_UNLIM/i) || node.$[attr].match(/POSHOLD_UNLIM/i)) {
-                                                point.setAction(MWNP.WPTYPE.PH_UNLIM);
+                                                point.setAction(MWNP.WPTYPE.POSHOLD_UNLIM);
                                             } else if (node.$[attr].match(/PH_TIME/i) || node.$[attr].match(/POSHOLD_TIME/i)) {
-                                                point.setAction(MWNP.WPTYPE.PH_TIME);
+                                                point.setAction(MWNP.WPTYPE.POSHOLD_TIME);
                                             } else if (node.$[attr].match(/RTH/i)) {
                                                 point.setAction(MWNP.WPTYPE.RTH);
                                             } else if (node.$[attr].match(/SET_POI/i)) {
