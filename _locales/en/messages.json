@@ -2504,7 +2504,7 @@
         "message": "Override RTH altitude and climb setting with roll/pitch stick"
     },
     "rthAltControlOverrideHELP": {
-        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. The climb first setting can be overriden by holding full roll left or right for >1 second (this only applies to fixed wing aircraft). "
+        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. On fixed wing aircraft, the 'Climb before RTH' setting can be overriden by holding full roll left or right for >1 second so that the plane will turn towards home immediately."
     },
     "rthTailFirst": {
         "message": "Tail first"
