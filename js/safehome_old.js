@@ -1,6 +1,7 @@
 /*global $*/
 'use strict';
 
+
 let Safehome = function (number, enabled, lat, lon) {
 
     var self = {};
