@@ -310,6 +310,17 @@ let WaypointCollection = function () {
         });
         return outputNumber;
     }
+    
+    self.isJumpTargetAttached = function(waypoint) {
+        let lJumptTargetAttached = [];
+        data.forEach(function (element) {
+            if (element.getAction() == MWNP.WPTYPE.JUMP && element.getP1() == waypoint.getNumber()) {
+                lJumptTargetAttached.push(element.getNumber());
+            }
+        });
+        console.log("lJumptTargetAttached ", lJumptTargetAttached);
+        return (lJumptTargetAttached.length != 0 && lJumptTargetAttached != 'undefined')
+    }
 
     return self;
 };

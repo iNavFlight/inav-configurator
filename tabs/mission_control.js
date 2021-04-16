@@ -1531,12 +1531,17 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
-                mission.dropWaypoint(selectedMarker);
-                selectedMarker = null;
-                mission.update();
-                clearEditForm();
-                cleanLayers();
-                redrawLayers();
+                if (mission.isJumpTargetAttached(selectedMarker)) {
+                    alert(chrome.i18n.getMessage('MissionPlannerJumpTargetRemoval'));
+                }
+                else {
+                    mission.dropWaypoint(selectedMarker);
+                    selectedMarker = null;
+                    mission.update();
+                    clearEditForm();
+                    cleanLayers();
+                    redrawLayers();
+                }
             }
         });
         

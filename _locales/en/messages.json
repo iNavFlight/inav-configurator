@@ -3607,6 +3607,9 @@
     "MissionPlannerRTHSettingsCheck": {
         "message": "RTH option is incorrect : Should be 0 or 1. Check it again! Being forced by default to 0, i.e no LAND after RTH!"
     },
+    "MissionPlannerJumpTargetRemoval": {
+        "message": "You can't remove a Waypoint which is defined as a JUMP target! You first need to remove the target on the waypoint triggering the JUMP."
+    },
     "SafehomeSelected": {
         "message": ""
     },
