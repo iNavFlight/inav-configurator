@@ -43,6 +43,7 @@ var mspHelper = (function (gui) {
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
+        'IMU2': 24,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting

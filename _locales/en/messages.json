@@ -1043,6 +1043,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_IMU2": {
+        "message": "Secondary IMU"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -1129,7 +1132,7 @@
     },
 
     "receiverHelp": {
-        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -2363,13 +2366,16 @@
         "message": "Programming"
     },
     "tabAdvancedTuning": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
     },
     "advancedTuningSave": {
         "message": "Save and Reboot"
     },
     "tabAdvancedTuningTitle": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningGenericTitle": {
+        "message": "Generic settings"
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
@@ -2459,7 +2465,7 @@
         "message": "Horizontal speed GPS weight"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "This value should be changed very carefully. In most cases there is not need to change that. For advanced users only!"
+        "message": "These values should be changed very carefully. In most cases there is no need to change them. For advanced users only!"
     },
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
@@ -2549,19 +2555,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. navigation bank angle [degrees]"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle [degrees]"
+        "message": "Max. navigation climb angle [degrees]"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
+    "navManualClimbRate": {
+        "message": "Max. Alt-hold climb rate [cm/s]"
+    },
+    "navManualClimbRateHelp": {
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+    },
+    "navAutoClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "navAutoClimbRateHelp": {
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+    },
     "maxDiveAngle": {
-        "message": "Max. dive angle [degrees]"
+        "message": "Max. navigation dive angle [degrees]"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2598,6 +2616,36 @@
     },
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+    },
+    "powerConfiguration": {
+        "message": "Battery Estimation Settings"
+    },
+    "idlePower": {
+        "message": "Idle power [cW]"
+    },
+    "idlePowerHelp": {
+        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruisePower": {
+        "message": "Cruise power [cW]"
+    },
+    "cruisePowerHelp": {
+        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruiseSpeed": {
+        "message": "Cruise speed [cm/s]"
+    },
+    "cruiseSpeedHelp": {
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+    },
+    "rthEnergyMargin": {
+        "message": "RTH energy margin [%]"
+    },
+    "rthEnergyMarginHelp": {
+        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+    },
+    "generalNavigationSettings": {
+        "message": "General Navigation Settings"
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
@@ -3081,6 +3129,9 @@
     },
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
+    },
+    "osdElement_OSD_RANGEFINDER": {
+        "message": "Rangefinder distance"
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
@@ -3641,7 +3692,7 @@
         "message": "Current Meter Type"
     },
     "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use <strong>fw_level_pitch_trim</strong> instead"
+        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
     },
     "pidId": {
         "message": "#"

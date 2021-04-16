@@ -35,17 +35,17 @@ TABS.auxiliary.initialize = function (callback) {
     function sort_modes_for_display() {
         // This array defines the order that the modes are displayed in the configurator modes page
         configuratorBoxOrder = [
-            "ARM", "PREARM",                                                                        // Arming
-            "ANGLE", "HORIZON", "MANUAL",                                                           // Flight modes
-            "NAV RTH", "NAV POSHOLD", "NAV COURSE HOLD", "NAV CRUISE",                              // Navigation mode
-            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                              // Flight mode modifiers
-            "NAV WP", "GCS NAV", "HOME RESET",                                                      // Navigation
-            "SERVO AUTOTRIM", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",               // Fixed wing specific
-            "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",         // Multi-rotor specific
-            "BEEPER", "LEDLOW", "LIGHTS",                                                           // Feedback
-            "OSD SW", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                        // OSD
-            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                  // FPV Camera
-            "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"  // Misc
+            "ARM", "PREARM",                                                                           // Arming
+            "ANGLE", "HORIZON", "MANUAL",                                                              // Flight modes
+            "NAV RTH", "NAV POSHOLD", "NAV COURSE HOLD",                                               // Navigation mode
+            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                 // Flight mode modifiers
+            "NAV WP", "GCS NAV", "HOME RESET",                                                         // Navigation
+            "SERVO AUTOTRIM", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",                  // Fixed wing specific
+            "TURTLE", "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",  // Multi-rotor specific
+            "BEEPER", "LEDS OFF", "LIGHTS",                                                            // Feedback
+            "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                          // OSD
+            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                     // FPV Camera
+            "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"     // Misc
         ];
 
         // Sort the modes
