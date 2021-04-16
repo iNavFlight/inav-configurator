@@ -1043,6 +1043,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_IMU2": {
+        "message": "Secondary IMU"
+    },
     "pidTuningName": {
         "message": "Name"
     },

@@ -99,6 +99,12 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1 }
     );
 
+    functionRules.push({
+        name: 'IMU2',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+
     for (var i = 0; i < functionRules.length; i++) {
         functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
     }
