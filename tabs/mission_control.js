@@ -1534,6 +1534,20 @@ TABS.mission_control.initialize = function (callback) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
                     alert(chrome.i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
+                else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
+                    if (confirm(chrome.i18n.getMessage('confirm_delete_point_with_options'))) {
+                        mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
+                            mission.dropWaypoint(element);
+                            mission.update();
+                        });
+                        mission.dropWaypoint(selectedMarker);
+                        selectedMarker = null;
+                        mission.update();
+                        clearEditForm();
+                        cleanLayers();
+                        redrawLayers();
+                    }
+                }
                 else {
                     mission.dropWaypoint(selectedMarker);
                     selectedMarker = null;
