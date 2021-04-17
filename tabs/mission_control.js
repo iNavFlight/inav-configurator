@@ -708,7 +708,7 @@ TABS.mission_control.initialize = function (callback) {
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLonMap(), mission.getWaypoint(element.getP1()).getLatMap()]);  
-                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+String(element.getP2()), selection=false);
+                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
                 else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
@@ -901,7 +901,7 @@ TABS.mission_control.initialize = function (callback) {
             
             $row.find(".waypointOptions-p2").val(element.getP2()).change(function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
-                    if ($(this).val() > 10 || $(this).val() < 0)
+                    if ($(this).val() > 10 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(0);
                       alert(chrome.i18n.getMessage('MissionPlannerJump2SettingsCheck'));
@@ -1477,6 +1477,8 @@ TABS.mission_control.initialize = function (callback) {
                 //cleanLines();
                 cleanLayers();
                 redrawLayers();
+                selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
+                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
             }
         });
         
@@ -1487,6 +1489,8 @@ TABS.mission_control.initialize = function (callback) {
                 //cleanLines();
                 cleanLayers();
                 redrawLayers();
+                selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
+                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
             }
         });
         
@@ -1605,6 +1609,7 @@ TABS.mission_control.initialize = function (callback) {
             sendWaypointsToFC();
             GUI.log('End send point');
             $('#saveMissionButton').removeClass('disabled');
+            
         });
 
         $('#loadEepromMissionButton').on('click', function () {
@@ -1823,6 +1828,12 @@ TABS.mission_control.initialize = function (callback) {
             mission.setValidMission(MISSION_PLANER.getValidMission());
             mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());
             updateTotalInfo();
+            mission.reinit();
+            mission.copy(MISSION_PLANER);
+            mission.update(true);
+            cleanLayers();
+            redrawLayers();
+            $('#MPeditPoint').fadeOut(300);
         }, 2000);
     }
 
