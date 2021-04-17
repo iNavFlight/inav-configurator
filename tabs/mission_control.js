@@ -1747,13 +1747,21 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 // update Attached Waypoints (i.e non Map Markers)
                 mission.update(true);
-                if (mission.getCenter() != {}) {
+                console.log("test ",Object.keys(mission.getCenter()).length !== 0);
+                if (Object.keys(mission.getCenter()).length !== 0) {
+                    console.log("toto");
                     var coord = ol.proj.fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
                     map.getView().setCenter(coord);
-                    if (mission.getCenter().zoom) map.getView().setZoom(mission.getCenter().zoom);
+                    console.log("mission.getCenter().zoom ", mission.getCenter().zoom);
+                    if (mission.getCenter().zoom) {
+                        map.getView().setZoom(mission.getCenter().zoom);
+                    }
+                    else {
+                        map.getView().setZoom(16);
+                    }
                 }
                 else {
-                    var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getCenter().lon / 10000000, mission.getWaypoint(0).getCenter().lat / 10000000]);
+                    var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
                     map.getView().setCenter(coord);
                     map.getView().setZoom(16);
                 }
