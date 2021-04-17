@@ -164,27 +164,6 @@
                     </table>
                 </div>
             </div>
-            <div class="clear-both"></div>
-            <div class="cf_column" style="margin-top:1em;">
-                <table class="settings-table settings-table--misc">
-                    <tr>
-                        <th data-i18n="pidTuningTPA"></th>
-                        <td>
-                            <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
-                            %
-                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th data-i18n="pidTuningTPABreakPoint"></th>
-                        <td>
-                            <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000"
-                                max="2000" />
-                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
         </div>
 
         <div id="subtab-rates" class="subtab__content">
@@ -481,17 +460,17 @@
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
-                            <th data-i18n="mc_airmode_type"></th>
+                            <th data-i18n="airmode_type"></th>
                             <td>
-                                <select data-setting="mc_airmode_type" />
-                                <div class="helpicon cf_tip" data-i18n_title="mc_airmode_type_help"></div>
+                                <select data-setting="airmode_type" />
+                                <div class="helpicon cf_tip" data-i18n_title="airmode_type_help"></div>
                             </td>
                         </tr>
                         <tr>
-                            <th data-i18n="mc_airmode_threshold"></th>
+                            <th data-i18n="airmode_throttle_threshold"></th>
                             <td>
-                                <select data-setting="mc_airmode_threshold" />
-                                <div class="helpicon cf_tip" data-i18n_title="mc_airmode_threshold_help"></div>
+                                <select data-setting="airmode_throttle_threshold" />
+                                <div class="helpicon cf_tip" data-i18n_title="airmode_throttle_threshold_help"></div>
                             </td>
                         </tr>
                         <tr>
@@ -526,6 +505,13 @@
                                 <input class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" />
                             </td>
                         </tr>
+                        <tr>
+                            <th data-i18n="itermBankAngleFreeze"></th>
+                            <td>
+                                <input class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" type="number" step="1" min="0" max="90" />
+                                <div class="helpicon cf_tip" data-i18n_title="itermBankAngleFreezeHelp"></div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -554,6 +540,44 @@
                             <td>
                                 <input data-setting="d_boost_gyro_delta_lpf_hz" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="d_boost_gyro_delta_lpf_hz_help"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="tpaMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column" style="margin-top:1em;">
+                <table class="settings-table settings-table--misc">
+                    <tr>
+                        <th data-i18n="pidTuningTPA"></th>
+                        <td>
+                            <input type="number" class="rate-tpa_input" id="tpa" step="1" min="0" max="100" />
+                            %
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="pidTuningTPABreakPoint"></th>
+                        <td>
+                            <input type="number" class="rate-tpa_input" id="tpa-breakpoint" step="10" min="1000"
+                                max="2000" />
+                            <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="fwLevelTrimMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column">
+                <table class="settings-table settings-table--filtering">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="fw_level_pitch_trim"></th>
+                            <td>
+                                <input data-setting="fw_level_pitch_trim" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="fw_level_pitch_trim_help"></div>
                             </td>
                         </tr>
                     </tbody>

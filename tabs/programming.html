@@ -1,6 +1,12 @@
 <div class="tab-configuration tab-programming toolbar_fixed_bottom">
     <div class="content_wrapper" id="programming-main-content">
     
+        
+        <div class="tab_title subtab__header">
+            <span class="subtab__header_label subtab__header_label--current" for="subtab-lc">Logic Conditions</span>
+            <span class="subtab__header_label" for="subtab-pid">PID Controllers</span>
+        </div>
+        
         <div class="gvar__container">
             <div class="gvar__wrapper">
                 <div class="gvar__cell">
@@ -9,24 +15,45 @@
                 </div>
             </div>
         </div>
-        
-        <table class="mixer-table logic__table">
-            <thead>
-                <tr>
-                    <th style="width: 50px" data-i18n="logicId"></th>
-                    <th style="width: 80px" data-i18n="logicEnabled"></th>
-                    <th style="width: 120px" data-i18n="logicOperation"></th>
-                    <th data-i18n="logicOperandA"></th>
-                    <th data-i18n="logicOperandB"></th>
-                    <th data-i18n="logicActivator"></th>
-                    <th style="width: 40px" data-i18n="logicFlags"></th>
-                    <th style="width: 50px" data-i18n="logicStatus"></th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
 
+        <div id="subtab-lc" class="subtab__content subtab__content--current">
+            <table class="mixer-table logic__table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px" data-i18n="logicId"></th>
+                        <th style="width: 80px" data-i18n="logicEnabled"></th>
+                        <th style="width: 120px" data-i18n="logicOperation"></th>
+                        <th data-i18n="logicOperandA"></th>
+                        <th data-i18n="logicOperandB"></th>
+                        <th data-i18n="logicActivator"></th>
+                        <th style="width: 40px" data-i18n="logicFlags"></th>
+                        <th style="width: 50px" data-i18n="logicStatus"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="subtab-pid" class="subtab__content">
+            <table class="mixer-table pid__table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px" data-i18n="pidId"></th>
+                        <th style="width: 80px" data-i18n="pidEnabled"></th>
+                        <th data-i18n="pidSetpoint"></th>
+                        <th data-i18n="pidMeasurement"></th>
+                        <th style="width: 80px" data-i18n="pidP"></th>
+                        <th style="width: 80px" data-i18n="pidI"></th>
+                        <th style="width: 80px" data-i18n="pidD"></th>
+                        <th style="width: 80px" data-i18n="pidFF"></th>
+                        <th style="width: 80px" data-i18n="pidOutput"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="content_toolbar">
         <div class="btn save_btn">

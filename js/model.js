@@ -152,7 +152,7 @@ const mixerList = [
     {
         id: 8,
         name: 'Flying Wing',
-        model: 'custom',
+        model: 'flying_wing',
         image: 'flying_wing',
         enabled: true,
         legacy: true,
@@ -171,7 +171,7 @@ const mixerList = [
     {
         id: 27,
         name: 'Flying Wing with differential thrust',
-        model: 'custom',
+        model: 'flying_wing',
         image: 'flying_wing',
         enabled: true,
         legacy: false,

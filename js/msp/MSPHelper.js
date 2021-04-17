@@ -43,6 +43,7 @@ var mspHelper = (function (gui) {
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
+        'IMU2': 24,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -537,6 +538,39 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_SET_LOGIC_CONDITIONS:
                 console.log("Logic conditions saved");
+                break;
+
+            case MSPCodes.MSP2_INAV_PROGRAMMING_PID:
+                PROGRAMMING_PID.flush();
+                if (data.byteLength % 19 === 0) {
+                    for (i = 0; i < data.byteLength; i += 19) {
+                        PROGRAMMING_PID.put(new ProgrammingPid(
+                            data.getInt8(i),                // enabled
+                            data.getInt8(i + 1),            // setpointType
+                            data.getInt32(i + 2, true),     // setpointValue
+                            data.getInt8(i + 6),            // measurementType
+                            data.getInt32(i + 7, true),     // measurementValue
+                            data.getInt16(i + 11, true),    // gainP
+                            data.getInt16(i + 13, true),    // gainI
+                            data.getInt16(i + 15, true),    // gainD
+                            data.getInt16(i + 17, true)     // gainFF
+                        ));
+                    }
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS:
+                if (data.byteLength % 4 === 0) {
+                    let index = 0;
+                    for (i = 0; i < data.byteLength; i += 4) {
+                        PROGRAMMING_PID_STATUS.set(index, data.getInt32(i, true));
+                        index++;
+                    }
+                }
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_PROGRAMMING_PID:
+                console.log("Programming PID saved");
                 break;
 
             case MSPCodes.MSP2_COMMON_MOTOR_MIXER:
@@ -2349,6 +2383,58 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadProgrammingPid = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID, false, false, callback);
+    }
+
+    self.sendProgrammingPid = function (onCompleteCallback) {
+        let nextFunction = sendPid,
+            pidIndex = 0;
+
+        if (PROGRAMMING_PID.getCount() == 0) {
+            onCompleteCallback();
+        } else {
+            nextFunction();
+        }
+
+        function sendPid() {
+
+            let buffer = [];
+
+            // send one at a time, with index, 20 bytes per one condition
+
+            let pid = PROGRAMMING_PID.get()[pidIndex];
+
+            buffer.push(pidIndex);
+            buffer.push(pid.getEnabled());
+            buffer.push(pid.getSetpointType());
+            buffer.push(specificByte(pid.getSetpointValue(), 0));
+            buffer.push(specificByte(pid.getSetpointValue(), 1));
+            buffer.push(specificByte(pid.getSetpointValue(), 2));
+            buffer.push(specificByte(pid.getSetpointValue(), 3));
+            buffer.push(pid.getMeasurementType());
+            buffer.push(specificByte(pid.getMeasurementValue(), 0));
+            buffer.push(specificByte(pid.getMeasurementValue(), 1));
+            buffer.push(specificByte(pid.getMeasurementValue(), 2));
+            buffer.push(specificByte(pid.getMeasurementValue(), 3));
+            buffer.push(specificByte(pid.getGainP(), 0));
+            buffer.push(specificByte(pid.getGainP(), 1));
+            buffer.push(specificByte(pid.getGainI(), 0));
+            buffer.push(specificByte(pid.getGainI(), 1));
+            buffer.push(specificByte(pid.getGainD(), 0));
+            buffer.push(specificByte(pid.getGainD(), 1));
+            buffer.push(specificByte(pid.getGainFF(), 0));
+            buffer.push(specificByte(pid.getGainFF(), 1));
+
+            // prepare for next iteration
+            pidIndex++;
+            if (pidIndex == PROGRAMMING_PID.getCount()) { //This is the last rule. Not pretty, but we have to send all rules
+                nextFunction = onCompleteCallback;
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_PROGRAMMING_PID, buffer, false, nextFunction);
+        }
+    };
+
     self.sendModeRanges = function (onCompleteCallback) {
         var nextFunction = send_next_mode_range;
 
@@ -3222,6 +3308,14 @@ var mspHelper = (function (gui) {
     self.loadGlobalVariablesStatus = function (callback) {
         if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
             MSP.send_message(MSPCodes.MSP2_INAV_GVAR_STATUS, false, false, callback);
+        } else {
+            callback();
+        }
+    };
+
+    self.loadProgrammingPidStatus = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
+            MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
         } else {
             callback();
         }

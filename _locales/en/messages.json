@@ -698,8 +698,8 @@
     "configurationThrottleMinimumCommand": {
         "message": "Minimum Command"
     },
-    "configurationBatteryVoltage": {
-        "message": "Battery Voltage"
+    "configurationVoltageCurrentSensor": {
+        "message": "Voltage and Current Sensors"
     },
     "configurationBatteryCurrent": {
         "message": "Battery Current"
@@ -714,13 +714,13 @@
         "message": "Number of cells (0 = auto)"
     },
     "configurationBatteryCellsHelp": {
-        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible"
+        "message": "Set this to the number of cells of your battery to disable automatic cell count detection or to make the automatic switching of battery profiles possible. 7S, 9S and 11S batteries cannot be autodetected."
     },
     "configurationBatteryCellDetectVoltage": {
         "message": "Maximum cell voltage for cell count detection"
     },
     "configurationBatteryCellDetectVoltageHelp": {
-        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate"
+        "message": "Maximum cell voltage used for cell count autodetection. Should be higher than maximum cell voltage to take into account possible drift in measured voltage and keep cell count detection accurate."
     },
     "configurationBatteryMinimum": {
         "message": "Minimum Cell Voltage"
@@ -734,10 +734,13 @@
     "configurationBatteryScale": {
         "message": "Voltage Scale"
     },
-    "configurationCurrent": {
-        "message": "Current Sensor"
+    "configurationBatteryVoltage": {
+        "message": "Battery Voltage"
     },
     "configurationCurrentScale": {
+        "message": "Current Meter Scale"
+    },
+    "configurationCurrentScaleHelp": {
         "message": "Scale the output voltage to milliamps [1/10th mV/A]"
     },
     "configurationCurrentOffset": {
@@ -746,8 +749,11 @@
     "configurationBatteryMultiwiiCurrent": {
         "message": "Enable support for legacy Multiwii MSP current output"
     },
-    "configurationBatteryCapacity": {
-        "message": "Battery Capacity"
+    "configurationBatterySettings": {
+        "message": "Battery Settings"
+    },
+    "configurationBatterySettingsHelp": {
+        "message": "These settings apply to the currently selected battery profile "
     },
     "configurationBatteryCapacityValue": {
         "message": "Capacity"
@@ -1037,6 +1043,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_IMU2": {
+        "message": "Secondary IMU"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -1053,7 +1062,7 @@
         "message": "FeedForward"
     },
     "pidTuningControlDerivative": {
-        "message": "Constrol Derivative"
+        "message": "Control Derivative"
     },
     "pidTuningRollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
@@ -1123,7 +1132,7 @@
     },
 
     "receiverHelp": {
-        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -1278,138 +1287,150 @@
         "message": "Pitch & Roll I Adjustment"
     },
     "adjustmentsFunction8": {
-        "message": "Pitch & Roll D/FF Adjustment"
+        "message": "Pitch & Roll D"
     },
     "adjustmentsFunction9": {
-        "message": "Yaw P Adjustment"
+        "message": "Pitch & Roll CD/FF Adjustment"
     },
     "adjustmentsFunction10": {
-        "message": "Yaw I Adjustment"
-    },
-    "adjustmentsFunction11": {
-        "message": "Yaw D/FF Adjustment"
-    },
-    "adjustmentsFunction12": {
-        "message": "Rate Profile Selection"
-    },
-    "adjustmentsFunction13": {
-        "message": "Pitch Rate"
-    },
-    "adjustmentsFunction14": {
-        "message": "Roll Rate"
-    },
-    "adjustmentsFunction15": {
         "message": "Pitch P Adjustment"
     },
-    "adjustmentsFunction16": {
+    "adjustmentsFunction11": {
         "message": "Pitch I Adjustment"
     },
-    "adjustmentsFunction17": {
-        "message": "Pitch D/FF Adjustment"
+    "adjustmentsFunction12": {
+        "message": "Pitch D Adjustment"
     },
-    "adjustmentsFunction18": {
+    "adjustmentsFunction13": {
+        "message": "Pitch CD/FF Adjustment"
+    },
+    "adjustmentsFunction14": {
         "message": "Roll P Adjustment"
     },
-    "adjustmentsFunction19": {
+    "adjustmentsFunction15": {
         "message": "Roll I Adjustment"
     },
+    "adjustmentsFunction16": {
+        "message": "Roll D Adjustment"
+    },
+    "adjustmentsFunction17": {
+        "message": "Roll CD/FF Adjustment"
+    },
+    "adjustmentsFunction18": {
+        "message": "Yaw P Adjustment"
+    },
+    "adjustmentsFunction19": {
+        "message": "Yaw I Adjustment"
+    },
     "adjustmentsFunction20": {
-        "message": "Roll D/FF Adjustment"
+        "message": "Yaw D Adjustment"
     },
     "adjustmentsFunction21": {
-        "message": "RC Yaw Expo Adjustment"
+        "message": "Yaw CD/FF Adjustment"
     },
     "adjustmentsFunction22": {
-        "message": "Manual RC Expo Adjustment"
+        "message": "Rate Profile Selection"
     },
     "adjustmentsFunction23": {
-        "message": "Manual RC Yaw Expo Adjustment"
+        "message": "Pitch Rate"
     },
     "adjustmentsFunction24": {
-        "message": "Manual Pitch & Roll Rate Adjustment"
+        "message": "Roll Rate"
     },
     "adjustmentsFunction25": {
-        "message": "Manual Roll Rate Adjustment"
+        "message": "RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction26": {
-        "message": "Manual Pitch Rate Adjustment"
+        "message": "Manual RC Expo Adjustment"
     },
     "adjustmentsFunction27": {
-        "message": "Manual Yaw Rate Adjustment"
+        "message": "Manual RC Yaw Expo Adjustment"
     },
     "adjustmentsFunction28": {
-        "message": "Navigation FW Cruise Throttle Adjustment"
+        "message": "Manual Pitch & Roll Rate Adjustment"
     },
     "adjustmentsFunction29": {
-        "message": "Navigation FW Pitch To Throttle Adjustment"
+        "message": "Manual Roll Rate Adjustment"
     },
     "adjustmentsFunction30": {
-        "message": "Board Roll Alignment Adjustment"
+        "message": "Manual Pitch Rate Adjustment"
     },
     "adjustmentsFunction31": {
-        "message": "Board Pitch Alignment Adjustment"
+        "message": "Manual Yaw Rate Adjustment"
     },
     "adjustmentsFunction32": {
-        "message": "Level P Adjustment"
+        "message": "Navigation FW Cruise Throttle Adjustment"
     },
     "adjustmentsFunction33": {
-        "message": "Level I Adjustment"
+        "message": "Navigation FW Pitch To Throttle Adjustment"
     },
     "adjustmentsFunction34": {
-        "message": "Level D Adjustment"
+        "message": "Board Roll Alignment Adjustment"
     },
     "adjustmentsFunction35": {
-        "message": "Pos XY P Adjustment"
+        "message": "Board Pitch Alignment Adjustment"
     },
     "adjustmentsFunction36": {
-        "message": "Pos XY I Adjustment"
+        "message": "Level P Adjustment"
     },
     "adjustmentsFunction37": {
-        "message": "Pos XY D Adjustment"
+        "message": "Level I Adjustment"
     },
     "adjustmentsFunction38": {
-        "message": "Pos Z P Adjustment"
+        "message": "Level D Adjustment"
     },
     "adjustmentsFunction39": {
-        "message": "Pos Z I Adjustment"
+        "message": "Pos XY P Adjustment"
     },
     "adjustmentsFunction40": {
-        "message": "Pos Z D Adjustment"
+        "message": "Pos XY I Adjustment"
     },
     "adjustmentsFunction41": {
-        "message": "Heading P Adjustment"
+        "message": "Pos XY D Adjustment"
     },
     "adjustmentsFunction42": {
-        "message": "Vel XY P Adjustment"
+        "message": "Pos Z P Adjustment"
     },
     "adjustmentsFunction43": {
-        "message": "Vel XY I Adjustment"
+        "message": "Pos Z I Adjustment"
     },
     "adjustmentsFunction44": {
-        "message": "Vel XY D Adjustment"
+        "message": "Pos Z D Adjustment"
     },
     "adjustmentsFunction45": {
-        "message": "Vel Z P Adjustment"
+        "message": "Heading P Adjustment"
     },
     "adjustmentsFunction46": {
-        "message": "Vel Z I Adjustment"
+        "message": "Vel XY P Adjustment"
     },
     "adjustmentsFunction47": {
-        "message": "Vel Z D Adjustment"
+        "message": "Vel XY I Adjustment"
     },
     "adjustmentsFunction48": {
-        "message": "FW min thr down pitch angle Adjustment"
+        "message": "Vel XY D Adjustment"
     },
     "adjustmentsFunction49": {
-        "message": "VTX power level Adjustment"
+        "message": "Vel Z P Adjustment"
     },
     "adjustmentsFunction50": {
-        "message": "Thrust PID Attenuation (TPA) Adjustment"
+        "message": "Vel Z I Adjustment"
     },
     "adjustmentsFunction51": {
-        "message": "TPA Breakpoint Adjustment"
+        "message": "Vel Z D Adjustment"
     },
     "adjustmentsFunction52": {
+        "message": "FW min thr down pitch angle Adjustment"
+    },
+    "adjustmentsFunction53": {
+        "message": "VTX power level Adjustment"
+    },
+    "adjustmentsFunction54": {
+        "message": "Thrust PID Attenuation (TPA) Adjustment"
+    },
+    "adjustmentsFunction55": {
+        "message": "TPA Breakpoint Adjustment"
+    },
+    "adjustmentsFunction56": {
         "message": "Control Smoothness Adjustment"
     },
     "adjustmentsSave": {
@@ -2345,13 +2366,16 @@
         "message": "Programming"
     },
     "tabAdvancedTuning": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
     },
     "advancedTuningSave": {
         "message": "Save and Reboot"
     },
     "tabAdvancedTuningTitle": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningGenericTitle": {
+        "message": "Generic settings"
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
@@ -2422,6 +2446,12 @@
     "posholdHoverMidThrottle": {
         "message": "Use mid. throttle for ALTHOLD"
     },
+    "mcWpSlowdown": {
+        "message": "Slow down when approaching waypoint"
+    },
+    "mcWpSlowdownHelp": {
+        "message": "When enabled, NAV engine will slow down when switching to the next waypoint. This prioritizes turning over forward movement. When disabled, NAV engine will continue to the next waypoint and turn as it goes."
+    },
     "positionEstimatorConfiguration": {
         "message": "Position Estimator"
     },
@@ -2441,7 +2471,7 @@
         "message": "Horizontal speed GPS weight"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "This value should be changed very carefully. In most cases there is not need to change that. For advanced users only!"
+        "message": "These values should be changed very carefully. In most cases there is no need to change them. For advanced users only!"
     },
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
@@ -2449,8 +2479,8 @@
     "w_z_baro_p_help": {
         "message": "When this value is set to <strong>0</strong>, barometer is not used for altitude computation"
     },
-    "w_z_gos_p_help": {
-        "message": "When this value is set to <strong>0</strong>, GPS is not used for altitude computation"
+    "w_z_gps_p_help": {
+        "message": "This setting is only used when no barometer is installed and <strong>inav_use_gps_no_baro</strong> is configured."
     },
     "wirelessModeSwitch": {
         "message": "Wireless mode"
@@ -2467,8 +2497,17 @@
     "rthClimbFirst": {
         "message": "Climb before RTH"
     },
+    "rthClimbFirstHelp": {
+        "message": "If set to ON or ON_FW_SPIRAL, aircraft will climb to nav_rth_altitude first before turning to head home. If set to OFF, aircraft will turn and head home immediately climbing on the way. For a fixed wing, ON will use a linear climb, ON_FW_SPIRAL will use a loiter turning climb with climb rate set by nav_auto_climb_rate and turn rate set by nav_fw_loiter_radius (ON_FW_SPIRAL is a fixed wing setting and behaves the same as ON for a multirotor)."
+    },
     "rthClimbIgnoreEmergency": {
         "message": "Climb regardless of position sensors health"
+    },
+    "rthAltControlOverride": {
+        "message": "Override RTH altitude and climb setting with roll/pitch stick"
+    },
+    "rthAltControlOverrideHELP": {
+        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. On fixed wing aircraft, the 'Climb before RTH' setting can be overriden by holding full roll left or right for >1 second so that the plane will turn towards home immediately."
     },
     "rthTailFirst": {
         "message": "Tail first"
@@ -2531,19 +2570,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. navigation bank angle [degrees]"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle [degrees]"
+        "message": "Max. navigation climb angle [degrees]"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
+    "navManualClimbRate": {
+        "message": "Max. Alt-hold climb rate [cm/s]"
+    },
+    "navManualClimbRateHelp": {
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+    },
+    "navAutoClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "navAutoClimbRateHelp": {
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+    },
     "maxDiveAngle": {
-        "message": "Max. dive angle [degrees]"
+        "message": "Max. navigation dive angle [degrees]"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2553,6 +2604,18 @@
     },
     "pitchToThrottleHelp": {
         "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
+    },
+    "pitchToThrottleSmoothing": {
+        "message": "Throttle smoothing"
+    },
+    "pitchToThrottleSmoothingHelp": {
+        "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
+    },
+    "pitchToThrottleThreshold": {
+        "message": "Instantaneous throttle adjustment threshold [centidegrees]"
+    },
+    "pitchToThrottleThresholdHelp": {
+        "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
     },
     "loiterRadius": {
         "message": "Loiter radius [cm]"
@@ -2567,7 +2630,37 @@
         "message": "Control Smoothness"
     },
      "controlSmoothnessHelp": {
-        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]"
+        "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+    },
+    "powerConfiguration": {
+        "message": "Battery Estimation Settings"
+    },
+    "idlePower": {
+        "message": "Idle power [cW]"
+    },
+    "idlePowerHelp": {
+        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruisePower": {
+        "message": "Cruise power [cW]"
+    },
+    "cruisePowerHelp": {
+        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruiseSpeed": {
+        "message": "Cruise speed [cm/s]"
+    },
+    "cruiseSpeedHelp": {
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+    },
+    "rthEnergyMargin": {
+        "message": "RTH energy margin [%]"
+    },
+    "rthEnergyMarginHelp": {
+        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+    },
+    "generalNavigationSettings": {
+        "message": "General Navigation Settings"
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
@@ -2579,7 +2672,7 @@
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
     "waypointSafeDistance": {
-        "message": "Waypoint safe distance [cm]"
+        "message": "Waypoint safe distance [cm]."
     },
     "waypointSafeDistanceHelp": {
         "message": "The maximum distance between the home point and the first waypoint."
@@ -3052,6 +3145,15 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
     },
+    "osdElement_OSD_RANGEFINDER": {
+        "message": "Rangefinder distance"
+    },
+    "osdSettingPLUS_CODE_DIGITS_HELP": {
+        "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
+    }, 
+    "osdSettingPLUS_CODE_SHORT_HELP": {
+        "message": "Removing 2, 4 and 6 leading digits requires a reference location within, respectively, ~800km, ~40km and ~2km to recover the original coordinates."
+    },
     "osdSettingCRSF_LQ_FORMAT_HELP": {
         "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
     },
@@ -3478,6 +3580,18 @@
     "dTermMechanics": {
         "message": "D-term mechanics"
     },
+    "tpaMechanics": {
+        "message": "Thrust PID attenuation"
+    },
+    "fw_level_pitch_trim": {
+        "message": "Level Trim [deg]"
+    },
+    "fw_level_pitch_trim_help": {
+        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
+    },
+    "fwLevelTrimMechanics": {
+        "message": "Fixed Wing Level Trim"
+    },
     "d_boost_factor": {
         "message": "D-Boost Factor"
     },
@@ -3499,17 +3613,17 @@
     "iTermMechanics": {
         "message": "I-term mechanics"
     },
-    "mc_airmode_type": {
+    "airmode_type": {
         "message": "Airmode handling type"
     },
-    "mc_airmode_type_help": {
-        "message": "Defines the Airmode state handling type for Multirotors. <br />Default STICK_CENTER is the classical approach in which Airmode is always active if enabled, but when the throttle is low and ROLL/PITCH/YAW sticks are centered, Iterms is not allowed to grow (ANTI_WINDUP). <br />STICK_CENTER_ONCE works like STICK_CENTER, but only until the first time THROTTLE is not low and ROLL/PITCH/YAW sticks are moved. After that, ANTI_WINDUP is deactivated until next arm. Useful for airplanes. <br />THROTTLE_THRESHOLD is the Airmode behavior known from Betaflight. In this mode, Airmode is active as soon THROTTLE position is above <i>mc_airmode_threshold</i> and stays active until disarm. ANTI_WINDUP is never triggered. For small Multirotors (up to 7-inch propellers) it is suggested to switch to THROTTLE_THRESHOLD since it keeps full stabilization no matter what pilot does with the sticks. Airplanes default to STICK_CENTER mode."
+    "airmode_type_help": {
+        "message": "Defines the Airmode state handling type. <br />Default STICK_CENTER is the classical approach in which Airmode is always active if enabled, but when the throttle is low and ROLL/PITCH/YAW sticks are centered, Iterms is not allowed to grow (ANTI_WINDUP). <br />STICK_CENTER_ONCE works like STICK_CENTER, but only until the first time THROTTLE is not low and ROLL/PITCH/YAW sticks are moved. After that, ANTI_WINDUP is deactivated until next arm. Useful for airplanes. <br />THROTTLE_THRESHOLD is the Airmode behavior known from Betaflight. In this mode, Airmode is active as soon THROTTLE position is above <i>airmode_throttle_threshold</i> and stays active until disarm. ANTI_WINDUP is never triggered. For small Multirotors (up to 7-inch propellers) it is suggested to switch to THROTTLE_THRESHOLD since it keeps full stabilization no matter what pilot does with the sticks. Airplanes default to STICK_CENTER_ONCE mode."
     },
-    "mc_airmode_threshold": {
+    "airmode_throttle_threshold": {
         "message": "Airmode Throttle threshold"
     },
-    "mc_airmode_threshold_help": {
-        "message": "Defines airmode THROTTLE activation threshold when mc_airmode_type THROTTLE_THRESHOLD is used"
+    "airmode_throttle_threshold_help": {
+        "message": "Defines airmode THROTTLE activation threshold when airmode_type THROTTLE_THRESHOLD is used"
     },
     "gps_map_center": {
         "message": "Center"
@@ -3522,6 +3636,12 @@
     },
     "antigravityCutoff": {
         "message": "Antigravity Cutoff Frequency"
+    },
+    "itermBankAngleFreeze": {
+        "message": "Yaw Iterm freeze bank angle"
+    },
+    "itermBankAngleFreezeHelp": {
+        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
     },
     "ouptputsConfiguration": {
         "message": "Configuration"
@@ -3645,5 +3765,35 @@
     },
     "WaypointOptionP2": {
         "message": "P2"
+    },
+    "rollPitchAdjustmentsMoved": {
+        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
+    },
+    "pidId": {
+        "message": "#"
+    },
+    "pidEnabled": {
+        "message": "Enabled"
+    },
+    "pidSetpoint": {
+        "message": "Setpoint"
+    },
+    "pidMeasurement": {
+        "message": "Measurement"
+    },
+    "pidP": {
+        "message": "P-gain"
+    },
+    "pidI": {
+        "message": "I-gain"
+    },
+    "pidD": {
+        "message": "D-gain"
+    },
+    "pidFF": {
+        "message": "FF-gain"
+    },
+    "pidOutput": {
+        "message": "Output"
     }
 }

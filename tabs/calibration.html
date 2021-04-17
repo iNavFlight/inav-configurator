@@ -54,15 +54,15 @@
                                     <table class="cf_table acc">
                                         <tr>
                                             <td data-i18n="accZero"></td>
-                                            <td><label for="accZeroX"><span>X</span></label><input type="number" name="accZeroX" min="0" max="2000"></td>
-                                            <td><label for="accZeroY"><span>Y</span></label><input type="number" name="accZeroY" min="0" max="2000"></td>
-                                            <td><label for="accZeroZ"><span>Z</span></label><input type="number" name="accZeroZ" min="0" max="2000"></td>
+                                            <td><label for="accZeroX"><span>X</span></label><input readonly disabled type="number" name="accZeroX" min="-32768" max="32767"></td>
+                                            <td><label for="accZeroY"><span>Y</span></label><input readonly disabled type="number" name="accZeroY" min="-32768" max="32767"></td>
+                                            <td><label for="accZeroZ"><span>Z</span></label><input readonly disabled type="number" name="accZeroZ" min="-32768" max="32767"></td>
                                         </tr>
                                         <tr>
                                             <td data-i18n="accGain"></td>
-                                            <td><label for="accGainX"><span>X</span></label><input type="number" name="accGainX" min="0" max="2000"></td>
-                                            <td><label for="accGainY"><span>Y</span></label><input type="number" name="accGainY" min="0" max="2000"></td>
-                                            <td><label for="accGainZ"><span>Z</span></label><input type="number" name="accGainZ" min="0" max="2000"></td>
+                                            <td><label for="accGainX"><span>X</span></label><input readonly disabled type="number" name="accGainX" min="1" max="8192"></td>
+                                            <td><label for="accGainY"><span>Y</span></label><input readonly disabled type="number" name="accGainY" min="1" max="8192"></td>
+                                            <td><label for="accGainZ"><span>Z</span></label><input readonly disabled type="number" name="accGainZ" min="1" max="8192"></td>
                                         </tr>
                                     </table>
                                 </div>
@@ -99,27 +99,27 @@
                         <table id="mag-calibrated-data" class="cf_table">
                             <tr>
                                 <td><label for="MagX"><span>Zero X</span></label></td>
-                                <td><input type="number" name="MagX" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagX" min="-32768" max="32767"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagY"><span>Zero Y</span></label></td>
-                                <td><input type="number" name="MagY" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagY" min="-32768" max="32767"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagZ"><span>Zero Z</span></label></td>
-                                <td><input type="number" name="MagZ" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagZ" min="-32768" max="32767"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainX"><span>Gain X</span></label></td>
-                                <td><input type="number" name="MagGainX" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagGainX" min="-32768" max="32767"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainY"><span>Gain Y</span></label></td>
-                                <td><input type="number" name="MagGainY" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagGainY" min="-32768" max="32767"></td>
                             </tr>
                             <tr>
                                 <td><label for="MagGainZ"><span>Gain Z</span></label></td>
-                                <td><input type="number" name="MagGainZ" min="0" max="2000"></td>
+                                <td><input readonly disabled type="number" name="MagGainZ" min="-32768" max="32767"></td>
                             </tr>
                         </table>
                     </div>
