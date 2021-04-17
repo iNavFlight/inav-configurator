@@ -884,6 +884,14 @@ TABS.mission_control.initialize = function (callback) {
                       $(this).val(1);
                       alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'));
                     }
+                    else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
+                        console.log("mission.getPoiList() ",mission.getPoiList());
+                        console.log(mission.convertJumpNumberToWaypoint(Number($(this).val())-1));
+                        if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
+                            $(this).val(1);
+                            alert(chrome.i18n.getMessage('MissionPlannerJump3SettingsCheck'));
+                        }
+                    }
                 }
                 element.setP1((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? mission.convertJumpNumberToWaypoint(Number($(this).val())-1) : Number($(this).val())));
                 mission.updateWaypoint(element);

@@ -6,6 +6,7 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     var self = {};
     let layerNumber = "undefined";
     let attachedNumber = "undefined";
+    let poiNumber = "undefined";
 
     self.getNumber = function () {
         return number;
@@ -21,6 +22,14 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
 
     self.setLayerNumber = function (data) {
         layerNumber = data;
+    };
+    
+    self.getPoiNumber = function () {
+        return poiNumber;
+    };
+
+    self.setPoiNumber = function (data) {
+        poiNumber = data;
     };
     
     self.isUsed = function () {

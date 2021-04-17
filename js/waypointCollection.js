@@ -321,6 +321,16 @@ let WaypointCollection = function () {
         console.log("lJumptTargetAttached ", lJumptTargetAttached);
         return (lJumptTargetAttached.length != 0 && lJumptTargetAttached != 'undefined')
     }
+    
+    self.getPoiList = function() {
+        let poiList = [];
+        data.forEach(function (element) {
+            if (element.getAction() == MWNP.WPTYPE.SET_POI) {
+                poiList.push(element.getNumber());
+            }
+        });
+        return poiList;
+    }
 
     return self;
 };
