@@ -1474,8 +1474,9 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedMarker) {
                 mission.dropAttachedFromWaypoint(selectedMarker, $(event.currentTarget).attr("data-index")-1);
                 renderWaypointOptionsTable(selectedMarker);
-                cleanLines();
-                redrawLayer();
+                //cleanLines();
+                cleanLayers();
+                redrawLayers();
             }
         });
         
@@ -1483,8 +1484,9 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedMarker) {
                 mission.addAttachedFromWaypoint(selectedMarker);
                 renderWaypointOptionsTable(selectedMarker);
-                cleanLines();
-                redrawLayer();
+                //cleanLines();
+                cleanLayers();
+                redrawLayers();
             }
         });
         
