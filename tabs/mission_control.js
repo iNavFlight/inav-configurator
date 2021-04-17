@@ -1088,11 +1088,11 @@ TABS.mission_control.initialize = function (callback) {
 
             var geometry = /** @type {ol.geom.SimpleGeometry} */
                 (this.feature_.getGeometry());
-                
-            geometry.translate(deltaX, deltaY);
-
-            this.coordinate_[0] = evt.coordinate[0];
-            this.coordinate_[1] = evt.coordinate[1]; 
+            if (tempMarker.kind == "waypoint" ||tempMarker.kind == "safehome") {
+                geometry.translate(deltaX, deltaY);
+                this.coordinate_[0] = evt.coordinate[0];
+                this.coordinate_[1] = evt.coordinate[1]; 
+            }
 
             let coord = ol.proj.toLonLat(geometry.getCoordinates());
             if (tempMarker.kind == "waypoint") {
