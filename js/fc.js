@@ -62,7 +62,8 @@ var CONFIG,
     BATTERY_CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
-    BRAKING_CONFIG;
+    BRAKING_CONFIG,
+    SAFEHOMES;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -244,7 +245,7 @@ var FC = {
             packetCount: 0
         };
 
-        MISSION_PLANER = {
+        /* MISSION_PLANER = {
             maxWaypoints: 0,
             isValidMission: 0,
             countBusyPoints: 0,
@@ -255,9 +256,13 @@ var FC = {
                 lon: 0,
                 alt: 0,
                 endMission: 0,
-                p1: 0
+                p1: 0,
+                p2: 0,
+                p3: 0
             }
-        };
+        }; */
+        
+        MISSION_PLANER = new WaypointCollection();
 
         ANALOG = {
             voltage: 0,
@@ -552,6 +557,8 @@ var FC = {
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
+        
+        SAFEHOMES = new SafehomeCollection();
     },
     getOutputUsages: function() {
         return {

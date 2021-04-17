@@ -66,8 +66,7 @@ var mspHelper = (function (gui) {
             flags,
             colorCount,
             color;
-
-        if (!dataHandler.unsupported) switch (dataHandler.code) {
+        if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSP_IDENT:
                 //FIXME remove this frame when proven not needed
                 console.log('Using deprecated msp command: MSP_IDENT');
@@ -442,13 +441,16 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
-                MISSION_PLANER.bufferPoint.number = data.getUint8(0);
-                MISSION_PLANER.bufferPoint.action = data.getUint8(1);
-                MISSION_PLANER.bufferPoint.lat = data.getInt32(2, true) / 10000000;
-                MISSION_PLANER.bufferPoint.lon = data.getInt32(6, true) / 10000000;
-                MISSION_PLANER.bufferPoint.alt = data.getInt32(10, true);
-                MISSION_PLANER.bufferPoint.p1 = data.getInt16(14, true);
-
+                MISSION_PLANER.put(new Waypoint(
+                    data.getUint8(0),
+                    data.getUint8(1),
+                    data.getInt32(2, true),
+                    data.getInt32(6, true),
+                    data.getInt32(10, true),
+                    data.getInt16(14, true),
+                    data.getInt16(16, true),
+                    data.getInt16(18, true)
+                ));
                 break;
             case MSPCodes.MSP_BOXIDS:
                 //noinspection JSUndeclaredVariable
@@ -1412,9 +1414,9 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_WP_GETINFO:
                 // Reserved for waypoint capabilities data.getUint8(0);
-                MISSION_PLANER.maxWaypoints = data.getUint8(1);
-                MISSION_PLANER.isValidMission = data.getUint8(2);
-                MISSION_PLANER.countBusyPoints = data.getUint8(3);
+                MISSION_PLANER.setMaxWaypoints(data.getUint8(1));
+                MISSION_PLANER.setValidMission(data.getUint8(2));
+                MISSION_PLANER.setCountBusyPoints(data.getUint8(3));
                 break;
             case MSPCodes.MSP_SET_WP:
                 console.log('Point saved');
@@ -1494,7 +1496,18 @@ var mspHelper = (function (gui) {
                     SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
                 }
                 break;
-
+            case MSPCodes.MSP2_INAV_SAFEHOME:
+                SAFEHOMES.put(new Safehome(
+                    data.getUint8(0),
+                    data.getUint8(1),
+                    data.getInt32(2, true),
+                    data.getInt32(6, true)
+                ));
+                break;
+            case MSPCodes.MSP2_INAV_SET_SAFEHOME:
+                console.log('Safehome points saved');
+                break;    
+            
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2102,34 +2115,7 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_CONFIG.opflow);
                 break;
 
-            case MSPCodes.MSP_SET_WP:
-                buffer.push(MISSION_PLANER.bufferPoint.number);    // sbufReadU8(src);    // number
-                buffer.push(MISSION_PLANER.bufferPoint.action);    // sbufReadU8(src);    // action
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 0));    // sbufReadU32(src);      // lat
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lat, 3));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 0));    // sbufReadU32(src);      // lon
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.lon, 3));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 0));    // sbufReadU32(src);      // to set altitude (cm)
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 1));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 2));
-                buffer.push(specificByte(MISSION_PLANER.bufferPoint.alt, 3));
-                buffer.push(lowByte(MISSION_PLANER.bufferPoint.p1)); //sbufReadU16(src);       // P1 speed or landing
-                buffer.push(highByte(MISSION_PLANER.bufferPoint.p1));
-                buffer.push(lowByte(0)); //sbufReadU16(src);       // P2
-                buffer.push(highByte(0));
-                buffer.push(lowByte(0)); //sbufReadU16(src);       // P3
-                buffer.push(highByte(0));
-                buffer.push(MISSION_PLANER.bufferPoint.endMission); //sbufReadU8(src);      // future: to set nav flag
-                break;
-            case MSPCodes.MSP_WP:
-                console.log(MISSION_PLANER.bufferPoint.number);
-                buffer.push(MISSION_PLANER.bufferPoint.number+1);
-
-                break;
+            
             case MSPCodes.MSP_WP_MISSION_SAVE:
                 // buffer.push(0);
                 console.log(buffer);
@@ -2195,17 +2181,17 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-	var buffer = [];
-	var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
-	buffer.push(BLACKBOX.blackboxDevice & 0xFF);
-	    messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
-	    buffer.push(lowByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(highByte(BLACKBOX.blackboxRateNum));
-	    buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
-	    buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+    var buffer = [];
+    var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+    buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+        messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
+        buffer.push(lowByte(BLACKBOX.blackboxRateNum));
+        buffer.push(highByte(BLACKBOX.blackboxRateNum));
+        buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
+        buffer.push(highByte(BLACKBOX.blackboxRateDenom));
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
-	    onDataCallback();
+        onDataCallback();
         });
     };
 
@@ -2823,7 +2809,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBatteryConfig = function (callback) {
-	MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
+    MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
     self.loadArmingConfig = function (callback) {
@@ -2988,6 +2974,76 @@ var mspHelper = (function (gui) {
 
     self.getMissionInfo = function (callback) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
+    };
+    
+    self.loadWaypoints = function (callback) {
+        MISSION_PLANER.reinit();
+        let waypointId = 1;
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getFirstWP);
+        
+        function getFirstWP() {
+            MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint)
+        };
+        
+        function nextWaypoint() {
+            waypointId++;
+            if (waypointId < MISSION_PLANER.getCountBusyPoints()) {
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
+            }
+        };
+    };
+    
+    self.saveWaypoints = function (callback) {
+        let waypointId = 1;
+        MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
+
+        function nextWaypoint() {
+            waypointId++;
+            if (waypointId < MISSION_PLANER.get().length) {
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, endMission);
+            }
+        };
+        
+        function endMission() {
+            MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
+        }
+    };
+    
+    self.loadSafehomes = function (callback) {
+        SAFEHOMES.flush();
+        let safehomeId = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
+        
+        function nextSafehome() {
+            safehomeId++;
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, callback);
+            }
+        };
+    };
+    
+    self.saveSafehomes = function (callback) {
+        let safehomeId = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
+        
+        function nextSendSafehome() {
+            safehomeId++;
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, callback);
+            }
+        };
     };
 
     self._getSetting = function (name) {

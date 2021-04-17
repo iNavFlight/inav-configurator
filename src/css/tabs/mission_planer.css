@@ -8,23 +8,95 @@
     border: 1px solid #3394b5;
     color: #fff;
     /*float: right;*/
-    font-family: 'open_sansbold', Arial, serif;
-    font-size: 12px;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 9px;
-    line-height: 28px;
+    padding: 0px;
     margin: 5px;
     float: left;
-    width: 130px;
-    text-align: center;
+    height: 28px;
+    line-height: 28px;
+    width: 28px;
 }
 
+.tab-mission-control .btn-text{
+   display: none;
+   font-family: 'open_sansbold', Arial, serif;
+   font-size: 12px;
+   text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+   line-height: 28px;
+   width: 80px;
+   text-align: center;
+}
 .tab-mission-control .btn a:hover {
     background-color: #3394b5;
     transition: all ease 0.2s;
+}
+
+.tab-mission-control .ic_save2FC {
+    background-image: url(../images/icons/cf_icon_MP_save2FC_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromFC {
+    background-image: url(../images/icons/cf_icon_MP_loadFromFC_grey.svg);
+}
+
+.tab-mission-control .ic_save2File {
+    background-image: url(../images/icons/cf_icon_MP_saveFile_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromFile {
+    background-image: url(../images/icons/cf_icon_MP_loadFile_grey.svg);
+}
+
+.tab-mission-control .ic_save2Eprom {
+    background-image: url(../images/icons/cf_icon_MP_save2Eprom_grey.svg);
+}
+
+.tab-mission-control .ic_loadFromEprom {
+    background-image: url(../images/icons/cf_icon_MP_loadFromEprom_grey.svg);
+}
+
+.tab-mission-control .ic_removeAll {
+    background-image: url(../images/icons/cf_icon_MP_removeAll_grey.svg);
+}
+
+.tab-mission-control .ic_save {
+    background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
+}
+
+.tab-mission-control .ic_cancel {
+    background-image: url(../images/icons/cf_icon_MP_cancel_grey.svg);
+}
+
+.tab-mission-control .ic_add {
+    background-image: url(../images/icons/cf_icon_MP_add_grey.svg);
+}
+
+.tab-mission-control .ic_show {
+    background-image: url(../images/icons/cf_icon_MP_show_grey.svg);
+}
+
+.tab-mission-control .ic_hide {
+    background-image: url(../images/icons/cf_icon_MP_hide_grey.svg);
+}
+
+.tab-mission-control .ic_play {
+    background-image: url(../images/icons/cf_icon_MP_play_grey.svg);
+}
+
+.tab-mission-control .ic_stop {
+    background-image: url(../images/icons/cf_icon_MP_stop_grey.svg);
+}
+
+.tab-mission-control .ic_center {
+    background-image: url(../images/icons/cf_icon_MP_center_grey.svg);
+}
+
+.tab-mission-control .btnicon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 24px;
 }
 
 .tab-mission-control .btn a:active {
@@ -43,13 +115,53 @@
     opacity: 0.5;
 }
 
-.tab-mission-control .btn-danger a {
+.tab-mission-control .btn-danger_long a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
+}
+.tab-mission-control .btn-danger_short a {
     background-color: #db250e;
     border: 1px solid #b5480e;
 }
 
+.tab-mission-control .btn-danger_long a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-danger_short a:hover {
+    background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
+}
 .tab-mission-control .btn-danger a:hover {
     background-color: #b5480e;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btn-success a {
+    background-color: #28a745;
+    border: 1px solid #218838;
+    height: 28px;
+    margin:5px;
+    line-height: 28px;
+    width: 28px;
+}
+
+.tab-mission-control .btn-success a:hover {
+    background-color: #218838;
     transition: all ease 0.2s;
 }
 
@@ -73,6 +185,7 @@
     padding-bottom: 5px;
     padding-top: 5px;
 }
+
 
 .tab-mission-control {
     height: 100%;
@@ -115,11 +228,250 @@
     width: 60px;
     display: inline-block;
 }
+.tab-mission-control .point-radio input{
+    width: 25px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+	display: inline-block;
+}
+.tab-mission-control .point-radio input[type=radio], input.radio{
+    width: 20px;
+    padding-left: 3px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: normal;
+	display: inline-block;
+}
+.tab-mission-control .radio-options{
+    width: 40px;
+    display: inline-block;
+	margin-right:7px;
+}
+/*
+.tab-mission-control .radio-options {
+    display: inline-block;
+}
 
+.tab-mission-control input[type=radio], input.radio {
+      float: left;
+    }
+*/
 .mission-control-settings {
     top: 65px;
     left: .5em;
 }
 .ol-touch .mission-control-settings {
     top: 80px;
+}
+.mission-control-safehome {
+    top: 85px;
+    left: .5em;
+}
+.ol-touch .mission-control-safehome {
+    top: 100px;
+}
+.mission-control-template {
+    top: 85px;
+    left: .5em;
+}
+.ol-touch .mission-control-template {
+    top: 100px;
+}
+
+.tab-mission-control .safehomesTable {
+    width: 100%;
+    text-align: center;
+    font-size: 8px;
+}
+
+.tab-mission-control .safehomesTable input[type="text"] {
+    font-size: 8px;
+    width: 100%;
+}
+
+.tab-mission-control .safehomesTable input[type="number"] {
+    font-size: 8px;
+    width: 100%;
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.tab-mission-control .safehomesTable input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tab-mission-control .safehomesTable thead {
+    display: table-header-group !important;
+}
+
+.tab-mission-control .safehomesTable thead tr {
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+    background-color: #828885;
+    color: #FFF;
+}
+.tab-mission-control .safehomesTable td,
+.tab-mission-control .safehomesTable th {
+    padding: 2px;
+    /* height: 2.5em; */
+}
+
+.tab-mission-control .safehomesTable tr:nth-child(even) td,
+.tab-mission-control .safehomesTable tr:nth-child(even) th {
+    background-color: #ebe7e7;
+}
+
+.tab-mission-control .waypointOptionsTable {
+    width: 100%;
+    text-align: center;
+    font-size: 8px;
+}
+
+.tab-mission-control .waypointOptionsTable input[type="text"] {
+    font-size: 8px;
+    width: 100%;
+}
+
+.tab-mission-control .waypointOptionsTable input[type="select"] {
+    font-size: 12px;
+    width: 100%;
+}
+
+.tab-mission-control .waypointOptionsTable input[type="number"] {
+    font-size: 8px;
+    width: 100%;
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.tab-mission-control .waypointOptionsTable input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tab-mission-control .waypointOptionsTable thead {
+    display: table-header-group !important;
+}
+
+.tab-mission-control .waypointOptionsTable thead tr {
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+    background-color: #828885;
+    color: #FFF;
+}
+.tab-mission-control .waypointOptionsTable td,
+.tab-mission-control .waypointOptionsTable th {
+    padding: 2px;
+    /* height: 2.5em; */
+}
+
+.tab-mission-control .waypointOptionsTable tr:nth-child(even) td,
+.tab-mission-control .waypointOptionsTable tr:nth-child(even) th {
+    background-color: #ebe7e7;
+}
+
+
+.tab-mission-control .btnMenu a {
+    /*  common styles for content toolbar buttons */
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-right: 20px;*/
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    /*float: right;*/
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    margin: 5px;
+    float: right;
+    height: 14px;
+    line-height: 14px;
+    width: 14px;
+}
+
+.tab-mission-control .btnMenu a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btnMenuIcon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px;
+}
+
+.tab-mission-control .btnMenu-danger a {
+    background-color: #db250e;
+        border: 1px solid #b5480e;
+
+}
+
+.tab-mission-control .btnMenu-danger a:hover {
+    background-color: #b5480e;
+}
+
+.tab-mission-control .btnTable a {
+    /*  common styles for content toolbar buttons */
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-right: 20px;*/
+    background-color: #37a8db;
+    border-radius: 3px;
+    border: 1px solid #3394b5;
+    color: #fff;
+    /*float: right;*/
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    margin: 2px;
+    float: left;
+    height: 11px;
+    line-height: 11px;
+    width: 11px;
+}
+
+.tab-mission-control .btnTable a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
+}
+
+.tab-mission-control .btnTableIcon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 11px;
+}
+
+.tab-mission-control .btnTable-danger a {
+    background-color: #db250e;
+    border: 1px solid #b5480e;
+
+}
+
+.tab-mission-control .btnTable-danger a:hover {
+    background-color: #b5480e;
+}
+
+.tab-mission-control .btnTable-success a {
+    background-color: #28a745;
+    border: 1px solid #218838;
+
+}
+
+.tab-mission-control .btnTable-success a:hover {
+    background-color: #218838;
 }
