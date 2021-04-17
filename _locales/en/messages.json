@@ -3143,7 +3143,7 @@
         "message": "Do you really want to delete all points?"
     },
     "confirm_delete_point_with_options": {
-        "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? If yes, Non-Geo options attached will be removed also!"
+        "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },
     "servoMixer": {
         "message": "Servo mixer"
@@ -3599,22 +3599,22 @@
         "message": "Current Meter Type"
     },
     "MissionPlannerJumpSettingsCheck": {
-        "message": "JUMP settings incorrect : Check it again! Being forced to WP 1!"
+        "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
     },
     "MissionPlannerJump2SettingsCheck": {
-        "message": "JUMP settings incorrect : Repeat should not exceed 10! Check it again! Being forced to number of repeat equal 0!"
+        "message": "JUMP settings incorrect : Repeat should not exceed 10! \nCheck it again! Being forced to number of repeat equal 0!"
     },
     "MissionPlannerJump3SettingsCheck": {
-        "message": "JUMP settings incorrect : not able to Jump to a POI! Being forced to WP 1!"
+        "message": "JUMP settings incorrect : not able to Jump to a POI! \nBeing forced to WP 1!"
     },
     "MissionPlannerHeadSettingsCheck": {
         "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"
     },
     "MissionPlannerRTHSettingsCheck": {
-        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! Being forced by default to 0, i.e no LAND after RTH!"
+        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! \nBeing forced by default to 0, i.e no LAND after RTH!"
     },
     "MissionPlannerJumpTargetRemoval": {
-        "message": "You can't remove a Waypoint which is defined as a JUMP target! You first need to remove the target on the waypoint triggering the JUMP."
+        "message": "You can't remove a Waypoint which is defined as a JUMP target! \nYou first need to remove the target on the waypoint triggering the JUMP."
     },
     "SafehomeSelected": {
         "message": ""
