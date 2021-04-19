@@ -2536,8 +2536,11 @@
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
-    "landDescentRate": {
-        "message": "Landing vertical speed [cm/s]"
+    "landMinAltVspd": {
+        "message": "Vertical descent velocity under min. vertical landing speed altitude [cm/s]"
+    },
+    "landMaxAltVspd": {
+        "message": "Vertical descent velocity above slowdown altitude [cm/s]"
     },
     "landSlowdownMinAlt": {
         "message": "Min. vertical landing speed at altitude [cm]"
