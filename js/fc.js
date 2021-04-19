@@ -62,11 +62,18 @@ var CONFIG,
     BATTERY_CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
-    BRAKING_CONFIG;
+    BRAKING_CONFIG,
+    SAFEHOMES;
 
 var FC = {
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
+    isAirplane: function () {
+        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE);
+    },
+    isMultirotor: function () {
+        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+    },
     isRpyFfComponentUsed: function () {
         return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
     },
@@ -74,7 +81,7 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     isCdComponentUsed: function () {
-        return MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER;
+        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -238,7 +245,7 @@ var FC = {
             packetCount: 0
         };
 
-        MISSION_PLANER = {
+        /* MISSION_PLANER = {
             maxWaypoints: 0,
             isValidMission: 0,
             countBusyPoints: 0,
@@ -249,9 +256,13 @@ var FC = {
                 lon: 0,
                 alt: 0,
                 endMission: 0,
-                p1: 0
+                p1: 0,
+                p2: 0,
+                p3: 0
             }
-        };
+        }; */
+        
+        MISSION_PLANER = new WaypointCollection();
 
         ANALOG = {
             voltage: 0,
@@ -546,6 +557,8 @@ var FC = {
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
+        
+        SAFEHOMES = new SafehomeCollection();
     },
     getOutputUsages: function() {
         return {

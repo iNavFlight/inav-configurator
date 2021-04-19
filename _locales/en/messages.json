@@ -1043,6 +1043,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_IMU2": {
+        "message": "Secondary IMU"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -1129,7 +1132,7 @@
     },
 
     "receiverHelp": {
-        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -2363,13 +2366,16 @@
         "message": "Programming"
     },
     "tabAdvancedTuning": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
     },
     "advancedTuningSave": {
         "message": "Save and Reboot"
     },
     "tabAdvancedTuningTitle": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningGenericTitle": {
+        "message": "Generic settings"
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
@@ -2440,6 +2446,12 @@
     "posholdHoverMidThrottle": {
         "message": "Use mid. throttle for ALTHOLD"
     },
+    "mcWpSlowdown": {
+        "message": "Slow down when approaching waypoint"
+    },
+    "mcWpSlowdownHelp": {
+        "message": "When enabled, NAV engine will slow down when switching to the next waypoint. This prioritizes turning over forward movement. When disabled, NAV engine will continue to the next waypoint and turn as it goes."
+    },
     "positionEstimatorConfiguration": {
         "message": "Position Estimator"
     },
@@ -2459,7 +2471,7 @@
         "message": "Horizontal speed GPS weight"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "This value should be changed very carefully. In most cases there is not need to change that. For advanced users only!"
+        "message": "These values should be changed very carefully. In most cases there is no need to change them. For advanced users only!"
     },
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
@@ -2485,8 +2497,17 @@
     "rthClimbFirst": {
         "message": "Climb before RTH"
     },
+    "rthClimbFirstHelp": {
+        "message": "If set to ON or ON_FW_SPIRAL, aircraft will climb to nav_rth_altitude first before turning to head home. If set to OFF, aircraft will turn and head home immediately climbing on the way. For a fixed wing, ON will use a linear climb, ON_FW_SPIRAL will use a loiter turning climb with climb rate set by nav_auto_climb_rate and turn rate set by nav_fw_loiter_radius (ON_FW_SPIRAL is a fixed wing setting and behaves the same as ON for a multirotor)."
+    },
     "rthClimbIgnoreEmergency": {
         "message": "Climb regardless of position sensors health"
+    },
+    "rthAltControlOverride": {
+        "message": "Override RTH altitude and climb setting with roll/pitch stick"
+    },
+    "rthAltControlOverrideHELP": {
+        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. On fixed wing aircraft, the 'Climb before RTH' setting can be overriden by holding full roll left or right for >1 second so that the plane will turn towards home immediately."
     },
     "rthTailFirst": {
         "message": "Tail first"
@@ -2549,19 +2570,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. navigation bank angle [degrees]"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle [degrees]"
+        "message": "Max. navigation climb angle [degrees]"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
+    "navManualClimbRate": {
+        "message": "Max. Alt-hold climb rate [cm/s]"
+    },
+    "navManualClimbRateHelp": {
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+    },
+    "navAutoClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "navAutoClimbRateHelp": {
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+    },
     "maxDiveAngle": {
-        "message": "Max. dive angle [degrees]"
+        "message": "Max. navigation dive angle [degrees]"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2598,6 +2631,36 @@
     },
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+    },
+    "powerConfiguration": {
+        "message": "Battery Estimation Settings"
+    },
+    "idlePower": {
+        "message": "Idle power [cW]"
+    },
+    "idlePowerHelp": {
+        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruisePower": {
+        "message": "Cruise power [cW]"
+    },
+    "cruisePowerHelp": {
+        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruiseSpeed": {
+        "message": "Cruise speed [cm/s]"
+    },
+    "cruiseSpeedHelp": {
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+    },
+    "rthEnergyMargin": {
+        "message": "RTH energy margin [%]"
+    },
+    "rthEnergyMarginHelp": {
+        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+    },
+    "generalNavigationSettings": {
+        "message": "General Navigation Settings"
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
@@ -3082,6 +3145,9 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
     },
+    "osdElement_OSD_RANGEFINDER": {
+        "message": "Rangefinder distance"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     }, 
@@ -3160,6 +3226,15 @@
     "missionDefaultSettingsHead": {
         "message": "Default settings"
     },
+    "missionSafehomeHead": {
+        "message": "Safe Home manager"
+    },
+    "missionTemplateHead": {
+        "message": "Mission template"
+    },
+    "missionActionMenuHead": {
+        "message": "Action Menu"
+    },
     "useOnlyStandalone": {
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
@@ -3168,6 +3243,9 @@
     },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
+    },
+    "confirm_delete_point_with_options": {
+        "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },
     "servoMixer": {
         "message": "Servo mixer"
@@ -3640,8 +3718,56 @@
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
     },
+    "MissionPlannerJumpSettingsCheck": {
+        "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
+    },
+    "MissionPlannerJump2SettingsCheck": {
+        "message": "JUMP settings incorrect : Repeat should not exceed 10! \nCheck it again! Being forced to number of repeat equal 0!"
+    },
+    "MissionPlannerJump3SettingsCheck": {
+        "message": "JUMP settings incorrect : not able to Jump to a POI! \nBeing forced to WP 1!"
+    },
+    "MissionPlannerHeadSettingsCheck": {
+        "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"
+    },
+    "MissionPlannerRTHSettingsCheck": {
+        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! \nBeing forced by default to 0, i.e no LAND after RTH!"
+    },
+    "MissionPlannerJumpTargetRemoval": {
+        "message": "You can't remove a Waypoint which is defined as a JUMP target! \nYou first need to remove the target on the waypoint triggering the JUMP."
+    },
+    "SafehomeSelected": {
+        "message": ""
+    },
+    "SafehomeId": {
+        "message": "#"
+    },
+    "SafehomeEnabled": {
+        "message": "Enabled"
+    },
+    "SafehomeLon": {
+        "message": "Lon"
+    },
+    "SafehomeLat": {
+        "message": "Lat"
+    },
+    "WaypointOptionSelected": {
+        "message": "+"
+    },
+    "WaypointOptionId": {
+        "message": "#"
+    },
+    "WaypointOptionAction": {
+        "message": "Type"
+    },
+    "WaypointOptionP1": {
+        "message": "P1"
+    },
+    "WaypointOptionP2": {
+        "message": "P2"
+    },
     "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use <strong>fw_level_pitch_trim</strong> instead"
+        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
     },
     "pidId": {
         "message": "#"
