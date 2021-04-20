@@ -26,8 +26,8 @@ SYM.WH = 0xAB;
 SYM.WATT = 0xAE;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
-SYM.WH_KM_0 = 172;
-SYM.WH_KM_1 = 173;
+SYM.WH_KM = 172;
+SYM.WH_MI = 173;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -1123,7 +1123,7 @@ OSD.constants = {
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
+                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM)
                 }
             ]
         },
