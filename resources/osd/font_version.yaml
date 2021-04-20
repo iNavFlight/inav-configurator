@@ -3,5 +3,5 @@
 255: &fontmeta
   data:
     - s: "INAV"
-    - u8: 1
+    - u8: 2
 256: *fontmeta
