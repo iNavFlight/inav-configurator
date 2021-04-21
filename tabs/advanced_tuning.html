@@ -236,6 +236,11 @@
                             <input id="hover-throttle" type="number" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="hover-throttle"><span data-i18n="posholdHoverThrottle"></span></label>
                         </div>
+                        <div class="checkbox">
+                            <input id="wp-slowdown" type="checkbox" class="toggle update_preview" data-setting="nav_mc_wp_slowdown" data-live="true" />
+                            <label for="wp-slowdown"><span data-i18n="mcWpSlowdown"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="mcWpSlowdownHelp"></div>
+                        </div>
                     </div>
                 </div>
             </div> <!-- left wrapper -->
@@ -330,14 +335,21 @@
                             <div class="helpicon cf_tip" data-i18n_title="rthHomeAltitudeHelp"></div>
                         </div>
     
-                        <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" id="rth-climb-first" data-setting="nav_rth_climb_first" data-live="true" />
+                        <div class="select">
+                            <select id="rth-climb-first" data-setting="nav_rth_climb_first"></select>
                             <label for="rth-climb-first"><span data-i18n="rthClimbFirst"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="rthClimbFirstHelp"></div>
                         </div>
     
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="rthClimbIgnoreEmergency" data-setting="nav_rth_climb_ignore_emerg" data-live="true" />
                             <label for="rthClimbIgnoreEmergency"><span data-i18n="rthClimbIgnoreEmergency"></span></label>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="rthAltControlOverride" data-setting="nav_rth_alt_control_override" data-live="true" />
+                            <label for="rthAltControlOverride"><span data-i18n="rthAltControlOverride"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="rthAltControlOverrideHelp"></div>
                         </div>
                         
                         <div class="checkbox notFixedWingTuning">
@@ -351,8 +363,13 @@
                         </div>
     
                         <div class="number">
-                            <input id="landDescentRate" type="number" data-setting="nav_landing_speed" data-setting-multiplier="1" step="1" min="100" max="2000" />
-                            <label for="landDescentRate"><span data-i18n="landDescentRate"></span></label>
+                            <input id="landMinAltVspd" type="number" data-setting="nav_landing_minalt_vspd" data-setting-multiplier="1" step="1" min="50" max="500" />
+                            <label for="landMinAltVspd"><span data-i18n="landMinAltVspd"></span></label>
+                        </div>
+    
+                        <div class="number">
+                            <input id="landMaxAltVspd" type="number" data-setting="nav_landing_maxalt_vspd" data-setting-multiplier="1" step="1" min="100" max="2000" />
+                            <label for="landMaxAltVspd"><span data-i18n="landMaxAltVspd"></span></label>
                         </div>
     
                         <div class="number">
