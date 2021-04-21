@@ -1327,10 +1327,11 @@ var mspHelper = (function (gui) {
                 RTH_AND_LAND_CONFIG.rthAltControlMode = data.getUint8(6);
                 RTH_AND_LAND_CONFIG.rthAbortThreshold = data.getUint16(7, true);
                 RTH_AND_LAND_CONFIG.rthAltitude = data.getUint16(9, true);
-                RTH_AND_LAND_CONFIG.landDescentRate = data.getUint16(11, true);
-                RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(13, true);
-                RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(15, true);
-                RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(17, true);
+                RTH_AND_LAND_CONFIG.landMinAltVspd = data.getUint16(11, true);
+                RTH_AND_LAND_CONFIG.landMaxAltVspd = data.getUint16(13, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMinAlt = data.getUint16(15, true);
+                RTH_AND_LAND_CONFIG.landSlowdownMaxAlt = data.getUint16(17, true);
+                RTH_AND_LAND_CONFIG.emergencyDescentRate = data.getUint16(19, true);
                 break;
 
             case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
@@ -2007,8 +2008,11 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(RTH_AND_LAND_CONFIG.rthAltitude));
                 buffer.push(highByte(RTH_AND_LAND_CONFIG.rthAltitude));
 
-                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landDescentRate));
-                buffer.push(highByte(RTH_AND_LAND_CONFIG.landDescentRate));
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landMinAltVspd));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landMinAltVspd));
+
+                buffer.push(lowByte(RTH_AND_LAND_CONFIG.landMaxAltVspd));
+                buffer.push(highByte(RTH_AND_LAND_CONFIG.landMaxAltVspd));
 
                 buffer.push(lowByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
                 buffer.push(highByte(RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
