@@ -96,19 +96,33 @@
                     </div>
                     <div class="spacer" id="SafehomeContent">
                         <div>
-                        <table class="safehomesTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 80px" data-i18n="SafehomeSelected"></th>
-                                    <th style="width: 50px" data-i18n="SafehomeId"></th>
-                                    <th style="width: 80px" data-i18n="SafehomeEnabled"></th>
-                                    <th style="width: 120px" data-i18n="SafehomeLon"></th>
-                                    <th style="width: 120px" data-i18n="SafehomeLat"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="safehomesTableBody">
-                            </tbody>
-                        </table>
+                            <table class="safehomesTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px" data-i18n="SafehomeSelected"></th>
+                                        <th style="width: 50px" data-i18n="SafehomeId"></th>
+                                        <th style="width: 80px" data-i18n="SafehomeEnabled"></th>
+                                        <th style="width: 120px" data-i18n="SafehomeLon"></th>
+                                        <th style="width: 120px" data-i18n="SafehomeLat"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="safehomesTableBody">
+                                </tbody>
+                            </table>
+                            <hr>
+                            <div class="spacer"  id="safehomeLegend">
+                                <span><b>Legend : </b></span>
+                                <div class="legendItem">
+                                    <span class="fill" style="border-bottom-color:#900C3F"></span>
+                                    <span class="textLegend">Max distance (m):</span>
+                                    <span id="safeHomeMaxDistance" class="valueLegend"></span>
+                                </div>
+                                <div class="legendItem">
+                                    <span class="fill"></span>
+                                    <span class="textLegend">Safe Radius (m):</span>
+                                    <span id="SafeHomeSafeDistance" class="valueLegend"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
