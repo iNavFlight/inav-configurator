@@ -35,7 +35,7 @@
     "jquery-ui-npm": "1.12.0",
     "marked": "^0.3.17",
     "minimist": "^1.2.0",
-    "nw": "^0.42.2-sdk",
+    "nw": "^0.50.3-sdk",
     "nw-dialog": "^1.0.7",
     "openlayers": "^4.6.5",
     "temp": "^0.8.3",
