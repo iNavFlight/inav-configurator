@@ -757,6 +757,11 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.RPM) + '983',
                 },
                 {
+                    name: 'GLIDESLOPE',
+                    id: 120,
+                    preview: FONT.symbol(119) + '12.3',
+                },
+                {
                     name: 'VERSION',
                     id: 119,
                     preview: 'INAV 2.7.0'
