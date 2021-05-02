@@ -1,4 +1,4 @@
-/*global MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper*/
+/*global $,MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
 'use strict';
 
 var
@@ -304,39 +304,34 @@ TABS.onboard_logging.initialize = function (callback) {
         if (GUI.connected_to) {
             // Begin by refreshing the occupied size in case it changed while the tab was open
             flash_update_summary(function() {
-                var
-                    maxBytes = DATAFLASH.usedSize;
+                const maxBytes = DATAFLASH.usedSize;
 
-                prepare_file(function(fileWriter) {
-                    var
-                        nextAddress = 0;
+                prepare_file(function(filename) {
+                    const fs = require('fs');
+                    let nextAddress = 0;
 
                     show_saving_dialog();
 
-                    function onChunkRead(chunkAddress, chunkDataView) {
-                        if (chunkDataView != null) {
+                    function onChunkRead(chunkAddress, chunk) {
+                        if (chunk != null) {
                             // Did we receive any data?
-                            if (chunkDataView.byteLength > 0) {
-                                nextAddress += chunkDataView.byteLength;
+                            if (chunk.byteLength > 0) {
+                                nextAddress += chunk.byteLength;
 
                                 $(".dataflash-saving progress").attr("value", nextAddress / maxBytes * 100);
 
-                                var
-                                    blob = new Blob([chunkDataView]);
+                                fs.writeFileSync(filename, new Uint8Array(chunk), {
+                                    "flag": "a"
+                                })
 
-                                fileWriter.onwriteend = function(e) {
-                                    if (saveCancelled || nextAddress >= maxBytes) {
-                                        if (saveCancelled) {
-                                            dismiss_saving_dialog();
-                                        } else {
-                                            mark_saving_dialog_done();
-                                        }
-                                    } else {
-                                        mspHelper.dataflashRead(nextAddress, onChunkRead);
-                                    }
-                                };
+                                if (saveCancelled) {
+                                    dismiss_saving_dialog();
+                                } else if (nextAddress >= maxBytes) {
+                                    mark_saving_dialog_done();
+                                }else {
+                                    mspHelper.dataflashRead(nextAddress, onChunkRead);
+                                }
 
-                                fileWriter.write(blob);
                             } else {
                                 // A zero-byte block indicates end-of-file, so we're done
                                 mark_saving_dialog_done();
@@ -355,50 +350,23 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function prepare_file(onComplete) {
-        var
-            date = new Date(),
-            filename = 'blackbox_log_' + date.getFullYear() + '-'  + zeroPad(date.getMonth() + 1, 2) + '-'
+        const date = new Date();
+        const filename = 'blackbox_log_' + date.getFullYear() + '-'  + zeroPad(date.getMonth() + 1, 2) + '-'
                 + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
                 + zeroPad(date.getSeconds(), 2);
+        const accepts = [{
+            description: 'TXT files', extensions: ['txt'],
+        }];
 
-        chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: filename,
-                accepts: [{extensions: ['TXT']}]}, function(fileEntry) {
-            var error = chrome.runtime.lastError;
-
-            if (error) {
-                console.error(error.message);
-
-                if (error.message != "User cancelled") {
-                    GUI.log(chrome.i18n.getMessage('dataflashFileWriteFailed'));
-                }
-                return;
-            }
-
-            // echo/console log path specified
-            chrome.fileSystem.getDisplayPath(fileEntry, function(path) {
-                console.log('Dataflash dump file path: ' + path);
-            });
-
-            fileEntry.createWriter(function (fileWriter) {
-                fileWriter.onerror = function (e) {
-                    console.error(e);
-
-                    // stop logging if the procedure was/is still running
-                };
-
-                onComplete(fileWriter);
-            }, function (e) {
-                // File is not readable or does not exist!
-                console.error(e);
-                GUI.log(chrome.i18n.getMessage('dataflashFileWriteFailed'));
-            });
+        nwdialog.setContext(document);
+        nwdialog.saveFileDialog(filename, accepts, '', function(file) {                
+            onComplete(file);
         });
     }
 
     function ask_to_erase_flash() {
         eraseCancelled = false;
         $(".dataflash-confirm-erase").removeClass('erasing');
-
         $(".dataflash-confirm-erase")[0].showModal();
     }
 
