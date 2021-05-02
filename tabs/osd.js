@@ -1,4 +1,4 @@
-/*global $*/
+/*global $,nwdialog*/
 'use strict';
 
 var SYM = SYM || {};
@@ -194,31 +194,13 @@ FONT.parseMCMFontFile = function (data) {
 //noinspection JSUnusedLocalSymbols
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
-        //noinspection JSUnresolvedVariable
-        chrome.fileSystem.chooseEntry({type: 'openFile', accepts: [
-            {extensions: ['mcm']}
-        ]}, function (fileEntry) {
-            FONT.data.loaded_font_file = fileEntry.name;
-            //noinspection JSUnresolvedVariable
-            if (chrome.runtime.lastError) {
-                //noinspection JSUnresolvedVariable
-                console.error(chrome.runtime.lastError.message);
-                return;
-            }
-            fileEntry.file(function (file) {
-                var reader = new FileReader();
-                reader.onloadend = function (e) {
-                    //noinspection JSUnresolvedVariable
-                    if (e.total != 0 && e.total == e.loaded) {
-                        FONT.parseMCMFontFile(e.target.result);
-                        resolve();
-                    }
-                    else {
-                        console.error('could not load whole font file');
-                    }
-                };
-                reader.readAsText(file);
-            });
+
+        nwdialog.setContext(document);
+        nwdialog.openFileDialog('.mcm', function(filename) {
+            const fs = require('fs');
+            const fontData = fs.readFileSync(filename, {flag: "r"});
+            FONT.parseMCMFontFile(fontData.toString());
+            resolve();
         });
     });
 };
