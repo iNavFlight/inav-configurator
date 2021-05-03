@@ -3538,16 +3538,16 @@
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
     },
-    "gyro_lpf_type": {
+    "gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "gyro_stage2_lowpass_type": {
-        "message": "Gyro Stage 2 LPF type"
-    },
-    "gyro_stage2_lowpass_type_help": {
+    "gyro_main_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "dterm_lpf_type": {
