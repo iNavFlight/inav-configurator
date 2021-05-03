@@ -774,79 +774,79 @@
         "message": "Threshold Velocity [cm/s]"
     },
     "configurationLaunchVelocityHelp": {
-        "message": "Forward velocity threshold for swing-launch detection [cm/s]"
+        "message": "Forward velocity threshold for swing-launch detection. Default: 300 [100-10000]"
     },
     "configurationLaunchAccel": {
         "message": "Threshold Acceleration [cm/s/s]"
     },
     "configurationLaunchAccelHelp": {
-        "message": "Forward acceleration threshold for bungee launch of throw launch [cm/s/s], 1G = 981 cm/s/s"
+        "message": "Forward acceleration threshold for bungee launch or throw launch, 1G = 981 cm/s/s. Default: 1863 [1000-20000]"
     },
     "configurationLaunchMaxAngle": {
         "message": "Max Throw Angle [&deg;]"
     },
     "configurationLaunchMaxAngleHelp": {
-        "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely [deg]"
+        "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely. Default: 45 [5-180]"
     },
     "configurationLaunchDetectTime": {
         "message": "Detect Time [ms]"
     },
     "configurationLaunchDetectTimeHelp": {
-        "message": "Time for which thresholds have to breached to consider launch happened [ms]"
+        "message": "Time for which thresholds have to breached to consider launch happened. Default: 40 [10-1000]"
     },
     "configurationLaunchThr": {
         "message": "Launch Throttle [uS]"
     },
     "configurationLaunchThrHelp": {
-        "message": "Launch throttle - throttle to be set during launch sequence (pwm units)"
+        "message": "Launch throttle - throttle to be set during launch sequence. Default: 1700 [1000-2000]"
     },
     "configurationLaunchIdleThr": {
         "message": "Idle Throttle [uS]"
     },
     "configurationLaunchIdleThrHelp": {
-        "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position)"
+        "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay [ms]"
     },
     "configurationLaunchMotorDelayHelp": {
-        "message": "Delay between detected launch and launch sequence start and throttling up (ms)"
+        "message": "Delay between detected launch and launch sequence start and throttling up. Default: 500 [0-5000]"
     },
     "configurationLaunchSpinupTime": {
         "message": "Motor Spinup Time [ms]"
     },
     "configurationLaunchSpinupTimeHelp": {
-        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr - to avoid big stress on ESC and large torque from propeller"
+        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr, to avoid big stress on ESC and large torque from propeller. Default: 100 [0-1000]"
     },
     "configurationLaunchMinTime": {
         "message": "Minimum Launch Time [ms]"
     },
     "configurationLaunchMinTimeHelp": {
-        "message": "Allow launch mode to execute at least this time (ms) and ignore stick movements [0-60000]."
+        "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
     },
     "configurationLaunchTimeout": {
         "message": "Launch Timeout [ms]"
     },
     "configurationLaunchTimeoutHelp": {
-        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over (ms)"
+        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
     },
     "configurationLaunchEndTime": {
         "message": "End Transition Time [ms]"
     },
     "configurationLaunchEndTimeHelp": {
-        "message": "Smooth transition time at the end of the launch (ms). Default: 2000 [0-5000]. This is added to the Launch Timeout."
+        "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
     },
     "configurationLaunchMaxAltitude": {
         "message": "Maximum Altitude [cm]"
     },
     "configurationLaunchMaxAltitudeHelp": {
-        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. [cm]"
+        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. Default: 0 [0-60000]"
     },
     "configurationLaunchClimbAngle": {
         "message": "Climb Angle [&deg;]"
     },
     "configurationLaunchClimbAngleHelp": {
-        "message": "Climb angle for launch sequence (degrees), is also restrained by global max_angle_inclination_pit"
+        "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
     },
     "configuration3d": {
         "message": "Reversible motors"
