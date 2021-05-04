@@ -162,31 +162,19 @@ TABS.pid_tuning.initialize = function (callback) {
         pid_and_rc_to_form();
 
         var $magHoldYawRate                 = $("#magHoldYawRate"),
-            $gyroSoftLpfHz                  = $('#gyroSoftLpfHz'),
             $accSoftLpfHz                   = $('#accSoftLpfHz'),
-            $dtermLpfHz                     = $('#dtermLpfHz'),
             $yawLpfHz                       = $('#yawLpfHz');
 
         $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
-        $gyroSoftLpfHz.val(FILTER_CONFIG.gyroSoftLpfHz);
         $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
-        $dtermLpfHz.val(FILTER_CONFIG.dtermLpfHz);
         $yawLpfHz.val(FILTER_CONFIG.yawLpfHz);
 
         $magHoldYawRate.change(function () {
             INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
         });
 
-        $gyroSoftLpfHz.change(function () {
-            FILTER_CONFIG.gyroSoftLpfHz = parseInt($gyroSoftLpfHz.val(), 10);
-        });
-
         $accSoftLpfHz.change(function () {
             INAV_PID_CONFIG.accSoftLpfHz = parseInt($accSoftLpfHz.val(), 10);
-        });
-
-        $dtermLpfHz.change(function () {
-            FILTER_CONFIG.dtermLpfHz = parseInt($dtermLpfHz.val(), 10);
         });
 
         $yawLpfHz.change(function () {
