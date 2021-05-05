@@ -94,6 +94,7 @@ SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
+SYM_ADSB = 0xFD;
 
 var FONT = FONT || {};
 
@@ -755,6 +756,12 @@ OSD.constants = {
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
                 },
+                {
+                    name: 'ADSB',
+                    id: 121,
+                    min_version: '3.0.0',
+                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                },                
                 {
                     name: 'VERSION',
                     id: 119,
