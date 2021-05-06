@@ -210,6 +210,10 @@ helper.defaultsDialog = (function() {
                     value: 40
                 },
                 {
+                    key: "d_boost_factor",
+                    value: 1
+                },
+                {
                     key: "gyro_lpf_type",
                     value: "BIQUAD"
                 },
@@ -378,6 +382,10 @@ helper.defaultsDialog = (function() {
 		{
                     key: "dterm_lpf_hz",
                     value: 40
+                },
+                {
+                    key: "d_boost_factor",
+                    value: 1
                 },
                 {
                     key: "gyro_lpf_type",
