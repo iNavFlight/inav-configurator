@@ -2492,7 +2492,10 @@
         "message": "Wireless mode"
     },
     "rthConfiguration": {
-        "message": "RTH and Landing Settings"
+        "message": "RTH settings"
+    },
+    "autoLandingSettings": {
+        "message": "Automatic landing settings"
     },
     "minRthDistance": {
         "message": "Min. RTH distance [cm]"
@@ -2542,17 +2545,26 @@
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
-    "landMinAltVspd": {
-        "message": "Vertical descent velocity under min. vertical landing speed altitude [cm/s]"
-    },
     "landMaxAltVspd": {
-        "message": "Vertical descent velocity above slowdown altitude [cm/s]"
+        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
     },
-    "landSlowdownMinAlt": {
-        "message": "Min. vertical landing speed at altitude [cm]"
+    "landMaxAltVspdHelp": {
+        "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "Vertical landing speed slowdown at altitude [cm]"
+        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+    },
+    "landSlowdownMaxAltHelp": {
+        "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
+    },
+    "landMinAltVspd": {
+        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+    },
+    "landMinAltVspdHelp": {
+        "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
+    },
+    "landSlowdownMinAlt": {
+        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed [cm/s]"
@@ -3532,16 +3544,16 @@
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
     },
-    "gyro_lpf_type": {
+    "gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "gyro_stage2_lowpass_type": {
-        "message": "Gyro Stage 2 LPF type"
-    },
-    "gyro_stage2_lowpass_type_help": {
+    "gyro_main_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "dterm_lpf_type": {

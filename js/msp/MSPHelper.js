@@ -2472,7 +2472,7 @@ var mspHelper = (function (gui) {
     };
 
     /**
-     * Send a request to read a block of data from the dataflash at the given address and pass that address and a dataview
+     * Send a request to read a block of data from the dataflash at the given address and pass that address and a ArrayBuffer
      * of the returned data to the given callback (or null for the data if an error occured).
      */
     self.dataflashRead = function (address, onDataCallback) {
@@ -2496,7 +2496,7 @@ var mspHelper = (function (gui) {
                 /* Strip that address off the front of the reply and deliver it separately so the caller doesn't have to
                  * figure out the reply format:
                  */
-                onDataCallback(address, new DataView(response.data.buffer, response.data.byteOffset + 4, response.data.buffer.byteLength - 4));
+                onDataCallback(address, response.data.buffer.slice(4));
             } else {
                 // Report error
                 onDataCallback(address, null);

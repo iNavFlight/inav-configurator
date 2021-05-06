@@ -66,19 +66,11 @@ presets.presets = [
                 value: 250
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 130
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 150
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -224,19 +216,11 @@ presets.presets = [
                 value: 500
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 110
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 250
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -374,19 +358,11 @@ presets.presets = [
                 value: 500
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 100
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 160
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -537,19 +513,11 @@ presets.presets = [
                 value: 500
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 60
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 120
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -699,19 +667,11 @@ presets.presets = [
                 value: 250
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 130
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 180
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -865,19 +825,11 @@ presets.presets = [
                 value: 250
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 115
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 0
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -1023,19 +975,11 @@ presets.presets = [
                 value: 500
             },
             {
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 100
             },
             {
-                key: "gyro_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "gyro_stage2_lowpass_hz",
-                value: 250
-            },
-            {
-                key: "gyro_stage2_lowpass_type",
+                key: "gyro_main_lpf_type",
                 value: "PT1"
             },
             {
@@ -1178,7 +1122,7 @@ presets.presets = [
                 value: "256HZ"
 	},
 	{
-                key: "gyro_lpf_hz",
+                key: "gyro_main_lpf_hz",
                 value: 25
 	},
 	{
@@ -1190,7 +1134,7 @@ presets.presets = [
                 value: 1
     },
 	{
-                key: "gyro_lpf_type",
+                key: "gyro_main_lpf_type",
                 value: "BIQUAD"
 	},
 	{
@@ -1348,7 +1292,7 @@ presets.presets = [
                 value: "256HZ"
 	},
 	{
-                 key: "gyro_lpf_hz",
+                 key: "gyro_main_lpf_hz",
                  value: 25
 	},
 	{
@@ -1360,7 +1304,7 @@ presets.presets = [
                 value: 1
     },
 	{
-                key: "gyro_lpf_type",
+                key: "gyro_main_lpf_type",
                 value: "BIQUAD"
 	},
 	{

@@ -1,3 +1,4 @@
+/*global $,nwdialog*/
 'use strict';
 
 TABS.firmware_flasher = {};
@@ -184,57 +185,41 @@ TABS.firmware_flasher.initialize = function (callback) {
             $('select[name="release"]').empty().append('<option value="0">Offline</option>');
         });
 
-        // UI Hooks
-        $('a.load_file').click(function () {
-            chrome.fileSystem.chooseEntry({type: 'openFile', accepts: [{extensions: ['hex']}]}, function (fileEntry) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.runtime.lastError.message);
+        $('a.load_file').on('click', function () {
 
-                    return;
-                }
-
-                // hide github info (if it exists)
+            nwdialog.setContext(document);
+            nwdialog.openFileDialog('.hex', function(filename) {
+                const fs = require('fs');
+                
                 $('div.git_info').slideUp();
 
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Loading file from: ' + path);
+                console.log('Loading file from: ' + filename);
 
-                    fileEntry.file(function (file) {
-                        var reader = new FileReader();
+                fs.readFile(filename, (err, data) => {
 
-                        reader.onprogress = function (e) {
-                            if (e.total > 104857600) { // 100 MB
-                                // dont allow reading files bigger then 100 MB
-                                console.log('File limit (100 MB) exceeded, aborting');
-                                reader.abort();
-                            }
-                        };
+                    if (err) {
+                        console.log("Error loading local file", err);
+                        return;
+                    }
 
-                        reader.onloadend = function(e) {
-                            if (e.total != 0 && e.total == e.loaded) {
-                                console.log('File loaded');
+                    console.log('File loaded');
 
-                                intel_hex = e.target.result;
+                    parse_hex(data.toString(), function (data) {
+                        parsed_hex = data;
 
-                                parse_hex(intel_hex, function (data) {
-                                    parsed_hex = data;
+                        if (parsed_hex) {
+                            googleAnalytics.sendEvent('Flashing', 'Firmware', 'local');
+                            $('a.flash_firmware').removeClass('disabled');
 
-                                    if (parsed_hex) {
-                                        googleAnalytics.sendEvent('Flashing', 'Firmware', 'local');
-                                        $('a.flash_firmware').removeClass('disabled');
-
-                                        $('span.progressLabel').text('Loaded Local Firmware: (' + parsed_hex.bytes_total + ' bytes)');
-                                    } else {
-                                        $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherHexCorrupted'));
-                                    }
-                                });
-                            }
-                        };
-
-                        reader.readAsText(file);
+                            $('span.progressLabel').text('Loaded Local Firmware: (' + parsed_hex.bytes_total + ' bytes)');
+                        } else {
+                            $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherHexCorrupted'));
+                        }
                     });
                 });
+
             });
+
         });
 
         /**
