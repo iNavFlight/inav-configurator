@@ -35,14 +35,14 @@ MWNP.WPTYPE.REV = swap(MWNP.WPTYPE);
 
 // Dictionary of Parameter1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
-    1:    {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: ''},
+    1:    {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'},
     2:    {parameter1: '', parameter2: '', parameter3: ''},
-    3:    {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: ''},
+    3:    {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: 'Sea level Ref'},
     4:    {parameter1: 'Force land (non zero)', parameter2: '', parameter3: ''},
     5:    {parameter1: '', parameter2: '', parameter3: ''},
     6:    {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
     7:    {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
-    8:    {parameter1: '', parameter2: '', parameter3: ''}
+    8:    {parameter1: '', parameter2: '', parameter3: 'Sea level Ref'}
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
@@ -363,19 +363,22 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////   
     var vMaxDistSH = 0;
     var settings = {};
-    mspHelper.getSetting("safehome_max_distance").then(function (s) {
-        if (s) {
-            console.log(s);
-            vMaxDistSH = Number(s.value)/100;
-            settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-        }
-        else {
-            console.log(s);
-            vMaxDistSH = 0;
-            settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-        }
-    });
-    console.log(settings);
+    if (CONFIGURATOR.connectionValid) {
+        mspHelper.getSetting("safehome_max_distance").then(function (s) {
+            if (s) {
+                vMaxDistSH = Number(s.value)/100;
+                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+            }
+            else {
+                vMaxDistSH = 0;
+                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+            }
+        });
+    }
+    else {
+        vMaxDistSH = 0;
+        settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+    }
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Waypoints parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
@@ -403,6 +406,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3').val('');
         $('#missionDistance').text(0);
         $('#MPeditPoint').fadeOut(300);
+    }
+    
+    function clearFilename() {
+        $('#missionFilename').text('');
     }
     
     /////////////////////////////////////////////
@@ -619,6 +626,7 @@ TABS.mission_control.initialize = function (callback) {
         cleanLayers();
         clearEditForm();
         updateTotalInfo();
+        clearFilename();
     }
     
     function addWaypointMarker(waypoint, isEdit=false) {
@@ -743,6 +751,8 @@ TABS.mission_control.initialize = function (callback) {
         if (textGeom) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
+        //let lengthMission = mission.getDistance();
+        //$('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
     }
     
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true) {
@@ -783,8 +793,8 @@ TABS.mission_control.initialize = function (callback) {
         
         lines.push(vectorLayer);
 
-        var length = ol.Sphere.getLength(line) + parseFloat($('#missionDistance').text());
-        $('#missionDistance').text(length.toFixed(3));
+/*         var length = ol.Sphere.getLength(line) + parseFloat($('#missionDistance').text());
+        $('#missionDistance').text(length.toFixed(3)); */
 
         map.addLayer(vectorLayer);
     }
@@ -1285,7 +1295,9 @@ TABS.mission_control.initialize = function (callback) {
                 // Change SpeedValue to Parameter1, 2, 3
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
-                $('#pointP3').val(selectedMarker.getP3());
+                changeSwitchery($('#pointP3'), selectedMarker.getP3() == 1);
+               
+                
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                     if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
@@ -1417,11 +1429,18 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#pointType').change(function () {
             if (selectedMarker) {
-                selectedMarker.setAction($('#pointType').val());
-                if ([MWNP.WPTYPE.SET_POI,MWNP.WPTYPE.PH_UNLIM,MWNP.WPTYPE.LAND].includes(selectedMarker.getAction())) {
+                selectedMarker.setAction(Number($('#pointType').val()));
+                if ([MWNP.WPTYPE.SET_POI,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(selectedMarker.getAction())) {
                     selectedMarker.setP1(0.0);
                     selectedMarker.setP2(0.0);
                     selectedMarker.setP3(0.0);
+                }
+                for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
+                    if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
+                        $('#pointP'+String(j).slice(-1)+'class').fadeIn(300);
+                        $('label[for=pointP'+String(j).slice(-1)+']').html(dictOfLabelParameterPoint[selectedMarker.getAction()][j]);
+                    }
+                    else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
                 }
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
@@ -1429,26 +1448,32 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
-        $('#pointLat').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
+        $('#pointLat').on('change', function (event) {
+            if (selectedMarker) {
                 selectedMarker.setLat(Math.round(Number($('#pointLat').val()) * 10000000));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
-                redrawLayer();
+                cleanLayers();
+                redrawLayers();
+                selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
+                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
             }
         });
         
-        $('#pointLon').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
+        $('#pointLon').on('change', function (event) {
+            if (selectedMarker) {
                 selectedMarker.setLon(Math.round(Number($('#pointLon').val()) * 10000000));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
-                redrawLayer();
+                cleanLayers();
+                redrawLayers();
+                selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
+                selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
             }
         });
         
-        $('#pointAlt').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
+        $('#pointAlt').on('change', function (event) {
+            if (selectedMarker) {
                 selectedMarker.setAlt(Number($('#pointAlt').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
@@ -1456,8 +1481,8 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
-        $('#pointP1').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
+        $('#pointP1').on('change', function (event) {
+            if (selectedMarker) {
                 selectedMarker.setP1(Number($('#pointP1').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
@@ -1465,8 +1490,8 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
-        $('#pointP2').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
+        $('#pointP2').on('change', function (event) {
+            if (selectedMarker) {
                 selectedMarker.setP2(Number($('#pointP2').val()));
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
@@ -1474,9 +1499,9 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
-        $('#pointP3').on('keypress', function (event) {
-            if (selectedMarker && event.which == 13) {
-                selectedMarker.setP3(Number($('#pointP3').val()));
+        $('#pointP3').on('change', function (event) {
+            if (selectedMarker) {
+                selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
@@ -1772,12 +1797,9 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 // update Attached Waypoints (i.e non Map Markers)
                 mission.update(true);
-                console.log("test ",Object.keys(mission.getCenter()).length !== 0);
                 if (Object.keys(mission.getCenter()).length !== 0) {
-                    console.log("toto");
                     var coord = ol.proj.fromLonLat([mission.getCenter().lon / 10000000 , mission.getCenter().lat / 10000000]);
                     map.getView().setCenter(coord);
-                    console.log("mission.getCenter().zoom ", mission.getCenter().zoom);
                     if (mission.getCenter().zoom) {
                         map.getView().setZoom(mission.getCenter().zoom);
                     }
@@ -1793,6 +1815,9 @@ TABS.mission_control.initialize = function (callback) {
                 
                 redrawLayers();
                 updateTotalInfo();
+                let sFilename = String(filename.split('\\').pop().split('/').pop());
+                GUI.log(sFilename+' has been loaded successfully !');
+                updateFilename(sFilename);
             });
         });
     }
@@ -1831,7 +1856,9 @@ TABS.mission_control.initialize = function (callback) {
                 GUI.log('<span style="color: red">Error writing file</span>');
                 return console.error(err);
             }
-            GUI.log('File saved');
+            let sFilename = String(filename.split('\\').pop().split('/').pop());
+            GUI.log(sFilename+' has been saved successfully !');
+            updateFilename(sFilename);
         });
     }
 
@@ -1846,6 +1873,9 @@ TABS.mission_control.initialize = function (callback) {
             mission.reinit();
             mission.copy(MISSION_PLANER);
             mission.update(true);
+            var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
+            map.getView().setCenter(coord);
+            map.getView().setZoom(16);
             redrawLayers();
             updateTotalInfo();
         }, 2000);
@@ -1877,8 +1907,19 @@ TABS.mission_control.initialize = function (callback) {
             $('#availablePoints').text(mission.getCountBusyPoints() + '/' + mission.getMaxWaypoints());
             $('#missionValid').html(mission.getValidMission() ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
         }
-    }    
+    }   
+    
 
+    function updateFilename(filename) {
+        $('#missionFilename').text(filename);
+        $('#infoMissionFilename').show();
+    }
+    
+    function changeSwitchery(element, checked) {
+      if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
+        element.parent().find('.switcherymid').trigger('click');
+      }
+    }
 
 };
 
