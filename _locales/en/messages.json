@@ -3038,7 +3038,7 @@
         "message": "Glideslope"
     },
     "osdElement_GLIDESLOPE_HELP": {
-        "message": "Horizontal speed/sink rate. Uses airspeed if available, groundspeed otherwise"
+        "message": "Horizontal speed divided by sink rate"
     },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
