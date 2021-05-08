@@ -95,6 +95,7 @@ SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
+SYM.GLIDESLOPE = 0x7F;
 
 var FONT = FONT || {};
 
@@ -758,8 +759,8 @@ OSD.constants = {
                 },
                 {
                     name: 'GLIDESLOPE',
-                    id: 120,
-                    preview: FONT.symbol(119) + '12.3',
+                    id: 124,
+                    preview: FONT.symbol(127) + FONT.embed_dot('12.3'),
                 },
                 {
                     name: 'VERSION',
