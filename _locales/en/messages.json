@@ -611,6 +611,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureFW_AUTOTRIM": {
+        "message": "Continuously trim servos on Fixed Wing"
+    },
+    "featureFW_AUTOTRIMTip": {
+        "message": "When flying in a stabilized mode, continuosusly adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+    },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
     },
@@ -2818,6 +2824,9 @@
     "osdGroupGPS": {
         "message": "GPS"
     },
+    "osdGroupPowerLimits": {
+        "message": "Power limits"
+    },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
     },
@@ -2892,6 +2901,15 @@
     },
     "osdElement_EFFICIENCY_WH": {
         "message": "Efficiency Wh/Km"
+    },
+    "osdElement_PLIMIT_REMAINING_BURST_TIME": {
+        "message": "Remaining burst time"
+    },
+    "osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
+        "message": "Active current limit"
+    },
+    "osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
+        "message": "Active power limit"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
