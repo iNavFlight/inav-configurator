@@ -760,6 +760,7 @@ OSD.constants = {
                 {
                     name: 'GLIDESLOPE',
                     id: 124,
+                    min_version: '3.0.0',
                     preview: FONT.symbol(127) + FONT.embed_dot('12.3'),
                 },
                 {
