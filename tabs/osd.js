@@ -1111,6 +1111,26 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupPowerLimits',
+            items: [
+                {
+                    name: 'PLIMIT_REMAINING_BURST_TIME',
+                    id: 121,
+                    preview: FONT.embed_dot('10.0S')
+                },
+                {
+                    name: 'PLIMIT_ACTIVE_CURRENT_LIMIT',
+                    id: 122,
+                    preview: FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP)
+                },
+                {
+                    name: 'PLIMIT_ACTIVE_POWER_LIMIT',
+                    id: 123,
+                    preview: '500' + FONT.symbol(SYM.WATT)
+                },
+            ]
+        },
+        {
             name: 'osdGroupGPS',
             enabled: function() {
                 return FC.isFeatureEnabled('GPS');
