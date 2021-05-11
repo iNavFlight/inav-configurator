@@ -1377,11 +1377,11 @@ OSD.constants = {
                     preview: function(osd_data) {
                         var crsflqformat;
                         if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
                         } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
                             crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
                         } else {
-                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
+                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
                         }
                         return crsflqformat;
                     }
