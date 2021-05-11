@@ -90,6 +90,7 @@ SYM.DB = 0xEB;
 SYM.DBM = 0xEC;
 SYM.MW = 0xED;
 SYM.SNR = 0xEE;
+SYM.LQ = 0x0C;
 SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
@@ -1374,13 +1375,15 @@ OSD.constants = {
                     id: 110,
                     positionable: true,
                     preview: function(osd_data) {
-                    var crsflqformat;
-                    if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
-                        crsflqformat = '2:100%';
-                    } else {
-                        crsflqformat = '  300%';
-                    }
-                    return crsflqformat;
+                        var crsflqformat;
+                        if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
+                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
+                        } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
+                            crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
+                        } else {
+                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                        }
+                        return crsflqformat;
                     }
                 },
                 {
