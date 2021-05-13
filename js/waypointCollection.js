@@ -341,7 +341,7 @@ let WaypointCollection = function () {
         let n = 0 ;
         let startCount = true;
         while (startCount && (nLoop!=-1)) {
-            if (nStart > data[data.length -1].getNumber()) {
+            if (nStart > data[data.length -1].getNumber() ) {
                 startCount = false;
                 break;
             }
@@ -351,27 +351,24 @@ let WaypointCollection = function () {
                 nStart++;
             }
             else if (self.getWaypoint(nStart).getAction() == MWNP.WPTYPE.JUMP) {
-                console.log("TITI"); 
-                console.log(jumpDict);
-                if (!Object.keys(jumpDict).includes(self.getWaypoint(nStart).getNumber()) ) {
+                if (!Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
                     jumpDict[self.getWaypoint(nStart).getNumber()] = {nStart: self.getWaypoint(nStart).getP1(), nLoop : self.getWaypoint(nStart).getP2(), n : 0};
                 }
-                console.log(jumpDict);
                 if (Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
-                    console.log("TOTO");
-                    console.log((jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] == 0));
+                    if (jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] == -1) {
+                        nLoop = -1;
+                    }
                     if ( (jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] ==0) ) {
                         nStart++;
                         //jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = 0;
                     }
                     else {
-                        jumpDict[self.getWaypoint(nStart).getNumber()]["n"]++;
-                        console.log(jumpDict[self.getWaypoint(nStart).getNumber()]["nStart"]);
-                        //nStart = 0; //jumpDict[self.getWaypoint(nStart).getNumber()]["nStart"];
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = jumpDict[self.getWaypoint(nStart).getNumber()]["n"]+1;
+                        let nStartTemp = jumpDict[self.getWaypoint(nStart).getNumber()]["nStart"];
+                        nStart = nStartTemp;
                     }
                 }
-                //nStart++;
-                console.log(jumpDict);
+                
             }
             else {
                 nStart++;
