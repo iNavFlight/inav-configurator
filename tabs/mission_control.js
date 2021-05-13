@@ -751,8 +751,8 @@ TABS.mission_control.initialize = function (callback) {
         if (textGeom) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
-        //let lengthMission = mission.getDistance();
-        //$('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
+        let lengthMission = mission.getDistance();
+        $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
     }
     
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true) {
