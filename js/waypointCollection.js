@@ -359,8 +359,8 @@ let WaypointCollection = function () {
                         nLoop = -1;
                     }
                     if ( (jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] ==0) ) {
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = 0;
                         nStart++;
-                        //jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = 0;
                     }
                     else {
                         jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = jumpDict[self.getWaypoint(nStart).getNumber()]["n"]+1;
@@ -388,7 +388,7 @@ let WaypointCollection = function () {
                 }
                 oldCoord = coord;
             });
-            console.log("lengthLine ", lengthLine);
+            //console.log("lengthLine ", lengthLine);
             return lengthLine.map(cumulativeSum);
         }
     }
