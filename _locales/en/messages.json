@@ -611,6 +611,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureFW_AUTOTRIM": {
+        "message": "Continuously trim servos on Fixed Wing"
+    },
+    "featureFW_AUTOTRIMTip": {
+        "message": "When flying in a stabilized mode, continuosusly adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+    },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
     },
@@ -2783,16 +2789,22 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "Crossfire SNR Alarm Level"
+        "message": "CRSF SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "Crossfire Link Quality Alarm"
+        "message": "CRSF Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
+    },
+    "osd_rssi_dbm_alarm": {
+        "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_rssi_dbm_alarm_HELP": {
+        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"
@@ -2817,6 +2829,9 @@
     },
     "osdGroupGPS": {
         "message": "GPS"
+    },
+    "osdGroupPowerLimits": {
+        "message": "Power limits"
     },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
@@ -2892,6 +2907,15 @@
     },
     "osdElement_EFFICIENCY_WH": {
         "message": "Efficiency Wh/Km"
+    },
+    "osdElement_PLIMIT_REMAINING_BURST_TIME": {
+        "message": "Remaining burst time"
+    },
+    "osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
+        "message": "Active current limit"
+    },
+    "osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
+        "message": "Active power limit"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
@@ -3538,16 +3562,16 @@
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
     },
-    "gyro_lpf_type": {
+    "gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "gyro_stage2_lowpass_type": {
-        "message": "Gyro Stage 2 LPF type"
-    },
-    "gyro_stage2_lowpass_type_help": {
+    "gyro_main_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "dterm_lpf_type": {

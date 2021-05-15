@@ -34,16 +34,12 @@ helper.defaultsDialog = (function() {
                 Filtering
                 */
                 {
-                    key: "gyro_lpf_hz",
+                    key: "gyro_main_lpf_hz",
                     value: 110
                 },
                 {
-                    key: "gyro_lpf_type",
+                    key: "gyro_main_lpf_type",
                     value: "PT1"
-                },
-                {
-                    key: "gyro_stage2_lowpass_hz",
-                    value: 0
                 },
                 {
                     key: "dterm_lpf_hz",
@@ -202,15 +198,19 @@ helper.defaultsDialog = (function() {
                     value: "256HZ"
                 },
                 {
-                    key: "gyro_lpf_hz",
+                    key: "gyro_main_lpf_hz",
                     value: 25
                 },
-		{
+		        {
                     key: "dterm_lpf_hz",
                     value: 40
                 },
                 {
-                    key: "gyro_lpf_type",
+                    key: "d_boost_factor",
+                    value: 1
+                },
+                {
+                    key: "gyro_main_lpf_type",
                     value: "BIQUAD"
                 },
                 {
@@ -372,15 +372,19 @@ helper.defaultsDialog = (function() {
                     value: "256HZ"
                 },
                 {
-                    key: "gyro_lpf_hz",
+                    key: "gyro_main_lpf_hz",
                     value: 25
                 },
-		{
+		        {
                     key: "dterm_lpf_hz",
                     value: 40
                 },
                 {
-                    key: "gyro_lpf_type",
+                    key: "d_boost_factor",
+                    value: 1
+                },
+                {
+                    key: "gyro_main_lpf_type",
                     value: "BIQUAD"
                 },
                 {
@@ -533,11 +537,11 @@ helper.defaultsDialog = (function() {
                     value: "256HZ"
                 },
                 {
-                    key: "gyro_lpf_hz",
+                    key: "gyro_main_lpf_hz",
                     value: 10
                 },
                 {
-                    key: "gyro_lpf_type",
+                    key: "gyro_main_lpf_type",
                     value: "BIQUAD"
                 },
                 {

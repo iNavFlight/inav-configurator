@@ -590,7 +590,8 @@ var FC = {
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
             {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
             {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
+            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
+            {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true}
         ];
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.4.0") && semver.lt(CONFIG.flightControllerVersion, "2.5.0")) {
