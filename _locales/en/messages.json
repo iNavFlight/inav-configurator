@@ -2804,7 +2804,7 @@
         "message": "CRSF RSSI dBm Alarm"
     },
     "osd_rssi_dbm_alarm_HELP": {
-        "message": "RSSI indicator blinks below this value. Range: [-128,0]. Zero disables this alarm."
+        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"
