@@ -475,3 +475,21 @@
 .tab-mission-control .btnTable-success a:hover {
     background-color: #218838;
 }
+
+.tab-mission-control .legendItem {
+    display:block;
+}
+
+.tab-mission-control .fill{
+    border:none;
+    border-bottom:5px dotted #88CC3E;
+    display:inline-block;
+    width:20px;
+}
+
+.tab-mission-control .textLegend{   
+    margin:2px; 
+}
+.tab-mission-control .valueLegend{
+    float:right;
+}

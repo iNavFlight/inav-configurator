@@ -360,9 +360,22 @@ TABS.mission_control.initialize = function (callback) {
     
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for default Settings
-    //////////////////////////////////////////////////////////////////////////////////////////////    
-    var settings = { speed: 0, alt: 5000, safeRadiusSH : 50};
-
+    //////////////////////////////////////////////////////////////////////////////////////////////   
+    var vMaxDistSH = 0;
+    var settings = {};
+    mspHelper.getSetting("safehome_max_distance").then(function (s) {
+        if (s) {
+            console.log(s);
+            vMaxDistSH = Number(s.value)/100;
+            settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+        }
+        else {
+            console.log(s);
+            vMaxDistSH = 0;
+            settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+        }
+    });
+    console.log(settings);
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Waypoints parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
@@ -543,7 +556,7 @@ TABS.mission_control.initialize = function (callback) {
         
         let circleStyle = new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'rgba(255, 163, 46, 1)',
+                color: 'rgba(144, 12, 63, 0.5)',
                 width: 3,
                 lineDash : [10]
             }),
@@ -570,9 +583,10 @@ TABS.mission_control.initialize = function (callback) {
             style : function(iconFeature) {
                 let styles = [getSafehomeIcon(safehome)];
                 if (safehome.isUsed()) {
-                    //circleStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), safehomeRangeRadius));
+                    circleStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(settings.maxDistSH)));
                     circleSafeStyle.setGeometry(new ol.geom.Circle(iconFeature.getGeometry().getCoordinates(), getProjectedRadius(Number(settings.safeRadiusSH))));
                     styles.push(circleSafeStyle);
+                    styles.push(circleStyle);
                 }
                 return styles;
             }
@@ -1029,6 +1043,8 @@ TABS.mission_control.initialize = function (callback) {
                 cleanSafehomeLayers();
                 renderSafehomesTable();
                 renderSafehomesOnMap();
+                $('#safeHomeMaxDistance').text(settings.maxDistSH);
+                $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
             };
 
             button.addEventListener('click', handleShowSafehome, false);
@@ -1530,8 +1546,11 @@ TABS.mission_control.initialize = function (callback) {
             $(this).addClass('disabled');
             GUI.log('Start of sending Safehome points');
             mspHelper.saveSafehomes();
-            GUI.log('End of sending Safehome points');
-            $('#saveEepromSafehomeButton').removeClass('disabled');
+            setTimeout(function(){
+                mspHelper.saveToEeprom();
+                GUI.log('End of sending Safehome points');
+                $('#saveEepromSafehomeButton').removeClass('disabled');
+            }, 500);
         });
         
         /////////////////////////////////////////////
@@ -1635,8 +1654,14 @@ TABS.mission_control.initialize = function (callback) {
         // Callback for settings
         /////////////////////////////////////////////
         $('#saveSettings').on('click', function () {
-            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()) };
+            let oldSafeRadiusSH = settings.safeRadiusSH;
+            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()), maxDistSH : vMaxDistSH};
             saveSettings();
+            if (settings.safeRadiusSH != oldSafeRadiusSH  && $('#showHideSafehomeButton').is(":visible")) {
+                cleanSafehomeLayers();
+                renderSafehomesOnMap(); 
+                $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
+            }
             closeSettingsPanel();
         });
 
