@@ -2789,16 +2789,22 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "Crossfire SNR Alarm Level"
+        "message": "CRSF SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "Crossfire Link Quality Alarm"
+        "message": "CRSF Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
+    },
+    "osd_rssi_dbm_alarm": {
+        "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_rssi_dbm_alarm_HELP": {
+        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"
