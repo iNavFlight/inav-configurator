@@ -611,6 +611,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureFW_AUTOTRIM": {
+        "message": "Continuously trim servos on Fixed Wing"
+    },
+    "featureFW_AUTOTRIMTip": {
+        "message": "When flying in a stabilized mode, continuosusly adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+    },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
     },
@@ -1043,6 +1049,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_IMU2": {
+        "message": "Secondary IMU"
+    },
     "pidTuningName": {
         "message": "Name"
     },
@@ -1129,7 +1138,7 @@
     },
 
     "receiverHelp": {
-        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
+        "message": "Please read receiver chapter of the documentation.  Configure serial port (if required), receiver mode (serial/ppm/pwm), provider (for serial receivers), bind receiver, set channel map, configure channel endpoints/range on TX so that all channels go from ~1000 to ~2000.  Set midpoint (default 1500), trim channels to 1500, configure stick deadband, verify behaviour when TX is off or out of range. Make sure that the channel values all increase when you push the sticks up and to the right. If not, reverse the channel in the TX. Do not apply any other mixing in the TX.<br /><span style=\"color: red\">IMPORTANT:</span> Before flying read failsafe chapter of documentation and configure failsafe."
     },
     "receiverThrottleMid": {
         "message": "Throttle MID"
@@ -2363,13 +2372,16 @@
         "message": "Programming"
     },
     "tabAdvancedTuning": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
     },
     "advancedTuningSave": {
         "message": "Save and Reboot"
     },
     "tabAdvancedTuningTitle": {
-        "message": "Advanced tuning"
+        "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningGenericTitle": {
+        "message": "Generic settings"
     },
     "presetApplyHead": {
         "message": "Applies following settings:"
@@ -2440,6 +2452,12 @@
     "posholdHoverMidThrottle": {
         "message": "Use mid. throttle for ALTHOLD"
     },
+    "mcWpSlowdown": {
+        "message": "Slow down when approaching waypoint"
+    },
+    "mcWpSlowdownHelp": {
+        "message": "When enabled, NAV engine will slow down when switching to the next waypoint. This prioritizes turning over forward movement. When disabled, NAV engine will continue to the next waypoint and turn as it goes."
+    },
     "positionEstimatorConfiguration": {
         "message": "Position Estimator"
     },
@@ -2459,7 +2477,7 @@
         "message": "Horizontal speed GPS weight"
     },
     "positionEstimatorConfigurationDisclaimer": {
-        "message": "This value should be changed very carefully. In most cases there is not need to change that. For advanced users only!"
+        "message": "These values should be changed very carefully. In most cases there is no need to change them. For advanced users only!"
     },
     "gps_min_sats": {
         "message": "Min. GPS satellites for a valid fix"
@@ -2474,7 +2492,10 @@
         "message": "Wireless mode"
     },
     "rthConfiguration": {
-        "message": "RTH and Landing Settings"
+        "message": "RTH settings"
+    },
+    "autoLandingSettings": {
+        "message": "Automatic landing settings"
     },
     "minRthDistance": {
         "message": "Min. RTH distance [cm]"
@@ -2485,8 +2506,17 @@
     "rthClimbFirst": {
         "message": "Climb before RTH"
     },
+    "rthClimbFirstHelp": {
+        "message": "If set to ON or ON_FW_SPIRAL, aircraft will climb to nav_rth_altitude first before turning to head home. If set to OFF, aircraft will turn and head home immediately climbing on the way. For a fixed wing, ON will use a linear climb, ON_FW_SPIRAL will use a loiter turning climb with climb rate set by nav_auto_climb_rate and turn rate set by nav_fw_loiter_radius (ON_FW_SPIRAL is a fixed wing setting and behaves the same as ON for a multirotor)."
+    },
     "rthClimbIgnoreEmergency": {
         "message": "Climb regardless of position sensors health"
+    },
+    "rthAltControlOverride": {
+        "message": "Override RTH altitude and climb setting with roll/pitch stick"
+    },
+    "rthAltControlOverrideHELP": {
+        "message": "When enabled, the climb on RTH can be canceled by holding full pitch down for >1 second so aircraft will fly home at the current altitude. On fixed wing aircraft, the 'Climb before RTH' setting can be overriden by holding full roll left or right for >1 second so that the plane will turn towards home immediately."
     },
     "rthTailFirst": {
         "message": "Tail first"
@@ -2515,14 +2545,26 @@
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
-    "landDescentRate": {
-        "message": "Landing vertical speed [cm/s]"
+    "landMaxAltVspd": {
+        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
     },
-    "landSlowdownMinAlt": {
-        "message": "Min. vertical landing speed at altitude [cm]"
+    "landMaxAltVspdHelp": {
+        "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "Vertical landing speed slowdown at altitude [cm]"
+        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+    },
+    "landSlowdownMaxAltHelp": {
+        "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
+    },
+    "landMinAltVspd": {
+        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+    },
+    "landMinAltVspdHelp": {
+        "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
+    },
+    "landSlowdownMinAlt": {
+        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed [cm/s]"
@@ -2549,19 +2591,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. navigation bank angle [degrees]"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. climb angle [degrees]"
+        "message": "Max. navigation climb angle [degrees]"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
+    "navManualClimbRate": {
+        "message": "Max. Alt-hold climb rate [cm/s]"
+    },
+    "navManualClimbRateHelp": {
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+    },
+    "navAutoClimbRate": {
+        "message": "Max. navigation climb rate [cm/s]"
+    },
+    "navAutoClimbRateHelp": {
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+    },
     "maxDiveAngle": {
-        "message": "Max. dive angle [degrees]"
+        "message": "Max. navigation dive angle [degrees]"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2598,6 +2652,36 @@
     },
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
+    },
+    "powerConfiguration": {
+        "message": "Battery Estimation Settings"
+    },
+    "idlePower": {
+        "message": "Idle power [cW]"
+    },
+    "idlePowerHelp": {
+        "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruisePower": {
+        "message": "Cruise power [cW]"
+    },
+    "cruisePowerHelp": {
+        "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
+    },
+    "cruiseSpeed": {
+        "message": "Cruise speed [cm/s]"
+    },
+    "cruiseSpeedHelp": {
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+    },
+    "rthEnergyMargin": {
+        "message": "RTH energy margin [%]"
+    },
+    "rthEnergyMarginHelp": {
+        "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
+    },
+    "generalNavigationSettings": {
+        "message": "General Navigation Settings"
     },
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
@@ -2705,16 +2789,22 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "Crossfire SNR Alarm Level"
+        "message": "CRSF SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "Crossfire Link Quality Alarm"
+        "message": "CRSF Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
+    },
+    "osd_rssi_dbm_alarm": {
+        "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_rssi_dbm_alarm_HELP": {
+        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"
@@ -2739,6 +2829,9 @@
     },
     "osdGroupGPS": {
         "message": "GPS"
+    },
+    "osdGroupPowerLimits": {
+        "message": "Power limits"
     },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
@@ -2814,6 +2907,15 @@
     },
     "osdElement_EFFICIENCY_WH": {
         "message": "Efficiency Wh/Km"
+    },
+    "osdElement_PLIMIT_REMAINING_BURST_TIME": {
+        "message": "Remaining burst time"
+    },
+    "osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
+        "message": "Active current limit"
+    },
+    "osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
+        "message": "Active power limit"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
@@ -3082,6 +3184,9 @@
     "osdSettingMainVoltageDecimals": {
         "message": "Main voltage decimals"
     },
+    "osdElement_OSD_RANGEFINDER": {
+        "message": "Rangefinder distance"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     }, 
@@ -3160,6 +3265,15 @@
     "missionDefaultSettingsHead": {
         "message": "Default settings"
     },
+    "missionSafehomeHead": {
+        "message": "Safe Home manager"
+    },
+    "missionTemplateHead": {
+        "message": "Mission template"
+    },
+    "missionActionMenuHead": {
+        "message": "Action Menu"
+    },
     "useOnlyStandalone": {
         "message": "Use stand-alone application.<br> Please visit the <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">website</a> to read the release notes and download."
     },
@@ -3168,6 +3282,9 @@
     },
     "confirm_delete_all_points": {
         "message": "Do you really want to delete all points?"
+    },
+    "confirm_delete_point_with_options": {
+        "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },
     "servoMixer": {
         "message": "Servo mixer"
@@ -3445,16 +3562,16 @@
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
     },
-    "gyro_lpf_type": {
+    "gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "gyro_stage2_lowpass_type": {
-        "message": "Gyro Stage 2 LPF type"
-    },
-    "gyro_stage2_lowpass_type_help": {
+    "gyro_main_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "dterm_lpf_type": {
@@ -3640,6 +3757,54 @@
     "configurationCurrentMeterType": {
         "message": "Current Meter Type"
     },
+    "MissionPlannerJumpSettingsCheck": {
+        "message": "JUMP settings incorrect : Check it again! \nBeing forced to WP 1!"
+    },
+    "MissionPlannerJump2SettingsCheck": {
+        "message": "JUMP settings incorrect : Repeat should not exceed 10! \nCheck it again! Being forced to number of repeat equal 0!"
+    },
+    "MissionPlannerJump3SettingsCheck": {
+        "message": "JUMP settings incorrect : not able to Jump to a POI! \nBeing forced to WP 1!"
+    },
+    "MissionPlannerHeadSettingsCheck": {
+        "message": "Heading value is incorrect : Check it again! Being forced by default to -1 thence!"
+    },
+    "MissionPlannerRTHSettingsCheck": {
+        "message": "RTH option is incorrect : Should be 0 or 1. Check it again! \nBeing forced by default to 0, i.e no LAND after RTH!"
+    },
+    "MissionPlannerJumpTargetRemoval": {
+        "message": "You can't remove a Waypoint which is defined as a JUMP target! \nYou first need to remove the target on the waypoint triggering the JUMP."
+    },
+    "SafehomeSelected": {
+        "message": ""
+    },
+    "SafehomeId": {
+        "message": "#"
+    },
+    "SafehomeEnabled": {
+        "message": "Enabled"
+    },
+    "SafehomeLon": {
+        "message": "Lon"
+    },
+    "SafehomeLat": {
+        "message": "Lat"
+    },
+    "WaypointOptionSelected": {
+        "message": "+"
+    },
+    "WaypointOptionId": {
+        "message": "#"
+    },
+    "WaypointOptionAction": {
+        "message": "Type"
+    },
+    "WaypointOptionP1": {
+        "message": "P1"
+    },
+    "WaypointOptionP2": {
+        "message": "P2"
+    },
     "defaultsQuadTitle": {
         "message": "Mini Quad with 3'-7' propellers"
     },
@@ -3656,7 +3821,7 @@
         "message": "Keep current settings (Not recommended)"
     },
     "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use <strong>fw_level_pitch_trim</strong> instead"
+        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
     },
     "pidId": {
         "message": "#"

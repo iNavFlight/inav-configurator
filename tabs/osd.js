@@ -1,4 +1,4 @@
-/*global $*/
+/*global $,nwdialog*/
 'use strict';
 
 var SYM = SYM || {};
@@ -26,8 +26,8 @@ SYM.WH = 0xAB;
 SYM.WATT = 0xAE;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
-SYM.WH_KM_0 = 172;
-SYM.WH_KM_1 = 173;
+SYM.WH_KM = 172;
+SYM.WH_MI = 173;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -90,6 +90,7 @@ SYM.DB = 0xEB;
 SYM.DBM = 0xEC;
 SYM.MW = 0xED;
 SYM.SNR = 0xEE;
+SYM.LQ = 0x0C;
 SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
@@ -194,31 +195,13 @@ FONT.parseMCMFontFile = function (data) {
 //noinspection JSUnusedLocalSymbols
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
-        //noinspection JSUnresolvedVariable
-        chrome.fileSystem.chooseEntry({type: 'openFile', accepts: [
-            {extensions: ['mcm']}
-        ]}, function (fileEntry) {
-            FONT.data.loaded_font_file = fileEntry.name;
-            //noinspection JSUnresolvedVariable
-            if (chrome.runtime.lastError) {
-                //noinspection JSUnresolvedVariable
-                console.error(chrome.runtime.lastError.message);
-                return;
-            }
-            fileEntry.file(function (file) {
-                var reader = new FileReader();
-                reader.onloadend = function (e) {
-                    //noinspection JSUnresolvedVariable
-                    if (e.total != 0 && e.total == e.loaded) {
-                        FONT.parseMCMFontFile(e.target.result);
-                        resolve();
-                    }
-                    else {
-                        console.error('could not load whole font file');
-                    }
-                };
-                reader.readAsText(file);
-            });
+
+        nwdialog.setContext(document);
+        nwdialog.openFileDialog('.mcm', function(filename) {
+            const fs = require('fs');
+            const fontData = fs.readFileSync(filename, {flag: "r"});
+            FONT.parseMCMFontFile(fontData.toString());
+            resolve();
         });
     });
 };
@@ -963,6 +946,11 @@ OSD.constants = {
                         }
                         return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                     }
+                },
+                {
+                    name: 'OSD_RANGEFINDER',
+                    id: 120,
+                    preview: "2" + FONT.symbol(SYM.DIST_KM)
                 }
             ]
         },
@@ -1118,8 +1106,28 @@ OSD.constants = {
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM_0) + FONT.symbol(SYM.WH_KM_1)
+                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM)
                 }
+            ]
+        },
+        {
+            name: 'osdGroupPowerLimits',
+            items: [
+                {
+                    name: 'PLIMIT_REMAINING_BURST_TIME',
+                    id: 121,
+                    preview: FONT.embed_dot('10.0S')
+                },
+                {
+                    name: 'PLIMIT_ACTIVE_CURRENT_LIMIT',
+                    id: 122,
+                    preview: FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP)
+                },
+                {
+                    name: 'PLIMIT_ACTIVE_POWER_LIMIT',
+                    id: 123,
+                    preview: '500' + FONT.symbol(SYM.WATT)
+                },
             ]
         },
         {
@@ -1367,13 +1375,15 @@ OSD.constants = {
                     id: 110,
                     positionable: true,
                     preview: function(osd_data) {
-                    var crsflqformat;
-                    if (Settings.getInputValue('osd_crsf_lq_format') == 1) {
-                        crsflqformat = '2:100%';
-                    } else {
-                        crsflqformat = '  300%';
-                    }
-                    return crsflqformat;
+                        var crsflqformat;
+                        if (Settings.getInputValue('osd_crsf_lq_format') == 0) {
+                            crsflqformat = FONT.symbol(SYM.LQ) + '100';
+                        } else if (Settings.getInputValue('osd_crsf_lq_format') == 1){
+                            crsflqformat = FONT.symbol(SYM.LQ) + '2:100';
+                        } else {
+                            crsflqformat = FONT.symbol(SYM.LQ) + '300';
+                        }
+                        return crsflqformat;
                     }
                 },
                 {
