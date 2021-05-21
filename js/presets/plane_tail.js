@@ -1,4 +1,4 @@
-module.exports = {
+window.preset_plane_tail = {
     name: 'Airplane with a tail',
     description: "General setup for airplanes with tails.",
     features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],

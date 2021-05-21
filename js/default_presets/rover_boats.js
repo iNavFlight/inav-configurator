@@ -1,4 +1,4 @@
-module.exports = {
+window.default_preset_rover_boats = {
     "title": 'Rovers & Boats',
     "notRecommended": false,
     "reboot": true,

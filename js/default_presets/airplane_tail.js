@@ -1,4 +1,4 @@
-module.exports = {
+window.default_preset_airplane_tail = {
     "title": 'Airplane with a Tail',
     "notRecommended": false,
     "id": 3,

@@ -1,4 +1,4 @@
-module.exports = {
+window.preset_generic_7_inch = {
     name: 'Generic 7" Quadcopter',
     description: "Quad X, 7\" propellers. F4/F7 CPU.",
     features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],

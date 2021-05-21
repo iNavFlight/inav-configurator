@@ -1,9 +1,5 @@
 /*global mspHelper,$,GUI,MSP,BF_CONFIG,chrome*/
 'use strict';
-var miniquad_3_7_preset = require('./default_presets/miniquad_3-7');
-var airplane_tail = require('./default_presets/airplane_tail');
-var airplane_wing = require('./default_presets/airplane_wing');
-var rover_boats = require('./default_presets/rover_boats');
 
 var helper = helper || {};
 
@@ -15,10 +11,10 @@ helper.defaultsDialog = (function () {
     let $container;
 
     let data = [
-        miniquad_3_7_preset,
-        airplane_tail,
-        airplane_wing,
-        rover_boats,
+        window.default_preset_miniquad_3_7,
+        window.default_preset_airplane_tail,
+        window.default_preset_airplane_wing,
+        window.default_preset_rover_boats,
         {
             "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
             "notRecommended": true,

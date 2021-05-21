@@ -1,4 +1,4 @@
-module.exports = {
+window.default_preset_airplane_wing = {
     "title": 'Airplane without a Tail (Wing, Delta, etc)',
     "notRecommended": false,
     "id": 3,

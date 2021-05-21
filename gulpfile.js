@@ -86,6 +86,8 @@ sources.js = [
     './js/msp/MSPHelper.js',
     './js/msp/MSPchainer.js',
     './js/port_handler.js',
+    './js/presets/*.js',
+    './js/default_presets/*.js',
     './js/serial.js',
     './js/servoMixRule.js',
     './js/motorMixRule.js',

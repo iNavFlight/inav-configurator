@@ -21,7 +21,7 @@
     "sandbox": {
     "pages": ["tabs/map.html"]
     },
-         
+    
     "permissions": [
         "https://www.google-analytics.com/",
         "https://maps.googleapis.com/*",    

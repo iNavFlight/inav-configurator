@@ -1,16 +1,5 @@
 'use strict';
 
-var allPresets = [
-    require("./presets/quad_generic_3_inch"),
-    require("./presets/quad_generic_5_inch"),
-    require("./presets/quad_generic_7_inch"),
-    require("./presets/quad_cinewhoop_3_inch"),
-    require("./presets/quad_freestyle_5_inch"),
-    require("./presets/quad_freestyle_6_inch"),
-    require("./presets/plane_tail"),
-    require("./presets/plane_tailless")
-];
-
 var presets = presets || {};
 
 presets.elementHelper = function (group, field, value) {
@@ -52,4 +41,13 @@ presets.settings = {
 /**
  * @type {{name: string, description: string, features: string[], applyDefaults: string[], settingsMSP: *[], type: string}[]}
  */
-presets.presets = allPresets;
+presets.presets = [
+    window.preset_quad_generic_3_inch,
+    window.preset_quad_generic_5_inch,
+    window.preset_quad_generic_7_inch,
+    window.preset_quad_cinewhoop_3_inch,
+    window.preset_quad_freestyle_5_inch,
+    window.preset_quad_freestyle_6_inch,
+    window.preset_plane_tail,
+    window.preset_plane_tailless
+];

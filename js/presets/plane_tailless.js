@@ -1,4 +1,4 @@
-module.exports = {
+window.preset_plane_tailless = {
     name: "Airplane without tail",
     description: "General setup for airplanes without tails: Flying Wing, Delta, etc.",
     features: ["Adjusted gyro filtering", "Adjusted PIDs", "Adjusted rates"],

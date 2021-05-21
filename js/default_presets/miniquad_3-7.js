@@ -1,4 +1,4 @@
-module.exports = {
+window.default_preset_miniquad_3_7 = {
     "title": 'Mini Quad with 3"-7" propellers',
     "notRecommended": false,
     "reboot": true,
