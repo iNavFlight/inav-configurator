@@ -1,4 +1,4 @@
-window.preset_freestyle_5_inch = {
+window.preset_quad_freestyle_5_inch = {
     name: '5" Freestyle Quadcopter, 2208 2450kV motors',
     description: "Overpowered freestyle quad. 5\", 3 bladed propellers like HQProp S4, Nepal N1, 2208 2450KV motors, 4S, DSHOT600 ESC protocol.<br>Optimized for smooth, freestyle or acrobatic flight.",
     features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],

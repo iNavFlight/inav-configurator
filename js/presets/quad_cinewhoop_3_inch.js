@@ -1,4 +1,4 @@
-window.preset_cinewhoop_3_inch = {
+window.preset_quad_cinewhoop_3_inch = {
     name: '3" Cinewhoop',
     description: "Based on the iFlight MegaBee Cinewhoop.",
     features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],

@@ -1,4 +1,4 @@
-window.preset_freestyle_6_inch = {
+window.preset_quad_freestyle_6_inch = {
     name: '6" Freestyle Quadcopter, 2207 1700kV motors',
     description: "6\", 3 bladed propellers, 2207 1700kV motors, 4S, DSHOT600 ESC protocol.<br>Optimized for smooth, freestyle or acrobatic flight with GPS or not.",
     features: ["DSHOT600", "2k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],

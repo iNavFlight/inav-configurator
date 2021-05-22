@@ -1,4 +1,4 @@
-window.preset_generic_3_inch = {
+window.preset_quad_generic_3_inch = {
     name: 'Generic 3" Quadcopter',
     description: "Quad X, 3\" propellers. F4/F7 CPU.",
     features: ["DSHOT600", "4k mode", "Matrix Filter", "Improved mechanics", "Optimized filtering", "Optimized rates"],
