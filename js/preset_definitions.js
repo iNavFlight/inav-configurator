@@ -1080,7 +1080,7 @@ presets.presets = [
             },
             {
                 key: "imu_acc_ignore_rate",
-                value: 8
+                value: 9
             },
             {
                 key: "imu_acc_ignore_slope",
@@ -1242,7 +1242,7 @@ presets.presets = [
             },
             {
                 key: "imu_acc_ignore_rate",
-                value: 8
+                value: 9
             },
             {
                 key: "imu_acc_ignore_slope",

@@ -315,7 +315,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "imu_acc_ignore_rate",
-                value: 8
+                value: 9
             },
             {
                 key: "imu_acc_ignore_slope",
@@ -481,7 +481,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "imu_acc_ignore_rate",
-                value: 8
+                value: 9
             },
             {
                 key: "imu_acc_ignore_slope",
