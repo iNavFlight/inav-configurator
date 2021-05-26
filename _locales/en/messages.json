@@ -2222,7 +2222,7 @@
         "message": "OSD"
     },
     "configurationSensors": {
-        "message": "Sensors"
+        "message": "Sensors & buses"
     },
     "sensorAccelerometer": {
         "message": "Accelerometer"

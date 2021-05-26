@@ -314,46 +314,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $i2cSpeed.change();
 
-        let $looptime = $("#looptime"),
-            $gyroLpf = $("#gyro-lpf"),
-            values = FC.getGyroLpfValues();
-
-        for (i in values) {
-            if (values.hasOwnProperty(i)) {
-                //noinspection JSUnfilteredForInLoop
-                $gyroLpf.append('<option value="' + i + '">' + values[i].label + '</option>');
-            }
-        }
-
-        $gyroLpf.val(INAV_PID_CONFIG.gyroscopeLpf);
-
-        $gyroLpf.change(function () {
-            INAV_PID_CONFIG.gyroscopeLpf = $gyroLpf.val();
-
-            GUI.fillSelect(
-                $looptime,
-                FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].looptimes,
-                FC_CONFIG.loopTime,
-                'Hz'
-            );
-            $looptime.val(FC.getLooptimes()[FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].tick].defaultLooptime);
-            $looptime.change();
-        });
-
-        $gyroLpf.change();
-
-        $looptime.val(FC_CONFIG.loopTime);
-        $looptime.change(function () {
-            FC_CONFIG.loopTime = $(this).val();
-
-            if (FC_CONFIG.loopTime < 500) {
-                $('#looptime-warning').show();
-            } else {
-                $('#looptime-warning').hide();
-            }
-        });
-        $looptime.change();
-
         var $sensorAcc = $('#sensor-acc'),
             $sensorMag = $('#sensor-mag'),
             $sensorBaro = $('#sensor-baro'),
@@ -443,10 +403,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
-            googleAnalytics.sendEvent("Platform", helper.platform.getById(MIXER_CONFIG.platformType).name, "LPF: " + FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label + " | Looptime: " + FC_CONFIG.loopTime);
 
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
-            googleAnalytics.sendEvent('Setting', 'GyroLpf', FC.getGyroLpfValues()[INAV_PID_CONFIG.gyroscopeLpf].label);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
             googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
