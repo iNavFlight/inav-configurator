@@ -1,8 +1,12 @@
+/*global nwdialog*/
 'use strict';
 
 TABS.logging = {};
 TABS.logging.initialize = function (callback) {
     var self = this;
+
+    let loggingFileName = null;
+    let readyToWrite = false;
 
     if (GUI.active_tab != 'logging') {
         GUI.active_tab = 'logging';
@@ -35,7 +39,7 @@ TABS.logging.initialize = function (callback) {
 
         $('a.logging').click(function () {
             if (GUI.connected_to) {
-                if (fileEntry != null) {
+                if (readyToWrite) {
                     var clicks = $(this).data('clicks');
 
                     if (!clicks) {
@@ -66,17 +70,17 @@ TABS.logging.initialize = function (callback) {
                             }
 
                             helper.interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
+                            const fs = require('fs');
                             helper.interval.add('write_data', function write_data() {
-                                if (log_buffer.length) { // only execute when there is actual data to write
-                                    if (fileWriter.readyState == 0 || fileWriter.readyState == 2) {
-                                        append_to_file(log_buffer.join('\n'));
+                                if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
 
-                                        $('.samples').text(samples += log_buffer.length);
+                                    fs.writeFileSync(loggingFileName, log_buffer.join('\n') + '\n', {
+                                        "flag": "a"
+                                    })
 
-                                        log_buffer = [];
-                                    } else {
-                                        console.log('IO having trouble keeping up with the data flow');
-                                    }
+                                    $('.samples').text(samples += log_buffer.length);
+
+                                    log_buffer = [];
                                 }
                             }, 1000);
 
@@ -99,15 +103,6 @@ TABS.logging.initialize = function (callback) {
                 }
             } else {
                 GUI.log(chrome.i18n.getMessage('loggingErrorNotConnected'));
-            }
-        });
-
-        chrome.storage.local.get('logging_file_entry', function (result) {
-            if (result.logging_file_entry) {
-                chrome.fileSystem.restoreEntry(result.logging_file_entry, function (entry) {
-                    fileEntry = entry;
-                    prepare_writer(true);
-                });
             }
         });
 
@@ -172,8 +167,7 @@ TABS.logging.initialize = function (callback) {
                     break;
             }
         }
-
-        append_to_file(head);
+        log_buffer.push(head);
     }
 
     function crunch_data() {
@@ -226,86 +220,26 @@ TABS.logging.initialize = function (callback) {
         log_buffer.push(sample);
     }
 
-    // IO related methods
-    var fileEntry = null,
-        fileWriter = null;
-
     function prepare_file() {
         // create or load the file
-        chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'inav_data_log', accepts: [{extensions: ['csv']}]}, function(entry) {
-            if (!entry) {
-                console.log('No file selected');
-                return;
-            }
 
-            fileEntry = entry;
+        const date = new Date();
+        const filename = 'inav_data_log_' + date.getFullYear() + '-'  + zeroPad(date.getMonth() + 1, 2) + '-'
+                + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
+                + zeroPad(date.getSeconds(), 2);
+        const accepts = [{
+            description: 'TXT files', extensions: ['txt'],
+        }];
 
-            // echo/console log path specified
-            chrome.fileSystem.getDisplayPath(fileEntry, function(path) {
-                console.log('Log file path: ' + path);
-            });
-
-            // change file entry from read only to read/write
-            chrome.fileSystem.getWritableEntry(fileEntry, function(fileEntryWritable) {
-                // check if file is writable
-                chrome.fileSystem.isWritableEntry(fileEntryWritable, function(isWritable) {
-                    if (isWritable) {
-                        fileEntry = fileEntryWritable;
-
-                        // save entry for next use
-                        chrome.storage.local.set({'logging_file_entry': chrome.fileSystem.retainEntry(fileEntry)});
-
-                        // reset sample counter in UI
-                        $('.samples').text(0);
-
-                        prepare_writer();
-                    } else {
-                        console.log('File appears to be read only, sorry.');
-                    }
-                });
-            });
+        nwdialog.setContext(document);
+        nwdialog.saveFileDialog(filename, accepts, '', function(file) {
+            loggingFileName = file;
+            readyToWrite = true;
+            chrome.storage.local.set({
+                    'logging_file_name': loggingFileName,
+                    'logging_file_ready': readyToWrite
+                });                
         });
-    }
-
-    function prepare_writer(retaining) {
-        fileEntry.createWriter(function (writer) {
-            fileWriter = writer;
-
-            fileWriter.onerror = function (e) {
-                console.error(e);
-
-                // stop logging if the procedure was/is still running
-                if ($('a.logging').data('clicks')) $('a.logging').click();
-            };
-
-            fileWriter.onwriteend = function () {
-                $('.size').text(bytesToSize(fileWriter.length));
-            };
-
-            if (retaining) {
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    GUI.log(chrome.i18n.getMessage('loggingAutomaticallyRetained', [path]));
-                });
-            }
-
-            // update log size in UI on fileWriter creation
-            $('.size').text(bytesToSize(fileWriter.length));
-        }, function (e) {
-            // File is not readable or does not exist!
-            console.error(e);
-
-            if (retaining) {
-                fileEntry = null;
-            }
-        });
-    }
-
-    function append_to_file(data) {
-        if (fileWriter.position < fileWriter.length) {
-            fileWriter.seek(fileWriter.length);
-        }
-
-        fileWriter.write(new Blob([data + '\n'], {type: 'text/plain'}));
     }
 };
 
