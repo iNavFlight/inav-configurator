@@ -3229,6 +3229,9 @@
     "missionDefaultSettingsHead": {
         "message": "Default settings"
     },
+    "missionDefaultElevationHead": {
+        "message": "Elevation Profile"
+    },
     "missionSafehomeHead": {
         "message": "Safe Home manager"
     },

@@ -86,6 +86,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <div id="missionPlanerSafehome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Safe Home manager</div>
@@ -133,7 +134,7 @@
 
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead">Edit point</div>
+                        <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead" id="EditPointNumber">Edit point</div>
                         <div class="btnMenu btnMenuIcon">
                             <div id="showHideWPeditButton"   class="save_btn">
                                 <a class="ic_hide" href="#" title="Hide"></a>
@@ -174,6 +175,10 @@
                         <div class="point" id="pointP3class" style="display: none">
                             <label class="point-label" for="pointP3">Parameter 3: </label>
                             <input id="pointP3" type="checkbox" value="0" class="togglemedium" checked required>
+                        </div>
+                        <div class="point" id="elevationAtWP" style="display: none">
+                            <label class="point-label">Elevation (m): </label>
+                            <span id="elevationValueAtWP">NA</span>
                         </div>
                         <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
@@ -235,7 +240,20 @@
             </div>
         </div>
         <div class="cf_column threefourth_left">
-            <div style="height:100%" id="missionMap"></div>
+            <div id="missionMap"></div>
+            <div id="missionPlanerElevation" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultElevationHead">Elevation Profile</div>
+                        <div class="btnMenu btnMenuIcon  save_btn">
+                                <a id="cancelSettings" class="ic_cancel" href="#" title="Cancel"></a>
+                                <a id="saveSettings" class="ic_save" href="#" title="Save"></a>
+                        </div>
+                    </div>
+                    <div class="spacer">
+                        <div id="elevationDiv">
+                        </div>
+                    </div>
+                </div>
             <div id="notLoadMap" data-i18n="useOnlyStandalone" style="display: none;"></div>
         </div>
     </div>

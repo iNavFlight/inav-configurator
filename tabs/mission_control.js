@@ -730,7 +730,7 @@ TABS.mission_control.initialize = function (callback) {
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLonMap(), mission.getWaypoint(element.getP1()).getLatMap()]);  
-                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false);
+                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
                 else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
@@ -755,32 +755,63 @@ TABS.mission_control.initialize = function (callback) {
         $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
     }
     
-    function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true) {
+    function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
         var line = new ol.geom.LineString([pos1, pos2]);
 
         var feature = new ol.Feature({
             geometry: line
         });
-        feature.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: color,
-                width: 3,
-                lineDash: [lineDash]
-            }),
-            text: new ol.style.Text({
-                text: lineText,
-                font: '14px sans-serif',
-                placement : 'line',
-                textBaseline: 'ideographic',
+        
+        feature.setStyle(
+            new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: color
+                    color: color,
+                    width: 3,
+                    lineDash: [lineDash]
+                }),
+                text: new ol.style.Text({
+                    text: lineText,
+                    font: '14px sans-serif',
+                    placement : 'line',
+                    textBaseline: 'ideographic',
+                    stroke: new ol.style.Stroke({
+                        color: color
+                    }),
                 }),
             }),
-        }));
+        );
+        
+        if (arrow) {
+            let dx = pos2[0] - pos1[0];
+            let dy = pos2[1] - pos1[1];
+            let rotation = Math.atan2(dx, dy);
+            var featureArrow = new ol.Feature({
+                geometry: new ol.geom.Point([pos1[0]+dx/2, pos1[1]+dy/2])
+            });
+            featureArrow.setStyle(
+                new ol.style.Style({
+                    image: new ol.style.Icon({
+                        src: '../images/icons/cf_icon_arrow.png',
+                        scale: 0.3,
+                        anchor: [0.5, 0.5],
+                        rotateWithView: true,
+                        rotation: rotation,
+                    }),
+                })
+            );
+        }
+        
 
-        var vectorSource = new ol.source.Vector({
-            features: [feature]
-        });
+        if (arrow) {
+            var vectorSource = new ol.source.Vector({
+                features: [feature, featureArrow]
+            });
+        }
+        else {
+            var vectorSource = new ol.source.Vector({
+                features: [feature]
+            });
+        }
 
         var vectorLayer = new ol.layer.Vector({
             source: vectorSource
@@ -1074,6 +1105,39 @@ TABS.mission_control.initialize = function (callback) {
         ol.inherits(app.PlannerSafehomeControl, ol.control.Control);
         
         /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerElevationControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#missionPlanerElevation').fadeIn(300);
+                plotElevation();
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-elevation ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP Elevation';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerElevationControl, ol.control.Control);
+        
+        /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `true` to start the drag sequence.
          */
@@ -1169,6 +1233,11 @@ TABS.mission_control.initialize = function (callback) {
          * @return {boolean} `false` to stop the drag sequence.
          */
         app.Drag.prototype.handleUpEvent = function (evt) {
+            if (tempMarker.kind == "waypoint" ){
+                if (mission.getWaypoint(tempMarker.number).getP3() == 1.0) {
+                    mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
+                }
+            }
             this.coordinate_ = null;
             this.feature_ = null;
             return false;
@@ -1197,12 +1266,14 @@ TABS.mission_control.initialize = function (callback) {
         if (CONFIGURATOR.connectionValid) {
             control_list = [
                 new app.PlannerSettingsControl(),
-                new app.PlannerSafehomeControl()
+                new app.PlannerSafehomeControl(),
+                new app.PlannerElevationControl(),
             ]
         }
         else {
             control_list = [
                 new app.PlannerSettingsControl(),
+                new app.PlannerElevationControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
@@ -1307,6 +1378,7 @@ TABS.mission_control.initialize = function (callback) {
                     else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
                 }
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
+                $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
                 $('#MPeditPoint').fadeIn(300);
                 redrawLayer();
             }
@@ -1502,6 +1574,14 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3').on('change', function (event) {
             if (selectedMarker) {
                 selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
+                console.log($('#pointP3').prop("checked"));
+                if ($('#pointP3').prop("checked")) {
+                    selectedMarker.getElevation(globalSettings);
+                    $('#elevationAtWP').fadeIn(300);
+                }
+                else {
+                    $('#elevationAtWP').fadeOut(300);
+                }
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
@@ -1919,6 +1999,24 @@ TABS.mission_control.initialize = function (callback) {
       if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
         element.parent().find('.switcherymid').trigger('click');
       }
+    }
+    
+    function plotElevation() {
+        var trace1 = {
+          x: [1, 2, 3, 4],
+          y: [10, 15, 13, 17],
+          type: 'scatter'
+        };
+
+        var trace2 = {
+          x: [1, 2, 3, 4],
+          y: [16, 5, 11, 9],
+          type: 'scatter'
+        };
+
+        var data = [trace1, trace2];
+
+        Plotly.newPlot('elevationDiv', data);
     }
 
 };

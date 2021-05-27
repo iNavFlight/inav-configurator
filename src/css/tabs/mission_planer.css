@@ -191,9 +191,13 @@
     height: 100%;
 }
 
-#missionMap {
-    height: 100%;
+/* #missionMap {
+    height: 60%;
 }
+
+#missionPlanerElevation {
+    height: 40%;
+} */
 
 .tab-mission-control input {
     width: 90px;
@@ -274,20 +278,27 @@
     top: 80px;
 }
 .mission-control-safehome {
-    top: 85px;
+    top: 115px;
     left: .5em;
 }
 .ol-touch .mission-control-safehome {
+    top: 120px;
+}
+
+.mission-control-elevation {
+    top: 90px;
+    left: .5em;
+}
+.ol-touch .mission-control-elevation {
     top: 100px;
 }
 .mission-control-template {
-    top: 85px;
+    top: 140px;
     left: .5em;
 }
 .ol-touch .mission-control-template {
-    top: 100px;
+    top: 140px;
 }
-
 .tab-mission-control .safehomesTable {
     width: 100%;
     text-align: center;
