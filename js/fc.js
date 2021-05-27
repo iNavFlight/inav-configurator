@@ -1187,7 +1187,7 @@ var FC = {
                 default: 0
             },
             1: {
-                name: "RC Channel",
+                name: "Get RC Channel",
                 type: "range",
                 range: [1, 16],
                 default: 1
