@@ -751,7 +751,7 @@ TABS.mission_control.initialize = function (callback) {
         if (textGeom) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
-        let lengthMission = mission.getDistance();
+        let lengthMission = mission.getDistance(true);
         $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
     }
     
@@ -2002,6 +2002,7 @@ TABS.mission_control.initialize = function (callback) {
     }
     
     function plotElevation() {
+        mission.getElevation(globalSettings);
         var trace1 = {
           x: [1, 2, 3, 4],
           y: [10, 15, 13, 17],

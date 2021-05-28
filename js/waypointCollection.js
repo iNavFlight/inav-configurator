@@ -332,22 +332,26 @@ let WaypointCollection = function () {
         return poiList;
     }
     
-    self.getDistance = function() {
-        let point2measure = []
-        let lengthLine = []
+    self.getPoint2Measure = function(reverse=false) {
+        let point2measure = [];
         let jumpDict = {};
         let nStart = 0;
         let nLoop = 0;
         let n = 0 ;
         let startCount = true;
-        while (startCount && (nLoop!=-1)) {
+        while (startCount) {
             if (nStart > data[data.length -1].getNumber() ) {
                 startCount = false;
                 break;
             }
 
             if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(self.getWaypoint(nStart).getAction())) {
-                point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                if (reverse) {
+                    point2measure.push([self.getWaypoint(nStart).getLatMap(), self.getWaypoint(nStart).getLonMap()]);
+                }
+                else {
+                    point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                }
                 nStart++;
             }
             else if (self.getWaypoint(nStart).getAction() == MWNP.WPTYPE.JUMP) {
@@ -356,6 +360,7 @@ let WaypointCollection = function () {
                 }
                 if (Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
                     if (jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] == -1) {
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] = 1;
                         nLoop = -1;
                     }
                     if ( (jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] ==0) ) {
@@ -368,13 +373,19 @@ let WaypointCollection = function () {
                         nStart = nStartTemp;
                     }
                 }
-                
             }
             else {
                 nStart++;
             }
         }
-        if (nLoop == -1) {
+        
+        return [nLoop, point2measure];
+    }
+    
+    self.getDistance = function(display) {
+        let lengthLine = [];
+        const [nLoop, point2measure] = self.getPoint2Measure();
+        if (nLoop == -1 && display) {
             return [-1];
         }
         else {
@@ -391,6 +402,30 @@ let WaypointCollection = function () {
             //console.log("lengthLine ", lengthLine);
             return lengthLine.map(cumulativeSum);
         }
+    }
+    
+    self.getElevation = async function(globalSettings) {
+        const [nLoop, point2measure] = self.getPoint2Measure(true);
+        let lengthMission = self.getDistance(true);
+        let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
+        //let point2measureMap = point2measure.map(function(x) { return x.map(function(y) {return y / 10000000})});
+        console.log(totalMissionDistance/30);
+        let samples = (Math.trunc(totalMissionDistance/30) <= 1024 ? Math.trunc(totalMissionDistance/30) : 1024);
+
+        console.log(samples);
+        console.log(point2measure.toString());
+        console.log('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples)+'&key='+globalSettings.mapApiKey);
+        if (globalSettings.mapProviderType == 'bing') {
+            const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples)+'&key='+globalSettings.mapApiKey);
+            const myJson = await response.json(); 
+            elevation = myJson.resourceSets[0].resources[0].elevations;
+        }
+        else {
+            elevation = "NA";
+        }
+        console.log("getElevation");
+        console.log(elevation);
+        return elevation;
     }
 
     return self;
