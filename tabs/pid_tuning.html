@@ -39,26 +39,26 @@
                         <tr class="ROLL" data-pid-bank-position="0">
                             <!-- 0 -->
                             <td></td>
-                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="p" step="1" min="0" max="300" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="300" /></td>
                         </tr>
                         <tr class="PITCH" data-pid-bank-position="1">
                             <!-- 1 -->
                             <td></td>
-                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="p" step="1" min="0" max="300" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="300" /></td>
                         </tr>
                         <tr class="YAW" data-pid-bank-position="2">
                             <!-- 2 -->
                             <td></td>
-                            <td><input type="number" name="p" step="1" min="0" max="255" /></td>
-                            <td><input type="number" name="i" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
-                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
+                            <td><input type="number" name="p" step="1" min="0" max="300" /></td>
+                            <td><input type="number" name="i" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_d" name="d" step="1" min="0" max="300" /></td>
+                            <td><input type="number" class="rpy_ff" name="ff" step="1" min="0" max="300" /></td>
                         </tr>
                     </table>
                     <table id="pid_baro" class="pid_tuning">
@@ -175,7 +175,7 @@
                         <tr>
                             <th class="roll" data-i18n="pidTuningRollRate"></th>
                             <td class="roll">
-                                <input type="number" id="rate-roll" class="rate-tpa_input" step="10" min="60"
+                                <input type="number" id="rate-roll" class="rate-tpa_input" step="10" min="40"
                                     max="1800" />
                                 degrees per second
                             </td>
@@ -183,14 +183,14 @@
                         <tr>
                             <th class="pitch" data-i18n="pidTuningPitchRate"></th>
                             <td class="pitch">
-                                <input type="number" id="rate-pitch" class="rate-tpa_input" step="10" min="60"
+                                <input type="number" id="rate-pitch" class="rate-tpa_input" step="10" min="40"
                                     max="1800" /> degrees per second
                             </td>
                         </tr>
                         <tr>
                             <th class="yaw" data-i18n="pidTuningYawRate"></th>
                             <td class="yaw">
-                                <input type="number" id="rate-yaw" class="rate-tpa_input" step="10" min="20"
+                                <input type="number" id="rate-yaw" class="rate-tpa_input" step="10" min="10"
                                     max="1800" />
                                 degrees per second
                             </td>
