@@ -1720,8 +1720,12 @@ TABS.mission_control.initialize = function (callback) {
                 selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
                 console.log($('#pointP3').prop("checked"));
                 if ($('#pointP3').prop("checked")) {
-                    selectedMarker.getElevation(globalSettings);
-                    $('#elevationAtWP').fadeIn(300);
+                    (async () => {
+                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                        $('#elevationValueAtWP').text(elevationAtWP);
+                        $('#elevationAtWP').fadeIn(300);
+                    })()
+                    
                 }
                 else {
                     $('#elevationAtWP').fadeOut(300);
@@ -2165,7 +2169,9 @@ TABS.mission_control.initialize = function (callback) {
     function plotElevation() {
         (async () => {
             const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
-            
+            console.log(elevation);
+            console.log(totalMissionDistance);
+            console.log(Array.from(Array(samples), (_,i)=> i*totalMissionDistance/samples));
             var trace_WGS84 = {
                 x: Array.from(Array(samples), (_,i)=> i*totalMissionDistance/samples),
                 y: elevation,
@@ -2176,10 +2182,10 @@ TABS.mission_control.initialize = function (callback) {
                     color: '#ff7f0e',
                 },
             };
-
+            console.log(altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*refPoint2measure[i]));
             var trace_missionHeight = {
                 x: lengthMission,
-                y: altPoint2measure.map(x => x / 100 + HOME.getAlt()) ,
+                y: altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i])) ,
                 type: 'scatter',
                 mode: 'lines+markers+text',
                 name: 'Mission altitude',
