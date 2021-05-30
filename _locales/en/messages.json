@@ -2701,6 +2701,60 @@
     "fixedWingNavigationConfiguration": {
       "message": "Fixed Wing Navigation Settings"
     },
+    "osd_unsupported_msg1": {
+        "message" : "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
+    },
+    "osd_unsupported_msg2": {
+        "message" : "Note that some flight controllers have an onboard <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> that can be flashed and configured with <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, however the MinimOSD cannot be configured through this interface."
+    },
+    "osd_elements": {
+        "message" : "Elements"
+    },
+    "osd_preview_title": {
+        "message" : "Preview <span>(drag to change position)</span>"
+    },
+    "osd_preview_title_drag":{
+        "message": ""
+    },
+    "osd_video_format": {
+        "message" : "Video Format"
+    },
+    "osd_units": {
+        "message" : "Units"
+    },
+    "osd_main_voltage_decimals": {
+        "message" : "Voltage Decimals"
+    },
+    "osd_coordinate_digits": {
+        "message" : "Coordinate Digits"
+    },
+    "osd_plus_code_digits": {
+        "message" : "Plus Code Digits"
+    },
+    "osd_plus_code_short": {
+        "message" : "Plus Code Remove Leading Digits"
+    },
+    "osd_crosshairs_style": {
+        "message" : "Crosshairs Style"
+    },
+    "osd_left_sidebar_scroll": {
+        "message" : "Left Sidebar Scroll"
+    },
+    "osd_right_sidebar_scroll": {
+        "message" : "Right Sidebar Scroll"
+    },
+    "osd_crsf_lq_format": {
+        "message" : "Crossfire LQ Format"
+    },
+    "osd_sidebar_scroll_arrows": {
+        "message" : "Sidebar Scroll Arrows"
+    },
+    "osd_home_position_arm_screen": {
+        "message" : "Home Position on Arming Screen"
+    },
+    "osd_alarms": {
+        "message" : "Alarms"
+    },
     "osdLayoutDefault": {
         "message": "Default Layout"
     },
@@ -3195,6 +3249,66 @@
     },
     "osdSettingCRSF_LQ_FORMAT_HELP": {
         "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
+    },
+    "osd_dji_HD_FPV": {
+        "message" : "DJI HD FPV"
+    },
+       "osd_dji_hide_unsupported": {
+        "message": "Hide unsupported elements"
+    },
+    "osd_dji_ESC_temp": {
+        "message" : "Source of ESC Temperature"
+    },
+    "osd_dji_RSSI_source": {
+        "message" : "Source of RSSI"
+    },
+    "osd_dji_GPS_source": {
+        "message" : "Source of GPS Speed"
+    },
+    "osd_dji_speed_source": {
+        "message" : "Source of 3D Speed"
+    },
+    "osd_dji_use_craft_name_elements": {
+        "message" : "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
+    },
+    "osd_dji_adjustments": {
+        "message" : "Show adjustments in Craft Name"
+    },
+    "osd_dji_cn_alternating_duration": {
+        "message" : "Craft Name alternating duration (in 1/10 sec)"
+    },
+    "osd_font_default": {
+        "message" : "Default"
+    },
+    "osd_font_vision": {
+        "message" : "Vision"
+    },
+    "osd_font_impact": {
+        "message" : "Impact"
+    },
+    "osd_font_impact_mini": {
+        "message" : "Impact mini"
+    },
+    "osd_font_clarity": {
+        "message" : "Clarity"
+    },
+    "osd_font_clarity_medium": {
+        "message" : "Clarity medium"
+    },
+    "osd_font_bold": {
+        "message" : "Bold"
+    },
+    "osd_font_large": {
+        "message" : "Large"
+    },
+    "osd_font_load_file": {
+        "message" : "Open Font File"
+    },
+    "osd_font_upload": {
+        "message" : "Upload Font"
+    },
+    "osd_font_manager": {
+        "message" : "Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."

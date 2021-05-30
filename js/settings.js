@@ -21,7 +21,7 @@ var Settings = (function () {
                 if (!s) {
                     // Setting doesn't exist.
                     input.val(null);
-                    parent.hide();
+                    parent.remove();
                     return;
                 }
                 parent.show();

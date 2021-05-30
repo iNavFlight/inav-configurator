@@ -1,11 +1,9 @@
 <div class="tab-osd toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <h1 class="tab_title">
-            OSD
-        </h1>
+        <h1 class="tab_title" data-i18n="tabOSD"></h1>
         <div class="unsupported hide">
-            <p class="note">Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD.</p>
-            <p class="note">Note that some flight controllers have an onboard <a href="https://www.youtube.com/watch?v=ikKH_6SQ-Tk" target="_blank">MinimOSD</a> that can be flashed and configured with <a href="https://github.com/ShikOfTheRa/scarab-osd/releases/latest" target="_blank">scarab-osd</a>, however the MinimOSD cannot be configured through this interface.</p>
+            <p data-i18n="osd_unsupported_msg1" class="note"></p>
+            <p data-i18n="osd_unsupported_msg2" class="note"></p>
         </div>
         <div class="supported hide">
             <div class="cf_column third_left osd__elements">
@@ -16,9 +14,7 @@
                         <div
                             class="gui_box_titlebar"
                             style="margin-bottom: 0">
-                            <div class="spacer_box_title">
-                                Elements
-                            </div>
+                            <div class="spacer_box_title" data-i18n="osd_elements"></div>
                         </div>
                         <div class="spacer_box">
                             <div class="display-fields"></div>
@@ -29,9 +25,7 @@
             <div class="cf_column twothird">
                 <div class="gui_box grey preview" style="float: left; position: fixed;">
                     <div class="gui_box_titlebar image">
-                        <div class="spacer_box_title">
-                          Preview <span>(drag to change position)</span>
-                        </div>
+                        <div class="spacer_box_title" data-i18n="osd_preview_title"></div>
                     </div>
                     <div class="display-layout">
                         <div class="col right">
@@ -43,9 +37,7 @@
                 <div class="cf_column third_right" style="width: calc(100% - 377px);">
                     <div class="gui_box grey">
                         <div class="gui_box_titlebar">
-                            <div class="spacer_box_title">Video
-                                Format
-                            </div>
+                            <div class="spacer_box_title" data-i18n="osd_video_format"></div>
                         </div>
                         <div class="spacer_box">
                             <div class="video-types"></div>
@@ -53,56 +45,64 @@
                     </div>
                     <div class="gui_box grey settings-container">
                         <div class="gui_box_titlebar">
-                            <div class="spacer_box_title" data-i18n="settings">
-                            </div>
+                            <div class="spacer_box_title" data-i18n="settings"></div>
                         </div>
                         <div class="spacer_box">
                             <div class="settings">
                                 <label class="units">
-                                    <select id="unit_mode" name="unit_mode"></select> Units
+                                    <select id="unit_mode" name="unit_mode"></select>
+                                    <span data-i18n="osd_units"></span>
                                     <div class="helpicon cf_tip" style="margin-top: 2px"></div>
                                 </label>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select> Voltage Decimals
+                                    <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
+                                    <span data-i18n="osd_main_voltage_decimals"></span>
                                 </label>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select> Coordinate Digits
+                                    <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
+                                    <span data-i18n="osd_coordinate_digits"></span>
                                 </label>
                                 <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select> Plus Code Digits
+                                    <select class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
+                                    <span data-i18n="osd_plus_code_digits"></span>
                                 </label>
                                 <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select> Plus Code Remove Leading Digits 
+                                    <select class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
+                                    <span data-i18n="osd_plus_code_short"></span> 
                                 </label>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select> Crosshairs Style
+                                    <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
+                                    <span data-i18n="osd_crosshairs_style"></span>
                                 </label>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select> Left Sidebar Scroll
+                                    <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select>
+                                    <span data-i18n="osd_left_sidebar_scroll"></span>
                                 </label>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select> Right Sidebar Scroll
+                                    <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select>
+                                    <span data-i18n="osd_right_sidebar_scroll"></span>
                                 </label>
                                 <div class="helpicon cf_tip" data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
                                 <label>
-                                    <select class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select> Crossfire LQ Format
+                                    <select class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select>
+                                    <span data-i18n="osd_crsf_lq_format"></span>
                                 </label>
                                 <label>
-                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_sidebar_scroll_arrows" data-live="true"> Sidebar Scroll Arrows
+                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_sidebar_scroll_arrows" data-live="true">
+                                    <span data-i18n="osd_sidebar_scroll_arrows"></span>
                                 </label>
                                 <label>
-                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_home_position_arm_screen" data-live="true"> Home Position on Arming Screen
+                                    <input type="checkbox" class="toggle update_preview" data-setting="osd_home_position_arm_screen" data-live="true">
+                                    <span data-i18n="osd_home_position_arm_screen"></span>
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="gui_box grey alarms-container">
                         <div class="gui_box_titlebar">
-                            <div class="spacer_box_title">
-                              Alarms
-                            </div>
+                            <div class="spacer_box_title" data-i18n="osd_alarms"></div>
                         </div>
                         <div class="spacer_box settings">
                             <label for="rssi_alarm">
@@ -188,6 +188,45 @@
                             </label>
                         </div>
                     </div>
+                    <div class="gui_box grey dji-hd-container"> 
+                        <div class="gui_box_titlebar">
+                            <div class="spacer_box_title" data-i18n="osd_dji_HD_FPV"></div>
+                        </div>
+                        <div class="spacer_box settings">
+                            <label id="djiUnsupportedElements">
+                               <span data-i18n="osd_dji_hide_unsupported"></span>
+                            </label>
+                            <label>
+                                <select id="djiEscTempSource" data-setting="dji_esc_temp_source" data-live="true"></select>
+                                <span data-i18n="osd_dji_ESC_temp"></span>
+                            </label>
+                            <label>
+                                <select id="djiRssiSource" data-setting="dji_rssi_source" data-live="true"></select>
+                                <span data-i18n="osd_dji_RSSI_source"></span>
+                            </label>
+                            <label>
+                                <select data-setting="osd_speed_source" data-live="true"></select>
+                                <span data-i18n="osd_dji_GPS_source"></span>
+                            </label>
+                            <label>
+                                <select data-setting="dji_message_speed_source" data-live="true"></select> 
+                                <span data-i18n="osd_dji_speed_source"></span>
+                            </label>
+                            <div class="djiCraftNameElements">
+                                <span><input type="checkbox" id="useCraftnameForMessages" data-setting="dji_use_name_for_messages" data-live="true" class="toggle"/>
+                                <span data-i18n="osd_dji_use_craft_name_elements"></span> 
+
+                            </div>
+                            <label>
+                                <select id="djiAdjustments" data-setting="dji_use_adjustments" data-live="true" class="toggle"></select>
+                                <span data-i18n="osd_dji_adjustments"></span>
+                            </label>
+                            <label for="cn_alternating_duration">
+                                <input id="cn_alternating_duration" data-setting="dji_cn_alternating_duration" data-setting-multiplier="1" type="number" data-step="1"></input>
+                                <span data-i18n="osd_dji_cn_alternating_duration"></span>
+                            </label>
+                        </div>
+                    </div> 
                 </div>
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
@@ -195,15 +234,15 @@
                     <h1 class="tab_title">Font:</h1>
                     <div class="content_wrapper font-preview"></div>
                     <div class="fontbuttons">
-                        <button data-font-file="default">Default</button>
-                        <button data-font-file="vision">Vision</button>
-                        <button data-font-file="impact">Impact</button>
-                        <button data-font-file="impact_mini">Impact mini</button>
-                        <button data-font-file="clarity">Clarity</button>
-                        <button data-font-file="clarity_medium">Clarity medium</button>
-                        <button data-font-file="bold">Bold</button>
-                        <button data-font-file="large">Large</button>
-                        <button class="load_font_file">Open Font File</button>
+                        <button data-font-file="default" data-i18n="osd_font_default"></button>
+                        <button data-font-file="vision" data-i18n="osd_font_vision"></button>
+                        <button data-font-file="impact" data-i18n="osd_font_impact"></button>
+                        <button data-font-file="impact_mini" data-i18n="osd_font_impact_mini"></button>
+                        <button data-font-file="clarity" data-i18n="osd_font_clarity"></button>
+                        <button data-font-file="clarity_medium" data-i18n="osd_font_clarity_medium"></button>
+                        <button data-font-file="bold" data-i18n="osd_font_bold"></button>
+                        <button data-font-file="large" data-i18n="osd_font_large"></button>
+                        <button class="load_font_file" data-i18n="osd_font_load_file"></button>
                     </div>
                     <div class="info">
                         <a name="progressbar"></a>
@@ -212,7 +251,7 @@
                     </div>
                 </div>
                 <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0;">
-                    <a class="flash_font active">Upload Font</a>
+                    <a class="flash_font active" data-i18n="osd_font_upload"></a>
                 </div>
             </div>
             <div class="clear-both"></div>
@@ -222,10 +261,10 @@
     </div>
     <div class="content_toolbar supported hide">
         <div class="btn">
-            <a class="active save" href="#" >Save</a>
+            <a class="active save" href="#" data-i18n="save"></a>
         </div>
         <div class="btn">
-            <a class="fonts" id="fontmanager" href="#" >Font Manager</a>
+            <a class="fonts" id="fontmanager" href="#" data-i18n="osd_font_manager"></a>
         </div>
     </div>
 </div>
