@@ -3232,6 +3232,9 @@
     "missionDefaultElevationHead": {
         "message": "Elevation Profile"
     },
+    "missionHomeHead": {
+        "message": "Take Off Home"
+    },
     "missionSafehomeHead": {
         "message": "Safe Home manager"
     },
@@ -3756,6 +3759,9 @@
     },
     "SafehomeLat": {
         "message": "Lat"
+    },
+    "SafehomeAlt": {
+        "message": "Elev"
     },
     "WaypointOptionSelected": {
         "message": "+"

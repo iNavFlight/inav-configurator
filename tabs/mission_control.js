@@ -383,7 +383,13 @@ TABS.mission_control.initialize = function (callback) {
     //      define & init Waypoints parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
     var mission = new WaypointCollection();
-
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //      define & init home parameters
+    ////////////////////////////////////////////////////////////////////////////////////////////// 
+    var HOME = new Waypoint(0,0,0,0);
+    var homeMarkers =[];    // layer for home point
+    
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Safehome parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
@@ -615,6 +621,103 @@ TABS.mission_control.initialize = function (callback) {
         let radiusProjected = (radius / ol.proj.METERS_PER_UNIT.m) * resolutionRate;
         return radiusProjected;
     }
+    
+    /////////////////////////////////////////////
+    //
+    // Manage Take Off Home
+    //
+    /////////////////////////////////////////////
+    function closeHomePanel() {
+        $('#missionPlanerHome').hide();
+        $('#missionPlanerElevation').hide();
+        cleanHomeLayers();
+    }
+    
+    function cleanHomeLayers() {       
+        for (var i in homeMarkers) {
+            map.removeLayer(homeMarkers[i]);
+        }
+        homeMarkers = [];
+    }
+    
+    function renderHomeTable() {
+        /*
+         * Process home table UI
+         */                
+
+        $(".home-lon").val(HOME.getLonMap()).change(function () {
+            HOME.setLon(Math.round(Number($(this).val()) * 10000000));
+            cleanHomeLayers();
+            renderHomeOnMap();
+        });
+        
+        $(".home-lat").val(HOME.getLatMap()).change(function () {
+            HOME.setLat(Math.round(Number($(this).val()) * 10000000));
+            cleanHomeLayers();
+            renderHomeOnMap();
+        });
+        
+        (async () => {
+            const elevationAtHome = await HOME.getElevation(globalSettings);
+            $('#elevationValueAtHome').text(elevationAtHome+' m');
+            HOME.setAlt(elevationAtHome);
+        })()
+        
+    }
+    
+    
+    function renderHomeOnMap() {
+        /*
+         * Process home on Map
+         */
+        map.addLayer(addHomeMarker(HOME));
+    }
+    
+    function addHomeMarker(home) {
+        /*
+         * add safehome on Map
+         */
+        let coord = ol.proj.fromLonLat([home.getLonMap(), home.getLatMap()]);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'home'
+        });
+
+        //iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
+        
+        var vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                        features: [iconFeature]
+                    }),
+            style : function(iconFeature) {
+                let styles = [getHomeIcon(home)];
+                return styles;
+            }
+        });
+
+        vectorLayer.kind = "home";
+        vectorLayer.number = home.getNumber();
+        vectorLayer.selection = false;
+        
+        homeMarkers.push(vectorLayer);
+        
+        return vectorLayer;
+    }
+    
+    function getHomeIcon(home) {
+        /*
+         * Process Safehome Icon
+         */
+        return new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_home.png'
+            })),
+        });
+    }
+    
     /////////////////////////////////////////////
     //
     // Manage Waypoint
@@ -1117,6 +1220,10 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
+                $('#missionPlanerHome').fadeIn(300);
+                cleanHomeLayers();
+                renderHomeTable();
+                renderHomeOnMap();
                 $('#missionPlanerElevation').fadeIn(300);
                 plotElevation();
             };
@@ -1178,7 +1285,7 @@ TABS.mission_control.initialize = function (callback) {
 
             var geometry = /** @type {ol.geom.SimpleGeometry} */
                 (this.feature_.getGeometry());
-            if (tempMarker.kind == "waypoint" ||tempMarker.kind == "safehome") {
+            if (tempMarker.kind == "waypoint" ||tempMarker.kind == "safehome" || tempMarker.kind == "home") {
                 geometry.translate(deltaX, deltaY);
                 this.coordinate_[0] = evt.coordinate[0];
                 this.coordinate_[1] = evt.coordinate[1]; 
@@ -1201,6 +1308,12 @@ TABS.mission_control.initialize = function (callback) {
                 SAFEHOMES.updateSafehome(tempSH);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+            }
+            else if (tempMarker.kind == "home") {                
+                HOME.setLon(Math.round(coord[0] * 10000000));
+                HOME.setLat(Math.round(coord[1] * 10000000));
+                $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
             
         };
@@ -1235,8 +1348,19 @@ TABS.mission_control.initialize = function (callback) {
         app.Drag.prototype.handleUpEvent = function (evt) {
             if (tempMarker.kind == "waypoint" ){
                 if (mission.getWaypoint(tempMarker.number).getP3() == 1.0) {
-                    mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
+                    (async () => {
+                        const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
+                        $('#elevationValueAtWP').text(elevationAtWP);
+                    })()
                 }
+            }
+            else if (tempMarker.kind == "home" ) {
+                (async () => {
+                    const elevationAtHome = await HOME.getElevation(globalSettings);
+                    $('#elevationValueAtHome').text(elevationAtHome+' m');
+                    HOME.setAlt(elevationAtHome);
+                    plotElevation();
+                })()
             }
             this.coordinate_ = null;
             this.feature_ = null;
@@ -1398,6 +1522,13 @@ TABS.mission_control.initialize = function (callback) {
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
+            else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
+                selectedMarker = HOME;
+                var geometry = selectedFeature.getGeometry();
+                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+                $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+            }
             else {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
@@ -1480,6 +1611,19 @@ TABS.mission_control.initialize = function (callback) {
             }
             else {
                 $('#SafehomeContent').fadeOut(300);
+            }
+        });
+        
+        $('#showHideHomeButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#HomeContent').fadeIn(300);
+            }
+            else {
+                $('#HomeContent').fadeOut(300);
             }
         });
         
@@ -1656,6 +1800,23 @@ TABS.mission_control.initialize = function (callback) {
                 GUI.log('End of sending Safehome points');
                 $('#saveEepromSafehomeButton').removeClass('disabled');
             }, 500);
+        });
+        
+        /////////////////////////////////////////////
+        // Callback for HOME Table
+        /////////////////////////////////////////////
+        $('#homeTableBody').on('click', "[data-role='home-center']", function (event) {
+            let mapCenter = map.getView().getCenter();
+            HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
+            HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
+            renderHomeTable();
+            cleanHomeLayers();
+            renderHomeOnMap();     
+            plotElevation();
+        });
+        
+        $('#cancelHome').on('click', function () {
+            closeHomePanel();
         });
         
         /////////////////////////////////////////////
@@ -2002,22 +2163,60 @@ TABS.mission_control.initialize = function (callback) {
     }
     
     function plotElevation() {
-        mission.getElevation(globalSettings);
-        var trace1 = {
-          x: [1, 2, 3, 4],
-          y: [10, 15, 13, 17],
-          type: 'scatter'
-        };
+        (async () => {
+            const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
+            
+            var trace_WGS84 = {
+                x: Array.from(Array(samples), (_,i)=> i*totalMissionDistance/samples),
+                y: elevation,
+                type: 'scatter',
+                name: 'WGS84 elevation',
+                fill: 'tozeroy',
+                line: {
+                    color: '#ff7f0e',
+                },
+            };
 
-        var trace2 = {
-          x: [1, 2, 3, 4],
-          y: [16, 5, 11, 9],
-          type: 'scatter'
-        };
+            var trace_missionHeight = {
+                x: lengthMission,
+                y: altPoint2measure.map(x => x / 100 + HOME.getAlt()) ,
+                type: 'scatter',
+                mode: 'lines+markers+text',
+                name: 'Mission altitude',
+                text: namePoint2measure,
+                textposition: 'top center',
+                textfont: {
+                    family:  'Raleway, sans-serif'
+                },
+                line: {
+                    color: '#1497f1',
+                },
+                marker: {
+                    color: '#1f77b4',
+                },
+            };
+            
+            var layout = {showlegend: true,
+                          legend: {
+                                "orientation": "h",
+                                xanchor: "center",
+                                y: 1.2,
+                                x: 0.5
+                          },
+                          title: 'Mission Elevation Profile',
+                          xaxis: {
+                            title: 'Distance (m)'
+                          },
+                          yaxis: {
+                            title: 'Elevation (m)'
+                          },
+                          height: 300,
+                          }
 
-        var data = [trace1, trace2];
+            var data = [trace_WGS84, trace_missionHeight];
 
-        Plotly.newPlot('elevationDiv', data);
+            Plotly.newPlot('elevationDiv', data, layout);
+        })()
     }
 
 };

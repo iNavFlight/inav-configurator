@@ -147,7 +147,7 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
         else {
             elevation = "NA";
         }
-        $('#elevationValueAtWP').text(elevation);
+        //$('#elevationValueAtWP').text(elevation);
         console.log("getElevation");
         return elevation;
     }

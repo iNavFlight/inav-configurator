@@ -87,6 +87,43 @@
                     </div>
                 </div>
                 
+                <div id="missionPlanerHome" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionHomeHead">Take Off home</div>
+                        <div class="btnMenu btnMenuIcon  save_btn">
+                            <div id="showHideHomeButton">
+                                <a class="ic_hide" href="#" title="Hide"></a>
+                            </div>
+                            <a id="cancelHome" class="ic_cancel" href="#" title="Cancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="HomeContent">
+                        <div>
+                            <table class="safehomesTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px" data-i18n="SafehomeSelected"></th>
+                                        <th style="width: 120px" data-i18n="SafehomeLon"></th>
+                                        <th style="width: 120px" data-i18n="SafehomeLat"></th>
+                                        <th style="width: 120px" data-i18n="SafehomeAlt"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="homeTableBody">
+                                    <tr>
+                                    <td><div id="viewHomePoint" class="btnTable btnTableIcon"> 
+                                            <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a> 
+                                        </div>
+                                    </td> 
+                                    <td><input type="number" class="home-lon" /></td>
+                                    <td><input type="number" class="home-lat" /></td>
+                                    <td><span id="elevationValueAtHome">NA</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="missionPlanerSafehome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Safe Home manager</div>
@@ -245,8 +282,7 @@
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultElevationHead">Elevation Profile</div>
                         <div class="btnMenu btnMenuIcon  save_btn">
-                                <a id="cancelSettings" class="ic_cancel" href="#" title="Cancel"></a>
-                                <a id="saveSettings" class="ic_save" href="#" title="Save"></a>
+                                <a id="cancelHome" class="ic_cancel" href="#" title="Cancel"></a>
                         </div>
                     </div>
                     <div class="spacer">
