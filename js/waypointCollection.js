@@ -331,6 +331,67 @@ let WaypointCollection = function () {
         });
         return poiList;
     }
+    
+    self.getDistance = function() {
+        let point2measure = []
+        let lengthLine = []
+        let jumpDict = {};
+        let nStart = 0;
+        let nLoop = 0;
+        let n = 0 ;
+        let startCount = true;
+        while (startCount && (nLoop!=-1)) {
+            if (nStart > data[data.length -1].getNumber() ) {
+                startCount = false;
+                break;
+            }
+
+            if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(self.getWaypoint(nStart).getAction())) {
+                point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                nStart++;
+            }
+            else if (self.getWaypoint(nStart).getAction() == MWNP.WPTYPE.JUMP) {
+                if (!Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
+                    jumpDict[self.getWaypoint(nStart).getNumber()] = {nStart: self.getWaypoint(nStart).getP1(), nLoop : self.getWaypoint(nStart).getP2(), n : 0};
+                }
+                if (Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
+                    if (jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] == -1) {
+                        nLoop = -1;
+                    }
+                    if ( (jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] ==0) ) {
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = 0;
+                        nStart++;
+                    }
+                    else {
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["n"] = jumpDict[self.getWaypoint(nStart).getNumber()]["n"]+1;
+                        let nStartTemp = jumpDict[self.getWaypoint(nStart).getNumber()]["nStart"];
+                        nStart = nStartTemp;
+                    }
+                }
+                
+            }
+            else {
+                nStart++;
+            }
+        }
+        if (nLoop == -1) {
+            return [-1];
+        }
+        else {
+        
+            const cumulativeSum = (sum => value => sum += value)(0);
+            
+            let oldCoord = [];
+            point2measure.forEach(function (coord) {
+                if (oldCoord != 'undefined' && oldCoord != []) {
+                    lengthLine.push(ol.Sphere.getLength(new ol.geom.LineString([oldCoord, coord])));
+                }
+                oldCoord = coord;
+            });
+            //console.log("lengthLine ", lengthLine);
+            return lengthLine.map(cumulativeSum);
+        }
+    }
 
     return self;
 };

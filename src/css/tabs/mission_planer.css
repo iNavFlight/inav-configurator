@@ -196,7 +196,7 @@
 }
 
 .tab-mission-control input {
-    width: 115px;
+    width: 90px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -208,7 +208,7 @@
 }
 
 .tab-mission-control select {
-    width: 118px;
+    width: 95px;
     padding-left: 3px;
     height: 20px;
     line-height: 20px;
@@ -225,7 +225,7 @@
     margin-left: 5px;
 }
 .tab-mission-control .point-label {
-    width: 60px;
+    width: 80px;
     display: inline-block;
 }
 .tab-mission-control .point-radio input{
