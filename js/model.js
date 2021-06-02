@@ -284,7 +284,7 @@ const mixerList = [
     {
         id: 14,
         name: 'Airplane',
-        model: 'custom',
+        model: 'twin_plane',
         image: 'airplane',
         enabled: true,
         legacy: true,
@@ -421,8 +421,8 @@ const mixerList = [
     {
         id: 24,
         name: 'Custom Airplane',
-        model: 'custom',
-        image: 'custom',
+        model: 'twin_plane',
+        image: 'airplane',
         enabled: false,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
@@ -443,7 +443,7 @@ const mixerList = [
     {
         id: 26,
         name: 'Airplane with differential thrust',
-        model: 'custom',
+        model: 'twin_plane',
         image: 'airplane',
         enabled: true,
         legacy: false,
@@ -464,7 +464,7 @@ const mixerList = [
     {
         id: 28,
         name: 'Airplane V-tail (individual aileron servos)',
-        model: 'custom',
+        model: 'twin_plane',
         image: 'airplane_vtail',
         enabled: true,
         legacy: false,
@@ -484,7 +484,7 @@ const mixerList = [
     {
         id: 29,
         name: 'Airplane V-tail (single aileron servo)',
-        model: 'custom',
+        model: 'twin_plane',
         image: 'airplane_vtail_single',
         enabled: true,
         legacy: false,
@@ -503,7 +503,7 @@ const mixerList = [
     {
         id: 30,
         name: 'Airplane without rudder',
-        model: 'custom',
+        model: 'twin_plane',
         image: 'airplane_norudder',
         enabled: true,
         legacy: false,
