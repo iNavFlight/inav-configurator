@@ -464,7 +464,7 @@ const mixerList = [
     {
         id: 28,
         name: 'Airplane V-tail (individual aileron servos)',
-        model: 'twin_plane',
+        model: 'vtail_plane',
         image: 'airplane_vtail',
         enabled: true,
         legacy: false,
@@ -484,7 +484,7 @@ const mixerList = [
     {
         id: 29,
         name: 'Airplane V-tail (single aileron servo)',
-        model: 'twin_plane',
+        model: 'vtail_single_servo_plane',
         image: 'airplane_vtail_single',
         enabled: true,
         legacy: false,
