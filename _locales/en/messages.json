@@ -3038,7 +3038,7 @@
         "message": "Glideslope"
     },
     "osdElement_GLIDESLOPE_HELP": {
-        "message": "Horizontal speed divided by sink rate"
+        "message": "Amount of horizontal distance traveled per unit of lost altitude"
     },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
