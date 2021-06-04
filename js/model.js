@@ -503,7 +503,7 @@ const mixerList = [
     {
         id: 30,
         name: 'Airplane without rudder',
-        model: 'twin_plane',
+        model: 'rudderless_plane',
         image: 'airplane_norudder',
         enabled: true,
         legacy: false,
