@@ -20,7 +20,7 @@ Open Blender, and import your .obj. This should be pretty uneventful.
 But if your model is large, you may just see an obstructed camera. If this is the case, switch to a flat on view (Top, Bottom, Left, Right, Front, or Back); which you access from the View menu in the bottom left corner of the screen, next to the 3D cube.
 ![image](https://user-images.githubusercontent.com/17590174/120713107-6193c480-c4b9-11eb-80f0-9e95cf0cae4b.png)
 
-At that point, you should be able to use the + and - keys on the number pad to zoom in and out. Zoom out until you can see your complete model. Then click the __Scale__ button and move the mouse to resize the model. You want to make it smaller until you can see a grid area underneath it. A good size seems to be around 1.5 empty grid squares around the largest dimensions.
+At that point, you should be able to use the + and - keys on the number pad to zoom in and out. Zoom out until you can see your complete model. Then click the __Scale__ button and move the mouse to resize the model. You want to make it smaller until you can see a grid area underneath it. A good size seems to be around 2.75 empty grid squares around the largest dimensions.
 ###Rotating
 At this point, your model should be the right size. However, it may not be facing the correct way. From the __Top__ view, you should be looking down on the top of your model. However, when using the __Front__ view, I have found that looking at the back of the model is the correct way around for Configurator. To rotate your model, click the __Rotate__ button and move the mouse. If you hold the __shift__ key while moving the mouse, you have finer control.
 ###Materials
