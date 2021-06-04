@@ -2527,13 +2527,6 @@ TABS.osd.initialize = function (callback) {
             });
         });
 
-        $(document).keypress(function (e) {
-            if (e.which == 13) { // enter
-                // Trigger regular Flashing sequence
-                $('a.flash_font').click();
-            }
-        });
-
         $('.update_preview').on('change', function () {
             if (OSD.data) {
                 // Force an OSD redraw by saving any element
