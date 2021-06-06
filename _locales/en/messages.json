@@ -615,7 +615,7 @@
         "message": "Continuously trim servos on Fixed Wing"
     },
     "featureFW_AUTOTRIMTip": {
-        "message": "When flying in a stabilized mode, continuosusly adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+        "message": "When flying in a stabilized mode, continuously adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
     },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
