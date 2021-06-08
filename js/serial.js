@@ -52,7 +52,7 @@ var serial = {
                                                 self.failed = 0;
                                             } else {
                                                 console.log('SERIAL: Connection did not recover from last onReceiveError, disconnecting');
-                                                GUI.log('Unrecoverable <span style="color: red">failure</span> of serial connection, disconnecting...');
+                                                GUI.log(chrome.i18n.getMessage('serialUnrecoverable'));
                                                 googleAnalytics.sendException('Serial: onReceiveError - unrecoverable', false);
 
                                                 if (GUI.connected_to || GUI.connecting_to) {
@@ -83,9 +83,9 @@ var serial = {
                                             if (info.paused) {
                                                 // assume unrecoverable, disconnect
                                                 console.log('SERIAL: Connection did not recover from ' + self.error + ' condition, disconnecting');
-                                                GUI.log('Unrecoverable <span style="color: red">failure</span> of serial connection, disconnecting...');
+                                                GUI.log(chrome.i18n.getMessage('serialUnrecoverable'));
                                                 googleAnalytics.sendException('Serial: ' + self.error + ' - unrecoverable', false);
-    
+
                                                 if (GUI.connected_to || GUI.connecting_to) {
                                                     $('a.connect').click();
                                                 } else {
@@ -101,11 +101,11 @@ var serial = {
                                 });
                             }, 50);
                             break;
-                            
+
                         case 'timeout':
                             // TODO
                             break;
-                            
+
                         case 'device_lost':
                             if (GUI.connected_to || GUI.connecting_to) {
                                 $('a.connect').click();
@@ -113,7 +113,7 @@ var serial = {
                                 self.disconnect();
                             }
                             break;
-                            
+
                         case 'disconnected':
                             // TODO
                             break;

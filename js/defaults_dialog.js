@@ -11,7 +11,7 @@ helper.defaultsDialog = (function() {
     let $container;
 
     let data = [{
-            "title": 'Mini Quad with 3"-7" propellers',
+            "title": chrome.i18n.getMessage('defaultsQuadTitle'),
             "notRecommended": false,
             "reboot": true,
             "settings": [
@@ -179,8 +179,8 @@ helper.defaultsDialog = (function() {
                 }
             ]
         },
-        {
-            "title": 'Airplane with a Tail',
+		{
+            "title": chrome.i18n.getMessage('defaultsAirplaneWithoutaTailTitle'),
             "notRecommended": false,
             "id": 3,
             "reboot": true,
@@ -189,7 +189,7 @@ helper.defaultsDialog = (function() {
                     key: "platform_type",
                     value: "AIRPLANE"
                 },
-		{
+				{
                     key: "applied_defaults",
                     value: 3
                 },
@@ -229,9 +229,9 @@ helper.defaultsDialog = (function() {
                     key: "motor_pwm_protocol",
                     value: "STANDARD"
                 },
-		{ 
-		    key: "throttle_idle",
-		    value: 5.0
+		{
+                    key: "throttle_idle",
+                    value: 5.0
 		},
                 {
                     key: "rc_yaw_expo",
@@ -253,17 +253,17 @@ helper.defaultsDialog = (function() {
                     key: "yaw_rate",
                     value: 3
                 },
-		{ 
-		    key: "nav_fw_pos_z_p",
-		    value: 20
+		{
+                    key: "nav_fw_pos_z_p",
+                    value: 20
 		},
-		{ 
-		    key: "nav_fw_pos_z_d",
-		    value: 5
+		{
+                    key: "nav_fw_pos_z_d",
+                    value: 5
 		},
-		{ 
-		    key: "nav_fw_pos_xy_p",
-		    value: 50
+		{
+                    key: "nav_fw_pos_xy_p",
+                    value: 50
 		},
 		{ 
 		    key: "fw_turn_assist_pitch_gain",
@@ -443,47 +443,47 @@ helper.defaultsDialog = (function() {
                     key: "fw_turn_assist_pitch_gain",
                     value: 0.2
 		},
-		{ 
+		{
                     key: "max_angle_inclination_rll",
                     value: 450
 		},
-		{ 
+		{
                     key: "nav_fw_bank_angle",
                     value: 45
 		},
-		{ 
+		{
                     key: "fw_p_pitch",
                     value: 10
 		},
-		{ 
+		{
                     key: "fw_i_pitch",
                     value: 15
 		},
-		{ 
+		{
                     key: "fw_ff_pitch",
                     value: 70
 		},
-		{ 
+		{
                     key: "fw_p_roll",
                     value: 5
 		},
-		{ 
+		{
                     key: "fw_i_roll",
                     value: 8
 		},
-		{ 
+		{
                     key: "fw_ff_roll",
                     value: 35
 		},
-		{ 
+		{
                     key: "fw_p_yaw",
                     value: 20
 		},
-		{ 
+		{
                     key: "fw_i_yaw",
                     value: 5
 		},
-		{ 
+		{
                     key: "fw_ff_yaw",
                     value: 100
 		},
@@ -528,7 +528,7 @@ helper.defaultsDialog = (function() {
             ]
 		},
         {
-            "title": 'Rovers & Boats',
+            "title": chrome.i18n.getMessage('defaultsRoversBoatsTitle'),
             "notRecommended": false,
             "reboot": true,
             "settings": [
@@ -591,7 +591,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
+            "title": chrome.i18n.getMessage('defaultsCustomUAVTitle'),
             "notRecommended": true,
             "reboot": false,
             "settings": [
@@ -606,7 +606,7 @@ helper.defaultsDialog = (function() {
             ]
         },
         {
-            "title": 'Keep current settings (Not recommended)',
+            "title": chrome.i18n.getMessage('defaultsKeepCurrentTitle'),
             "notRecommended": true,
             "reboot": false,
             "settings": [
@@ -656,7 +656,7 @@ helper.defaultsDialog = (function() {
                 mspHelper.saveToEeprom(function () {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-            
+
                     if (selectedDefaultPreset.reboot) {
                         GUI.tab_switch_cleanup(function() {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
@@ -677,7 +677,7 @@ helper.defaultsDialog = (function() {
         if (selectedDefaultPreset && selectedDefaultPreset.settings) {
 
             mspHelper.loadBfConfig(function () {
-                privateScope.setFeaturesBits(selectedDefaultPreset)   
+                privateScope.setFeaturesBits(selectedDefaultPreset)
             });
         }
     };
