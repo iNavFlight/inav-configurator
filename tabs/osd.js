@@ -921,9 +921,9 @@ OSD.constants = {
                         } else {
                             if (OSD.data.preferences.units === 0) {
                                 // imperial
-                                return '118' + FONT.symbol(SYM.ALT_FT);
+                                return ' 118' + FONT.symbol(SYM.ALT_FT);
                             }
-                            return '399' + FONT.symbol(SYM.ALT_M);
+                            return ' 399' + FONT.symbol(SYM.ALT_M);
                         }
                     }
                 },
