@@ -3034,6 +3034,12 @@
     "osdElement_ESC_RPM": {
         "message": "Motor RPM from ESC telemetry"
     },
+    "osdElement_GLIDESLOPE": {
+        "message": "Glideslope"
+    },
+    "osdElement_GLIDESLOPE_HELP": {
+        "message": "Amount of horizontal distance traveled per unit of lost altitude"
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
