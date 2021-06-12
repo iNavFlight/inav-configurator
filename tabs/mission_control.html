@@ -45,6 +45,10 @@
                         </div>
                     </div>
                     <div class="spacer"  id="InfoContent">
+                        <div id="infoMissionFilename" style="padding-bottom: 2px;">
+                            <span>Filename loaded:</span>
+                            <span id="missionFilename" style="color: #3394b5"></span>
+                        </div>
                         <div id="infoMissionDistance" style="padding-bottom: 2px;">
                             <span>Distance (m):</span>
                             <span id="missionDistance"></span>
@@ -149,7 +153,7 @@
 								<!-- <option value="2">PH_UNLIM</option> -->
 								<option value="3">PH_TIME</option>
 								<!--<option value="4">RTH</option>-->
-								<option value="5">Point of Interest</option>
+								<option value="5">POI</option>
 								<!--<option value="6">Jump</option>
 								<option value="7">Heading lock</option>-->
 								<option value="8">Land</option>
@@ -167,6 +171,10 @@
                             <label class="point-label" for="pointAlt">Alt (cm): </label>
                             <input id="pointAlt" type="text" value="0" required><span id="altitudeInMeters"></span>
                         </div>
+                        <div class="point" id="pointP3class" style="display: none">
+                            <label class="point-label" for="pointP3">Parameter 3: </label>
+                            <input id="pointP3" type="checkbox" value="0" class="togglemedium" checked required>
+                        </div>
                         <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
                             <input id="pointP1" type="text" value="0" required>
@@ -174,10 +182,6 @@
 						<div class="point" id="pointP2class" style="display: none">
                             <label class="point-label" for="pointP2">Parameter 2: </label>
                             <input id="pointP2" type="text" value="0" required>
-                        </div>
-						<div class="point" id="pointP3class" style="display: none">
-                            <label class="point-label" for="pointP3">Parameter 3: </label>
-                            <input id="pointP3" type="text" value="0" required>
                         </div>
                         <div>
                         <table class="waypointOptionsTable">
