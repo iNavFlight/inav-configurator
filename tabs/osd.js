@@ -1714,7 +1714,9 @@ OSD.reload = function(callback) {
 
     MSP.promise(MSPCodes.MSP2_CF_SERIAL_CONFIG).then(function (resp) {
         $.each(SERIAL_CONFIG.ports, function(index, port){
-            OSD.data.isDjiHdFpv = port.functions.includes('DJI_FPV');
+            if(port.functions.includes('DJI_FPV')) {
+                OSD.data.isDjiHdFpv = true;
+            }
         });
     });
 
