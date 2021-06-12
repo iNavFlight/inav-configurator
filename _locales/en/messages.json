@@ -615,7 +615,7 @@
         "message": "Continuously trim servos on Fixed Wing"
     },
     "featureFW_AUTOTRIMTip": {
-        "message": "When flying in a stabilized mode, continuosusly adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+        "message": "When flying in a stabilized mode, continuously adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
     },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
@@ -2222,7 +2222,7 @@
         "message": "OSD"
     },
     "configurationSensors": {
-        "message": "Sensors"
+        "message": "Sensors & buses"
     },
     "sensorAccelerometer": {
         "message": "Accelerometer"
@@ -3033,6 +3033,12 @@
     },
     "osdElement_ESC_RPM": {
         "message": "Motor RPM from ESC telemetry"
+    },
+    "osdElement_GLIDESLOPE": {
+        "message": "Glideslope"
+    },
+    "osdElement_GLIDESLOPE_HELP": {
+        "message": "Amount of horizontal distance traveled per unit of lost altitude"
     },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"

@@ -44,7 +44,7 @@ TABS.auxiliary.initialize = function (callback) {
             "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD",                                 // Navigation mode
             "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                 // Flight mode modifiers
             "NAV WP", "GCS NAV", "HOME RESET",                                                         // Navigation
-            "SERVO AUTOTRIM", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",                  // Fixed wing specific
+            "SERVO AUTOTRIM", "AUTO LEVEL", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",    // Fixed wing specific
             "TURTLE", "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",  // Multi-rotor specific
             "BEEPER", "LEDS OFF", "LIGHTS",                                                            // Feedback
             "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                          // OSD

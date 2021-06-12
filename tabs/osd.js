@@ -95,6 +95,7 @@ SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
+SYM.GLIDESLOPE = 0x7F;
 
 var FONT = FONT || {};
 
@@ -755,6 +756,12 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     preview: FONT.symbol(SYM.RPM) + '983',
+                },
+                {
+                    name: 'GLIDESLOPE',
+                    id: 124,
+                    min_version: '3.0.0',
+                    preview: FONT.symbol(127) + FONT.embed_dot('12.3'),
                 },
                 {
                     name: 'VERSION',
@@ -2525,13 +2532,6 @@ TABS.osd.initialize = function (callback) {
                     });
                 });
             });
-        });
-
-        $(document).keypress(function (e) {
-            if (e.which == 13) { // enter
-                // Trigger regular Flashing sequence
-                $('a.flash_font').click();
-            }
         });
 
         $('.update_preview').on('change', function () {

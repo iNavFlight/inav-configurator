@@ -614,72 +614,6 @@ var FC = {
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
     },
-    getLooptimes: function () {
-        return {
-            125: {
-                defaultLooptime: 500,
-                looptimes: {
-                    1000: "1kHz",
-                    500: "2kHz",
-                    250: "4kHz",
-                    125: "8kHz"
-                }
-            },
-            1000: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz"
-                }
-            }
-        };
-    },
-    getGyroFrequencies: function () {
-        return {
-            125: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz",
-                    500: "2kHz",
-                    250: "4kHz",
-                    125: "8kHz"
-                }
-            },
-            1000: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz"
-                }
-            }
-        };
-    },
-    getGyroLpfValues: function () {
-        return [
-            {
-                tick: 125,
-                label: "256Hz"
-            },
-            {
-                tick: 1000,
-                label: "188Hz"
-            },
-            {
-                tick: 1000,
-                label: "98Hz"
-            },
-            {
-                tick: 1000,
-                label: "42Hz"
-            },
-            {
-                tick: 1000,
-                label: "20Hz"
-            },
-            {
-                tick: 1000,
-                label: "10Hz"
-            }
-        ];
-    },
     getGpsProtocols: function () {
         return [
             'NMEA',
@@ -1253,7 +1187,7 @@ var FC = {
                 default: 0
             },
             1: {
-                name: "RC Channel",
+                name: "Get RC Channel",
                 type: "range",
                 range: [1, 16],
                 default: 1
