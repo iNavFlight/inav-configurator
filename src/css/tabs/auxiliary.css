@@ -192,6 +192,11 @@
 .tab-auxiliary .save_btn a {
     line-height: 28px;
 }
+.tab-auxiliary .toolbox {
+    font-weight: bold;
+    color: rgb(105, 99, 99);
+    padding: 10px 5px;
+}
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-auxiliary .fixed_band {
