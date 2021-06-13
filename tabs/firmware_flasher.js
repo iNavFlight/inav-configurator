@@ -545,6 +545,46 @@ TABS.firmware_flasher.initialize = function (callback) {
     });
 };
 
+TABS.firmware_flasher.FLASH_MESSAGE_TYPES = {NEUTRAL : 'NEUTRAL',
+                                             VALID   : 'VALID',
+                                             INVALID : 'INVALID',
+                                             ACTION  : 'ACTION'};
+
+TABS.firmware_flasher.flashingMessage = function(message, type) {
+    let self = this;
+
+    let progressLabel_e = $('span.progressLabel');
+    switch (type) {
+        case self.FLASH_MESSAGE_TYPES.VALID:
+            progressLabel_e.removeClass('invalid actionRequired')
+                           .addClass('valid');
+            break;
+        case self.FLASH_MESSAGE_TYPES.INVALID:
+            progressLabel_e.removeClass('valid actionRequired')
+                           .addClass('invalid');
+            break;
+        case self.FLASH_MESSAGE_TYPES.ACTION:
+            progressLabel_e.removeClass('valid invalid')
+                           .addClass('actionRequired');
+            break;
+        case self.FLASH_MESSAGE_TYPES.NEUTRAL:
+        default:
+            progressLabel_e.removeClass('valid invalid actionRequired');
+            break;
+    }
+    if (message != null) {
+        progressLabel_e.html(message);
+    }
+
+    return self;
+};
+
+TABS.firmware_flasher.flashProgress = function(value) {
+    $('.progress').val(value);
+
+    return this;
+};
+
 TABS.firmware_flasher.cleanup = function (callback) {
     PortHandler.flush_callbacks();
 
