@@ -414,15 +414,33 @@ let WaypointCollection = function () {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
         let lengthMission = self.getDistance(true);
         let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
-        let samples = (Math.trunc(totalMissionDistance/30) <= 1024 ? Math.trunc(totalMissionDistance/30) : 1024);
+        let samples;
+        if (point2measure.length <= 2){
+            samples = 1;
+        }
+        else if (Math.trunc(totalMissionDistance/30) <= 1024 &&  point2measure.length > 2){
+            samples = Math.trunc(totalMissionDistance/30);
+        }
+        else {
+            samples = 1024;
+        }
+        console.log(samples);
         if (globalSettings.mapProviderType == 'bing') {
-            const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples)+'&key='+globalSettings.mapApiKey);
-            const myJson = await response.json(); 
-            elevation = myJson.resourceSets[0].resources[0].elevations;
+            if (point2measure.length >1) {
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
+                const myJson = await response.json(); 
+                elevation = myJson.resourceSets[0].resources[0].elevations;
+            }
+            else {
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights=ellipsoid&key='+globalSettings.mapApiKey);
+                const myJson = await response.json(); 
+                elevation = myJson.resourceSets[0].resources[0].elevations;
+            }
         }
         else {
             elevation = "NA";
         }
+        //console.log("elevation ", elevation);
         return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];
     }
 

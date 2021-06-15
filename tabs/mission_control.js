@@ -717,7 +717,14 @@ TABS.mission_control.initialize = function (callback) {
             })),
         });
     }
-    
+
+
+    function updateHome() {
+        renderHomeTable();
+        cleanHomeLayers();
+        renderHomeOnMap();     
+        plotElevation();    
+    }
     /////////////////////////////////////////////
     //
     // Manage Waypoint
@@ -1347,12 +1354,13 @@ TABS.mission_control.initialize = function (callback) {
          */
         app.Drag.prototype.handleUpEvent = function (evt) {
             if (tempMarker.kind == "waypoint" ){
-                if (mission.getWaypoint(tempMarker.number).getP3() == 1.0) {
                     (async () => {
-                        const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
+                        if (mission.getWaypoint(tempMarker.number).getP3() == 1.0) {
+                            const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
+                            $('#elevationValueAtWP').text(elevationAtWP);
+                        }
+                        plotElevation();
                     })()
-                }
             }
             else if (tempMarker.kind == "home" ) {
                 (async () => {
@@ -1536,6 +1544,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.update();
                 cleanLayers();
                 redrawLayers();
+                plotElevation();
             }
             //mission.missionDisplayDebug();
         });
@@ -1673,6 +1682,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayers();
                 selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+                plotElevation();
             }
         });
         
@@ -1685,6 +1695,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayers();
                 selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+                plotElevation();
             }
         });
         
@@ -1694,6 +1705,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
+                plotElevation();
             }
         });
         
@@ -1733,6 +1745,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
+                plotElevation();
             }
         });
         
@@ -1813,13 +1826,14 @@ TABS.mission_control.initialize = function (callback) {
             let mapCenter = map.getView().getCenter();
             HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
             HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
-            renderHomeTable();
-            cleanHomeLayers();
-            renderHomeOnMap();     
-            plotElevation();
+            updateHome();
         });
         
         $('#cancelHome').on('click', function () {
+            closeHomePanel();
+        });
+        
+        $('#cancelPlot').on('click', function () {
             closeHomePanel();
         });
         
@@ -1829,6 +1843,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
                 removeAllWaypoints();
+                plotElevation();
             }
         });
 
@@ -1849,6 +1864,7 @@ TABS.mission_control.initialize = function (callback) {
                         clearEditForm();
                         cleanLayers();
                         redrawLayers();
+                        plotElevation();
                     }
                 }
                 else {
@@ -1858,6 +1874,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                     cleanLayers();
                     redrawLayers();
+                    plotElevation();
                 }
             }
         });
@@ -1992,6 +2009,10 @@ TABS.mission_control.initialize = function (callback) {
                                             mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
                                         } else if (attr.match(/cy/i)) {
                                             mission.setCenterLat(parseFloat(node.$[attr]) * 10000000);
+                                        } else if (attr.match(/home\-x/i)) {
+                                            HOME.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                        } else if (attr.match(/home\-y/i)) {
+                                            HOME.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
                                         }
                                     }
                                 } else if (node['#name'].match(/missionitem/i) && node.$) {
@@ -2059,6 +2080,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 
                 redrawLayers();
+                updateHome();
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
                 GUI.log(sFilename+' has been loaded successfully !');
@@ -2076,7 +2098,11 @@ TABS.mission_control.initialize = function (callback) {
 
         var data = {
             'version': { $: { 'value': '2.3-pre8' } },
-            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 'cy': (Math.round(center[1] * 10000000) / 10000000), 'zoom': zoom } },
+            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 
+                          'cy': (Math.round(center[1] * 10000000) / 10000000), 
+                          'home-x' : HOME.getLonMap(),
+                          'home-y' : HOME.getLatMap(),
+                          'zoom': zoom } },
             'missionitem': []
         };
         
@@ -2167,62 +2193,91 @@ TABS.mission_control.initialize = function (callback) {
     }
     
     function plotElevation() {
-        (async () => {
-            const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
-            console.log(elevation);
-            console.log(totalMissionDistance);
-            console.log(Array.from(Array(samples), (_,i)=> i*totalMissionDistance/samples));
-            var trace_WGS84 = {
-                x: Array.from(Array(samples), (_,i)=> i*totalMissionDistance/samples),
-                y: elevation,
-                type: 'scatter',
-                name: 'WGS84 elevation',
-                fill: 'tozeroy',
-                line: {
-                    color: '#ff7f0e',
-                },
-            };
-            console.log(altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*refPoint2measure[i]));
-            var trace_missionHeight = {
-                x: lengthMission,
-                y: altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i])) ,
-                type: 'scatter',
-                mode: 'lines+markers+text',
-                name: 'Mission altitude',
-                text: namePoint2measure,
-                textposition: 'top center',
-                textfont: {
-                    family:  'Raleway, sans-serif'
-                },
-                line: {
-                    color: '#1497f1',
-                },
-                marker: {
-                    color: '#1f77b4',
-                },
-            };
-            
-            var layout = {showlegend: true,
-                          legend: {
-                                "orientation": "h",
-                                xanchor: "center",
-                                y: 1.2,
-                                x: 0.5
-                          },
-                          title: 'Mission Elevation Profile',
-                          xaxis: {
-                            title: 'Distance (m)'
-                          },
-                          yaxis: {
-                            title: 'Elevation (m)'
-                          },
-                          height: 300,
-                          }
+        if ($('#missionPlanerElevation').is(":visible")) {
+            if (mission.get().length == 0) {
+                var data = [[0], [0]];
+                var layout = {showlegend: true,
+                              legend: {
+                                    "orientation": "h",
+                                    xanchor: "center",
+                                    y: 1.3,
+                                    x: 0.5
+                              },
+                              title: 'Mission Elevation Profile',
+                              xaxis: {
+                                title: 'Distance (m)'
+                              },
+                              yaxis: {
+                                title: 'Elevation (m)',
+                              },
+                              height: 300,
+                              }
+                Plotly.newPlot('elevationDiv', data, layout);
+            }
+            else {
+                (async () => {
+                    const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
+                    let x_elevation = Array.from(Array(samples+1), (_,i)=> i*totalMissionDistance/samples);
+                    var trace_WGS84 = {
+                        x: x_elevation,
+                        y: elevation,
+                        type: 'scatter',
+                        name: 'WGS84 elevation',
+                        hovertemplate: '<b>Elevation</b>: %{y} m',
+                        fill: 'tozeroy',
+                        line: {
+                            color: '#ff7f0e',
+                        },
+                    };
+                    let y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
+                    let y_elevationReference = refPoint2measure.map((x,i) => (x == 1 ? "WGS84" : "Take-off Home"));
+                    console.log(y_elevationReference);
+                    var trace_missionHeight = {
+                        x: lengthMission,
+                        y: y_missionElevation ,
+                        type: 'scatter',
+                        mode: 'lines+markers+text',
+                        name: 'Mission altitude',
+                        text: namePoint2measure,
+                        textposition: 'top center',
+                        textfont: {
+                            family:  'Raleway, sans-serif'
+                        },
+                        customdata: y_elevationReference,
+                        hovertemplate: '<b>WP</b>: %{text}' +
+                                '<br><b>Elevation</b>: %{y} m<br>' +
+                                '<b>Reference</b>: %{customdata}',
+                        line: {
+                            color: '#1497f1',
+                        },
+                        marker: {
+                            color: '#1f77b4',
+                        },
+                    };
+                    var layout = {showlegend: true,
+                                  legend: {
+                                        "orientation": "h",
+                                        xanchor: "center",
+                                        y: 1.3,
+                                        x: 0.5
+                                  },
+                                  title: 'Mission Elevation Profile',
+                                  xaxis: {
+                                    title: 'Distance (m)'
+                                  },
+                                  yaxis: {
+                                    title: 'Elevation (m)',
+                                    range: [-10 + Math.min(Math.min(...y_missionElevation), Math.min(...elevation)), 10 + Math.max(Math.max(...y_missionElevation), Math.max(...elevation))],
+                                  },
+                                  height: 300,
+                                  }
 
-            var data = [trace_WGS84, trace_missionHeight];
+                    var data = [trace_WGS84, trace_missionHeight];
 
-            Plotly.newPlot('elevationDiv', data, layout);
-        })()
+                    Plotly.newPlot('elevationDiv', data, layout);
+                })()
+            }
+        }
     }
 
 };
