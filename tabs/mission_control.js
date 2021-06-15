@@ -1050,8 +1050,6 @@ TABS.mission_control.initialize = function (callback) {
                       alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'));
                     }
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
-                        console.log("mission.getPoiList() ",mission.getPoiList());
-                        console.log(mission.convertJumpNumberToWaypoint(Number($(this).val())-1));
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
                             alert(chrome.i18n.getMessage('MissionPlannerJump3SettingsCheck'));
@@ -1730,7 +1728,6 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3').on('change', function (event) {
             if (selectedMarker) {
                 selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
-                console.log($('#pointP3').prop("checked"));
                 if ($('#pointP3').prop("checked")) {
                     (async () => {
                         const elevationAtWP = await selectedMarker.getElevation(globalSettings);
@@ -2231,7 +2228,6 @@ TABS.mission_control.initialize = function (callback) {
                     };
                     let y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
                     let y_elevationReference = refPoint2measure.map((x,i) => (x == 1 ? "WGS84" : "Take-off Home"));
-                    console.log(y_elevationReference);
                     var trace_missionHeight = {
                         x: lengthMission,
                         y: y_missionElevation ,

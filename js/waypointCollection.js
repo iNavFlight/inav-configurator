@@ -318,7 +318,6 @@ let WaypointCollection = function () {
                 lJumptTargetAttached.push(element.getNumber());
             }
         });
-        console.log("lJumptTargetAttached ", lJumptTargetAttached);
         return (lJumptTargetAttached.length != 0 && lJumptTargetAttached != 'undefined')
     }
     
@@ -424,7 +423,6 @@ let WaypointCollection = function () {
         else {
             samples = 1024;
         }
-        console.log(samples);
         if (globalSettings.mapProviderType == 'bing') {
             if (point2measure.length >1) {
                 const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
