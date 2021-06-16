@@ -1220,9 +1220,9 @@ OSD.constants = {
                         } else {
                             if (OSD.data.preferences.units === 0) {
                                 // Imperial
-                                return '275' + FONT.symbol(SYM.ALT_FT);
+                                return ' 275' + FONT.symbol(SYM.ALT_FT);
                             }
-                            return '477' + FONT.symbol(SYM.ALT_M);
+                            return ' 477' + FONT.symbol(SYM.ALT_M);
                         }
                     },
                 },
