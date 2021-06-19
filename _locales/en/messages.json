@@ -611,6 +611,12 @@
     "featureFW_LAUNCH": {
         "message": "Permanently enable Launch Mode for Fixed Wing"
     },
+    "featureFW_AUTOTRIM": {
+        "message": "Continuously trim servos on Fixed Wing"
+    },
+    "featureFW_AUTOTRIMTip": {
+        "message": "When flying in a stabilized mode, continuously adjust the servo midpoints so that the airplane keeps flying straight when switching to manual mode. Requires GPS."
+    },
     "featureDYNAMIC_FILTERS": {
         "message": "Dynamic Gyro Filters"
     },
@@ -774,79 +780,79 @@
         "message": "Threshold Velocity [cm/s]"
     },
     "configurationLaunchVelocityHelp": {
-        "message": "Forward velocity threshold for swing-launch detection [cm/s]"
+        "message": "Forward velocity threshold for swing-launch detection. Default: 300 [100-10000]"
     },
     "configurationLaunchAccel": {
         "message": "Threshold Acceleration [cm/s/s]"
     },
     "configurationLaunchAccelHelp": {
-        "message": "Forward acceleration threshold for bungee launch of throw launch [cm/s/s], 1G = 981 cm/s/s"
+        "message": "Forward acceleration threshold for bungee launch or throw launch, 1G = 981 cm/s/s. Default: 1863 [1000-20000]"
     },
     "configurationLaunchMaxAngle": {
         "message": "Max Throw Angle [&deg;]"
     },
     "configurationLaunchMaxAngleHelp": {
-        "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely [deg]"
+        "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely. Default: 45 [5-180]"
     },
     "configurationLaunchDetectTime": {
         "message": "Detect Time [ms]"
     },
     "configurationLaunchDetectTimeHelp": {
-        "message": "Time for which thresholds have to breached to consider launch happened [ms]"
+        "message": "Time for which thresholds have to breached to consider launch happened. Default: 40 [10-1000]"
     },
     "configurationLaunchThr": {
         "message": "Launch Throttle [uS]"
     },
     "configurationLaunchThrHelp": {
-        "message": "Launch throttle - throttle to be set during launch sequence (pwm units)"
+        "message": "Launch throttle - throttle to be set during launch sequence. Default: 1700 [1000-2000]"
     },
     "configurationLaunchIdleThr": {
         "message": "Idle Throttle [uS]"
     },
     "configurationLaunchIdleThrHelp": {
-        "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position)"
+        "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay [ms]"
     },
     "configurationLaunchMotorDelayHelp": {
-        "message": "Delay between detected launch and launch sequence start and throttling up (ms)"
+        "message": "Delay between detected launch and launch sequence start and throttling up. Default: 500 [0-5000]"
     },
     "configurationLaunchSpinupTime": {
         "message": "Motor Spinup Time [ms]"
     },
     "configurationLaunchSpinupTimeHelp": {
-        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr - to avoid big stress on ESC and large torque from propeller"
+        "message": "Time to bring power from minimum throttle to nav_fw_launch_thr, to avoid big stress on ESC and large torque from propeller. Default: 100 [0-1000]"
     },
     "configurationLaunchMinTime": {
         "message": "Minimum Launch Time [ms]"
     },
     "configurationLaunchMinTimeHelp": {
-        "message": "Allow launch mode to execute at least this time (ms) and ignore stick movements [0-60000]."
+        "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
     },
     "configurationLaunchTimeout": {
         "message": "Launch Timeout [ms]"
     },
     "configurationLaunchTimeoutHelp": {
-        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over (ms)"
+        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
     },
     "configurationLaunchEndTime": {
         "message": "End Transition Time [ms]"
     },
     "configurationLaunchEndTimeHelp": {
-        "message": "Smooth transition time at the end of the launch (ms). Default: 2000 [0-5000]. This is added to the Launch Timeout."
+        "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
     },
     "configurationLaunchMaxAltitude": {
         "message": "Maximum Altitude [cm]"
     },
     "configurationLaunchMaxAltitudeHelp": {
-        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. [cm]"
+        "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. Default: 0 [0-60000]"
     },
     "configurationLaunchClimbAngle": {
         "message": "Climb Angle [&deg;]"
     },
     "configurationLaunchClimbAngleHelp": {
-        "message": "Climb angle for launch sequence (degrees), is also restrained by global max_angle_inclination_pit"
+        "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
     },
     "configuration3d": {
         "message": "Reversible motors"
@@ -1197,6 +1203,9 @@
 
     "auxiliaryHelp": {
         "message": "Use ranges to define the switches on your transmitter and corresponding mode assignments.  A receiver channel that gives a reading between a range min/max will activate the mode.  Remember to save your settings using the Save button."
+    },
+	    "auxiliaryToggleUnused": {
+        "message": "Hide unused modes"
     },
     "auxiliaryMin": {
         "message": "Min"
@@ -2216,7 +2225,7 @@
         "message": "OSD"
     },
     "configurationSensors": {
-        "message": "Sensors"
+        "message": "Sensors & buses"
     },
     "sensorAccelerometer": {
         "message": "Accelerometer"
@@ -2486,7 +2495,10 @@
         "message": "Wireless mode"
     },
     "rthConfiguration": {
-        "message": "RTH and Landing Settings"
+        "message": "RTH settings"
+    },
+    "autoLandingSettings": {
+        "message": "Automatic landing settings"
     },
     "minRthDistance": {
         "message": "Min. RTH distance [cm]"
@@ -2536,17 +2548,26 @@
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
-    "landMinAltVspd": {
-        "message": "Vertical descent velocity under min. vertical landing speed altitude [cm/s]"
-    },
     "landMaxAltVspd": {
-        "message": "Vertical descent velocity above slowdown altitude [cm/s]"
+        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
     },
-    "landSlowdownMinAlt": {
-        "message": "Min. vertical landing speed at altitude [cm]"
+    "landMaxAltVspdHelp": {
+        "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "Vertical landing speed slowdown at altitude [cm]"
+        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+    },
+    "landSlowdownMaxAltHelp": {
+        "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
+    },
+    "landMinAltVspd": {
+        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+    },
+    "landMinAltVspdHelp": {
+        "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
+    },
+    "landSlowdownMinAlt": {
+        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed [cm/s]"
@@ -2683,6 +2704,60 @@
     "fixedWingNavigationConfiguration": {
       "message": "Fixed Wing Navigation Settings"
     },
+    "osd_unsupported_msg1": {
+        "message" : "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
+    },
+    "osd_unsupported_msg2": {
+        "message" : "Note that some flight controllers have an onboard <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> that can be flashed and configured with <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, however the MinimOSD cannot be configured through this interface."
+    },
+    "osd_elements": {
+        "message" : "Elements"
+    },
+    "osd_preview_title": {
+        "message" : "Preview <span>(drag to change position)</span>"
+    },
+    "osd_preview_title_drag":{
+        "message": ""
+    },
+    "osd_video_format": {
+        "message" : "Video Format"
+    },
+    "osd_units": {
+        "message" : "Units"
+    },
+    "osd_main_voltage_decimals": {
+        "message" : "Voltage Decimals"
+    },
+    "osd_coordinate_digits": {
+        "message" : "Coordinate Digits"
+    },
+    "osd_plus_code_digits": {
+        "message" : "Plus Code Digits"
+    },
+    "osd_plus_code_short": {
+        "message" : "Plus Code Remove Leading Digits"
+    },
+    "osd_crosshairs_style": {
+        "message" : "Crosshairs Style"
+    },
+    "osd_left_sidebar_scroll": {
+        "message" : "Left Sidebar Scroll"
+    },
+    "osd_right_sidebar_scroll": {
+        "message" : "Right Sidebar Scroll"
+    },
+    "osd_crsf_lq_format": {
+        "message" : "Crossfire LQ Format"
+    },
+    "osd_sidebar_scroll_arrows": {
+        "message" : "Sidebar Scroll Arrows"
+    },
+    "osd_home_position_arm_screen": {
+        "message" : "Home Position on Arming Screen"
+    },
+    "osd_alarms": {
+        "message" : "Alarms"
+    },
     "osdLayoutDefault": {
         "message": "Default Layout"
     },
@@ -2771,16 +2846,22 @@
         "message": "Maximum ESC temperature"
     },
     "osd_snr_alarm": {
-        "message": "Crossfire SNR Alarm Level"
+        "message": "CRSF SNR Alarm Level"
     },
     "osdalarmSNR_HELP": {
         "message": "SNR is only shown below this value. 0dB (1:1 ratio), indicates that received signal equals noise floor."
     },
     "osd_link_quality_alarm": {
-        "message": "Crossfire Link Quality Alarm"
+        "message": "CRSF Link Quality Alarm"
     },
     "osdalarmLQ_HELP": {
         "message": "For Crossfire use 70%. For Tracer use 50%."
+    },
+    "osd_rssi_dbm_alarm": {
+        "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_rssi_dbm_alarm_HELP": {
+        "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
     },
     "osdGroupGeneral": {
         "message": "General"
@@ -2805,6 +2886,9 @@
     },
     "osdGroupGPS": {
         "message": "GPS"
+    },
+    "osdGroupPowerLimits": {
+        "message": "Power limits"
     },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
@@ -2880,6 +2964,15 @@
     },
     "osdElement_EFFICIENCY_WH": {
         "message": "Efficiency Wh/Km"
+    },
+    "osdElement_PLIMIT_REMAINING_BURST_TIME": {
+        "message": "Remaining burst time"
+    },
+    "osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
+        "message": "Active current limit"
+    },
+    "osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
+        "message": "Active power limit"
     },
     "osdElement_THROTTLE_POSITION_AUTO_THR": {
         "message": "Throttle Position / Auto Throttle"
@@ -2997,6 +3090,12 @@
     },
     "osdElement_ESC_RPM": {
         "message": "Motor RPM from ESC telemetry"
+    },
+    "osdElement_GLIDESLOPE": {
+        "message": "Glideslope"
+    },
+    "osdElement_GLIDESLOPE_HELP": {
+        "message": "Amount of horizontal distance traveled per unit of lost altitude"
     },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
@@ -3159,6 +3258,66 @@
     },
     "osdSettingCRSF_LQ_FORMAT_HELP": {
         "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
+    },
+    "osd_dji_HD_FPV": {
+        "message" : "DJI HD FPV"
+    },
+       "osd_dji_hide_unsupported": {
+        "message": "Hide unsupported elements"
+    },
+    "osd_dji_ESC_temp": {
+        "message" : "Source of ESC Temperature"
+    },
+    "osd_dji_RSSI_source": {
+        "message" : "Source of RSSI"
+    },
+    "osd_dji_GPS_source": {
+        "message" : "Source of GPS Speed"
+    },
+    "osd_dji_speed_source": {
+        "message" : "Source of 3D Speed"
+    },
+    "osd_dji_use_craft_name_elements": {
+        "message" : "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
+    },
+    "osd_dji_adjustments": {
+        "message" : "Show adjustments in Craft Name"
+    },
+    "osd_dji_cn_alternating_duration": {
+        "message" : "Craft Name alternating duration (in 1/10 sec)"
+    },
+    "osd_font_default": {
+        "message" : "Default"
+    },
+    "osd_font_vision": {
+        "message" : "Vision"
+    },
+    "osd_font_impact": {
+        "message" : "Impact"
+    },
+    "osd_font_impact_mini": {
+        "message" : "Impact mini"
+    },
+    "osd_font_clarity": {
+        "message" : "Clarity"
+    },
+    "osd_font_clarity_medium": {
+        "message" : "Clarity medium"
+    },
+    "osd_font_bold": {
+        "message" : "Bold"
+    },
+    "osd_font_large": {
+        "message" : "Large"
+    },
+    "osd_font_load_file": {
+        "message" : "Open Font File"
+    },
+    "osd_font_upload": {
+        "message" : "Upload Font"
+    },
+    "osd_font_manager": {
+        "message" : "Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -3532,16 +3691,16 @@
     "itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
     },
-    "gyro_lpf_type": {
+    "gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
-    "gyro_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
-    "gyro_stage2_lowpass_type": {
-        "message": "Gyro Stage 2 LPF type"
-    },
-    "gyro_stage2_lowpass_type_help": {
+    "gyro_main_lpf_type_help": {
         "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
     },
     "dterm_lpf_type": {

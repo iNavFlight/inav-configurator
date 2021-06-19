@@ -176,6 +176,10 @@
     padding: 5px;
 }
 
+.tab-firmware_flasher .release_info .notes img {
+    max-width: 100%;
+}
+
 .tab-firmware_flasher .git_info {
     display: none;
     margin-bottom: 10px;

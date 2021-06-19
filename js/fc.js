@@ -590,7 +590,8 @@ var FC = {
             {bit: 30, group: 'other', name: 'FW_LAUNCH', haveTip: false, showNameInTip: false},
             {bit: 2, group: 'other', name: 'TX_PROF_SEL', haveTip: false, showNameInTip: false},
             {bit: 0, group: 'other', name: 'THR_VBAT_COMP', haveTip: true, showNameInTip: true},
-            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true}
+            {bit: 3, group: 'other', name: 'BAT_PROFILE_AUTOSWITCH', haveTip: true, showNameInTip: true},
+            {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true}
         ];
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.4.0") && semver.lt(CONFIG.flightControllerVersion, "2.5.0")) {
@@ -612,72 +613,6 @@ var FC = {
     },
     isMotorOutputEnabled: function () {
         return this.isFeatureEnabled('PWM_OUTPUT_ENABLE', this.getFeatures());
-    },
-    getLooptimes: function () {
-        return {
-            125: {
-                defaultLooptime: 500,
-                looptimes: {
-                    1000: "1kHz",
-                    500: "2kHz",
-                    250: "4kHz",
-                    125: "8kHz"
-                }
-            },
-            1000: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz"
-                }
-            }
-        };
-    },
-    getGyroFrequencies: function () {
-        return {
-            125: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz",
-                    500: "2kHz",
-                    250: "4kHz",
-                    125: "8kHz"
-                }
-            },
-            1000: {
-                defaultLooptime: 1000,
-                looptimes: {
-                    1000: "1kHz"
-                }
-            }
-        };
-    },
-    getGyroLpfValues: function () {
-        return [
-            {
-                tick: 125,
-                label: "256Hz"
-            },
-            {
-                tick: 1000,
-                label: "188Hz"
-            },
-            {
-                tick: 1000,
-                label: "98Hz"
-            },
-            {
-                tick: 1000,
-                label: "42Hz"
-            },
-            {
-                tick: 1000,
-                label: "20Hz"
-            },
-            {
-                tick: 1000,
-                label: "10Hz"
-            }
-        ];
     },
     getGpsProtocols: function () {
         return [
@@ -1252,7 +1187,7 @@ var FC = {
                 default: 0
             },
             1: {
-                name: "RC Channel",
+                name: "Get RC Channel",
                 type: "range",
                 range: [1, 16],
                 default: 1
