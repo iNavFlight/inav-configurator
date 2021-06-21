@@ -1418,6 +1418,11 @@ OSD.constants = {
                     id: 105,
                     preview: '1'
                 },
+                {
+                    name: 'VTX_POWER_MW',
+                    id: 119,
+                    preview: '  25'
+                },
             ]
         },
         {
