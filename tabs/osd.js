@@ -26,8 +26,10 @@ SYM.WH = 0xAB;
 SYM.WATT = 0xAE;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
-SYM.WH_KM = 172;
-SYM.WH_MI = 173;
+SYM.WH_KM = 0xAC;
+SYM.WH_MI = 0xAD;
+SYM.MAH_MI_0 = 0x0A;
+SYM.MAH_MI_1 = 0x0B;
 SYM.GPS_SAT1 = 0x1E;
 SYM.GPS_SAT2 = 0x1F;
 SYM.GPS_HDP1 = 0xBD;
@@ -1160,12 +1162,27 @@ OSD.constants = {
                 {
                     name: 'EFFICIENCY_MAH',
                     id: 35,
-                    preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '123' + FONT.symbol(SYM.MAH_MI_0) + FONT.symbol(SYM.MAH_MI_1);
+                        } else {
+                            return '123' + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1);
+                        }
+                        
+                    }
                 },
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM)
+                    preview: function(osd_data) {
+                        if (OSD.data.preferences.units === 0) {
+                            // Imperial
+                            return '123' + FONT.symbol(SYM.WH_MI);
+                        } else {
+                            return '123' + FONT.symbol(SYM.WH_KM);
+                        }
+                    }
                 }
             ]
         },
