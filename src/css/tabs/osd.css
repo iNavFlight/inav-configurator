@@ -21,6 +21,10 @@
     background-color: #575757;
 }
 
+.blue {
+    color: #151f8c;
+}
+
 .tab-osd .spacer_box_title {
     float: none;
 }
@@ -448,12 +452,25 @@ button {
 }
 
 .tab-osd .settings select {
-    width: 61px;
+    width: 65px;
     margin-right: 11px;
 }
 
 .tab-osd .settings .switchery {
     margin-right: 25px;
+}
+
+.tab-osd .settings .djiCraftNameElements {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-top: 5px;
+    padding-bottom: 5px;
+}
+
+.no-bottom {
+    border-bottom: none !important;
+    padding-bottom: 0 i !important;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {

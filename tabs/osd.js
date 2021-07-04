@@ -95,6 +95,7 @@ SYM.GVAR_1 = 0xEF;
 SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
+SYM.GLIDESLOPE = 0x7F;
 
 var FONT = FONT || {};
 
@@ -426,8 +427,60 @@ OSD.initData = function () {
         items: [],
         groups: {},
         display_items: [],
-        preview: []
+        preview: [],
+        isDjiHdFpv: false
     };
+};
+
+OSD.DjiElements =  {
+    supported: [
+        "RSSI_VALUE",
+        "MAIN_BATT_VOLTAGE",
+        "MAIN_BATT_CELL_VOLTAGE",
+        "CRAFT_NAME",
+        "FLYMODE",
+        "ESC_TEMPERATURE",
+        "ALTITUDE",
+        "VARIO_NUM",
+        "CROSSHAIRS",
+        "HORIZON_SIDEBARS",
+        "PITCH_ANGLE",
+        "ROLL_ANGLE",
+        "CURRENT_DRAW",
+        "MAH_DRAWN",
+        "GPS_SPEED",
+        "GPS_SATS",
+        "LONGITUDE",
+        "LATITUDE",
+        "DIRECTION_TO_HOME",
+        "DISTANCE_TO_HOME" 
+    ],
+    emptyGroups: [
+        "MapsAndRadars",
+        "GForce",
+        "Timers",
+        "VTX",
+        "CRSF",
+        "GVars",
+        "PIDs",
+        "PIDOutputs",
+        "PowerLimits"
+    ],
+    supportedSettings: [
+        "units"
+    ],
+    supportedAlarms: [
+        "rssi_alarm",
+        "osd_alt_alarm"
+    ],
+    craftNameElements: [
+        "MESSAGES",
+        "THROTTLE_POSITION",
+        "THROTTLE_POSITION_AUTO_THR",
+        "3D_SPEED",
+        "EFFICIENCY_MAH",
+        "TRIP_DIST"
+    ]   
 };
 
 OSD.constants = {
@@ -757,6 +810,12 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.RPM) + '983',
                 },
                 {
+                    name: 'GLIDESLOPE',
+                    id: 124,
+                    min_version: '3.0.0',
+                    preview: FONT.symbol(127) + FONT.embed_dot('12.3'),
+                },
+                {
                     name: 'VERSION',
                     id: 119,
                     preview: 'INAV 2.7.0'
@@ -921,9 +980,9 @@ OSD.constants = {
                         } else {
                             if (OSD.data.preferences.units === 0) {
                                 // imperial
-                                return '118' + FONT.symbol(SYM.ALT_FT);
+                                return ' 118' + FONT.symbol(SYM.ALT_FT);
                             }
-                            return '399' + FONT.symbol(SYM.ALT_M);
+                            return ' 399' + FONT.symbol(SYM.ALT_M);
                         }
                     }
                 },
@@ -1161,9 +1220,9 @@ OSD.constants = {
                         } else {
                             if (OSD.data.preferences.units === 0) {
                                 // Imperial
-                                return '275' + FONT.symbol(SYM.ALT_FT);
+                                return ' 275' + FONT.symbol(SYM.ALT_FT);
                             }
-                            return '477' + FONT.symbol(SYM.ALT_M);
+                            return ' 477' + FONT.symbol(SYM.ALT_M);
                         }
                     },
                 },
@@ -1659,6 +1718,15 @@ OSD.reload = function(callback) {
             callback();
         }
     };
+
+    MSP.promise(MSPCodes.MSP2_CF_SERIAL_CONFIG).then(function (resp) {
+        $.each(SERIAL_CONFIG.ports, function(index, port){
+            if(port.functions.includes('DJI_FPV')) {
+                OSD.data.isDjiHdFpv = true;
+            }
+        });
+    });
+
     MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
 
         OSD.msp.decodeLayoutCounts(resp);
@@ -2062,6 +2130,7 @@ OSD.GUI.updateFields = function() {
             continue;
         }
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
+        groupContainer.attr('id', group.name);
         var groupTitleContainer = groupContainer.find('.spacer_box_title');
         var groupTitle = chrome.i18n.getMessage(group.name);
         groupTitleContainer.text(groupTitle);
@@ -2155,9 +2224,100 @@ OSD.GUI.updateFields = function() {
         }
         $tmpl.parent().append(groupContainer);
     }
+
+    $('#djiUnsupportedElements').prepend(
+        $('<input type="checkbox" class="toggle" />') 
+        .attr('checked', OSD.data.isDjiHdFpv) 
+        .on('change', function () {
+            OSD.GUI.updateDjiView(this.checked);
+            OSD.GUI.updatePreviews();
+        })
+     );
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
+};
+
+OSD.GUI.removeBottomLines = function(){
+    // restore
+    $('.display-field').removeClass('no-bottom');
+    $('.gui_box').each(function(index, gui_box){
+        var elements = $(gui_box).find('.display-fields, .settings').children();
+        var lastVisible = false;
+        elements.each(function(index, element){
+            if ($(element).is(':visible')) {
+                lastVisible = $(element);
+            }
+        });
+        if (lastVisible) {
+            lastVisible.addClass('no-bottom');
+        }
+    });
+};
+
+OSD.GUI.updateDjiMessageElements = function(on) {
+    $('.display-field').each(function(index, element) {
+        var name = $(element).find('input').attr('name'); 
+        if (OSD.DjiElements.craftNameElements.includes(name)) {
+            if (on) {
+                $(element)
+                    .addClass('blue')
+                    .show();
+            } else if ($('#djiUnsupportedElements').find('input').is(':checked')) {
+                $(element).hide();
+            } 
+        }
+
+        if (!on) {
+            $(element).removeClass('blue');
+        }
+    });
+    OSD.GUI.removeBottomLines();
+};
+
+OSD.GUI.updateDjiView = function(on) {
+    if (on) {
+        $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
+            $('#osdGroup' + groupName).hide();    
+        });
+
+        var displayFields = $('.display-field');
+        displayFields.each(function(index, element) {
+            var name = $(element).find('input').attr('name');
+            if (!OSD.DjiElements.supported.includes(name)) {
+                $(element).hide();
+            }
+        });
+
+        var settings = $('.settings-container').find('.settings').children();
+        settings.each(function(index, element) {
+            var name = $(element).attr('class');          
+            if (!OSD.DjiElements.supportedSettings.includes(name)) {
+                $(element).hide();
+            }                 
+        });
+
+        var alarms = $('.alarms-container').find('.settings').children();
+        alarms.each(function(index, element) {
+            var name = $(element).attr('for');
+            if (!OSD.DjiElements.supportedAlarms.includes(name)) {
+                $(element).hide();
+            }
+        });
+    } else {
+        $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
+            $('#osdGroup' + groupName).show();    
+        });
+
+        $('.display-field')
+            .show()
+            .removeClass('no-bottom');
+
+        $('.settings-container, .alarms-container').find('.settings').children()
+            .show()
+            .removeClass('no-bottom');
+    }
+    OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -2192,6 +2352,11 @@ OSD.GUI.updatePreviews = function() {
         }
         var itemData = OSD.data.items[ii];
         if (!itemData.isVisible) {
+            continue;
+        }
+        // DJI HD FPV: Hide elements that only appear in craft name
+        if (OSD.DjiElements.craftNameElements.includes(item.name) &&
+        $('#djiUnsupportedElements').find('input').is(':checked')) {
             continue;
         }
         var j = (itemData.position >= 0) ? itemData.position : itemData.position + OSD.data.display_size.total;
@@ -2358,6 +2523,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
+    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv);
 };
 
 OSD.GUI.update = function() {
@@ -2527,13 +2693,6 @@ TABS.osd.initialize = function (callback) {
             });
         });
 
-        $(document).keypress(function (e) {
-            if (e.which == 13) { // enter
-                // Trigger regular Flashing sequence
-                $('a.flash_font').click();
-            }
-        });
-
         $('.update_preview').on('change', function () {
             if (OSD.data) {
                 // Force an OSD redraw by saving any element
@@ -2545,6 +2704,10 @@ TABS.osd.initialize = function (callback) {
                     OSD.GUI.saveItem({id: 0});
                 }, 100);
             }
+        });
+
+        $('#useCraftnameForMessages').on('change', function() {
+            OSD.GUI.updateDjiMessageElements(this.checked);
         });
 
         // Update SENSOR_CONFIG, used to detect

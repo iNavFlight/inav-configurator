@@ -44,7 +44,7 @@ TABS.auxiliary.initialize = function (callback) {
             "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD",                                 // Navigation mode
             "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                 // Flight mode modifiers
             "NAV WP", "GCS NAV", "HOME RESET",                                                         // Navigation
-            "SERVO AUTOTRIM", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",                  // Fixed wing specific
+            "SERVO AUTOTRIM", "AUTO LEVEL", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",    // Fixed wing specific
             "TURTLE", "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",  // Multi-rotor specific
             "BEEPER", "LEDS OFF", "LIGHTS",                                                            // Feedback
             "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                          // OSD
@@ -343,6 +343,7 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         function update_ui() {
+            let hasUsedMode = false;
             for (var i = 0; i < AUX_CONFIG.length; i++) {
                 var modeElement = $('#mode-' + i);
                 if (modeElement.find(' .range').length == 0) {
@@ -356,8 +357,16 @@ TABS.auxiliary.initialize = function (callback) {
                 } else {
                     $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('off');
                 }
+                hasUsedMode = true;
             }
-
+        
+            let hideUnused = hideUnusedModes && hasUsedMode;
+            for (let i = 0; i < AUX_CONFIG.length; i++) {
+                let modeElement = $('#mode-' + i);
+                if (modeElement.find(' .range').length == 0) {
+                    modeElement.toggle(!hideUnused);
+                }
+            }    
             var auxChannelCount = RC.active_channels - 4;
 
             for (var i = 0; i < (auxChannelCount); i++) {
@@ -365,6 +374,17 @@ TABS.auxiliary.initialize = function (callback) {
             }
         }
 
+        let hideUnusedModes = false;
+        chrome.storage.local.get('hideUnusedModes', function (result) {
+            $("input#switch-toggle-unused")
+                .change(function() {
+                    hideUnusedModes = $(this).prop("checked");
+                    chrome.storage.local.set({ hideUnusedModes: hideUnusedModes });
+                    update_ui();
+                })
+                .prop("checked", !!result.hideUnusedModes)
+                .change();
+        });  
         // update ui instantly on first load
         update_ui();
 
