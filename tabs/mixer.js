@@ -277,66 +277,31 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
-        motorWizardModal = new jBox('Modal', {
-            width: 480,
-            height: 410,
-            closeButton: 'title',
-            animation: false,
-            attach: $wizardButton,
-            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
-            content: $('#mixerWizardContent')
-        });
+        motorWizardModal = helper.setupMixerWizard(
+            $wizardButton,
+            "#mixerWizardTemplate",
+            chrome.i18n.getMessage("mixerWizardModalTitle")
+        );
 
-        function validateMixerWizard() {
-            let errorCount = 0;
-            for (let i = 0; i < 4; i++) {
-                const $elements = $('[data-motor] option:selected[id=' + i + ']'),
-                    assignedRulesCount = $elements.length;
-
-                if (assignedRulesCount != 1) {
-                    errorCount++;
-                    $elements.closest('tr').addClass("red-background");
-                } else {
-                    $elements.closest('tr').removeClass("red-background");
-                }
-
-            }
-
-            return (errorCount == 0);
-        }
-
-        $(".wizard-motor-select").change(validateMixerWizard);
-
-        $("#wizard-execute-button").click(function () {
-
-            // Validate mixer settings
-            if (!validateMixerWizard()) {
-                return;
-            }
-
+        $(document).on("click", "#wizard-execute-button", function () {
             MOTOR_RULES.flush();
 
-            for (let i = 0; i < 4; i++) {
-                const $selects = $(".wizard-motor-select");
-                let rule = -1;
+            $positions = $(this).closest(".mixer-wizard").find(".position");
 
-                $selects.each(function () {
-                    if (parseInt($(this).find(":selected").attr("id"), 10) == i) {
-                        rule = parseInt($(this).attr("data-motor"), 10);
-                    }
-                });
+            for (let positionIndex = 0; positionIndex < $positions.length; positionIndex++) {
+                const $position = $positions.filter(`[data-position-index="${positionIndex}"]`);
+                const $motor = $position.find("[draggable]");
+                const motorIndex = parseInt($motor.attr("data-motor-index"), 10);
 
-                const r = currentMixerPreset.motorMixer[rule];
-
+                const rule = currentMixerPreset.motorMixer[motorIndex];
                 MOTOR_RULES.put(
                     new MotorMixRule(
-                        r.getThrottle(),
-                        r.getRoll(),
-                        r.getPitch(),
-                        r.getYaw()
+                        rule.getThrottle(),
+                        rule.getRoll(),
+                        rule.getPitch(),
+                        rule.getYaw()
                     )
                 );
-                
             }
 
             renderMotorMixRules();
