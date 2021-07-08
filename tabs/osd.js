@@ -26,6 +26,8 @@ SYM.WH = 0xAB;
 SYM.WATT = 0xAE;
 SYM.MAH_KM_0 = 157;
 SYM.MAH_KM_1 = 158;
+SYM.MAH_MI_0 = 0x0A;
+SYM.MAH_MI_1 = 0x0B;
 SYM.WH_KM = 172;
 SYM.WH_MI = 173;
 SYM.GPS_SAT1 = 0x1E;
@@ -96,6 +98,15 @@ SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
 SYM.GLIDESLOPE = 0x7F;
+SYM.DIST_NM = 0x119;
+SYM.NM = 0x11A;
+SYM.KTS_3D = 0x11B;
+SYM.KTS = 0x11C;
+SYM.HUND_FTM = 0x11D;
+SYM.MAH_NM_0 = 0x11E;
+SYM.MAH_NM_1 = 0x11F;
+SYM.AH_NM = 0x120;
+SYM.WH_NM = 0x121;
 
 var FONT = FONT || {};
 
@@ -324,35 +335,51 @@ var OSD = OSD || {};
 
 // common functions for altitude and negative altitude alarms
 function altitude_alarm_unit(osd_data) {
-    if (OSD.data.preferences.units === 0) {
-        return 'ft';
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            return 'ft';
+        default: // Metric
+            return 'm';
     }
-    return 'm';
 }
 
 function altitude_alarm_to_display(osd_data, value) {
-    if (OSD.data.preferences.units === 0) {
-        // meters to feet
-        return Math.round(value * 3.28084)
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            // feet to meters
+            return Math.round(value * 3.28084)
+        default: // Metric
+            return value;
     }
-    return value;
 }
 
 function altitude_alarm_from_display(osd_data, value) {
-    if (OSD.data.preferences.units === 0) {
-        // feet to meters
-        return Math.round(value / 3.28084);
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            // feet to meters
+            return Math.round(value / 3.28084);
+        default: // Metric
+            return value;
     }
-    return value;
 }
 
 function altitude_alarm_max(osd_data, value) {
     var meters_max = 10000;
-    if (OSD.data.preferences.units === 0) {
-        // meters max to feet max
-        return Math.trunc(meters_max * 3.28084);
+    switch (OSD.data.preferences.units) {
+        case 0: // Imperial
+        case 3: // UK
+        case 4: // GA
+            // meters max to feet max
+            return Math.trunc(meters_max * 3.28084);
+        default: // Metric
+            return meters_max;
     }
-    return meters_max;
 }
 
 // Used to wrap altitude conversion functions for firmwares up
@@ -503,6 +530,7 @@ OSD.constants = {
         {name: 'osdUnitMetric', value: 1},
         {name: 'osdUnitMetricMPH', tip: 'osdUnitMetricMPHTip', value: 2},
         {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 3},
+        {name: 'osdUnitGA', tip: 'osdUnitGATip', value: 4},
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
@@ -551,39 +579,65 @@ OSD.constants = {
             name: 'DIST',
             field: 'dist',
             unit: function(osd_data) {
-                if (OSD.data.preferences.units === 0) {
-                    return 'mi';
+                switch (OSD.data.preferences.units) {
+                    case 0: // Imperial
+                    case 3: // UK
+                        return 'mi';
+                    case 4: // GA
+                        return 'NM';
+                    default: // Metric
+                        return 'm';
                 }
-                return 'm';
             },
             to_display: function(osd_data, value) {
-                if (OSD.data.preferences.units === 0) {
-                    // meters to miles
-                    return (value / 1609.34).toFixed(2);
+                switch (OSD.data.preferences.units) {
+                    case 0: // Imperial
+                    case 3: // UK
+                        // meters to miles
+                        return (value / 1609.344).toFixed(2);
+                    case 4: // GA
+                        // metres to nautical miles
+                        return (value / 1852.001).toFixed(2);
+                    default: // Metric
+                        return value;
                 }
-                return value;
             },
             from_display: function(osd_data, value) {
-                if (OSD.data.preferences.units === 0) {
-                    // miles to meters
-                    return Math.round(value * 1609.34);
+                switch (OSD.data.preferences.units) {
+                    case 0: // Imperial
+                    case 3: // UK
+                        // miles to meters
+                        return Math.round(value * 1609.344);
+                    case 4: // GA
+                        return Math.round(value * 1852.001);
+                    default: // Metric
+                        return value;
                 }
-                return value;
             },
             step: function(osd_data) {
-                if (OSD.data.preferences.units === 0) {
-                    return 0.01;
+                switch (OSD.data.preferences.units) {
+                    case 0: // Imperial
+                    case 3: // UK
+                    case 4: // GA
+                        return 0.01;
+                    default: // Metric
+                        return 1;
                 }
-                return 1;
             },
             min: 0,
             max: function(osd_data) {
                 var meters_max = 50000;
-                if (OSD.data.preferences.units === 0) {
-                    // Meters max to miles max
-                    return Math.trunc(meters_max / 1609.344);
+                switch (OSD.data.preferences.units) {
+                    case 0: // Imperial
+                    case 3: // UK
+                        // Meters max to miles max
+                        return Math.trunc(meters_max / 1609.344);
+                    case 4: // GA
+                        // Meters max to nautical miles max
+                        return Math.trunc(meters_max / 1852.001);
+                    default: // Metric
+                        return meters_max;
                 }
-                return meters_max;
             }
         },
         {
@@ -720,17 +774,27 @@ OSD.constants = {
                     id: 49,
                     preview: function(osd_data) {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                                case 4: // GA
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
+                                default:
+                                    // Metric
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
                             }
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
+                            
                         } else {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                case 4: // GA
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                default: // Metric
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                             }
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -785,12 +849,20 @@ OSD.constants = {
                     },
                     preview: function(osd_data) {
                         var speed;
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
-                            // Imperial
-                            speed = ' 35' + FONT.symbol(SYM.MPH);
-                        } else {
-                            speed = ' 55' + FONT.symbol(SYM.KMH);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                speed = ' 35' + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                speed = ' 30' + FONT.symbol(SYM.KTS);
+                                break;
+                            default: // Metric
+                                speed = ' 56' + FONT.symbol(SYM.KMH);
+                                break;
                         }
+
                         return FONT.symbol(SYM.AIR) + speed;
                     }
                 },
@@ -830,24 +902,24 @@ OSD.constants = {
                     name: 'IMU_TEMPERATURE',
                     id: 86,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.IMU_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return FONT.symbol(SYM.IMU_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return FONT.symbol(SYM.IMU_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return FONT.symbol(SYM.IMU_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.BARO_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return FONT.symbol(SYM.BARO_TEMP) + ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return FONT.symbol(SYM.BARO_TEMP) + ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
@@ -855,108 +927,108 @@ OSD.constants = {
                     id: 107,
                     min_version: '2.5.0',
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 98' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 98' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 38' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return FONT.symbol(SYM.ESC_TEMPERATURE) + ' 37' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR1_TEMPERATURE',
                     id: 88,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR2_TEMPERATURE',
                     id: 89,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR3_TEMPERATURE',
                     id: 90,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR4_TEMPERATURE',
                     id: 91,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR5_TEMPERATURE',
                     id: 92,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR6_TEMPERATURE',
                     id: 93,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR7_TEMPERATURE',
                     id: 94,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
                 {
                     name: 'SENSOR8_TEMPERATURE',
                     id: 95,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // Imperial
-                            return ' 90' + FONT.symbol(SYM.TEMP_F);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return ' 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return ' 32' + FONT.symbol(SYM.TEMP_C);
                         }
-                        // Metric, UK
-                        return ' 32' + FONT.symbol(SYM.TEMP_C);
                     }
                 },
             ]
@@ -973,17 +1045,23 @@ OSD.constants = {
                     id: 15,
                     preview: function () {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            if (OSD.data.preferences.units === 0) {
-                                // imperial
-                                return FONT.symbol(SYM.ALT_FT) + '118';
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                case 4: // GA
+                                    return FONT.symbol(SYM.ALT_FT) + '375';
+                                default: // Metric
+                                    return FONT.symbol(SYM.ALT_M) + '114'
                             }
-                            return FONT.symbol(SYM.ALT_M) + '399'
                         } else {
-                            if (OSD.data.preferences.units === 0) {
-                                // imperial
-                                return ' 118' + FONT.symbol(SYM.ALT_FT);
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                case 4: // GA
+                                    return ' 375' + FONT.symbol(SYM.ALT_FT);
+                                default: // Metric
+                                    return ' 114' + FONT.symbol(SYM.ALT_M);
                             }
-                            return ' 399' + FONT.symbol(SYM.ALT_M);
                         }
                     }
                 },
@@ -1000,17 +1078,31 @@ OSD.constants = {
                     name: 'VARIO_NUM',
                     id: 26,
                     preview: function(osd_data) {
-                        if (OSD.data.preferences.units === 0) {
-                            // imperial
-                            return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.embed_dot('-1.6') + FONT.symbol(SYM.FT_S);
+                            case 4: // GA
+                                return FONT.embed_dot('-2.6') + FONT.symbol(SYM.HUND_FTM);
+                            default: // Metric
+                                return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                         }
-                        return FONT.embed_dot('-0.5') + FONT.symbol(SYM.M_S);
                     }
                 },
                 {
                     name: 'OSD_RANGEFINDER',
                     id: 120,
-                    preview: "2" + FONT.symbol(SYM.DIST_KM)
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.embed_dot('1') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.embed_dot('1') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.embed_dot('2') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 }
             ]
         },
@@ -1161,12 +1253,32 @@ OSD.constants = {
                 {
                     name: 'EFFICIENCY_MAH',
                     id: 35,
-                    preview: "123" + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1)
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return ' 76' + FONT.symbol(SYM.MAH_MI_0) + FONT.symbol(SYM.MAH_MI_1);
+                            case 4: // GA
+                                return ' 66' + FONT.symbol(SYM.MAH_NM_0) + FONT.symbol(SYM.MAH_NM_1);
+                            default: // Metric
+                                return '123' + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1);
+                        }
+                    }
                 },
                 {
                     name: 'EFFICIENCY_WH',
                     id: 39,
-                    preview: FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM)
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.embed_dot('0.76') + FONT.symbol(SYM.WH_MI);
+                            case 4: // GA
+                                return FONT.embed_dot('0.66') + FONT.symbol(SYM.WH_NM);
+                            default: // Metric
+                                return FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM);
+                        }
+                    }
                 }
             ]
         },
@@ -1201,11 +1313,16 @@ OSD.constants = {
                     id: 13,
                     preview: function(osd_data) {
                         // 3 chars
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
-                            // Imperial
-                            return FONT.embed_dot(' 25') + FONT.symbol(SYM.MPH);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot(' 88') + FONT.symbol(SYM.MPH);
+                            case 4: // GA
+                                return FONT.embed_dot(' 76') + FONT.symbol(SYM.KTS);
+                            default: // Metric
+                                return FONT.embed_dot('141') + FONT.symbol(SYM.KMH);
                         }
-                        return FONT.embed_dot(' 40') + FONT.symbol(SYM.KMH);
                     }
                 },
                 {
@@ -1213,17 +1330,23 @@ OSD.constants = {
                     id: 96,
                     preview: function(osd_data) {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.ALT_FT) + '275';
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                case 4: // GA
+                                    return FONT.symbol(SYM.ALT_FT) + '375';
+                                default: // Metric
+                                    return FONT.symbol(SYM.ALT_M) + '114';
                             }
-                            return FONT.symbol(SYM.ALT_M) + '477';
                         } else {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return ' 275' + FONT.symbol(SYM.ALT_FT);
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                case 4: // GA
+                                    return ' 375' + FONT.symbol(SYM.ALT_FT);
+                                default: // Metric
+                                    return ' 114' + FONT.symbol(SYM.ALT_M);
                             }
-                            return ' 477' + FONT.symbol(SYM.ALT_M);
                         }
                     },
                 },
@@ -1232,11 +1355,16 @@ OSD.constants = {
                     id: 85,
                     preview: function(osd_data) {
                         // 3 chars
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
-                            // Imperial
-                            return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
+                            case 4: // GA
+                                return FONT.embed_dot(' 26') + FONT.symbol(SYM.KTS_3D);
+                            default: // Metric
+                                return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
                         }
-                        return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
                     }
                 },
                 {
@@ -1284,17 +1412,25 @@ OSD.constants = {
                     id: 23,
                     preview: function(osd_data) {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                                case 4: // GA
+                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
+                                default: // Metric
+                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
                             }
-                            return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                         } else {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                case 4: // GA
+                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                default: // Metric
+                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                             }
-                            return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -1304,17 +1440,25 @@ OSD.constants = {
                     min_version: '1.9.1',
                     preview: function(osd_data) {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
+                                case 4: // GA
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
+                                default: // Metric
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
                             }
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.73');
                         } else {
-                            if (OSD.data.preferences.units === 0) {
-                                // Imperial
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            switch (OSD.data.preferences.units) {
+                                case 0: // Imperial
+                                case 3: // UK
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                case 4: // GA
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                default: // Metric
+                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                             }
-                            return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -1329,11 +1473,18 @@ OSD.constants = {
                     preview: function(osd_data) {
                         // 6 chars
                         var p = FONT.symbol(SYM.WIND_SPEED_HORIZONTAL) + FONT.symbol(SYM.DIRECTION + 1);
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
-                            // Imperial
-                            p += FONT.embed_dot('3.27') + FONT.symbol(SYM.MPH);
-                        } else {
-                            p += FONT.embed_dot('5.27') + FONT.symbol(SYM.KMH);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                p += FONT.embed_dot('3.27') + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                p += FONT.embed_dot('2.84') + FONT.symbol(SYM.KTS);
+                                break;
+                            default: // Metric
+                                p += FONT.embed_dot('5.26') + FONT.symbol(SYM.KMH);
+                                break;
                         }
                         return p;
                     }
@@ -1344,11 +1495,18 @@ OSD.constants = {
                     preview: function(osd_data) {
                         // 6 chars
                         var p = FONT.symbol(SYM.WIND_SPEED_VERTICAL) + FONT.symbol(SYM.AH_DECORATION_UP);
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 2) {
-                            // Imperial
-                            p += FONT.embed_dot('1.03') + FONT.symbol(SYM.MPH);
-                        } else {
-                            p += FONT.embed_dot('1.67') + FONT.symbol(SYM.KMH);
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                p += FONT.embed_dot('1.03') + FONT.symbol(SYM.MPH);
+                                break;
+                            case 4: // GA
+                                p += FONT.embed_dot('0.90') + FONT.symbol(SYM.KTS);
+                                break;
+                            default: // Metric
+                                p += FONT.embed_dot('1.66') + FONT.symbol(SYM.KMH);
+                                break;
                         }
                         return p;
                     }
@@ -1388,10 +1546,17 @@ OSD.constants = {
                     id: 98,
                     preview: function(osd_data) {
                         var scale;
-                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 3) {
-                            scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
-                        } else {
-                            scale = "100" + FONT.symbol(SYM.M);
+                        switch(OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
+                                break;
+                            case 4: // GA
+                                scale = FONT.embed_dot("0.08") + FONT.symbol(SYM.NM);
+                                break;
+                            default: // Metric
+                                scale = "100" + FONT.symbol(SYM.M);
+                                break;
                         }
                         return FONT.symbol(SYM.SCALE) + scale;
                     },

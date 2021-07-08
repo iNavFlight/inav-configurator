@@ -2864,6 +2864,12 @@
     "osdUnitUKTip": {
         "message": "Use imperial units except for the temperature, which is displayed in Celsius."
     },
+    "osdUnitGA": {
+        "message": "General Aviation"
+    },
+    "osdUnitGATip": {
+        "message": "Use GA standard units (non-SI): Nautical Miles, Feet, Knots, Celcius."
+    },
     "osd_rssi_alarm": {
         "message": "RSSI (%)"
     },
