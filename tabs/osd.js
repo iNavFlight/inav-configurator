@@ -65,11 +65,11 @@ SYM.FT_S = 153;
 SYM.CLOCK = 0xBC;
 SYM.ZERO_HALF_TRAILING_DOT = 192;
 SYM.ZERO_HALF_LEADING_DOT = 208;
-SYM.AH_AIRCRAFT0 = 218;
-SYM.AH_AIRCRAFT1 = 219;
-SYM.AH_AIRCRAFT2 = 220;
-SYM.AH_AIRCRAFT3 = 221;
-SYM.AH_AIRCRAFT4 = 222;
+SYM.AH_AIRCRAFT0 = 430;
+SYM.AH_AIRCRAFT1 = 431;
+SYM.AH_AIRCRAFT2 = 432;
+SYM.AH_AIRCRAFT3 = 433;
+SYM.AH_AIRCRAFT4 = 434;
 SYM.ROLL_LEFT = 0xCC;
 SYM.ROLL_LEVEL = 0xCD;
 SYM.ROLL_RIGHT = 0xCE;
@@ -98,13 +98,13 @@ SYM.GVAR_2 = 0xF0;
 SYM.GVAR_3 = 0xF1;
 SYM.GVAR_4 = 0xF2;
 SYM.GLIDESLOPE = 0x7F;
-SYM.DIST_NM = 0x119;
-SYM.NM = 0x11A;
-SYM.KTS_3D = 0x11B;
-SYM.KTS = 0x11C;
-SYM.HUND_FTM = 0x11D;
-SYM.MAH_NM_0 = 0x11E;
-SYM.MAH_NM_1 = 0x11F;
+SYM.DIST_NM = 0xFE;
+SYM.NM = 0xDD;
+SYM.KTS_3D = 0x119;
+SYM.KTS = 0xDE;
+SYM.HUND_FTM = 0xDC;
+SYM.MAH_NM_0 = 0xDA;
+SYM.MAH_NM_1 = 0xDB;
 SYM.AH_NM = 0x120;
 SYM.WH_NM = 0x121;
 
@@ -1096,11 +1096,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.embed_dot('1') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.embed_dot('15.9') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.embed_dot('1') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.embed_dot('13.8') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.embed_dot('2') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.embed_dot('25.6') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 }
