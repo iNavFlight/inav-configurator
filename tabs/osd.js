@@ -2331,6 +2331,10 @@ OSD.GUI.updateFields = function() {
             } else {
                 name = inflection.titleize(name);
             }
+            var searchTerm = $('.osd_search').val();
+            if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                continue;
+            }
             var help = chrome.i18n.getMessage(nameKey + '_HELP');
             if (help) {
                 $('<div class="helpicon cf_tip"></div>')
@@ -2389,7 +2393,9 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        $tmpl.parent().append(groupContainer);
+        if (groupContainer.find('.display-fields').children().size() > 0) {
+            $tmpl.parent().append(groupContainer);
+        }
     }
 
     $('#djiUnsupportedElements').prepend(
@@ -2691,6 +2697,9 @@ OSD.GUI.updateAll = function() {
         layouts.hide();
         layouts.off('change');
     }
+    $('.osd_search').on('input', function() {
+        OSD.GUI.updateFields();
+    });
     $('.supported').fadeIn();
     OSD.GUI.updateVideoMode();
     OSD.GUI.updateUnits();
