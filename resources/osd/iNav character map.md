@@ -32,10 +32,10 @@ SYM_AH_KM                  |                              | Ah per Km           
 _ASCII_ __*__              |                              | #                                     | 035        | 0x23
 SYM_AH_MI                  |                              | Ah per Mile                           | 036        | 0x24
 _ASCII_ __*__              |                              | %                                     | 037        | 0x25
-SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 038        | 0x26
-SYM_MAH_MI_0               | SYM.MAH_MI_0                 | mAh per Mile, left side               | 039        | 0x27
-SYM_MAH_MI_1               | SYM.MAH_MI_1                 | mAh per Mile, right side              | 063        | 0x3F
+SYM_MAH_MI_0               | SYM.MAH_MI_0                 | mAh per Mile, left side               | 038        | 0x26
+SYM_MAH_MI_1               | SYM.MAH_MI_1                 | mAh per Mile, right side              | 039        | 0x27
 _ASCII_ __*__              |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E
+SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 063        | 0x3F
 _ASCII_ __*__              |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F
 SYM_MAH_NM_0               | SYM.MAH_NM_0                 | mAh per Nautical mile, left side      | 096        | 0x60
 SYM_MAH_NM_1               | SYM.MAH_NM_1                 | mAh per Nautical mile, right side     | 097        | 0x61
