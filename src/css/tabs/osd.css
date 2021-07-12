@@ -336,6 +336,10 @@
     height: calc(100% - 41px);
 }
 
+.font-preview {
+    padding-top:10px;
+}
+
 .tab-osd .content_toolbar {
     text-align: right;
 }

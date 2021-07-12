@@ -2,111 +2,110 @@
 'use strict';
 
 var SYM = SYM || {};
-SYM.MILLIOHM = 0x00;
-SYM.BATT = 0x90;
+SYM.LAST_CHAR = 225; // For drawing the font preview
+SYM.BLANK = 0x20;
+SYM.MILLIOHM = 0x62;
+SYM.BATT = 0x63;
 SYM.RSSI = 0x01;
-SYM.AH_RIGHT = 0x02;
-SYM.AH_LEFT = 0x03;
-SYM.THR = 0x04;
-SYM.VOLT = 0x06;
-SYM.AH_DECORATION_UP = 5;
-SYM.WIND_SPEED_HORIZONTAL = 22;
-SYM.WIND_SPEED_VERTICAL = 23;
-SYM.FLY_M = 0x9C;
-SYM.ON_M = 0x9B;
-SYM.AH_CENTER_LINE = 0x26;
-SYM.AH_CENTER_LINE_RIGHT = 0x27;
-SYM.AH_CENTER = 0x7E;
-SYM.AH_BAR9_0 = 0x80;
-SYM.AZIMUTH = 0x8D; // 141
-SYM.AH_DECORATION = 0x13;
-SYM.AMP = 0x9A;
-SYM.MAH = 0x07;
-SYM.WH = 0xAB;
-SYM.WATT = 0xAE;
-SYM.MAH_KM_0 = 157;
-SYM.MAH_KM_1 = 158;
-SYM.MAH_MI_0 = 0x0A;
-SYM.MAH_MI_1 = 0x0B;
-SYM.WH_KM = 172;
-SYM.WH_MI = 173;
-SYM.GPS_SAT1 = 0x1E;
-SYM.GPS_SAT2 = 0x1F;
-SYM.GPS_HDP1 = 0xBD;
-SYM.GPS_HDP2 = 0xBE;
-SYM.KMH = 161;
-SYM.KMH_3D = 0x89;
-SYM.MPH = 176;
-SYM.MPH_3D = 0x8A;
-SYM.ALT_M = 177;
-SYM.ALT_FT = 179;
-SYM.LAT = 0xA6;
-SYM.LON = 0xA7;
-SYM.AIR = 151;
-SYM.DIRECTION = 114;
-SYM.DIR_TO_HOME = 0x60;
-SYM.SCALE = 175;
-SYM.DIST_KM = 182;
-SYM.DIST_MI = 184;
-SYM.M = 185;
-SYM.MI = 187;
-SYM.HOME = 191;
-SYM.TRIP_DIST = 0x22;
-SYM.HEADING = 0xA9;
-SYM.DEGREES = 0xA8;
-SYM.HEADING_N = 24;
-SYM.HEADING_E = 26;
-SYM.HEADING_W = 27;
-SYM.HEADING_DIVIDED_LINE = 28;
-SYM.HEADING_LINE = 29;
-SYM.VARIO_UP_2A = 0xA2;
-SYM.M_S = 0x9F;
-SYM.FT_S = 153;
-SYM.CLOCK = 0xBC;
-SYM.ZERO_HALF_TRAILING_DOT = 192;
-SYM.ZERO_HALF_LEADING_DOT = 208;
-SYM.AH_AIRCRAFT0 = 430;
-SYM.AH_AIRCRAFT1 = 431;
-SYM.AH_AIRCRAFT2 = 432;
-SYM.AH_AIRCRAFT3 = 433;
-SYM.AH_AIRCRAFT4 = 434;
-SYM.ROLL_LEFT = 0xCC;
-SYM.ROLL_LEVEL = 0xCD;
-SYM.ROLL_RIGHT = 0xCE;
-SYM.PITCH_UP = 0xCF;
-SYM.PITCH_DOWN = 0xDF;
-SYM.TEMP_C = 0x0E;
-SYM.TEMP_F = 0x0D;
-SYM.LAST_CHAR = 190;
-SYM.BARO_TEMP = 0xF0;
-SYM.IMU_TEMP = 0xF1;
-SYM.TEMP = 0xF2;
-SYM.GFORCE = 0xE6;
-SYM.GFORCE_X = 0xE7;
-SYM.GFORCE_Y = 0xE8;
-SYM.GFORCE_Z = 0xE9;
+SYM.AH_RIGHT = 0x12D;
+SYM.AH_LEFT = 0x12C;
+SYM.THR = 0x95;
+SYM.VOLT = 0x1F;
+SYM.AH_DECORATION_UP = 0x15;
+SYM.WIND_SPEED_HORIZONTAL = 0x86;
+SYM.WIND_SPEED_VERTICAL = 0x87;
+SYM.FLY_M = 0x9F;
+SYM.ON_M = 0x9E;
+SYM.AH_CENTER_LINE = 0x13A;
+SYM.AH_CENTER_LINE_RIGHT = 0x13B;
+SYM.AH_BAR9_0 = 0x14C;
+SYM.AZIMUTH = 0x05;
+SYM.AH_DECORATION = 0x131;
+SYM.AMP = 0x6A;
+SYM.MAH = 0x99;
+SYM.WH = 0x6D;
+SYM.WATT = 0x71;
+SYM.MAH_KM_0 = 0x6B;
+SYM.MAH_KM_1 = 0x6C;
+SYM.MAH_MI_0 = 0x27;
+SYM.MAH_MI_1 = 0x3F;
+SYM.WH_KM = 0x6E;
+SYM.WH_MI = 0x6F;
+SYM.GPS_SAT1 = 0x08;
+SYM.GPS_SAT2 = 0x09;
+SYM.GPS_HDP1 = 0x0E;
+SYM.GPS_HDP2 = 0x0F;
+SYM.KMH = 0x90;
+SYM.KMH_3D = 0x88;
+SYM.MPH = 0x91;
+SYM.MPH_3D = 0x89;
+SYM.ALT_M = 0x76;
+SYM.ALT_FT = 0x78;
+SYM.LAT = 0x03;
+SYM.LON = 0x04;
+SYM.AIR = 0x8C;
+SYM.DIRECTION = 0x17;
+SYM.DIR_TO_HOME = 0x13C;
+SYM.SCALE = 0x0D;
+SYM.DIST_KM = 0x7E;
+SYM.DIST_MI = 0x80;
+SYM.M = 0x82;
+SYM.MI = 0x84;
+SYM.HOME = 0x10;
+SYM.TRIP_DIST = 0x75;
+SYM.HEADING = 0x0C;
+SYM.DEGREES = 0x0B;
+SYM.HEADING_N = 0xC8;
+SYM.HEADING_E = 0xCA;
+SYM.HEADING_W = 0xCB;
+SYM.HEADING_DIVIDED_LINE = 0x93;
+SYM.HEADING_LINE = 0x94;
+SYM.VARIO_UP_2A = 0x155;
+SYM.M_S = 0x8F;
+SYM.FT_S = 0x8D;
+SYM.CLOCK = 0xA0;
+SYM.ZERO_HALF_TRAILING_DOT = 0xA1;
+SYM.ZERO_HALF_LEADING_DOT = 0xB1;
+SYM.ROLL_LEFT = 0xAD;
+SYM.ROLL_LEVEL = 0xAE;
+SYM.ROLL_RIGHT = 0xAF;
+SYM.PITCH_UP = 0xB0;
+SYM.PITCH_DOWN = 0xBB;
+SYM.TEMP_C = 0x97;
+SYM.TEMP_F = 0x96;
+SYM.BARO_TEMP = 0xC0;
+SYM.IMU_TEMP = 0xC1;
+SYM.TEMP = 0xC2;
+SYM.GFORCE = 0xBC;
+SYM.GFORCE_X = 0xBD;
+SYM.GFORCE_Y = 0xBE;
+SYM.GFORCE_Z = 0xBF;
 SYM.RPM = 0x8B;
-SYM.ESC_TEMPERATURE = 0xF3;
-SYM.RSS2 = 0xEA;
-SYM.DB = 0xEB;
-SYM.DBM = 0xEC;
-SYM.MW = 0xED;
-SYM.SNR = 0xEE;
-SYM.LQ = 0x0C;
-SYM.GVAR_1 = 0xEF;
-SYM.GVAR_2 = 0xF0;
-SYM.GVAR_3 = 0xF1;
-SYM.GVAR_4 = 0xF2;
-SYM.GLIDESLOPE = 0x7F;
-SYM.DIST_NM = 0xFE;
-SYM.NM = 0xDD;
-SYM.KTS_3D = 0x119;
-SYM.KTS = 0xDE;
-SYM.HUND_FTM = 0xDC;
-SYM.MAH_NM_0 = 0xDA;
-SYM.MAH_NM_1 = 0xDB;
-SYM.AH_NM = 0x120;
-SYM.WH_NM = 0x121;
+SYM.ESC_TEMPERATURE = 0xC3;
+SYM.RSS2 = 0x11;
+SYM.DB = 0x12;
+SYM.DBM = 0x13;
+SYM.MW = 0x72;
+SYM.SNR = 0x14;
+SYM.LQ = 0x02;
+SYM.GLIDESLOPE = 0x9C;
+SYM.DIST_NM = 0x81;
+SYM.NM = 0x85;
+SYM.KT_3D = 0x8A;
+SYM.KT = 0x92;
+SYM.HUND_FTM = 0x8E;
+SYM.MAH_NM_0 = 0x60;
+SYM.MAH_NM_1 = 0x61;
+SYM.AH_NM = 0x26;
+SYM.WH_NM = 0x70;
+
+SYM.AH_AIRCRAFT0 = 0x1A2;
+SYM.AH_AIRCRAFT1 = 0x1A3;
+SYM.AH_AIRCRAFT2 = 0x1A4;
+SYM.AH_AIRCRAFT3 = 0x1A5;
+SYM.AH_AIRCRAFT4 = 0x1A6;
+
+SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
 var FONT = FONT || {};
 
@@ -256,9 +255,8 @@ FONT.draw = function (charAddress) {
 
 // Returns the font data for a blank character
 FONT.blank = function() {
-    var blank = 0x55; // A byte with all pixels set to transparent
     var size = FONT.constants.SIZES.MAX_NVM_FONT_CHAR_SIZE;
-    return Array.apply(null, {length: size}).map(function() { return blank; });
+    return Array.apply(null, {length: size}).map(function() { return SYM.BLANK; });
 };
 
 FONT.msp = {
@@ -311,9 +309,9 @@ FONT.upload = function (callback) {
 
 FONT.preview = function ($el) {
     $el.empty();
-    for (var i = 0; i <= SYM.LAST_CHAR; i++) {
+    for (var i = 1; i <= SYM.LAST_CHAR; i++) {
         var url = FONT.data.character_image_urls[i];
-        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img>');
+        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img> ');
     }
 };
 
@@ -856,7 +854,7 @@ OSD.constants = {
                                 speed = ' 35' + FONT.symbol(SYM.MPH);
                                 break;
                             case 4: // GA
-                                speed = ' 30' + FONT.symbol(SYM.KTS);
+                                speed = ' 30' + FONT.symbol(SYM.KT);
                                 break;
                             default: // Metric
                                 speed = ' 56' + FONT.symbol(SYM.KMH);
@@ -869,7 +867,7 @@ OSD.constants = {
                 {
                     name: 'RTC_TIME',
                     id: 29,
-                    preview: FONT.symbol(SYM.CLOCK) + '13:37'
+                    preview: FONT.symbol(SYM.CLOCK) + '13:37:25'
                 },
                 {
                     name: 'RC_SOURCE',
@@ -886,11 +884,12 @@ OSD.constants = {
                     name: 'GLIDESLOPE',
                     id: 124,
                     min_version: '3.0.0',
-                    preview: FONT.symbol(127) + FONT.embed_dot('12.3'),
+                    preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
                 },
                 {
                     name: 'VERSION',
                     id: 119,
+                    min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
                 }
             ]
@@ -1319,7 +1318,7 @@ OSD.constants = {
                             case 3: // UK
                                 return FONT.embed_dot(' 88') + FONT.symbol(SYM.MPH);
                             case 4: // GA
-                                return FONT.embed_dot(' 76') + FONT.symbol(SYM.KTS);
+                                return FONT.embed_dot(' 76') + FONT.symbol(SYM.KT);
                             default: // Metric
                                 return FONT.embed_dot('141') + FONT.symbol(SYM.KMH);
                         }
@@ -1361,7 +1360,7 @@ OSD.constants = {
                             case 3: // UK
                                 return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
                             case 4: // GA
-                                return FONT.embed_dot(' 26') + FONT.symbol(SYM.KTS_3D);
+                                return FONT.embed_dot(' 26') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
                                 return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
                         }
@@ -1480,7 +1479,7 @@ OSD.constants = {
                                 p += FONT.embed_dot('3.27') + FONT.symbol(SYM.MPH);
                                 break;
                             case 4: // GA
-                                p += FONT.embed_dot('2.84') + FONT.symbol(SYM.KTS);
+                                p += FONT.embed_dot('2.84') + FONT.symbol(SYM.KT);
                                 break;
                             default: // Metric
                                 p += FONT.embed_dot('5.26') + FONT.symbol(SYM.KMH);
@@ -1502,7 +1501,7 @@ OSD.constants = {
                                 p += FONT.embed_dot('1.03') + FONT.symbol(SYM.MPH);
                                 break;
                             case 4: // GA
-                                p += FONT.embed_dot('0.90') + FONT.symbol(SYM.KTS);
+                                p += FONT.embed_dot('0.90') + FONT.symbol(SYM.KT);
                                 break;
                             default: // Metric
                                 p += FONT.embed_dot('1.66') + FONT.symbol(SYM.KMH);
@@ -1937,6 +1936,8 @@ OSD.updateDisplaySize = function () {
         y: OSD.constants.VIDEO_LINES[video_type],
         total: null
     };
+
+    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2569,7 +2570,7 @@ OSD.GUI.updatePreviews = function() {
         item.preview_img.style.pointerEvents = 'none';
     }
 
-    var centerishPosition = 224;
+    var centerishPosition = 255;
 
     // AHI is one line up with NTSC (less lines) compared to PAL
     if (OSD.constants.VIDEO_TYPES[OSD.data.video_system] == 'NTSC')
@@ -2584,18 +2585,24 @@ OSD.GUI.updatePreviews = function() {
 
     // crosshairs
     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        if (Settings.getInputValue('osd_crosshairs_style') == 1) {
-            // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 2, SYM.AH_AIRCRAFT0);
+        crsHNumber = Settings.getInputValue('osd_crosshairs_style');
+       if (crsHNumber == 1) {
+            // AIRCRAFT style - Only 3 elements are displayed in the firmware
+        //    OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 2, SYM.AH_AIRCRAFT0);
             OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_AIRCRAFT1);
             OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_AIRCRAFT2);
             OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 2, SYM.AH_AIRCRAFT4);
+        //    OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 2, SYM.AH_AIRCRAFT4);
+        } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
+            // TYPES 3 to 8 (zero indexed)
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
             OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
             OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CENTER);
         }
     }
 
