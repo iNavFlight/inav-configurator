@@ -501,7 +501,8 @@ OSD.constants = {
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
         {name: 'osdUnitMetric', value: 1},
-        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 2},
+        {name: 'osdUnitMetricMPH', tip: 'osdUnitMetricMPHTip', value: 2},
+        {name: 'osdUnitUK', tip: 'osdUnitUKTip', value: 3},
     ],
     AHISIDEBARWIDTHPOSITION: 7,
     AHISIDEBARHEIGHTPOSITION: 3,
@@ -1387,7 +1388,7 @@ OSD.constants = {
                     id: 98,
                     preview: function(osd_data) {
                         var scale;
-                        if (OSD.data.preferences.units === 0) {
+                        if (OSD.data.preferences.units === 0 || OSD.data.preferences.units === 3) {
                             scale = FONT.embed_dot("0.10") + FONT.symbol(SYM.MI);
                         } else {
                             scale = "100" + FONT.symbol(SYM.M);
