@@ -76,20 +76,8 @@ PortHandler.check = function () {
                     } else {
                         console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
                     }
+                    self.restorePortOptions();
                 });
-
-                chrome.storage.local.get('last_used_bps', function (result) {
-                    if (result['last_used_bps']) {
-                        $('#baud').val(result['last_used_bps']);
-                    }
-                });
-
-                chrome.storage.local.get('wireless_mode_enabled', function (result) {
-                    if (result['wireless_mode_enabled']) {
-                        $('#wireless-mode').prop('checked', true).change();
-                    }
-                });
-
             }
 
             if (!self.initial_ports) {
@@ -141,7 +129,7 @@ PortHandler.check = function () {
 
         self.check_usb_devices();
 
-        GUI.updateManualPortVisibility();
+        GUI.updatePortOptions();
         setTimeout(function () {
             self.check();
         }, 250);
@@ -149,10 +137,11 @@ PortHandler.check = function () {
 };
 
 PortHandler.check_usb_devices = function (callback) {
+    const self = this;
     chrome.usb.getDevices(usbDevices.STM32DFU, function (result) {
         if (result.length) {
             if (!$("div#port-picker #port [value='DFU']").length) {
-                $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
+                self.appendPort('DFU');
                 $('div#port-picker #port').val('DFU');
             }
             self.dfu_available = true;
@@ -163,18 +152,43 @@ PortHandler.check_usb_devices = function (callback) {
             self.dfu_available = false;
         }
 
-        if(callback) callback(self.dfu_available);
+        if (callback) {
+            callback(self.dfu_available);
+        }
     });
 };
+
+PortHandler.portProperties = function (port) {
+    let data = {};
+    if (port === 'manual') {
+        data.isManual = true
+    }
+    if (port && port.startsWith('BLE')) {
+        data.isBLE = true;
+        data.ignoresBaudRate = true;
+    }
+    if (port === 'DFU') {
+        data.isDFU = true;
+        data.ignoresBaudRate = true;
+    }
+    return data;
+}
+
+PortHandler.appendPort = function (port, name) {
+    let data = this.portProperties(port);
+    let portName = name || port;
+    $('div#port-picker #port').append($("<option/>", {value: port, text: portName, data: data}));
+}
 
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one
 
-    for (var i = 0; i < ports.length; i++) {
-        $('div#port-picker #port').append($("<option/>", {value: ports[i], text: ports[i], data: {isManual: false}}));
+    for (let ii = 0; ii < ports.length; ii++) {
+        this.appendPort(ports[ii]);
     }
-
-    $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
+    if (serial.allowsOtherDevices()) {
+        this.appendPort('manual', 'Manual Selection');
+    }
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {
@@ -200,6 +214,52 @@ PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {
     this.port_detected_callbacks.push(obj);
 
     return obj;
+};
+
+PortHandler.getSelectedPort = function() {
+    const $port = $('#port');
+    const $portOverride = $('#port-override');
+    const portData = $port.find('option:selected').data();
+    if (portData && portData.isManual) {
+        return $portOverride.val();
+    }
+    return $port.val();
+};
+
+PortHandler.portOptionsKey = function(port) {
+    return 'portOptions:' + port;
+};
+
+PortHandler.savePortOptions = function() {
+    const port = this.getSelectedPort();
+    const key = this.portOptionsKey(port);
+    const baud = $('#baud').val();
+    const wirelessMode = $('#wireless-mode').prop('checked');
+    const data = {};
+    data[key] = {baud: baud, wirelessMode: wirelessMode};
+    chrome.storage.local.set(data);
+};
+
+PortHandler.restorePortOptions = function() {
+    const port = this.getSelectedPort();
+    const key = this.portOptionsKey(port);
+    const $baud = $('#baud');
+    const $wirelessMode = $('#wireless-mode');
+    chrome.storage.local.get([key], function(result) {
+        // Defaults
+        let baud = $baud.find('option').first().val();
+        let wirelessMode = false;
+        if (result && result[key]) {
+            baud = result[key].baud;
+            wirelessMode = result[key].wirelessMode;
+        }
+        if (!$baud.prop('disabled')) {
+            $baud.val(baud);
+        }
+        if (!$wirelessMode.prop('disabled')) {
+            $wirelessMode.prop('checked', wirelessMode).change();
+        }
+    });
 };
 
 PortHandler.port_removed = function (name, code, timeout, ignore_timeout) {

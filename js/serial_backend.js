@@ -5,18 +5,27 @@ $(document).ready(function () {
 
     var $port = $('#port'),
         $baud = $('#baud'),
-        $portOverride = $('#port-override');
+        $portOverride = $('#port-override'),
+        $wirelessMode = $('#wireless-mode');
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
      */
-    $('#wireless-mode').change(function () {
-        var $this = $(this);
 
-        if ($this.is(':checked')) {
+    $wirelessMode.change(function (e) {
+        if ($wirelessMode.prop('checked')) {
             helper.mspQueue.setLockMethod('hard');
         } else {
             helper.mspQueue.setLockMethod('soft');
+        }
+        if (e.originalEvent) {
+            PortHandler.savePortOptions();
+        }
+    });
+
+    $baud.change(function (e) {
+        if (e.originalEvent) {
+            PortHandler.savePortOptions();
         }
     });
 
@@ -72,23 +81,35 @@ $(document).ready(function () {
         }
     };
 
-    GUI.updateManualPortVisibility = function(){
+    GUI.updatePortOptions = function(){
         var selected_port = $port.find('option:selected');
+        if (!selected_port || !selected_port.data()) {
+            return;
+        }
         if (selected_port.data().isManual) {
             $('#port-override-option').show();
         }
         else {
             $('#port-override-option').hide();
         }
-        if (selected_port.data().isDFU) {
-            $baud.hide();
+        if (selected_port.data().ignoresBaudRate) {
+            $baud.addClass('disabled').prop('disabled', true);
         }
         else {
-            $baud.show();
+            $baud.removeClass('disabled').prop('disabled', false);
         }
+        let wirelessModeContainer = $wirelessMode.parent();
+        if (selected_port.data().isBLE) {
+            $wirelessMode.prop('disabled', true).prop('checked', true).change();
+            wirelessModeContainer.addClass('disabled');
+        } else {
+            $wirelessMode.prop('disabled', false);
+            wirelessModeContainer.removeClass('disabled');
+        }
+        PortHandler.restorePortOptions();
     };
 
-    GUI.updateManualPortVisibility();
+    GUI.updatePortOptions();
 
     $portOverride.change(function () {
         chrome.storage.local.set({'portOverride': $portOverride.val()});
@@ -99,7 +120,7 @@ $(document).ready(function () {
     });
 
     $port.change(function (target) {
-        GUI.updateManualPortVisibility();
+        GUI.updatePortOptions();
     });
 
     $('div.connect_controls a.connect').click(function () {
@@ -107,9 +128,7 @@ $(document).ready(function () {
 
             var clicks = $(this).data('clicks');
             var selected_baud = parseInt($baud.val());
-            var selected_port = $port.find('option:selected').data().isManual ?
-                    $portOverride.val() :
-                    String($port.val());
+            var selected_port = PortHandler.getSelectedPort();
             if (selected_port === 'DFU') {
                 GUI.log(chrome.i18n.getMessage('dfu_connect_message'));
             }
@@ -237,6 +256,8 @@ function onOpen(openInfo) {
 
         GUI.log(chrome.i18n.getMessage('serialPortOpened', [openInfo.connectionId]));
 
+        PortHandler.savePortOptions();
+
         // save selected port with chrome.storage if the port differs
         chrome.storage.local.get('last_used_port', function (result) {
             if (result.last_used_port) {
@@ -249,9 +270,6 @@ function onOpen(openInfo) {
                 chrome.storage.local.set({'last_used_port': GUI.connected_to});
             }
         });
-
-        chrome.storage.local.set({last_used_bps: serial.bitrate});
-        chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
 
         serial.onReceive.addListener(read_serial);
 
