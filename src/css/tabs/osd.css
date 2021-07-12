@@ -484,6 +484,13 @@ button {
 }
 
 .osd_layouts {
-    display: block;
+    display: inline-block;
     margin-bottom: 1em;
+    width: auto !important;
+}
+
+.osd_search {
+    float: right;
+    width: auto !important;
+    margin-right: 0 !important;
 }
