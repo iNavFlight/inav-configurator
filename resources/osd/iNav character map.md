@@ -87,8 +87,8 @@ SYM_MS                     | SYM.M_S                      | Metres per Second   
 SYM_KMH                    | SYM.KMH                      | Kilometres per Hour                   | 144        | 0x90
 SYM_MPH                    | SYM.MPH                      | Miles per Hour                        | 145        | 0x91
 SYM_KT                     | SYM.KT                       | Knots                                 | 146        | 0x92
-SYM_HEADING_DIVIDED_LINE   | SYM.HEADING_DIVIDED_LINE     | Heading graphic                       | 147        | 0x93
-SYM_HEADING_LINE           | SYM.HEADING_LINE             | Heading graphic                       | 148        | 0x94
+                           |                              |                                       | 147        | 0x93
+                           |                E             |                                       | 148        | 0x94
 SYM_THR                    | SYM.THR                      | Throttle symbol                       | 149        | 0x95
 SYM_TEMP_F                 | SYM.TEMP_F                   | Farenheit symbol                      | 150        | 0x96
 SYM_TEMP_C                 | SYM.TEMP_C                   | Celcius symbol                        | 151        | 0x97
@@ -122,6 +122,8 @@ SYM_HEADING_N              | SYM.HEADING_N                | Heading graph North 
 SYM_HEADING_S              | SYM.HEADING_S                | Heading graph South                   | 201        | 0xC9
 SYM_HEADING_E              | SYM.HEADING_E                | Heading graph East                    | 202        | 0xCA
 SYM_HEADING_W              | SYM.HEADING_W                | Heading graph West                    | 203        | 0xCB
+SYM_HEADING_DIVIDED_LINE   | SYM.HEADING_DIVIDED_LINE     | Heading graphic                       | 204        | 0xCC
+SYM_HEADING_LINE           | SYM.HEADING_LINE             | Heading graphic                       | 205        | 0xCD
  | | | | 
 SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
