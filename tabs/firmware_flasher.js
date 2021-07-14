@@ -71,27 +71,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             });
         });
 
-        /*$('.target_search').on('input', function(){
-            var searchText = $('.target_search').val();
-            var targetList = $('#board_targets > option');
-            alert("Searching... " + searchText + " through " + targetList.length + " targets.")
-            for (var ti = 0; ti < targetList.length; ti++) {
-                alert ("Target: " + targetList[ti]);
-                alert("Comparing " + searchText + " with " + targetList[ti].text);
-                if (searchText.length > 0) { 
-                    if ((targetList[i].text().toLowerCase().includes(searchText.toLowerCase())) === FALSE) {
-                        targetList[i].hide();
-                        alert("Hiding " + targetList[ti].text());
-                    } else {
-                        alert("Search string found.");
-                    }
-                } else {
-                    alert("Nothing to search, show everything.");
-                    targetList[ti].show();
-                }
-            }
-        });*/
-
         var buildBoardOptions = function(){
             var boards_e = $('select[name="board"]').empty();
             var showDevReleases = ($('input.show_development_releases').is(':checked'));

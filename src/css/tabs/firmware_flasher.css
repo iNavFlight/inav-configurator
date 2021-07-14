@@ -265,6 +265,7 @@
 
 .tab-firmware_flasher .target_search {
     padding-left: 3px;
+    width: 295px;
     height: 20px;
     line-height: 20px;
     text-align: left;
