@@ -26,17 +26,17 @@ SYM_AH_DECORATION_UP       | SYM.AH_DECORATION_UP         | AHi up arrow        
 SYM_AH_DECORATION_DOWN     |                              | AHI down arrow                        | 022        | 0x16
 SYM_DECORATION             | SYM.DIRECTION                | Direction little arrows               | 023 - 030  | 0x17 - 0x1E
 SYM_VOLT                   | SYM.VOLT                     | Volts symbol                          | 031        | 0x1F
-SYM_BLANK __*__            | SYM.BLANK                    | Empty                                 | 032        | 0x20
-_ASCII_ __*__              |                              | !                                     | 033        | 0x21
+SYM_BLANK _*_              | SYM.BLANK                    | Empty                                 | 032        | 0x20
+_ASCII_ _*_                |                              | !                                     | 033        | 0x21
 SYM_AH_KM                  |                              | Ah per Km                             | 034        | 0x22
-_ASCII_ __*__              |                              | #                                     | 035        | 0x23
+_ASCII_ _*_                |                              | #                                     | 035        | 0x23
 SYM_AH_MI                  |                              | Ah per Mile                           | 036        | 0x24
-_ASCII_ __*__              |                              | %                                     | 037        | 0x25
+_ASCII_ _*_                |                              | %                                     | 037        | 0x25
 SYM_MAH_MI_0               | SYM.MAH_MI_0                 | mAh per Mile, left side               | 038        | 0x26
 SYM_MAH_MI_1               | SYM.MAH_MI_1                 | mAh per Mile, right side              | 039        | 0x27
-_ASCII_ __*__              |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E
+_ASCII_ _*_                |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E
 SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 063        | 0x3F
-_ASCII_ __*__              |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F
+_ASCII_ _*_                |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F
 SYM_MAH_NM_0               | SYM.MAH_NM_0                 | mAh per Nautical mile, left side      | 096        | 0x60
 SYM_MAH_NM_1               | SYM.MAH_NM_1                 | mAh per Nautical mile, right side     | 097        | 0x61
 SYM_MILLIOHM               | SYM.MILLIOHM                 | MilliOhm symbol                       | 098        | 0x62
@@ -65,7 +65,7 @@ SYM_ALT_KM                 |                              | Altitude in Kilometr
 SYM_ALT_FT                 | SYM.ALT_FT                   | Altitude in Feet                      | 120        | 0x78
 SYM_ALT_KFT                |                              | Altitude in thousand Feet             | 121        | 0x79
 SYM_DIST_M                 |                              | Distance in Metres                    | 122        | 0x7A
-_ASCII_ __*__              |                              | Bracket symbols                       | 123 - 125  | 0x7B - 0x7D
+_ASCII_ _*_                |                              | Bracket symbols                       | 123 - 125  | 0x7B - 0x7D
 SYM_DIST_KM                | SYM.DIST_KM                  | Distance in Kilometres                | 126        | 0x7E
 SYM_DIST_FT                |                              | Distance in Feet                      | 127        | 0x7F
 SYM_DIST_MI                | SYM.DIST_MI                  | Distance in Miles                     | 128        | 0x80
@@ -87,8 +87,8 @@ SYM_MS                     | SYM.M_S                      | Metres per Second   
 SYM_KMH                    | SYM.KMH                      | Kilometres per Hour                   | 144        | 0x90
 SYM_MPH                    | SYM.MPH                      | Miles per Hour                        | 145        | 0x91
 SYM_KT                     | SYM.KT                       | Knots                                 | 146        | 0x92
-                           |                              |                                       | 147        | 0x93
-                           |                E             |                                       | 148        | 0x94
+---                        | ---                          | ---                                   | 147        | 0x93
+---                        | ---                          | ---                                   | 148        | 0x94
 SYM_THR                    | SYM.THR                      | Throttle symbol                       | 149        | 0x95
 SYM_TEMP_F                 | SYM.TEMP_F                   | Farenheit symbol                      | 150        | 0x96
 SYM_TEMP_C                 | SYM.TEMP_C                   | Celcius symbol                        | 151        | 0x97
@@ -187,4 +187,4 @@ SYM_HUD_ARROWS_D1          |                              | 1 arrow down        
 SYM_HUD_ARROWS_D2          |                              | 2 arrows down                         | 440        | 0x1B8
 SYM_HUD_ARROWS_D3          |                              | 3 arrows down                         | 441        | 0x1B9
 
-__*__ Do not change the IDs of these characters
+_*_ Do not change the IDs of these characters
