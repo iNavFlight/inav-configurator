@@ -32,8 +32,8 @@ SYM_AH_KM                  |                              | Ah per Km           
 _ASCII_ _*_                |                              | #                                     | 035        | 0x23
 SYM_AH_MI                  |                              | Ah per Mile                           | 036        | 0x24
 _ASCII_ _*_                |                              | %                                     | 037        | 0x25
-SYM_MAH_MI_0               | SYM.MAH_MI_0                 | mAh per Mile, left side               | 038        | 0x26
-SYM_MAH_MI_1               | SYM.MAH_MI_1                 | mAh per Mile, right side              | 039        | 0x27
+_ASCII_ _*_                |                              | &                                     | 038        | 0x26
+---                        | ---                          | ---                                   | 039        | 0x27
 _ASCII_ _*_                |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E
 SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 063        | 0x3F
 _ASCII_ _*_                |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F
@@ -87,8 +87,8 @@ SYM_MS                     | SYM.M_S                      | Metres per Second   
 SYM_KMH                    | SYM.KMH                      | Kilometres per Hour                   | 144        | 0x90
 SYM_MPH                    | SYM.MPH                      | Miles per Hour                        | 145        | 0x91
 SYM_KT                     | SYM.KT                       | Knots                                 | 146        | 0x92
----                        | ---                          | ---                                   | 147        | 0x93
----                        | ---                          | ---                                   | 148        | 0x94
+SYM_MAH_MI_0               | SYM.MAH_MI_0                 | mAh per Mile, left side               | 147        | 0x93
+SYM_MAH_MI_1               | SYM.MAH_MI_1                 | mAh per Mile, right side              | 148        | 0x94
 SYM_THR                    | SYM.THR                      | Throttle symbol                       | 149        | 0x95
 SYM_TEMP_F                 | SYM.TEMP_F                   | Farenheit symbol                      | 150        | 0x96
 SYM_TEMP_C                 | SYM.TEMP_C                   | Celcius symbol                        | 151        | 0x97
