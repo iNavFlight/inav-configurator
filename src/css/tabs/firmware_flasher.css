@@ -262,3 +262,17 @@
     text-shadow: none;
     opacity: 0.5;
 }
+
+.tab-firmware_flasher .target_search {
+    padding-left: 3px;
+    width: 295px;
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+    border: 1px solid silver;
+    border-radius: 3px;
+    margin-right: 11px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: normal;
+}
