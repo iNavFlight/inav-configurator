@@ -813,7 +813,11 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
+        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
+            return [ "NONE", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "Benewake TFmini", "VL53L1X", "US42"];
+        } else {
+            return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
+        }
     },
     getOpticalFlowNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
