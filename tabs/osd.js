@@ -851,13 +851,13 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                speed = ' 35' + FONT.symbol(SYM.MPH);
+                                speed = '115' + FONT.symbol(SYM.MPH);
                                 break;
                             case 4: // GA
-                                speed = ' 30' + FONT.symbol(SYM.KT);
+                                speed = '100' + FONT.symbol(SYM.KT);
                                 break;
                             default: // Metric
-                                speed = ' 56' + FONT.symbol(SYM.KMH);
+                                speed = '185' + FONT.symbol(SYM.KMH);
                                 break;
                         }
 
@@ -1212,7 +1212,7 @@ OSD.constants = {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
                             return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
                         } else {
-                            return ' 690' + FONT.symbol(SYM.MAH); // 4 chars
+                            return '1034' + FONT.symbol(SYM.MAH); // 4 chars
                         }
                     }
                 },
@@ -1234,7 +1234,7 @@ OSD.constants = {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
                             return FONT.symbol(SYM.WATT) + '50 '; // 3 chars
                         } else {
-                            return ' 50' + FONT.symbol(SYM.WATT); // 3 chars
+                            return ' 69' + FONT.symbol(SYM.WATT); // 3 chars
                         }
                     }
                 },
@@ -1245,7 +1245,7 @@ OSD.constants = {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
                             return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
                         } else {
-                            return ' 690' + FONT.symbol(SYM.MAH); // 4 chars
+                            return '1276' + FONT.symbol(SYM.MAH); // 4 chars
                         }
                     }
                 },
@@ -1256,11 +1256,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return ' 76' + FONT.symbol(SYM.MAH_MI_0) + FONT.symbol(SYM.MAH_MI_1);
+                                return '116' + FONT.symbol(SYM.MAH_MI_0) + FONT.symbol(SYM.MAH_MI_1);
                             case 4: // GA
-                                return ' 66' + FONT.symbol(SYM.MAH_NM_0) + FONT.symbol(SYM.MAH_NM_1);
+                                return '101' + FONT.symbol(SYM.MAH_NM_0) + FONT.symbol(SYM.MAH_NM_1);
                             default: // Metric
-                                return '123' + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1);
+                                return '187' + FONT.symbol(SYM.MAH_KM_0) + FONT.symbol(SYM.MAH_KM_1);
                         }
                     }
                 },
@@ -1316,11 +1316,11 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot(' 88') + FONT.symbol(SYM.MPH);
+                                return FONT.embed_dot('115') + FONT.symbol(SYM.MPH);
                             case 4: // GA
-                                return FONT.embed_dot(' 76') + FONT.symbol(SYM.KT);
+                                return FONT.embed_dot('100') + FONT.symbol(SYM.KT);
                             default: // Metric
-                                return FONT.embed_dot('141') + FONT.symbol(SYM.KMH);
+                                return FONT.embed_dot('185') + FONT.symbol(SYM.KMH);
                         }
                     }
                 },
@@ -1358,11 +1358,11 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot(' 30') + FONT.symbol(SYM.MPH_3D);
+                                return FONT.embed_dot('115') + FONT.symbol(SYM.MPH_3D);
                             case 4: // GA
-                                return FONT.embed_dot(' 26') + FONT.symbol(SYM.KT_3D);
+                                return FONT.embed_dot('100') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
-                                return FONT.embed_dot(' 48') + FONT.symbol(SYM.KMH_3D);
+                                return FONT.embed_dot('185') + FONT.symbol(SYM.KMH_3D);
                         }
                     }
                 },
@@ -2663,7 +2663,8 @@ OSD.GUI.updatePreviews = function() {
             $img.addClass('field-' + item.id)
                 .data('item', item)
                 .prop('draggable', true)
-                .on('dragstart', OSD.GUI.preview.onDragStart);
+                .on('dragstart', OSD.GUI.preview.onDragStart)
+                .prop('title', inflection.titleize(item.name));
         }
 
         $row.append($img);
