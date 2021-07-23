@@ -27,6 +27,10 @@ helper.defaultsDialog = (function () {
                 value: 500
             },
             {
+                key: "motor_pwm_rate",
+                value: 1000
+            },
+            {
                 key: "motor_pwm_protocol",
                 value: "ONESHOT125"
             },
