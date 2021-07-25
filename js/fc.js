@@ -657,101 +657,168 @@ var FC = {
         ];
     },
     getEscProtocols: function () {
-        return {
-            0: {
-                name: "STANDARD",
-                message: null,
-                defaultRate: 400,
-                rates: {
-                    50: "50Hz",
-                    400: "400Hz"
+
+        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
+            return {
+                0: {
+                    name: "STANDARD",
+                    message: null,
+                    defaultRate: 400,
+                    rates: {
+                        50: "50Hz",
+                        400: "400Hz"
+                    }
+                },
+                1: {
+                    name: "ONESHOT125",
+                    message: null,
+                    defaultRate: 1000,
+                    rates: {
+                        1000: "1kHz",
+                        2000: "2kHz"
+                    }
+                },
+                2: {
+                    name: "MULTISHOT",
+                    message: null,
+                    defaultRate: 2000,
+                    rates: {
+                        1000: "1kHz",
+                        2000: "2kHz"
+                    }
+                },
+                3: {
+                    name: "BRUSHED",
+                    message: null,
+                    defaultRate: 8000,
+                    rates: {
+                        8000: "8kHz",
+                        16000: "16kHz",
+                        32000: "32kHz"
+                    }
+                },
+                4: {
+                    name: "DSHOT150",
+                    message: null,
+                    defaultRate: 4000,
+                    rates: {
+                        4000: "4kHz"
+                    }
+                },
+                5: {
+                    name: "DSHOT300",
+                    message: null,
+                    defaultRate: 8000,
+                    rates: {
+                        8000: "8kHz"
+                    }
+                },
+                6: {
+                    name: "DSHOT600",
+                    message: null,
+                    defaultRate: 16000,
+                    rates: {
+                        16000: "16kHz"
+                    }
                 }
-            },
-            1: {
-                name: "ONESHOT125",
-                message: null,
-                defaultRate: 1000,
-                rates: {
-                    400: "400Hz",
-                    1000: "1kHz",
-                    2000: "2kHz"
+            };
+        } else {
+            return {
+                0: {
+                    name: "STANDARD",
+                    message: null,
+                    defaultRate: 400,
+                    rates: {
+                        50: "50Hz",
+                        400: "400Hz"
+                    }
+                },
+                1: {
+                    name: "ONESHOT125",
+                    message: null,
+                    defaultRate: 1000,
+                    rates: {
+                        400: "400Hz",
+                        1000: "1kHz",
+                        2000: "2kHz"
+                    }
+                },
+                2: {
+                    name: "ONESHOT42",
+                    message: null,
+                    defaultRate: 2000,
+                    rates: {
+                        400: "400Hz",
+                        1000: "1kHz",
+                        2000: "2kHz",
+                        4000: "4kHz",
+                        8000: "8kHz"
+                    }
+                },
+                3: {
+                    name: "MULTISHOT",
+                    message: null,
+                    defaultRate: 2000,
+                    rates: {
+                        400: "400Hz",
+                        1000: "1kHz",
+                        2000: "2kHz",
+                        4000: "4kHz",
+                        8000: "8kHz"
+                    }
+                },
+                4: {
+                    name: "BRUSHED",
+                    message: null,
+                    defaultRate: 8000,
+                    rates: {
+                        8000: "8kHz",
+                        16000: "16kHz",
+                        32000: "32kHz"
+                    }
+                },
+                5: {
+                    name: "DSHOT150",
+                    message: null,
+                    defaultRate: 4000,
+                    rates: {
+                        4000: "4kHz"
+                    }
+                },
+                6: {
+                    name: "DSHOT300",
+                    message: null,
+                    defaultRate: 8000,
+                    rates: {
+                        8000: "8kHz"
+                    }
+                },
+                7: {
+                    name: "DSHOT600",
+                    message: null,
+                    defaultRate: 16000,
+                    rates: {
+                        16000: "16kHz"
+                    }
+                },
+                8: {
+                    name: "DSHOT1200",
+                    message: "escProtocolNotAdvised",
+                    defaultRate: 16000,
+                    rates: {
+                        16000: "16kHz"
+                    }
+                },
+                9: {
+                    name: "SERIALSHOT",
+                    message: "escProtocolExperimental",
+                    defaultRate: 4000,
+                    rates: {
+                        4000: "4kHz"
+                    }
                 }
-            },
-            2: {
-                name: "ONESHOT42",
-                message: null,
-                defaultRate: 2000,
-                rates: {
-                    400: "400Hz",
-                    1000: "1kHz",
-                    2000: "2kHz",
-                    4000: "4kHz",
-                    8000: "8kHz"
-                }
-            },
-            3: {
-                name: "MULTISHOT",
-                message: null,
-                defaultRate: 2000,
-                rates: {
-                    400: "400Hz",
-                    1000: "1kHz",
-                    2000: "2kHz",
-                    4000: "4kHz",
-                    8000: "8kHz"
-                }
-            },
-            4: {
-                name: "BRUSHED",
-                message: null,
-                defaultRate: 8000,
-                rates: {
-                    8000: "8kHz",
-                    16000: "16kHz",
-                    32000: "32kHz"
-                }
-            },
-            5: {
-                name: "DSHOT150",
-                message: null,
-                defaultRate: 4000,
-                rates: {
-                    4000: "4kHz"
-                }
-            },
-            6: {
-                name: "DSHOT300",
-                message: null,
-                defaultRate: 8000,
-                rates: {
-                    8000: "8kHz"
-                }
-            },
-            7: {
-                name: "DSHOT600",
-                message: null,
-                defaultRate: 16000,
-                rates: {
-                    16000: "16kHz"
-                }
-            },
-            8: {
-                name: "DSHOT1200",
-                message: "escProtocolNotAdvised",
-                defaultRate: 16000,
-                rates: {
-                    16000: "16kHz"
-                }
-            },
-            9: {
-                name: "SERIALSHOT",
-                message: "escProtocolExperimental",
-                defaultRate: 4000,
-                rates: {
-                    4000: "4kHz"
-                }
-            }
-        };
+            };
+        }        
     },
     getServoRates: function () {
         return {
@@ -813,7 +880,11 @@ var FC = {
         }
     },
     getRangefinderNames: function () {
-        return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
+        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
+            return [ "NONE", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "Benewake TFmini", "VL53L1X", "US42"];
+        } else {
+            return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
+        }
     },
     getOpticalFlowNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
