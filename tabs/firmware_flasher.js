@@ -53,8 +53,25 @@ TABS.firmware_flasher.initialize = function (callback) {
             buildBoardOptions();
         });
 
-        var buildBoardOptions = function(){
+        $('.target_search').on('input', function(){
+            var searchText = $('.target_search').val().toLocaleLowerCase();
 
+            $('#board_targets option').each(function(i){
+                var target = $(this);
+                //alert("Comparing " + searchText + " with " + target.text());
+                if (searchText.length > 0 && i !== 0) { 
+                    if (target.text().toLowerCase().includes(searchText)) {
+                        target.show();
+                    } else {
+                        target.hide();
+                    }
+                } else {
+                    target.show();
+                }
+            });
+        });
+
+        var buildBoardOptions = function(){
             var boards_e = $('select[name="board"]').empty();
             var showDevReleases = ($('input.show_development_releases').is(':checked'));
             boards_e.append($("<option value='0'>{0}</option>".format(chrome.i18n.getMessage('firmwareFlasherOptionLabelSelectBoard'))));
