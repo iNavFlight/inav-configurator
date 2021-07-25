@@ -1404,7 +1404,7 @@ OSD.constants = {
                 {
                     name: 'AZIMUTH',
                     id: 108,
-                    preview: FONT.symbol(SYM.AZIMUTH) + ' 20'
+                    preview: FONT.symbol(SYM.AZIMUTH) + '120' + FONT.symbol(SYM.DEGREES)
                 },
                 {
                     name: 'DISTANCE_TO_HOME',
