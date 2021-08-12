@@ -318,6 +318,27 @@ input[type="number"]::-webkit-inner-spin-button {
     color: #d40000;
 }
 
+.imu2icon {
+    background: url("../images/icons/sensor_imu2_off.png") no-repeat -5px 2px;
+    background-size: 40px;
+    height: 30px;
+    margin-top: 3px;
+    width: 100%;
+    padding-top: 40px;
+    color: #4f4f4f;
+    text-align: center;
+}
+
+.imu2icon.active {
+    background-image: url("../images/icons/sensor_imu2_on.png");
+    color: #818181;
+}
+
+.imu2icon.error {
+    background-image: url("../images/icons/sensor_imu2_error.png");
+    color: #d40000;
+}
+
 .magicon {
     background: url("../images/icons/sensor_mag_off.png") no-repeat -5px 2px;
     background-size: 42px;
