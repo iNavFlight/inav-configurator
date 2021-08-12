@@ -403,6 +403,7 @@ function sensor_status_ex(hw_status)
     sensor_status_update_icon('.sonar',     '.sonaricon',       hw_status.rangeHwStatus);
     sensor_status_update_icon('.airspeed',  '.airspeedicon',    hw_status.speedHwStatus);
     sensor_status_update_icon('.opflow',    '.opflowicon',      hw_status.flowHwStatus);
+    sensor_status_update_icon('.imu2',      '.imu2icon',        hw_status.imu2HwStatus);
 }
 
 function sensor_status_update_icon(sensId, sensIconId, status)
@@ -437,7 +438,8 @@ function sensor_status_hash(hw_status)
            hw_status.gpsHwStatus +
            hw_status.rangeHwStatus +
            hw_status.speedHwStatus +
-           hw_status.flowHwStatus;
+           hw_status.flowHwStatus + 
+           hw_status.imu2HwStatus;
 }
 
 /**
@@ -460,6 +462,7 @@ function sensor_status(sensors_detected) {
     SENSOR_STATUS.rangeHwStatus     = have_sensor(sensors_detected, 'sonar') ? 1 : 0;
     SENSOR_STATUS.speedHwStatus     = have_sensor(sensors_detected, 'airspeed') ? 1 : 0;
     SENSOR_STATUS.flowHwStatus      = have_sensor(sensors_detected, 'opflow') ? 1 : 0;
+    SENSOR_STATUS.imu2HwStatus      = have_sensor(sensors_detected, 'imu2') ? 1 : 0;
     sensor_status_ex(SENSOR_STATUS);
 }
 

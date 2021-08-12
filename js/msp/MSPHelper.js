@@ -1,4 +1,4 @@
-/*global $, SERVO_DATA, PID_names, ADJUSTMENT_RANGES, RXFAIL_CONFIG, SERVO_CONFIG*/
+/*global $, SERVO_DATA, PID_names, ADJUSTMENT_RANGES, RXFAIL_CONFIG, SERVO_CONFIG,CONFIG*/
 'use strict';
 
 var mspHelper = (function (gui) {
@@ -133,6 +133,12 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
+
+                if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
+                    SENSOR_STATUS.imu2HwStatus = data.getUint8(9);
+                } else {
+                    SENSOR_STATUS.imu2HwStatus = 0;
+                }
                 sensor_status_ex(SENSOR_STATUS);
                 break;
 
