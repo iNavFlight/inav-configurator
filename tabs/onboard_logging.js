@@ -100,7 +100,7 @@ TABS.onboard_logging.initialize = function (callback) {
 
                     helper.features.reset();
                     helper.features.fromUI($('.require-blackbox-supported'));
-                    helper.features.execute(function () {   
+                    helper.features.execute(function () {
                         mspHelper.sendBlackboxConfiguration(save_to_eeprom);
                     });
                 });
@@ -354,12 +354,10 @@ TABS.onboard_logging.initialize = function (callback) {
         const filename = 'blackbox_log_' + date.getFullYear() + '-'  + zeroPad(date.getMonth() + 1, 2) + '-'
                 + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
                 + zeroPad(date.getSeconds(), 2);
-        const accepts = [{
-            description: 'TXT files', extensions: ['txt'],
-        }];
+        const accepts = '.txt';
 
         nwdialog.setContext(document);
-        nwdialog.saveFileDialog(filename, accepts, '', function(file) {                
+        nwdialog.saveFileDialog(filename, accepts, '', function(file) {
             onComplete(file);
         });
     }
