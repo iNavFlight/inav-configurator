@@ -2411,24 +2411,6 @@
     "tabMixer": {
         "message": "Mixer"
     },
-    "tabPresets": {
-        "message": "Presets"
-    },
-    "presetsPreset": {
-        "message": "Preset"
-    },
-    "presetsDescription": {
-        "message": "Description"
-    },
-    "presetsButtonApply": {
-        "message": "Apply"
-    },
-    "presetApplyTitle" : {
-        "message": "Confirm"
-    },
-    "presetsButtonSaveAndReboot": {
-        "message": "Save and reboot"
-    },
     "presetsApplyHeader": {
         "message": "Warning"
     },
