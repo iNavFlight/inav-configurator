@@ -318,7 +318,6 @@ let WaypointCollection = function () {
                 lJumptTargetAttached.push(element.getNumber());
             }
         });
-        console.log("lJumptTargetAttached ", lJumptTargetAttached);
         return (lJumptTargetAttached.length != 0 && lJumptTargetAttached != 'undefined')
     }
     
@@ -332,22 +331,32 @@ let WaypointCollection = function () {
         return poiList;
     }
     
-    self.getDistance = function() {
-        let point2measure = []
-        let lengthLine = []
+    self.getPoint2Measure = function(reverse=false) {
+        let point2measure = [];
+        let altPoint2measure = [];
+        let namePoint2measure = [];
+        let refPoint2measure = [];
         let jumpDict = {};
         let nStart = 0;
         let nLoop = 0;
         let n = 0 ;
         let startCount = true;
-        while (startCount && (nLoop!=-1)) {
+        while (startCount) {
             if (nStart > data[data.length -1].getNumber() ) {
                 startCount = false;
                 break;
             }
 
             if ([MWNP.WPTYPE.WAYPOINT,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(self.getWaypoint(nStart).getAction())) {
-                point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                if (reverse) {
+                    point2measure.push([self.getWaypoint(nStart).getLatMap(), self.getWaypoint(nStart).getLonMap()]);
+                }
+                else {
+                    point2measure.push(ol.proj.fromLonLat([self.getWaypoint(nStart).getLonMap(), self.getWaypoint(nStart).getLatMap()]));
+                }
+                altPoint2measure.push(self.getWaypoint(nStart).getAlt());
+                namePoint2measure.push(self.getWaypoint(nStart).getLayerNumber()+1);
+                refPoint2measure.push(self.getWaypoint(nStart).getP3());
                 nStart++;
             }
             else if (self.getWaypoint(nStart).getAction() == MWNP.WPTYPE.JUMP) {
@@ -356,6 +365,7 @@ let WaypointCollection = function () {
                 }
                 if (Object.keys(jumpDict).includes(String(self.getWaypoint(nStart).getNumber())) ) {
                     if (jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] == -1) {
+                        jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] = 1;
                         nLoop = -1;
                     }
                     if ( (jumpDict[self.getWaypoint(nStart).getNumber()]["n"]>=jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"]  || jumpDict[self.getWaypoint(nStart).getNumber()]["nLoop"] ==0) ) {
@@ -368,13 +378,19 @@ let WaypointCollection = function () {
                         nStart = nStartTemp;
                     }
                 }
-                
             }
             else {
                 nStart++;
             }
         }
-        if (nLoop == -1) {
+        
+        return [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure];
+    }
+    
+    self.getDistance = function(display) {
+        let lengthLine = [];
+        const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure();
+        if (nLoop == -1 && display) {
             return [-1];
         }
         else {
@@ -391,6 +407,39 @@ let WaypointCollection = function () {
             //console.log("lengthLine ", lengthLine);
             return lengthLine.map(cumulativeSum);
         }
+    }
+    
+    self.getElevation = async function(globalSettings) {
+        const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
+        let lengthMission = self.getDistance(true);
+        let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
+        let samples;
+        if (point2measure.length <= 2){
+            samples = 1;
+        }
+        else if (Math.trunc(totalMissionDistance/30) <= 1024 &&  point2measure.length > 2){
+            samples = Math.trunc(totalMissionDistance/30);
+        }
+        else {
+            samples = 1024;
+        }
+        if (globalSettings.mapProviderType == 'bing') {
+            if (point2measure.length >1) {
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
+                const myJson = await response.json(); 
+                elevation = myJson.resourceSets[0].resources[0].elevations;
+            }
+            else {
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights=ellipsoid&key='+globalSettings.mapApiKey);
+                const myJson = await response.json(); 
+                elevation = myJson.resourceSets[0].resources[0].elevations;
+            }
+        }
+        else {
+            elevation = "NA";
+        }
+        //console.log("elevation ", elevation);
+        return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];
     }
 
     return self;

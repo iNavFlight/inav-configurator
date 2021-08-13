@@ -126,7 +126,8 @@ sources.js = [
     './js/safehome.js',
     './js/waypointCollection.js',
     './js/waypoint.js',
-    './node_modules/openlayers/dist/ol.js'
+    './node_modules/openlayers/dist/ol.js',
+    './js/libraries/plotly-latest.min.js'
 ];
 
 sources.receiverCss = [

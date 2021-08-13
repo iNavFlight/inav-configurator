@@ -383,7 +383,13 @@ TABS.mission_control.initialize = function (callback) {
     //      define & init Waypoints parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
     var mission = new WaypointCollection();
-
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //      define & init home parameters
+    ////////////////////////////////////////////////////////////////////////////////////////////// 
+    var HOME = new Waypoint(0,0,0,0);
+    var homeMarkers =[];    // layer for home point
+    
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Safehome parameters
     //////////////////////////////////////////////////////////////////////////////////////////////    
@@ -615,6 +621,110 @@ TABS.mission_control.initialize = function (callback) {
         let radiusProjected = (radius / ol.proj.METERS_PER_UNIT.m) * resolutionRate;
         return radiusProjected;
     }
+    
+    /////////////////////////////////////////////
+    //
+    // Manage Take Off Home
+    //
+    /////////////////////////////////////////////
+    function closeHomePanel() {
+        $('#missionPlanerHome').hide();
+        $('#missionPlanerElevation').hide();
+        cleanHomeLayers();
+    }
+    
+    function cleanHomeLayers() {       
+        for (var i in homeMarkers) {
+            map.removeLayer(homeMarkers[i]);
+        }
+        homeMarkers = [];
+    }
+    
+    function renderHomeTable() {
+        /*
+         * Process home table UI
+         */                
+
+        $(".home-lon").val(HOME.getLonMap()).change(function () {
+            HOME.setLon(Math.round(Number($(this).val()) * 10000000));
+            cleanHomeLayers();
+            renderHomeOnMap();
+        });
+        
+        $(".home-lat").val(HOME.getLatMap()).change(function () {
+            HOME.setLat(Math.round(Number($(this).val()) * 10000000));
+            cleanHomeLayers();
+            renderHomeOnMap();
+        });
+        
+        (async () => {
+            const elevationAtHome = await HOME.getElevation(globalSettings);
+            $('#elevationValueAtHome').text(elevationAtHome+' m');
+            HOME.setAlt(elevationAtHome);
+        })()
+        
+    }
+    
+    
+    function renderHomeOnMap() {
+        /*
+         * Process home on Map
+         */
+        map.addLayer(addHomeMarker(HOME));
+    }
+    
+    function addHomeMarker(home) {
+        /*
+         * add safehome on Map
+         */
+        let coord = ol.proj.fromLonLat([home.getLonMap(), home.getLatMap()]);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'home'
+        });
+
+        //iconFeature.setStyle(getSafehomeIcon(safehome, safehome.isUsed()));
+        
+        var vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                        features: [iconFeature]
+                    }),
+            style : function(iconFeature) {
+                let styles = [getHomeIcon(home)];
+                return styles;
+            }
+        });
+
+        vectorLayer.kind = "home";
+        vectorLayer.number = home.getNumber();
+        vectorLayer.selection = false;
+        
+        homeMarkers.push(vectorLayer);
+        
+        return vectorLayer;
+    }
+    
+    function getHomeIcon(home) {
+        /*
+         * Process Safehome Icon
+         */
+        return new ol.style.Style({
+            image: new ol.style.Icon(({
+                anchor: [0.5, 1],
+                opacity: 1,
+                scale: 0.5,
+                src: '../images/icons/cf_icon_home.png'
+            })),
+        });
+    }
+
+
+    function updateHome() {
+        renderHomeTable();
+        cleanHomeLayers();
+        renderHomeOnMap();     
+        plotElevation();    
+    }
     /////////////////////////////////////////////
     //
     // Manage Waypoint
@@ -730,7 +840,7 @@ TABS.mission_control.initialize = function (callback) {
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLonMap(), mission.getWaypoint(element.getP1()).getLatMap()]);  
-                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false);
+                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
                 else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
@@ -751,36 +861,67 @@ TABS.mission_control.initialize = function (callback) {
         if (textGeom) {
             textGeom.setCoordinates(map.getCoordinateFromPixel([0,0]));
         }
-        let lengthMission = mission.getDistance();
+        let lengthMission = mission.getDistance(true);
         $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
     }
     
-    function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true) {
+    function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
         var line = new ol.geom.LineString([pos1, pos2]);
 
         var feature = new ol.Feature({
             geometry: line
         });
-        feature.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: color,
-                width: 3,
-                lineDash: [lineDash]
-            }),
-            text: new ol.style.Text({
-                text: lineText,
-                font: '14px sans-serif',
-                placement : 'line',
-                textBaseline: 'ideographic',
+        
+        feature.setStyle(
+            new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: color
+                    color: color,
+                    width: 3,
+                    lineDash: [lineDash]
+                }),
+                text: new ol.style.Text({
+                    text: lineText,
+                    font: '14px sans-serif',
+                    placement : 'line',
+                    textBaseline: 'ideographic',
+                    stroke: new ol.style.Stroke({
+                        color: color
+                    }),
                 }),
             }),
-        }));
+        );
+        
+        if (arrow) {
+            let dx = pos2[0] - pos1[0];
+            let dy = pos2[1] - pos1[1];
+            let rotation = Math.atan2(dx, dy);
+            var featureArrow = new ol.Feature({
+                geometry: new ol.geom.Point([pos1[0]+dx/2, pos1[1]+dy/2])
+            });
+            featureArrow.setStyle(
+                new ol.style.Style({
+                    image: new ol.style.Icon({
+                        src: '../images/icons/cf_icon_arrow.png',
+                        scale: 0.3,
+                        anchor: [0.5, 0.5],
+                        rotateWithView: true,
+                        rotation: rotation,
+                    }),
+                })
+            );
+        }
+        
 
-        var vectorSource = new ol.source.Vector({
-            features: [feature]
-        });
+        if (arrow) {
+            var vectorSource = new ol.source.Vector({
+                features: [feature, featureArrow]
+            });
+        }
+        else {
+            var vectorSource = new ol.source.Vector({
+                features: [feature]
+            });
+        }
 
         var vectorLayer = new ol.layer.Vector({
             source: vectorSource
@@ -909,8 +1050,6 @@ TABS.mission_control.initialize = function (callback) {
                       alert(chrome.i18n.getMessage('MissionPlannerJumpSettingsCheck'));
                     }
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
-                        console.log("mission.getPoiList() ",mission.getPoiList());
-                        console.log(mission.convertJumpNumberToWaypoint(Number($(this).val())-1));
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
                             alert(chrome.i18n.getMessage('MissionPlannerJump3SettingsCheck'));
@@ -1074,6 +1213,43 @@ TABS.mission_control.initialize = function (callback) {
         ol.inherits(app.PlannerSafehomeControl, ol.control.Control);
         
         /**
+         * @constructor
+         * @extends {ol.control.Control}
+         * @param {Object=} opt_options Control options.
+         */
+        app.PlannerElevationControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#missionPlanerHome').fadeIn(300);
+                cleanHomeLayers();
+                renderHomeTable();
+                renderHomeOnMap();
+                $('#missionPlanerElevation').fadeIn(300);
+                plotElevation();
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-elevation ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP Elevation';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+
+        };
+        ol.inherits(app.PlannerElevationControl, ol.control.Control);
+        
+        /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
          * @return {boolean} `true` to start the drag sequence.
          */
@@ -1114,7 +1290,7 @@ TABS.mission_control.initialize = function (callback) {
 
             var geometry = /** @type {ol.geom.SimpleGeometry} */
                 (this.feature_.getGeometry());
-            if (tempMarker.kind == "waypoint" ||tempMarker.kind == "safehome") {
+            if (tempMarker.kind == "waypoint" ||tempMarker.kind == "safehome" || tempMarker.kind == "home") {
                 geometry.translate(deltaX, deltaY);
                 this.coordinate_[0] = evt.coordinate[0];
                 this.coordinate_[1] = evt.coordinate[1]; 
@@ -1137,6 +1313,12 @@ TABS.mission_control.initialize = function (callback) {
                 SAFEHOMES.updateSafehome(tempSH);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+            }
+            else if (tempMarker.kind == "home") {                
+                HOME.setLon(Math.round(coord[0] * 10000000));
+                HOME.setLat(Math.round(coord[1] * 10000000));
+                $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
             
         };
@@ -1169,6 +1351,23 @@ TABS.mission_control.initialize = function (callback) {
          * @return {boolean} `false` to stop the drag sequence.
          */
         app.Drag.prototype.handleUpEvent = function (evt) {
+            if (tempMarker.kind == "waypoint" ){
+                    (async () => {
+                        if (mission.getWaypoint(tempMarker.number).getP3() == 1.0) {
+                            const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
+                            $('#elevationValueAtWP').text(elevationAtWP);
+                        }
+                        plotElevation();
+                    })()
+            }
+            else if (tempMarker.kind == "home" ) {
+                (async () => {
+                    const elevationAtHome = await HOME.getElevation(globalSettings);
+                    $('#elevationValueAtHome').text(elevationAtHome+' m');
+                    HOME.setAlt(elevationAtHome);
+                    plotElevation();
+                })()
+            }
             this.coordinate_ = null;
             this.feature_ = null;
             return false;
@@ -1197,12 +1396,14 @@ TABS.mission_control.initialize = function (callback) {
         if (CONFIGURATOR.connectionValid) {
             control_list = [
                 new app.PlannerSettingsControl(),
-                new app.PlannerSafehomeControl()
+                new app.PlannerSafehomeControl(),
+                new app.PlannerElevationControl(),
             ]
         }
         else {
             control_list = [
                 new app.PlannerSettingsControl(),
+                new app.PlannerElevationControl(),
                 //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
@@ -1307,6 +1508,7 @@ TABS.mission_control.initialize = function (callback) {
                     else {$('#pointP'+String(j).slice(-1)+'class').fadeOut(300);}
                 }
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
+                $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
                 $('#MPeditPoint').fadeIn(300);
                 redrawLayer();
             }
@@ -1326,6 +1528,13 @@ TABS.mission_control.initialize = function (callback) {
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
                 $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
             }
+            else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
+                selectedMarker = HOME;
+                var geometry = selectedFeature.getGeometry();
+                var coord = ol.proj.toLonLat(geometry.getCoordinates());
+                $('.home-lon').val(Math.round(coord[0] * 10000000) / 10000000);
+                $('.home-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+            }
             else {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
@@ -1333,6 +1542,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.update();
                 cleanLayers();
                 redrawLayers();
+                plotElevation();
             }
             //mission.missionDisplayDebug();
         });
@@ -1411,6 +1621,19 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
         
+        $('#showHideHomeButton').on('click', function () {
+            var src = ($(this).children().attr('class') === 'ic_hide')
+                ? 'ic_show'
+                : 'ic_hide';
+            $(this).children().attr('class', src);
+            if ($(this).children().attr('class') === 'ic_hide') {
+                $('#HomeContent').fadeIn(300);
+            }
+            else {
+                $('#HomeContent').fadeOut(300);
+            }
+        });
+        
         $('#showHideWPeditButton').on('click', function () {
             var src = ($(this).children().attr('class') === 'ic_hide')
                 ? 'ic_show'
@@ -1457,6 +1680,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayers();
                 selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+                plotElevation();
             }
         });
         
@@ -1469,6 +1693,7 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayers();
                 selectedFeature = markers[selectedMarker.getLayerNumber()].getSource().getFeatures()[0];
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
+                plotElevation();
             }
         });
         
@@ -1478,6 +1703,7 @@ TABS.mission_control.initialize = function (callback) {
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
+                plotElevation();
             }
         });
         
@@ -1502,9 +1728,21 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3').on('change', function (event) {
             if (selectedMarker) {
                 selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
+                if ($('#pointP3').prop("checked")) {
+                    (async () => {
+                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                        $('#elevationValueAtWP').text(elevationAtWP);
+                        $('#elevationAtWP').fadeIn(300);
+                    })()
+                    
+                }
+                else {
+                    $('#elevationAtWP').fadeOut(300);
+                }
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
+                plotElevation();
             }
         });
         
@@ -1579,11 +1817,30 @@ TABS.mission_control.initialize = function (callback) {
         });
         
         /////////////////////////////////////////////
+        // Callback for HOME Table
+        /////////////////////////////////////////////
+        $('#homeTableBody').on('click', "[data-role='home-center']", function (event) {
+            let mapCenter = map.getView().getCenter();
+            HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
+            HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
+            updateHome();
+        });
+        
+        $('#cancelHome').on('click', function () {
+            closeHomePanel();
+        });
+        
+        $('#cancelPlot').on('click', function () {
+            closeHomePanel();
+        });
+        
+        /////////////////////////////////////////////
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
                 removeAllWaypoints();
+                plotElevation();
             }
         });
 
@@ -1604,6 +1861,7 @@ TABS.mission_control.initialize = function (callback) {
                         clearEditForm();
                         cleanLayers();
                         redrawLayers();
+                        plotElevation();
                     }
                 }
                 else {
@@ -1613,6 +1871,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                     cleanLayers();
                     redrawLayers();
+                    plotElevation();
                 }
             }
         });
@@ -1747,6 +2006,10 @@ TABS.mission_control.initialize = function (callback) {
                                             mission.setCenterLon(parseFloat(node.$[attr]) * 10000000);
                                         } else if (attr.match(/cy/i)) {
                                             mission.setCenterLat(parseFloat(node.$[attr]) * 10000000);
+                                        } else if (attr.match(/home\-x/i)) {
+                                            HOME.setLon(Math.round(parseFloat(node.$[attr]) * 10000000));
+                                        } else if (attr.match(/home\-y/i)) {
+                                            HOME.setLat(Math.round(parseFloat(node.$[attr]) * 10000000));
                                         }
                                     }
                                 } else if (node['#name'].match(/missionitem/i) && node.$) {
@@ -1814,6 +2077,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 
                 redrawLayers();
+                updateHome();
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
                 GUI.log(sFilename+' has been loaded successfully !');
@@ -1831,7 +2095,11 @@ TABS.mission_control.initialize = function (callback) {
 
         var data = {
             'version': { $: { 'value': '2.3-pre8' } },
-            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 'cy': (Math.round(center[1] * 10000000) / 10000000), 'zoom': zoom } },
+            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000), 
+                          'cy': (Math.round(center[1] * 10000000) / 10000000), 
+                          'home-x' : HOME.getLonMap(),
+                          'home-y' : HOME.getLatMap(),
+                          'zoom': zoom } },
             'missionitem': []
         };
         
@@ -1919,6 +2187,93 @@ TABS.mission_control.initialize = function (callback) {
       if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
         element.parent().find('.switcherymid').trigger('click');
       }
+    }
+    
+    function plotElevation() {
+        if ($('#missionPlanerElevation').is(":visible")) {
+            if (mission.get().length == 0) {
+                var data = [[0], [0]];
+                var layout = {showlegend: true,
+                              legend: {
+                                    "orientation": "h",
+                                    xanchor: "center",
+                                    y: 1.3,
+                                    x: 0.5
+                              },
+                              title: 'Mission Elevation Profile',
+                              xaxis: {
+                                title: 'Distance (m)'
+                              },
+                              yaxis: {
+                                title: 'Elevation (m)',
+                              },
+                              height: 300,
+                              }
+                Plotly.newPlot('elevationDiv', data, layout);
+            }
+            else {
+                (async () => {
+                    const [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure] = await mission.getElevation(globalSettings);
+                    let x_elevation = Array.from(Array(samples+1), (_,i)=> i*totalMissionDistance/samples);
+                    var trace_WGS84 = {
+                        x: x_elevation,
+                        y: elevation,
+                        type: 'scatter',
+                        name: 'WGS84 elevation',
+                        hovertemplate: '<b>Elevation</b>: %{y} m',
+                        fill: 'tozeroy',
+                        line: {
+                            color: '#ff7f0e',
+                        },
+                    };
+                    let y_missionElevation = altPoint2measure.map((x,i) => x / 100 + HOME.getAlt()*(1-refPoint2measure[i]));
+                    let y_elevationReference = refPoint2measure.map((x,i) => (x == 1 ? "WGS84" : "Take-off Home"));
+                    var trace_missionHeight = {
+                        x: lengthMission,
+                        y: y_missionElevation ,
+                        type: 'scatter',
+                        mode: 'lines+markers+text',
+                        name: 'Mission altitude',
+                        text: namePoint2measure,
+                        textposition: 'top center',
+                        textfont: {
+                            family:  'Raleway, sans-serif'
+                        },
+                        customdata: y_elevationReference,
+                        hovertemplate: '<b>WP</b>: %{text}' +
+                                '<br><b>Elevation</b>: %{y} m<br>' +
+                                '<b>Reference</b>: %{customdata}',
+                        line: {
+                            color: '#1497f1',
+                        },
+                        marker: {
+                            color: '#1f77b4',
+                        },
+                    };
+                    var layout = {showlegend: true,
+                                  legend: {
+                                        "orientation": "h",
+                                        xanchor: "center",
+                                        y: 1.3,
+                                        x: 0.5
+                                  },
+                                  title: 'Mission Elevation Profile',
+                                  xaxis: {
+                                    title: 'Distance (m)'
+                                  },
+                                  yaxis: {
+                                    title: 'Elevation (m)',
+                                    range: [-10 + Math.min(Math.min(...y_missionElevation), Math.min(...elevation)), 10 + Math.max(Math.max(...y_missionElevation), Math.max(...elevation))],
+                                  },
+                                  height: 300,
+                                  }
+
+                    var data = [trace_WGS84, trace_missionHeight];
+
+                    Plotly.newPlot('elevationDiv', data, layout);
+                })()
+            }
+        }
     }
 
 };
