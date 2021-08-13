@@ -1,4 +1,4 @@
-/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG*/
+/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass*/
 'use strict';
 
 TABS.configuration = {};
@@ -37,7 +37,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadINAVPidConfig,
-        mspHelper.loadSensorConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
         loadCraftName,
@@ -59,7 +58,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveLooptimeConfig,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
-        mspHelper.saveSensorConfig,
         mspHelper.saveVTXConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
@@ -314,50 +312,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $i2cSpeed.change();
 
-        var $sensorAcc = $('#sensor-acc'),
-            $sensorMag = $('#sensor-mag'),
-            $sensorBaro = $('#sensor-baro'),
-            $sensorPitot = $('#sensor-pitot'),
-            $sensorRangefinder = $('#sensor-rangefinder'),
-            $sensorOpflow = $('#sensor-opflow');
-
-        GUI.fillSelect($sensorAcc, FC.getAccelerometerNames());
-        $sensorAcc.val(SENSOR_CONFIG.accelerometer);
-        $sensorAcc.change(function () {
-            SENSOR_CONFIG.accelerometer = $sensorAcc.val();
-        });
-
-
-        GUI.fillSelect($sensorMag, FC.getMagnetometerNames());
-        $sensorMag.val(SENSOR_CONFIG.magnetometer);
-        $sensorMag.change(function () {
-            SENSOR_CONFIG.magnetometer = $sensorMag.val();
-        });
-
-        GUI.fillSelect($sensorBaro, FC.getBarometerNames());
-        $sensorBaro.val(SENSOR_CONFIG.barometer);
-        $sensorBaro.change(function () {
-            SENSOR_CONFIG.barometer = $sensorBaro.val();
-        });
-
-        GUI.fillSelect($sensorPitot, FC.getPitotNames());
-        $sensorPitot.val(SENSOR_CONFIG.pitot);
-        $sensorPitot.change(function () {
-            SENSOR_CONFIG.pitot = $sensorPitot.val();
-        });
-
-        GUI.fillSelect($sensorRangefinder, FC.getRangefinderNames());
-        $sensorRangefinder.val(SENSOR_CONFIG.rangefinder);
-        $sensorRangefinder.change(function () {
-            SENSOR_CONFIG.rangefinder = $sensorRangefinder.val();
-        });
-
-        GUI.fillSelect($sensorOpflow, FC.getOpticalFlowNames());
-        $sensorOpflow.val(SENSOR_CONFIG.opflow);
-        $sensorOpflow.change(function () {
-            SENSOR_CONFIG.opflow = $sensorOpflow.val();
-        });
-
         $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
         $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
         $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
@@ -407,10 +361,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
-            googleAnalytics.sendEvent('Board', 'Accelerometer', FC.getAccelerometerNames()[SENSOR_CONFIG.accelerometer]);
-            googleAnalytics.sendEvent('Board', 'Magnetometer', FC.getMagnetometerNames()[SENSOR_CONFIG.magnetometer]);
-            googleAnalytics.sendEvent('Board', 'Barometer', FC.getBarometerNames()[SENSOR_CONFIG.barometer]);
-            googleAnalytics.sendEvent('Board', 'Pitot', FC.getPitotNames()[SENSOR_CONFIG.pitot]);
+            googleAnalytics.sendEvent('Board', 'Accelerometer', $('#sensor-acc').children("option:selected").text());
+            googleAnalytics.sendEvent('Board', 'Magnetometer', $('#sensor-mag').children("option:selected").text());
+            googleAnalytics.sendEvent('Board', 'Barometer', $('#sensor-baro').children("option:selected").text());
+            googleAnalytics.sendEvent('Board', 'Pitot', $('#sensor-pitot').children("option:selected").text());
 
             for (var i = 0; i < features.length; i++) {
                 var featureName = features[i].name;
