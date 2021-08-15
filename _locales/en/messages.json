@@ -2834,11 +2834,23 @@
     "osdUnitMetric": {
         "message": "Metric"
     },
+    "osdUnitMetricMPH": {
+        "message": "Metric + MPH"
+    },
+    "osdUnitMetricMPHTip": {
+        "message": "Use metric units except for the speed, which is displayed in miles per hour."
+    },
     "osdUnitUK": {
         "message": "UK"
     },
     "osdUnitUKTip": {
-        "message": "Use metric units except for the speed, which is displayed in miles per hour."
+        "message": "Use imperial units except for the temperature, which is displayed in Celsius."
+    },
+    "osdUnitGA": {
+        "message": "General Aviation"
+    },
+    "osdUnitGATip": {
+        "message": "Use GA standard units (non-SI): Nautical Miles, Feet, Knots, Celcius."
     },
     "osd_rssi_alarm": {
         "message": "RSSI (%)"
