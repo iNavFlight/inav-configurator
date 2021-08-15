@@ -27,12 +27,8 @@ helper.defaultsDialog = (function () {
                 value: 500
             },
             {
-                key: "motor_pwm_rate",
-                value: 1000
-            },
-            {
                 key: "motor_pwm_protocol",
-                value: "ONESHOT125"
+                value: "DSHOT300"
             },
             /*
             Filtering
@@ -51,11 +47,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "dterm_lpf_type",
-                value: "PT1"
+                value: "PT3"
             },
             {
                 key: "dterm_lpf2_hz",
-                value: 170
+                value: 0
             },
             {
                 key: "dterm_lpf2_type",
@@ -93,7 +89,11 @@ helper.defaultsDialog = (function () {
                 value: "RP"
             },
             {
-                key: "d_boost_factor",
+                key: "d_boost_min",
+                value: 0.5
+            },
+            {
+                key: "d_boost_max",
                 value: 1.5
             },
             {
@@ -587,21 +587,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_fw_pos_hdg_d",
                 value: 0
-            }
-        ]
-    },
-    {
-        "title": 'Custom UAV - INAV legacy defaults (Not recommended)',
-        "notRecommended": true,
-        "reboot": false,
-        "settings": [
-            {
-                key: "motor_pwm_protocol",
-                value: "STANDARD"
-            },
-            {
-                key: "applied_defaults",
-                value: 1
             }
         ]
     },
