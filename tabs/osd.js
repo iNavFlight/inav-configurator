@@ -98,6 +98,7 @@ SYM.MAH_NM_0 = 0x60;
 SYM.MAH_NM_1 = 0x61;
 SYM.AH_NM = 0x3F;
 SYM.WH_NM = 0x70;
+SYM.VTX_POWER = 0x27;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1581,7 +1582,7 @@ OSD.constants = {
                 {
                     name: 'VTX_POWER',
                     id: 105,
-                    preview: '1'
+                    preview: FONT.symbol(SYM.VTX_POWER) + '1'
                 },
             ]
         },
