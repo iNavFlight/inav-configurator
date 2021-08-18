@@ -98,6 +98,7 @@ SYM.MAH_NM_0 = 0x60;
 SYM.MAH_NM_1 = 0x61;
 SYM.AH_NM = 0x3F;
 SYM.WH_NM = 0x70;
+SYM.MAX = 0xCE;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1308,23 +1309,6 @@ OSD.constants = {
             },
             items: [
                 {
-                    name: 'GPS_SPEED',
-                    id: 13,
-                    preview: function(osd_data) {
-                        // 3 chars
-                        switch (OSD.data.preferences.units) {
-                            case 0: // Imperial
-                            case 2: // Metric + MPH
-                            case 3: // UK
-                                return FONT.embed_dot('115') + FONT.symbol(SYM.MPH);
-                            case 4: // GA
-                                return FONT.embed_dot('100') + FONT.symbol(SYM.KT);
-                            default: // Metric
-                                return FONT.embed_dot('185') + FONT.symbol(SYM.KMH);
-                        }
-                    }
-                },
-                {
                     name: 'MSL_ALTITUDE',
                     id: 96,
                     preview: function(osd_data) {
@@ -1350,6 +1334,23 @@ OSD.constants = {
                     },
                 },
                 {
+                    name: 'GPS_SPEED',
+                    id: 13,
+                    preview: function(osd_data) {
+                        // 3 chars
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot('115') + FONT.symbol(SYM.MPH);
+                            case 4: // GA
+                                return FONT.embed_dot('100') + FONT.symbol(SYM.KT);
+                            default: // Metric
+                                return FONT.embed_dot('185') + FONT.symbol(SYM.KMH);
+                        }
+                    }
+                },
+                {
                     name: '3D_SPEED',
                     id: 85,
                     preview: function(osd_data) {
@@ -1358,11 +1359,45 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot('115') + FONT.symbol(SYM.MPH_3D);
+                                return FONT.embed_dot('127') + FONT.symbol(SYM.MPH_3D);
                             case 4: // GA
-                                return FONT.embed_dot('100') + FONT.symbol(SYM.KT_3D);
+                                return FONT.embed_dot('110') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
-                                return FONT.embed_dot('185') + FONT.symbol(SYM.KMH_3D);
+                                return FONT.embed_dot('204') + FONT.symbol(SYM.KMH_3D);
+                        }
+                    }
+                },
+                {
+                    name: 'GPS_MAX_SPEED',
+                    id: 125,
+                    preview: function(osd_data) {
+                        // 3 chars
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot('138') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.MPH);
+                            case 4: // GA
+                                return FONT.embed_dot('120') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KT);
+                            default: // Metric
+                                return FONT.embed_dot('222') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KMH);
+                        }
+                    }
+                },
+                {
+                    name: '3D_MAX_SPEED',
+                    id: 126,
+                    preview: function(osd_data) {
+                        // 3 chars
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.embed_dot('150') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.MPH_3D);
+                            case 4: // GA
+                                return FONT.embed_dot('130') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KT_3D);
+                            default: // Metric
+                                return FONT.embed_dot('241') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KMH_3D);
                         }
                     }
                 },

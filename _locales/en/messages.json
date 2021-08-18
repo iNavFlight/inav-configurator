@@ -3062,6 +3062,12 @@
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
     },
+    "osdElement_GPS_MAX_SPEED": {
+        "message": "GPS Maximum Speed"
+    },
+    "osdElement_GPS_MAX_SPEED_HELP": {
+        "message": "Shows highest GPS ground speed."
+    },
     "osdElement_MSL_ALTITUDE": {
         "message": "MSL Altitude"
     },
@@ -3073,6 +3079,12 @@
     },
     "osdElement_3D_SPEED_HELP": {
         "message": "Shows 3D speed considering both horizontal and vertical speed."
+    },
+    "osdElement_3D_MAX_SPEED": {
+        "message": "3D Maximum Speed"
+    },
+    "osdElement_3D_MAX_SPEED_HELP": {
+        "message": "Shows highest 3D speed considering both horizontal and vertical speed."
     },
     "osdElement_GPS_SATS": {
         "message": "GPS Satellites"
