@@ -866,6 +866,26 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'AIR_MAX_SPEED',
+                    id: 127,
+                    enabled: function() {
+                        return SENSOR_CONFIG.pitot != 0;
+                    },
+                    preview: function(osd_data) {
+                        // 3 chars
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 2: // Metric + MPH
+                            case 3: // UK
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('135') + FONT.symbol(SYM.MPH_3D);
+                            case 4: // GA
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('177') + FONT.symbol(SYM.KT_3D);
+                            default: // Metric
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('217') + FONT.symbol(SYM.KMH_3D);
+                        }
+                    }
+                },
+                {
                     name: 'RTC_TIME',
                     id: 29,
                     preview: FONT.symbol(SYM.CLOCK) + '13:37:25'
