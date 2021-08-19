@@ -1376,11 +1376,11 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot('138') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.MPH);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('138') + FONT.symbol(SYM.MPH);
                             case 4: // GA
-                                return FONT.embed_dot('120') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KT);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('120') + FONT.symbol(SYM.KT);
                             default: // Metric
-                                return FONT.embed_dot('222') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KMH);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('222') + FONT.symbol(SYM.KMH);
                         }
                     }
                 },
@@ -1393,11 +1393,11 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.embed_dot('150') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.MPH_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('150') + FONT.symbol(SYM.MPH_3D);
                             case 4: // GA
-                                return FONT.embed_dot('130') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KT_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('130') + FONT.symbol(SYM.KT_3D);
                             default: // Metric
-                                return FONT.embed_dot('241') + FONT.symbol(SYM.MAX) + FONT.symbol(SYM.KMH_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.embed_dot('241') + FONT.symbol(SYM.KMH_3D);
                         }
                     }
                 },
