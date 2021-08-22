@@ -877,11 +877,11 @@ OSD.constants = {
                             case 0: // Imperial
                             case 2: // Metric + MPH
                             case 3: // UK
-                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('135') + FONT.symbol(SYM.MPH_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('135') + FONT.symbol(SYM.MPH);
                             case 4: // GA
-                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('177') + FONT.symbol(SYM.KT_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('177') + FONT.symbol(SYM.KT);
                             default: // Metric
-                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('217') + FONT.symbol(SYM.KMH_3D);
+                                return FONT.symbol(SYM.MAX) + FONT.symbol(SYM.AIR) + FONT.embed_dot('217') + FONT.symbol(SYM.KMH);
                         }
                     }
                 },
