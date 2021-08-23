@@ -760,7 +760,7 @@ OSD.constants = {
                 {
                     name: 'MAIN_BATT_REMAINING_PERCENTAGE',
                     id: 38,
-                    preview: '100%'
+                    preview: FONT.symbol(SYM.BATT) + '100%'
                 },
                 {
                     name: 'REMAINING_FLIGHT_TIME',
