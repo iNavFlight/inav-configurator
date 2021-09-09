@@ -560,7 +560,7 @@
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Setup"
     },
 
     "RX_PPM": {
@@ -1009,7 +1009,7 @@
         "message": "Craft name. Can be displayed by OSD and by compatible RC systems."
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Configuration"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -1216,7 +1216,7 @@
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: PID Tuning"
     },
 
     "receiverHelp": {
@@ -1280,7 +1280,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Receiver"
     },
 
     "auxiliaryHelp": {
@@ -1528,9 +1528,11 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Adjustments"
     },
-
+    "programmingEepromSaved": {
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
+    },
     "transponderNotSupported": {
         "message": "Your flight controller's firmware does not support transponder functionality."
     },
@@ -1556,7 +1558,7 @@
         "message": "Transponder data is <span style=\"color: red\">invalid</span>"
     },
     "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Transponder"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
@@ -2012,7 +2014,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
 
     "controlAxisRoll": {
