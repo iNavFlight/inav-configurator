@@ -57,7 +57,7 @@ For local development, **node.js** build system is used.
     - With Chrome: Run `npm run gulp`. Then open `chrome://extensions`, enable
     the `Developer mode`, click on the `Load unpacked extension...` button and select the `inav-configurator` directory.
 
-Other tasks are also defined in `gulpfile.js`. To run a task, use `./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
+Other tasks are also defined in `gulpfile.js`. To run a task, use `node ./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
 
 - **build**: Generate JS and CSS output files used by the configurator from their sources. It must be run whenever changes are made to any `.js` or `.css` files in order to have those changes appear
 in the configurator. If new files are added, they must be included in `gulpfile.js`. See the comments at the top of `gulpfile.js` to learn how to do so. See also the `watch` task.
