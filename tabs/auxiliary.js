@@ -346,7 +346,7 @@ TABS.auxiliary.initialize = function (callback) {
         function update_ui() {
             let hasUsedMode = false;
             let acroEnabled = true;
-            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD"];
+            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
 
             var auxChannelCount = RC.active_channels - 4;
 
