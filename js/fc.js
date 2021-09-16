@@ -1244,7 +1244,7 @@ var FC = {
                 output: "boolean"
             },
             41: {
-                name: "SET PID PROFILE",
+                name: "SET PROFILE",
                 hasOperand: [true, false],
                 output: "boolean"
             },
@@ -1306,7 +1306,7 @@ var FC = {
                     32: "CRSF LQ",
                     33: "CRSF SNR",
                     34: "GPS Valid Fix",
-                    35: "Active PID Profile"
+                    35: "Active Profile"
                 }
             },
             3: {
