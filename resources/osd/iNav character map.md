@@ -33,7 +33,7 @@ _ASCII_ _*_                |                              | #                   
 SYM_AH_MI                  |                              | Ah per Mile                           | 036        | 0x24
 _ASCII_ _*_                |                              | %                                     | 037        | 0x25
 _ASCII_ _*_                |                              | &                                     | 038        | 0x26
----                        | ---                          | ---                                   | 039        | 0x27
+SYM_VTX_POWER              | SYM.VTX_POWER                | VTx Power                             | 039        | 0x27
 _ASCII_ _*_                |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E
 SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 063        | 0x3F
 _ASCII_ _*_                |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F
