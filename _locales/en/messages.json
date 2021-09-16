@@ -3250,6 +3250,9 @@
     "osdElement_WIND_SPEED_VERTICAL_HELP": {
         "message": "Shows estimated vertical wind speed and direction (up or down)."
     },
+    "osdElement_ACTIVE_PROFILE": {
+        "message": "Show the active profile"
+    },
     "osdElement_LEVEL_PIDS": {
         "message": "Level PIDs"
     },
