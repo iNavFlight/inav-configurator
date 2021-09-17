@@ -36,6 +36,21 @@ a.disabled {
     color: #999;
 }
 
+/* Pilot's units */
+.displayPilotUnit {
+    font-style: normal;
+    font-family: 'open_sansregular', Arial, serif;
+    line-height: 19px;
+    color: #00103b;
+    font-size: 12px;
+    float: right;
+    margin-top: 7px;
+    margin-right: 7px;
+    display: block;
+    padding-right: 10px;
+    transition: none;
+}
+
 /* Help-Icon  */
 .helpicon {
     float: right;
@@ -1952,6 +1967,11 @@ dialog {
 
     input {
         font-size: 11px !important;
+    }
+
+    .displayPilotUnit {
+        float: right;
+        transition: none;
     }
 
     .helpicon {

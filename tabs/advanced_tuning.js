@@ -34,6 +34,8 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.notFixedWingTuning').show();
         }
 
+        initialisePilotUnits();
+
         GUI.simpleBind();
 
         localize();
@@ -68,8 +70,6 @@ TABS.advanced_tuning.initialize = function (callback) {
         GUI.log(chrome.i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_advanced_tuning a'));
     }
-
-
 };
 
 TABS.advanced_tuning.cleanup = function (callback) {

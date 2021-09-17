@@ -18,6 +18,8 @@ let globalSettings = {
     proxyLayer: null
 };
 
+var osdUnits = null;
+
 $(document).ready(function () {
     // translate to user-selected language
     localize();
@@ -171,6 +173,22 @@ $(document).ready(function () {
                 function content_ready() {
                     GUI.tab_switch_in_progress = false;
                 }
+
+                if (osdUnits == null ) {
+                    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
+                        var prefs = resp.data;
+                        prefs.readU8();
+                        prefs.readU8();
+                        prefs.readU8();
+                        prefs.readU8();
+                        prefs.readU8();
+                        prefs.readU8();
+                        prefs.readU8();
+                        osdUnits = prefs.readU8();
+                        done();
+                    });
+                }
+
 
                 switch (tab) {
                     case 'landing':
@@ -425,6 +443,8 @@ $(document).ready(function () {
                 element.val(val.toFixed(decimal_places));
             }
         }
+
+        displayPilotUnits(element)
     });
 
     $("#showlog").on('click', function() {
@@ -479,6 +499,49 @@ $(document).ready(function () {
         });
     });
 });
+
+function initialisePilotUnits() {
+    $(".displayPilotUnit").each(function(){
+        displayPilotUnits($('#' + $(this).attr('id').slice(0,-3)));
+    });
+}
+
+function displayPilotUnits(element) {
+    if( $('#' + element.attr('id') + '_PU').length ) {
+        var unitElement = $('#' + element.attr('id') + '_PU');
+        if (unitElement.hasClass('displayPilotUnit _cm')) {
+            switch (osdUnits) {
+                case 0: // Imperial
+                case 3: // UK
+                case 4: // GA
+                    unitElement.html((element.val() / 30.48).toFixed(2) + "ft");
+                    break;
+                case 2: // Metric + MPH
+                default: // Metric 1
+                    unitElement.html((element.val() / 100).toFixed(2) + "m");
+                    break
+            }
+        } else if (unitElement.hasClass('displayPilotUnit _cms')) {
+            switch (osdUnits) {
+                case 0: // Imperial
+                case 2: // Metric + MPH
+                case 3: // UK
+                    unitElement.html((element.val() / 44.704).toFixed(2) + "MPH");
+                    break;
+                case 4: // GA
+                    unitElement.html((element.val() / 51.44444444444457).toFixed(2) + "Kt");
+                    break;
+                default: // Metric 1
+                    unitElement.html((element.val() / 27.77777777777778).toFixed(2) + "Km/h");
+                    break
+            }
+        } else if (unitElement.hasClass('displayPilotUnit _ms')) {
+            unitElement.html((element.val() / 1000).toFixed(2) + "sec");
+        } else if (unitElement.hasClass('displayPilotUnit _us')) {
+            unitElement.html(((element.val() - 1000) / 10).toFixed(1) + "%");
+        }
+    }
+}
 
 function catch_startup_time(startTime) {
     var endTime = new Date().getTime(),

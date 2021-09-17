@@ -389,6 +389,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
 
+        initialisePilotUnits();
+
         GUI.content_ready(callback);
     }
 };
