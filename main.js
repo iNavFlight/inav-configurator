@@ -510,15 +510,16 @@ function displayPilotUnits(element) {
     if( $('#' + element.attr('id') + '_PU').length ) {
         var unitElement = $('#' + element.attr('id') + '_PU');
         if (unitElement.hasClass('displayPilotUnit _cm')) {
+            var displayValue = null;
             switch (osdUnits) {
                 case 0: // Imperial
                 case 3: // UK
                 case 4: // GA
-                    unitElement.html((element.val() / 30.48).toFixed(2) + "ft");
+                    unitElement.html(getNeatDisplayValue((element.val() / 30.48).toFixed(2)) + " ft");
                     break;
                 case 2: // Metric + MPH
                 default: // Metric 1
-                    unitElement.html((element.val() / 100).toFixed(2) + "m");
+                    unitElement.html(getNeatDisplayValue((element.val() / 100).toFixed(2)) + " m");
                     break
             }
         } else if (unitElement.hasClass('displayPilotUnit _cms')) {
@@ -526,21 +527,33 @@ function displayPilotUnits(element) {
                 case 0: // Imperial
                 case 2: // Metric + MPH
                 case 3: // UK
-                    unitElement.html((element.val() / 44.704).toFixed(2) + "MPH");
+                    unitElement.html(getNeatDisplayValue((element.val() / 44.704).toFixed(2)) + " mph");
                     break;
                 case 4: // GA
-                    unitElement.html((element.val() / 51.44444444444457).toFixed(2) + "Kt");
+                    unitElement.html(getNeatDisplayValue((element.val() / 51.44444444444457).toFixed(2)) + " kt");
                     break;
                 default: // Metric 1
-                    unitElement.html((element.val() / 27.77777777777778).toFixed(2) + "Km/h");
+                    unitElement.html(getNeatDisplayValue((element.val() / 27.77777777777778).toFixed(2)) + " km/h");
                     break
             }
         } else if (unitElement.hasClass('displayPilotUnit _ms')) {
-            unitElement.html((element.val() / 1000).toFixed(2) + "sec");
+            unitElement.html(getNeatDisplayValue((element.val() / 1000).toFixed(2)) + " sec");
         } else if (unitElement.hasClass('displayPilotUnit _us')) {
-            unitElement.html(((element.val() - 1000) / 10).toFixed(1) + "%");
+            unitElement.html(getNeatDisplayValue(((element.val() - 1000) / 10).toFixed(2)) + " %");
         }
     }
+}
+
+function getNeatDisplayValue(displayValue) {
+    if (displayValue.slice(-1) == "0") {
+        if (displayValue.slice(-2) == "00") {
+            displayValue = displayValue.slice(0, -3);
+        } else {
+            displayValue = displayValue.slice(0, -1);
+        }
+    }
+
+    return displayValue;
 }
 
 function catch_startup_time(startTime) {
