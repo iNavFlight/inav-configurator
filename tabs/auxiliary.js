@@ -434,6 +434,8 @@ TABS.auxiliary.initialize = function (callback) {
         // enable data pulling
         helper.mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
 
+        $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
+
         GUI.content_ready(callback);
     }
 };
@@ -441,3 +443,7 @@ TABS.auxiliary.initialize = function (callback) {
 TABS.auxiliary.cleanup = function (callback) {
     if (callback) callback();
 };
+
+$(window).on('resize', function(){
+    $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
+});

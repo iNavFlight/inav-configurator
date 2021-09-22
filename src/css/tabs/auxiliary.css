@@ -209,33 +209,27 @@
 .tab-auxiliary .acroEnabled {
     margin-top: 0;
     margin-bottom: 0;
-    margin-right: 20px;
-    background-color: #37a8db;
-    border-radius: 3px;
-    border: 1px solid #3394b5;
-    color: #fff;
+    background-color: #e4e4e4;
     font-family: 'open_sansbold', Arial, serif;
     font-size: 12px;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
     display: block;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0 9px;
     line-height: 28px;
     position: fixed;
     bottom:10px;
     left:20px;
+    width:10%;
+    text-align: center;
     z-index: 25000;
 }
 
 .tab-auxiliary .acroEnabled.on {
-    background-color: #37a8db;
-    border: 1px solid #3394b5;
+    color: #37a8db;
 }
 
 .tab-auxiliary .acroEnabled.off {
-    background-color: #828885;
-    border: 1px solid #616664;
+    color: #828885;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
