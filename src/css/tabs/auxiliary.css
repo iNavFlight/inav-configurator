@@ -209,7 +209,8 @@
 .tab-auxiliary .acroEnabled {
     margin-top: 0;
     margin-bottom: 0;
-    background-color: #e4e4e4;
+    background-color: #828885;
+    color: white;
     font-family: 'open_sansbold', Arial, serif;
     font-size: 12px;
     display: block;
@@ -225,11 +226,11 @@
 }
 
 .tab-auxiliary .acroEnabled.on {
-    color: #37a8db;
+    background-color: #37a8db;
 }
 
 .tab-auxiliary .acroEnabled.off {
-    color: #828885;
+    background-color: #828885;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
