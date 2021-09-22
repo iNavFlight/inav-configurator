@@ -1243,6 +1243,11 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            41: {
+                name: "LOITER RADIUS OVERRIDE",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1301,6 +1306,7 @@ var FC = {
                     32: "CRSF LQ",
                     33: "CRSF SNR",
                     34: "GPS Valid Fix",
+                    35: "Loiter Radius [cm]",
                 }
             },
             3: {
