@@ -111,6 +111,7 @@ TABS.auxiliary.initialize = function (callback) {
         $(newMode).data('index', modeIndex);
         $(newMode).data('id', modeId);
         $(newMode).data('origId', ORIG_AUX_CONFIG_IDS[modeIndex]);
+        $(newMode).data('modeName', AUX_CONFIG[modeIndex]);
 
         $(newMode).find('.name').data('modeElement', newMode);
         $(newMode).find('a.addRange').data('modeElement', newMode);
@@ -344,8 +345,19 @@ TABS.auxiliary.initialize = function (callback) {
 
         function update_ui() {
             let hasUsedMode = false;
+            let acroEnabled = true;
+            let acroFail = ["ANGLE", "HORIZON", "MANUAL", "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD", "NAV WP", "GCS NAV"];
+
+            var auxChannelCount = RC.active_channels - 4;
+
+            for (var i = 0; i < (auxChannelCount); i++) {
+                update_marker(i, RC.channels[i + 4]);
+            }
+
             for (var i = 0; i < AUX_CONFIG.length; i++) {
                 var modeElement = $('#mode-' + i);
+                let inRange = false;
+                
                 if (modeElement.find(' .range').length == 0) {
                     // if the mode is unused, skip it
                     modeElement.removeClass('off').removeClass('on');
@@ -353,11 +365,47 @@ TABS.auxiliary.initialize = function (callback) {
                 }
 
                 if (FC.isModeBitSet(modeElement.data('origId'))) {
-                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').addClass('on').removeClass('off');
+                    // The flight controller can activate the mode
+                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').addClass('on').removeClass('inRange').removeClass('off');
+
+                    if (jQuery.inArray(modeElement.data('modeName'), acroFail) !== -1) {
+                        acroEnabled = false;
+                    }
                 } else {
-                    $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('off');
+                    // Check to see if the mode is in range
+                    var modeRanges = modeElement.find(' .range');
+                    for (r = 0; r < modeRanges.length; r++) {
+                        var rangeLow = $(modeRanges[r]).find('.lowerLimitValue').html();
+                        var rangeHigh = $(modeRanges[r]).find('.upperLimitValue').html();
+                        var markerPosition = $(modeRanges[r]).find('.marker')[0].style.left;
+                        markerPosition = markerPosition.substring(0, markerPosition.length-1);
+
+                        rangeLow = (rangeLow - 900) / (2100-900) * 100;
+                        rangeHigh = (rangeHigh - 900) / (2100-900) * 100;
+
+                        if ((markerPosition >= rangeLow) && (markerPosition <= rangeHigh)) {
+                            inRange = true;
+                        }
+                    }
+                    
+                    if (inRange) {
+                        $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').addClass('inRange').removeClass('off');
+
+                        if (jQuery.inArray(modeElement.data('modeName'), acroFail) !== -1) {
+                            acroEnabled = false;
+                        }
+                    } else {
+                        // If not, it is shown as disabled.
+                        $('.mode .name').eq(modeElement.data('index')).data('modeElement').removeClass('on').removeClass('inRange').addClass('off');
+                    }
                 }
                 hasUsedMode = true;
+            }
+
+            if (acroEnabled) {
+                $('.acroEnabled').addClass('on').removeClass('off');
+            } else {
+                $('.acroEnabled').removeClass('on').addClass('off');
             }
         
             let hideUnused = hideUnusedModes && hasUsedMode;
@@ -367,11 +415,6 @@ TABS.auxiliary.initialize = function (callback) {
                     modeElement.toggle(!hideUnused);
                 }
             }    
-            var auxChannelCount = RC.active_channels - 4;
-
-            for (var i = 0; i < (auxChannelCount); i++) {
-                update_marker(i, RC.channels[i + 4]);
-            }
         }
 
         let hideUnusedModes = false;
@@ -391,6 +434,8 @@ TABS.auxiliary.initialize = function (callback) {
         // enable data pulling
         helper.mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
 
+        $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
+
         GUI.content_ready(callback);
     }
 };
@@ -398,3 +443,7 @@ TABS.auxiliary.initialize = function (callback) {
 TABS.auxiliary.cleanup = function (callback) {
     if (callback) callback();
 };
+
+$(window).on('resize', function(){
+    $(".tab-auxiliary .acroEnabled").width($("#mode-0 .info").width());
+});
