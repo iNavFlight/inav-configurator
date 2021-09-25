@@ -663,6 +663,9 @@ TABS.mission_control.initialize = function (callback) {
             HOME.setAlt(elevationAtHome);
         })()
 
+        if (globalSettings.mapProviderType == 'bing') {
+            $('#elevationEarthModelclass').fadeIn(300);
+        }
     }
 
 
@@ -1462,7 +1465,9 @@ TABS.mission_control.initialize = function (callback) {
         // Map on-click behavior definition
         //////////////////////////////////////////////////////////////////////////
         map.on('click', function (evt) {
+            var tempSelectedMarkerIndex = null;
             if (selectedMarker != null && selectedFeature != null) {
+                tempSelectedMarkerIndex = selectedMarker.getLayerNumber();
                 try {
                     selectedFeature.setStyle(getWaypointIcon(selectedMarker, false));
                     selectedMarker = null;
@@ -1494,10 +1499,14 @@ TABS.mission_control.initialize = function (callback) {
                 if (globalSettings.mapProviderType == 'bing') {
                     $('#elevationAtWP').fadeIn();
                     $('#groundClearanceAtWP').fadeIn();
-                    (async () => {
-                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                    })()
+                    if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
+                        (async () => {
+                            const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                            $('#elevationValueAtWP').text(elevationAtWP);
+                            checkAltElevSanity(false);
+                            plotElevation();
+                        })()
+                    }
                 } else {
                     $('#elevationAtWP').fadeOut();
                     $('#groundClearanceAtWP').fadeOut();
@@ -1751,7 +1760,7 @@ TABS.mission_control.initialize = function (callback) {
                         if (P3Value != selectedMarker.getP3()) {
                             if ($('#pointP3').prop("checked")) {
                                 if (altitude < 0) {
-                                    alert("Altitude below ground level, setting to default");
+                                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
                                     altitude = Number($('#MPdefaultPointAlt').val());
                                 }
                                 selectedMarker.setAlt(altitude + elevationAtWP * 100);
@@ -1850,9 +1859,6 @@ TABS.mission_control.initialize = function (callback) {
             HOME.setLon(Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7));
             HOME.setLat(Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7));
             updateHome();
-            if (globalSettings.mapProviderType == 'bing') {
-                $('#elevationEarthModelclass').fadeIn(300);
-            }
         });
 
         $('#cancelHome').on('click', function () {
@@ -2251,23 +2257,23 @@ TABS.mission_control.initialize = function (callback) {
         if (selectedMarker.getP3()) {
             if (Number($('#pointAlt').val()) < 100 * elevationAtWP) {
                 if (reset) {
-                    alert("Altitude below ground level. Change ignored");
+                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     $('#pointAlt').val(selectedMarker.getAlt());
                 } else {
-                    alert("Altitude below ground level, setting to default");
+                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
                     let altitude = Number($('#MPdefaultPointAlt').val()) + 100 * elevationAtWP;
                     $('#pointAlt').val(altitude);
                 }
             }
             groundClearance = Number($('#pointAlt').val()) / 100 - elevationAtWP;
-        } else if (homeMarkers.length & HOME.getAlt() != "N/A") {
+        } else if (homeMarkers.length && HOME.getAlt() != "N/A") {
             let elevationAtHome = HOME.getAlt();
             if ((Number($('#pointAlt').val()) / 100 + elevationAtHome) < elevationAtWP) {
                 if (reset) {
-                    alert("Altitude below ground level. Change ignored");
+                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     $('#pointAlt').val(selectedMarker.getAlt());
                 } else {
-                    alert("Altitude below ground level, setting to default");
+                    alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
                     let altitude = Number($('#MPdefaultPointAlt').val()) + 100 * (elevationAtWP - elevationAtHome);
                     $('#pointAlt').val(altitude);
                 }

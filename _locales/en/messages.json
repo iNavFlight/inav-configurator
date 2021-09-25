@@ -3346,7 +3346,7 @@
     },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
-    }, 
+    },
     "osdSettingPLUS_CODE_SHORT_HELP": {
         "message": "Removing 2, 4 and 6 leading digits requires a reference location within, respectively, ~800km, ~40km and ~2km to recover the original coordinates."
     },
@@ -3997,6 +3997,12 @@
     },
     "MissionPlannerJumpTargetRemoval": {
         "message": "You can't remove a Waypoint which is defined as a JUMP target! \nYou first need to remove the target on the waypoint triggering the JUMP."
+    },
+    "MissionPlannerAltitudeChangeReset": {
+        "message": "Altitude below ground level. Change ignored"
+    },
+    "MissionPlannerAltitudeSetDefault": {
+        "message": "Altitude below ground level, setting to default"
     },
     "SafehomeSelected": {
         "message": ""
