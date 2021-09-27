@@ -665,6 +665,8 @@ TABS.mission_control.initialize = function (callback) {
 
         if (globalSettings.mapProviderType == 'bing') {
             $('#elevationEarthModelclass').fadeIn(300);
+        } else {
+            $('#elevationEarthModelclass').fadeOut(300);
         }
     }
 
@@ -1361,7 +1363,8 @@ TABS.mission_control.initialize = function (callback) {
                     (async () => {
                         const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
                         $('#elevationValueAtWP').text(elevationAtWP);
-                        checkAltElevSanity(false);
+                        const returnAltitude = checkAltElevSanity(false, mission.getWaypoint(tempMarker.number).getAlt(), elevationAtWP, mission.getWaypoint(tempMarker.number).getP3());
+                        mission.getWaypoint(tempMarker.number).setAlt(returnAltitude);
                         plotElevation();
                     })()
                 }
@@ -1503,7 +1506,8 @@ TABS.mission_control.initialize = function (callback) {
                         (async () => {
                             const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                             $('#elevationValueAtWP').text(elevationAtWP);
-                            checkAltElevSanity(false);
+                            const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                            selectedMarker.setAlt(returnAltitude);
                             plotElevation();
                         })()
                     }
@@ -1539,10 +1543,24 @@ TABS.mission_control.initialize = function (callback) {
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection) {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(tempMarker.number, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
-                mission.insertWaypoint(tempWp, tempMarker.number);
-                mission.update();
-                cleanLayers();
-                redrawLayers();
+                if (homeMarkers.length && HOME.getAlt() != "N/A") {
+                    (async () => {
+                        const elevationAtWP = await tempWp.getElevation(globalSettings);
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+
+                        mission.insertWaypoint(tempWp, tempMarker.number);
+                        mission.update();
+                        cleanLayers();
+                        redrawLayers();
+                        plotElevation();
+                    })()
+                } else {
+                    mission.insertWaypoint(tempWp, tempMarker.number);
+                    mission.update();
+                    cleanLayers();
+                    redrawLayers();
+                    plotElevation();
+                }
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
                 selectedMarker = SAFEHOMES.getSafehome(tempMarker.number);
@@ -1562,11 +1580,24 @@ TABS.mission_control.initialize = function (callback) {
             else {
                 let tempWpCoord = ol.proj.toLonLat(evt.coordinate);
                 let tempWp = new Waypoint(mission.get().length, MWNP.WPTYPE.WAYPOINT, Math.round(tempWpCoord[1] * 10000000), Math.round(tempWpCoord[0] * 10000000), alt=Number(settings.alt), p1=Number(settings.speed));
-                mission.put(tempWp);
-                mission.update();
-                cleanLayers();
-                redrawLayers();
-                plotElevation();
+                if (homeMarkers.length && HOME.getAlt() != "N/A") {
+                    (async () => {
+                        const elevationAtWP = await tempWp.getElevation(globalSettings);
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+
+                        mission.put(tempWp);
+                        mission.update();
+                        cleanLayers();
+                        redrawLayers();
+                        plotElevation();
+                    })()
+                } else {
+                    mission.put(tempWp);
+                    mission.update();
+                    cleanLayers();
+                    redrawLayers();
+                    plotElevation();
+                }
             }
             //mission.missionDisplayDebug();
         });
@@ -1722,7 +1753,9 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#pointAlt').on('change', function (event) {
             if (selectedMarker) {
-                checkAltElevSanity(true);
+                const elevationAtWP = Number($('#elevationValueAtWP').text());
+                const returnAltitude = checkAltElevSanity(true, Number($('#pointAlt').val()), elevationAtWP, selectedMarker.getP3());
+                selectedMarker.setAlt(returnAltitude);
                 mission.updateWaypoint(selectedMarker);
                 mission.update();
                 redrawLayer();
@@ -1761,7 +1794,7 @@ TABS.mission_control.initialize = function (callback) {
                             if ($('#pointP3').prop("checked")) {
                                 if (altitude < 0) {
                                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
-                                    altitude = Number($('#MPdefaultPointAlt').val());
+                                    altitude = settings.alt;
                                 }
                                 selectedMarker.setAlt(altitude + elevationAtWP * 100);
                             } else {
@@ -1771,7 +1804,8 @@ TABS.mission_control.initialize = function (callback) {
                         $('#pointAlt').val(selectedMarker.getAlt());
                         altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
                         $('#altitudeInMeters').text(` ${altitudeMeters}m`);
-                        checkAltElevSanity(false);
+                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                        selectedMarker.setAlt(returnAltitude);
                         mission.updateWaypoint(selectedMarker);
                         mission.update();
                         redrawLayer();
@@ -1872,16 +1906,18 @@ TABS.mission_control.initialize = function (callback) {
         $('#elevationEarthModel').on('change', function (event) {
             if (globalSettings.mapProviderType == 'bing') {
                 (async () => {
-                    if (selectedMarker) {
-                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        mission.updateWaypoint(selectedMarker);
-                    }
                     const elevationAtHome = await HOME.getElevation(globalSettings);
                     $('#elevationValueAtHome').text(elevationAtHome+' m');
                     HOME.setAlt(elevationAtHome);
 
-                    checkAltElevSanity(false);
+                    if (selectedMarker) {
+                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                        $('#elevationValueAtWP').text(elevationAtWP);
+                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                        selectedMarker.setAlt(returnAltitude);
+                        mission.updateWaypoint(selectedMarker);
+                    }
+
                     mission.update();
                     redrawLayer();
                     plotElevation();
@@ -2244,46 +2280,45 @@ TABS.mission_control.initialize = function (callback) {
       }
     }
 
-    /* reset = true : changes WP Altitude value back to previous value if setting below ground level.
-     ^ reset = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
-    function checkAltElevSanity(reset) {
+    /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
+     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
+    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, P3Datum) {
         if (globalSettings.mapProviderType != 'bing') {
-            selectedMarker.setAlt(Number($('#pointAlt').val()));
-            return;
+            return checkAltitude;
         }
 
-        const elevationAtWP = Number($('#elevationValueAtWP').text());
         let groundClearance = "NO HOME";
-        if (selectedMarker.getP3()) {
-            if (Number($('#pointAlt').val()) < 100 * elevationAtWP) {
-                if (reset) {
+        let altitude = checkAltitude;
+        if (selectedMarker != null && selectedMarker.getP3()) {
+            if (checkAltitude < 100 * elevation) {
+                if (resetAltitude) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
-                    $('#pointAlt').val(selectedMarker.getAlt());
+                    altitude = selectedMarker.getAlt();
                 } else {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
-                    let altitude = Number($('#MPdefaultPointAlt').val()) + 100 * elevationAtWP;
-                    $('#pointAlt').val(altitude);
+                    altitude = settings.alt + 100 * elevation;
                 }
             }
-            groundClearance = Number($('#pointAlt').val()) / 100 - elevationAtWP;
+            groundClearance = altitude / 100 - elevation;
         } else if (homeMarkers.length && HOME.getAlt() != "N/A") {
             let elevationAtHome = HOME.getAlt();
-            if ((Number($('#pointAlt').val()) / 100 + elevationAtHome) < elevationAtWP) {
-                if (reset) {
+            if ((checkAltitude / 100 + elevationAtHome) < elevation) {
+                if (resetAltitude) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
-                    $('#pointAlt').val(selectedMarker.getAlt());
+                    altitude = selectedMarker.getAlt();
                 } else {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeSetDefault'));
-                    let altitude = Number($('#MPdefaultPointAlt').val()) + 100 * (elevationAtWP - elevationAtHome);
-                    $('#pointAlt').val(altitude);
+                    altitude = settings.alt + 100 * (elevation - elevationAtHome);
                 }
             }
-            groundClearance = Number($('#pointAlt').val()) / 100 + (elevationAtHome - elevationAtWP);
+            groundClearance = altitude / 100 + (elevationAtHome - elevation);
         }
-        selectedMarker.setAlt(Number($('#pointAlt').val()));
-        let altitudeMeters = parseInt(selectedMarker.getAlt()) / 100;
+        $('#pointAlt').val(altitude);
+        let altitudeMeters = parseInt(altitude) / 100;
         $('#altitudeInMeters').text(` ${altitudeMeters}m`);
         $('#groundClearanceValueAtWP').text(` ${groundClearance}`);
+
+        return altitude;
     }
 
     function plotElevation() {
