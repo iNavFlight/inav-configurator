@@ -424,10 +424,8 @@ let WaypointCollection = function () {
             samples = 1024;
         }
         if (globalSettings.mapProviderType == 'bing') {
-            let elevationEarthModel = "ellipsoid";
-            if ($('#elevationEarthModel').prop("checked")) {
-                elevationEarthModel = "sealevel";
-            }
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
+
             if (point2measure.length >1) {
                 const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights='+elevationEarthModel+'&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
                 const myJson = await response.json();

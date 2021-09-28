@@ -4001,9 +4001,6 @@
     "MissionPlannerAltitudeChangeReset": {
         "message": "Altitude below ground level. Change ignored"
     },
-    "MissionPlannerAltitudeSetDefault": {
-        "message": "Altitude below ground level, setting to default"
-    },
     "SafehomeSelected": {
         "message": ""
     },
