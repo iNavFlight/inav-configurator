@@ -22,6 +22,14 @@
     background: #37a8db;
 }
 
+.tab-auxiliary .mode.inRange .info {
+    background: #104156;
+    color: white;
+}
+.tab-auxiliary .mode.inRange:nth-child(odd) .info {
+    background: #104156;
+}
+
 .tab-auxiliary .mode.off .info {
     background: #828885;
     color: white;
@@ -196,6 +204,33 @@
     font-weight: bold;
     color: rgb(105, 99, 99);
     padding: 10px 5px;
+}
+
+.tab-auxiliary .acroEnabled {
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: #828885;
+    color: white;
+    font-family: 'open_sansbold', Arial, serif;
+    font-size: 12px;
+    display: block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    line-height: 28px;
+    position: fixed;
+    bottom:10px;
+    left:20px;
+    width:10%;
+    text-align: center;
+    z-index: 25000;
+}
+
+.tab-auxiliary .acroEnabled.on {
+    background-color: #37a8db;
+}
+
+.tab-auxiliary .acroEnabled.off {
+    background-color: #828885;
 }
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {

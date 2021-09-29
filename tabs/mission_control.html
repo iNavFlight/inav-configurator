@@ -114,13 +114,17 @@
                                             <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
                                         </div>
                                     </td>
-                                    <td><input type="number" class="home-lat" /></td>
                                     <td><input type="number" class="home-lon" /></td>
-                                    <td><span id="elevationValueAtHome">NA</span></td>
+                                    <td><input type="number" class="home-lat" /></td>
+                                    <td><span id="elevationValueAtHome">N/A</span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="point" id="elevationEarthModelclass" style="display: none">
+                        <label class="spacer_box_title i18n-replaced" for="elevationEarthModel">Use Sea Level Earth DEM Model: </label>
+                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" required>
                     </div>
                 </div>
 
@@ -215,7 +219,11 @@
                         </div>
                         <div class="point" id="elevationAtWP" style="display: none">
                             <label class="point-label">Elevation (m): </label>
-                            <span id="elevationValueAtWP">NA</span>
+                            <span id="elevationValueAtWP">N/A</span>
+                        </div>
+                        <div class="point" id="groundClearanceAtWP" style="display: none">
+                            <label class="point-label">Grd Dist (m): </label>
+                            <span id="groundClearanceValueAtWP">N/A</span>
                         </div>
                         <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
