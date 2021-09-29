@@ -436,13 +436,15 @@ let WaypointCollection = function () {
         }
 
         if (globalSettings.mapProviderType == 'bing') {
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
+
             if (point2measure.length >1) {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights='+elevationEarthModel+'&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
                 const myJson = await response.json();
                 elevation = myJson.resourceSets[0].resources[0].elevations;
             }
             else {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights=ellipsoid&key='+globalSettings.mapApiKey);
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
                 const myJson = await response.json();
                 elevation = myJson.resourceSets[0].resources[0].elevations;
             }
