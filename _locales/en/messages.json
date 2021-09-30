@@ -3966,7 +3966,7 @@
         "message": "I2C Speed"
     },
     "configurationI2cSpeedHelp": {
-        "message": "I2C speed should be kept at the highest level that allows for all connected devices to work. Default 400kHz is a save value and it is suggested to switch to 800kHz in case of Multirotors."
+        "message": "I2C speed should be kept at the highest level that allows for all connected devices to work. Default 400kHz is a safe value and it is suggested to switch to 800kHz in case of Multirotors."
     },
     "i2cSpeedSuggested800khz": {
         "message": "Please switch to 800kHz if connected hardware allows for it"
