@@ -13,7 +13,7 @@
                         </div>
                     </div>
                     <div class="spacer" id="ActionContent">
-                        
+
                         <div class="btn save_btn">
                             <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" title="Load Mission File"></a>
                             <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" title="Save Mission File"></a>
@@ -86,7 +86,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="missionPlanerHome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionHomeHead">Take Off home</div>
@@ -110,20 +110,24 @@
                                 </thead>
                                 <tbody id="homeTableBody">
                                     <tr>
-                                    <td><div id="viewHomePoint" class="btnTable btnTableIcon"> 
-                                            <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a> 
+                                    <td><div id="viewHomePoint" class="btnTable btnTableIcon">
+                                            <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
                                         </div>
-                                    </td> 
+                                    </td>
                                     <td><input type="number" class="home-lon" /></td>
                                     <td><input type="number" class="home-lat" /></td>
-                                    <td><span id="elevationValueAtHome">NA</span></td>
+                                    <td><span id="elevationValueAtHome">N/A</span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    <div class="point" id="elevationEarthModelclass" style="display: none">
+                        <label class="spacer_box_title i18n-replaced" for="elevationEarthModel">Use Sea Level Earth DEM Model: </label>
+                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" required>
+                    </div>
                 </div>
-                
+
                 <div id="missionPlanerSafehome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Safe Home manager</div>
@@ -215,7 +219,11 @@
                         </div>
                         <div class="point" id="elevationAtWP" style="display: none">
                             <label class="point-label">Elevation (m): </label>
-                            <span id="elevationValueAtWP">NA</span>
+                            <span id="elevationValueAtWP">N/A</span>
+                        </div>
+                        <div class="point" id="groundClearanceAtWP" style="display: none">
+                            <label class="point-label">Grd Dist (m): </label>
+                            <span id="groundClearanceValueAtWP">N/A</span>
                         </div>
                         <div class="point" id="pointP1class" style="display: none">
                             <label class="point-label" for="pointP1">Parameter 1: </label>
@@ -244,7 +252,7 @@
                             </tbody>
                         </table>
                         </div>
-                        
+
 						<!-- <div class="point-radio" id="pointOptionclass" style="display: none">
 							<div class="radio-line">
 								<input type="radio" id="Options_None" name="Options" value="None" checked>
@@ -256,7 +264,7 @@
 								<input type="checkbox" id="Options_LandRTH">
 								<label for="Options_LandRTH">Land after RTH</label><br>
 							</div>
-							<div class="radio-line">	
+							<div class="radio-line">
 								<input type="radio" id="Options_JUMP" name="Options" value="JUMP">
 								<label class="radio-options" for="Options_JUMP">JUMP</label>
 								<label for="Options_TargetJUMP">Target WP: </label>
@@ -264,14 +272,14 @@
 								<label for="Options_NumberJUMP">Repeat: </label>
 								<input id="Options_NumberJUMP" type="text" value="0" required><br>
 							</div>
-							<div class="radio-line">	
+							<div class="radio-line">
 								<input type="radio" id="Options_HEAD" name="Options" value="SET_HEAD">
 								<label class="radio-options" for="Options_HEAD">HEAD</label>
 								<label for="Options_HeadingHead">Heading: </label>
 								<input id="Options_HeadingHead" type="text" value="-1" required><br>
 							</div>
                         </div> -->
-						
+
                     </div>
                 </div>
             </div>
