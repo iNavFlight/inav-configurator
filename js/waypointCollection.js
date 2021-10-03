@@ -180,12 +180,14 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
-                    element.setEndMission(0xA5);
-                }
-                else {
-                    element.setEndMission(0);
-                }
+                // CR8
+                // if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
+                    // element.setEndMission(0xA5);
+                // }
+                // else {
+                    // element.setEndMission(0);
+                // }
+                // CR8
             }
         });
     };

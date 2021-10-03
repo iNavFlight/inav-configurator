@@ -187,6 +187,12 @@
                     </div>
                     <div class="spacer" id="WPeditContent">
                         <input type="hidden" name="pointNumber" value="">
+                        <!-- CR8 -->
+                        <div class="point" id="pointLastWPclass"> <!-- style="display: none"> -->
+                            <label class="point-label" for="pointLastWP">Last WP: </label>
+                            <input id="pointLastWP" type="checkbox" value="0" class="togglemedium" required>
+                        </div>
+                        <!-- CR8 -->
                         <div class="point">
                             <label class="point-label" for="pointType">Type: </label>
                             <select name="type" id="pointType">
@@ -199,6 +205,7 @@
 								<!--<option value="6">Jump</option>
 								<option value="7">Heading lock</option>-->
 								<option value="8">Land</option>
+                                <option value="9">Fly By Home</option>   <!-- CR9 -->
                             </select>
                         </div>
                         <div class="point">
