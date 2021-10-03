@@ -807,12 +807,18 @@ TABS.mission_control.initialize = function (callback) {
         let oldPos,
             oldAction,
             poiList = [],
-            oldHeading;
+            oldHeading,
+            multiMissionIndex;  // CR8
         let activatePoi = false;
         let activateHead = false;
         $('#missionDistance').text(0);
         cleanLines();
         mission.get().forEach(function (element) {
+            // CR8
+            if (element.getEndMission() == 0xA5) {
+                multiMissionIndex = element.getNumber();
+            }
+            // CR8
             if (!element.isAttached()) {
                 let coord = ol.proj.fromLonLat([element.getLonMap(), element.getLatMap()]);
                 if (element.getAction() == 5) {
@@ -851,6 +857,11 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
+                    // CR8
+                    // let jumpWPIndex = 0;
+                    // jumpWPIndex = multiMissionIndex + element.getP1() + 1;
+                    // let coord = ol.proj.fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
+                    // CR8
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(element.getP1()).getLonMap(), mission.getWaypoint(element.getP1()).getLatMap()]);
                     paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
                 }
@@ -1720,7 +1731,11 @@ TABS.mission_control.initialize = function (callback) {
         // CR8
         $('#pointLastWP').on('change', function (event) {
             if (selectedMarker) {
-                selectedMarker.setEndMission( $('#pointLastWP').prop("checked") ? 1.0 : 0.0);
+                selectedMarker.setEndMission( $('#pointLastWP').prop("checked") ? 0xA5 : 0.0);
+
+                mission.updateWaypoint(selectedMarker);
+                mission.update();
+                redrawLayer();
             }
         });
         // CR8
@@ -2160,7 +2175,11 @@ TABS.mission_control.initialize = function (callback) {
                                             point.setP2(parseInt(node.$[attr]));
                                         } else if (attr.match(/parameter3/i)) {
                                             point.setP3(parseInt(node.$[attr]));
+                                        // CR8
+                                        } else if (attr.match(/flag/i)) {
+                                            point.setEndMission(parseInt(node.$[attr]));
                                         }
+                                        // CR8
                                     }
                                     mission.put(point);
                                 }
@@ -2223,6 +2242,7 @@ TABS.mission_control.initialize = function (callback) {
                         'parameter1': (MWNP.WPTYPE.REV[waypoint.getAction()] == "JUMP" ? waypoint.getP1()+1 : waypoint.getP1()),
                         'parameter2': waypoint.getP2(),
                         'parameter3': waypoint.getP3(),
+                        'flag': waypoint.getEndMission(),   // CR8
                     } };
             data.missionitem.push(point);
         });
