@@ -92,7 +92,11 @@
 .tab-mission-control .ic_center {
     background-image: url(../images/icons/cf_icon_MP_center_grey.svg);
 }
-
+/* CR8 */
+.tab-mission-control .ic_setup {
+    background-image: url(../images/icons/cf_icon_setup_white.svg);
+}
+/* CR8 */
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
@@ -342,7 +346,14 @@
 .tab-mission-control .safehomesTable tr:nth-child(even) th {
     background-color: #ebe7e7;
 }
-
+/* CR8 */
+.tab-mission-control .multimissionTable {
+    width: 100%;
+    text-align: left;
+    font-size: 12px;
+    float: left;
+}
+/* CR8 */
 .tab-mission-control .waypointOptionsTable {
     width: 100%;
     text-align: center;
@@ -498,8 +509,8 @@
     width:20px;
 }
 
-.tab-mission-control .textLegend{   
-    margin:2px; 
+.tab-mission-control .textLegend{
+    margin:2px;
 }
 .tab-mission-control .valueLegend{
     float:right;
