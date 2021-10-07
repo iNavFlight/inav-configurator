@@ -2172,7 +2172,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 redrawLayers();
-                if (!(HOME.getLatMap() == 0 && HOME.getLonMap() == 0) {
+                if (!(HOME.getLatMap() == 0 && HOME.getLonMap() == 0)) {
                     updateHome();
                 }
                 updateTotalInfo();
