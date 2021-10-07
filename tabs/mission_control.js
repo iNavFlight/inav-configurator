@@ -657,11 +657,15 @@ TABS.mission_control.initialize = function (callback) {
             renderHomeOnMap();
         });
 
-        (async () => {
-            const elevationAtHome = await HOME.getElevation(globalSettings);
-            $('#elevationValueAtHome').text(elevationAtHome+' m');
-            HOME.setAlt(elevationAtHome);
-        })()
+        if (HOME.getLatMap() == 0 && HOME.getLonMap() == 0) {
+            HOME.setAlt("N/A");
+        } else {
+            (async () => {
+                const elevationAtHome = await HOME.getElevation(globalSettings);
+                $('#elevationValueAtHome').text(elevationAtHome+' m');
+                HOME.setAlt(elevationAtHome);
+            })()
+        }
 
         if (globalSettings.mapProviderType == 'bing') {
             $('#elevationEarthModelclass').fadeIn(300);
