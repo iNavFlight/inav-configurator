@@ -181,6 +181,16 @@ let WaypointCollection = function () {
                     idx++;
                 }
                 // CR8
+                // alert(element.getNumber() + " flag " + element.getEndMission())
+                if (!(bMWPfile && bReverse)) {
+                    if (element.getNumber() == self.get().length - 1) {
+                        element.setEndMission(0xA5);
+                    }
+                    else if ((element.getNumber() == self.get().length - 2) && element.getEndMission() == 0xA5) {
+                        element.setEndMission(0);
+                    }
+                }
+
                 // if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
                     // element.setEndMission(0xA5);
                 // }
