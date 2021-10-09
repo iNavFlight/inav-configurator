@@ -10,7 +10,7 @@ let WaypointCollection = function () {
         countBusyPoints = 0,
         version = 0,
         center = {}
-        
+
     self.getMaxWaypoints = function () {
         return maxWaypoints;
     };
@@ -18,15 +18,15 @@ let WaypointCollection = function () {
     self.setMaxWaypoints = function (data) {
         maxWaypoints = data;
     };
-    
+
     self.getValidMission = function () {
         return isValidMission;
     };
-    
+
     self.setValidMission = function (data) {
         isValidMission = data;
     };
-    
+
     self.getCountBusyPoints = function () {
         return countBusyPoints;
     };
@@ -34,7 +34,7 @@ let WaypointCollection = function () {
     self.setCountBusyPoints = function (data) {
         countBusyPoints = data;
     };
-    
+
     self.getVersion = function () {
         return version;
     };
@@ -42,11 +42,11 @@ let WaypointCollection = function () {
     self.setVersion = function (data) {
         version = data;
     };
-    
+
     self.getCenter = function () {
         return center;
     };
-    
+
     self.setCenter = function (data) {
         center = data;
     };
@@ -54,11 +54,11 @@ let WaypointCollection = function () {
     self.setCenterZoom = function (data) {
         center.zoom = data;
     };
-    
+
     self.setCenterLon = function (data) {
         center.lon = data;
     };
-    
+
     self.setCenterLat = function (data) {
         center.lat = data;
     };
@@ -70,7 +70,7 @@ let WaypointCollection = function () {
     self.get = function () {
         return data;
     };
-    
+
     self.isEmpty = function () {
         return data == [];
     };
@@ -78,7 +78,7 @@ let WaypointCollection = function () {
     self.flush = function () {
         data = [];
     };
-    
+
     self.reinit = function () {
         data = [];
         maxWaypoints = 60;
@@ -99,13 +99,13 @@ let WaypointCollection = function () {
             }
         }
     };
-    
+
     self.updateWaypoint = function(newWaypoint) {
         if (newWaypoint.isUsed()) {
             data[newWaypoint.getNumber()] = newWaypoint;
         }
     };
-    
+
     self.dropWaypoint = function(newWaypoint) {
         self.getWaypoint(newWaypoint.getNumber()).setUsed(false);
         let indexId = newWaypoint.getNumber()
@@ -120,7 +120,7 @@ let WaypointCollection = function () {
         data.splice(indexId, 1);
 
     };
-    
+
     self.insertWaypoint = function (newWaypoint, indexId) {
         data.forEach(function (wp) {
             if (wp.getNumber() >= indexId) {
@@ -133,7 +133,7 @@ let WaypointCollection = function () {
         data.splice(indexId, 0, newWaypoint);
     };
 
-    
+
     self.drop = function (waypointId) {
         self.getWaypoint(waypointId).setUsed(false);
         var tmpData = [];
@@ -148,7 +148,7 @@ let WaypointCollection = function () {
 
         data = tmpData;
     };
-    
+
     self.update = function (bMWPfile=false, bReverse=false) {
         let oldWPNumber = 0;
         let optionIdx = 0;
@@ -167,7 +167,7 @@ let WaypointCollection = function () {
                         element.setP1(element.getP1()+1);
                     }
                 }
-                
+
                 if ([MWNP.WPTYPE.JUMP,MWNP.WPTYPE.SET_HEAD,MWNP.WPTYPE.RTH].includes(element.getAction())) {
                     element.setAttachedId(oldWPNumber);
                     element.setAttachedNumber(optionIdx);
@@ -189,7 +189,7 @@ let WaypointCollection = function () {
             }
         });
     };
-    
+
     self.getNonAttachedList = function () {
         let tmpData = [];
         data.forEach(function (element) {
@@ -199,8 +199,8 @@ let WaypointCollection = function () {
         });
 
         return tmpData;
-    } 
-    
+    }
+
     self.getAttachedList = function () {
         let tmpData = [];
         data.forEach(function (element) {
@@ -210,8 +210,8 @@ let WaypointCollection = function () {
         });
 
         return tmpData;
-    } 
-    
+    }
+
     self.getAttachedFromWaypoint = function (waypoint) {
         let tmpData = [];
         data.forEach(function (element) {
@@ -221,8 +221,8 @@ let WaypointCollection = function () {
         });
 
         return tmpData;
-    } 
-    
+    }
+
     self.addAttachedFromWaypoint = function (waypoint) {
         let tmpNumber = 0;
         let tmpData = self.getAttachedFromWaypoint(waypoint);
@@ -234,8 +234,8 @@ let WaypointCollection = function () {
         tempWp.setAttachedId(waypoint.getNumber());
         self.insertWaypoint(tempWp, waypoint.getNumber()+tmpNumber+1);
         self.update();
-    } 
-    
+    }
+
     self.dropAttachedFromWaypoint = function (waypoint, waypointAttachedNumber) {
         data.forEach(function (element) {
             if (element.isAttached() && element.getAttachedId() == waypoint.getNumber() && element.getAttachedNumber() == waypointAttachedNumber) {
@@ -243,9 +243,9 @@ let WaypointCollection = function () {
                 self.update();
             }
         });
-        
-    } 
-    
+
+    }
+
     self.extractBuffer = function(waypointId) {
         let buffer = [];
         let waypoint = self.getWaypoint(waypointId);
@@ -270,10 +270,10 @@ let WaypointCollection = function () {
         buffer.push(lowByte(waypoint.getP3())); //sbufReadU16(src);       // P3
         buffer.push(highByte(waypoint.getP3()));
         buffer.push(waypoint.getEndMission()); //sbufReadU8(src);      // future: to set nav flag
-        
+
         return buffer;
     }
-    
+
     self.missionDisplayDebug = function() {
         if (data && data.length != 0) {
             data.forEach(function (element) {
@@ -289,7 +289,7 @@ let WaypointCollection = function () {
             });
         }
     }
-    
+
     self.copy = function(mission){
         mission.get().forEach(function (element) {
             self.put(element);
@@ -300,7 +300,7 @@ let WaypointCollection = function () {
         self.setVersion(mission.getVersion());
         self.setCenter(mission.getCenter());
     }
-    
+
     self.convertJumpNumberToWaypoint = function(jumpId) {
         let outputNumber = 0;
         self.getNonAttachedList().forEach(function (element) {
@@ -310,7 +310,7 @@ let WaypointCollection = function () {
         });
         return outputNumber;
     }
-    
+
     self.isJumpTargetAttached = function(waypoint) {
         let lJumptTargetAttached = [];
         data.forEach(function (element) {
@@ -320,7 +320,7 @@ let WaypointCollection = function () {
         });
         return (lJumptTargetAttached.length != 0 && lJumptTargetAttached != 'undefined')
     }
-    
+
     self.getPoiList = function() {
         let poiList = [];
         data.forEach(function (element) {
@@ -330,7 +330,7 @@ let WaypointCollection = function () {
         });
         return poiList;
     }
-    
+
     self.getPoint2Measure = function(reverse=false) {
         let point2measure = [];
         let altPoint2measure = [];
@@ -383,10 +383,10 @@ let WaypointCollection = function () {
                 nStart++;
             }
         }
-        
+
         return [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure];
     }
-    
+
     self.getDistance = function(display) {
         let lengthLine = [];
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure();
@@ -394,9 +394,9 @@ let WaypointCollection = function () {
             return [-1];
         }
         else {
-        
+
             const cumulativeSum = (sum => value => sum += value)(0);
-            
+
             let oldCoord = [];
             point2measure.forEach(function (coord) {
                 if (oldCoord != 'undefined' && oldCoord != []) {
@@ -408,7 +408,7 @@ let WaypointCollection = function () {
             return lengthLine.map(cumulativeSum);
         }
     }
-    
+
     self.getElevation = async function(globalSettings) {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
         let lengthMission = self.getDistance(true);
@@ -424,19 +424,21 @@ let WaypointCollection = function () {
             samples = 1024;
         }
         if (globalSettings.mapProviderType == 'bing') {
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
+
             if (point2measure.length >1) {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights=ellipsoid&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
-                const myJson = await response.json(); 
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights='+elevationEarthModel+'&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
+                const myJson = await response.json();
                 elevation = myJson.resourceSets[0].resources[0].elevations;
             }
             else {
-                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights=ellipsoid&key='+globalSettings.mapApiKey);
-                const myJson = await response.json(); 
+                const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+point2measure+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
+                const myJson = await response.json();
                 elevation = myJson.resourceSets[0].resources[0].elevations;
             }
         }
         else {
-            elevation = "NA";
+            elevation = "N/A";
         }
         //console.log("elevation ", elevation);
         return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];
