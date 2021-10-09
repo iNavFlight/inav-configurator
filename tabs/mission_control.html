@@ -176,7 +176,7 @@
                     </div>
                 </div>
 <!-- CR8 -->
-                <div id="missionPlannerMultiMission" class="gui_box grey">  <!-- style="display: none"> -->
+                <div id="missionPlannerMultiMission" class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Multi mission manager</div>
                         <div class="btnMenu btnMenuIcon save_btn">
@@ -185,43 +185,26 @@
                             </div>
                         </div>
                     </div>
-                    <div class="spacer" id="multimissionContent">
-                        <table class="multimissionTable">
-                            <tbody id="MMTableBody">
-                                <tr>
-                                    <td>Mission:</td>
-                                    <td>
-                                        <select name="Number" id="multimissionOptionList">
-                                            <option value="0">ALL</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Add New</td>
-                                    <td>
-                                        <div class="btnTable btnTableIcon save_btn">
-                                            <a class="ic_add" id="addMultimissionButton" href="#" title="Add"></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr id= "deleteMMTable" style="display: none">
-                                    <td>Delete</td>
-                                    <td>
-                                        <div class="btnTable btnTableIcon btnTable-danger">
-                                            <a class="ic_cancel" id="deleteMultimissionButton" href="#" title="Delete"></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
+                    <div class="spacer" id="multimissionContent">  <!-- style="display: none"> -->
+                        <div class="btnTable btnTableIcon save_btn" style="display: inline-block">
+                            <label for="multimissionOptionList">Mission Num </label>
+                            <select name="Number" id="multimissionOptionList">
+                                <option value="0">ALL</option>
+                            </select>
+                            <a class="ic_save" id="updateMultimissionButton" href="#" title="Update" style="display: none; float: right"></a>
+                        </div>
+                        <br>
+                        <span style="display: inline">
+                            <div class="btnTable btnTableIcon save_btn" style="float: left">
+                                <label for="addMultimissionButton">Add </label>
+                                <a class="ic_add" id="addMultimissionButton" href="#" title="Add"></a>
+                            </div>
+                            <div class="btnTable btnTableIcon btnTable-danger" id= "deleteMMTable" style="display: none; float: right">
+                                <label for="deleteMultimissionButton">Delete </label>
+                                <a class="ic_cancel" id="deleteMultimissionButton" href="#" title="Delete"></a>
+                            </div>
+                        </span>
                     </div>
-                        <!-- <div class="btnTable btnTableIcon save_btn"> -->
-                            <!-- <label class="spacer_box_title i18n-replaced" for="pointLastWP">Last WP: </label> -->
-                            <!-- <a class="ic_add" id="addMultimissionButton2" href="#" title="Add"></a> -->
-                            <!-- <label class="spacer_box_title i18n-replaced" for="pointLastWPx">Last WP again: </label> -->
-                            <!-- <a class="ic_add" id="addMultimissionButton2xx" href="#" title="Add"></a> -->
-                        <!-- </div> -->
                 </div>
 <!-- CR8 -->
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
@@ -239,7 +222,7 @@
                     <div class="spacer" id="WPeditContent">
                         <input type="hidden" name="pointNumber" value="">
                         <!-- CR8 -->
-                        <!-- <div class="point" id="pointLastWPclass"> <!-- style="display: none"> --> -->
+                        <!-- <div class="point" id="pointLastWPclass"> <!-- style="display: none"> -->
                             <!-- <label class="point-label" for="pointLastWP">Last WP: </label> -->
                             <!-- <input id="pointLastWP" type="checkbox" value="0" class="togglemedium" required> -->
                         <!-- </div> -->
