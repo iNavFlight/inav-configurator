@@ -2009,7 +2009,6 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadEepromMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllWaypoints();
-            GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
             MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointsFromFC);
         });
 
@@ -2017,12 +2016,6 @@ TABS.mission_control.initialize = function (callback) {
             $(this).addClass('disabled');
             GUI.log('Start send point');
             sendWaypointsToFC();
-            GUI.log('End send point');
-            $('#saveEepromMissionButton').removeClass('disabled');
-            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-            setTimeout(function(){
-                MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
-            },2000);
         });
 
         /////////////////////////////////////////////
@@ -2227,8 +2220,8 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function getWaypointsFromFC() {
-        mspHelper.loadWaypoints();
-        setTimeout(function(){
+        mspHelper.loadWaypoints(function() {
+            GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
             mission.reinit();
             mission.copy(MISSION_PLANER);
             mission.update(true);
@@ -2237,15 +2230,19 @@ TABS.mission_control.initialize = function (callback) {
             map.getView().setZoom(16);
             redrawLayers();
             updateTotalInfo();
-        }, 2000);
+        });
     }
 
     function sendWaypointsToFC() {
         MISSION_PLANER.reinit();
         MISSION_PLANER.copy(mission);
         MISSION_PLANER.update(true, true);
-        mspHelper.saveWaypoints();
-        setTimeout(function(){
+        mspHelper.saveWaypoints(function() {
+            GUI.log('End send point');
+            $('#saveEepromMissionButton').removeClass('disabled');
+            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
+
             mission.setMaxWaypoints(MISSION_PLANER.getMaxWaypoints());
             mission.setValidMission(MISSION_PLANER.getValidMission());
             mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());
@@ -2256,7 +2253,7 @@ TABS.mission_control.initialize = function (callback) {
             cleanLayers();
             redrawLayers();
             $('#MPeditPoint').fadeOut(300);
-        }, 2000);
+        });
     }
 
 
