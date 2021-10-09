@@ -861,7 +861,7 @@ var FC = {
         return [];
     },
     getAccelerometerNames: function () {
-        return [ "NONE", "AUTO", "ADXL345", "MPU6050", "MMA845x", "BMA280", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
+        return [ "NONE", "AUTO", "MPU6050", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
     },
     getBarometerNames: function () {
         if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
