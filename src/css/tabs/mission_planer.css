@@ -302,7 +302,7 @@
 .tab-mission-control .safehomesTable {
     width: 100%;
     text-align: center;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 .tab-mission-control .safehomesTable input[type="text"] {
@@ -311,7 +311,7 @@
 }
 
 .tab-mission-control .safehomesTable input[type="number"] {
-    font-size: 8px;
+    font-size: 10px;
     width: 100%;
     -moz-appearance: textfield;
 }
@@ -498,8 +498,8 @@
     width:20px;
 }
 
-.tab-mission-control .textLegend{   
-    margin:2px; 
+.tab-mission-control .textLegend{
+    margin:2px;
 }
 .tab-mission-control .valueLegend{
     float:right;

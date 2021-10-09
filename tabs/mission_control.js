@@ -474,8 +474,8 @@ TABS.mission_control.initialize = function (callback) {
                     </td> \
                     <td><span class="safehome-number"/></td>\
                     <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
-                    <td><input type="number" class="safehome-lon" /></td>\
                     <td><input type="number" class="safehome-lat" /></td>\
+                    <td><input type="number" class="safehome-lon" /></td>\
                     </tr>\
                 ');
 
@@ -645,14 +645,14 @@ TABS.mission_control.initialize = function (callback) {
          * Process home table UI
          */
 
-        $(".home-lon").val(HOME.getLonMap()).change(function () {
-            HOME.setLon(Math.round(Number($(this).val()) * 10000000));
+        $(".home-lat").val(HOME.getLatMap()).change(function () {
+            HOME.setLat(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
         });
 
-        $(".home-lat").val(HOME.getLatMap()).change(function () {
-            HOME.setLat(Math.round(Number($(this).val()) * 10000000));
+        $(".home-lon").val(HOME.getLonMap()).change(function () {
+            HOME.setLon(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
         });
