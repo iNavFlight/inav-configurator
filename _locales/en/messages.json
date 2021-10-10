@@ -3509,6 +3509,9 @@
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },
+    "confirm_multimission_file_load": {
+        "message": "This is a multi mission file. Loading will over write current multi mission.\n Continue ?"
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
