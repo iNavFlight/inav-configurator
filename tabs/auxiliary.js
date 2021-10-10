@@ -181,6 +181,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         $(rangeElement).find('a.deleteRange').click(function () {
             var rangeElement = $(this).data('rangeElement');
+            modeElement.removeClass('inRange');
             rangeElement.remove();
         });
 
