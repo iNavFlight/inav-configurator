@@ -346,14 +346,7 @@
 .tab-mission-control .safehomesTable tr:nth-child(even) th {
     background-color: #ebe7e7;
 }
-/* CR8 */
-.tab-mission-control .multimissionTable {
-    width: 100%;
-    text-align: left;
-    font-size: 12px;
-    float: left;
-}
-/* CR8 */
+
 .tab-mission-control .waypointOptionsTable {
     width: 100%;
     text-align: center;
