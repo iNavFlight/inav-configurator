@@ -183,6 +183,11 @@
                         </div>
                     </div>
                     <div class="spacer" id="multimissionContent">  <!-- style="display: none"> -->
+                        <div style="display: inline-block">
+                            <label>Mission Info: </label>
+                            <span id="multimissionInfo">None</span>
+                        </div>
+                        <br>
                         <div class="btnTable btnTableIcon save_btn" style="display: inline-block">
                             <label for="multimissionOptionList">Mission Num </label>
                             <select name="Number" id="multimissionOptionList">
@@ -191,16 +196,12 @@
                             <a class="ic_save" id="updateMultimissionButton" href="#" title="Update" style="display: none; float: right"></a>
                         </div>
                         <br>
-                        <span style="display: inline">
+                        <!-- <span style="display: inline"> -->
                             <div class="btnTable btnTableIcon save_btn" style="float: left">
                                 <label for="addMultimissionButton">Add New Mission</label>
                                 <a class="ic_add" id="addMultimissionButton" href="#" title="Add"></a>
                             </div>
-                            <div class="btnTable btnTableIcon btnTable-danger" id= "deleteMMTable" style="display: none; float: right">
-                                <label for="deleteMultimissionButton">Delete Mission</label>
-                                <a class="ic_cancel" id="deleteMultimissionButton" href="#" title="Delete"></a>
-                            </div>
-                        </span>
+                        <!-- </span> -->
                     </div>
                 </div>
 <!-- CR8 -->
@@ -218,12 +219,6 @@
                     </div>
                     <div class="spacer" id="WPeditContent">
                         <input type="hidden" name="pointNumber" value="">
-                        <!-- CR8 -->
-                        <!-- <div class="point" id="pointLastWPclass"> <!-- style="display: none"> -->
-                            <!-- <label class="point-label" for="pointLastWP">Last WP: </label> -->
-                            <!-- <input id="pointLastWP" type="checkbox" value="0" class="togglemedium" required> -->
-                        <!-- </div> -->
-                        <!-- CR8 -->
                         <div class="point">
                             <label class="point-label" for="pointType">Type: </label>
                             <select name="type" id="pointType">
@@ -236,7 +231,6 @@
 								<!--<option value="6">Jump</option>
 								<option value="7">Heading lock</option>-->
 								<option value="8">Land</option>
-                                <option value="9">Fly By Home</option>   <!-- CR9 -->
                             </select>
                         </div>
                         <div class="point">

@@ -761,13 +761,24 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
+    function updateMultimissionInfo() {
+        if (multimissionCount) {
+            let totalMMWPs = multimission.get().length + mission.get().length;
+            $('#multimissionInfo').text(multimissionCount + ' missions (' + totalMMWPs + ' WPs)');
+            // mission.setCountBusyPoints(multimission.get().length - 1);
+        }
+    }
+
     function updateAllMultimission(missionDelete = false) {
+        alert("UpdateMM");
+        updateMultimissionInfo();
+
         if (!mission.get().length) {
             multimissionCount --;
             renderMultimissionTable();
             // return;
         }
-
+// alert("prevWPCount " + prevWPCount)
         var i = prevWPCount;
         if (!missionDelete) {
             mission.get().forEach(function (element) {
@@ -775,30 +786,28 @@ TABS.mission_control.initialize = function (callback) {
                 i++;
             });
         }
-        alert("mission length " + mission.get().length);
-        alert("multimission length " + multimission.get().length);
-        multimission.update();
+        // alert("mission length " + mission.get().length);
+        // alert("multimission length " + multimission.get().length);
 
         i = 0;
         multimission.get().forEach(function (element) {
             element.setNumber(i);
-            // alert("multimission length 2 " + multimission.get().length);
             // alert("Num=" + element.getNumber() + " Action=" + element.getAction() + " Lat=" + element.getLat() + " Lon=" + element.getLon() + " Alt=" + element.getAlt() + " P1=" + element.getP1() + " P2=" + element.getP2() + " P3=" + element.getP3() + " Flag=" + element.getEndMission() + " AttachedID=" + element.getAttachedId() + " Attached Num=" + element.getAttachedNumber())
             i++;
         });
+        multimission.update();
 
         mission.reinit();
         mission.copy(multimission);
         mission.update();
         i = 0;
         // mission.get().forEach(function (element) {
-            // // alert("mission length " + mission.get().length);
+            // alert("mission length " + mission.get().length);
             // alert("Num=" + element.getNumber() + " Action=" + element.getAction() + " Lat=" + element.getLat() + " Lon=" + element.getLon() + " Alt=" + element.getAlt() + " P1=" + element.getP1() + " P2=" + element.getP2() + " P3=" + element.getP3() + " Flag=" + element.getEndMission() + " AttachedID=" + element.getAttachedId() + " Attached Num=" + element.getAttachedNumber())
             // i++;
         // });
         selectedMarker = null;
         clearEditForm();
-        alert("UpdateMM");
         var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
         map.getView().setCenter(coord);
         map.getView().setZoom(16);
@@ -812,7 +821,7 @@ TABS.mission_control.initialize = function (callback) {
         var WPCount = 0;
         var done = false;
         prevWPCount = 0;
-
+        alert("editMM");
         mission.get().forEach(function (element) {
             if (element.getEndMission() == 0xA5 && !done) {
                 MMCount ++;
@@ -840,7 +849,6 @@ TABS.mission_control.initialize = function (callback) {
         mission.update();
         selectedMarker = null;
         clearEditForm();
-        alert("editMM");
         var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
         map.getView().setCenter(coord);
         map.getView().setZoom(16);
@@ -852,11 +860,11 @@ TABS.mission_control.initialize = function (callback) {
     function deleteMultimission() {
         updateAllMultimission(true);
         multimissionCount -= multimissionCount == 2 ? 2 : 1;
+        // alert(multimissionCount)
         if (!multimissionCount) {
             multimission.flush();
         }
         renderMultimissionTable();
-        $('#deleteMMTable').fadeOut(300);
         $('#updateMultimissionButton').fadeOut(300);
     }
 
@@ -870,18 +878,18 @@ TABS.mission_control.initialize = function (callback) {
         $('#multimissionOptionList').val(multimissionCount);
         removeAllWaypoints();
         $('#updateMultimissionButton').fadeIn(300);
-        $('#removeAllPoints').prop('disabled', true);
+        prevWPCount = multimission.get().length;
     }
 
-    function handleMultiMission() {
-        if (multimissionCount) {
-            // multimissionCount ++;
-            // renderMultimissionTable();
-            // if (Number($('#multimissionOptionList').val())) {
-                // updateAllMultimission();
-            // }
-            // $('#multimissionOptionList').val(multimissionCount);
+    function checkDeleteMultiMission() {
+        if (multimissionCount && Number($('#multimissionOptionList').val())) {
+            deleteMultimission();
+            return false;
         }
+        multimissionCount = 0;
+        multimission.flush();
+        renderMultimissionTable();
+        return true;
     }
 // CR8
 
@@ -1786,6 +1794,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
             }
             //mission.missionDisplayDebug();
+            updateMultimissionInfo();   // CR8
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -1904,17 +1913,6 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback for Waypoint edition
         /////////////////////////////////////////////
-        // CR8
-        // $('#pointLastWP').on('change', function (event) {
-            // if (selectedMarker) {
-                // selectedMarker.setEndMission( $('#pointLastWP').prop("checked") ? 0xA5 : 0.0);
-
-                // mission.updateWaypoint(selectedMarker);
-                // mission.update();
-                // redrawLayer();
-            // }
-        // });
-        // CR8
         $('#pointType').change(function () {
             if (selectedMarker) {
                 selectedMarker.setAction(Number($('#pointType').val()));
@@ -2150,12 +2148,10 @@ TABS.mission_control.initialize = function (callback) {
                 if (missions == 1) {
                     updateAllMultimission();
                 }
-                $('#deleteMMTable').fadeIn(300);
                 $('#updateMultimissionButton').fadeIn(300);
             } else {
                 alert("here2");
                 updateAllMultimission();
-                $('#deleteMMTable').fadeOut(300);
                 $('#updateMultimissionButton').fadeOut(300);
                 return;
             }
@@ -2165,10 +2161,6 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#addMultimissionButton').on('click', function () {
             addMultimission();
-        });
-
-        $('#deleteMultimissionButton').on('click', function () {
-            deleteMultimission();
         });
 
         $('#updateMultimissionButton').on('click', function () {
@@ -2181,7 +2173,11 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
             if (markers.length && confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) {
-                removeAllWaypoints();
+                // CR8
+                if (checkDeleteMultiMission()) {
+                    removeAllWaypoints();
+                }
+                // CR8
                 plotElevation();
             }
         });
@@ -2289,8 +2285,6 @@ TABS.mission_control.initialize = function (callback) {
             loadSettings();
             closeSettingsPanel();
         });
-
-
 
         updateTotalInfo();
     }
@@ -2555,8 +2549,6 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-
-
     function updateTotalInfo() {
         if (CONFIGURATOR.connectionValid) {
             let availableWPs = mission.getMaxWaypoints() - mission.getCountBusyPoints();    // CR8
@@ -2564,7 +2556,6 @@ TABS.mission_control.initialize = function (callback) {
             $('#missionValid').html(mission.getValidMission() ? chrome.i18n.getMessage('armingCheckPass') : chrome.i18n.getMessage('armingCheckFail'));
         }
     }
-
 
     function updateFilename(filename) {
         $('#missionFilename').text(filename);
