@@ -1996,30 +1996,35 @@ TABS.mission_control.initialize = function (callback) {
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
-            getWaypointsFromFC();
-            GUI.log('End get point');
-            $('#loadMissionButton').removeClass('disabled');
+            getWaypointsFromFC(false);
         });
 
         $('#saveMissionButton').on('click', function () {
+            if (!mission.get().length) {
+                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                return;
+            }
             $(this).addClass('disabled');
             GUI.log('Start send point');
-            sendWaypointsToFC();
-            GUI.log('End send point');
-            $('#saveMissionButton').removeClass('disabled');
-
+            sendWaypointsToFC(false);
         });
 
         $('#loadEepromMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllWaypoints();
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointsFromFC);
+            $(this).addClass('disabled');
+            GUI.log('Start get point');
+            getWaypointsFromFC(true);
         });
 
         $('#saveEepromMissionButton').on('click', function () {
+            if (!mission.get().length) {
+                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                return;
+            }
             $(this).addClass('disabled');
             GUI.log('Start send point');
-            sendWaypointsToFC();
+            sendWaypointsToFC(true);
         });
 
         /////////////////////////////////////////////
@@ -2225,30 +2230,51 @@ TABS.mission_control.initialize = function (callback) {
     // Load/Save FC mission Toolbox
     //
     /////////////////////////////////////////////
-    function getWaypointsFromFC() {
-        mspHelper.loadWaypoints(function() {
-            GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
-            mission.reinit();
-            mission.copy(MISSION_PLANER);
-            mission.update(true);
-            var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
-            map.getView().setCenter(coord);
-            map.getView().setZoom(16);
-            redrawLayers();
-            updateTotalInfo();
-        });
+    function getWaypointsFromFC(loadEeprom) {
+        if (loadEeprom) {
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointData);
+        } else {
+            getWaypointData();
+        }
+
+        function getWaypointData() {
+            mspHelper.loadWaypoints(function() {
+                GUI.log('End get point');
+                if (loadEeprom) {
+                    GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
+                    $('#loadEepromMissionButton').removeClass('disabled');
+                } else {
+                    $('#loadMissionButton').removeClass('disabled');
+                }
+                if (!MISSION_PLANER.getCountBusyPoints()) {
+                    alert(chrome.i18n.getMessage('no_waypoints_to_load'));
+                    return;
+                }
+                mission.reinit();
+                mission.copy(MISSION_PLANER);
+                mission.update(true);
+                var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
+                map.getView().setCenter(coord);
+                map.getView().setZoom(16);
+                redrawLayers();
+                updateTotalInfo();
+            });
+        };
     }
 
-    function sendWaypointsToFC() {
+    function sendWaypointsToFC(saveEeprom) {
         MISSION_PLANER.reinit();
         MISSION_PLANER.copy(mission);
         MISSION_PLANER.update(true, true);
         mspHelper.saveWaypoints(function() {
             GUI.log('End send point');
-            $('#saveEepromMissionButton').removeClass('disabled');
-            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
-
+            if (saveEeprom) {
+                $('#saveEepromMissionButton').removeClass('disabled');
+                GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+                MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
+            } else {
+                $('#saveMissionButton').removeClass('disabled');
+            }
             mission.setMaxWaypoints(MISSION_PLANER.getMaxWaypoints());
             mission.setValidMission(MISSION_PLANER.getValidMission());
             mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());

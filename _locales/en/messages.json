@@ -3509,6 +3509,12 @@
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
     },
+    "no_waypoints_to_load": {
+        "message": "No waypoints to load !"
+    },
+    "no_waypoints_to_save": {
+        "message": "No waypoints to save !"
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
