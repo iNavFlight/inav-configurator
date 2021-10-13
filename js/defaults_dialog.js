@@ -77,6 +77,10 @@ helper.defaultsDialog = (function () {
                 key: "setpoint_kalman_q",
                 value: 200
             },
+            {
+                key: "smith_predictor_delay",   // Enable Smith Predictor 
+                value: 1.5
+            },   
             /*
             Mechanics
             */

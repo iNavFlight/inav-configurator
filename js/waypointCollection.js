@@ -426,15 +426,28 @@ let WaypointCollection = function () {
         let lengthMission = self.getDistance(true);
         let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
         let samples;
+        let sampleMaxNum;
+        let sampleDistance;
+
+        if (globalSettings.mapProviderType == 'bing') {
+            sampleMaxNum = 1024;
+            sampleDistance = 30;
+        } else {    // use opentopodata.org instead
+            sampleMaxNum = 99;
+            sampleDistance = 60;
+        }
+
         if (point2measure.length <= 2){
             samples = 1;
         }
-        else if (Math.trunc(totalMissionDistance/30) <= 1024 &&  point2measure.length > 2){
-            samples = Math.trunc(totalMissionDistance/30);
+        else if (Math.trunc(totalMissionDistance / sampleDistance) <= sampleMaxNum && point2measure.length > 2){
+            samples = Math.trunc(totalMissionDistance / sampleDistance);
         }
         else {
-            samples = 1024;
+            samples = sampleMaxNum;
         }
+
+        let elevation = "N/A";
         if (globalSettings.mapProviderType == 'bing') {
             let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
 
@@ -450,7 +463,23 @@ let WaypointCollection = function () {
             }
         }
         else {
-            elevation = "N/A";
+            let coordList = "";
+            point2measure.forEach(function (item) {
+                coordList += item + '|';
+            });
+            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+coordList+'&samples='+String(samples+1));
+            const myJson = await response.json();
+
+            if (myJson.status == "OK") {
+                elevation = [];
+                for (var i = 0; i < myJson.results.length; i++){
+                    if (myJson.results[i].elevation == null) {
+                        elevation[i] = 0;
+                    } else {
+                        elevation[i] = myJson.results[i].elevation;
+                    }
+                }
+            }
         }
         //console.log("elevation ", elevation);
         return [lengthMission, totalMissionDistance, samples, elevation, altPoint2measure, namePoint2measure, refPoint2measure];

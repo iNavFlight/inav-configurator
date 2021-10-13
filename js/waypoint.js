@@ -137,7 +137,7 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     };
 
     self.getElevation = async function (globalSettings) {
-        let elevation;
+        let elevation = "N/A";
         if (globalSettings.mapProviderType == 'bing') {
             let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
 
@@ -146,7 +146,11 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
             elevation = myJson.resourceSets[0].resources[0].elevations[0];
         }
         else {
-            elevation = "N/A";
+            const response = await fetch('https://api.opentopodata.org/v1/aster30m?locations='+self.getLatMap()+','+self.getLonMap());
+            const myJson = await response.json();
+            if (myJson.status == "OK" && myJson.results[0].elevation != null) {
+                elevation = myJson.results[0].elevation;
+            }
         }
         return elevation;
     }

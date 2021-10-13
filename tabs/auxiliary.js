@@ -36,20 +36,30 @@ TABS.auxiliary.initialize = function (callback) {
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
 
+    const modeSections = {};
+        modeSections["ARM"] = "Arming";
+        modeSections["ANGLE"] = "Flight Modes";
+        modeSections["NAV COURSE HOLD"] = "Navigation Modes";
+        modeSections["NAV ALTHOLD"] = "Flight Mode Modifiers";
+        modeSections["AUTO TUNE"] = "Fixed Wing";
+        modeSections["FPV ANGLE MIX"] = "Multi-rotor";
+        modeSections["OSD OFF"] = "OSD Modes";
+        modeSections["CAMSTAB"] = "FPV Camera Modes";
+        modeSections["BEEPER"] = "Misc Modes";
+
     function sort_modes_for_display() {
         // This array defines the order that the modes are displayed in the configurator modes page
-        configuratorBoxOrder = [
-            "ARM", "PREARM",                                                                           // Arming
-            "ANGLE", "HORIZON", "MANUAL",                                                              // Flight modes
-            "NAV RTH", "NAV POSHOLD", "NAV CRUISE", "NAV COURSE HOLD",                                 // Navigation mode
-            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                 // Flight mode modifiers
-            "NAV WP", "GCS NAV", "HOME RESET",                                                         // Navigation
-            "SERVO AUTOTRIM", "AUTO LEVEL", "AUTO TUNE", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON",    // Fixed wing specific
-            "TURTLE", "FPV ANGLE MIX", "TURN ASSIST", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",  // Multi-rotor specific
-            "BEEPER", "LEDS OFF", "LIGHTS",                                                            // Feedback
-            "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                          // OSD
-            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                     // FPV Camera
-            "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"     // Misc
+        const configuratorBoxOrder = [
+            "ARM", "PREARM",                                                                                        // Arming
+            "ANGLE", "HORIZON", "MANUAL",                                                                           // Flight modes
+            "NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV",                         // Navigation modes
+            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                              // Flight mode modifiers
+            "AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON", "TURN ASSIST",  // Fixed wing specific
+            "FPV ANGLE MIX", "TURTLE", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",                              // Multi-rotor specific
+            "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                                       // OSD
+            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                                  // FPV Camera
+            "BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY",        // Misc
+                "MSP RC OVERRIDE", "USER1", "USER2"
         ];
 
         // Sort the modes
@@ -96,6 +106,15 @@ TABS.auxiliary.initialize = function (callback) {
                 }
             }
         }
+    }
+
+    function createModeSection(sectionName) {
+        var modeSectionTemplate = $('#tab-auxiliary-templates .modeSection');
+        var newModeSection = modeSectionTemplate.clone();
+        $(newModeSection).attr('id', 'section-' + sectionName);
+        $(newModeSection).find('.modeSectionName').text(sectionName);
+
+        return newModeSection;
     }
 
     function createMode(modeIndex, modeId) {
@@ -197,6 +216,11 @@ TABS.auxiliary.initialize = function (callback) {
 
         var modeTableBodyElement = $('.tab-auxiliary .modes tbody')
         for (var modeIndex = 0; modeIndex < AUX_CONFIG.length; modeIndex++) {
+
+            if (AUX_CONFIG[modeIndex] in modeSections) {
+                var newSection = createModeSection(modeSections[AUX_CONFIG[modeIndex]]);
+                modeTableBodyElement.append(newSection);
+            }
 
             var modeId = AUX_CONFIG_IDS[modeIndex];
             var newMode = createMode(modeIndex, modeId);
@@ -415,7 +439,11 @@ TABS.auxiliary.initialize = function (callback) {
                 if (modeElement.find(' .range').length == 0) {
                     modeElement.toggle(!hideUnused);
                 }
-            }    
+            }
+            
+            $(".modeSection").each(function() {
+                $(this).toggle(!hideUnused);
+            });
         }
 
         let hideUnusedModes = false;
