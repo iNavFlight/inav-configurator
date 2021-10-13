@@ -35,8 +35,14 @@
                         <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block">
                             <a class="btnicon ic_removeAll" href="#" title="Remove all"></a>
                         </div>
+                        <!-- CR8 -->
+                        <div id="openMultimission" class="btn save_btn" style="float: right; padding-top: 1px; display: inline-block">
+                            <a class="btnicon ic_openMultimission" href="#" title="Multi Mission"></a>
+                        </div>
+                        <!-- CR8 -->
                     </div>
                 </div>
+
                 <div id="missionPlanerTotalInfo" class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
@@ -86,7 +92,38 @@
                         </div>
                     </div>
                 </div>
-
+<!-- CR8 -->
+                <div id="missionPlannerMultiMission" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Multi mission manager</div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <div id="showHideMultimissionButton">
+                                <a class="ic_hide" href="#" title="Hide"></a>
+                            </div>
+                            <a id="cancelMultimission" class="ic_cancel" href="#" title="Cancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="multimissionContent">
+                        <div style="display: inline-block">
+                            <label>Mission Info: </label>
+                            <span id="multimissionInfo">None</span>
+                        </div>
+                        <br>
+                        <div class="btn btnTable btnTableIcon save_btn" style="display: inline-block">
+                            <label for="multimissionOptionList">Mission Number </label>
+                            <select name="Number" id="multimissionOptionList">
+                                <option value="0">ALL</option>
+                            </select>
+                            <a class="ic_save disabled" id="updateMultimissionButton" href="#" title="Update" style="float: right"></a>
+                        </div>
+                        <br>
+                        <div class="btn btnTable btnTableIcon save_btn" style="float: left">
+                            <label for="addMultimissionButton">Add New Mission</label>
+                            <a class="ic_add disabled" id="addMultimissionButton" href="#" title="Add"></a>
+                        </div>
+                    </div>
+                </div>
+<!-- CR8 -->
                 <div id="missionPlanerHome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionHomeHead">Take Off home</div>
@@ -172,37 +209,7 @@
                         </div>
                     </div>
                 </div>
-<!-- CR8 -->
-                <div id="missionPlannerMultiMission" class="gui_box grey">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Multi mission manager</div>
-                        <div class="btn btnMenu btnMenuIcon save_btn">
-                            <div id="showHideMultimissionButton" class="disabled">
-                                <a class="ic_show" href="#" title="Hide"></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="spacer" id="multimissionContent" style="display: none">
-                        <div style="display: inline-block">
-                            <label>Mission Info: </label>
-                            <span id="multimissionInfo">None</span>
-                        </div>
-                        <br>
-                        <div class="btn btnTable btnTableIcon save_btn" style="display: inline-block">
-                            <label for="multimissionOptionList">Mission Num </label>
-                            <select name="Number" id="multimissionOptionList">
-                                <option value="0">ALL</option>
-                            </select>
-                            <a class="ic_save disabled" id="updateMultimissionButton" href="#" title="Update" style="float: right"></a>
-                        </div>
-                        <br>
-                        <div class="btnTable btnTableIcon save_btn" style="float: left">
-                            <label for="addMultimissionButton">Add New Mission</label>
-                            <a class="ic_add disabled" id="addMultimissionButton" href="#" title="Add"></a>
-                        </div>
-                    </div>
-                </div>
-<!-- CR8 -->
+
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead" id="EditPointNumber">Edit point</div>

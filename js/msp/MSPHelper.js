@@ -2990,6 +2990,7 @@ var mspHelper = (function (gui) {
     self.loadWaypoints = function (callback) {
         MISSION_PLANER.reinit();
         let waypointId = 1;
+        let startTime = new Date().getTime();
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getFirstWP);
 
         function getFirstWP() {
@@ -3002,6 +3003,7 @@ var mspHelper = (function (gui) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
             }
             else {
+                GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
@@ -3009,6 +3011,7 @@ var mspHelper = (function (gui) {
 
     self.saveWaypoints = function (callback) {
         let waypointId = 1;
+        let startTime = new Date().getTime();
         MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
 
         function nextWaypoint() {
@@ -3022,6 +3025,7 @@ var mspHelper = (function (gui) {
         };
 
         function endMission() {
+            GUI.log('Send time: ' + (new Date().getTime() - startTime) + 'ms');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };

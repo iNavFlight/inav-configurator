@@ -60,7 +60,11 @@
 .tab-mission-control .ic_removeAll {
     background-image: url(../images/icons/cf_icon_MP_removeAll_grey.svg);
 }
-
+/* CR8 */
+.tab-mission-control .ic_openMultimission {
+    background-image: url(../images/icons/cf_icon_multimission_white.svg);
+}
+/* CR8 */
 .tab-mission-control .ic_save {
     background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
 }
