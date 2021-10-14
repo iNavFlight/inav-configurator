@@ -285,21 +285,31 @@
 .ol-touch .mission-control-settings {
     top: 80px;
 }
-.mission-control-safehome {
-    top: 115px;
-    left: .5em;
-}
-.ol-touch .mission-control-safehome {
-    top: 120px;
-}
-
-.mission-control-elevation {
+/* CR8 */
+.mission-control-multimission {
     top: 90px;
     left: .5em;
 }
-.ol-touch .mission-control-elevation {
+.ol-touch .mission-control-multimission {
     top: 100px;
 }
+
+.mission-control-elevation {
+    top: 115px;
+    left: .5em;
+}
+.ol-touch .mission-control-elevation {
+    top: 120px;
+}
+
+.mission-control-safehome {
+    top: 140px;
+    left: .5em;
+}
+.ol-touch .mission-control-safehome {
+    top: 140px;
+}
+/* CR8 */
 .mission-control-template {
     top: 140px;
     left: .5em;

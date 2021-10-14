@@ -47,13 +47,6 @@ var dictOfLabelParameterPoint = {
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
 
-// CR8
-//////////////////////////////////////////////////////////////////////////////////////////////
-//      define multimission parameters
-//////////////////////////////////////////////////////////////////////////////////////////////
-var multimissionCount = 0;
-// CR8
-
 ////////////////////////////////////
 //
 // Tab mission control block
@@ -392,8 +385,10 @@ TABS.mission_control.initialize = function (callback) {
     //      define & init Waypoints parameters
     //////////////////////////////////////////////////////////////////////////////////////////////
     var mission = new WaypointCollection();
+    // CR8
     var multimission = new WaypointCollection();
-
+    var multimissionCount = 0;
+    // CR8
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init home parameters
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -873,6 +868,17 @@ TABS.mission_control.initialize = function (callback) {
         cleanLayers();
         redrawLayers();
         updateTotalInfo();
+    }
+
+    function mapSelectEditMultimission(WPNumber) {
+        var MMCount = 1;
+
+        mission.get().forEach(function (element) {
+            if (element.getEndMission() == 0xA5 && element.getNumber() < WPNumber) {
+                MMCount ++;
+            }
+        });
+        $('#multimissionOptionList').val(MMCount).change();
     }
 
     function deleteMultimission() {
@@ -1465,7 +1471,6 @@ TABS.mission_control.initialize = function (callback) {
                 element: element,
                 target: options.target
             });
-
         };
         ol.inherits(app.PlannerSafehomeControl, ol.control.Control);
 
@@ -1502,9 +1507,41 @@ TABS.mission_control.initialize = function (callback) {
                 element: element,
                 target: options.target
             });
-
         };
         ol.inherits(app.PlannerElevationControl, ol.control.Control);
+
+        // CR8
+        // /**
+         // * @constructor
+         // * @extends {ol.control.Control}
+         // * @param {Object=} opt_options Control options.
+         // */
+        app.PlannerMultiMissionControl = function (opt_options) {
+            var options = opt_options || {};
+            var button = document.createElement('button');
+
+            button.innerHTML = ' ';
+            button.style = 'background: url(\'../images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
+
+            var handleShowSettings = function () {
+                $('#missionPlannerMultiMission').fadeIn(300);
+            };
+
+            button.addEventListener('click', handleShowSettings, false);
+            button.addEventListener('touchstart', handleShowSettings, false);
+
+            var element = document.createElement('div');
+            element.className = 'mission-control-multimission ol-unselectable ol-control';
+            element.appendChild(button);
+            element.title = 'MP MultiMission';
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        };
+        ol.inherits(app.PlannerMultiMissionControl, ol.control.Control);
+        // CR8
 
         /**
          * @param {ol.MapBrowserEvent} evt Map browser event.
@@ -1662,6 +1699,7 @@ TABS.mission_control.initialize = function (callback) {
         if (CONFIGURATOR.connectionValid) {
             control_list = [
                 new app.PlannerSettingsControl(),
+                new app.PlannerMultiMissionControl(),   // CR8
                 new app.PlannerSafehomeControl(),
                 new app.PlannerElevationControl(),
             ]
@@ -1669,8 +1707,9 @@ TABS.mission_control.initialize = function (callback) {
         else {
             control_list = [
                 new app.PlannerSettingsControl(),
+                new app.PlannerMultiMissionControl(),   // CR8
                 new app.PlannerElevationControl(),
-                //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+                // new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
 
@@ -1721,6 +1760,7 @@ TABS.mission_control.initialize = function (callback) {
                 map.getView().setZoom(result.missionPlanerLastValues.zoom);
             }
         });
+
         //////////////////////////////////////////////////////////////////////////
         // Map on-click behavior definition
         //////////////////////////////////////////////////////////////////////////
@@ -1853,6 +1893,15 @@ TABS.mission_control.initialize = function (callback) {
             //mission.missionDisplayDebug();
             updateMultimissionState();   // CR8
         });
+
+        // CR8
+        map.on('dblclick', function () {
+            if (!(multimissionCount && multimissionAllWPLoaded()) || selectedMarker == null) return;
+            mapSelectEditMultimission(selectedMarker.getNumber());
+            updateMultimissionState();
+        });
+        // CR8
+
 
         //////////////////////////////////////////////////////////////////////////
         // change mouse cursor when over marker
@@ -2281,13 +2330,6 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         /////////////////////////////////////////////
-        // Callback for Utility buttons
-        /////////////////////////////////////////////
-        $('#openMultimission').on('click', function () {
-            $('#missionPlannerMultiMission').fadeIn(300);
-        });
-
-        /////////////////////////////////////////////
         // Callback for Save/load buttons
         /////////////////////////////////////////////
         $('#loadFileMissionButton').on('click', function () {
@@ -2484,7 +2526,7 @@ TABS.mission_control.initialize = function (callback) {
                         multimission.reinit();
                         multimission.copy(mission);
                         renderMultimissionTable();
-                        $('#openMultimission').trigger('click');
+                        $('#missionPlannerMultiMission').fadeIn(300);
                         setMultimissionEditControl(false);
                     }
                     updateMultimissionState();
@@ -2607,7 +2649,7 @@ TABS.mission_control.initialize = function (callback) {
                     multimission.copy(mission);
                     // alert(multimission.get().length);
                     renderMultimissionTable();
-                    $('#openMultimission').trigger('click');
+                    $('#missionPlannerMultiMission').fadeIn(300);
                     setMultimissionEditControl(false);
                 }
                 updateMultimissionState();
