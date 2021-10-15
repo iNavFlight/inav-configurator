@@ -829,7 +829,7 @@ TABS.mission_control.initialize = function (callback) {
         clearEditForm();
         var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
         map.getView().setCenter(coord);
-        map.getView().setZoom(16);
+        map.getView().setZoom(14);
         cleanLayers();
         redrawLayers();
         updateTotalInfo();
@@ -872,7 +872,7 @@ TABS.mission_control.initialize = function (callback) {
         clearEditForm();
         var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
         map.getView().setCenter(coord);
-        map.getView().setZoom(16);
+        map.getView().setZoom(14);
         cleanLayers();
         redrawLayers();
         updateTotalInfo();
@@ -902,7 +902,6 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function addMultimission() {
-        // alert(Number($('#multimissionOptionList').val()));
         if (Number($('#multimissionOptionList').val()) || !multimissionCount) {
             updateAllMultimission();
         }
@@ -1052,9 +1051,9 @@ TABS.mission_control.initialize = function (callback) {
         cleanLines();
         mission.get().forEach(function (element) {
             // CR8
-            if (element.getEndMission() == 0xA5) {
-                multiMissionWPNum = element.getNumber() + 1;
-            }
+            // if (element.getEndMission() == 0xA5) {
+                // multiMissionWPNum = element.getNumber() + 1;
+            // }
             // CR8
             if (!element.isAttached()) {
                 let coord = ol.proj.fromLonLat([element.getLonMap(), element.getLatMap()]);
@@ -1083,11 +1082,11 @@ TABS.mission_control.initialize = function (callback) {
                         paintLine(oldPos, coord, element.getNumber(), color='#1497f1', lineDash=0, lineText=String(oldHeading)+"°");
                     }
                     // CR8
-                    // oldPos = coord;
                     if (element.getEndMission() == 0xA5) {
                         oldPos = 'undefined';
                         activatePoi = false;
                         activateHead = false;
+                        multiMissionWPNum = element.getNumber() + 1;
                     } else {
                         oldPos = coord;
                     }
@@ -1121,6 +1120,7 @@ TABS.mission_control.initialize = function (callback) {
                     oldPos = 'undefined';
                     activatePoi = false;
                     activateHead = false;
+                    multiMissionWPNum = element.getNumber() + 1;
                 }
                 // CR8
             }
@@ -1553,11 +1553,8 @@ TABS.mission_control.initialize = function (callback) {
          * @return {boolean} `true` to start the drag sequence.
          */
         app.Drag.prototype.handleDownEvent = function (evt) {
-            // CR8
-            if (disableMarkerEdit) {
-                return false;
-            }
-            // CR8
+            if (disableMarkerEdit) return false;   // CR8
+
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -1902,6 +1899,7 @@ TABS.mission_control.initialize = function (callback) {
         // CR8
         map.on('dblclick', function () {
             if (!(multimissionCount && multimissionAllWPLoaded()) || selectedMarker == null) return;
+
             mapSelectEditMultimission(selectedMarker.getNumber());
             updateMultimissionState();
         });
