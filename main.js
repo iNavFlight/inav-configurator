@@ -11,7 +11,20 @@ googleAnalyticsService.getConfig().addCallback(function (config) {
 
 chrome.storage = chrome.storage || {};
 
+// Set how the units render on the configurator only
+const UnitType = {
+    none: "none",
+    OSD: "OSD",
+    imperial: "imperial",
+    metric: "metric",
+}
+
 let globalSettings = {
+    // Configurator rendering options
+    // Used to depict how the units are displayed within the UI
+    unitType: null,
+    // Used to convert units within the UI
+    osdUnits: null,    
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
@@ -22,6 +35,12 @@ $(document).ready(function () {
     // translate to user-selected language
     localize();
 
+    chrome.storage.local.get('unit_type', function (result) {
+        if (!result.unit_type) {
+            result.unit_type = UnitType.none;
+        }
+        globalSettings.unitType = result.unit_type;        
+    });
     chrome.storage.local.get('map_provider_type', function (result) {
         if (typeof result.map_provider_type === 'undefined') {
             result.map_provider_type = 'osm';
@@ -303,11 +322,31 @@ $(document).ready(function () {
                     googleAnalyticsConfig.setTrackingPermitted(check);
                 });
 
+                $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
-                $('#proxylayer').val(globalSettings.proxyLayer);
-                
+                $('#proxylayer').val(globalSettings.proxyLayer);        
+
+                // Set the value of the unit type
+                // none, OSD, imperial, metric
+                $('#ui-unit-type').change(function () {
+                    chrome.storage.local.set({
+                        'unit_type': $(this).val()
+                    });
+                    globalSettings.unitType = $(this).val();
+
+                    // Update the osd units in global settings
+                    // but only if we need it
+                    if (globalSettings.unitType === UnitType.OSD) {
+                        get_osd_settings();
+                    }
+
+                    // Horrible way to reload the tab
+                    const activeTab = $('#tabs li.active'); 
+                    activeTab.removeClass('active');  
+                    activeTab.find('a').click();            
+                });
                 $('#map-provider-type').change(function () {
                     chrome.storage.local.set({
                         'map_provider_type': $(this).val()
@@ -479,6 +518,24 @@ $(document).ready(function () {
         });
     });
 });
+
+function get_osd_settings() {
+    if (globalSettings.osdUnits !== undefined && globalSettings.osdUnits !==  null) {
+        return;
+    }
+    
+    MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
+        var prefs = resp.data;
+        prefs.readU8();
+        prefs.readU8();
+        prefs.readU8();
+        prefs.readU8();
+        prefs.readU8();
+        prefs.readU8();
+        prefs.readU8();
+        globalSettings.osdUnits = prefs.readU8();
+    });
+}
 
 function catch_startup_time(startTime) {
     var endTime = new Date().getTime(),
