@@ -975,8 +975,8 @@ TABS.mission_control.initialize = function (callback) {
                     map.addLayer(addWaypointMarker(element));
                 }
             });
+            repaintLine4Waypoints(mission);
         }
-        repaintLine4Waypoints(mission);
     }
 
     function redrawLayer() {
