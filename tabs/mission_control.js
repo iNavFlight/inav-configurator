@@ -763,7 +763,6 @@ TABS.mission_control.initialize = function (callback) {
     function updateMultimissionState() {
         // alert(mission.get().length + "   " + multimissionCount)
         if (mission.get().length || multimissionCount) {
-            // $("#showHideMultimissionButton").removeClass('disabled');
             if (multimissionCount < maxMultimissionCount) {
                 $("#addMultimissionButton").removeClass('disabled');
             } else {
@@ -781,18 +780,17 @@ TABS.mission_control.initialize = function (callback) {
                 $('#multimissionInfo').text('No multi missions loaded');
             }
         } else {
-            // $("#showHideMultimissionButton").addClass('disabled');
             $("#addMultimissionButton").addClass('disabled');
         }
     }
 
     function updateAllMultimission(missionDelete = false) {
         // alert("UpdateMM");
-        // remove new MM mission if no mission WPs added before update
+        // flag if new MM mission empty at update
         let missionIsEmptyOnUpdate = mission.get().length ? false : true;
 
-        var i = startWPCount;
         // if mission deleted simply update MM without adding in currently loaded mission
+        var i = startWPCount;
         if (!missionDelete) {
             mission.get().forEach(function (element) {
                 multimission.get().splice(i, 0, element);
@@ -803,7 +801,7 @@ TABS.mission_control.initialize = function (callback) {
         // alert("multimission length " + multimission.get().length);
 
         i = 0;
-        multimission.get().forEach(function (element) {     // redo WP numbering
+        multimission.get().forEach(function (element) {     // renumber MM WPs
             element.setNumber(i);
             i++;
         });
@@ -815,7 +813,8 @@ TABS.mission_control.initialize = function (callback) {
         mission.update();
         // mission.missionDisplayDebug();
 
-        // cancel MM if no mission WPs added to new mission prior to update to MM with a single loaded mission
+        /* Remove empty missions at update.
+         * Cancel MM if only 2 MM missions loaded and one mission is empty */
         if (missionIsEmptyOnUpdate) {
             multimissionCount -= multimissionCount == 2 ? 2 : 1;
             if (!multimissionCount) {
@@ -879,7 +878,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function mapSelectEditMultimission(WPNumber) {
-        var MMCount = 1;
+        let MMCount = 1;
 
         mission.get().forEach(function (element) {
             if (element.getEndMission() == 0xA5 && element.getNumber() < WPNumber) {
@@ -898,6 +897,7 @@ TABS.mission_control.initialize = function (callback) {
             setMultimissionEditControl(false);
         }
         renderMultimissionTable();
+
         $("#updateMultimissionButton").addClass('disabled');
     }
 
@@ -908,9 +908,11 @@ TABS.mission_control.initialize = function (callback) {
         multimissionCount += !multimissionCount ? 2 : 1;
         renderMultimissionTable();
         $('#multimissionOptionList').val(multimissionCount);
+
         removeAllWaypoints();
-        $("#updateMultimissionButton").removeClass('disabled');
         startWPCount = multimission.get().length;
+
+        $("#updateMultimissionButton").removeClass('disabled');
         setMultimissionEditControl(true);
     }
 
@@ -925,6 +927,7 @@ TABS.mission_control.initialize = function (callback) {
         multimissionCount = 0;
         multimission.flush();
         renderMultimissionTable();
+
         setMultimissionEditControl(true);
         return true;
     }
@@ -1234,8 +1237,8 @@ TABS.mission_control.initialize = function (callback) {
                     map.addLayer(addWaypointMarker(element));
                 }
             });
+            repaintLine4Waypoints(mission); // CR9
         }
-        repaintLine4Waypoints(mission);
     }
 
     function redrawLayer() {

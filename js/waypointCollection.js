@@ -72,7 +72,7 @@ let WaypointCollection = function () {
     };
 
     self.isEmpty = function () {
-        return data == [];
+        return data.length == 0;    // CR9
     };
 
     self.flush = function () {
