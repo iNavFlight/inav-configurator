@@ -37,6 +37,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="missionPlanerTotalInfo" class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
@@ -63,6 +64,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="missionPlanerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
@@ -86,7 +88,37 @@
                         </div>
                     </div>
                 </div>
-
+<!-- CR8 -->
+                <div id="missionPlannerMultiMission" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Multi Mission Manager</div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <div id="showHideMultimissionButton">
+                                <a class="ic_hide" href="#" title="Hide"></a>
+                            </div>
+                            <a id="cancelMultimission" class="ic_cancel" href="#" title="Cancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="multimissionContent">
+                        <div style="display: inline-block">
+                            <label>Mission Info: </label>
+                            <span id="multimissionInfo">None</span>
+                        </div>
+                        <hr>
+                        <div class="btn btnTable btnTableIcon save_btn" style="display: inline-block">
+                            <label for="multimissionOptionList">Mission Number </label>
+                            <select name="Number" id="multimissionOptionList">
+                                <option value="0">ALL</option>
+                            </select>
+                            <a class="ic_save disabled" id="updateMultimissionButton" href="#" title="Update All" style="float: right"></a>
+                        </div>
+                        <div class="btn btnTable btnTableIcon save_btn" style="padding-top: 4px; float: left">
+                            <label for="addMultimissionButton">Add New Mission</label>
+                            <a class="ic_add disabled" id="addMultimissionButton" href="#" title="Add"></a>
+                        </div>
+                    </div>
+                </div>
+<!-- CR8 -->
                 <div id="missionPlanerHome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionHomeHead">Take Off home</div>
@@ -110,13 +142,13 @@
                                 </thead>
                                 <tbody id="homeTableBody">
                                     <tr>
-                                    <td><div id="viewHomePoint" class="btnTable btnTableIcon">
-                                            <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
-                                        </div>
-                                    </td>
-                                    <td><input type="number" class="home-lon" /></td>
-                                    <td><input type="number" class="home-lat" /></td>
-                                    <td><span id="elevationValueAtHome">N/A</span></td>
+                                        <td><div id="viewHomePoint" class="btnTable btnTableIcon">
+                                                <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
+                                            </div>
+                                        </td>
+                                        <td><input type="number" class="home-lon" /></td>
+                                        <td><input type="number" class="home-lat" /></td>
+                                        <td><span id="elevationValueAtHome">N/A</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -180,8 +212,8 @@
                             <div id="showHideWPeditButton"   class="save_btn">
                                 <a class="ic_hide" href="#" title="Hide"></a>
                             </div>
-                            <div id="removePoint" class="btnMenu-danger">
-                                <a class="ic_removeAll" href="#" title="Remove"></a>
+<!-- CR8 -->                <div id="removePoint" class="btn btnMenu-danger">
+<!-- CR8 -->                    <a id="removePointButton" class="ic_removeAll" href="#" title="Remove"></a>
                             </div>
                         </div>
                     </div>
@@ -238,8 +270,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 30px">
-                                        <div id="addOptionsPoint" class="btnTable btnTableIcon btnTable-success">
-                                            <a class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
+<!-- CR8 -->                            <div id="addOptionsPoint" class="btn btnTable btnTableIcon btnTable-success">
+<!-- CR8 -->                                <a id="addOptionsPointButton" class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
                                         </div>
                                     </th>
                                     <th style="width: 50px" data-i18n="WaypointOptionId"></th>

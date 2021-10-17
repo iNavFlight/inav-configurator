@@ -60,7 +60,11 @@
 .tab-mission-control .ic_removeAll {
     background-image: url(../images/icons/cf_icon_MP_removeAll_grey.svg);
 }
-
+/* CR8 */
+.tab-mission-control .ic_openMultimission {
+    background-image: url(../images/icons/cf_icon_multimission_white.svg);
+}
+/* CR8 */
 .tab-mission-control .ic_save {
     background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
 }
@@ -92,7 +96,11 @@
 .tab-mission-control .ic_center {
     background-image: url(../images/icons/cf_icon_MP_center_grey.svg);
 }
-
+/* CR8 */
+.tab-mission-control .ic_setup {
+    background-image: url(../images/icons/cf_icon_setup_white.svg);
+}
+/* CR8 */
 .tab-mission-control .btnicon {
     background-repeat: no-repeat;
     background-position: center;
@@ -277,21 +285,31 @@
 .ol-touch .mission-control-settings {
     top: 80px;
 }
-.mission-control-safehome {
-    top: 115px;
-    left: .5em;
-}
-.ol-touch .mission-control-safehome {
-    top: 120px;
-}
-
-.mission-control-elevation {
+/* CR8 */
+.mission-control-multimission {
     top: 90px;
     left: .5em;
 }
-.ol-touch .mission-control-elevation {
+.ol-touch .mission-control-multimission {
     top: 100px;
 }
+
+.mission-control-elevation {
+    top: 115px;
+    left: .5em;
+}
+.ol-touch .mission-control-elevation {
+    top: 120px;
+}
+
+.mission-control-safehome {
+    top: 140px;
+    left: .5em;
+}
+.ol-touch .mission-control-safehome {
+    top: 140px;
+}
+/* CR8 */
 .mission-control-template {
     top: 140px;
     left: .5em;

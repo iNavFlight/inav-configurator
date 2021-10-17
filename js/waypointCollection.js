@@ -72,7 +72,7 @@ let WaypointCollection = function () {
     };
 
     self.isEmpty = function () {
-        return data == [];
+        return data.length == 0;    // CR9
     };
 
     self.flush = function () {
@@ -180,12 +180,16 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
-                    element.setEndMission(0xA5);
+                // CR8
+                if (!(bMWPfile && bReverse)) {
+                    if (element.getNumber() == self.get().length - 1) {
+                        element.setEndMission(0xA5);
+                    }
+                    else if ((element.getNumber() == self.get().length - 2) && element.getEndMission() == 0xA5) {
+                        element.setEndMission(0);
+                    }
                 }
-                else {
-                    element.setEndMission(0);
-                }
+                // CR8
             }
         });
     };
