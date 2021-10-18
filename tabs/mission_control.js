@@ -748,11 +748,12 @@ TABS.mission_control.initialize = function (callback) {
     // Manage Multi Mission
     //
     /////////////////////////////////////////////
-    /* Multi Mission uses a 'multimission' waypoint collection as a repository for all missions loaded. 'mission' WP
-     * collection remains as the WP source used for the map display.
+    /* Multi Mission working method:
+     * 'multimission' waypoint collection is a repository for all multi missions.
+     * 'mission' WP collection remains as the WP source for the map display.
      * All missions can be displayed on the map or only a single mission. With all missions displayed 'mission' and
-     * 'multimission' both contain all missions. When a single mission is displayed 'multimission' contains all
-     * missions except the currently displayed mission and 'mission' only contains the currently displayed mission.
+     * 'multimission' are copies containing all missions. When a single mission is displayed 'multimission' contains all
+     * missions except the currently displayed mission.
      * On update to display all missions the current dislayed mission is merged back into 'multimission' and 'mission'
      * updated as a copy of 'multimission'.
      * When all missions are displayed WP data can be viewed but mission edit is disabled.
@@ -783,6 +784,7 @@ TABS.mission_control.initialize = function (callback) {
                     $("#updateMultimissionButton").addClass('disabled');
                 }
                 $('#multimissionInfo').text(multimissionCount + ' missions (' + totalmultimissionWPs + '/' + mission.getMaxWaypoints() + ' WPs)');
+                document.getElementById('multimissionInfo').style.color = totalmultimissionWPs > mission.getMaxWaypoints() ? "#FF0000" : "#303030";
             } else {
                 $('#multimissionInfo').text('No multi missions loaded');
                 $('#cancelMultimission').trigger('click');
@@ -796,8 +798,10 @@ TABS.mission_control.initialize = function (callback) {
         // flag if new MM mission empty at update
         let missionIsEmptyOnUpdate = mission.isEmpty() ? true : false;
 
+        /* copy active single mission into MM on update so MM contains all missions.
+         * active mission may be deleted by not copying back into MM on update */
         var i = startWPCount;
-        if (!missionDelete) {   // if mission set for delete update MM without adding in currently loaded mission
+        if (!missionDelete) {
             mission.get().forEach(function (element) {
                 multimission.get().splice(i, 0, element);
                 i++;
@@ -817,7 +821,7 @@ TABS.mission_control.initialize = function (callback) {
         mission.update();
         // mission.missionDisplayDebug();
 
-        /* Remove empty missions at update.
+        /* Remove empty missions on update.
          * Cancel MM if only 2 MM missions loaded and one mission is empty */
         if (missionIsEmptyOnUpdate) {
             multimissionCount -= multimissionCount == 2 ? 2 : 1;
@@ -835,11 +839,13 @@ TABS.mission_control.initialize = function (callback) {
         updateTotalInfo();
     }
 
+    /* selects single mission from MM repository */
     function editMultimission() {
         var MMCount = 0;
         var endWPCount = 0;
         var found = false;
         startWPCount = 0;
+
         mission.get().forEach(function (element) {
             if (element.getEndMission() == 0xA5 && !found) {
                 MMCount ++;
@@ -855,12 +861,12 @@ TABS.mission_control.initialize = function (callback) {
         mission.reinit();
         tempMissionData = multimission.get().slice(startWPCount, endWPCount + 1);   // copy selected single mission from MM
         let i = 0;
-        tempMissionData.forEach(function (element) {    // write copied mission to active mission
+        tempMissionData.forEach(function (element) {    // write copied mission to active map mission
             mission.put(element);
             mission.get()[i].setNumber(i);
             i++;
         });
-        multimission.get().splice(startWPCount, (endWPCount - startWPCount + 1)) // cut current mission from MM
+        multimission.get().splice(startWPCount, (endWPCount - startWPCount + 1))    // cut current active map mission from MM
 
         mission.update();
         selectedMarker = null;
@@ -870,6 +876,7 @@ TABS.mission_control.initialize = function (callback) {
         updateTotalInfo();
     }
 
+    /* single mission selection by double clicking mission WP on map */
     function mapSelectEditMultimission(WPNumber) {
         let MMCount = 1;
 
@@ -941,9 +948,10 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function multimissionAllWPLoaded() {
-        return Number($('#multimissionOptionList').val()) == 0;
+        return multimissionCount && Number($('#multimissionOptionList').val()) == 0;
     }
 
+    /* disable mission/WP edit when all missions displayed on map */
     function setMultimissionEditControl(enabled = true) {
         if (enabled) {
             disableMarkerEdit = false;
@@ -970,7 +978,6 @@ TABS.mission_control.initialize = function (callback) {
     function removeAllWaypoints() {
         mission.reinit();
         refreshLayers();    // CR8
-        // cleanLayers();
         clearEditForm();
         updateTotalInfo();
         clearFilename();
@@ -1122,7 +1129,11 @@ TABS.mission_control.initialize = function (callback) {
         }
         let lengthMission = mission.getDistance(true);
 
-        $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
+        if (disableMarkerEdit) {
+            $('#missionDistance').text('N/A');
+        } else {
+            $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
+        }
     }
 
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
@@ -2287,7 +2298,6 @@ TABS.mission_control.initialize = function (callback) {
                 // CR8
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
-
                     updateMultimissionState();
                 }
                 // CR8
@@ -2322,6 +2332,7 @@ TABS.mission_control.initialize = function (callback) {
                     refreshLayers();    // CR8
                     plotElevation();
                 }
+                updateMultimissionState();  // CR8
             }
         });
 
@@ -2346,7 +2357,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadMissionButton').on('click', function () {
-            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
+            if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
@@ -2364,7 +2376,8 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#loadEepromMissionButton').on('click', function () {
-            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
+            if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
