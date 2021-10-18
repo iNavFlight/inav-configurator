@@ -894,7 +894,7 @@ TABS.mission_control.initialize = function (callback) {
         if (!multimissionCount) {
             multimission.flush();
         } else {
-            setMultimissionEditControl(false);
+            setMultimissionEditControl(true);
         }
         renderMultimissionTable();
 
@@ -913,7 +913,7 @@ TABS.mission_control.initialize = function (callback) {
         startWPCount = multimission.get().length;
 
         $("#updateMultimissionButton").removeClass('disabled');
-        setMultimissionEditControl(true);
+        setMultimissionEditControl(false);
     }
 
     function removeAllMultiMissionCheck() {
@@ -928,7 +928,7 @@ TABS.mission_control.initialize = function (callback) {
         multimission.flush();
         renderMultimissionTable();
 
-        setMultimissionEditControl(true);
+        setMultimissionEditControl(false);
         return true;
     }
 
@@ -951,20 +951,18 @@ TABS.mission_control.initialize = function (callback) {
         return multimissionCount && Number($('#multimissionOptionList').val()) == 0;
     }
 
-    /* disable mission/WP edit when all missions displayed on map */
+    /* disable mission/WP edit when all missions displayed on map, true = edit disabled */
     function setMultimissionEditControl(enabled = true) {
+        disableMarkerEdit = enabled;
+        $("*", "#MPeditPoint").prop('disabled',enabled);
         if (enabled) {
-            disableMarkerEdit = false;
-            $("*", "#MPeditPoint").prop('disabled',false);
-            $("#addOptionsPointButton").removeClass('disabled');
-            $("#removePointButton").removeClass('disabled');
-            $("#waypointOptionsTableBody").fadeIn();
-        } else {
-            disableMarkerEdit = true;
-            $("*", "#MPeditPoint").prop('disabled',true);
             $("#addOptionsPointButton").addClass('disabled');
             $("#removePointButton").addClass('disabled');
             $("#waypointOptionsTableBody").fadeOut();
+        } else {
+            $("#addOptionsPointButton").removeClass('disabled');
+            $("#removePointButton").removeClass('disabled');
+            $("#waypointOptionsTableBody").fadeIn();
         }
     }
 
@@ -1092,8 +1090,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (element.isAttached()) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
-                    let jumpWPIndex = 0;
-                    jumpWPIndex = multiMissionWPNum + element.getP1();
+                    let jumpWPIndex = multiMissionWPNum + element.getP1();
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
                     paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
                 }
@@ -1599,7 +1596,7 @@ TABS.mission_control.initialize = function (callback) {
 
             var geometry = /** @type {ol.geom.SimpleGeometry} */
                 (this.feature_.getGeometry());
-            if ((tempMarker.kind == "waypoint") || tempMarker.kind == "safehome" || tempMarker.kind == "home") {
+            if (tempMarker.kind == "waypoint" || tempMarker.kind == "safehome" || tempMarker.kind == "home") {
                 geometry.translate(deltaX, deltaY);
                 this.coordinate_[0] = evt.coordinate[0];
                 this.coordinate_[1] = evt.coordinate[1];
@@ -1661,7 +1658,7 @@ TABS.mission_control.initialize = function (callback) {
          * @return {boolean} `false` to stop the drag sequence.
          */
         app.Drag.prototype.handleUpEvent = function (evt) {
-            if ( tempMarker.kind == "waypoint") {
+            if (tempMarker.kind == "waypoint") {
                 if (selectedMarker != null && tempMarker.number == selectedMarker.getLayerNumber()) {
                     (async () => {
                         const elevationAtWP = await mission.getWaypoint(tempMarker.number).getElevation(globalSettings);
@@ -1718,7 +1715,7 @@ TABS.mission_control.initialize = function (callback) {
                 new app.PlannerSettingsControl(),
                 new app.PlannerMultiMissionControl(),
                 new app.PlannerElevationControl(),
-                // new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
+                //new app.PlannerSafehomeControl() // TO COMMENT FOR RELEASE : DECOMMENT FOR DEBUG
             ]
         }
 
@@ -2248,7 +2245,7 @@ TABS.mission_control.initialize = function (callback) {
                 updateAllMultimission();
 
                 $("#updateMultimissionButton").addClass('disabled');
-                setMultimissionEditControl(multimissionCount ? false : true);
+                setMultimissionEditControl(multimissionCount ? true : false);
                 updateMultimissionState();
                 return;
             } else {
@@ -2260,7 +2257,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (missions == 1) updateAllMultimission();
 
                 $("#updateMultimissionButton").removeClass('disabled');
-                setMultimissionEditControl(true);
+                setMultimissionEditControl(false);
             }
 
             editMultimission();
@@ -2522,7 +2519,7 @@ TABS.mission_control.initialize = function (callback) {
                         multimission.copy(mission);
                         renderMultimissionTable();
                         $('#missionPlannerMultiMission').fadeIn(300);
-                        setMultimissionEditControl(false);
+                        setMultimissionEditControl(true);
                     }
                 }
                 updateMultimissionState();
@@ -2640,7 +2637,7 @@ TABS.mission_control.initialize = function (callback) {
                     multimission.copy(mission);
                     renderMultimissionTable();
                     $('#missionPlannerMultiMission').fadeIn(300);
-                    setMultimissionEditControl(false);
+                    setMultimissionEditControl(true);
                 }
                 updateMultimissionState();
 
