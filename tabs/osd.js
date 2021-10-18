@@ -908,13 +908,11 @@ OSD.constants = {
                     min_version: '3.0.0',
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
                 },
-                // CR8
                 {
                     name: 'MISSION INFO',
                     id: 128,
                     preview: 'M1/6>27WP'
                 },
-                // CR8
                 {
                     name: 'VERSION',
                     id: 119,
