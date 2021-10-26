@@ -149,7 +149,7 @@ let WaypointCollection = function () {
         data = tmpData;
     };
 
-    self.update = function (bMWPfile=false, bReverse=false) {
+    self.update = function (singleMission = true, bMWPfile=false, bReverse=false) {
         let oldWPNumber = 0;
         let optionIdx = 0;
         let idx = 0;
@@ -180,7 +180,8 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                if (!(bMWPfile && bReverse)) {
+
+                if (singleMission) {
                     if (element.getNumber() == self.get().length - 1) {
                         element.setEndMission(0xA5);
                     }
