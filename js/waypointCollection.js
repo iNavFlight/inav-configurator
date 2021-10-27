@@ -181,6 +181,7 @@ let WaypointCollection = function () {
                     idx++;
                 }
 
+                /* only update EndMission flags when single mission loaded on map */
                 if (singleMission) {
                     if (element.getNumber() == self.get().length - 1) {
                         element.setEndMission(0xA5);
