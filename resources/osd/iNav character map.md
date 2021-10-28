@@ -124,8 +124,7 @@ SYM_HEADING_E              | SYM.HEADING_E                | Heading graph East  
 SYM_HEADING_W              | SYM.HEADING_W                | Heading graph West                    | 203        | 0xCB
 SYM_HEADING_DIVIDED_LINE   | SYM.HEADING_DIVIDED_LINE     | Heading graphic                       | 204        | 0xCC
 SYM_HEADING_LINE           | SYM.HEADING_LINE             | Heading graphic                       | 205        | 0xCD
-SYM_MAX			   | SYM.MAX			  | Max icon				  | 206	       | 0xCE
-SYM_PROFILE		   | SYM.PROFILE		  | Profile icon			  | 207	       | 0xCF
+SYM_MAX					   | SYM.MAX					  | Max icon						 	  | 206		   | 0xCE
  | | | | 
 SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
