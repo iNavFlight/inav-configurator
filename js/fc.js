@@ -1243,8 +1243,14 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+
             41: {
                 name: "LOITER RADIUS OVERRIDE",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            42: {
+                name: "SET PROFILE",
                 hasOperand: [true, false],
                 output: "boolean"
             },
@@ -1307,6 +1313,7 @@ var FC = {
                     33: "CRSF SNR",
                     34: "GPS Valid Fix",
                     35: "Loiter Radius [cm]",
+                    36: "Active Profile",
                 }
             },
             3: {
