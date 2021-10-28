@@ -68,6 +68,8 @@ in the `./dist/` directory.
 directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
 for the Windows app. If you don't have Wine installed you can create a release by running the **release-only-linux** task.
 
+     To build a specific release, use the command `release --platform="win64"` for example.
+
 ## Different map providers
 
 INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps, and MapProxy map providers. 

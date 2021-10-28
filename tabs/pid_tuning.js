@@ -123,14 +123,6 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.requires-v2_4').hide();
         }
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-            $('.requires-v2_5').show();
-            $('.hides-v2_5').hide();
-        } else {
-            $('.requires-v2_5').hide();
-            $('.hides-v2_5').show();
-        }
-
         if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
             $('.requires-v2_6').show();
             $('.hides-v2_6').hide();
@@ -161,24 +153,12 @@ TABS.pid_tuning.initialize = function (callback) {
 
         pid_and_rc_to_form();
 
-        var $magHoldYawRate                 = $("#magHoldYawRate"),
-            $accSoftLpfHz                   = $('#accSoftLpfHz'),
-            $yawLpfHz                       = $('#yawLpfHz');
+        let $magHoldYawRate                 = $("#magHoldYawRate");
 
         $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
-        $accSoftLpfHz.val(INAV_PID_CONFIG.accSoftLpfHz);
-        $yawLpfHz.val(FILTER_CONFIG.yawLpfHz);
 
         $magHoldYawRate.change(function () {
             INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
-        });
-
-        $accSoftLpfHz.change(function () {
-            INAV_PID_CONFIG.accSoftLpfHz = parseInt($accSoftLpfHz.val(), 10);
-        });
-
-        $yawLpfHz.change(function () {
-            FILTER_CONFIG.yawLpfHz = parseInt($yawLpfHz.val(), 10);
         });
 
         if (!FC.isRpyFfComponentUsed()) {
