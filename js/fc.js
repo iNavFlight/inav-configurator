@@ -1243,7 +1243,7 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
-            41: {
+            42: {
                 name: "SET PROFILE",
                 hasOperand: [true, false],
                 output: "boolean"
@@ -1306,7 +1306,7 @@ var FC = {
                     32: "CRSF LQ",
                     33: "CRSF SNR",
                     34: "GPS Valid Fix",
-                    35: "Active Profile"
+                    36: "Active Profile"
                 }
             },
             3: {
