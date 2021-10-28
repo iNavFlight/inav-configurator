@@ -2798,6 +2798,12 @@
     "osd_plus_code_short": {
         "message" : "Plus Code Remove Leading Digits"
     },
+    "osd_esc_rpm_precision": {
+      "message": "ESC RPM precision"
+    },
+    "osd_esc_rpm_precision_help": {
+        "message": "The number of digits shown in the RPM display. If the RPM is higher than the number of digits, it will be shown in thousand RPM with as many decimal places as allowed."
+      },
     "osd_crosshairs_style": {
         "message" : "Crosshairs Style"
     },

@@ -900,7 +900,10 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
-                    preview: FONT.symbol(SYM.RPM) + '983',
+                    preview: function(){
+                        let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
+                        return FONT.symbol(SYM.RPM) + rpmPreview;
+                    } 
                 },
                 {
                     name: 'GLIDESLOPE',
