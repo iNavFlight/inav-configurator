@@ -910,7 +910,7 @@ OSD.constants = {
                 },
                 {
                     name: 'MISSION INFO',
-                    id: 128,
+                    id: 129,
                     preview: 'M1/6>27WP'
                 },
                 {
