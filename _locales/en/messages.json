@@ -2494,11 +2494,20 @@
     "userControlMode": {
         "message": "User Control Mode"
     },
+    "posholdDefaultSpeed": {
+        "message": "Default navigation speed [cm/s]"
+    },
+    "posholdDefaultSpeedHelp": {
+        "message": "Default speed during RTH, also used for WP navigation if no speed set for WP leg. Limited to Max. navigation speed"
+    },
     "posholdMaxSpeed": {
         "message": "Max. navigation speed [cm/s]"
     },
     "posholdMaxManualSpeed": {
         "message": "Max. CRUISE speed [cm/s]"
+    },
+    "posholdMaxManualSpeedHelp": {
+        "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
     },
     "posholdMaxClimbRate": {
         "message": "Max. navigation climb rate [cm/s]"
