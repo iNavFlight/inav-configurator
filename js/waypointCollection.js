@@ -149,7 +149,7 @@ let WaypointCollection = function () {
         data = tmpData;
     };
 
-    self.update = function (singleMission = true, bMWPfile=false, bReverse=false) {
+    self.update = function (updateEndFlag = true, bMWPfile=false, bReverse=false) {
         let oldWPNumber = 0;
         let optionIdx = 0;
         let idx = 0;
@@ -181,8 +181,8 @@ let WaypointCollection = function () {
                     idx++;
                 }
 
-                /* only update EndMission flags when single mission loaded on map */
-                if (singleMission) {
+                /* only update EndMission flag when required and only if single mission loaded on map */
+                if (updateEndFlag) {
                     if (element.getNumber() == self.get().length - 1) {
                         element.setEndMission(0xA5);
                     }
