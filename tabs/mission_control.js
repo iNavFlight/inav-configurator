@@ -2642,21 +2642,20 @@ TABS.mission_control.initialize = function (callback) {
                 mission.copy(MISSION_PLANER);
                 mission.update(false, true);
 
+                /* check multimissions */
                 multimissionCount = 0;
-                let missionEndFlagCount = 0;
                 mission.get().forEach(function (element) {
                     if (element.getEndMission() == 0xA5) {
-                        missionEndFlagCount ++;
+                        multimissionCount ++;
                     }
                 });
-                if (missionEndFlagCount > 1) {
-                    multimissionCount = missionEndFlagCount;
-                    multimission.reinit();
+                multimissionCount = multimissionCount > 1 ? multimissionCount : 0;
+                multimission.reinit();
+                if (multimissionCount > 1) {
                     multimission.copy(mission);
-                    renderMultimissionTable();
                     $('#missionPlannerMultiMission').fadeIn(300);
                 }
-                updateMultimissionState();
+                renderMultimissionTable();
 
                 setView(16);
                 redrawLayers();
