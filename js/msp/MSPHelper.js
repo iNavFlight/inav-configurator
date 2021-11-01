@@ -519,7 +519,7 @@ var mspHelper = (function (gui) {
                         ));
                     }
                 }
-                
+
                 break;
 
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_STATUS:
@@ -1297,7 +1297,7 @@ var mspHelper = (function (gui) {
                 CALIBRATION_DATA.magZero.Y = data.getInt16(15, true);
                 CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
                 CALIBRATION_DATA.opflow.Scale = (data.getInt16(19, true) / 256.0);
-                
+
                 if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
                     CALIBRATION_DATA.magGain.X = data.getInt16(21, true);
                     CALIBRATION_DATA.magGain.Y = data.getInt16(23, true);
@@ -1513,8 +1513,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 console.log('Safehome points saved');
-                break;    
-            
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2125,7 +2125,7 @@ var mspHelper = (function (gui) {
                 buffer.push(SENSOR_CONFIG.opflow);
                 break;
 
-            
+
             case MSPCodes.MSP_WP_MISSION_SAVE:
                 // buffer.push(0);
                 console.log(buffer);
@@ -2985,51 +2985,50 @@ var mspHelper = (function (gui) {
     self.getMissionInfo = function (callback) {
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
     };
-    
+
     self.loadWaypoints = function (callback) {
         MISSION_PLANER.reinit();
-        let waypointId = 1;
-        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, getFirstWP);
-        
-        function getFirstWP() {
-            MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint)
-        };
-        
-        function nextWaypoint() {
+        let waypointId = 0;
+        let startTime = new Date().getTime();
+        MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, loadWaypoint);
+
+        function loadWaypoint() {
             waypointId++;
             if (waypointId < MISSION_PLANER.getCountBusyPoints()) {
-                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, nextWaypoint);
-            }
-            else {
+                MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, loadWaypoint);
+            } else {
+                GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
     };
-    
-    self.saveWaypoints = function (callback) {
-        let waypointId = 1;
-        MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint)
 
-        function nextWaypoint() {
+    self.saveWaypoints = function (callback) {
+        let waypointId = 0;
+        let startTime = new Date().getTime();
+        sendWaypoint();
+
+        function sendWaypoint() {
             waypointId++;
             if (waypointId < MISSION_PLANER.get().length) {
-                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, nextWaypoint);
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, sendWaypoint);
             }
             else {
                 MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, endMission);
             }
         };
-        
+
         function endMission() {
+            GUI.log('Send time: ' + (new Date().getTime() - startTime) + 'ms');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };
-    
+
     self.loadSafehomes = function (callback) {
         SAFEHOMES.flush();
         let safehomeId = 0;
         MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
-        
+
         function nextSafehome() {
             safehomeId++;
             if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
@@ -3040,11 +3039,11 @@ var mspHelper = (function (gui) {
             }
         };
     };
-    
+
     self.saveSafehomes = function (callback) {
         let safehomeId = 0;
         MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
-        
+
         function nextSendSafehome() {
             safehomeId++;
             if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
