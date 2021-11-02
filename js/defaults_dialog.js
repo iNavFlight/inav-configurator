@@ -214,7 +214,11 @@ helper.defaultsDialog = (function () {
                 value: 10
             },
             {
-                key: "d_boost_factor",
+                key: "d_boost_min",
+                value: 1
+            },
+            {
+                key: "d_boost_max",
                 value: 1
             },
             {
@@ -392,7 +396,11 @@ helper.defaultsDialog = (function () {
                 value: 10
             },
             {
-                key: "d_boost_factor",
+                key: "d_boost_min",
+                value: 1
+            },
+            {
+                key: "d_boost_max",
                 value: 1
             },
             {
