@@ -267,7 +267,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 20
+                value: 15
             },
             {
                 key: "nav_fw_pos_z_d",
@@ -283,7 +283,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "max_angle_inclination_rll",
-                value: 350
+                value: 450
             },
             {
                 key: "nav_fw_bank_angle",
@@ -295,7 +295,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_i_pitch",
-                value: 10
+                value: 5
+            },
+            {
+                key: "fw_d_pitch",
+                value: 5
             },
             {
                 key: "fw_ff_pitch",
@@ -303,15 +307,19 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_p_roll",
-                value: 10
+                value: 15
             },
             {
                 key: "fw_i_roll",
-                value: 8
+                value: 3
+            },
+            {
+                key: "fw_d_roll",
+                value: 7
             },
             {
                 key: "fw_ff_roll",
-                value: 40
+                value: 50
             },
             {
                 key: "fw_p_yaw",
@@ -319,7 +327,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_i_yaw",
-                value: 5
+                value: 0
             },
             {
                 key: "fw_ff_yaw",
@@ -359,7 +367,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 1500
+                value: 5000
             },
         ],
         "features": [
@@ -449,7 +457,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 20
+                value: 15
             },
             {
                 key: "nav_fw_pos_z_d",
@@ -465,7 +473,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "max_angle_inclination_rll",
-                value: 450
+                value: 550
             },
             {
                 key: "nav_fw_bank_angle",
@@ -473,11 +481,15 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_p_pitch",
-                value: 10
+                value: 15
             },
             {
                 key: "fw_i_pitch",
-                value: 15
+                value: 5
+            },
+                        {
+                key: "fw_d_pitch",
+                value: 5
             },
             {
                 key: "fw_ff_pitch",
@@ -485,15 +497,15 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_p_roll",
-                value: 5
+                value: 15
             },
             {
                 key: "fw_i_roll",
-                value: 8
+                value: 3
             },
             {
                 key: "fw_ff_roll",
-                value: 35
+                value: 50
             },
             {
                 key: "imu_acc_ignore_rate",
@@ -529,7 +541,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 1500
+                value: 5000
             },
         ],
         "features": [
