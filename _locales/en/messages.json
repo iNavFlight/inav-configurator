@@ -3071,7 +3071,7 @@
         "message": "Shows the throttle stick position in flight modes where it controls the throttle output. On navigation modes, it shows the actual throttle value applied to the motors."
     },
     "osdElement_GPS_SPEED": {
-        "message": "GPS Speed"
+        "message": "Ground Speed"
     },
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
@@ -3377,16 +3377,16 @@
         "message": "Hide unsupported elements"
     },
     "osd_dji_ESC_temp": {
-        "message" : "Source of ESC Temperature"
+        "message" : "Source of <i>ESC Temperature</i>"
     },
     "osd_dji_RSSI_source": {
-        "message" : "Source of RSSI"
+        "message" : "Source of <i>RSSI</i>"
     },
     "osd_dji_GPS_source": {
-        "message" : "Source of GPS Speed"
+        "message" : "Source of <i>GPS Speed</i>"
     },
     "osd_dji_speed_source": {
-        "message" : "Source of 3D Speed"
+        "message" : "Source of <i>3D Speed</i>"
     },
     "osd_dji_use_craft_name_elements": {
         "message" : "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
