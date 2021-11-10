@@ -77,6 +77,10 @@ helper.defaultsDialog = (function () {
                 key: "setpoint_kalman_q",
                 value: 200
             },
+            {
+                key: "smith_predictor_delay",   // Enable Smith Predictor 
+                value: 1.5
+            },   
             /*
             Mechanics
             */
@@ -210,7 +214,11 @@ helper.defaultsDialog = (function () {
                 value: 10
             },
             {
-                key: "d_boost_factor",
+                key: "d_boost_min",
+                value: 1
+            },
+            {
+                key: "d_boost_max",
                 value: 1
             },
             {
@@ -388,7 +396,11 @@ helper.defaultsDialog = (function () {
                 value: 10
             },
             {
-                key: "d_boost_factor",
+                key: "d_boost_min",
+                value: 1
+            },
+            {
+                key: "d_boost_max",
                 value: 1
             },
             {

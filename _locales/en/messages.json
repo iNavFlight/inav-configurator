@@ -560,7 +560,7 @@
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Setup"
     },
 
     "RX_PPM": {
@@ -1009,7 +1009,7 @@
         "message": "Craft name. Can be displayed by OSD and by compatible RC systems."
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Configuration"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -1216,7 +1216,7 @@
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: PID Tuning"
     },
 
     "receiverHelp": {
@@ -1280,7 +1280,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Receiver"
     },
 
     "auxiliaryHelp": {
@@ -1528,9 +1528,11 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Adjustments"
     },
-
+    "programmingEepromSaved": {
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
+    },
     "transponderNotSupported": {
         "message": "Your flight controller's firmware does not support transponder functionality."
     },
@@ -1556,7 +1558,7 @@
         "message": "Transponder data is <span style=\"color: red\">invalid</span>"
     },
     "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Transponder"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
@@ -2012,7 +2014,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
 
     "controlAxisRoll": {
@@ -2227,9 +2229,6 @@
     },
     "accLpfCutoffFrequency": {
         "message": "Accelerometer LPF cutoff frequency"
-    },
-    "accLpfCutoffFrequencyHelp": {
-        "message": "Software-based filter to remove mechanical vibrations from the accelerometer measurements. Value is cutoff frequency (Hz). For larger frames with bigger props set to lower value."
     },
     "dtermLpfCutoffFrequency": {
         "message": "D-term LPF cutoff frequency"
@@ -2495,11 +2494,20 @@
     "userControlMode": {
         "message": "User Control Mode"
     },
+    "posholdDefaultSpeed": {
+        "message": "Default navigation speed [cm/s]"
+    },
+    "posholdDefaultSpeedHelp": {
+        "message": "Default speed during RTH, also used for WP navigation if no speed set for WP leg. Limited to Max. navigation speed"
+    },
     "posholdMaxSpeed": {
         "message": "Max. navigation speed [cm/s]"
     },
     "posholdMaxManualSpeed": {
         "message": "Max. CRUISE speed [cm/s]"
+    },
+    "posholdMaxManualSpeedHelp": {
+        "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
     },
     "posholdMaxClimbRate": {
         "message": "Max. navigation climb rate [cm/s]"
@@ -2801,6 +2809,12 @@
     "osd_plus_code_short": {
         "message" : "Plus Code Remove Leading Digits"
     },
+    "osd_esc_rpm_precision": {
+      "message": "ESC RPM precision"
+    },
+    "osd_esc_rpm_precision_help": {
+        "message": "The number of digits shown in the RPM display. If the RPM is higher than the number of digits, it will be shown in thousand RPM with as many decimal places as allowed."
+      },
     "osd_crosshairs_style": {
         "message" : "Crosshairs Style"
     },
@@ -3248,6 +3262,9 @@
     "osdElement_WIND_SPEED_VERTICAL_HELP": {
         "message": "Shows estimated vertical wind speed and direction (up or down)."
     },
+    "osdElement_ACTIVE_PROFILE": {
+        "message": "Show the active profile"
+    },
     "osdElement_LEVEL_PIDS": {
         "message": "Level PIDs"
     },
@@ -3508,6 +3525,12 @@
     },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
+    },
+    "no_waypoints_to_load": {
+        "message": "No waypoints to load !"
+    },
+    "no_waypoints_to_save": {
+        "message": "No waypoints to save !"
     },
     "servoMixer": {
         "message": "Servo mixer"
@@ -3833,12 +3856,6 @@
     "rpm_gyro_min_hz": {
         "message": "Gyro RPM filter min. frequency"
     },
-    "acc_lpf_type": {
-        "message": "Accelerometer LPF type"
-    },
-    "acc_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
     "dTermMechanics": {
         "message": "D-term mechanics"
     },
@@ -3854,10 +3871,16 @@
     "fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
     },
-    "d_boost_factor": {
-        "message": "D-Boost Factor"
+    "d_boost_min": {
+        "message": "D-Boost Min. Scale"
     },
-    "d_boost_factor_help": {
+    "d_boost_min_help": {
+        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
+    },
+    "d_boost_max": {
+        "message": "D-Boost Max. Scale"
+    },
+    "d_boost_max_help": {
         "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
     },
     "d_boost_max_at_acceleration": {
@@ -3874,18 +3897,6 @@
     },
     "iTermMechanics": {
         "message": "I-term mechanics"
-    },
-    "airmode_type": {
-        "message": "Airmode handling type"
-    },
-    "airmode_type_help": {
-        "message": "Defines the Airmode state handling type. <br />Default STICK_CENTER is the classical approach in which Airmode is always active if enabled, but when the throttle is low and ROLL/PITCH/YAW sticks are centered, Iterms is not allowed to grow (ANTI_WINDUP). <br />STICK_CENTER_ONCE works like STICK_CENTER, but only until the first time THROTTLE is not low and ROLL/PITCH/YAW sticks are moved. After that, ANTI_WINDUP is deactivated until next arm. Useful for airplanes. <br />THROTTLE_THRESHOLD is the Airmode behavior known from Betaflight. In this mode, Airmode is active as soon THROTTLE position is above <i>airmode_throttle_threshold</i> and stays active until disarm. ANTI_WINDUP is never triggered. For small Multirotors (up to 7-inch propellers) it is suggested to switch to THROTTLE_THRESHOLD since it keeps full stabilization no matter what pilot does with the sticks. Airplanes default to STICK_CENTER_ONCE mode."
-    },
-    "airmode_throttle_threshold": {
-        "message": "Airmode Throttle threshold"
-    },
-    "airmode_throttle_threshold_help": {
-        "message": "Defines airmode THROTTLE activation threshold when airmode_type THROTTLE_THRESHOLD is used"
     },
     "gps_map_center": {
         "message": "Center"

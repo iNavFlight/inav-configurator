@@ -231,13 +231,19 @@
                             <label for="user-control-mode"><span data-i18n="userControlMode"></span></label>
                         </div>
                         <div class="number">
-                            <input id="max-speed" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="max-speed"><span data-i18n="posholdMaxSpeed"></span></label>
-                            <div class="displayPilotUnit _cms" id="max-speed_PU"></div>
+                            <input id="default-auto-speed" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="default-auto-speed"><span data-i18n="posholdDefaultSpeed"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="posholdDefaultSpeedHelp"></div>
+                            <div class="displayPilotUnit _cms" id="default-auto-speed_PU"></div>
+                        </div>
+                        <div class="number">
+                            <input id="max-auto-speed" type="number" data-setting="nav_max_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="max-auto-speed"><span data-i18n="posholdMaxSpeed"></span></label>
                         </div>
                         <div class="number">
                             <input id="max-manual-speed" type="number" data-setting="nav_manual_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="max-manual-speed"><span data-i18n="posholdMaxManualSpeed"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="posholdMaxManualSpeedHelp"></div>
                             <div class="displayPilotUnit _cms" id="max-manual-speed_PU"></div>
                         </div>
                         <div class="number">

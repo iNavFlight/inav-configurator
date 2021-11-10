@@ -975,8 +975,8 @@ TABS.mission_control.initialize = function (callback) {
                     map.addLayer(addWaypointMarker(element));
                 }
             });
+            repaintLine4Waypoints(mission);
         }
-        repaintLine4Waypoints(mission);
     }
 
     function redrawLayer() {
@@ -1503,22 +1503,17 @@ TABS.mission_control.initialize = function (callback) {
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
-                if (globalSettings.mapProviderType == 'bing') {
-                    $('#elevationAtWP').fadeIn();
-                    $('#groundClearanceAtWP').fadeIn();
-                    if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
-                        (async () => {
-                            const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                            $('#elevationValueAtWP').text(elevationAtWP);
-                            const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
-                            selectedMarker.setAlt(returnAltitude);
-                            plotElevation();
-                        })()
-                    }
-                } else {
-                    $('#elevationAtWP').fadeOut();
-                    $('#groundClearanceAtWP').fadeOut();
+                if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
+                    (async () => {
+                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                        $('#elevationValueAtWP').text(elevationAtWP);
+                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                        selectedMarker.setAlt(returnAltitude);
+                        plotElevation();
+                    })()
                 }
+                $('#elevationAtWP').fadeIn();
+                $('#groundClearanceAtWP').fadeIn();
 
                 $('#altitudeInMeters').text(` ${altitudeMeters}m`);
                 $('#pointLon').val(Math.round(coord[0] * 10000000) / 10000000);
@@ -1789,33 +1784,31 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedMarker) {
                 const P3Value = selectedMarker.getP3();
                 selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
-                if (globalSettings.mapProviderType == 'bing') {
-                    (async () => {
-                        const elevationAtWP = await selectedMarker.getElevation(globalSettings);
-                        $('#elevationValueAtWP').text(elevationAtWP);
-                        var altitude = Number($('#pointAlt').val());
-                        if (P3Value != selectedMarker.getP3()) {
-                            if ($('#pointP3').prop("checked")) {
-                                if (altitude < 0) {
-                                    altitude = settings.alt;
-                                }
-                                selectedMarker.setAlt(altitude + elevationAtWP * 100);
-                            } else {
-                                selectedMarker.setAlt(altitude - Number(elevationAtWP) * 100);
+                (async () => {
+                    const elevationAtWP = await selectedMarker.getElevation(globalSettings);
+                    $('#elevationValueAtWP').text(elevationAtWP);
+                    var altitude = Number($('#pointAlt').val());
+                    if (P3Value != selectedMarker.getP3()) {
+                        if ($('#pointP3').prop("checked")) {
+                            if (altitude < 0) {
+                                altitude = settings.alt;
                             }
+                            selectedMarker.setAlt(altitude + elevationAtWP * 100);
+                        } else {
+                            selectedMarker.setAlt(altitude - Number(elevationAtWP) * 100);
                         }
-                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
-                        selectedMarker.setAlt(returnAltitude);
-                        $('#pointAlt').val(selectedMarker.getAlt());
-                        altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
-                        $('#altitudeInMeters').text(` ${altitudeMeters}m`);
+                    }
+                    const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                    selectedMarker.setAlt(returnAltitude);
+                    $('#pointAlt').val(selectedMarker.getAlt());
+                    altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+                    $('#altitudeInMeters').text(` ${altitudeMeters}m`);
 
-                        mission.updateWaypoint(selectedMarker);
-                        mission.update();
-                        redrawLayer();
-                        plotElevation();
-                    })()
-                }
+                    mission.updateWaypoint(selectedMarker);
+                    mission.update();
+                    redrawLayer();
+                    plotElevation();
+                })()
             }
         });
 
@@ -1996,30 +1989,35 @@ TABS.mission_control.initialize = function (callback) {
             removeAllWaypoints();
             $(this).addClass('disabled');
             GUI.log('Start get point');
-            getWaypointsFromFC();
-            GUI.log('End get point');
-            $('#loadMissionButton').removeClass('disabled');
+            getWaypointsFromFC(false);
         });
 
         $('#saveMissionButton').on('click', function () {
+            if (!mission.get().length) {
+                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                return;
+            }
             $(this).addClass('disabled');
             GUI.log('Start send point');
-            sendWaypointsToFC();
-            GUI.log('End send point');
-            $('#saveMissionButton').removeClass('disabled');
-
+            sendWaypointsToFC(false);
         });
 
         $('#loadEepromMissionButton').on('click', function () {
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             removeAllWaypoints();
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointsFromFC);
+            $(this).addClass('disabled');
+            GUI.log('Start get point');
+            getWaypointsFromFC(true);
         });
 
         $('#saveEepromMissionButton').on('click', function () {
+            if (!mission.get().length) {
+                alert(chrome.i18n.getMessage('no_waypoints_to_save'));
+                return;
+            }
             $(this).addClass('disabled');
             GUI.log('Start send point');
-            sendWaypointsToFC();
+            sendWaypointsToFC(true);
         });
 
         /////////////////////////////////////////////
@@ -2225,30 +2223,51 @@ TABS.mission_control.initialize = function (callback) {
     // Load/Save FC mission Toolbox
     //
     /////////////////////////////////////////////
-    function getWaypointsFromFC() {
-        mspHelper.loadWaypoints(function() {
-            GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
-            mission.reinit();
-            mission.copy(MISSION_PLANER);
-            mission.update(true);
-            var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
-            map.getView().setCenter(coord);
-            map.getView().setZoom(16);
-            redrawLayers();
-            updateTotalInfo();
-        });
+    function getWaypointsFromFC(loadEeprom) {
+        if (loadEeprom) {
+            MSP.send_message(MSPCodes.MSP_WP_MISSION_LOAD, [0], getWaypointData);
+        } else {
+            getWaypointData();
+        }
+
+        function getWaypointData() {
+            mspHelper.loadWaypoints(function() {
+                GUI.log('End get point');
+                if (loadEeprom) {
+                    GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
+                    $('#loadEepromMissionButton').removeClass('disabled');
+                } else {
+                    $('#loadMissionButton').removeClass('disabled');
+                }
+                if (!MISSION_PLANER.getCountBusyPoints()) {
+                    alert(chrome.i18n.getMessage('no_waypoints_to_load'));
+                    return;
+                }
+                mission.reinit();
+                mission.copy(MISSION_PLANER);
+                mission.update(true);
+                var coord = ol.proj.fromLonLat([mission.getWaypoint(0).getLonMap(), mission.getWaypoint(0).getLatMap()]);
+                map.getView().setCenter(coord);
+                map.getView().setZoom(16);
+                redrawLayers();
+                updateTotalInfo();
+            });
+        };
     }
 
-    function sendWaypointsToFC() {
+    function sendWaypointsToFC(saveEeprom) {
         MISSION_PLANER.reinit();
         MISSION_PLANER.copy(mission);
         MISSION_PLANER.update(true, true);
         mspHelper.saveWaypoints(function() {
             GUI.log('End send point');
-            $('#saveEepromMissionButton').removeClass('disabled');
-            GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-            MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
-
+            if (saveEeprom) {
+                $('#saveEepromMissionButton').removeClass('disabled');
+                GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+                MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false);
+            } else {
+                $('#saveMissionButton').removeClass('disabled');
+            }
             mission.setMaxWaypoints(MISSION_PLANER.getMaxWaypoints());
             mission.setValidMission(MISSION_PLANER.getValidMission());
             mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());
@@ -2286,10 +2305,6 @@ TABS.mission_control.initialize = function (callback) {
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
      ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
     function checkAltElevSanity(resetAltitude, checkAltitude, elevation, P3Datum) {
-        if (globalSettings.mapProviderType != 'bing') {
-            return checkAltitude;
-        }
-
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
         if (P3Datum) {

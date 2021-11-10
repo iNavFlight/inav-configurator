@@ -100,6 +100,7 @@ SYM.AH_NM = 0x3F;
 SYM.WH_NM = 0x70;
 SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
+SYM.PROFILE = 0xCF;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -900,7 +901,10 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
-                    preview: FONT.symbol(SYM.RPM) + '983',
+                    preview: function(){
+                        let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
+                        return FONT.symbol(SYM.RPM) + rpmPreview;
+                    } 
                 },
                 {
                     name: 'GLIDESLOPE',
@@ -1712,6 +1716,13 @@ OSD.constants = {
         {
             name: 'osdGroupPIDs',
             items: [
+                {
+                    name: 'ACTIVE_PROFILE',
+                    id: 128,
+                    preview:  function(osd_data) {
+                        return FONT.symbol(SYM.PROFILE) + '1';
+                    }
+                },
                 {
                     name: 'ROLL_PIDS',
                     id: 16,
