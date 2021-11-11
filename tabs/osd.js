@@ -904,18 +904,13 @@ OSD.constants = {
                     preview: function(){
                         let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
                         return FONT.symbol(SYM.RPM) + rpmPreview;
-                    } 
+                    }
                 },
                 {
                     name: 'GLIDESLOPE',
                     id: 124,
                     min_version: '3.0.0',
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
-                },
-                {
-                    name: 'MISSION INFO',
-                    id: 129,
-                    preview: 'M1/6>27WP'
                 },
                 {
                     name: 'VERSION',
