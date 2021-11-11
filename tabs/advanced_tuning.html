@@ -89,7 +89,7 @@
                             <div class="helpicon cf_tip" data-i18n_title="idlePowerHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="cruisePower" data-unit="cms" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <input type="number" id="cruisePower" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="5000" />
                             <label for="cruisePower"><span data-i18n="cruisePower"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="cruisePowerHelp"></div>
                         </div>
@@ -179,7 +179,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="loiterRadius" type="number" data-setting="nav_fw_loiter_radius" data-setting-multiplier="1" step="1" min="0" max="30000" />
+                            <input id="loiterRadius" type="number" data-unit="cm" data-setting="nav_fw_loiter_radius" data-setting-multiplier="1" step="1" min="0" max="30000" />
                             <label for="loiterRadius"><span data-i18n="loiterRadius"></span></label>
                         </div>
 
@@ -215,17 +215,13 @@
                             <select id="user-control-mode" data-setting="nav_user_control_mode"></select>
                             <label for="user-control-mode"><span data-i18n="userControlMode"></span></label>
                         </div>
-                        <div class="number"> 
-                            <input id="max-speed" data-unit="cms" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="max-speed"><span data-i18n="posholdMaxSpeed"></span></label>
-                        </div>
                         <div class="number">
-                            <input id="default-auto-speed" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <input id="default-auto-speed" type="number" data-unit="cms" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="default-auto-speed"><span data-i18n="posholdDefaultSpeed"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="posholdDefaultSpeedHelp"></div>
                         </div>
                         <div class="number">
-                            <input id="max-auto-speed" type="number" data-setting="nav_max_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <input id="max-auto-speed" type="number" data-unit="cms" data-setting="nav_max_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="max-auto-speed"><span data-i18n="posholdMaxSpeed"></span></label>
                         </div>
                         <div class="number">
