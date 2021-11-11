@@ -37,6 +37,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="missionPlanerTotalInfo" class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
@@ -63,6 +64,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="missionPlanerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
@@ -83,6 +85,46 @@
                         <div class="point">
                             <label class="point-label" for="MPdefaultSafeRangeSH">Radius (m): </label>
                             <input id="MPdefaultSafeRangeSH" type="text" value="0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="missionPlannerMultiMission" class="gui_box grey" style="display: none">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title i18n-replaced" data-i18n="missionMultiMissionHead">Multi Missions</div>
+                        <div class="btnMenu btnMenuIcon save_btn">
+                            <div id="showHideMultimissionButton">
+                                <a class="ic_hide" href="#" title="Hide"></a>
+                            </div>
+                            <a id="cancelMultimission" class="ic_cancel" href="#" title="Cancel"></a>
+                        </div>
+                    </div>
+                    <div class="spacer" id="multimissionContent">
+                        <div class="btn btnTable btnTableIcon save_btn">
+                            <div>
+                                <span>Missions Info:</span>
+                                <span id="multimissionInfo">None</span>
+                            </div>
+                            <div style="margin-top: 5px">
+                                <span>Active Mission:</span>
+                                <span id="activeNissionIndex">1</span>
+                                <a class="ic_save disabled" id="setActiveMissionButton" href="#" title="Set Active"></a>
+                            </div>
+                            <hr>
+                            <div style="display: inline-block">
+                                <label for="multimissionOptionList">Mission No.</label>
+                                <select name="Number" id="multimissionOptionList" style="width: 50px">
+                                    <option value="0">ALL</option>
+                                </select>
+                                <div style="float: right">
+                                    <span>Update All</span>
+                                    <a class="ic_save disabled" id="updateMultimissionButton" href="#" title="Update All"></a>
+                                </div>
+                                <div style="margin-bottom: 5px; margin-top: 5px">
+                                    <label for="addMultimissionButton">Add New Mission</label>
+                                    <a class="ic_add disabled" id="addMultimissionButton" href="#" title="Add"></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -110,13 +152,13 @@
                                 </thead>
                                 <tbody id="homeTableBody">
                                     <tr>
-                                    <td><div id="viewHomePoint" class="btnTable btnTableIcon">
-                                            <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
-                                        </div>
-                                    </td>
-                                    <td><input type="number" class="home-lon" /></td>
-                                    <td><input type="number" class="home-lat" /></td>
-                                    <td><span id="elevationValueAtHome">N/A</span></td>
+                                        <td><div id="viewHomePoint" class="btnTable btnTableIcon">
+                                                <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
+                                            </div>
+                                        </td>
+                                        <td><input type="number" class="home-lon" /></td>
+                                        <td><input type="number" class="home-lat" /></td>
+                                        <td><span id="elevationValueAtHome">N/A</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -180,8 +222,11 @@
                             <div id="showHideWPeditButton"   class="save_btn">
                                 <a class="ic_hide" href="#" title="Hide"></a>
                             </div>
-                            <div id="removePoint" class="btnMenu-danger">
-                                <a class="ic_removeAll" href="#" title="Remove"></a>
+                            <div id="removePoint" class="btn btnMenu-danger">
+                                <a id="removePointButton" class="ic_removeAll" href="#" title="Remove"></a>
+                            </div>
+                            <div id="editMission" class="save_btn" style="display: none">
+                                <a id="editMissionButton" class="ic_setup" href="#" title="Edit Mission"></a>
                             </div>
                         </div>
                     </div>
@@ -238,8 +283,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 30px">
-                                        <div id="addOptionsPoint" class="btnTable btnTableIcon btnTable-success">
-                                            <a class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
+                                        <div id="addOptionsPoint" class="btn btnTable btnTableIcon btnTable-success">
+                                            <a id="addOptionsPointButton" class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
                                         </div>
                                     </th>
                                     <th style="width: 50px" data-i18n="WaypointOptionId"></th>

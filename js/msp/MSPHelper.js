@@ -455,7 +455,8 @@ var mspHelper = (function (gui) {
                     data.getInt32(10, true),
                     data.getInt16(14, true),
                     data.getInt16(16, true),
-                    data.getInt16(18, true)
+                    data.getInt16(18, true),
+                    data.getUint8(20)
                 ));
                 break;
             case MSPCodes.MSP_BOXIDS:
@@ -3207,9 +3208,9 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.setSetting = function (name, value) {
+    self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data);
+            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
         });
     };
 

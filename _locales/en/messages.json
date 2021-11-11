@@ -3508,6 +3508,9 @@
     "missionSafehomeHead": {
         "message": "Safe Home manager"
     },
+    "missionMultiMissionHead": {
+        "message": "Multi Missions"
+    },
     "missionTemplateHead": {
         "message": "Mission template"
     },
@@ -3525,6 +3528,15 @@
     },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
+    },
+    "confirm_multimission_file_load": {
+        "message": "This is a multi mission file. Loading will over write current multi mission.\nContinue?"
+    },
+    "confirm_overwrite_multimission_file_load_option": {
+        "message": "This will over write current multi mission.\nContinue?"
+    },
+    "multimission_active_index_saved_eeprom": {
+        "message": "Mission active index saved"
     },
     "no_waypoints_to_load": {
         "message": "No waypoints to load !"
