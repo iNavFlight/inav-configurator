@@ -915,7 +915,7 @@ OSD.constants = {
                 {
                     name: 'MISSION INFO',
                     id: 129,
-                    min_version: '4.0.0'
+                    min_version: '4.0.0',
                     preview: 'M1/6>27WP'
                 },
                 {
