@@ -215,13 +215,23 @@
                             <select id="user-control-mode" data-setting="nav_user_control_mode"></select>
                             <label for="user-control-mode"><span data-i18n="userControlMode"></span></label>
                         </div>
-                        <div class="number">
+                        <div class="number"> 
                             <input id="max-speed" data-unit="cms" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="max-speed"><span data-i18n="posholdMaxSpeed"></span></label>
                         </div>
                         <div class="number">
+                            <input id="default-auto-speed" type="number" data-setting="nav_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="default-auto-speed"><span data-i18n="posholdDefaultSpeed"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="posholdDefaultSpeedHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="max-auto-speed" type="number" data-setting="nav_max_auto_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="max-auto-speed"><span data-i18n="posholdMaxSpeed"></span></label>
+                        </div>
+                        <div class="number">
                             <input id="max-manual-speed" data-unit="cms" type="number" data-setting="nav_manual_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="max-manual-speed"><span data-i18n="posholdMaxManualSpeed"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="posholdMaxManualSpeedHelp"></div>
                         </div>
                         <div class="number">
                             <input id="max-bank-angle" type="number" data-setting="nav_mc_bank_angle" data-setting-multiplier="1" step="1" min="15" max="45" />

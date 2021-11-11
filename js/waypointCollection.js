@@ -72,7 +72,7 @@ let WaypointCollection = function () {
     };
 
     self.isEmpty = function () {
-        return data == [];
+        return data.length == 0;
     };
 
     self.flush = function () {
@@ -149,7 +149,7 @@ let WaypointCollection = function () {
         data = tmpData;
     };
 
-    self.update = function (bMWPfile=false, bReverse=false) {
+    self.update = function (updateEndFlag = true, bMWPfile=false, bReverse=false) {
         let oldWPNumber = 0;
         let optionIdx = 0;
         let idx = 0;
@@ -180,11 +180,15 @@ let WaypointCollection = function () {
                     optionIdx = 0;
                     idx++;
                 }
-                if (element.getNumber() == ((bMWPfile && bReverse) ? self.get().length : self.get().length-1)) {
-                    element.setEndMission(0xA5);
-                }
-                else {
-                    element.setEndMission(0);
+
+                /* only update EndMission flag when required and only if single mission loaded on map */
+                if (updateEndFlag) {
+                    if (element.getNumber() == self.get().length - 1) {
+                        element.setEndMission(0xA5);
+                    }
+                    else if ((element.getNumber() == self.get().length - 2) && element.getEndMission() == 0xA5) {
+                        element.setEndMission(0);
+                    }
                 }
             }
         });

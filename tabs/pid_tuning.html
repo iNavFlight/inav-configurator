@@ -271,13 +271,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Matrix Gyro Filter</th>
-                            <td>
-                                <select data-setting="dynamic_gyro_notch_enabled" />
-                                <div class="helpicon cf_tip" data-i18n_title="dynamic_gyro_notch_enabled_help"></div>
-                            </td>
-                        </tr>
-                        <tr>
                             <th>Matrix Filter Min Frequency</th>
                             <td>
                                 <input data-setting="dynamic_gyro_notch_min_hz" type="number" class="rate-tpa_input" />
@@ -289,12 +282,6 @@
                             <td>
                                 <input data-setting="dynamic_gyro_notch_q" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" title="The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Unicorn Filter</th>
-                            <td>
-                                <select data-setting="setpoint_kalman_enabled" />
                             </td>
                         </tr>
                         <tr>
@@ -317,13 +304,6 @@
                             <td>
                                 <input data-setting="dterm_lpf_hz" type="number" class="rate-tpa_input" />
                                 <div class="helpicon cf_tip" data-i18n_title="dtermLpfCutoffFrequencyHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="dterm_lpf2_hz"></th>
-                            <td>
-                                <input data-setting="dterm_lpf2_hz" type="number" class="rate-tpa_input" />
-                                <div class="helpicon cf_tip" data-i18n_title="dterm_lpf2_hz_help"></div>
                             </td>
                         </tr>
                     </tbody>
@@ -358,13 +338,6 @@
             <div class="cf_column">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
-                        <tr>
-                            <th data-i18n="itermRelax"></th>
-                            <td>
-                                <select data-setting="mc_iterm_relax" />
-                                <div class="helpicon cf_tip" data-i18n_title="itermRelaxHelp"></div>
-                            </td>
-                        </tr>
                         <tr>
                             <th data-i18n="itermRelaxCutoff"></th>
                             <td>
@@ -407,10 +380,17 @@
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
-                            <th data-i18n="d_boost_factor"></th>
+                            <th data-i18n="d_boost_min"></th>
                             <td>
-                                <input data-setting="d_boost_factor" class="rate-tpa_input" />
-                                <div class="helpicon cf_tip" data-i18n_title="d_boost_factor_help"></div>
+                                <input data-setting="d_boost_min" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="d_boost_min_help"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="d_boost_max"></th>
+                            <td>
+                                <input data-setting="d_boost_max" class="rate-tpa_input" />
+                                <div class="helpicon cf_tip" data-i18n_title="d_boost_max_help"></div>
                             </td>
                         </tr>
                         <tr>

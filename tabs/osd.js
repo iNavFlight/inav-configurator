@@ -100,6 +100,7 @@ SYM.AH_NM = 0x3F;
 SYM.WH_NM = 0x70;
 SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
+SYM.PROFILE = 0xCF;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -480,7 +481,7 @@ OSD.DjiElements =  {
         "LONGITUDE",
         "LATITUDE",
         "DIRECTION_TO_HOME",
-        "DISTANCE_TO_HOME" 
+        "DISTANCE_TO_HOME"
     ],
     emptyGroups: [
         "MapsAndRadars",
@@ -507,7 +508,7 @@ OSD.DjiElements =  {
         "3D_SPEED",
         "EFFICIENCY_MAH",
         "TRIP_DIST"
-    ]   
+    ]
 };
 
 OSD.constants = {
@@ -784,7 +785,7 @@ OSD.constants = {
                                     // Metric
                                     return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
                             }
-                            
+
                         } else {
                             switch (OSD.data.preferences.units) {
                                 case 0: // Imperial
@@ -900,13 +901,22 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
-                    preview: FONT.symbol(SYM.RPM) + '983',
+                    preview: function(){
+                        let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
+                        return FONT.symbol(SYM.RPM) + rpmPreview;
+                    }
                 },
                 {
                     name: 'GLIDESLOPE',
                     id: 124,
                     min_version: '3.0.0',
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
+                },
+                {
+                    name: 'MISSION INFO',
+                    id: 129,
+                    min_version: '4.0.0',
+                    preview: 'M1/6>27WP'
                 },
                 {
                     name: 'VERSION',
@@ -1713,6 +1723,13 @@ OSD.constants = {
             name: 'osdGroupPIDs',
             items: [
                 {
+                    name: 'ACTIVE_PROFILE',
+                    id: 128,
+                    preview:  function(osd_data) {
+                        return FONT.symbol(SYM.PROFILE) + '1';
+                    }
+                },
+                {
                     name: 'ROLL_PIDS',
                     id: 16,
                     preview: 'ROL  40  30  20  23'
@@ -2455,8 +2472,8 @@ OSD.GUI.updateFields = function() {
     }
 
     $('#djiUnsupportedElements').prepend(
-        $('<input type="checkbox" class="toggle" />') 
-        .attr('checked', OSD.data.isDjiHdFpv) 
+        $('<input type="checkbox" class="toggle" />')
+        .attr('checked', OSD.data.isDjiHdFpv)
         .on('change', function () {
             OSD.GUI.updateDjiView(this.checked);
             OSD.GUI.updatePreviews();
@@ -2486,7 +2503,7 @@ OSD.GUI.removeBottomLines = function(){
 
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
-        var name = $(element).find('input').attr('name'); 
+        var name = $(element).find('input').attr('name');
         if (OSD.DjiElements.craftNameElements.includes(name)) {
             if (on) {
                 $(element)
@@ -2494,7 +2511,7 @@ OSD.GUI.updateDjiMessageElements = function(on) {
                     .show();
             } else if ($('#djiUnsupportedElements').find('input').is(':checked')) {
                 $(element).hide();
-            } 
+            }
         }
 
         if (!on) {
@@ -2507,7 +2524,7 @@ OSD.GUI.updateDjiMessageElements = function(on) {
 OSD.GUI.updateDjiView = function(on) {
     if (on) {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
-            $('#osdGroup' + groupName).hide();    
+            $('#osdGroup' + groupName).hide();
         });
 
         var displayFields = $('.display-field');
@@ -2520,10 +2537,10 @@ OSD.GUI.updateDjiView = function(on) {
 
         var settings = $('.settings-container').find('.settings').children();
         settings.each(function(index, element) {
-            var name = $(element).attr('class');          
+            var name = $(element).attr('class');
             if (!OSD.DjiElements.supportedSettings.includes(name)) {
                 $(element).hide();
-            }                 
+            }
         });
 
         var alarms = $('.alarms-container').find('.settings').children();
@@ -2535,7 +2552,7 @@ OSD.GUI.updateDjiView = function(on) {
         });
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
-            $('#osdGroup' + groupName).show();    
+            $('#osdGroup' + groupName).show();
         });
 
         $('.display-field')
