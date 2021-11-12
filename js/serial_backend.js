@@ -236,9 +236,6 @@ function onOpen(openInfo) {
         GUI.connecting_to = false;
 
         GUI.log(chrome.i18n.getMessage('serialPortOpened', [openInfo.connectionId]));
-        
-        // Reset the osdUnits
-        globalSettings.osdUnits = null;
 
         // save selected port with chrome.storage if the port differs
         chrome.storage.local.get('last_used_port', function (result) {
