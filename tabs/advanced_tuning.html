@@ -21,12 +21,12 @@
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAngleHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchVelocity" data-unit="cms" data-setting="nav_fw_launch_velocity" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input type="number" id="launchVelocity" data-unit="cms" data-setting="nav_fw_launch_velocity" data-setting-multiplier="1" step="1" min="100" max="10000" />
                             <label for="launchVelocity"><span data-i18n="configurationLaunchVelocity"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchAccel" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input type="number" id="launchAccel" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="20000" />
                             <label for="launchAccel"><span data-i18n="configurationLaunchAccel"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchAccelHelp"></div>
                         </div>
@@ -56,7 +56,7 @@
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchThrHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchClimbAngle" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="60000" />
+                            <input type="number" id="launchClimbAngle" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="45" />
                             <label for="launchClimbAngle"><span data-i18n="configurationLaunchClimbAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchClimbAngleHelp"></div>
                         </div>
@@ -84,22 +84,22 @@
                     </div>
                     <div class="spacer_box">
                         <div class="number">
-                            <input type="number" id="idlePower" data-setting="idle_power" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <input type="number" id="idlePower" data-setting="idle_power" data-setting-multiplier="1" step="1" min="0" max="65535" />
                             <label for="idlePower"><span data-i18n="idlePower"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="idlePowerHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="cruisePower" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <input type="number" id="cruisePower" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="4294967295" />
                             <label for="cruisePower"><span data-i18n="cruisePower"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="cruisePowerHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="cruiseSpeed" data-unit="cms" data-setting="nav_fw_cruise_speed" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <input type="number" id="cruiseSpeed" data-unit="cms" data-setting="nav_fw_cruise_speed" data-setting-multiplier="1" step="1" min="0" max="65535" />
                             <label for="cruiseSpeed"><span data-i18n="cruiseSpeed"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="cruiseSpeedHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="rthEnergyMargin" data-setting="rth_energy_margin" data-setting-multiplier="1" step="1" min="0" max="5000" />
+                            <input type="number" id="rthEnergyMargin" data-setting="rth_energy_margin" data-setting-multiplier="1" step="1" min="0" max="100" />
                             <label for="rthEnergyMargin"><span data-i18n="rthEnergyMargin"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="rthEnergyMarginHelp"></div>
                         </div>
@@ -457,7 +457,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="emergencyDescentRate" type="number" data-unit="cms" data-setting="nav_emerg_landing_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <input id="emergencyDescentRate" type="number" data-unit="cms" data-setting="nav_emerg_landing_speed" data-setting-multiplier="1" step="1" min="100" max="2000" />
                             <label for="emergencyDescentRate"><span data-i18n="emergencyDescentRate"></span></label>
                         </div>
                     </div>
