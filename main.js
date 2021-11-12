@@ -65,6 +65,11 @@ $(document).ready(function () {
         }
         globalSettings.proxyLayer = result.proxylayer;
     });
+	
+    // Resets the OSD units used by the unit coversion when the FC is disconnected.
+    if (!CONFIGURATOR.connectionValid) {
+        globalSettings.osdUnits = null;
+    }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
