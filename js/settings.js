@@ -27,6 +27,7 @@ var Settings = (function () {
                     return;
                 }
                 parent.show();
+
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
@@ -69,9 +70,6 @@ var Settings = (function () {
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
                     input.attr('type', 'number');
-                    input.attr('step', 1 / multiplier);
-                    input.attr('min', s.setting.min / multiplier);
-                    input.attr('max', s.setting.max / multiplier);
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
                 }
 
@@ -173,6 +171,13 @@ var Settings = (function () {
 
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
+
+        // Update the step, min, and max; as we have the multiplier here.
+        if (element.attr('type') == 'number') {
+            element.attr('step', ((multiplier != 1) ? '0.01' : '1'));
+            element.attr('min', (element.attr('min') / multiplier).toFixed(2));
+            element.attr('max', (element.attr('max') / multiplier).toFixed(2));
+        }
 
         // Update the input with a new formatted unit
         const convertedValue = Number((oldValue / multiplier).toFixed(2));
