@@ -516,6 +516,11 @@ input[type="number"]::-webkit-inner-spin-button {
     z-index: 10000;
 }
 
+/* options modified GUI BOX */
+#options-window .gui_box {
+    float: none;
+}
+
 .options_container__checkbox input {
     float: left;
     margin-top: 3px;
@@ -2198,4 +2203,37 @@ ol li {
 .red-background td,
 .red-background th {
     background-color: tomato !important;
+}
+
+/* Wrapper for inputs with unit displays */
+.unit_wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+/* Position the unit to the right of the wrapper */
+.unit_wrapper::after {
+    position: absolute;
+    top: 2px;
+    right: .7em;
+    transition: all .05s ease-in-out;
+}
+
+/* Move unit more to the left on hover or focus within
+     for arrow buttons will appear to the right of number inputs */
+.unit_wrapper:hover::after,
+.unit_wrapper:focus-within::after {
+    right: 1.3em;
+}
+
+/* Handle Firefox (arrows always shown) */
+@supports (-moz-appearance:none) {
+    .unit_wrapper::after {
+        right: 1.3em;
+    }
+}
+
+/* Set the unit abbreviation for each unit class */
+.unit::after {
+    content: attr(data-unit) ;
 }

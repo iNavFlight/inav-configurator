@@ -12,7 +12,13 @@
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
     },
-
+    "options_unit_type": {
+        "message": "Set how the units render on the configurator only"
+    },
+    "options_render": {
+        "message": "Configurator rendering options"
+    },
+    
     "connect": {
         "message": "Connect"
     },
