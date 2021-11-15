@@ -784,12 +784,14 @@ TABS.mission_control.initialize = function (callback) {
                     totalmultimissionWPs = multimission.get().length + mission.get().length;
                     $("#updateMultimissionButton").removeClass('disabled');
                     $("#setActiveMissionButton").removeClass('disabled');
+                    $('#missionPlanerElevation').show();
                 } else {
                     $('#missionDistance').text('N/A');
                     totalmultimissionWPs = mission.get().length;
                     $("#editMission").show();
                     $("#updateMultimissionButton").addClass('disabled');
                     $("#setActiveMissionButton").addClass('disabled');
+                    $('#missionPlanerElevation').hide();
                     setMultimissionEditControl(true);
                 }
                 $('#multimissionInfo').text(multimissionCount + ' missions (' + totalmultimissionWPs + '/' + mission.getMaxWaypoints() + ' WPs)');
@@ -2820,9 +2822,11 @@ TABS.mission_control.initialize = function (callback) {
                             color: '#1f77b4',
                         },
                     };
-                    let missionNumber = "";
+                    /* Show multi mission number in plot title when single mission displayed
+                     * Not updated when ALL multi missions displayed since plot disabled */
+                    let missionNumber = '';
                     if (multimissionCount) {
-                        missionNumber = " " + ($('#multimissionOptionList').val());
+                        missionNumber = ' ' + ($('#multimissionOptionList').val());
                     }
                     var layout = {showlegend: true,
                                   legend: {
