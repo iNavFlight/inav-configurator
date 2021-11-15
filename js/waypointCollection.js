@@ -5,7 +5,7 @@ let WaypointCollection = function () {
 
     let self = {},
         data = [],
-        maxWaypoints = 60,
+        maxWaypoints = 120,
         isValidMission = 0,
         countBusyPoints = 0,
         version = 0,
@@ -81,7 +81,7 @@ let WaypointCollection = function () {
 
     self.reinit = function () {
         data = [];
-        maxWaypoints = 60;
+        maxWaypoints = 120;
         isValidMission = 0;
         countBusyPoints = 0;
         version = 0;
