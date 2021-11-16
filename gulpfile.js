@@ -238,7 +238,7 @@ gulp.task('dist-build', gulp.series('build', function() {
         './images/**/*',
         './_locales/**/*',
         './build/*',
-        './src/css/font-awesome/fonts/*',
+        './src/css/font-awesome/webfonts/*',
         './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
         './resources/*.json',
         './resources/models/*',

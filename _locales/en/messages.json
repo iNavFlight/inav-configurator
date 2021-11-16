@@ -364,6 +364,9 @@
     "communityRCGroupsSupport": {
         "message": "RC Groups Support"
     },
+    "communityDiscordServer": {
+        "message": "Discord Server"
+    },
     "communitySlackSupport": {
         "message": "Slack Support Live Chat"
     },
