@@ -359,7 +359,7 @@
         "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAV</strong> users.<br />If you found the INAV or INAV Configurator useful, please consider <strong>supporting</strong> its development by donating."
     },
     "defaultSponsorsHead": {
-        "message": "Sponsors"
+        "message": "INAV is supported by"
     },
     "communityRCGroupsSupport": {
         "message": "RC Groups Support"
