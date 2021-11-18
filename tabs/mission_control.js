@@ -2462,7 +2462,7 @@ TABS.mission_control.initialize = function (callback) {
                                             mission.setVersion(node.$[attr]);
                                         }
                                     }
-                                } else if (node['#name'].match(/mwp/i) && node.$) {
+                                } else if (node['#name'].match(/meta/i) || node['#name'].match(/mwp/i) && node.$) {
                                     for (var attr in node.$) {
                                         if (attr.match(/zoom/i)) {
                                             mission.setCenterZoom(parseInt(node.$[attr]));
@@ -2533,7 +2533,13 @@ TABS.mission_control.initialize = function (callback) {
                         mission.flush();
                         return;
                     } else {
-                        // update Attached Waypoints (i.e non Map Markers)
+                        /* update Attached Waypoints (i.e non Map Markers)
+                         * Ensure WPs numbered sequentially across all missions */
+                        i = 1;
+                        mission.get().forEach(function (element) {
+                            element.setNumber(i);
+                            i++;
+                        });
                         mission.update(false, true);
                         multimissionCount = missionEndFlagCount;
                         multimission.reinit();
@@ -2579,10 +2585,10 @@ TABS.mission_control.initialize = function (callback) {
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
-
+        let version = (multimissionCount && !singleMissionActive()) ? '4.0.0' : '2.3-pre8';
         var data = {
-            'version': { $: { 'value': '2.3-pre8' } },
-            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000),
+            'version': { $: { 'value': version } },
+            'meta': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000),
                           'cy': (Math.round(center[1] * 10000000) / 10000000),
                           'home-x' : HOME.getLonMap(),
                           'home-y' : HOME.getLatMap(),
@@ -2590,9 +2596,10 @@ TABS.mission_control.initialize = function (callback) {
             'missionitem': []
         };
 
+        let missionStartWPNumber = 0;
         mission.get().forEach(function (waypoint) {
             var point = { $: {
-                        'no': waypoint.getNumber()+1,
+                        'no': waypoint.getNumber() - missionStartWPNumber + 1,
                         'action': MWNP.WPTYPE.REV[waypoint.getAction()],
                         'lat': waypoint.getLatMap(),
                         'lon': waypoint.getLonMap(),
@@ -2602,6 +2609,9 @@ TABS.mission_control.initialize = function (callback) {
                         'parameter3': waypoint.getP3(),
                         'flag': waypoint.getEndMission(),
                     } };
+            if (waypoint.getEndMission() == 0xA5) {
+                missionStartWPNumber = waypoint.getNumber() + 1;
+            }
             data.missionitem.push(point);
         });
 
