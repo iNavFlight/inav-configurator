@@ -2588,7 +2588,7 @@ TABS.mission_control.initialize = function (callback) {
         let version = (multimissionCount && !singleMissionActive()) ? '4.0.0' : '2.3-pre8';
         var data = {
             'version': { $: { 'value': version } },
-            'meta': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000),
+            'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000),
                           'cy': (Math.round(center[1] * 10000000) / 10000000),
                           'home-x' : HOME.getLonMap(),
                           'home-y' : HOME.getLatMap(),
