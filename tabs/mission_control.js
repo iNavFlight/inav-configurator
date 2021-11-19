@@ -2462,7 +2462,7 @@ TABS.mission_control.initialize = function (callback) {
                                             mission.setVersion(node.$[attr]);
                                         }
                                     }
-                                } else if (node['#name'].match(/mwp/i) && node.$) {
+                                } else if (node['#name'].match(/meta/i) || node['#name'].match(/mwp/i) && node.$) {
                                     for (var attr in node.$) {
                                         if (attr.match(/zoom/i)) {
                                             mission.setCenterZoom(parseInt(node.$[attr]));
@@ -2533,7 +2533,13 @@ TABS.mission_control.initialize = function (callback) {
                         mission.flush();
                         return;
                     } else {
-                        // update Attached Waypoints (i.e non Map Markers)
+                        /* update Attached Waypoints (i.e non Map Markers)
+                         * Ensure WPs numbered sequentially across all missions */
+                        i = 1;
+                        mission.get().forEach(function (element) {
+                            element.setNumber(i);
+                            i++;
+                        });
                         mission.update(false, true);
                         multimissionCount = missionEndFlagCount;
                         multimission.reinit();
@@ -2579,9 +2585,10 @@ TABS.mission_control.initialize = function (callback) {
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
-
+        let multimission = multimissionCount && !singleMissionActive();
+        let version = multimission ? '4.0.0' : '2.3-pre8';
         var data = {
-            'version': { $: { 'value': '2.3-pre8' } },
+            'version': { $: { 'value': version } },
             'mwp': { $: { 'cx': (Math.round(center[0] * 10000000) / 10000000),
                           'cy': (Math.round(center[1] * 10000000) / 10000000),
                           'home-x' : HOME.getLonMap(),
@@ -2590,9 +2597,17 @@ TABS.mission_control.initialize = function (callback) {
             'missionitem': []
         };
 
+        let missionStartWPNumber = 0;
+        let missionNumber = 1;
         mission.get().forEach(function (waypoint) {
+            if (waypoint.getNumber() - missionStartWPNumber == 0 && multimission) {
+                let meta = {$:{
+                        'mission': missionNumber
+                    }};
+                data.missionitem.push(meta);
+            }
             var point = { $: {
-                        'no': waypoint.getNumber()+1,
+                        'no': waypoint.getNumber() - missionStartWPNumber + 1,
                         'action': MWNP.WPTYPE.REV[waypoint.getAction()],
                         'lat': waypoint.getLatMap(),
                         'lon': waypoint.getLonMap(),
@@ -2603,10 +2618,16 @@ TABS.mission_control.initialize = function (callback) {
                         'flag': waypoint.getEndMission(),
                     } };
             data.missionitem.push(point);
+
+            if (waypoint.getEndMission() == 0xA5) {
+                missionStartWPNumber = waypoint.getNumber() + 1;
+                missionNumber ++;
+            }
         });
 
         var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
+        xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {
             if (err) {
                 GUI.log('<span style="color: red">Error writing file</span>');
