@@ -39,7 +39,7 @@ TABS.auxiliary.initialize = function (callback) {
     const modeSections = {};
         modeSections["ARM"] = "Arming";
         modeSections["ANGLE"] = "Flight Modes";
-        modeSections["NAV COURSE HOLD"] = "Navigation Modes";
+        modeSections["NAV RTH"] = "Navigation Modes";
         modeSections["NAV ALTHOLD"] = "Flight Mode Modifiers";
         modeSections["AUTO TUNE"] = "Fixed Wing";
         modeSections["FPV ANGLE MIX"] = "Multi-rotor";
@@ -52,10 +52,10 @@ TABS.auxiliary.initialize = function (callback) {
         const configuratorBoxOrder = [
             "ARM", "PREARM",                                                                                        // Arming
             "ANGLE", "HORIZON", "MANUAL",                                                                           // Flight modes
-            "NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV",                         // Navigation modes
-            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE",                                                              // Flight mode modifiers
+            "NAV RTH", "NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV WP", "GCS NAV",                         // Navigation modes
+            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SURFACE",                                                   // Flight mode modifiers
             "AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON", "TURN ASSIST",  // Fixed wing specific
-            "FPV ANGLE MIX", "TURTLE", "MC BRAKING", "SURFACE", "HEADFREE", "HEADADJ",                              // Multi-rotor specific
+            "FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ",                                         // Multi-rotor specific
             "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                                       // OSD
             "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                                  // FPV Camera
             "BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY",        // Misc
