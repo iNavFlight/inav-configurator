@@ -54,6 +54,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
         $('#save-button').click(function () {
             saveChainer.execute();
+            GUI.log(chrome.i18n.getMessage('programmingEepromSaved'));
         });
 
         helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {

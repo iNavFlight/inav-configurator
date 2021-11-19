@@ -560,7 +560,7 @@
         "message": "Settings restored to <strong>default</strong>"
     },
     "initialSetupEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Setup"
     },
 
     "RX_PPM": {
@@ -1009,7 +1009,7 @@
         "message": "Craft name. Can be displayed by OSD and by compatible RC systems."
     },
     "configurationEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Configuration"
     },
     "configurationButtonSave": {
         "message": "Save and Reboot"
@@ -1216,7 +1216,7 @@
         "message": "PID data <strong>refreshed</strong>"
     },
     "pidTuningEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: PID Tuning"
     },
 
     "receiverHelp": {
@@ -1280,7 +1280,7 @@
         "message": "RC Tuning data <strong>refreshed</strong>"
     },
     "receiverEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Receiver"
     },
 
     "auxiliaryHelp": {
@@ -1528,9 +1528,11 @@
         "message": "Save"
     },
     "adjustmentsEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Adjustments"
     },
-
+    "programmingEepromSaved": {
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
+    },
     "transponderNotSupported": {
         "message": "Your flight controller's firmware does not support transponder functionality."
     },
@@ -1556,7 +1558,7 @@
         "message": "Transponder data is <span style=\"color: red\">invalid</span>"
     },
     "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Transponder"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
@@ -2012,7 +2014,7 @@
         "message": "Save"
     },
     "ledStripEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>"
+        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
 
     "controlAxisRoll": {
@@ -2492,11 +2494,20 @@
     "userControlMode": {
         "message": "User Control Mode"
     },
+    "posholdDefaultSpeed": {
+        "message": "Default navigation speed [cm/s]"
+    },
+    "posholdDefaultSpeedHelp": {
+        "message": "Default speed during RTH, also used for WP navigation if no speed set for WP leg. Limited to Max. navigation speed"
+    },
     "posholdMaxSpeed": {
         "message": "Max. navigation speed [cm/s]"
     },
     "posholdMaxManualSpeed": {
         "message": "Max. CRUISE speed [cm/s]"
+    },
+    "posholdMaxManualSpeedHelp": {
+        "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
     },
     "posholdMaxClimbRate": {
         "message": "Max. navigation climb rate [cm/s]"
@@ -3060,7 +3071,7 @@
         "message": "Shows the throttle stick position in flight modes where it controls the throttle output. On navigation modes, it shows the actual throttle value applied to the motors."
     },
     "osdElement_GPS_SPEED": {
-        "message": "GPS Speed"
+        "message": "Ground Speed"
     },
     "osdElement_GPS_SPEED_HELP": {
         "message": "Shows GPS ground speed."
@@ -3251,6 +3262,9 @@
     "osdElement_WIND_SPEED_VERTICAL_HELP": {
         "message": "Shows estimated vertical wind speed and direction (up or down)."
     },
+    "osdElement_ACTIVE_PROFILE": {
+        "message": "Show the active profile"
+    },
     "osdElement_LEVEL_PIDS": {
         "message": "Level PIDs"
     },
@@ -3363,16 +3377,16 @@
         "message": "Hide unsupported elements"
     },
     "osd_dji_ESC_temp": {
-        "message" : "Source of ESC Temperature"
+        "message" : "Source of <i>ESC Temperature</i>"
     },
     "osd_dji_RSSI_source": {
-        "message" : "Source of RSSI"
+        "message" : "Source of <i>RSSI</i>"
     },
     "osd_dji_GPS_source": {
-        "message" : "Source of GPS Speed"
+        "message" : "Source of <i>GPS Speed</i>"
     },
     "osd_dji_speed_source": {
-        "message" : "Source of 3D Speed"
+        "message" : "Source of <i>3D Speed</i>"
     },
     "osd_dji_use_craft_name_elements": {
         "message" : "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
@@ -3494,6 +3508,9 @@
     "missionSafehomeHead": {
         "message": "Safe Home manager"
     },
+    "missionMultiMissionHead": {
+        "message": "Multi Missions"
+    },
     "missionTemplateHead": {
         "message": "Mission template"
     },
@@ -3511,6 +3528,15 @@
     },
     "confirm_delete_point_with_options": {
         "message": "Do you really want to delete this Waypoint with non-Geo JUMP/SET_HEAD/RTH options? \nIf yes, Non-Geo options attached will be removed also!"
+    },
+    "confirm_multimission_file_load": {
+        "message": "This is a multi mission file. Loading will over write current multi mission.\nContinue?"
+    },
+    "confirm_overwrite_multimission_file_load_option": {
+        "message": "This will over write current multi mission.\nContinue?"
+    },
+    "multimission_active_index_saved_eeprom": {
+        "message": "Mission active index saved"
     },
     "no_waypoints_to_load": {
         "message": "No waypoints to load !"
@@ -3857,10 +3883,16 @@
     "fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
     },
-    "d_boost_factor": {
-        "message": "D-Boost Factor"
+    "d_boost_min": {
+        "message": "D-Boost Min. Scale"
     },
-    "d_boost_factor_help": {
+    "d_boost_min_help": {
+        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
+    },
+    "d_boost_max": {
+        "message": "D-Boost Max. Scale"
+    },
+    "d_boost_max_help": {
         "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
     },
     "d_boost_max_at_acceleration": {
