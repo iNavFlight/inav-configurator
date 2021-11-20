@@ -136,7 +136,7 @@ FONT.constants = {
         MAX_NVM_FONT_CHAR_FIELD_SIZE: 64,
         CHAR_HEIGHT: 18,
         CHAR_WIDTH: 12,
-        LINE: 30
+        LINE: 50
     },
     COLORS: {
         // black
@@ -512,19 +512,27 @@ OSD.DjiElements =  {
 };
 
 OSD.constants = {
-    VISIBLE: 0x0800,
+    VISIBLE: 0x2000,
     VIDEO_TYPES: [
         'AUTO',
         'PAL',
-        'NTSC'
+        'NTSC',
+        'HD'
     ],
     VIDEO_LINES: {
         PAL: 16,
-        NTSC: 13
+        NTSC: 13,
+        HD: 18
+    },
+    VIDEO_COLS: {
+        PAL: 30,
+        NTSC: 30,
+        HD: 50
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
-        NTSC: 390
+        NTSC: 390,
+        HD: 900
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2003,9 +2011,17 @@ OSD.updateDisplaySize = function () {
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
+    
+    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
+    $('.preview').toggleClass('preview_hd', (video_type == 'HD'))
+    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
+	
+	// Not sure I can do this! This will mess with the calculation of the y position of the widget
+	//FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
+    
     // compute the size
     OSD.data.display_size = {
-        x: FONT.constants.SIZES.LINE,
+        x: OSD.constants.VIDEO_COLS[video_type],
         y: OSD.constants.VIDEO_LINES[video_type],
         total: null
     };
@@ -2040,21 +2056,21 @@ OSD.msp = {
      * b: blink flag
      * y: y coordinate
      * x: x coordinate
-     * 0000 vbyy yyyx xxxx
+     * 00vb yyyy yyxx xxxx
      */
     helpers: {
         unpack: {
             position: function (bits) {
                 var display_item = {};
                 // size * y + x
-                display_item.position = FONT.constants.SIZES.LINE * ((bits >> 5) & 0x001F) + (bits & 0x001F);
+                display_item.position = FONT.constants.SIZES.LINE * ((bits >> 6) & 0x003F) + (bits & 0x003F);
                 display_item.isVisible = (bits & OSD.constants.VISIBLE) != 0;
                 return display_item;
             }
         },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x0800 : 0) | (((display_item.position / FONT.constants.SIZES.LINE) & 0x001F) << 5) | (display_item.position % FONT.constants.SIZES.LINE);
+                return (display_item.isVisible ? 0x2000 : 0) | (((display_item.position / FONT.constants.SIZES.LINE) & 0x003F) << 6) | (display_item.position % FONT.constants.SIZES.LINE);
             }
         }
     },
@@ -2649,16 +2665,16 @@ OSD.GUI.updatePreviews = function() {
         item.preview_img.style.pointerEvents = 'none';
     }
 
-    var centerishPosition = 255;
 
-    // AHI is one line up with NTSC (less lines) compared to PAL
-    if (OSD.constants.VIDEO_TYPES[OSD.data.video_system] == 'NTSC')
-      centerishPosition -= OSD.data.display_size.x;
+    var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
+    if (OSD.data.display_size.y % 2 == 0) {
+        centerPosition += OSD.data.display_size.x / 2;
+    }
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
         for (i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
 
@@ -2667,21 +2683,21 @@ OSD.GUI.updatePreviews = function() {
         crsHNumber = Settings.getInputValue('osd_crosshairs_style');
        if (crsHNumber == 1) {
             // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 2, SYM.AH_AIRCRAFT4);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 2, SYM.AH_AIRCRAFT4);
         } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
             // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
         }
     }
 
@@ -2690,21 +2706,17 @@ OSD.GUI.updatePreviews = function() {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
         for (i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
         // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
-    var mapCenter = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
-    if (OSD.data.display_size.y % 2 == 0) {
-        mapCenter += OSD.data.display_size.x / 2;
-    }
-    OSD.GUI.updateMapPreview(mapCenter, 'MAP_NORTH', 'N', SYM.HOME);
-    OSD.GUI.updateMapPreview(mapCenter, 'MAP_TAKEOFF', 'T', SYM.HOME);
-    OSD.GUI.updateMapPreview(mapCenter, 'RADAR', null, SYM.DIR_TO_HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
 
     // render
     var $preview = $('.display-layout .preview').empty();
