@@ -330,6 +330,10 @@ helper.defaultsDialog = (function () {
                 value: 0
             },
             {
+                key: "fw_d_yaw",
+                value: 0
+            },
+            {
                 key: "fw_ff_yaw",
                 value: 100
             },
@@ -504,8 +508,28 @@ helper.defaultsDialog = (function () {
                 value: 3
             },
             {
+                key: "fw_d_roll",
+                value: 7
+            },
+            {
                 key: "fw_ff_roll",
                 value: 50
+            },
+            {
+                key: "fw_p_yaw",
+                value: 20
+            },
+            {
+                key: "fw_i_yaw",
+                value: 0
+            },
+            {
+                key: "fw_d_yaw",
+                value: 0
+            },
+            {
+                key: "fw_ff_yaw",
+                value: 100
             },
             {
                 key: "imu_acc_ignore_rate",
