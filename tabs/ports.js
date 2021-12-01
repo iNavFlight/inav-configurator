@@ -94,7 +94,7 @@ TABS.ports.initialize = function (callback) {
     );
 
     functionRules.push({
-        name: 'SHARKBYTE_OSD',
+        name: 'HDZERO_VTX',
         groups: ['peripherals'],
         maxPorts: 1 }
     );

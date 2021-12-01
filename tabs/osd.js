@@ -136,7 +136,9 @@ FONT.constants = {
         MAX_NVM_FONT_CHAR_FIELD_SIZE: 64,
         CHAR_HEIGHT: 18,
         CHAR_WIDTH: 12,
-        LINE: 50
+        LINE: 30,
+		/** maximum line size (used to calculate OSD element positions) */
+		MAXLINE: 50
     },
     COLORS: {
         // black
@@ -2012,13 +2014,8 @@ OSD.updateDisplaySize = function () {
         video_type = 'PAL';
     }
     
-    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd', (video_type == 'HD'))
-    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
-	
-	// Not sure I can do this! This will mess with the calculation of the y position of the widget
-	//FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
-    
+    FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
+
     // compute the size
     OSD.data.display_size = {
         x: OSD.constants.VIDEO_COLS[video_type],
@@ -2027,6 +2024,10 @@ OSD.updateDisplaySize = function () {
     };
 
     OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
+
+    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
+    $('.preview').toggleClass('preview_hd', (video_type == 'HD'))
+    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2063,14 +2064,14 @@ OSD.msp = {
             position: function (bits) {
                 var display_item = {};
                 // size * y + x
-                display_item.position = FONT.constants.SIZES.LINE * ((bits >> 6) & 0x003F) + (bits & 0x003F);
+                display_item.position = FONT.constants.SIZES.MAXLINE * ((bits >> 6) & 0x003F) + (bits & 0x003F);
                 display_item.isVisible = (bits & OSD.constants.VISIBLE) != 0;
                 return display_item;
             }
         },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x2000 : 0) | (((display_item.position / FONT.constants.SIZES.LINE) & 0x003F) << 6) | (display_item.position % FONT.constants.SIZES.LINE);
+                return (display_item.isVisible ? 0x2000 : 0) | (((display_item.position / FONT.constants.SIZES.MAXLINE) & 0x003F) << 6) | (display_item.position % FONT.constants.SIZES.MAXLINE);
             }
         }
     },
