@@ -2,6 +2,7 @@
 'use strict';
 
 var helper = helper || {};
+var savingDefaultsModal;
 
 helper.defaultsDialog = (function () {
 
@@ -694,6 +695,7 @@ helper.defaultsDialog = (function () {
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                                 //noinspection JSUnresolvedVariable
+                                savingDefaultsModal.close();
                                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
                                 GUI.handleReconnect();
                             });
@@ -705,13 +707,25 @@ helper.defaultsDialog = (function () {
     };
 
     privateScope.onPresetClick = function (event) {
+        savingDefaultsModal = new jBox('Modal', {
+            width: 400,
+            height: 100,
+            animation: false,
+            closeOnClick: false,
+            closeOnEsc: false,
+            content: $('#modal-saving-defaults')
+        }).open();
+
         $container.hide();
+
         let selectedDefaultPreset = data[$(event.currentTarget).data("index")];
         if (selectedDefaultPreset && selectedDefaultPreset.settings) {
 
             mspHelper.loadBfConfig(function () {
                 privateScope.setFeaturesBits(selectedDefaultPreset)
             });
+        } else {
+            savingDefaultsModal.close(); 
         }
     };
 

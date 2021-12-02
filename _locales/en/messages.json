@@ -43,6 +43,9 @@
     "deviceReady": {
         "message": "Device - <span style=\"color: #37a8db\">Ready</span>"
     },
+    "savingDefaults": {
+        "message": "Device - <span style=\"color: red\">Saving default settings</span>"
+    },
     "fcNotConnected": {
         "message": "Not connected"
     },
