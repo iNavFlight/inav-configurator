@@ -136,9 +136,7 @@ FONT.constants = {
         MAX_NVM_FONT_CHAR_FIELD_SIZE: 64,
         CHAR_HEIGHT: 18,
         CHAR_WIDTH: 12,
-        LINE: 30,
-		/** maximum line size (used to calculate OSD element positions) */
-		MAXLINE: 50
+        LINE: 30
     },
     COLORS: {
         // black
@@ -456,7 +454,6 @@ OSD.initData = function () {
         item_count: 0,
         items: [],
         groups: {},
-        display_items: [],
         preview: [],
         isDjiHdFpv: false
     };
@@ -2013,21 +2010,39 @@ OSD.updateDisplaySize = function () {
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
-    
+
+	// save the original OSD element positions.
+	var origPos = [];
+    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+        origPos.push(OSD.msp.helpers.pack.position(OSD.data.items[ii]));
+    }
+
+	// save the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
-
-    // compute the size
-    OSD.data.display_size = {
-        x: OSD.constants.VIDEO_COLS[video_type],
-        y: OSD.constants.VIDEO_LINES[video_type],
-        total: null
-    };
-
     OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
+    // set the new display size
+    OSD.data.display_size = {
+        x: FONT.constants.SIZES.LINE,
+        y: OSD.constants.VIDEO_LINES[video_type],
+        total: OSD.constants.VIDEO_BUFFER_CHARS[video_type]
+    };
+
+	// recalculate the OSD element positions for the new cols per line
+    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+		var item = OSD.msp.helpers.unpack.position(origPos[ii]);
+		// do not recalculate anything not visible or outside of the screen
+		if (item.isVisible && item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
+			OSD.data.items[ii] = item;
+		}
+	}
+	
+	// set the preview size
     $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd', (video_type == 'HD'))
+    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
     $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
+    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
+    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2051,7 +2066,7 @@ OSD.saveItem = function(item, callback) {
 //noinspection JSUnusedLocalSymbols
 OSD.msp = {
     /**
-     * Note, unsigned 16 bit int for position ispacked:
+     * Unsigned 16 bit int for position is packed:
      * 0: unused
      * v: visible flag
      * b: blink flag
@@ -2063,15 +2078,27 @@ OSD.msp = {
         unpack: {
             position: function (bits) {
                 var display_item = {};
-                // size * y + x
-                display_item.position = FONT.constants.SIZES.MAXLINE * ((bits >> 6) & 0x003F) + (bits & 0x003F);
+                display_item.x = bits & 0x3F;
+				display_item.y = (bits >> 6) & 0x3F;
+                
+				//display_item.x = (bits & 0x3F) % OSD.data.display_size.x;
+				//display_item.y = ((bits >> 6) & 0x3F) % OSD.data.display_size.y;
+                display_item.position = (display_item.y) * FONT.constants.SIZES.LINE + (display_item.x);
                 display_item.isVisible = (bits & OSD.constants.VISIBLE) != 0;
                 return display_item;
             }
         },
+        calculate: {
+        	coords: function(display_item) {
+        		display_item.x = (display_item.position % FONT.constants.SIZES.LINE) & 0x3F;
+        		display_item.y = (display_item.position / FONT.constants.SIZES.LINE) & 0x3F;
+        		return display_item;
+        	}
+        },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x2000 : 0) | (((display_item.position / FONT.constants.SIZES.MAXLINE) & 0x003F) << 6) | (display_item.position % FONT.constants.SIZES.MAXLINE);
+                return (display_item.isVisible ? 0x2000 : 0)
+                	| ((display_item.y & 0x3F) << 6) | (display_item.x & 0x3F);
             }
         }
     },
@@ -2455,8 +2482,8 @@ OSD.GUI.updateFields = function() {
                             // Ensure the element is inside the viewport, at least partially.
                             // In that case move it to the very first row/col, otherwise there's
                             // no way to reposition items that are outside the viewport.
-                            if (itemData.position >= OSD.data.preview.length) {
-                                itemData.position = 0;
+                            if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
+                                itemData.x = itemData.y = itemData.position = 0;
                             }
                             $position.show();
                         } else {
@@ -2477,6 +2504,7 @@ OSD.GUI.updateFields = function() {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
+                            OSD.msp.helpers.calculate.coords(itemData);
                             OSD.GUI.saveItem(item);
                         }))
                 );
@@ -2593,14 +2621,6 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 OSD.GUI.updatePreviews = function() {
     // buffer the preview;
     OSD.data.preview = [];
-    OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
-        var field = OSD.data.display_items[ii];
-        // reset fields that somehow end up off the screen
-        if (field.position > OSD.data.display_size.total) {
-            field.position = 0;
-        }
-    }
 
     // clear the buffer
     for (i = 0; i < OSD.data.display_size.total; i++) {
@@ -2617,6 +2637,12 @@ OSD.GUI.updatePreviews = function() {
         if (!itemData.isVisible) {
             continue;
         }
+
+		if (itemData.x >= OSD.data.display_size.x)
+		{
+			continue;
+		}
+
         // DJI HD FPV: Hide elements that only appear in craft name
         if (OSD.DjiElements.craftNameElements.includes(item.name) &&
         $('#djiUnsupportedElements').find('input').is(':checked')) {
