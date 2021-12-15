@@ -2080,9 +2080,6 @@ OSD.msp = {
                 var display_item = {};
                 display_item.x = bits & 0x3F;
 				display_item.y = (bits >> 6) & 0x3F;
-                
-				//display_item.x = (bits & 0x3F) % OSD.data.display_size.x;
-				//display_item.y = ((bits >> 6) & 0x3F) % OSD.data.display_size.y;
                 display_item.position = (display_item.y) * FONT.constants.SIZES.LINE + (display_item.x);
                 display_item.isVisible = (bits & OSD.constants.VISIBLE) != 0;
                 return display_item;
