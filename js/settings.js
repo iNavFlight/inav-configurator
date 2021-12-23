@@ -104,9 +104,6 @@ var Settings = (function () {
         const getUnitDisplayTypeValue = () => {
             // Try and match the values 
             switch (configUnitType) {
-                case UnitType.none:
-                    return  5;
-                    break;
                 case UnitType.metric:
                     return 0;
                     break;
@@ -115,6 +112,10 @@ var Settings = (function () {
                     break;
                 case UnitType.OSD: // Match the OSD value on the UI
                     return globalSettings.osdUnits;
+                    break;
+                case UnitType.none:
+                default:
+                    return -1;
                     break;
             }
         }
@@ -147,7 +148,7 @@ var Settings = (function () {
 
 
         // Ensure we can do conversions
-        if (uiUnitValue === -1 || !inputUnit || !oldValue || !element) {
+        if (!inputUnit || !oldValue || !element) {
             return;
         }
 
@@ -155,7 +156,7 @@ var Settings = (function () {
         //to get the correct conversion, the first index is the from
         //unit and the second is the too unit
         //unitConversionTable[toUnit][fromUnit] -> factor
-        const unitConversionTable = {
+        const unitRatioTable = {
             'cm' : {
                 'm' : 100, 
                 'ft' : 30.48
@@ -206,7 +207,7 @@ var Settings = (function () {
                 'cdeg' : 'deg',
                 'ms' : 'sec'
             },
-            5:{} //default units
+            default:{}//show base units
         };
 
         //this returns the factor in which to multiply to convert a unit
@@ -214,11 +215,11 @@ var Settings = (function () {
             if (conversionTable[uiUnitValue]){
                 const fromUnits = conversionTable[uiUnitValue];
                 if (fromUnits[inputUnit]){
-                    const multiplier = unitConversionTable[inputUnit][fromUnits[inputUnit]];
+                    cost multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
                     return {'multiplier':multiplier, 'unitName':fromUnits[inputUnit]};
                 }
             }
-            return {multiplier:1, unitName:inputUnit};         
+            return {multiplier:1, unitName:inputUnit};
         }
 
         // Get the default multi obj or the custom       
