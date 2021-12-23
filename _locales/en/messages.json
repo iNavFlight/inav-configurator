@@ -871,79 +871,79 @@
         "message": "Fixed Wing Auto Launch Settings"
     },
     "configurationLaunchVelocity": {
-        "message": "Threshold Velocity [cm/s]"
+        "message": "Threshold Velocity"
     },
     "configurationLaunchVelocityHelp": {
         "message": "Forward velocity threshold for swing-launch detection. Default: 300 [100-10000]"
     },
     "configurationLaunchAccel": {
-        "message": "Threshold Acceleration [cm/s/s]"
+        "message": "Threshold Acceleration"
     },
     "configurationLaunchAccelHelp": {
         "message": "Forward acceleration threshold for bungee launch or throw launch, 1G = 981 cm/s/s. Default: 1863 [1000-20000]"
     },
     "configurationLaunchMaxAngle": {
-        "message": "Max Throw Angle [&deg;]"
+        "message": "Max Throw Angle"
     },
     "configurationLaunchMaxAngleHelp": {
         "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely. Default: 45 [5-180]"
     },
     "configurationLaunchDetectTime": {
-        "message": "Detect Time [ms]"
+        "message": "Detect Time"
     },
     "configurationLaunchDetectTimeHelp": {
         "message": "Time for which thresholds have to breached to consider launch happened. Default: 40 [10-1000]"
     },
     "configurationLaunchThr": {
-        "message": "Launch Throttle [uS]"
+        "message": "Launch Throttle"
     },
     "configurationLaunchThrHelp": {
         "message": "Launch throttle - throttle to be set during launch sequence. Default: 1700 [1000-2000]"
     },
     "configurationLaunchIdleThr": {
-        "message": "Idle Throttle [uS]"
+        "message": "Idle Throttle"
     },
     "configurationLaunchIdleThrHelp": {
         "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
     "configurationLaunchMotorDelay": {
-        "message": "Motor Delay [ms]"
+        "message": "Motor Delay"
     },
     "configurationLaunchMotorDelayHelp": {
         "message": "Delay between detected launch and launch sequence start and throttling up. Default: 500 [0-5000]"
     },
     "configurationLaunchSpinupTime": {
-        "message": "Motor Spinup Time [ms]"
+        "message": "Motor Spinup Time"
     },
     "configurationLaunchSpinupTimeHelp": {
         "message": "Time to bring power from minimum throttle to nav_fw_launch_thr, to avoid big stress on ESC and large torque from propeller. Default: 100 [0-1000]"
     },
     "configurationLaunchMinTime": {
-        "message": "Minimum Launch Time [ms]"
+        "message": "Minimum Launch Time"
     },
     "configurationLaunchMinTimeHelp": {
         "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
     },
     "configurationLaunchTimeout": {
-        "message": "Launch Timeout [ms]"
+        "message": "Launch Timeout"
     },
     "configurationLaunchTimeoutHelp": {
         "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
     },
     "configurationLaunchEndTime": {
-        "message": "End Transition Time [ms]"
+        "message": "End Transition Time"
     },
     "configurationLaunchEndTimeHelp": {
         "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
     },
     "configurationLaunchMaxAltitude": {
-        "message": "Maximum Altitude [cm]"
+        "message": "Maximum Altitude"
     },
     "configurationLaunchMaxAltitudeHelp": {
         "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. Default: 0 [0-60000]"
     },
     "configurationLaunchClimbAngle": {
-        "message": "Climb Angle [&deg;]"
+        "message": "Climb Angle"
     },
     "configurationLaunchClimbAngleHelp": {
         "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
@@ -2507,16 +2507,16 @@
         "message": "User Control Mode"
     },
     "posholdDefaultSpeed": {
-        "message": "Default navigation speed [cm/s]"
+        "message": "Default navigation speed"
     },
     "posholdDefaultSpeedHelp": {
         "message": "Default speed during RTH, also used for WP navigation if no speed set for WP leg. Limited to Max. navigation speed"
     },
     "posholdMaxSpeed": {
-        "message": "Max. navigation speed [cm/s]"
+        "message": "Max. navigation speed"
     },
     "posholdMaxManualSpeed": {
-        "message": "Max. CRUISE speed [cm/s]"
+        "message": "Max. CRUISE speed"
     },
     "posholdMaxManualSpeedHelp": {
         "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
@@ -2528,7 +2528,7 @@
         "message": "Max. ALTHOLD climb rate [cm/s]"
     },
     "posholdMaxBankAngle": {
-        "message": "Multirotor max. banking angle [degrees]"
+        "message": "Multirotor max. banking angle"
     },
     "posholdMaxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
@@ -2585,7 +2585,7 @@
         "message": "Automatic landing settings"
     },
     "minRthDistance": {
-        "message": "Min. RTH distance [cm]"
+        "message": "Min. RTH distance"
     },
     "minRthDistanceHelp": {
         "message": "If UAV is within this distance from the home point, it will land instead of RTH then land"
@@ -2615,19 +2615,19 @@
         "message": "RTH altitude mode"
     },
     "rthAbortThreshold": {
-        "message": "RTH abort threshold [cm]"
+        "message": "RTH abort threshold"
     },
     "rthAbortThresholdHelp": {
         "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
     },
     "rthAltitude": {
-        "message": "RTH altitude [cm]"
+        "message": "RTH altitude"
     },
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
     "rthHomeAltitudeLabel": {
-        "message": "RTH Home altitude [cm]"
+        "message": "RTH Home altitude"
     },
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
@@ -2654,7 +2654,7 @@
         "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
-        "message": "Emergency landing speed [cm/s]"
+        "message": "Emergency landing speed"
     },
     "cruiseThrottle": {
         "message": "Cruise throttle"
@@ -2678,31 +2678,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. navigation bank angle [degrees]"
+        "message": "Max. navigation bank angle"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. navigation climb angle [degrees]"
+        "message": "Max. navigation climb angle"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "navManualClimbRate": {
-        "message": "Max. Alt-hold climb rate [cm/s]"
+        "message": "Max. Alt-hold climb rate"
     },
     "navManualClimbRateHelp": {
         "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
     },
     "navAutoClimbRate": {
-        "message": "Max. navigation climb rate [cm/s]"
+        "message": "Max. navigation climb rate"
     },
     "navAutoClimbRateHelp": {
         "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
     },
     "maxDiveAngle": {
-        "message": "Max. navigation dive angle [degrees]"
+        "message": "Max. navigation dive angle"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2720,13 +2720,13 @@
         "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
     },
     "pitchToThrottleThreshold": {
-        "message": "Instantaneous throttle adjustment threshold [centidegrees]"
+        "message": "Instantaneous throttle adjustment threshold"
     },
     "pitchToThrottleThresholdHelp": {
         "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
     },
     "loiterRadius": {
-        "message": "Loiter radius [cm]"
+        "message": "Loiter radius"
     },
     "loiterDirectionLabel": {
         "message": "Loiter direction"
@@ -2744,25 +2744,25 @@
         "message": "Battery Estimation Settings"
     },
     "idlePower": {
-        "message": "Idle power [cW]"
+        "message": "Idle power"
     },
     "idlePowerHelp": {
         "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
     },
     "cruisePower": {
-        "message": "Cruise power [cW]"
+        "message": "Cruise power"
     },
     "cruisePowerHelp": {
         "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
     },
     "cruiseSpeed": {
-        "message": "Cruise speed [cm/s]"
+        "message": "Cruise speed"
     },
     "cruiseSpeedHelp": {
         "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
     },
     "rthEnergyMargin": {
-        "message": "RTH energy margin [%]"
+        "message": "RTH energy margin"
     },
     "rthEnergyMarginHelp": {
         "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
@@ -2774,13 +2774,13 @@
         "message": "Waypoint Navigation Settings"
     },
     "waypointRadius": {
-        "message": "Waypoint radius [cm]"
+        "message": "Waypoint radius"
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
     "waypointSafeDistance": {
-        "message": "Waypoint safe distance [cm]."
+        "message": "Waypoint safe distance"
     },
     "waypointSafeDistanceHelp": {
         "message": "The maximum distance between the home point and the first waypoint."
@@ -3677,49 +3677,49 @@
         "message": "Distance to home"
     },
     "brakingSpeedThreshold": {
-        "message": "Min. speed threshold [cm/s]"
+        "message": "Min. speed threshold"
     },
     "brakingSpeedThresholdTip": {
         "message": "Braking will be enabled only if actual speed if higher than threshold"
     },
     "brakingDisengageSpeed": {
-        "message": "Braking disengage speed [cm/s]"
+        "message": "Braking disengage speed"
     },
     "brakingDisengageSpeedTip": {
         "message": "Braking will end when speed goes below this value"
     },
     "brakingTimeout": {
-        "message": "Max. braking duration [ms]"
+        "message": "Max. braking duration"
     },
     "brakingTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking can be active."
     },
     "brakingBoostFactor": {
-        "message": "Boost factor [%]"
+        "message": "Boost factor"
     },
     "brakingBoostFactorTip": {
         "message": "Defines how strong the braking boost will be. 100% means the navigation engine is allowed to double the banking speed and acceleration"
     },
     "brakingBoostTimeout": {
-        "message": "Max. braking boost duration [ms]"
+        "message": "Max. braking boost duration"
     },
     "brakingBoostTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking boost can be active."
     },
     "brakingBoostSpeedThreshold": {
-        "message": "Boost min. speed threshold [cm/s]"
+        "message": "Boost min. speed threshold"
     },
     "brakingBoostSpeedThresholdTip": {
         "message": "Braking boost will be enabled only if actual speed if higher than threshold"
     },
     "brakingBoostDisengageSpeed": {
-        "message": "Braking boost disengage speed [cm/s]"
+        "message": "Braking boost disengage speed"
     },
     "brakingBoostDisengageSpeedTip": {
         "message": "Braking boost will end when speed goes below this value"
     },
     "brakingBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. bank angle"
     },
     "brakingBankAngleTip": {
         "message": "Max bank angle allowed during braking phase"
