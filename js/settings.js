@@ -215,7 +215,7 @@ var Settings = (function () {
             if (conversionTable[uiUnitValue]){
                 const fromUnits = conversionTable[uiUnitValue];
                 if (fromUnits[inputUnit]){
-                    cost multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
+                    const multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
                     return {'multiplier':multiplier, 'unitName':fromUnits[inputUnit]};
                 }
             }
