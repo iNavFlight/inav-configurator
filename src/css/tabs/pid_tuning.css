@@ -244,11 +244,9 @@
 .show {
     width:110px;
     float:right;
-    margin-right:3px;
 }
 
 .show a {
-    margin-left: 10px;
     width: calc(100% - 10px);
 }
 
@@ -328,6 +326,7 @@
 .tab-pid_tuning .resetbt {
     width: 140px;
     float: right;
+    margin-right:10px;
 }
 
 .tab-pid_tuning .right {
