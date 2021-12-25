@@ -140,9 +140,11 @@ TABS.pid_tuning.initialize = function (callback) {
           if($(this).text() == "Show all PIDs") {
             $('.tab-pid_tuning table.pid_tuning').show();
             $(this).text('Hide unused PIDs');
+            $('.show').addClass('unusedPIDsHidden');
           } else {
             hideUnusedPids(CONFIG.activeSensors);
             $(this).text('Show all PIDs');
+            $('.show').removeClass('unusedPIDsHidden');
           }
         });
 
