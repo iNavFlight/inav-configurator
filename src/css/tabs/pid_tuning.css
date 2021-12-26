@@ -252,6 +252,10 @@
     width: calc(100% - 10px);
 }
 
+.show.unusedPIDsHidden {
+    width: 130px;
+}
+
 .tab-pid_tuning .helpicon {
     margin-top: -1px;
 }
