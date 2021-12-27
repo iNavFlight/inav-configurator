@@ -35,6 +35,7 @@ SYM.GPS_SAT1 = 0x08;
 SYM.GPS_SAT2 = 0x09;
 SYM.GPS_HDP1 = 0x0E;
 SYM.GPS_HDP2 = 0x0F;
+SYM.KM = 0x83;
 SYM.KMH = 0x90;
 SYM.KMH_3D = 0x88;
 SYM.MPH = 0x91;
@@ -101,6 +102,8 @@ SYM.WH_NM = 0x70;
 SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
+SYM.GLIDE_MINS = 0xD1;
+SYM.GLIDE_RANGE = 0xD0;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -911,6 +914,18 @@ OSD.constants = {
                     id: 124,
                     min_version: '3.0.0',
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
+                },
+                {
+                    name: 'GLIDE_TIME',
+                    id: 130,
+                    min_version: '5.0.0',
+                    preview: FONT.symbol(SYM.GLIDE_MINS) + '102',
+                },
+                {
+                    name: 'GLIDE_RANGE',
+                    id: 131,
+                    min_version: '5.0.0',
+                    preview: FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot('1.3') + FONT.symbol(SYM.KM),
                 },
                 {
                     name: 'MISSION INFO',
