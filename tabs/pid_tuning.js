@@ -140,15 +140,32 @@ TABS.pid_tuning.initialize = function (callback) {
           if($(this).text() == "Show all PIDs") {
             $('.tab-pid_tuning table.pid_tuning').show();
             $(this).text('Hide unused PIDs');
+            $('.show').addClass('unusedPIDsHidden');
           } else {
             hideUnusedPids(CONFIG.activeSensors);
             $(this).text('Show all PIDs');
+            $('.show').removeClass('unusedPIDsHidden');
           }
         });
 
         $('#resetPIDs').on('click', function(){
             MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
 	        updateActivatedTab();
+        });
+
+        $('#resetDefaults').on('click', function() {
+            mspHelper.setSetting("applied_defaults", 0, function() { 
+                mspHelper.saveToEeprom( function () {
+                    GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+
+                    GUI.tab_switch_cleanup(function () {
+                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.handleReconnect();
+                        });
+                    });
+                });
+            });
         });
 
         pid_and_rc_to_form();

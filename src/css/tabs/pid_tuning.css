@@ -244,12 +244,14 @@
 .show {
     width:110px;
     float:right;
-    margin-right:3px;
 }
 
 .show a {
-    margin-left: 10px;
     width: calc(100% - 10px);
+}
+
+.show.unusedPIDsHidden {
+    width: 130px;
 }
 
 .tab-pid_tuning .helpicon {
@@ -328,6 +330,7 @@
 .tab-pid_tuning .resetbt {
     width: 140px;
     float: right;
+    margin-right:10px;
 }
 
 .tab-pid_tuning .right {
