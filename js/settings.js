@@ -104,10 +104,10 @@ var Settings = (function () {
         const getUnitDisplayTypeValue = () => {
             // Try and match the values 
             switch (configUnitType) {
-                case UnitType.metric:
+                case UnitType.imperial:
                     return 0;
                     break;
-                case UnitType.imperial:
+                case UnitType.metric:
                     return 1;
                     break;
                 case UnitType.OSD: // Match the OSD value on the UI
