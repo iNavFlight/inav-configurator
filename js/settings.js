@@ -177,17 +177,17 @@ var Settings = (function () {
 
         //this holds which units get converted in which unit systems
         const conversionTable = {
-            0: {//metric
-                'cm': 'm',
-                'cms' : 'kmh',
-                'ms' : 'sec',
-                'cdeg' : 'deg'
-            },
-            1: { //imperial
+            0: { //imperial
                 'cm' : 'ft',
                 'cms' : 'mph',
                 'cdeg' : 'deg',
                 'ms' : 'sec'
+            },
+            1: {//metric
+                'cm': 'm',
+                'cms' : 'kmh',
+                'ms' : 'sec',
+                'cdeg' : 'deg'
             },
             2: { //metric with MPH
                 'cm': 'm',
