@@ -190,6 +190,9 @@ TABS.pid_tuning.initialize = function (callback) {
         // UI Hooks
 
         $('a.refresh').click(function () {
+            $("#content-watermark").remove();
+            $(".tab-pid_tuning").remove();
+
             GUI.tab_switch_cleanup(function () {
                 GUI.log(chrome.i18n.getMessage('pidTuningDataRefreshed'));
                 TABS.pid_tuning.initialize();
