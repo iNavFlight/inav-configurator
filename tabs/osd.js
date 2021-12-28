@@ -925,7 +925,7 @@ OSD.constants = {
                     name: 'GLIDE_RANGE',
                     id: 131,
                     min_version: '5.0.0',
-                    preview: FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot('1.3') + FONT.symbol(SYM.KM),
+                    preview: FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.KM),
                 },
                 {
                     name: 'MISSION INFO',
