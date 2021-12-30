@@ -84,6 +84,12 @@
 }
 
 .mixer_btn_add {
+    float: right;
+    margin: 15px 0 10px;
+}
+
+.mixer_btn_logic {
+    float: left;
     margin: 15px 0 10px;
 }
 
