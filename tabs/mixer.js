@@ -375,8 +375,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             MIXER_CONFIG.appliedMixerPreset = presetId;
 
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
-
             if (currentMixerPreset.id == 3) {
                 $wizardButton.parent().removeClass("is-hidden");
             } else {
@@ -416,6 +414,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $('#load-mixer-button').click(function () {
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
