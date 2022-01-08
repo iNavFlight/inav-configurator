@@ -101,6 +101,7 @@ SYM.WH_NM = 0x70;
 SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
+SYM.SWITCH_INDICATOR_HIGH = 0xD2;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1691,6 +1692,35 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupSwitchIndicators',
+            items: [
+                {
+                    name: 'SWITCH_INDICATOR_0',
+                    id: 130,
+                    positionable: true,
+                    preview: 'A' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_1',
+                    id: 131,
+                    positionable: true,
+                    preview: 'B' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_2',
+                    id: 132,
+                    positionable: true,
+                    preview: 'C' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_3',
+                    id: 133,
+                    positionable: true,
+                    preview: 'D' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                }
+            ]
+        },
+        {
             name: 'osdGroupGVars',
             items: [
                 {
@@ -2841,6 +2871,21 @@ TABS.osd.initialize = function (callback) {
                     $(self).html(oldText);
                 }, 2000);
             });
+        });
+
+
+        // Setup switch indicators
+        $(".osdSwitchInd_channel option").each(function() {
+            $(this).text("Ch " + $(this).text());
+        });
+        
+        $('.osdSwitchIndChar').on('keyup', function() {
+            let testExp = new RegExp('^[A-Za-z]');
+            if (testExp.test($(this).val())) {
+                $(this).val($(this).val().toUpperCase());
+            } else {
+                $(this).val("");
+            }
         });
 
         // font preview window
