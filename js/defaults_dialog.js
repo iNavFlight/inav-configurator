@@ -90,6 +90,10 @@ helper.defaultsDialog = (function () {
                 value: "THROTTLE_THRESHOLD"
             },
             {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
                 key: "mc_iterm_relax",
                 value: "RP"
             },
