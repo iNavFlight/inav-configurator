@@ -1698,25 +1698,25 @@ OSD.constants = {
                     name: 'SWITCH_INDICATOR_0',
                     id: 130,
                     positionable: true,
-                    preview: 'A' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                    preview: 'SWI1' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
                 },
                 {
                     name: 'SWITCH_INDICATOR_1',
                     id: 131,
                     positionable: true,
-                    preview: 'B' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                    preview: 'SWI2' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
                 },
                 {
                     name: 'SWITCH_INDICATOR_2',
                     id: 132,
                     positionable: true,
-                    preview: 'C' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                    preview: 'SWI3' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
                 },
                 {
                     name: 'SWITCH_INDICATOR_3',
                     id: 133,
                     positionable: true,
-                    preview: 'D' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                    preview: 'SWI4' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
                 }
             ]
         },
@@ -2878,13 +2878,15 @@ TABS.osd.initialize = function (callback) {
         $(".osdSwitchInd_channel option").each(function() {
             $(this).text("Ch " + $(this).text());
         });
-        
-        $('.osdSwitchIndChar').on('keyup', function() {
-            let testExp = new RegExp('^[A-Za-z]');
-            if (testExp.test($(this).val())) {
-                $(this).val($(this).val().toUpperCase());
+
+        // Make sure that the switch hint only contains A to Z
+        $('.osdSwitchIndName').on('keyup', function() {
+            let testExp = new RegExp('^[A-Za-z0-9]');
+            let testText = $(this).val();
+            if (testExp.test(testText.slice(-1))) {
+                $(this).val(testText.toUpperCase());
             } else {
-                $(this).val("");
+                $(this).val(testText.slice(0, -1));
             }
         });
 

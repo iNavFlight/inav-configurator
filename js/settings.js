@@ -53,6 +53,7 @@ var Settings = (function () {
                     }
                 } else if (s.setting.type == 'string') {
                     input.val(s.value);
+                    input.attr('maxlength', s.setting.max);
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
 
