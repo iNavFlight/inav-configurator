@@ -2513,6 +2513,9 @@ OSD.GUI.updateFields = function() {
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
+
+     // Update the OSD preview
+     refreshOSDSwitchIndicators();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2879,8 +2882,9 @@ TABS.osd.initialize = function (callback) {
             $(this).text("Ch " + $(this).text());
         });
 
-        // Make sure that the switch hint only contains A to Z
+        // Function when text for switch indicators change
         $('.osdSwitchIndName').on('keyup', function() {
+            // Make sure that the switch hint only contains A to Z
             let testExp = new RegExp('^[A-Za-z0-9]');
             let testText = $(this).val();
             if (testExp.test(testText.slice(-1))) {
@@ -2888,6 +2892,14 @@ TABS.osd.initialize = function (callback) {
             } else {
                 $(this).val(testText.slice(0, -1));
             }
+
+            // Update the OSD preview
+            refreshOSDSwitchIndicators();
+        });
+
+        // Function to update the OSD layout when the switch text alignment changes
+        $("#switchIndicators_alignLeft").on('change', function() {
+            refreshOSDSwitchIndicators();
         });
 
         // font preview window
@@ -3028,6 +3040,29 @@ TABS.osd.initialize = function (callback) {
         });
     }));
 };
+
+function refreshOSDSwitchIndicators() {
+    let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupSwitchIndicators";
+      })[0];
+    for (let si = 0; si < group.items.length; si++) {
+        let item = group.items[si];
+        if ($("#osdSwitchInd" + si +"_name").val() != undefined) {
+            let switchIndText = $("#osdSwitchInd" + si +"_name").val();
+            if (switchIndText == "") {
+                item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+            } else {
+                if ($("#switchIndicators_alignLeft").prop('checked')) {
+                    item.preview = switchIndText + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+                } else {
+                    item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH) + switchIndText;
+                }
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+}
 
 TABS.osd.cleanup = function (callback) {
     PortHandler.flush_callbacks();

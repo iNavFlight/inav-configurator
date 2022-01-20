@@ -3427,6 +3427,9 @@
     "osd_switch_indicator_settings": {
         "message" : "Switch Indicator Settings"
     },
+    "osd_switch_indicators_align_left": {
+        "message" : "Align switch names to left of switches"
+    },
     "osdSwitchInd0": {
         "message" : "Switch 1"
     },
