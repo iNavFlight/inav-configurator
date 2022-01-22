@@ -925,7 +925,17 @@ OSD.constants = {
                     name: 'GLIDE_RANGE',
                     id: 131,
                     min_version: '5.0.0',
-                    preview: FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.KM),
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.NM);
+                            default: // Metric & Metric + MPH
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.KM);
+                        }
+                    }
                 },
                 {
                     name: 'MISSION INFO',
