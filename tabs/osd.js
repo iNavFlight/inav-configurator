@@ -929,11 +929,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.MI);
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 12') + FONT.symbol(SYM.MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.NM);
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 11') + FONT.symbol(SYM.NM);
                             default: // Metric & Metric + MPH
-                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 1.3') + FONT.symbol(SYM.KM);
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 21') + FONT.symbol(SYM.KM);
                         }
                     }
                 },
