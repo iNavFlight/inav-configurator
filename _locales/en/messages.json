@@ -139,6 +139,9 @@
     "tabAuxiliary": {
         "message": "Modes"
     },
+    "tabMagAlignment": {
+        "message": "Mag alignment helper"
+    },
 
     "serialPortOpened": {
         "message": "Serial port <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"

@@ -275,6 +275,9 @@ $(document).ready(function () {
                     case 'programming':
                         TABS.programming.initialize(content_ready);
                         break;
+                    case 'mag_alignment':
+                        TABS.mag_alignment.initialize(content_ready);
+                        break;
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
