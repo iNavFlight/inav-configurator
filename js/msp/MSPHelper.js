@@ -44,6 +44,7 @@ var mspHelper = (function (gui) {
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
         'IMU2': 24,
+        'HDZERO_VTX': 25,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting

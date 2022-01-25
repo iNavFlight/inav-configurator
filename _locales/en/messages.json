@@ -1143,6 +1143,9 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_HDZERO_VTX": {
+        "message": "HDZero VTX"
+    },
     "portsFunction_IMU2": {
         "message": "Secondary IMU"
     },
