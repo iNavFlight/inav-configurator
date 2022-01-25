@@ -2,10 +2,12 @@
 
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
-    SERVO_ELEVATOR = 2,
-    SERVO_FLAPPERON_1 = 3,
-    SERVO_FLAPPERON_2 = 4,
-    SERVO_RUDDER = 5,
+    SERVO_ELEVATOR = 1,
+    SERVO_ELEVON_1 = 1,
+    SERVO_ELEVON_2 = 2,
+    SERVO_FLAPPERON_1 = 2,
+    SERVO_FLAPPERON_2 = 3,
+    SERVO_RUDDER = 4,
     SERVO_BICOPTER_LEFT = 4,
     SERVO_BICOPTER_RIGHT = 5,
     SERVO_DUALCOPTER_LEFT = 4,
@@ -162,10 +164,10 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_ROLL,  50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_ROLL, -50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_PITCH, 50, 0),
         ]
     },     // 8
     {
@@ -181,10 +183,10 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, -0.1)
         ],
         servoMixer: [
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_ROLL,  50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_ROLL, -50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_PITCH, 50, 0),
         ]
     },     // 27
     {
@@ -289,6 +291,7 @@ const mixerList = [
         enabled: true,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -296,9 +299,9 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),*/
             new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
         ]
     },           // 14
@@ -448,6 +451,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
             new MotorMixRule(1.0, 0.0, 0.0, -0.3)
@@ -455,9 +459,9 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),*/
             new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
         ]
     },
@@ -469,16 +473,19 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
+            new ServoMixRule(1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
-            new ServoMixRule(5, INPUT_STABILIZED_PITCH, -50, 0),
-            new ServoMixRule(5, INPUT_STABILIZED_YAW,   -50, 0)
+            /*new ServoMixRule(2, INPUT_FEATURE_FLAPS,    100, 0),*/
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0)
         ]
     },
     {
@@ -493,11 +500,11 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(1, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, -50, 0),
             new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
         ]
     },
     {
@@ -508,13 +515,16 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,    100, 0),*/
         ]
     },
     {

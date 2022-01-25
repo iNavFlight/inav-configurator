@@ -3574,9 +3574,6 @@
     "platformConfiguration": {
         "message": "Platform configuration"
     },
-    "platformHasFlaps": {
-        "message": "Has flaps"
-    },
     "mixerPreset": {
         "message": "Mixer preset"
     },

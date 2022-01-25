@@ -999,7 +999,7 @@ var FC = {
             'RC Channel 8',         // 11
             'Gimbal Pitch',         // 12
             'Gimbal Roll',          // 13
-            'Flaps',                // 14
+            'Flaperon Mode',        // 14
             'RC Channel 9',         // 15
             'RC Channel 10',        // 16
             'RC Channel 11',        // 17
