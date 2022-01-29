@@ -227,5 +227,6 @@ var MSPCodes = {
     MSP2_INAV_FWUPDT_ROLLBACK_EXEC:     0x2037,
     
     MSP2_INAV_SAFEHOME:                 0x2038,
-    MSP2_INAV_SET_SAFEHOME:             0x2039
+    MSP2_INAV_SET_SAFEHOME:             0x2039,
+    MSP2_INAV_SET_MSP_OPTIONS:          0x203B
 };

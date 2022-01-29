@@ -72,6 +72,8 @@ $(document).ready(function () {
         }
     };
 
+
+
     GUI.updateManualPortVisibility = function(){
         var selected_port = $port.find('option:selected');
         if (selected_port.data().isManual) {
@@ -80,11 +82,16 @@ $(document).ready(function () {
         else {
             $('#port-override-option').hide();
         }
-        if (selected_port.data().isDFU) {
+        if (selected_port.data().isDFU || selected_port.data().isBle) {
             $baud.hide();
         }
         else {
             $baud.show();
+        }
+        if (selected_port.data().isBle) {
+            serial.serialType = serialType.BLE;
+        } else {
+            serial.serialType = serialType.COM;
         }
     };
 
@@ -227,6 +234,18 @@ function onInvalidFirmwareVersion()
     $('#tabs .tab_cli a').click();
 }
 
+function onBleNotSupported()
+{
+    GUI.log("<span style=\"color: red\">Connection error:</span> Firmware doesn't support BLE connections. Abort");
+    chrome.serial.disconnect(openInfo.connectionId, function (result) {
+        console.log('SERIAL: Connection closed - ' + result);
+    });
+    CONFIGURATOR.connectionValid = false;
+    GUI.allowedTabs = [];
+    onConnect();
+    $('#tabs .tab_cli a').click();
+}
+
 function onOpen(openInfo) {
     if (openInfo) {
         // update connected_to
@@ -282,10 +301,17 @@ function onOpen(openInfo) {
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
                         if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
                             mspHelper.getCraftName(function(name) {
+                                if (serial.serialType == serialType.BLE) {         
+                                    if (semver.lt(CONFIG.apiVersion, "2.5.0")) {
+                                        onBleNotSupported();
+                                    } else {
+                                        mspHelper.setMSP_Options();
+                                    }
+                                }
                                 if (name) {
                                     CONFIG.name = name;
                                 }
-                                onValidFirmware();
+                                 onValidFirmware();  
                             });
                         } else  {
                             onInvalidFirmwareVersion();
@@ -296,6 +322,12 @@ function onOpen(openInfo) {
                 }
             });
         });
+
+
+
+        // Request
+        
+
     } else {
         console.log('Failed to open serial port');
         GUI.log(chrome.i18n.getMessage('serialPortOpenFail'));
@@ -312,6 +344,7 @@ function onOpen(openInfo) {
         $connectButton.find('.connect').data("clicks", false);
     }
 }
+
 
 function onConnect() {
     helper.timeout.remove('connecting'); // kill connecting timer
