@@ -1254,6 +1254,26 @@ var FC = {
                 hasOperand: [true, false],
                 output: "boolean"
             },
+            43: {
+                name: "CONSTRAIN MIN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            44: {
+                name: "CONSTRAIN MAX",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            45: {
+                name: "MIN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            46: {
+                name: "MAX",
+                hasOperand: [true, true],
+                output: "raw"
+            },
         }
     },
     getOperandTypes: function () {
