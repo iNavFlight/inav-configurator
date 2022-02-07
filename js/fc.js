@@ -1254,6 +1254,16 @@ var FC = {
                 hasOperand: [true, false],
                 output: "boolean"
             },
+            43: {
+                name: "MIN",
+                hasOperand: [true, true],
+                output: "raw"
+            },
+            44: {
+                name: "MAX",
+                hasOperand: [true, true],
+                output: "raw"
+            },
         }
     },
     getOperandTypes: function () {
