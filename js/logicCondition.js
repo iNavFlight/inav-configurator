@@ -256,16 +256,55 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         $row.find('.logic_cell__operation').html("<select class='logic_element__operation' ></select>");
         let $t = $row.find('.logic_element__operation');
         
-        for (let k in FC.getLogicOperators()) {
-            if (FC.getLogicOperators().hasOwnProperty(k)) {
-                let o = FC.getLogicOperators()[k];
-                if (self.getOperation() == parseInt(k, 10)) {
-                    $t.append('<option value="' + k + '" selected>' + o.name + '</option>');
-                } else {
-                    $t.append('<option value="' + k + '">' + o.name + '</option>');
-                }
+        let lcOperators = [];
+
+        for (let lcID in FC.getLogicOperators()) {
+            if (FC.getLogicOperators().hasOwnProperty(lcID)) {
+                let op = FC.getLogicOperators()[lcID];
+                lcOperators[parseInt(lcID, 10)] = {
+                    id: parseInt(lcID, 10),
+                    name: op.name,
+                    operandType: op.operandType,
+                    hasOperand: op.hasOperand,
+                    output: op.output
+                };
             }
         }
+
+        lcOperators.sort((a, b) => {
+            let lcAT = a.operandType.toLowerCase(),
+                lcBT = b.operandType.toLowerCase(), 
+                lcAN = a.name.toLowerCase(),
+                lcBN = b.name.toLowerCase();
+            
+            if (lcAT == lcBT) {
+                return (lcAN < lcBN) ? -1 : (lcAN > lcBN) ? 1 : 0;
+            } else  {
+                return (lcAT < lcBT) ? -1 : 1;
+            }
+        });
+
+        let section = "";
+
+        lcOperators.forEach( val => {
+            if (section != val.operandType) {
+                if (section != "") {
+                    $t.append('</optgroup>');
+                }
+
+                section = val.operandType;
+                $t.append('<optgroup label="** ' + val.operandType + ' **">');
+            }
+
+            if (self.getOperation() == val.id) {
+                $t.append('<option value="' + val.id + '" selected>' + val.name + '</option>');
+            } else {
+                $t.append('<option value="' + val.id + '">' + val.name + '</option>');
+            }
+        });
+
+        $t.append('</optgroup>');
+
         $t.change(self.onOperatorChange);
 
         self.renderOperand(0);
