@@ -12,7 +12,13 @@
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
     },
-
+    "options_unit_type": {
+        "message": "Set how the units render on the configurator only"
+    },
+    "options_render": {
+        "message": "Configurator rendering options"
+    },
+    
     "connect": {
         "message": "Connect"
     },
@@ -36,6 +42,9 @@
     },
     "deviceReady": {
         "message": "Device - <span style=\"color: #37a8db\">Ready</span>"
+    },
+    "savingDefaults": {
+        "message": "Device - <span style=\"color: red\">Saving default settings</span>"
     },
     "fcNotConnected": {
         "message": "Not connected"
@@ -332,7 +341,7 @@
     },
 
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/p/MATEKF405WING\" target=\"_blank\">Matek F405-WING</a>, <a href=\"https://inavflight.com/shop/p/MATEKF722SE\" target=\"_blank\">Matek F722-SE</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -353,10 +362,13 @@
         "message": "This utility is fully <strong>open source</strong> and is available free of charge to all <strong>INAV</strong> users.<br />If you found the INAV or INAV Configurator useful, please consider <strong>supporting</strong> its development by donating."
     },
     "defaultSponsorsHead": {
-        "message": "Sponsors"
+        "message": "INAV is supported by"
     },
     "communityRCGroupsSupport": {
         "message": "RC Groups Support"
+    },
+    "communityDiscordServer": {
+        "message": "Discord Server"
     },
     "communitySlackSupport": {
         "message": "Slack Support Live Chat"
@@ -1130,6 +1142,9 @@
     },
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
+    },
+    "portsFunction_HDZERO_VTX": {
+        "message": "HDZero VTX"
     },
     "portsFunction_IMU2": {
         "message": "Secondary IMU"
@@ -3558,9 +3573,6 @@
     },
     "platformConfiguration": {
         "message": "Platform configuration"
-    },
-    "platformHasFlaps": {
-        "message": "Has flaps"
     },
     "mixerPreset": {
         "message": "Mixer preset"

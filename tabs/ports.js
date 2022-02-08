@@ -94,6 +94,12 @@ TABS.ports.initialize = function (callback) {
     );
 
     functionRules.push({
+        name: 'HDZERO_VTX',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+
+    functionRules.push({
         name: 'SMARTPORT_MASTER',
         groups: ['peripherals'],
         maxPorts: 1 }

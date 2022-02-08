@@ -124,6 +124,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
 
+                if (!MIXER_CONFIG.hasFlaps) {
+                    $row.find(".mix-rule-input").children('option[value="14"]').remove();
+                }
+
                 $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
                     servoRule.setInput($(this).val());
                     updateFixedValueVisibility($row, $(this));
@@ -272,8 +276,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         let $platformSelect = $('#platform-type'),
             platforms = helper.platform.getList(),
-            $hasFlapsWrapper = $('#has-flaps-wrapper'),
-            $hasFlaps = $('#has-flaps'),
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
@@ -354,29 +356,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         }
 
-        $hasFlaps.prop("checked", MIXER_CONFIG.hasFlaps);
-        $hasFlaps.change(function () {
-            if ($(this).is(":checked")) {
-                MIXER_CONFIG.hasFlaps = 1;
-            } else {
-                MIXER_CONFIG.hasFlaps = 0;
-            }
-        });
-        $hasFlaps.change();
-
         $platformSelect.change(function () {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
 
             var $platformSelectParent = $platformSelect.parent('.select');
-
-            if (currentPlatform.flapsPossible) {
-                $hasFlapsWrapper.removeClass('is-hidden');
-                $platformSelectParent.removeClass('no-bottom-border');
-            } else {
-                $hasFlapsWrapper.addClass('is-hidden');
-                $platformSelectParent.addClass('no-bottom-border');
-            }
 
             fillMixerPreset();
             $mixerPreset.change();
@@ -430,6 +414,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $('#load-mixer-button').click(function () {
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();

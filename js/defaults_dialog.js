@@ -2,6 +2,7 @@
 'use strict';
 
 var helper = helper || {};
+var savingDefaultsModal;
 
 helper.defaultsDialog = (function () {
 
@@ -12,6 +13,7 @@ helper.defaultsDialog = (function () {
 
     let data = [{
         "title": 'Mini Quad with 3"-7" propellers',
+        "id": 2,
         "notRecommended": false,
         "reboot": true,
         "settings": [
@@ -87,6 +89,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "airmode_type",
                 value: "THROTTLE_THRESHOLD"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
             },
             {
                 key: "mc_iterm_relax",
@@ -330,6 +336,10 @@ helper.defaultsDialog = (function () {
                 value: 0
             },
             {
+                key: "fw_d_yaw",
+                value: 0
+            },
+            {
                 key: "fw_ff_yaw",
                 value: 100
             },
@@ -504,8 +514,28 @@ helper.defaultsDialog = (function () {
                 value: 3
             },
             {
+                key: "fw_d_roll",
+                value: 7
+            },
+            {
                 key: "fw_ff_roll",
                 value: 50
+            },
+            {
+                key: "fw_p_yaw",
+                value: 20
+            },
+            {
+                key: "fw_i_yaw",
+                value: 0
+            },
+            {
+                key: "fw_d_yaw",
+                value: 0
+            },
+            {
+                key: "fw_ff_yaw",
+                value: 100
             },
             {
                 key: "imu_acc_ignore_rate",
@@ -553,6 +583,7 @@ helper.defaultsDialog = (function () {
     },
     {
         "title": 'Rovers & Boats',
+        "id": 1,
         "notRecommended": false,
         "reboot": true,
         "settings": [
@@ -616,6 +647,7 @@ helper.defaultsDialog = (function () {
     },
     {
         "title": 'Keep current settings (Not recommended)',
+        "id": 0,
         "notRecommended": true,
         "reboot": false,
         "settings": [
@@ -670,6 +702,7 @@ helper.defaultsDialog = (function () {
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                                 //noinspection JSUnresolvedVariable
+                                savingDefaultsModal.close();
                                 GUI.log(chrome.i18n.getMessage('deviceRebooting'));
                                 GUI.handleReconnect();
                             });
@@ -681,13 +714,30 @@ helper.defaultsDialog = (function () {
     };
 
     privateScope.onPresetClick = function (event) {
+        savingDefaultsModal = new jBox('Modal', {
+            width: 400,
+            height: 100,
+            animation: false,
+            closeOnClick: false,
+            closeOnEsc: false,
+            content: $('#modal-saving-defaults')
+        }).open();
+
         $container.hide();
+
         let selectedDefaultPreset = data[$(event.currentTarget).data("index")];
         if (selectedDefaultPreset && selectedDefaultPreset.settings) {
+
+            if (selectedDefaultPreset.id == 0) {
+                // Close applying preset dialog if keeping current settings.
+                savingDefaultsModal.close(); 
+            }
 
             mspHelper.loadBfConfig(function () {
                 privateScope.setFeaturesBits(selectedDefaultPreset)
             });
+        } else {
+            savingDefaultsModal.close(); 
         }
     };
 

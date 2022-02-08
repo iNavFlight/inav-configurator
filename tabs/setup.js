@@ -8,6 +8,12 @@ TABS.setup = {
 TABS.setup.initialize = function (callback) {
     var self = this;
 
+    // Update the osd units in global settings
+    // but only if we need it
+    if (globalSettings.unitType === UnitType.OSD) {
+        get_osd_settings();
+    }
+
     if (GUI.active_tab != 'setup') {
         GUI.active_tab = 'setup';
         googleAnalytics.sendAppView('Setup');
