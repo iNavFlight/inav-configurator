@@ -301,9 +301,9 @@ TABS.mission_control.initialize = function (callback) {
               //update RTH every 5th GPS update since it really shouldn't change
               if(rthUpdateInterval >= 5)
               {
-                MISSION_PLANER.bufferPoint.number = -1; //needed to get point 0 which id RTH
+                MISSION_PLANNER.bufferPoint.number = -1; //needed to get point 0 which id RTH
                 MSP.send_message(MSPCodes.MSP_WP, mspHelper.crunch(MSPCodes.MSP_WP), false, function rth_update() {
-                    var coord = ol.proj.fromLonLat([MISSION_PLANER.bufferPoint.lon, MISSION_PLANER.bufferPoint.lat]);
+                    var coord = ol.proj.fromLonLat([MISSION_PLANNER.bufferPoint.lon, MISSION_PLANNER.bufferPoint.lat]);
                     rthGeo.setCoordinates(coord);
                   });
                 rthUpdateInterval = 0;
@@ -433,16 +433,16 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadSettings() {
-        chrome.storage.local.get('missionPlanerSettings', function (result) {
-            if (result.missionPlanerSettings) {
-                settings = result.missionPlanerSettings;
+        chrome.storage.local.get('missionPlannerSettings', function (result) {
+            if (result.missionPlannerSettings) {
+                settings = result.missionPlannerSettings;
             }
             refreshSettings();
         });
     }
 
     function saveSettings() {
-        chrome.storage.local.set({'missionPlanerSettings': settings});
+        chrome.storage.local.set({'missionPlannerSettings': settings});
     }
 
     function refreshSettings() {
@@ -452,7 +452,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function closeSettingsPanel() {
-        $('#missionPlanerSettings').hide();
+        $('#missionPlannerSettings').hide();
     }
 
     /////////////////////////////////////////////
@@ -461,7 +461,7 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function closeSafehomePanel() {
-        $('#missionPlanerSafehome').hide();
+        $('#missionPlannerSafehome').hide();
         cleanSafehomeLayers();
     }
 
@@ -636,8 +636,8 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function closeHomePanel() {
-        $('#missionPlanerHome').hide();
-        $('#missionPlanerElevation').hide();
+        $('#missionPlannerHome').hide();
+        $('#missionPlannerElevation').hide();
         cleanHomeLayers();
     }
 
@@ -784,14 +784,14 @@ TABS.mission_control.initialize = function (callback) {
                     totalmultimissionWPs = multimission.get().length + mission.get().length;
                     $("#updateMultimissionButton").removeClass('disabled');
                     $("#setActiveMissionButton").removeClass('disabled');
-                    $('#missionPlanerElevation').show();
+                    $('#missionPlannerElevation').show();
                 } else {
                     $('#missionDistance').text('N/A');
                     totalmultimissionWPs = mission.get().length;
                     $("#editMission").show();
                     $("#updateMultimissionButton").addClass('disabled');
                     $("#setActiveMissionButton").addClass('disabled');
-                    $('#missionPlanerElevation').hide();
+                    $('#missionPlannerElevation').hide();
                     setMultimissionEditControl(true);
                 }
                 $('#multimissionInfo').text(multimissionCount + ' missions (' + totalmultimissionWPs + '/' + mission.getMaxWaypoints() + ' WPs)');
@@ -1443,7 +1443,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/CF_settings_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#missionPlanerSettings').fadeIn(300);
+                $('#missionPlannerSettings').fadeIn(300);
             };
 
             button.addEventListener('click', handleShowSettings, false);
@@ -1476,7 +1476,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/icons/cf_icon_safehome_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSafehome = function () {
-                $('#missionPlanerSafehome').fadeIn(300);
+                $('#missionPlannerSafehome').fadeIn(300);
                 //SAFEHOMES.flush();
                 //mspHelper.loadSafehomes();
                 cleanSafehomeLayers();
@@ -1514,11 +1514,11 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/icons/cf_icon_elevation_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                $('#missionPlanerHome').fadeIn(300);
+                $('#missionPlannerHome').fadeIn(300);
                 cleanHomeLayers();
                 renderHomeTable();
                 renderHomeOnMap();
-                $('#missionPlanerElevation').fadeIn(300);
+                $('#missionPlannerElevation').fadeIn(300);
                 plotElevation();
             };
 
@@ -1775,7 +1775,7 @@ TABS.mission_control.initialize = function (callback) {
         // save map view settings when user moves it
         //////////////////////////////////////////////////////////////////////////
         map.on('moveend', function (evt) {
-            chrome.storage.local.set({'missionPlanerLastValues': {
+            chrome.storage.local.set({'missionPlannerLastValues': {
                 center: ol.proj.toLonLat(map.getView().getCenter()),
                 zoom: map.getView().getZoom()
             }});
@@ -1783,10 +1783,10 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         // load map view settings on startup
         //////////////////////////////////////////////////////////////////////////
-        chrome.storage.local.get('missionPlanerLastValues', function (result) {
-            if (result.missionPlanerLastValues && result.missionPlanerLastValues.center) {
-                map.getView().setCenter(ol.proj.fromLonLat(result.missionPlanerLastValues.center));
-                map.getView().setZoom(result.missionPlanerLastValues.zoom);
+        chrome.storage.local.get('missionPlannerLastValues', function (result) {
+            if (result.missionPlannerLastValues && result.missionPlannerLastValues.center) {
+                map.getView().setCenter(ol.proj.fromLonLat(result.missionPlannerLastValues.center));
+                map.getView().setZoom(result.missionPlannerLastValues.zoom);
             }
         });
 
@@ -2642,7 +2642,7 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     //
     // Load/Save FC mission Toolbox
-    // mission = configurator store, WP number indexed from 0, MISSION_PLANER = FC NVM store, WP number indexed from 1
+    // mission = configurator store, WP number indexed from 0, MISSION_PLANNER = FC NVM store, WP number indexed from 1
     /////////////////////////////////////////////
     function getWaypointsFromFC(loadEeprom) {
         if (loadEeprom) {
@@ -2660,12 +2660,12 @@ TABS.mission_control.initialize = function (callback) {
                 } else {
                     $('#loadMissionButton').removeClass('disabled');
                 }
-                if (!MISSION_PLANER.getCountBusyPoints()) {
+                if (!MISSION_PLANNER.getCountBusyPoints()) {
                     alert(chrome.i18n.getMessage('no_waypoints_to_load'));
                     return;
                 }
                 mission.reinit();
-                mission.copy(MISSION_PLANER);
+                mission.copy(MISSION_PLANNER);
                 mission.update(false, true);
 
                 /* check multimissions */
@@ -2691,9 +2691,9 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function sendWaypointsToFC(saveEeprom) {
-        MISSION_PLANER.reinit();
-        MISSION_PLANER.copy(mission);
-        MISSION_PLANER.update(false, true, true);
+        MISSION_PLANNER.reinit();
+        MISSION_PLANNER.copy(mission);
+        MISSION_PLANNER.update(false, true, true);
         mspHelper.saveWaypoints(function() {
             GUI.log('End send point');
             if (saveEeprom) {
@@ -2703,13 +2703,13 @@ TABS.mission_control.initialize = function (callback) {
             } else {
                 $('#saveMissionButton').removeClass('disabled');
             }
-            mission.setMaxWaypoints(MISSION_PLANER.getMaxWaypoints());
-            mission.setValidMission(MISSION_PLANER.getValidMission());
-            mission.setCountBusyPoints(MISSION_PLANER.getCountBusyPoints());
+            mission.setMaxWaypoints(MISSION_PLANNER.getMaxWaypoints());
+            mission.setValidMission(MISSION_PLANNER.getValidMission());
+            mission.setCountBusyPoints(MISSION_PLANNER.getCountBusyPoints());
             multimission.setMaxWaypoints(mission.getMaxWaypoints());
             updateTotalInfo();
             mission.reinit();
-            mission.copy(MISSION_PLANER);
+            mission.copy(MISSION_PLANNER);
             mission.update(false, true);
             refreshLayers();
             $('#MPeditPoint').fadeOut(300);
@@ -2783,7 +2783,7 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function plotElevation() {
-        if ($('#missionPlanerElevation').is(":visible") && !disableMarkerEdit) {
+        if ($('#missionPlannerElevation').is(":visible") && !disableMarkerEdit) {
             if (mission.isEmpty()) {
                 var data = [[0], [0]];
                 var layout = {showlegend: true,

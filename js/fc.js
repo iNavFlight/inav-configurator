@@ -30,7 +30,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
-    MISSION_PLANER,
+    MISSION_PLANNER,
     ANALOG,
     ARMING_CONFIG,
     FC_CONFIG,
@@ -246,7 +246,7 @@ var FC = {
             packetCount: 0
         };
 
-        /* MISSION_PLANER = {
+        /* MISSION_PLANNER = {
             maxWaypoints: 0,
             isValidMission: 0,
             countBusyPoints: 0,
@@ -262,8 +262,8 @@ var FC = {
                 p3: 0
             }
         }; */
-        
-        MISSION_PLANER = new WaypointCollection();
+
+        MISSION_PLANNER = new WaypointCollection();
 
         ANALOG = {
             voltage: 0,
@@ -558,7 +558,7 @@ var FC = {
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
-        
+
         SAFEHOMES = new SafehomeCollection();
     },
     getOutputUsages: function() {
@@ -819,7 +819,7 @@ var FC = {
                     }
                 }
             };
-        }        
+        }
     },
     getServoRates: function () {
         return {
