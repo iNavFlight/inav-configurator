@@ -2707,7 +2707,6 @@ TABS.mission_control.initialize = function (callback) {
             mission.setValidMission(MISSION_PLANNER.getValidMission());
             mission.setCountBusyPoints(MISSION_PLANNER.getCountBusyPoints());
             multimission.setMaxWaypoints(mission.getMaxWaypoints());
-
             updateTotalInfo();
             mission.reinit();
             mission.copy(MISSION_PLANNER);
