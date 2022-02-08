@@ -1,7 +1,7 @@
 /*global $,FC*/
 'use strict';
 
-let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
+let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags, codeGroup) {
     let self = {};
     let $row;
 
@@ -69,12 +69,26 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         flags = data;
     };
 
+    self.getCodeGroup = function () {
+        return codeGroup;
+    };
+
+    self.setCodeGroup = function (data) {
+        codeGroup = data;
+    };
+
     self.onEnabledChange = function (event) {
         let $cT = $(event.currentTarget);
         self.setEnabled(!!$cT.prop('checked'));
         self.renderStatus();
         self.renderActivator();
     };
+
+    self.onCodeGroupChange = function (event) {
+        let $cT =$(event.currentTarget);
+        self.setCodeGroup($cT.val());
+        renderCodeGroups();
+    }
 
     self.getOperatorMetadata = function () {
         return FC.getLogicOperators()[self.getOperation()];
@@ -233,6 +247,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         $container.find('tbody').append('<tr>\
                 <td class="logic_cell__index"></td>\
                 <td class="logic_cell__enabled"></td>\
+                <td class="logic_cell__codeGroup"></td>\
                 <td class="logic_cell__operation"></td>\
                 <td class="logic_cell__operandA"></td>\
                 <td class="logic_cell__operandB"></td>\
@@ -249,6 +264,21 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         $row.find('.logic_element__enabled').
             prop('checked', self.getEnabled()).
             change(self.onEnabledChange);
+
+        /*
+         * Code group select
+         */
+        $row.find('.logic_cell__codeGroup').html("<select class='logic_element__codeGroup' ></select>");
+        let $cg = $row.find('.logic_element__codeGroup');
+
+        for (let cgi = 0; cgi < 10; cgi++) {
+            if (self.getCodeGroup() == cgi) {
+                $cg.append('<option value="' + cgi + '" selected>' + cgi + '</option>');
+            } else {
+                $cg.append('<option value="' + cgi + '">' + cgi + '</option>');
+            }
+        }
+        $cg.change(self.onCodeGroupChange);
 
         /*
          * Operator select

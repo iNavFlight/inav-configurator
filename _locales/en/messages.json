@@ -3790,6 +3790,9 @@
     "logicEnabled": {
         "message": "Enabled"
     },
+    "logicCodeGroup": {
+        "message": "Code Group"
+    },
     "logicOperation": {
         "message": "Operation"
     },

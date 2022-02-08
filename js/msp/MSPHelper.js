@@ -507,8 +507,9 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS:
                 LOGIC_CONDITIONS.flush();
-                if (data.byteLength % 14 === 0) {
-                    for (i = 0; i < data.byteLength; i += 14) {
+                if (data.byteLength % 15 === 0) {
+
+                    for (i = 0; i < data.byteLength; i += 15) {
                         LOGIC_CONDITIONS.put(new LogicCondition(
                             data.getInt8(i),
                             data.getInt8(i + 1),
@@ -517,7 +518,8 @@ var mspHelper = (function (gui) {
                             data.getInt32(i + 4, true),
                             data.getUint8(i + 8),
                             data.getInt32(i + 9, true),
-                            data.getInt8(i + 13)
+                            data.getInt8(i + 13),
+                            data.getInt8(i + 14)
                         ));
                     }
                 }
@@ -2364,7 +2366,7 @@ var mspHelper = (function (gui) {
 
             let buffer = [];
 
-            // send one at a time, with index, 14 bytes per one condition
+            // send one at a time, with index, 15 bytes per one condition
 
             let condition = LOGIC_CONDITIONS.get()[conditionIndex];
 
@@ -2385,6 +2387,8 @@ var mspHelper = (function (gui) {
             buffer.push(specificByte(condition.getOperandBValue(), 2));
             buffer.push(specificByte(condition.getOperandBValue(), 3));
             buffer.push(condition.getFlags());
+            buffer.push(condition.getCodeGroup());
+
 
             // prepare for next iteration
             conditionIndex++;
