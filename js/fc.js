@@ -1087,43 +1087,43 @@ var FC = {
             },
             7: {
                 name: "AND",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             8: {
                 name: "OR",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             9: {
                 name: "XOR",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             10: {
                 name: "NAND",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             11: {
                 name: "NOR",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             12: {
                 name: "NOT",
-                operandType: "Logic",
+                operandType: "Logic Switches",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             13: {
                 name: "Sticky",
-                operandType: "Switches",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
