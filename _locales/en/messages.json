@@ -115,6 +115,9 @@
     "tabGPS": {
         "message": "GPS"
     },
+    "tabMagnetometer": {
+        "message": "Magnetometer"
+    },
     "tabOutputs": {
         "message": "Outputs"
     },
@@ -767,6 +770,15 @@
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
+    },
+    "configurationSensorAlignmentMagRoll": {
+        "message": "Roll Degrees"
+    },
+    "configurationSensorAlignmentMagPitch": {
+        "message": "Pitch Degrees"
+    },
+    "configurationSensorAlignmentMagYaw": {
+        "message": "Yaw Degrees"
     },
     "configurationAccelTrims": {
         "message": "Accelerometer Trim"
@@ -1691,6 +1703,15 @@
     },
     "gpsSignalStr": {
         "message": "Signal Strength"
+    },
+    "magnetometerHead": {
+        "message": "Magnetometer Alignment"
+    },
+    "configurationMagnetometerHelp": {
+        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
+    },
+    "magnetometerStatHead": {
+        "message": "Mag Statistics"
     },
     "motors": {
         "message": "Motors"

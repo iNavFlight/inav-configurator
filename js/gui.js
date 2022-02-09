@@ -24,6 +24,7 @@ var GUI_control = function () {
         'cli',
         'configuration',
         'gps',
+        'magnetometer',
         'led_strip',
         'logging',
         'onboard_logging',

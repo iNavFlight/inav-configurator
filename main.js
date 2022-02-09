@@ -248,6 +248,9 @@ $(document).ready(function () {
                     case 'gps':
                         TABS.gps.initialize(content_ready);
                         break;
+                    case 'magnetometer':
+                        TABS.magnetometer.initialize(content_ready);
+                        break;
                     case 'mission_control':
                         TABS.mission_control.initialize(content_ready);
                         break;

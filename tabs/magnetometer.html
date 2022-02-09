@@ -1,0 +1,74 @@
+<div class="tab-magnetometer">
+    <div class="content_wrapper" style="height: calc(100% - 40px)">
+        <div class="tab_title" data-i18n="tabMagnetometer">Magnetometer</div>
+        <div class="cf_column fourth">
+            <div class="spacer_right">
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="magnetometerHead"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="note">
+                            <div class="note_spacer">
+                                <p data-i18n="configurationMagnetometerHelp"></p>
+                            </div>
+                        </div>
+                        <div class="select">
+                            <select id="magalign" class="magalign">
+                                <option value="0">Default</option>
+                                <!-- list generated here -->
+                            </select>
+                            <label for="magalign" data-i18n="configurationSensorAlignmentMag"></label>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="alignRoll" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            <label for="alignRoll">
+                                <span data-i18n="configurationSensorAlignmentMagRoll"></span>
+                            </label>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="alignPitch" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            <label for="alignPitch">
+                                <span data-i18n="configurationSensorAlignmentMagPitch"></span>
+                            </label>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="alignYaw" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            <label for="alignYaw">
+                                <span data-i18n="configurationSensorAlignmentMagYaw"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf_column threefourth_left" style="height: calc(100% - 100px);">
+            <div class="gui_box grey magnetometer_model">
+                <div class="gui_box_titlebar" style="margin-bottom: 0;">
+                    <div class="spacer_box_title" data-i18n="magnetometerMapHead"></div>
+                </div>
+                <div id="model">
+                    <div class="model-and-info">
+                        <div id="interactive_block">
+                            <div id="canvas_wrapper">
+                                <canvas id="canvas"></canvas>
+                            </div>
+                            <a class="reset" href="#" data-i18n="initialSetupButtonResetZaxis"></a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+    </div>
+
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+        </div>
+    </div>
+</div>
+</div>
