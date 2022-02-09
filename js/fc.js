@@ -1324,6 +1324,7 @@ var FC = {
                     34: "GPS Valid Fix",
                     35: "Loiter Radius [cm]",
                     36: "Active Profile",
+                    37: "Battery cells",
                 }
             },
             3: {
