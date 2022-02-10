@@ -74,12 +74,6 @@ TABS.magnetometer.initialize = function (callback) {
         function(callback) {
             mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
         },
-        function (callbakc){
-            console.log("Roll",self.alignmentConfig.roll * 10)
-            console.log("Pitch",(180+self.alignmentConfig.pitch) * 10)
-            console.log("Yaw",self.alignmentConfig.yaw * 10)
-
-        },
         mspHelper.saveToEeprom
     ];
 
