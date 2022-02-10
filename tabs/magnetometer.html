@@ -21,22 +21,26 @@
                             <label for="magalign" data-i18n="configurationSensorAlignmentMag"></label>
                         </div>
 
+                        <!--
+                        value of roll and pitch must be inverted
+                        Because the pitch of the mag is the roll of the quad and the roll of the mag is the pitch of the quad
+                        -->
                         <div class="number">
                             <input type="number" id="alignRoll" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
                             <label for="alignRoll">
-                                <span data-i18n="configurationSensorAlignmentMagRoll"></span>
+                                <span data-i18n="configurationSensorAlignmentMagPitch"></span>
                             </label>
                         </div>
 
                         <div class="number">
                             <input type="number" id="alignPitch" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
                             <label for="alignPitch">
-                                <span data-i18n="configurationSensorAlignmentMagPitch"></span>
+                                <span data-i18n="configurationSensorAlignmentMagRoll"></span>
                             </label>
                         </div>
 
                         <div class="number">
-                            <input type="number" id="alignYaw" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            <input type="number" id="alignYaw" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
                             <label for="alignYaw">
                                 <span data-i18n="configurationSensorAlignmentMagYaw"></span>
                             </label>

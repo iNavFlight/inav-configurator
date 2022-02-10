@@ -28,14 +28,15 @@ TABS.magnetometer.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadMixerConfig,
         mspHelper.loadSensorAlignment,
+        // Pitch and roll must be inverted
         function(callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
-                self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
+                self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
         function(callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
-                self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
+                self.alignmentConfig.roll = (parseInt(data.value, 10) / 10) - 180;
             }).then(callback)
         },
         function(callback) {
@@ -63,14 +64,21 @@ TABS.magnetometer.initialize = function (callback) {
         },
         mspHelper.saveSensorAlignment,
         // Pitch/Roll/Yaw
+        // Pitch and roll must be inverted
         function(callback) {
-            mspHelper.setSetting("align_mag_roll", self.alignmentConfig.roll * 10, callback);
+            mspHelper.setSetting("align_mag_roll", self.alignmentConfig.pitch * 10, callback);
         },
         function(callback) {
-            mspHelper.setSetting("align_mag_pitch", self.alignmentConfig.pitch * 10, callback);
+            mspHelper.setSetting("align_mag_pitch", (180+self.alignmentConfig.roll) * 10, callback);
         },
         function(callback) {
             mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
+        },
+        function (callbakc){
+            console.log("Roll",self.alignmentConfig.roll * 10)
+            console.log("Pitch",(180+self.alignmentConfig.pitch) * 10)
+            console.log("Yaw",self.alignmentConfig.yaw * 10)
+
         },
         mspHelper.saveToEeprom
     ];
@@ -257,7 +265,7 @@ TABS.magnetometer.initialize3D = function () {
             return;
         }
 
-        gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.roll), THREE.Math.degToRad(180-self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.pitch), 'YXZ');
+        gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180-self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
 
         // draw
         renderer.render(scene, camera);
