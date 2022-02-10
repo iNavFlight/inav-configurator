@@ -72,11 +72,11 @@ var Settings = (function () {
                     input.attr('type', 'number');
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
 
-                    if (s.setting.min) {
+                    if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
                         input.attr('min', (s.setting.min / multiplier).toFixed(Math.log10(multiplier)));
                     }
 
-                    if (s.setting.max) {
+                    if (typeof s.setting.max !== 'undefined' && s.setting.max !== null) {
                         input.attr('max', (s.setting.max / multiplier).toFixed(Math.log10(multiplier)));
                     }
                 }
