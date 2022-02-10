@@ -1045,222 +1045,266 @@ var FC = {
         return {
             0: {
                 name: "True",
+                operandType: "Active",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             1: {
                 name: "Equal",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
                 name: "Greater Than",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
                 name: "Lower Than",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             4: {
                 name: "Low",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             5: {
                 name: "Mid",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             6: {
                 name: "High",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             7: {
                 name: "AND",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             8: {
                 name: "OR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             9: {
                 name: "XOR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             10: {
                 name: "NAND",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             11: {
                 name: "NOR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             12: {
                 name: "NOT",
+                operandType: "Logic Switches",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             13: {
-                name: "STICKY",
+                name: "Sticky",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             14: {
-                name: "ADD",
+                name: "Basic: Add",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             15: {
-                name: "SUB",
+                name: "Basic: Subtract",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             16: {
-                name: "MUL",
+                name: "Basic: Multiply",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             17: {
-                name: "DIV",
+                name: "Basic: Divide",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             40: {
-                name: "MOD",
+                name: "Modulo",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             18: {
-                name: "GVAR SET",
+                name: "Set GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             19: {
-                name: "GVAR INC",
+                name: "Increase GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             20: {
-                name: "GVAR DEC",
+                name: "Decrease GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             21: {
-                name: "IO PORT SET",
+                name: "Set IO Port",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, true],
                 output: "none"
             },
             22: {
-                name: "OVERRIDE ARMING SAFETY",
+                name: "Override Arming Safety",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             23: {
-                name: "OVERRIDE THROTTLE SCALE",
+                name: "Override Throttle Scale",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             29: {
-                name: "OVERRIDE THROTTLE",
+                name: "Override Throttle",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             24: {
-                name: "SWAP ROLL & YAW",
+                name: "Swap Roll & Yaw",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             25: {
-                name: "SET VTX POWER LEVEL",
+                name: "Set VTx Power Level",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             30: {
-                name: "SET VTX BAND",
+                name: "Set VTx Band",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             31: {
-                name: "SET VTX CHANNEL",
+                name: "Set VTx Channel",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             26: {
-                name: "INVERT ROLL",
+                name: "Invert Roll",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             27: {
-                name: "INVERT PITCH",
+                name: "Invert Pitch",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             28: {
-                name: "INVERT YAW",
+                name: "Invert Yaw",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             32: {
-                name: "SET OSD LAYOUT",
+                name: "Set OSD Layout",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             33: {
-                name: "SIN",
+                name: "Trigonometry: Sine",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             34: {
-                name: "COS",
+                name: "Trigonometry: Cosine",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             35: {
-                name: "TAN",
+                name: "Trigonometry: Tangent",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             36: {
-                name: "MAP INPUT",
+                name: "Map Input",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             37: {
-                name: "MAP OUTPUT",
+                name: "Map Output",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             38: {
-                name: "RC CHANNEL OVERRIDE",
+                name: "Override RC Channel",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, true],
                 output: "boolean"
             },
 
             41: {
-                name: "LOITER RADIUS OVERRIDE",
+                name: "Override Loiter Radius",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             42: {
-                name: "SET PROFILE",
+                name: "Set Profile",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             43: {
-                name: "MIN",
+                name: "Use Lowest Value",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "raw"
             },
             44: {
-                name: "MAX",
+                name: "Use Highest Value",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "raw"
             },
