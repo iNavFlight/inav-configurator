@@ -455,7 +455,6 @@ OSD.initData = function () {
         item_count: 0,
         items: [],
         groups: {},
-        display_items: [],
         preview: [],
         isDjiHdFpv: false
     };
@@ -513,19 +512,27 @@ OSD.DjiElements =  {
 };
 
 OSD.constants = {
-    VISIBLE: 0x0800,
+    VISIBLE: 0x2000,
     VIDEO_TYPES: [
         'AUTO',
         'PAL',
-        'NTSC'
+        'NTSC',
+        'HD'
     ],
     VIDEO_LINES: {
         PAL: 16,
-        NTSC: 13
+        NTSC: 13,
+        HD: 18
+    },
+    VIDEO_COLS: {
+        PAL: 30,
+        NTSC: 30,
+        HD: 50
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
-        NTSC: 390
+        NTSC: 390,
+        HD: 900
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2033,14 +2040,39 @@ OSD.updateDisplaySize = function () {
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
-    // compute the size
+
+	// save the original OSD element positions.
+	var origPos = [];
+    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+        origPos.push(OSD.msp.helpers.pack.position(OSD.data.items[ii]));
+    }
+
+	// save the new video type and cols per line
+    FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
+    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
+
+    // set the new display size
     OSD.data.display_size = {
         x: FONT.constants.SIZES.LINE,
         y: OSD.constants.VIDEO_LINES[video_type],
-        total: null
+        total: OSD.constants.VIDEO_BUFFER_CHARS[video_type]
     };
 
-    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
+	// recalculate the OSD element positions for the new cols per line
+    for (var ii = 0; ii < OSD.data.items.length; ii++) {
+		var item = OSD.msp.helpers.unpack.position(origPos[ii]);
+		// do not recalculate anything not visible or outside of the screen
+		if (item.isVisible && item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
+			OSD.data.items[ii] = item;
+		}
+	}
+	
+	// set the preview size
+    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
+    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
+    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
+    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
+    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2064,27 +2096,36 @@ OSD.saveItem = function(item, callback) {
 //noinspection JSUnusedLocalSymbols
 OSD.msp = {
     /**
-     * Note, unsigned 16 bit int for position ispacked:
+     * Unsigned 16 bit int for position is packed:
      * 0: unused
      * v: visible flag
      * b: blink flag
      * y: y coordinate
      * x: x coordinate
-     * 0000 vbyy yyyx xxxx
+     * 00vb yyyy yyxx xxxx
      */
     helpers: {
         unpack: {
             position: function (bits) {
                 var display_item = {};
-                // size * y + x
-                display_item.position = FONT.constants.SIZES.LINE * ((bits >> 5) & 0x001F) + (bits & 0x001F);
+                display_item.x = bits & 0x3F;
+				display_item.y = (bits >> 6) & 0x3F;
+                display_item.position = (display_item.y) * FONT.constants.SIZES.LINE + (display_item.x);
                 display_item.isVisible = (bits & OSD.constants.VISIBLE) != 0;
                 return display_item;
             }
         },
+        calculate: {
+        	coords: function(display_item) {
+        		display_item.x = (display_item.position % FONT.constants.SIZES.LINE) & 0x3F;
+        		display_item.y = (display_item.position / FONT.constants.SIZES.LINE) & 0x3F;
+        		return display_item;
+        	}
+        },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x0800 : 0) | (((display_item.position / FONT.constants.SIZES.LINE) & 0x001F) << 5) | (display_item.position % FONT.constants.SIZES.LINE);
+                return (display_item.isVisible ? 0x2000 : 0)
+                	| ((display_item.y & 0x3F) << 6) | (display_item.x & 0x3F);
             }
         }
     },
@@ -2469,8 +2510,8 @@ OSD.GUI.updateFields = function() {
                             // Ensure the element is inside the viewport, at least partially.
                             // In that case move it to the very first row/col, otherwise there's
                             // no way to reposition items that are outside the viewport.
-                            if (itemData.position >= OSD.data.preview.length) {
-                                itemData.position = 0;
+                            if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
+                                itemData.x = itemData.y = itemData.position = 0;
                             }
                             $position.show();
                         } else {
@@ -2491,6 +2532,7 @@ OSD.GUI.updateFields = function() {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
+                            OSD.msp.helpers.calculate.coords(itemData);
                             OSD.GUI.saveItem(item);
                         }))
                 );
@@ -2610,14 +2652,6 @@ OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymb
 OSD.GUI.updatePreviews = function() {
     // buffer the preview;
     OSD.data.preview = [];
-    OSD.data.display_size.total = OSD.data.display_size.x * OSD.data.display_size.y;
-    for (var ii = 0; ii < OSD.data.display_items.length; ii++) {
-        var field = OSD.data.display_items[ii];
-        // reset fields that somehow end up off the screen
-        if (field.position > OSD.data.display_size.total) {
-            field.position = 0;
-        }
-    }
 
     // clear the buffer
     for (i = 0; i < OSD.data.display_size.total; i++) {
@@ -2634,6 +2668,12 @@ OSD.GUI.updatePreviews = function() {
         if (!itemData.isVisible) {
             continue;
         }
+
+		if (itemData.x >= OSD.data.display_size.x)
+		{
+			continue;
+		}
+
         // DJI HD FPV: Hide elements that only appear in craft name
         if (OSD.DjiElements.craftNameElements.includes(item.name) &&
         $('#djiUnsupportedElements').find('input').is(':checked')) {
@@ -2683,16 +2723,16 @@ OSD.GUI.updatePreviews = function() {
         item.preview_img.style.pointerEvents = 'none';
     }
 
-    var centerishPosition = 255;
 
-    // AHI is one line up with NTSC (less lines) compared to PAL
-    if (OSD.constants.VIDEO_TYPES[OSD.data.video_system] == 'NTSC')
-      centerishPosition -= OSD.data.display_size.x;
+    var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
+    if (OSD.data.display_size.y % 2 == 0) {
+        centerPosition += OSD.data.display_size.x / 2;
+    }
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
         for (i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
 
@@ -2701,21 +2741,21 @@ OSD.GUI.updatePreviews = function() {
         crsHNumber = Settings.getInputValue('osd_crosshairs_style');
        if (crsHNumber == 1) {
             // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 2, SYM.AH_AIRCRAFT4);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 2, SYM.AH_AIRCRAFT4);
         } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
             // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
         }
     }
 
@@ -2724,21 +2764,17 @@ OSD.GUI.updatePreviews = function() {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
         for (i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
         // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerishPosition + hudwidth - 1, SYM.AH_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
-    var mapCenter = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
-    if (OSD.data.display_size.y % 2 == 0) {
-        mapCenter += OSD.data.display_size.x / 2;
-    }
-    OSD.GUI.updateMapPreview(mapCenter, 'MAP_NORTH', 'N', SYM.HOME);
-    OSD.GUI.updateMapPreview(mapCenter, 'MAP_TAKEOFF', 'T', SYM.HOME);
-    OSD.GUI.updateMapPreview(mapCenter, 'RADAR', null, SYM.DIR_TO_HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'MAP_TAKEOFF', 'T', SYM.HOME);
+    OSD.GUI.updateMapPreview(centerPosition, 'RADAR', null, SYM.DIR_TO_HOME);
 
     // render
     var $preview = $('.display-layout .preview').empty();

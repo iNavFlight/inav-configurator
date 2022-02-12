@@ -415,8 +415,42 @@ button {
     border-bottom: 0;
 }
 
+.tab-osd .third_left {
+	float: left;
+	width: calc(50% - 197px);
+}
+
+.tab-osd .third_right {
+    float: right;
+	width: calc(50% - 197px);
+}
+
 .tab-osd .preview {
     width: 360px;
+    left: calc(50% - 197px);
+}
+
+.tab-osd .preview_hd {
+    width: 600px !important;
+    left: calc(50% - 317px) !important;
+}
+
+.tab-osd .hd_43_left {
+	border-left: 1px solid red;
+	position: absolute;
+	left: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_43_right {
+	border-right: 1px solid red;
+	position: absolute;
+	right: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_hd_side {
+	width: calc(50% - 317px) !important;
 }
 
 .tab-osd .preview {

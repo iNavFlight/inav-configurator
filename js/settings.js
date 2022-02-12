@@ -72,6 +72,14 @@ var Settings = (function () {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
                     input.attr('type', 'number');
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
+
+                    if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
+                        input.attr('min', (s.setting.min / multiplier).toFixed(Math.log10(multiplier)));
+                    }
+
+                    if (typeof s.setting.max !== 'undefined' && s.setting.max !== null) {
+                        input.attr('max', (s.setting.max / multiplier).toFixed(Math.log10(multiplier)));
+                    }
                 }
 
                 // If data is defined, We want to convert this value into 

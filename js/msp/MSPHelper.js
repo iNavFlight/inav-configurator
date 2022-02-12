@@ -44,6 +44,7 @@ var mspHelper = (function (gui) {
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
         'IMU2': 24,
+        'HDZERO_VTX': 25,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -447,7 +448,7 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP_WP:
-                MISSION_PLANER.put(new Waypoint(
+                MISSION_PLANNER.put(new Waypoint(
                     data.getUint8(0),
                     data.getUint8(1),
                     data.getInt32(2, true),
@@ -1422,9 +1423,9 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_WP_GETINFO:
                 // Reserved for waypoint capabilities data.getUint8(0);
-                MISSION_PLANER.setMaxWaypoints(data.getUint8(1));
-                MISSION_PLANER.setValidMission(data.getUint8(2));
-                MISSION_PLANER.setCountBusyPoints(data.getUint8(3));
+                MISSION_PLANNER.setMaxWaypoints(data.getUint8(1));
+                MISSION_PLANNER.setValidMission(data.getUint8(2));
+                MISSION_PLANNER.setCountBusyPoints(data.getUint8(3));
                 break;
             case MSPCodes.MSP_SET_WP:
                 console.log('Point saved');
@@ -2988,14 +2989,14 @@ var mspHelper = (function (gui) {
     };
 
     self.loadWaypoints = function (callback) {
-        MISSION_PLANER.reinit();
+        MISSION_PLANNER.reinit();
         let waypointId = 0;
         let startTime = new Date().getTime();
         MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, loadWaypoint);
 
         function loadWaypoint() {
             waypointId++;
-            if (waypointId < MISSION_PLANER.getCountBusyPoints()) {
+            if (waypointId < MISSION_PLANNER.getCountBusyPoints()) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, loadWaypoint);
             } else {
                 GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
@@ -3011,11 +3012,11 @@ var mspHelper = (function (gui) {
 
         function sendWaypoint() {
             waypointId++;
-            if (waypointId < MISSION_PLANER.get().length) {
-                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, sendWaypoint);
+            if (waypointId < MISSION_PLANNER.get().length) {
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANNER.extractBuffer(waypointId), false, sendWaypoint);
             }
             else {
-                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANER.extractBuffer(waypointId), false, endMission);
+                MSP.send_message(MSPCodes.MSP_SET_WP, MISSION_PLANNER.extractBuffer(waypointId), false, endMission);
             }
         };
 
