@@ -28,14 +28,15 @@ TABS.magnetometer.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadMixerConfig,
         mspHelper.loadSensorAlignment,
+        // Pitch and roll must be inverted
         function(callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
-                self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
+                self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
         function(callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
-                self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
+                self.alignmentConfig.roll = (parseInt(data.value, 10) / 10) - 180;
             }).then(callback)
         },
         function(callback) {
@@ -63,11 +64,12 @@ TABS.magnetometer.initialize = function (callback) {
         },
         mspHelper.saveSensorAlignment,
         // Pitch/Roll/Yaw
+        // Pitch and roll must be inverted
         function(callback) {
-            mspHelper.setSetting("align_mag_roll", self.alignmentConfig.roll * 10, callback);
+            mspHelper.setSetting("align_mag_roll", self.alignmentConfig.pitch * 10, callback);
         },
         function(callback) {
-            mspHelper.setSetting("align_mag_pitch", self.alignmentConfig.pitch * 10, callback);
+            mspHelper.setSetting("align_mag_pitch", (180+self.alignmentConfig.roll) * 10, callback);
         },
         function(callback) {
             mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
@@ -221,9 +223,10 @@ TABS.magnetometer.initialize3D = function () {
             var modelMaterial = new THREE.MeshFaceMaterial(materials);
             gps_model = new THREE.Mesh(geometry, modelMaterial);
 
-            gps_model.scale.set(5, 5, 5);
+            gps_model.scale.set(2.5, 2.5, 2.5);
             // TODO This should depend on the selected drone model
-            gps_model.position.set(0, 0, 25);
+            gps_model.position.set(0, 0, 27);
+            gps_model.rotation.y = 3 * Math.PI / 2
 
             scene.add(gps_model);
 
@@ -252,13 +255,11 @@ TABS.magnetometer.initialize3D = function () {
     scene.add(camera);
 
     this.render3D = function () {
-        if (!model) {
+        if (!model || !gps_model) {
             return;
         }
 
-        gps_model.rotation.x = THREE.Math.degToRad(self.alignmentConfig.pitch);
-        gps_model.rotation.y = THREE.Math.degToRad(self.alignmentConfig.yaw);
-        gps_model.rotation.z = THREE.Math.degToRad(self.alignmentConfig.roll);
+        gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180-self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
 
         // draw
         renderer.render(scene, camera);

@@ -999,6 +999,18 @@ li.active .ic_mixer {
     background-image: url("../images/icons/cf_icon_mixer_white.svg");
 }
 
+.ic_mag {
+    background-image: url("../images/icons/cf_icon_mag_grey.svg");
+}
+
+.ic_mag:hover {
+    background-image: url("../images/icons/cf_icon_mag_white.svg");
+}
+
+li.active .ic_mag {
+    background-image: url("../images/icons/cf_icon_mag_white.svg");
+}
+
 #content {
     margin-top: 0;
     padding: 0;
