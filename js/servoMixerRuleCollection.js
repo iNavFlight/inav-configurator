@@ -99,5 +99,20 @@ let ServoMixerRuleCollection = function () {
         });
     }
 
+    self.getNextUnusedIndex = function() {
+        let nextTarget = 0;
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                let target = data[ruleIndex].getTarget();
+                if (target > nextTarget) {
+                    nextTarget = target;
+                }
+            }
+        }
+
+        return nextTarget+1;
+    }
+
     return self;
 };
