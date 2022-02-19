@@ -18,6 +18,8 @@ TABS.magnetometer.initialize = function (callback) {
         yaw: 0
     };
 
+    self.pageElements = {};
+    self.isSavePreset = true;
     //========================
     // Load chain
     // =======================
@@ -64,13 +66,23 @@ TABS.magnetometer.initialize = function (callback) {
         // Pitch/Roll/Yaw
         // Pitch and roll must be inverted
         function (callback) {
-            mspHelper.setSetting("align_mag_roll", self.alignmentConfig.pitch * 10, callback);
+            if (self.isSavePreset)
+                mspHelper.setSetting("align_mag_roll", 0, callback);
+            else
+                mspHelper.setSetting("align_mag_roll", self.alignmentConfig.pitch * 10, callback);
         },
         function (callback) {
-            mspHelper.setSetting("align_mag_pitch", (180 + self.alignmentConfig.roll) * 10, callback);
+            if (self.isSavePreset)
+                mspHelper.setSetting("align_mag_pitch", 0, callback);
+            else
+                mspHelper.setSetting("align_mag_pitch", (180 + self.alignmentConfig.roll) * 10, callback);
+
         },
         function (callback) {
-            mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
+            if (self.isSavePreset)
+                mspHelper.setSetting("align_mag_yaw", 0, callback);
+            else
+                mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
         },
         mspHelper.saveToEeprom
     ];
@@ -97,11 +109,72 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function generateRange(min, max, step) {
-        const arr = []
+        const arr = [];
         for (var i = min; i <= max; i += step) {
             arr.push(i)
         }
         return arr;
+    }
+
+    /*
+    Returns pitch, roll and yaw in degree by the id of a preset.
+    Degree are the ones used in the slider
+     */
+    function getAxisDegreeWithPreset(selectedPreset) {
+        switch (selectedPreset) {
+            case 1: //CW0_DEG = 1
+                return [180, 0, 0];
+            case 2: //CW90_DEG = 2
+                return [180, 0, 90];
+            case 3: //CW180_DEG = 3
+                return [180, 0, 180];
+            case 4: //CW270_DEG = 4
+                return [180, 0, 270];
+            case 5: //CW0_DEG_FLIP = 5
+                return [0, 0, 0];
+            case 6: //CW90_DEG_FLIP = 5
+                return [0, 0, 90];
+            case 7: //CW180_DEG_FLIP = 5
+                return [0, 0, 180];
+            case 0: //ALIGN_DEFAULT = 0
+            case 8: //CW270_DEG_FLIP = 5
+            default://If not recognized, returns defualt
+                return [0, 0, 270];
+        }
+    }
+
+    function isUsingAPreset() {
+        return self.alignmentConfig.roll == -180 && self.alignmentConfig.pitch == 0 && self.alignmentConfig.yaw == 0
+    }
+
+    function updateRollAxis(value) {
+        self.alignmentConfig.roll = Number(value);
+        self.pageElements.roll_slider.val(self.alignmentConfig.roll);
+        self.pageElements.orientation_mag_roll.val(self.alignmentConfig.roll);
+        self.render3D();
+    }
+
+    function updatePitchAxis(value) {
+        self.alignmentConfig.pitch = Number(value);
+        self.pageElements.pitch_slider.val(self.alignmentConfig.pitch);
+        self.pageElements.orientation_mag_pitch.val(self.alignmentConfig.pitch);
+        self.render3D();
+    }
+
+    function updateYawAxis(value) {
+        self.alignmentConfig.yaw = Number(value);
+        self.pageElements.yaw_slider.val(self.alignmentConfig.yaw);
+        self.pageElements.orientation_mag_yaw.val(self.alignmentConfig.yaw);
+        self.render3D();
+    }
+
+    //Called when a preset is selected
+    function presetUpdated(degrees){
+        self.isSavePreset = true;
+        self.pageElements.orientation_mag_e.css("opacity", 1);
+        updatePitchAxis(degrees[0]);
+        updateRollAxis(degrees[1]);
+        updateYawAxis(degrees[2]);
     }
 
 
@@ -113,82 +186,98 @@ TABS.magnetometer.initialize = function (callback) {
         self.render3D();
 
         let alignments = FC.getSensorAlignments();
-        let orientation_mag_e = $('select.magalign');
-        let orientation_mag_roll = $('#alignRoll');
-        let orientation_mag_pitch = $('#alignPitch');
-        let orientation_mag_yaw = $('#alignYaw');
-        let roll_slider = $('#roll_slider');
-        let pitch_slider = $('#pitch_slider');
-        let yaw_slider = $('#yaw_slider');
+        self.pageElements.orientation_mag_e = $('select.magalign');
+        self.pageElements.orientation_mag_roll = $('#alignRoll');
+        self.pageElements.orientation_mag_pitch = $('#alignPitch');
+        self.pageElements.orientation_mag_yaw = $('#alignYaw');
+        self.pageElements.roll_slider = $('#roll_slider');
+        self.pageElements.pitch_slider = $('#pitch_slider');
+        self.pageElements.yaw_slider = $('#yaw_slider');
 
         for (i = 0; i < alignments.length; i++) {
-            orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
+            self.pageElements.orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
-        orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
+        self.pageElements.orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
 
-        orientation_mag_roll.val(self.alignmentConfig.roll);
-        orientation_mag_pitch.val(self.alignmentConfig.pitch);
-        orientation_mag_yaw.val(self.alignmentConfig.yaw);
+        if (isUsingAPreset()) {
+            //If using a preset, checking if custom values are equal to 0
+            //Update the slider, but don't save the value until they will be not modified.
+            const degrees = getAxisDegreeWithPreset(SENSOR_ALIGNMENT.align_mag);
+            presetUpdated(degrees);
+        }
+        else {
+            updateRollAxis(self.alignmentConfig.roll);
+            updatePitchAxis(self.alignmentConfig.pitch);
+            updateYawAxis(self.alignmentConfig.yaw);
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
+        }
+
 
         function clamp(input, min, max) {
             return Math.min(Math.max(parseInt($(input).val()), min), max);
         }
 
-        orientation_mag_e.change(function () {
+        self.pageElements.orientation_mag_e.change(function () {
             SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
-            self.render3D();
+            const degrees = getAxisDegreeWithPreset(SENSOR_ALIGNMENT.align_mag);
+            presetUpdated(degrees);
         });
 
-        orientation_mag_roll.change(function () {
-            self.alignmentConfig.roll = clamp(this, -180, 180);
-            self.render3D();
+        self.pageElements.orientation_mag_roll.change(function () {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
+            updateRollAxis(clamp(this, -180, 180));
         });
 
-        orientation_mag_pitch.change(function () {
-            self.alignmentConfig.pitch = clamp(this, -180, 180)
-            self.render3D();
+        self.pageElements.orientation_mag_pitch.change(function () {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
+            updatePitchAxis(clamp(this, -180, 180));
+
         });
 
-        orientation_mag_yaw.change(function () {
-            self.alignmentConfig.yaw = clamp(this, -180, 360);
-            self.render3D();
+        self.pageElements.orientation_mag_yaw.change(function () {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
+            updateYawAxis(clamp(this, -180, 360));
+
         });
 
         $('a.save').click(function () {
             saveChainer.execute()
         });
 
-        roll_slider.noUiSlider({
-            start: [0],
+        self.pageElements.roll_slider.noUiSlider({
+            start: [self.alignmentConfig.roll],
             range: {
                 'min': [-180],
                 'max': [180]
             },
             step: 1,
         });
-        roll_slider.noUiSlider_pips({
+        self.pageElements.roll_slider.noUiSlider_pips({
             mode: 'values',
             values: generateRange(-180, 180, 15),
             density: 4,
             stepped: true
-        })
+        });
 
-        pitch_slider.noUiSlider({
-            start: [0],
+        self.pageElements.pitch_slider.noUiSlider({
+            start: [self.alignmentConfig.pitch],
             range: {
                 'min': [-180],
                 'max': [180]
             },
             step: 1,
         });
-        pitch_slider.noUiSlider_pips({
+        self.pageElements.pitch_slider.noUiSlider_pips({
             mode: 'values',
             values: generateRange(-180, 180, 15),
             density: 4,
             stepped: true
-        })
+        });
 
-        yaw_slider.noUiSlider({
+        self.pageElements.yaw_slider.noUiSlider({
             start: [self.alignmentConfig.yaw],
             range: {
                 'min': [-180],
@@ -196,26 +285,39 @@ TABS.magnetometer.initialize = function (callback) {
             },
             step: 45,
         });
-        yaw_slider.noUiSlider_pips({
+        self.pageElements.yaw_slider.noUiSlider_pips({
             mode: 'values',
             values: generateRange(-180, 360, 45),
             density: 4,
             stepped: true
-        })
+        });
 
+        self.pageElements.pitch_slider.Link('lower').to((e) => {
+            console.log("pitch_slider");
+            updatePitchAxis(e);
+        });
+        self.pageElements.roll_slider.Link('lower').to((e) => {
+            console.log("roll_slider");
+            updateRollAxis(e);
+        });
+        self.pageElements.yaw_slider.Link('lower').to((e) => {
+            console.log("yaw_slider");
+            updateYawAxis(e);
+        });
 
-        pitch_slider.Link('lower').to(orientation_mag_pitch)
-        pitch_slider.Link('lower').to((e) => {
-            orientation_mag_pitch.trigger("change")
+        self.pageElements.pitch_slider.click(() => {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
-        roll_slider.Link('lower').to(orientation_mag_roll);
-        roll_slider.Link('lower').to((e) => {
-            orientation_mag_roll.trigger("change")
+        self.pageElements.roll_slider.click(() => {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
-        yaw_slider.Link('lower').to(orientation_mag_yaw)
-        yaw_slider.Link('lower').to((e) => {
-            orientation_mag_yaw.trigger("change")
+        self.pageElements.yaw_slider.click(() => {
+            self.isSavePreset = false;
+            self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
+
         GUI.content_ready(callback);
     }
 
@@ -247,18 +349,20 @@ TABS.magnetometer.initialize3D = function () {
     if (window.WebGLRenderingContext && (detector_canvas.getContext('webgl') || detector_canvas.getContext('experimental-webgl'))) {
         renderer = new THREE.WebGLRenderer({canvas: canvas.get(0), alpha: true, antialias: true});
         useWebGlRenderer = true;
-    } else {
+    }
+    else {
         renderer = new THREE.CanvasRenderer({canvas: canvas.get(0), alpha: true});
     }
     // initialize render size for current canvas size
-    renderer.setSize(wrapper.width()*2, wrapper.height()*2);
+    renderer.setSize(wrapper.width() * 2, wrapper.height() * 2);
 
     // load the model including materials
     if (useWebGlRenderer) {
         if (MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
-        } else {
+        }
+        else {
             model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
         }
     }
@@ -295,9 +399,13 @@ TABS.magnetometer.initialize3D = function () {
             scene.add(gps_model);
 
             self.render3D();
-        }, function() { console.log("Couldn't load model file", arguments)});
+        }, function () {
+            console.log("Couldn't load model file", arguments)
+        });
 
-    }, function() { console.log("Couldn't load model file", arguments)});
+    }, function () {
+        console.log("Couldn't load model file", arguments)
+    });
 
     // stationary camera
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
@@ -323,7 +431,7 @@ TABS.magnetometer.initialize3D = function () {
             return;
         }
 
-        gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180-self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
+        gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
 
         // draw
         renderer.render(scene, camera);

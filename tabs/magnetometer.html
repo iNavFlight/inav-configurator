@@ -1,6 +1,11 @@
 <div class="tab-magnetometer">
-    <div class="content_wrapper" style="height: calc(100% - 40px)">
+    <div class="content_wrapper" style="height: calc(80% - 40px)">
         <div class="tab_title" data-i18n="tabMagnetometer">Magnetometer</div>
+        <div class="note spacebottom">
+            <div class="note_spacer">
+                <p i18n="magnetometerHelp"></p>
+            </div>
+        </div>
         <div style="height: calc(100% - 150px);">
             <div id="model">
                 <div class="model-and-info">
@@ -15,6 +20,18 @@
         </div>
         <div class="config-section gui_box grey">
             <div class="spacer_box">
+                <div id="alignment-info" class="info-box">
+                    <span data-i18n="magnetometerInfo"></span>
+                </div>
+                <div style="display: flex; justify-content: left;">
+                    <div class="select">
+                        <select id="magalign" class="magalign">
+                            <option value="0">Default</option>
+                            <!-- list generated here -->
+                        </select>
+                        <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
+                    </div>
+                </div>
                 <table class="axis-table">
                     <thead>
                     <tr>
@@ -35,7 +52,6 @@
 
                         </td>
                     </tr>
-
                     </thead>
                     <tbody>
                     <tr>
