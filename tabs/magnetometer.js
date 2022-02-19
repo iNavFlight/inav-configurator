@@ -169,7 +169,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     //Called when a preset is selected
-    function presetUpdated(degrees){
+    function presetUpdated(degrees) {
         self.isSavePreset = true;
         self.pageElements.orientation_mag_e.css("opacity", 1);
         updatePitchAxis(degrees[0]);
@@ -293,15 +293,12 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         self.pageElements.pitch_slider.Link('lower').to((e) => {
-            console.log("pitch_slider");
             updatePitchAxis(e);
         });
         self.pageElements.roll_slider.Link('lower').to((e) => {
-            console.log("roll_slider");
             updateRollAxis(e);
         });
         self.pageElements.yaw_slider.Link('lower').to((e) => {
-            console.log("yaw_slider");
             updateYawAxis(e);
         });
 
@@ -326,18 +323,26 @@ TABS.magnetometer.initialize = function (callback) {
 
 TABS.magnetometer.initialize3D = function () {
     var self = this,
-        loader,
         canvas,
         wrapper,
         renderer,
         camera,
         scene,
-        light,
-        light2,
         model,
         model_file,
         gps_model,
         useWebGlRenderer = false;
+
+    let cameraParams = {
+        distance: 1,
+        mdown: new THREE.Vector2(),
+        mmove: new THREE.Vector2(),
+        phi: 25,
+        theta: -15,
+        phim: 0,
+        thetam: 0,
+        fov: 53
+    };
 
     canvas = $('.model-and-info #canvas');
     wrapper = $('.model-and-info #canvas_wrapper');
@@ -378,25 +383,26 @@ TABS.magnetometer.initialize3D = function () {
     // setup scene
     scene = new THREE.Scene();
 
-    loader = new THREE.JSONLoader();
+    const loader = new THREE.JSONLoader();
+    //Load the UAV model
     loader.load('./resources/models/' + model_file + '.json', function (geometry, materials) {
         var modelMaterial = new THREE.MeshFaceMaterial(materials);
         model = new THREE.Mesh(geometry, modelMaterial);
-
         model.scale.set(10, 10, 10);
-
+        cameraParams.distance = camera.position.clone().sub(model.position).length();
         scene.add(model);
 
+        //Load the GPS model
         loader.load('./resources/models/gps.json', function (geometry, materials) {
             var modelMaterial = new THREE.MeshFaceMaterial(materials);
             gps_model = new THREE.Mesh(geometry, modelMaterial);
 
-            gps_model.scale.set(2.5, 2.5, 2.5);
+            gps_model.scale.set(0.3, 0.3, 0.3);
             // TODO This should depend on the selected drone model
-            gps_model.position.set(0, 0, 27);
-            gps_model.rotation.y = 3 * Math.PI / 2
+            gps_model.position.set(0, 0, 3);
+            gps_model.rotation.y = 3 * Math.PI / 2;
 
-            scene.add(gps_model);
+            model.add(gps_model);
 
             self.render3D();
         }, function () {
@@ -411,9 +417,11 @@ TABS.magnetometer.initialize3D = function () {
     camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
 
     // some light
-    light = new THREE.AmbientLight(0x404040);
-    light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 1.5);
-    light2.position.set(0, 1, 0);
+    const light = new THREE.AmbientLight(0x404040);
+    const light1 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
+    light1.position.set(-1, 1, 1);
+    const light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
+    light2.position.set(-1, -1, -1);
 
     // move camera away from the model
     camera.position.z = 0;
@@ -423,6 +431,7 @@ TABS.magnetometer.initialize3D = function () {
 
     // add camera, model, light to the foreground scene
     scene.add(light);
+    scene.add(light1);
     scene.add(light2);
     scene.add(camera);
 
@@ -432,9 +441,18 @@ TABS.magnetometer.initialize3D = function () {
         }
 
         gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
-
         // draw
         renderer.render(scene, camera);
+    };
+
+    let updateCamera = function () {
+        if (!model)
+            return;
+        camera.position.x = cameraParams.distance * Math.sin(THREE.Math.degToRad(cameraParams.theta)) * Math.cos(THREE.Math.degToRad(cameraParams.phi));
+        camera.position.y = cameraParams.distance * Math.sin(THREE.Math.degToRad(cameraParams.phi));
+        camera.position.z = cameraParams.distance * Math.cos(THREE.Math.degToRad(cameraParams.theta)) * Math.cos(THREE.Math.degToRad(cameraParams.phi));
+        camera.lookAt(model.position);
+        self.render3D();
     };
 
     // handle canvas resize
@@ -447,6 +465,28 @@ TABS.magnetometer.initialize3D = function () {
     };
 
     $(window).on('resize', this.resize3D);
+
+    //Code to move the camera with the mouse
+    let modelCanMove = false;
+    canvas.mousedown((e) => {
+        cameraParams.mdown.set(e.clientX, e.clientY);
+        cameraParams.thetam = cameraParams.theta;
+        cameraParams.phim = cameraParams.phi;
+        modelCanMove = true;
+    });
+    canvas.mousemove((e) => {
+        if (modelCanMove) {
+            cameraParams.mmove.set(e.clientX, e.clientY);
+            cameraParams.theta = -(cameraParams.mmove.x - cameraParams.mdown.x) * 0.5 + cameraParams.thetam;
+            cameraParams.phi = (cameraParams.mmove.y - cameraParams.mdown.y) * 0.5 + cameraParams.phim;
+            cameraParams.phi = Math.min(90, Math.max(-90, cameraParams.phi));
+            updateCamera();
+        }
+    });
+    canvas.mouseup((e) => {
+        modelCanMove = false;
+    });
+    updateCamera();
 
     this.render3D()
 };
