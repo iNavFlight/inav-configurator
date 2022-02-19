@@ -28,7 +28,8 @@ let globalSettings = {
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
-    proxyLayer: null
+    proxyLayer: null,
+    showProfileParameters: null,
 };
 
 $(document).ready(function () {
@@ -64,6 +65,12 @@ $(document).ready(function () {
             result.proxylayer = 'your_proxy_layer_name';
         }
         globalSettings.proxyLayer = result.proxylayer;
+    });
+    chrome.storage.local.get('show_profile_parameters', function (result) {
+        if (typeof result.show_profile_parameters === 'undefined') {
+            result.show_profile_parameters = 1;
+        }
+        globalSettings.showProfileParameters = result.show_profile_parameters;
     });
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
@@ -327,11 +334,33 @@ $(document).ready(function () {
                     googleAnalyticsConfig.setTrackingPermitted(check);
                 });
 
+                $('div.show_profile_parameters input').change(function () {
+                    globalSettings.showProfileParameters = $(this).is(':checked');
+                    chrome.storage.local.set({
+                        'show_profile_parameters': globalSettings.showProfileParameters
+                    });
+
+                    // Update CSS on select boxes
+                    if (globalSettings.showProfileParameters) {
+                        $('.dropdown-dark #profilechange').addClass('showProfileParams');
+                        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
+                    } else {
+                        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
+                        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
+                    }
+
+                    // Horrible way to reload the tab
+                    const activeTab = $('#tabs li.active'); 
+                    activeTab.removeClass('active');  
+                    activeTab.find('a').click(); 
+                });
+
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
-                $('#proxylayer').val(globalSettings.proxyLayer);        
+                $('#proxylayer').val(globalSettings.proxyLayer);   
+                $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
 
                 // Set the value of the unit type
                 // none, OSD, imperial, metric

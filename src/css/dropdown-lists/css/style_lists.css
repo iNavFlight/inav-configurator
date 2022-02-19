@@ -146,10 +146,10 @@
   text-shadow: 0 1px rgba(0, 0, 0, 0.4);
 }
 
-.dropdown-dark #profilechange {
+.dropdown-dark #profilechange.showProfileParams {
   color: #d5ebfe;
 }
 
-.dropdown-dark #batteryprofilechange {
+.dropdown-dark #batteryprofilechange.showProfileParams {
   color: #fef2d5;
 }

@@ -12,12 +12,14 @@ var Settings = (function () {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
 
-            if (FC.isBatteryProfileParameter(settingName)) {
-                input.css("background-color","#fef2d5");
-            }
+            if (globalSettings.showProfileParameters) {
+                if (FC.isBatteryProfileParameter(settingName)) {
+                    input.css("background-color","#fef2d5");
+                }
 
-            if (FC.isControlProfileParameter(settingName)) {
-                input.css("background-color","#d5ebfe");
+                if (FC.isControlProfileParameter(settingName)) {
+                    input.css("background-color","#d5ebfe");
+                }
             }
 
             return mspHelper.getSetting(settingName).then(function (s) {
