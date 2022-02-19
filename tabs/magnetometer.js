@@ -4,8 +4,6 @@
 TABS.magnetometer = {};
 
 
-
-
 TABS.magnetometer.initialize = function (callback) {
     var self = this;
 
@@ -29,17 +27,17 @@ TABS.magnetometer.initialize = function (callback) {
         mspHelper.loadMixerConfig,
         mspHelper.loadSensorAlignment,
         // Pitch and roll must be inverted
-        function(callback) {
+        function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
                 self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
-        function(callback) {
+        function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
                 self.alignmentConfig.roll = (parseInt(data.value, 10) / 10) - 180;
             }).then(callback)
         },
-        function(callback) {
+        function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
             }).then(callback)
@@ -65,13 +63,13 @@ TABS.magnetometer.initialize = function (callback) {
         mspHelper.saveSensorAlignment,
         // Pitch/Roll/Yaw
         // Pitch and roll must be inverted
-        function(callback) {
+        function (callback) {
             mspHelper.setSetting("align_mag_roll", self.alignmentConfig.pitch * 10, callback);
         },
-        function(callback) {
-            mspHelper.setSetting("align_mag_pitch", (180+self.alignmentConfig.roll) * 10, callback);
+        function (callback) {
+            mspHelper.setSetting("align_mag_pitch", (180 + self.alignmentConfig.roll) * 10, callback);
         },
-        function(callback) {
+        function (callback) {
             mspHelper.setSetting("align_mag_yaw", self.alignmentConfig.yaw * 10, callback);
         },
         mspHelper.saveToEeprom
@@ -98,6 +96,15 @@ TABS.magnetometer.initialize = function (callback) {
         GUI.load("./tabs/magnetometer.html", process_html);
     }
 
+    function generateRange(min, max, step) {
+        const arr = []
+        for (var i = min; i <= max; i += step) {
+            arr.push(i)
+        }
+        return arr;
+    }
+
+
     function process_html() {
         localize();
 
@@ -110,6 +117,9 @@ TABS.magnetometer.initialize = function (callback) {
         let orientation_mag_roll = $('#alignRoll');
         let orientation_mag_pitch = $('#alignPitch');
         let orientation_mag_yaw = $('#alignYaw');
+        let roll_slider = $('#roll_slider');
+        let pitch_slider = $('#pitch_slider');
+        let yaw_slider = $('#yaw_slider');
 
         for (i = 0; i < alignments.length; i++) {
             orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
@@ -126,25 +136,21 @@ TABS.magnetometer.initialize = function (callback) {
 
         orientation_mag_e.change(function () {
             SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
-
             self.render3D();
         });
 
         orientation_mag_roll.change(function () {
             self.alignmentConfig.roll = clamp(this, -180, 180);
-
             self.render3D();
         });
 
         orientation_mag_pitch.change(function () {
             self.alignmentConfig.pitch = clamp(this, -180, 180)
-
             self.render3D();
         });
 
         orientation_mag_yaw.change(function () {
             self.alignmentConfig.yaw = clamp(this, -180, 360);
-
             self.render3D();
         });
 
@@ -152,7 +158,64 @@ TABS.magnetometer.initialize = function (callback) {
             saveChainer.execute()
         });
 
+        roll_slider.noUiSlider({
+            start: [0],
+            range: {
+                'min': [-180],
+                'max': [180]
+            },
+            step: 1,
+        });
+        roll_slider.noUiSlider_pips({
+            mode: 'values',
+            values: generateRange(-180, 180, 15),
+            density: 4,
+            stepped: true
+        })
 
+        pitch_slider.noUiSlider({
+            start: [0],
+            range: {
+                'min': [-180],
+                'max': [180]
+            },
+            step: 1,
+        });
+        pitch_slider.noUiSlider_pips({
+            mode: 'values',
+            values: generateRange(-180, 180, 15),
+            density: 4,
+            stepped: true
+        })
+
+        yaw_slider.noUiSlider({
+            start: [self.alignmentConfig.yaw],
+            range: {
+                'min': [-180],
+                'max': [360]
+            },
+            step: 45,
+        });
+        yaw_slider.noUiSlider_pips({
+            mode: 'values',
+            values: generateRange(-180, 360, 45),
+            density: 4,
+            stepped: true
+        })
+
+
+        pitch_slider.Link('lower').to(orientation_mag_pitch)
+        pitch_slider.Link('lower').to((e) => {
+            orientation_mag_pitch.trigger("change")
+        });
+        roll_slider.Link('lower').to(orientation_mag_roll);
+        roll_slider.Link('lower').to((e) => {
+            orientation_mag_roll.trigger("change")
+        });
+        yaw_slider.Link('lower').to(orientation_mag_yaw)
+        yaw_slider.Link('lower').to((e) => {
+            orientation_mag_yaw.trigger("change")
+        });
         GUI.content_ready(callback);
     }
 
@@ -198,7 +261,8 @@ TABS.magnetometer.initialize3D = function () {
         } else {
             model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
         }
-    } else {
+    }
+    else {
         model_file = 'fallback'
     }
 

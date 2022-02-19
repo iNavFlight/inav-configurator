@@ -115,6 +115,35 @@
     border-top-right-radius: 0;
 }
 
+.tab-magnetometer .axis-table {
+    width: 100%;
+    table-layout: auto;
+    text-align: center;
+}
+
+.tab-magnetometer .slider {
+    width: calc(100% - 40px);
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab-magnetometer input {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab-magnetometer #interactive_block {
+    position: absolute;
+    width: calc(100% - 40px);
+    height: calc(100% - 245px);
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #e4e4e4;
+    margin-bottom: 10px;
+}
+
 #magnetometer-map {
     height: 400px;
     width: 100%;
@@ -122,6 +151,30 @@
     position: relative;
 }
 
+.tab-magnetometer .buttons a {
+    background-color: #fff;
+    color: black;
+    opacity: 0.8;
+    transition: all ease 0.3s;
+    text-align: center;
+    font-weight: bold;
+
+}
+
+.tab-magnetometer .buttons a:hover {
+    background-color: #fff;
+    color: black;
+    opacity: 0.8;
+    transition: all ease 0.3s;
+}
+
+.tab-magnetometer .info {
+    background-color: #e4e4e4;
+}
+
+.tab-magnetometer .table-title {
+    font-weight: bold;
+}
 /*noinspection ALL*/
 progress[value]::-webkit-progress-bar {
     background-color: #d2d2d2;

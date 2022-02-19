@@ -772,13 +772,13 @@
         "message": "MAG Alignment"
     },
     "configurationSensorAlignmentMagRoll": {
-        "message": "Roll Degrees"
+        "message": "Roll"
     },
     "configurationSensorAlignmentMagPitch": {
-        "message": "Pitch Degrees"
+        "message": "Pitch"
     },
     "configurationSensorAlignmentMagYaw": {
-        "message": "Yaw Degrees"
+        "message": "Yaw"
     },
     "configurationAccelTrims": {
         "message": "Accelerometer Trim"
@@ -4119,5 +4119,8 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "reset": {
+        "message": "Reset"
     }
 }
