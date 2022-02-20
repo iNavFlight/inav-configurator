@@ -420,6 +420,34 @@ TABS.magnetometer.initialize3D = function () {
         self.render3D();
     };
 
+    let getDistanceZByModelName = function (name) {
+        switch (name) {
+            case "quad_x":
+                return [0, 0, 3];
+            case "quad_vtail":
+                return [0, 0, 4.5];
+            case "quad_atail":
+                return [0, 0, 5];
+            case "y4":
+            case "y6":
+            case "tricopter":
+                return [0, 1.4, 0];
+            case "hex_x":
+            case "hex_plus":
+                return [0, 2, 0];
+            case "flying_wing":
+            case "rudderless_plane":
+            case "twin_plane":
+            case "vtail_plane":
+            case "vtail_single_servo_plane":
+                return [0, 1.4, 0];
+            case "fallback":
+            default:
+                return [0, 2.5, 0];
+
+        }
+    };
+
     // setup scene
     scene = new THREE.Scene();
 
@@ -450,14 +478,15 @@ TABS.magnetometer.initialize3D = function () {
         cameraParams.distance = camera.position.clone().sub(model.position).length();
         scene.add(model);
 
+        const gpsOffset = getDistanceZByModelName(model_file);
+
         //Load the GPS model
         loader.load('./resources/models/gps.json', function (geometry, materials) {
             var modelMaterial = new THREE.MeshFaceMaterial(materials);
             gps_model = new THREE.Mesh(geometry, modelMaterial);
 
             gps_model.scale.set(0.3, 0.3, 0.3);
-            // TODO This should depend on the selected drone model
-            gps_model.position.set(0, 0, 3);
+            gps_model.position.set(gpsOffset[0], gpsOffset[1], gpsOffset[2]);
             gps_model.rotation.y = 3 * Math.PI / 2;
 
             model.add(gps_model);
@@ -474,8 +503,7 @@ TABS.magnetometer.initialize3D = function () {
             xyz_model = new THREE.Mesh(geometry, modelMaterial);
 
             xyz_model.scale.set(0.2, 0.2, 0.2);
-            // TODO This should depend on the selected drone model
-            xyz_model.position.set(0, 0, 3);
+            xyz_model.position.set(gpsOffset[0], gpsOffset[1], gpsOffset[2]);
             xyz_model.rotation.y = 3 * Math.PI / 2;
 
             model.add(xyz_model);
