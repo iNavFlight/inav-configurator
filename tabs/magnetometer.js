@@ -452,7 +452,7 @@ TABS.magnetometer.initialize3D = function () {
     scene = new THREE.Scene();
 
     // stationary camera
-    camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
+    camera = new THREE.PerspectiveCamera(cameraParams.fov, wrapper.width() / wrapper.height(), 1, 10000);
 
     // some light
     const light = new THREE.AmbientLight(0x404040);
