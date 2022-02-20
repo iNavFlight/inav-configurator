@@ -302,15 +302,15 @@ TABS.magnetometer.initialize = function (callback) {
             updateYawAxis(e);
         });
 
-        self.pageElements.pitch_slider.click(() => {
+        self.pageElements.pitch_slider.change((e) => {
             self.isSavePreset = false;
             self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
-        self.pageElements.roll_slider.click(() => {
+        self.pageElements.roll_slider.change((e) => {
             self.isSavePreset = false;
             self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
-        self.pageElements.yaw_slider.click(() => {
+        self.pageElements.yaw_slider.change((e) => {
             self.isSavePreset = false;
             self.pageElements.orientation_mag_e.css("opacity", 0.5);
         });
@@ -334,11 +334,11 @@ TABS.magnetometer.initialize3D = function () {
         useWebGlRenderer = false;
 
     let cameraParams = {
-        distance: 1,
+        distance: 80,
         mdown: new THREE.Vector2(),
         mmove: new THREE.Vector2(),
-        phi: 25,
-        theta: -15,
+        phi: 32.5,
+        theta: -3.5,
         phim: 0,
         thetam: 0,
         fov: 53
@@ -380,65 +380,9 @@ TABS.magnetometer.initialize3D = function () {
         model_file = 'fallback';
     }
 
-    // setup scene
-    scene = new THREE.Scene();
-
-    const loader = new THREE.JSONLoader();
-    //Load the UAV model
-    loader.load('./resources/models/' + model_file + '.json', function (geometry, materials) {
-        var modelMaterial = new THREE.MeshFaceMaterial(materials);
-        model = new THREE.Mesh(geometry, modelMaterial);
-        model.scale.set(10, 10, 10);
-        cameraParams.distance = camera.position.clone().sub(model.position).length();
-        scene.add(model);
-
-        //Load the GPS model
-        loader.load('./resources/models/gps.json', function (geometry, materials) {
-            var modelMaterial = new THREE.MeshFaceMaterial(materials);
-            gps_model = new THREE.Mesh(geometry, modelMaterial);
-
-            gps_model.scale.set(0.3, 0.3, 0.3);
-            // TODO This should depend on the selected drone model
-            gps_model.position.set(0, 0, 3);
-            gps_model.rotation.y = 3 * Math.PI / 2;
-
-            model.add(gps_model);
-
-            self.render3D();
-        }, function () {
-            console.log("Couldn't load model file", arguments)
-        });
-
-    }, function () {
-        console.log("Couldn't load model file", arguments)
-    });
-
-    // stationary camera
-    camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
-
-    // some light
-    const light = new THREE.AmbientLight(0x404040);
-    const light1 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
-    light1.position.set(-1, 1, 1);
-    const light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
-    light2.position.set(-1, -1, -1);
-
-    // move camera away from the model
-    camera.position.z = 0;
-    camera.position.y = 50;
-    camera.position.x = -90;
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-    // add camera, model, light to the foreground scene
-    scene.add(light);
-    scene.add(light1);
-    scene.add(light2);
-    scene.add(camera);
-
     this.render3D = function () {
-        if (!model || !gps_model) {
+        if (!model || !gps_model)
             return;
-        }
 
         gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
         // draw
@@ -446,7 +390,7 @@ TABS.magnetometer.initialize3D = function () {
     };
 
     let updateCamera = function () {
-        if (!model)
+        if (!model || !camera)
             return;
         camera.position.x = cameraParams.distance * Math.sin(THREE.Math.degToRad(cameraParams.theta)) * Math.cos(THREE.Math.degToRad(cameraParams.phi));
         camera.position.y = cameraParams.distance * Math.sin(THREE.Math.degToRad(cameraParams.phi));
@@ -463,6 +407,65 @@ TABS.magnetometer.initialize3D = function () {
 
         self.render3D();
     };
+
+    // setup scene
+    scene = new THREE.Scene();
+
+    // stationary camera
+    camera = new THREE.PerspectiveCamera(50, wrapper.width() / wrapper.height(), 1, 10000);
+
+    // some light
+    const light = new THREE.AmbientLight(0x404040);
+    const light1 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
+    light1.position.set(-1, 1, 1);
+    const light2 = new THREE.DirectionalLight(new THREE.Color(1, 1, 1), 0.8);
+    light2.position.set(-1, -1, -1);
+
+    // add camera, model, light to the foreground scene
+    scene.add(light);
+    scene.add(light1);
+    scene.add(light2);
+    scene.add(camera);
+
+    //Load the models
+    const loader = new THREE.JSONLoader();
+    //Load the UAV model
+    loader.load('./resources/models/' + model_file + '.json', function (geometry, materials) {
+        var modelMaterial = new THREE.MeshFaceMaterial(materials);
+        model = new THREE.Mesh(geometry, modelMaterial);
+        model.scale.set(10, 10, 10);
+        model.rotation.y = Math.PI / 2;
+        cameraParams.distance = camera.position.clone().sub(model.position).length();
+        scene.add(model);
+
+        //Load the GPS model
+        loader.load('./resources/models/gps.json', function (geometry, materials) {
+            var modelMaterial = new THREE.MeshFaceMaterial(materials);
+            gps_model = new THREE.Mesh(geometry, modelMaterial);
+
+            gps_model.scale.set(0.3, 0.3, 0.3);
+            // TODO This should depend on the selected drone model
+            gps_model.position.set(0, 0, 3);
+            gps_model.rotation.y = 3 * Math.PI / 2;
+
+            model.add(gps_model);
+
+            updateCamera();
+            //self.render3D();
+        }, function () {
+            console.log("Couldn't load model file", arguments)
+        });
+
+    }, function () {
+        console.log("Couldn't load model file", arguments)
+    });
+
+    // move camera away from the model
+    camera.position.z = 0;
+    camera.position.y = -10;
+    camera.position.x = -80;
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
 
     $(window).on('resize', this.resize3D);
 
@@ -486,7 +489,6 @@ TABS.magnetometer.initialize3D = function () {
     canvas.mouseup((e) => {
         modelCanMove = false;
     });
-    updateCamera();
 
     this.render3D()
 };
