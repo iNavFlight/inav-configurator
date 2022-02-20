@@ -23,15 +23,22 @@
                 <div id="alignment-info" class="info-box">
                     <span data-i18n="magnetometerInfo"></span>
                 </div>
-                <div style="display: flex; justify-content: left;">
-                    <div class="select">
-                        <select id="magalign" class="magalign">
-                            <option value="0">Default</option>
-                            <!-- list generated here -->
-                        </select>
-                        <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
-                    </div>
+                <div class="select" style="display: flex; justify-content: left;">
+                    <select id="magalign" class="magalign">
+                        <option value="0">Default</option>
+                        <!-- list generated here -->
+                    </select>
+                    <label for="magalign" data-i18n="magnetometerOrientationPreset"></label>
                 </div>
+                <div class="select" style="display: flex; justify-content: left;">
+                    <select id="element_to_show">
+                        <option value="0" selected>Magnetometer</option>
+                        <option value="1">XYZ</option>
+                        <!-- list generated here -->
+                    </select>
+                    <label for="element_to_show" data-i18n="magnetometerElementToShow"></label>
+                </div>
+
                 <table class="axis-table">
                     <thead>
                     <tr>

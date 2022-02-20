@@ -1716,6 +1716,9 @@
     "magnetometerInfo": {
         "message": "Select a preset or create a custom configuration moving the sliders"
     },
+    "magnetometerElementToShow": {
+        "message": "Element to show"
+    },
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },

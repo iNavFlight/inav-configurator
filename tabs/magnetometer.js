@@ -20,6 +20,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     self.pageElements = {};
     self.isSavePreset = true;
+    self.showMagnetometer = true;
     //========================
     // Load chain
     // =======================
@@ -212,6 +213,12 @@ TABS.magnetometer.initialize = function (callback) {
             self.pageElements.orientation_mag_e.css("opacity", 0.5);
         }
 
+        const elementToShow = $("#element_to_show");
+        elementToShow.change(function () {
+            const value = parseInt($(this).val());
+            self.showMagnetometer = (value == 0);
+            self.render3D();
+        });
 
         function clamp(input, min, max) {
             return Math.min(Math.max(parseInt($(input).val()), min), max);
@@ -331,6 +338,7 @@ TABS.magnetometer.initialize3D = function () {
         model,
         model_file,
         gps_model,
+        xyz_model,
         useWebGlRenderer = false;
 
     let cameraParams = {
@@ -381,10 +389,14 @@ TABS.magnetometer.initialize3D = function () {
     }
 
     this.render3D = function () {
-        if (!model || !gps_model)
+        if (!model || !gps_model || !xyz_model)
             return;
 
+        gps_model.visible = self.showMagnetometer;
+        xyz_model.visible = !self.showMagnetometer;
         gps_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
+        xyz_model.rotation.set(THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
+
         // draw
         renderer.render(scene, camera);
     };
@@ -449,6 +461,24 @@ TABS.magnetometer.initialize3D = function () {
             gps_model.rotation.y = 3 * Math.PI / 2;
 
             model.add(gps_model);
+
+            updateCamera();
+            //self.render3D();
+        }, function () {
+            console.log("Couldn't load model file", arguments)
+        });
+
+        //Load the XYZ model
+        loader.load('./resources/models/xyz.json', function (geometry, materials) {
+            var modelMaterial = new THREE.MeshFaceMaterial(materials);
+            xyz_model = new THREE.Mesh(geometry, modelMaterial);
+
+            xyz_model.scale.set(0.2, 0.2, 0.2);
+            // TODO This should depend on the selected drone model
+            xyz_model.position.set(0, 0, 3);
+            xyz_model.rotation.y = 3 * Math.PI / 2;
+
+            model.add(xyz_model);
 
             updateCamera();
             //self.render3D();
