@@ -28,12 +28,12 @@
     text-align: left;
     border: 1px solid silver;
     border-radius: 3px;
-    margin-right: 11px;
     font-size: 12px;
     font-weight: normal;
 }
 
 .config-section .number input,
+.config-section .checkbox input,
 .tab-configuration .number input {
     width: 106px;
 }
@@ -221,7 +221,7 @@ hr {
 
 .config-section label {
     position: absolute;
-    left: 118px;
+    left: 108px;
 }
 
 .config-section .radio label {

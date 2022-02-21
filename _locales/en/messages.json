@@ -2129,7 +2129,7 @@
         "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
     },
     "failsafeDelayItem": {
-        "message": "Guard time for activation after signal lost [1 = 0.1 sec.]"
+        "message": "Guard time for activation after signal lost [For deciseconds (ds): 1 = 0.1 sec.]"
     },
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
@@ -2138,7 +2138,7 @@
         "message": "Throttle value used while landing"
     },
     "failsafeOffDelayItem": {
-        "message": "Delay for turning off the Motors during Failsafe [1 = 0.1 sec.]"
+        "message": "Delay for turning off the Motors during Failsafe [For deciseconds (ds):1 = 0.1 sec.]"
     },
     "failsafeOffDelayHelp": {
         "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
@@ -2897,16 +2897,16 @@
         "message": "Fly Time (minutes)"
     },
     "osd_alt_alarm": {
-        "message": "Altitude (meters)"
+        "message": "Altitude"
     },
     "osd_dist_alarm": {
-        "message": "Distance (meters)"
+        "message": "Distance"
     },
     "osdAlarmDIST_HELP": {
         "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
     },
     "osd_neg_alt_alarm": {
-        "message": "Negative Altitude (meters)"
+        "message": "Negative Altitude"
     },
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."

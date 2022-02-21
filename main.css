@@ -2221,11 +2221,19 @@ ol li {
     position: relative;
 }
 
+.unit_wrapper input {
+    margin-right: 0 !important;
+}
+
+.unit_wrapper ~ label, select ~ label, input ~ label {
+    margin-left: 10px;
+}
+
 /* Position the unit to the right of the wrapper */
 .unit_wrapper::after {
     position: absolute;
     top: 2px;
-    right: .7em;
+    right: .5em;
     transition: all .05s ease-in-out;
 }
 
@@ -2233,13 +2241,13 @@ ol li {
      for arrow buttons will appear to the right of number inputs */
 .unit_wrapper:hover::after,
 .unit_wrapper:focus-within::after {
-    right: 1.3em;
+    right: 1.0em;
 }
 
 /* Handle Firefox (arrows always shown) */
 @supports (-moz-appearance:none) {
     .unit_wrapper::after {
-        right: 1.3em;
+        right: 1.0em;
     }
 }
 
