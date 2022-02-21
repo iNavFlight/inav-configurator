@@ -1,5 +1,7 @@
 'use strict';
 
+const GulpClient = require("gulp");
+
 var Settings = (function () {
     let self = {};
 
@@ -27,6 +29,8 @@ var Settings = (function () {
                     return;
                 }
                 parent.show();
+
+                input.prop('title', 'CLI: ' + input.data('setting'));
 
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
@@ -69,9 +73,9 @@ var Settings = (function () {
                     input.val(s.value.toFixed(2));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
-                    input.attr('type', 'number');
-                    input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
 
+                    input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
+                    input.attr('type', 'number');
                     if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
                         input.attr('min', (s.setting.min / multiplier).toFixed(Math.log10(multiplier)));
                     }
@@ -136,22 +140,39 @@ var Settings = (function () {
 
         //display names for the units
         const unitDisplayDames = {
+            // Misc
             'us' : "uS",
-            'deg' : '&deg;',
-            'cdeg' : 'centi&deg;',
-            'cmss' : 'cm/s/s',
-            'cm' : 'cm',
-            'cms' : 'cm/s',
-            'm' : 'm',
-            'ms' : 'ms',
-            'mps' : 'm/s',
-            'kmh' : 'Km/h',
-            'sec' : 's',
-            'kt' : 'Kt',
-            'ft' : 'ft',
-            'mph' : 'mph',
             'cw' : 'cW',
-            'percent' : '%'
+            'percent' : '%',
+            'cmss' : 'cm/s/s',
+            // Time
+            'msec' : 'ms',
+            'dsec' : 'ds',
+            'sec' : 's',
+            // Angles
+            'deg' : '&deg;',
+            'decideg' : 'deci&deg;',
+            // Temperature
+            'decidegc' : 'deci&deg;C',
+            'degc' : '&deg;C',
+            'degf' : '&deg;F',
+            // Speed
+            'cms' : 'cm/s',
+            'v-cms' : 'cm/s',
+            'ms' : 'm/s',
+            'kmh' : 'Km/h',
+            'mph' : 'mph',
+            'hftmin' : 'x100 ft/min',
+            'fts' : 'ft/s',
+            'kt' : 'Kt',
+            // Distance
+            'cm' : 'cm',
+            'm' : 'm',
+            'km' : 'Km',
+            'm-lrg' : 'm', // Metres, but converted to larger units
+            'ft' : 'ft',
+            'mi' : 'mi',
+            'nm' : 'NM'
         }
 
 
@@ -169,17 +190,38 @@ var Settings = (function () {
                 'm' : 100, 
                 'ft' : 30.48
             },
-            'cms' : {
+            'm' : {
+                'm' : 1,
+                'ft' : 0.3048
+            },
+            'm-lrg' : {
+                'km' : 1000,
+                'mi' : 1609.344,
+                'nm' : 1852
+            },
+            'cms' : { // Horizontal speed
                 'kmh' : 27.77777777777778, 
                 'kt': 51.44444444444457, 
                 'mph' : 44.704,
-                'mps' : 100
+                'ms' : 100
             },
-            'ms' : {
+            'v-cms' : { // Vertical speed
+                'ms' : 100,
+                'hftmin' : 50.8,
+                'fts' : 30.48
+            },
+            'msec' : {
                 'sec' : 1000
             },
-            'cdeg' : {
+            'dsec' : {
+                'sec' : 10
+            },
+            'decideg' : {
                 'deg' : 10
+            },
+            'decidegc' : {
+                'degc' : 10,
+                'degf' : 'FAHREN'
             },
         };
 
@@ -187,33 +229,58 @@ var Settings = (function () {
         const conversionTable = {
             0: { //imperial
                 'cm' : 'ft',
+                'm' : 'ft',
+                'm-lrg' : 'mi',
                 'cms' : 'mph',
-                'cdeg' : 'deg',
-                'ms' : 'sec'
+                'v-cms' : 'fts',
+                'msec' : 'sec',
+                'dsec' : 'sec',
+                'decideg' : 'deg',
+                'decidegc' : 'degf',
             },
-            1: {//metric
+            1: { //metric
                 'cm': 'm',
+                'm' : 'm',
+                'm-lrg' : 'km',
                 'cms' : 'kmh',
-                'ms' : 'sec',
-                'cdeg' : 'deg'
+                'v-cms' : 'ms',
+                'msec' : 'sec',
+                'dsec' : 'sec',
+                'decideg' : 'deg',
+                'decidegc' : 'degc',
             },
             2: { //metric with MPH
                 'cm': 'm',
+                'm' : 'm',
+                'm-lrg' : 'km',
                 'cms' : 'mph',
-                'cdeg' : 'deg',
-                'ms' : 'sec'
+                'v-cms' : 'ms',
+                'decideg' : 'deg',
+                'msec' : 'sec',
+                'dsec' : 'sec',
+                'decidegc' : 'degc',
             },
             3:{ //UK
                 'cm' : 'ft',
+                'm' : 'ft',
+                'm-lrg' : 'mi',
                 'cms' : 'mph',
-                'cdeg' : 'deg',
-                'ms' : 'sec'
+                'v-cms' : 'fts',
+                'decideg' : 'deg',
+                'msec' : 'sec',
+                'dsec' : 'sec',
+                'decidegc' : 'degc',
             },
             4: { //General aviation
                 'cm' : 'ft',
+                'm' : 'ft',
+                'm-lrg' : 'nm',
                 'cms': 'kt',
-                'cdeg' : 'deg',
-                'ms' : 'sec'
+                'v-cms' : 'hftmin',
+                'decideg' : 'deg',
+                'msec' : 'sec',
+                'dsec' : 'sec',
+                'decidegc' : 'degc',
             },
             default:{}//show base units
         };
@@ -239,18 +306,31 @@ var Settings = (function () {
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
             element.attr('step', ((multiplier != 1) ? '0.01' : '1'));
-            element.attr('min', (element.attr('min') / multiplier).toFixed(2));
-            element.attr('max', (element.attr('max') / multiplier).toFixed(2));
+            if (multiplier != 'FAHREN') {
+                element.attr('min', (element.attr('min') / multiplier).toFixed(2));
+                element.attr('max', (element.attr('max') / multiplier).toFixed(2));
+            }
         }
 
         // Update the input with a new formatted unit
-        const convertedValue = Number((oldValue / multiplier).toFixed(2));
-        const newValue = Number.isInteger(convertedValue) ? Math.round(convertedValue) : convertedValue;
+        let newValue = "";
+        if (multiplier == 'FAHREN') {
+            element.attr('min', toFahrenheit(element.attr('min')).toFixed(2));
+            element.attr('max', toFahrenheit(element.attr('max')).toFixed(2));
+            newValue = toFahrenheit(oldValue).toFixed(2);
+        } else {
+            const convertedValue = Number((oldValue / multiplier).toFixed(2));
+            newValue = Number.isInteger(convertedValue) ? Math.round(convertedValue) : convertedValue;
+        }
         element.val(newValue);
         element.data('setting-multiplier', multiplier);
 
         // Now wrap the input in a display that shows the unit
         element.wrap(`<div data-unit="${unitDisplayDames[unitName]}" class="unit_wrapper unit"></div>`);
+
+        function toFahrenheit(decidegC) {
+            return (decidegC / 10) * 1.8 + 32;
+        };
     }
 
     self.saveInput = function(input) {
@@ -271,8 +351,13 @@ var Settings = (function () {
         } else if(setting.type == 'string') {
             value = input.val();
         } else {
-            var multiplier = parseFloat(input.data('setting-multiplier') || 1);
-            value = parseFloat(input.val()) * multiplier;
+            var multiplier = input.data('setting-multiplier') || 1;
+            if (multiplier == 'FAHREN') {
+                value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
+            } else {
+                multiplier = parseFloat(multiplier);
+                value = Math.round(parseFloat(input.val()) * multiplier);
+            }
         }
         return mspHelper.setSetting(settingName, value);
     };
