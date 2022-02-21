@@ -63,7 +63,7 @@ var Settings = (function () {
                     } else {
                         input.attr('step', "0.01");
                     }
-                    
+
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
                     input.val(s.value.toFixed(2));
@@ -71,6 +71,14 @@ var Settings = (function () {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
                     input.attr('type', 'number');
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
+
+                    if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
+                        input.attr('min', (s.setting.min / multiplier).toFixed(Math.log10(multiplier)));
+                    }
+
+                    if (typeof s.setting.max !== 'undefined' && s.setting.max !== null) {
+                        input.attr('max', (s.setting.max / multiplier).toFixed(Math.log10(multiplier)));
+                    }
                 }
 
                 // If data is defined, We want to convert this value into 
@@ -104,19 +112,19 @@ var Settings = (function () {
         const getUnitDisplayTypeValue = () => {
             // Try and match the values 
             switch (configUnitType) {
+                case UnitType.imperial:
+                    return 0;
+                    break;
+                case UnitType.metric:
+                    return 1;
+                    break;
                 case UnitType.OSD: // Match the OSD value on the UI
                     return globalSettings.osdUnits;
                     break;
-                case UnitType.imperial:
-                    return 0; // Imperial OSD Value
-                    break;
-                case UnitType.metric:
-                    return 1; // Metric + MPH OSD Value
-                    break;
                 case UnitType.none:
                 default:
-                    // Something went wrong
                     return -1;
+                    break;
             }
         }
 
@@ -126,48 +134,104 @@ var Settings = (function () {
 
         const oldValue = element.val();
 
+        //display names for the units
+        const unitDisplayDames = {
+            'us' : "uS",
+            'deg' : '&deg;',
+            'cdeg' : 'centi&deg;',
+            'cmss' : 'cm/s/s',
+            'cm' : 'cm',
+            'cms' : 'cm/s',
+            'm' : 'm',
+            'ms' : 'ms',
+            'mps' : 'm/s',
+            'kmh' : 'Km/h',
+            'sec' : 's',
+            'kt' : 'Kt',
+            'ft' : 'ft',
+            'mph' : 'mph',
+            'cw' : 'cW',
+            'percent' : '%'
+        }
+
+
         // Ensure we can do conversions
-        if (configUnitType === UnitType.none || uiUnitValue === -1 || !inputUnit || !oldValue || !element) {
+        if (!inputUnit || !oldValue || !element) {
             return;
         }
 
-        // Used to convert between a value and a value matching the int
-        // unit display value. Eg 1 = Metric 
-        // units. We use the OSD unit values here for easy
-        const conversionTable = {    
-            1: {
-                'cm':  { multiplier: 100, unitName: 'm' },
-                'cms': { multiplier: 27.77777777777778, unitName: 'Km/h' }
+        //this is used to get the factor in which we multiply
+        //to get the correct conversion, the first index is the from
+        //unit and the second is the too unit
+        //unitConversionTable[toUnit][fromUnit] -> factor
+        const unitRatioTable = {
+            'cm' : {
+                'm' : 100, 
+                'ft' : 30.48
             },
-            2: {
-                'cm':  { multiplier: 100, unitName: 'm' },
-            },          
-            4: {
-                'cms': { multiplier: 51.44444444444457, unitName: 'Kt' }
+            'cms' : {
+                'kmh' : 27.77777777777778, 
+                'kt': 51.44444444444457, 
+                'mph' : 44.704,
+                'mps' : 100
             },
-            default: {
-                'cm':  { multiplier: 30.48, unitName: 'ft' },
-                'cms': { multiplier: 44.704, unitName: 'mph' },
-                'ms':  { multiplier: 1000, unitName: 'sec' }                
+            'ms' : {
+                'sec' : 1000
             },
-        }
+            'cdeg' : {
+                'deg' : 10
+            },
+        };
 
-        // Small closure to try and get the multiplier 
-        // needed from the conversion table
+        //this holds which units get converted in which unit systems
+        const conversionTable = {
+            0: { //imperial
+                'cm' : 'ft',
+                'cms' : 'mph',
+                'cdeg' : 'deg',
+                'ms' : 'sec'
+            },
+            1: {//metric
+                'cm': 'm',
+                'cms' : 'kmh',
+                'ms' : 'sec',
+                'cdeg' : 'deg'
+            },
+            2: { //metric with MPH
+                'cm': 'm',
+                'cms' : 'mph',
+                'cdeg' : 'deg',
+                'ms' : 'sec'
+            },
+            3:{ //UK
+                'cm' : 'ft',
+                'cms' : 'mph',
+                'cdeg' : 'deg',
+                'ms' : 'sec'
+            },
+            4: { //General aviation
+                'cm' : 'ft',
+                'cms': 'kt',
+                'cdeg' : 'deg',
+                'ms' : 'sec'
+            },
+            default:{}//show base units
+        };
+
+        //this returns the factor in which to multiply to convert a unit
         const getUnitMultiplier = () => {
-            if(conversionTable[uiUnitValue] && conversionTable[uiUnitValue][inputUnit]) {
-                return conversionTable[uiUnitValue][inputUnit];
+            if (conversionTable[uiUnitValue]){
+                const fromUnits = conversionTable[uiUnitValue];
+                if (fromUnits[inputUnit]){
+                    const multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
+                    return {'multiplier':multiplier, 'unitName':fromUnits[inputUnit]};
+                }
             }
-            
-            return conversionTable['default'][inputUnit];
+            return {multiplier:1, unitName:inputUnit};
         }
 
         // Get the default multi obj or the custom       
         const multiObj = getUnitMultiplier();
-
-        if(!multiObj) {
-            return;
-        }
 
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
@@ -186,7 +250,7 @@ var Settings = (function () {
         element.data('setting-multiplier', multiplier);
 
         // Now wrap the input in a display that shows the unit
-        element.wrap(`<div data-unit="${unitName}" class="unit_wrapper unit"></div>`);
+        element.wrap(`<div data-unit="${unitDisplayDames[unitName]}" class="unit_wrapper unit"></div>`);
     }
 
     self.saveInput = function(input) {
