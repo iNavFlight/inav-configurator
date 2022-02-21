@@ -178,72 +178,70 @@
                         <tr>
                             <th class="roll" data-i18n="pidTuningRollRate"></th>
                             <td class="roll">
-                                <input type="number" class="rate-tpa_input" data-setting="roll_rate" data-setting-unit="ddeg" />
-                                <input type="number" id="rate-roll" class="rate-tpa_input" step="10" min="40" max="1800" />
-                                degrees per second
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="roll_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
                         <tr>
                             <th class="pitch" data-i18n="pidTuningPitchRate"></th>
                             <td class="pitch">
-                                <input type="number" id="rate-pitch" class="rate-tpa_input" step="10" min="40" max="1800" /> degrees per second
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="pitch_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
                         <tr>
                             <th class="yaw" data-i18n="pidTuningYawRate"></th>
                             <td class="yaw">
-                                <input type="number" id="rate-yaw" class="rate-tpa_input" step="10" min="10" max="1800" /> degrees per second
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="yaw_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
                         <tr>
-                            <th>Roll & Pitch Expo</th>
+                            <th data-i18n="pidTuningRollAndPitchExpo"></th>
                             <td>
-                                <input data-setting="rc_expo" type="number" class="rate-tpa_input" />
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="rc_expo" data-unit="percent" /></div>
                             </td>
                         </tr>
                         <tr>
-                            <th>Yaw Expo</th>
+                            <th data-i18n="pidTuningYawExpo"></th>
                             <td>
-                                <input data-setting="rc_yaw_expo" type="number" class="rate-tpa_input" />
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="rc_yaw_expo" data-unit="percent" /></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuningMaxRollAngle"></th>
                             <td>
-                                <input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-setting-multiplier="10" /> degrees
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-unit="decideg-lrg" /></div>
                                 <div class="helpicon cf_tip" data-i18n_title="pidTuningMaxRollAngleHelp"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuningMaxPitchAngle"></th>
                             <td>
-                                <input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-setting-multiplier="10" /> degrees
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
                                 <div class="helpicon cf_tip" data-i18n_title="pidTuningMaxPitchAngleHelp"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="magHoldYawRate"></th>
                             <td>
-                                <input type="number" id="magHoldYawRate" class="rate-tpa_input" step="5" min="10" max="250" /> degrees per second
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
                                 <div class="helpicon cf_tip" data-i18n_title="pidTuningMagHoldYawRateHelp"></div>
                             </td>
                         </tr>
                         <tr>
                             <th class="roll" data-i18n="pidTuningManualRollRate"></th>
                             <td class="roll">
-                                <input type="number" id="rate-manual-roll" class="rate-tpa_input" step="1" min="0" max="100" /> %
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="manual_roll_rate" data-unit="percent" /></div>
                             </td>
                         </tr>
                         <tr>
                             <th class="pitch" data-i18n="pidTuningManualPitchRate"></th>
                             <td class="pitch">
-                                <input type="number" id="rate-manual-pitch" class="rate-tpa_input" step="1" min="0" max="100" /> %
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="manual_pitch_rate" data-unit="percent" /></div>
                             </td>
                         </tr>
                         <tr>
                             <th class="yaw" data-i18n="pidTuningManualYawRate"></th>
                             <td class="yaw">
-                                <input type="number" id="rate-manual-yaw" class="rate-tpa_input" step="1" min="0" max="100" /> %
+                                <div class="rates_number"><input type="number" class="rate-tpa_input" data-setting="manual_yaw_rate" data-unit="percent" /></div>
                             </td>
                         </tr>
                     </tbody>

@@ -2232,7 +2232,9 @@ ol li {
 /* Position the unit to the right of the wrapper */
 .unit_wrapper::after {
     position: absolute;
-    top: 2px;
+    /*top: 2px;*/
+    bottom: -2px;
+    height: 100%;
     right: .5em;
     transition: all .05s ease-in-out;
 }

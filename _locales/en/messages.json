@@ -1182,6 +1182,12 @@
     "pidTuningYawRate": {
         "message": "YAW rate"
     },
+    "pidTuningRollAndPitchExpo": {
+        "message": "Roll & Pitch Expo"
+    },
+    "pidTuningYawExpo" : {
+        "message": "Yaw Expo"
+    },
     "pidTuningMaxRollAngle": {
         "message": "Max. ROLL angle"
     },
@@ -1204,7 +1210,7 @@
         "message": "Manual YAW rate"
     },
     "magHoldYawRate": {
-        "message": "MagHold rate"
+        "message": "Heading Hold rate limit"
     },
     "pidTuningMagHoldYawRateHelp": {
         "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
