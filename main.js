@@ -71,8 +71,8 @@ $(document).ready(function () {
             result.show_profile_parameters = 1;
         }
         globalSettings.showProfileParameters = result.show_profile_parameters;
-        // Update CSS on select boxes
-        updateProfilesSelectColours();
+        // Update CSS on to show highlighing or not
+        updateProfilesHighlightColours();
     });
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
@@ -203,6 +203,9 @@ $(document).ready(function () {
 
                 function content_ready() {
                     GUI.tab_switch_in_progress = false;
+
+                    // Update CSS on to show highlighing or not
+                    updateProfilesHighlightColours();
                 }
 
                 switch (tab) {
@@ -343,7 +346,7 @@ $(document).ready(function () {
                     });
 
                     // Update CSS on select boxes
-                    updateProfilesSelectColours();
+                    updateProfilesHighlightColours();
 
                     // Horrible way to reload the tab
                     const activeTab = $('#tabs li.active'); 
@@ -567,13 +570,33 @@ function get_osd_settings() {
     });
 }
 
-function updateProfilesSelectColours() {
+function updateProfilesHighlightColours() {
     if (globalSettings.showProfileParameters) {
         $('.dropdown-dark #profilechange').addClass('showProfileParams');
         $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
+
+        $('.batteryProfileHighlight').each(function() {
+            $(this).addClass('batteryProfileHighlightActive');
+            $(this).removeClass('batteryProfileHighlight');
+        });
+
+        $('.controlProfileHighlight').each(function() {
+            $(this).addClass('controlProfileHighlightActive');
+            $(this).removeClass('controlProfileHighlight');
+        });
     } else {
         $('.dropdown-dark #profilechange').removeClass('showProfileParams');
         $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
+
+        $('.batteryProfileHighlightActive').each(function() {
+            $(this).addClass('batteryProfileHighlight');
+            $(this).removeClass('batteryProfileHighlightActive');
+        });
+
+        $('.controlProfileHighlightActive').each(function() {
+            $(this).addClass('controlProfileHighlight');
+            $(this).removeClass('controlProfileHighlightActive');
+        });
     }
 }
 

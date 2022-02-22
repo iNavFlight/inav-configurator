@@ -113,8 +113,8 @@ TABS.pid_tuning.initialize = function (callback) {
         localize();
 
         if (FC.isCdComponentUsed()) {
-            $('th.feedforward').html(chrome.i18n.getMessage('pidTuningControlDerivative'));
-            $('th.feedforward').attr('title', chrome.i18n.getMessage('pidTuningControlDerivative'));
+            $('th.feedforward').html(chrome.i18n.getMessage('pidTuning_ControlDerivative'));
+            $('th.feedforward').attr('title', chrome.i18n.getMessage('pidTuning_ControlDerivative'));
         }
 
         if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {

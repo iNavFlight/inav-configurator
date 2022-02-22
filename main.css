@@ -2257,3 +2257,19 @@ ol li {
 .unit::after {
     content: attr(data-unit) ;
 }
+
+.batteryProfileHighlight {
+    background-color: none;
+}
+
+.batteryProfileHighlightActive {
+    background-color: #fef2d5;
+}
+
+.controlProfileHighlight {
+    background-color:none;
+}
+
+.controlProfileHighlightActive {
+    background-color: #d5ebfe;
+}
