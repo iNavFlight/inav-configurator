@@ -71,6 +71,8 @@ $(document).ready(function () {
             result.show_profile_parameters = 1;
         }
         globalSettings.showProfileParameters = result.show_profile_parameters;
+        // Update CSS on select boxes
+        updateProfilesSelectColours();
     });
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
@@ -341,13 +343,7 @@ $(document).ready(function () {
                     });
 
                     // Update CSS on select boxes
-                    if (globalSettings.showProfileParameters) {
-                        $('.dropdown-dark #profilechange').addClass('showProfileParams');
-                        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
-                    } else {
-                        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
-                        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
-                    }
+                    updateProfilesSelectColours();
 
                     // Horrible way to reload the tab
                     const activeTab = $('#tabs li.active'); 
@@ -361,7 +357,7 @@ $(document).ready(function () {
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);   
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
-
+                
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
                 $('#ui-unit-type').change(function () {
@@ -537,7 +533,7 @@ $(document).ready(function () {
     profile_e.change(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
-            GUI.log(chrome.i18n.getMessage('pidTuningLoadedProfile', [profile + 1]));
+            GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
             updateActivatedTab();
         });
     });
@@ -569,6 +565,16 @@ function get_osd_settings() {
         prefs.readU8();
         globalSettings.osdUnits = prefs.readU8();
     });
+}
+
+function updateProfilesSelectColours() {
+    if (globalSettings.showProfileParameters) {
+        $('.dropdown-dark #profilechange').addClass('showProfileParams');
+        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
+    } else {
+        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
+        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
+    }
 }
 
 function catch_startup_time(startTime) {

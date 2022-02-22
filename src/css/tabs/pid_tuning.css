@@ -307,7 +307,7 @@
     border-bottom: 0;
 }
 
-.tab-pid_tuning .rates_number {
+.tab-pid_tuning .pidTuning_number {
     clear: left;
     padding: 4px;
     float: left;

@@ -340,13 +340,20 @@ var Settings = (function () {
 
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
+            let step = element.attr('step') || 1;
             let decimalPlaces = 0;
-            if (multiplier > 1) {
-                element.attr('step', '0.01');
-                decimalPlaces = 2;
-            } else {
-                element.attr('step', (multiplier < 1) ? (multiplier * 100).toFixed(0) : '1');
+            
+            step = step / multiplier;
+            
+            if (step < 1) {
+                decimalPlaces = step.toString().length - step.toString().indexOf(".") - 1;
+                if (parseInt(step.toString().slice(-1)) > 1 ) { 
+                    decimalPlaces--; 
+                }
+                step = 1 / Math.pow(10, decimalPlaces);
             }
+            element.attr('step', step.toFixed(decimalPlaces));
+
             if (multiplier != 'FAHREN') {
                 element.attr('min', (element.attr('min') / multiplier).toFixed(decimalPlaces));
                 element.attr('max', (element.attr('max') / multiplier).toFixed(decimalPlaces));

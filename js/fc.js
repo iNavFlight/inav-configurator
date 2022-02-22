@@ -1445,7 +1445,6 @@ var FC = {
     },
     isBatteryProfileParameter: function(paramName) {
         return ($.inArray(paramName,this.getBatteryProfileParameters()) != -1);
-        //return true;
     },
     getControlProfileParameters: function () {
         return [
