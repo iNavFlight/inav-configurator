@@ -50,8 +50,6 @@ var MSPCodes = {
     MSP_CF_SERIAL_CONFIG:       54,
     MSP_SET_CF_SERIAL_CONFIG:   55,
     MSP_SONAR:                  58,
-    MSP_PID_CONTROLLER:         59,
-    MSP_SET_PID_CONTROLLER:     60,
     MSP_ARMING_CONFIG:          61,
     MSP_SET_ARMING_CONFIG:      62,
     MSP_DATAFLASH_SUMMARY:      70,
@@ -158,7 +156,7 @@ var MSPCodes = {
     MSP_BF_CONFIG:             66, // Depreciated
     MSP_SET_BF_CONFIG:         67, // Depreciated
     MSP_SET_REBOOT:         68, // reboot settings
-    MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
+    MSP_BF_BUILD_INFO:          69,  // Depreciated
 
     // INAV specific codes
     MSPV2_SETTING:                      0x1003,

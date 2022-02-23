@@ -68,15 +68,6 @@ var mspHelper = (function (gui) {
             colorCount,
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
-            case MSPCodes.MSP_IDENT:
-                //FIXME remove this frame when proven not needed
-                console.log('Using deprecated msp command: MSP_IDENT');
-                // Deprecated
-                CONFIG.version = parseFloat((data.getUint8(0) / 100).toFixed(2));
-                CONFIG.multiType = data.getUint8(1);
-                CONFIG.msp_version = data.getUint8(2);
-                CONFIG.capability = data.getUint32(3, true);
-                break;
             case MSPCodes.MSP_STATUS:
                 console.log('Using deprecated msp command: MSP_STATUS');
                 CONFIG.cycleTime = data.getUint16(0, true);
@@ -2736,14 +2727,6 @@ var mspHelper = (function (gui) {
     /*
      * Basic sending methods used for chaining purposes
      */
-
-    /**
-     * @deprecated
-     * @param callback
-     */
-    self.loadMspIdent = function (callback) {
-        MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
-    };
 
     self.loadINAVPidConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
