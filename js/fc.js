@@ -2,7 +2,6 @@
 
 // define all the global variables that are uses to hold FC state
 var CONFIG,
-    BF_CONFIG,
     LED_STRIP,
     LED_COLORS,
     LED_MODE_COLORS,
@@ -63,7 +62,10 @@ var CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
     BRAKING_CONFIG,
-    SAFEHOMES;
+    SAFEHOMES,
+    BOARD_ALIGNMENT,
+    CURRENT_METER_CONFIG,
+    FEATURES;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -127,20 +129,24 @@ var FC = {
             name: ''
         };
 
-        BF_CONFIG = {
-            mixerConfiguration: 0,
-            features: 0,
-            serialrx_type: 0,
-            board_align_roll: 0,
-            board_align_pitch: 0,
-            board_align_yaw: 0,
-            currentscale: 0,
-            currentoffset: 0
+        BOARD_ALIGNMENT = {
+            roll: 0,
+            pitch: 0,
+            yaw: 0
+        };
+
+        CURRENT_METER_CONFIG = {
+            scale: 0,
+            offset: 0,
+            type: 0,
+            capacity: 0
         };
 
         LED_STRIP = [];
         LED_COLORS = [];
         LED_MODE_COLORS = [];
+
+        FEATURES = 0;
 
         PID = {
         };
@@ -576,7 +582,7 @@ var FC = {
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
             {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
+            {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},
@@ -606,7 +612,7 @@ var FC = {
             features = this.getFeatures();
         }
         for (var i = 0; i < features.length; i++) {
-            if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
+            if (features[i].name == featureName && bit_check(FEATURES, features[i].bit)) {
                 return true;
             }
         }

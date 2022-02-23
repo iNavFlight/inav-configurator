@@ -1,4 +1,4 @@
-/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass*/
+/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass,BOARD_ALIGNMENT,TABS,MISC*/
 'use strict';
 
 TABS.configuration = {};
@@ -30,7 +30,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
-        mspHelper.loadBfConfig,
+        mspHelper.loadFeatures,
         mspHelper.loadArmingConfig,
         mspHelper.loadLoopTime,
         mspHelper.load3dConfig,
@@ -39,6 +39,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
+        mspHelper.loadBoardAlignment,
+        mspHelper.loadCurrentMeterConfig,
         loadCraftName,
         mspHelper.loadMiscV2
     ];
@@ -50,7 +52,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var saveChainer = new MSPChainerClass();
 
     var saveChain = [
-        mspHelper.saveBfConfig,
         mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
@@ -59,6 +60,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
+        mspHelper.saveBoardAlignment,
+        mspHelper.saveCurrentMeterConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
         saveSettings,
@@ -133,7 +136,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
-        helper.features.updateUI($('.tab-configuration'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-configuration'), FEATURES);
 
         // translate to user-selected language
         localize();
@@ -145,32 +148,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
         orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
-
-        // generate GPS
-        var gpsProtocols = FC.getGpsProtocols();
-        var gpsSbas = FC.getGpsSbasProviders();
-
-        var gps_protocol_e = $('#gps_protocol');
-        for (i = 0; i < gpsProtocols.length; i++) {
-            gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
-        }
-
-        gps_protocol_e.change(function () {
-            MISC.gps_type = parseInt($(this).val());
-        });
-
-        gps_protocol_e.val(MISC.gps_type);
-
-        var gps_ubx_sbas_e = $('#gps_ubx_sbas');
-        for (i = 0; i < gpsSbas.length; i++) {
-            gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
-        }
-
-        gps_ubx_sbas_e.change(function () {
-            MISC.gps_ubx_sbas = parseInt($(this).val());
-        });
-
-        gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -255,7 +232,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         // fill board alignment
-        $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
+        $('input[name="board_align_yaw"]').val((BOARD_ALIGNMENT.yaw / 10.0).toFixed(1));
 
         // fill magnetometer
         $('#mag_declination').val(MISC.mag_declination);
@@ -270,8 +247,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#voltagescale').val(MISC.vbatscale);
 
         // fill current
-        $('#currentscale').val(BF_CONFIG.currentscale);
-        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentscale').val(CURRENT_METER_CONFIG.scale);
+        $('#currentoffset').val(CURRENT_METER_CONFIG.offset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -351,13 +328,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             craftName = $('input[name="craft_name"]').val();
 
-            if (FC.isFeatureEnabled('GPS', features)) {
-                googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
-                googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
-            }
-
-            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
-
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
@@ -373,13 +343,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
-                BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
-                BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                BOARD_ALIGNMENT.yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
+                CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();
             });
         });

@@ -15,7 +15,7 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig,
-        mspHelper.loadBfConfig
+        mspHelper.loadFeatures
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -101,7 +101,7 @@ TABS.pid_tuning.initialize = function (callback) {
       if (have_sensor(sensors_detected, 'mag')) {
         $('#pid_mag').show();
       }
-      if (bit_check(BF_CONFIG.features, 7)) {   //This will need to be reworked to remove BF_CONFIG reference eventually
+      if (bit_check(FEATURES, 7)) {
         $('#pid_gps').show();
       }
       if (have_sensor(sensors_detected, 'sonar')) {
@@ -132,7 +132,7 @@ TABS.pid_tuning.initialize = function (callback) {
         }
 
         helper.tabs.init($('.tab-pid_tuning'));
-        helper.features.updateUI($('.tab-pid_tuning'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
 
         hideUnusedPids(CONFIG.activeSensors);
 

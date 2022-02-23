@@ -1,4 +1,4 @@
-/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,BF_CONFIG,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
+/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.outputs = {
@@ -24,7 +24,7 @@ TABS.outputs.initialize = function (callback) {
 
     loadChainer.setChain([
         mspHelper.loadMiscV2,
-        mspHelper.loadBfConfig,
+        mspHelper.loadFeatures,
         mspHelper.load3dConfig,
         mspHelper.loadMotors,
         mspHelper.loadMotorMixRules,
@@ -46,7 +46,6 @@ TABS.outputs.initialize = function (callback) {
         saveSettings,
         mspHelper.sendServoConfigurations,
         mspHelper.saveAdvancedConfig,
-        mspHelper.saveBfConfig,
         mspHelper.saveMiscV2,
         mspHelper.saveToEeprom
     ]);
@@ -65,7 +64,7 @@ TABS.outputs.initialize = function (callback) {
 
     function onLoad() {
 
-        self.feature3DEnabled = bit_check(BF_CONFIG.features, 12);
+        self.feature3DEnabled = bit_check(FEATURES, 12);
 
         process_motors();
         process_servos();
@@ -193,7 +192,7 @@ TABS.outputs.initialize = function (callback) {
 
         $('#servo-rate-container').show();
 
-        helper.features.updateUI($('.tab-motors'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-motors'), FEATURES);
         GUI.simpleBind();
 
         let $reversibleMotorCheckbox = $('#feature-12');
