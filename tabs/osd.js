@@ -2011,13 +2011,18 @@ OSD.updateDisplaySize = function () {
         video_type = 'PAL';
     }
 
-	// save the original OSD element positions.
-	var origPos = [];
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-        origPos.push(OSD.msp.helpers.pack.position(OSD.data.items[ii]));
+    // save the original OSD element positions for all layouts
+    var osdLayouts = [];
+    for (var ii = 0; ii < OSD.data.layout_count; ii++) {
+        var items = OSD.data.layouts[ii];
+        var origPos = [];
+        for (var jj = 0; jj < OSD.data.items.length; jj++) {
+            origPos.push(OSD.msp.helpers.pack.position(items[jj]));
+        }
+        osdLayouts.push(origPos);
     }
 
-	// save the new video type and cols per line
+    // set the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
     OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
@@ -2028,16 +2033,20 @@ OSD.updateDisplaySize = function () {
         total: OSD.constants.VIDEO_BUFFER_CHARS[video_type]
     };
 
-	// recalculate the OSD element positions for the new cols per line
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-		var item = OSD.msp.helpers.unpack.position(origPos[ii]);
-		// do not recalculate anything not visible or outside of the screen
-		if (item.isVisible && item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-			OSD.data.items[ii] = item;
-		}
-	}
-	
-	// set the preview size
+    // re-calculate the OSD element positions for each layout
+    for (var ii = 0; ii < OSD.data.layout_count; ii++) {
+        var origPos = osdLayouts[ii];
+        var items = OSD.data.layouts[ii];
+        for (var jj = 0; jj < OSD.data.item_count; jj++) {
+            var item = OSD.msp.helpers.unpack.position(origPos[jj]);
+            // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
+            if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
+                items[jj] = item; 
+            }
+        }
+    }
+
+    // set the preview size based on the video type
     $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
     $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
     $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
@@ -2094,7 +2103,7 @@ OSD.msp = {
         },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x2000 : 0)
+                return (display_item.isVisible ? OSD.constants.VISIBLE : 0)
                 	| ((display_item.y & 0x3F) << 6) | (display_item.x & 0x3F);
             }
         }

@@ -64,7 +64,8 @@ var CONFIG,
     SETTINGS,
     BRAKING_CONFIG,
     SAFEHOMES,
-    BOARD_ALIGNMENT;
+    BOARD_ALIGNMENT,
+    CURRENT_METER_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -143,7 +144,14 @@ var FC = {
             roll: 0,
             pitch: 0,
             yaw: 0
-        }
+        };
+
+        CURRENT_METER_CONFIG = {
+            scale: 0,
+            offset: 0,
+            type: 0,
+            capacity: 0
+        };
 
         LED_STRIP = [];
         LED_COLORS = [];
@@ -583,7 +591,7 @@ var FC = {
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
             {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
+            {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},

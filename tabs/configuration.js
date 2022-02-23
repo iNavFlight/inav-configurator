@@ -40,6 +40,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
+        mspHelper.loadCurrentMeterConfig,
         loadCraftName,
         mspHelper.loadMiscV2
     ];
@@ -61,6 +62,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
         mspHelper.saveBoardAlignment,
+        mspHelper.saveCurrentMeterConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
         saveSettings,
@@ -147,32 +149,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
         orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
-
-        // generate GPS
-        var gpsProtocols = FC.getGpsProtocols();
-        var gpsSbas = FC.getGpsSbasProviders();
-
-        var gps_protocol_e = $('#gps_protocol');
-        for (i = 0; i < gpsProtocols.length; i++) {
-            gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
-        }
-
-        gps_protocol_e.change(function () {
-            MISC.gps_type = parseInt($(this).val());
-        });
-
-        gps_protocol_e.val(MISC.gps_type);
-
-        var gps_ubx_sbas_e = $('#gps_ubx_sbas');
-        for (i = 0; i < gpsSbas.length; i++) {
-            gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
-        }
-
-        gps_ubx_sbas_e.change(function () {
-            MISC.gps_ubx_sbas = parseInt($(this).val());
-        });
-
-        gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -272,8 +248,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#voltagescale').val(MISC.vbatscale);
 
         // fill current
-        $('#currentscale').val(BF_CONFIG.currentscale);
-        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentscale').val(CURRENT_METER_CONFIG.scale);
+        $('#currentoffset').val(CURRENT_METER_CONFIG.offset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -375,13 +351,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
                 BOARD_ALIGNMENT.yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
-                BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();
             });
         });

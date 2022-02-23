@@ -973,7 +973,7 @@
         "message": "Cycles/Sec (Hz)"
     },
     "configurationGPS": {
-        "message": "GPS"
+        "message": "Configuration"
     },
     "configurationGPSProtocol": {
         "message": "Protocol"
@@ -1624,10 +1624,10 @@
         "message":"<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
     },
     "gpsHead": {
-        "message": "GPS"
+        "message": "Position"
     },
     "gpsStatHead": {
-        "message": "GPS Statistics"
+        "message": "Statistics"
     },
     "gpsMapHead": {
         "message": "Current GPS location"

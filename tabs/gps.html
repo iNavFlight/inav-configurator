@@ -1,8 +1,78 @@
-<div class="tab-gps">
+<div class="tab-gps toolbar_fixed_bottom">
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabGPS">GPS</div>
-        <div class="cf_column fourth">
+        <div class="cf_column third_left">
             <div class="spacer_right">
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="configurationGPS"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="note">
+                            <div class="note_spacer">
+                                <p data-i18n="configurationGPSHelp"></p>
+                            </div>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" data-bit="7" class="feature toggle" name="GPS" title="GPS"
+                                id="feature-7">
+                            <label for="feature-7">
+                                <span data-i18n="featureGPS"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="featureGPSTip"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="gps_protocol" class="gps_protocol">
+                                <!-- list generated here -->
+                            </select>
+                            <label for="gps_protocol">
+                                <span data-i18n="configurationGPSProtocol"></span>
+                            </label>
+                        </div>
+                        <div class="select">
+                            <select id="gps_ubx_sbas" class="gps_ubx_sbas">
+                                <!-- list generated here -->
+                            </select>
+                            <label for="gps_ubx_sbas">
+                                <span data-i18n="configurationGPSubxSbas"></span>
+                            </label>
+                        </div>
+                        <div class="number is-hidden">
+                            <input type="number" id="mag_declination" name="mag_declination" step="0.1" min="-180"
+                                max="180" />
+                            <label for="mag_declination">
+                                <span data-i18n="configurationMagDeclination"></span>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" data-setting="gps_ublox_use_galileo"
+                                data-live="true">
+                            <label for="gps_use_galileo">
+                                <span data-i18n="configurationGPSUseGalileo"></span>
+                            </label>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="tzOffset" data-setting="tz_offset" data-setting-multiplier="1"
+                                step="1" min="-1440" max="1440" />
+                            <label for="tzOffset">
+                                <span data-i18n="tzOffset"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="tzOffsetHelp"></div>
+                        </div>
+                        <div class="select">
+                            <select id="tzAutomaticDST" data-setting="tz_automatic_dst"></select>
+                            <label for="tzAutomaticDST">
+                                <span data-i18n="tzAutomaticDST"></span>
+                            </label>
+                            <div class="helpicon cf_tip" data-i18n_title="tzAutomaticDSTHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="gpsHead"></div>
@@ -80,18 +150,23 @@
             </div>
         </div>
 
-        <div class="cf_column threefourth_left">
+        <div class="cf_column twothird">
             <div class="gui_box grey gps_map">
                 <div class="gui_box_titlebar" style="margin-bottom: 0;">
                     <div class="spacer_box_title" data-i18n="gpsMapHead"></div>
                 </div>
                 <div id="loadmap">
                     <div style="height:100%" id="gps-map">
-                      <button class="map-button" id="center_button" data-i18n="gps_map_center"></button>
+                        <button class="map-button" id="center_button" data-i18n="gps_map_center"></button>
                     </div>
                 </div>
-        </div>
+            </div>
 
+        </div>
     </div>
-</div>
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
+        </div>
+    </div>
 </div>

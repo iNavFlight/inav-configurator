@@ -35,6 +35,8 @@ var MSPCodes = {
     MSP_SET_MODE_RANGE:         35,
     MSP_BOARD_ALIGNMENT:        38,
     MSP_SET_BOARD_ALIGNMENT:    39,
+    MSP_CURRENT_METER_CONFIG:   40,
+    MSP_SET_CURRENT_METER_CONFIG: 41,
     MSP_RX_CONFIG:              44,
     MSP_SET_RX_CONFIG:          45,
     MSP_LED_COLORS:             46,
