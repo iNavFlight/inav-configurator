@@ -735,21 +735,6 @@ var mspHelper = (function (gui) {
                 console.log('RCMAP saved');
                 break;
 
-            case MSPCodes.MSP_BF_CONFIG:
-                BF_CONFIG.mixerConfiguration = data.getUint8(0);
-                BF_CONFIG.features = data.getUint32(1, true);
-                BF_CONFIG.serialrx_type = data.getUint8(5);
-                BF_CONFIG.board_align_roll = data.getInt16(6, true); // -180 - 360
-                BF_CONFIG.board_align_pitch = data.getInt16(8, true); // -180 - 360
-                BF_CONFIG.board_align_yaw = data.getInt16(10, true); // -180 - 360
-                BF_CONFIG.currentscale = data.getInt16(12, true);
-                BF_CONFIG.currentoffset = data.getInt16(14, true);
-                break;
-
-            case MSPCodes.MSP_SET_BF_CONFIG:
-                console.log('BF_CONFIG saved');
-                break;
-
             case MSPCodes.MSP_BOARD_ALIGNMENT:
                 BOARD_ALIGNMENT.roll = data.getInt16(0, true); // -180 - 360
                 BOARD_ALIGNMENT.pitch = data.getInt16(2, true); // -180 - 360
@@ -769,6 +754,14 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_SET_CURRENT_METER_CONFIG:
                 console.log('MSP_SET_CURRENT_METER_CONFIG saved');
+                break;
+
+            case MSPCodes.MSP_FEATURE:
+                FEATURES = data.getUint32(0, true);
+                break;
+
+            case MSPCodes.MSP_SET_FEATURE:
+                console.log('MSP_SET_FEATURE saved');
                 break;
 
             case MSPCodes.MSP_SET_REBOOT:
@@ -1561,6 +1554,13 @@ var mspHelper = (function (gui) {
 
         switch (code) {
 
+            case MSPCodes.MSP_SET_FEATURE:
+                buffer.push(specificByte(FEATURES, 0));
+                buffer.push(specificByte(FEATURES, 1));
+                buffer.push(specificByte(FEATURES, 2));
+                buffer.push(specificByte(FEATURES, 3));
+                break;
+
             case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
                 buffer.push(specificByte(BOARD_ALIGNMENT.roll, 0));
                 buffer.push(specificByte(BOARD_ALIGNMENT.roll, 1));
@@ -1580,24 +1580,6 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 1));
                 break;
                 
-            case MSPCodes.MSP_SET_BF_CONFIG:
-                buffer.push(BF_CONFIG.mixerConfiguration);
-                buffer.push(specificByte(BF_CONFIG.features, 0));
-                buffer.push(specificByte(BF_CONFIG.features, 1));
-                buffer.push(specificByte(BF_CONFIG.features, 2));
-                buffer.push(specificByte(BF_CONFIG.features, 3));
-                buffer.push(BF_CONFIG.serialrx_type);
-                buffer.push(specificByte(BF_CONFIG.board_align_roll, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_roll, 1));
-                buffer.push(specificByte(BF_CONFIG.board_align_pitch, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_pitch, 1));
-                buffer.push(specificByte(BF_CONFIG.board_align_yaw, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_yaw, 1));
-                buffer.push(lowByte(BF_CONFIG.currentscale));
-                buffer.push(highByte(BF_CONFIG.currentscale));
-                buffer.push(lowByte(BF_CONFIG.currentoffset));
-                buffer.push(highByte(BF_CONFIG.currentoffset));
-                break;
             case MSPCodes.MSP_SET_VTX_CONFIG:
                 if (VTX_CONFIG.band > 0) {
                     buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
@@ -2803,8 +2785,8 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
     };
 
-    self.loadBfConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
+    self.loadFeatures = function (callback) {
+        MSP.send_message(MSPCodes.MSP_FEATURE, false, false, callback);
     };
 
     self.loadBoardAlignment = function (callback) {
@@ -2915,10 +2897,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
     };
 
-    self.saveBfConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, callback);
+    self.saveFeatures = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_FEATURE, mspHelper.crunch(MSPCodes.MSP_SET_FEATURE), false, callback);
     };
-    
+
     self.saveCurrentMeterConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_CURRENT_METER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_CURRENT_METER_CONFIG), false, callback);
     };

@@ -1,4 +1,4 @@
-/*global $,MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
+/*global $,MSP,MSPCodes,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
 'use strict';
 
 var
@@ -17,7 +17,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     if (CONFIGURATOR.connectionValid) {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, function() {
+        MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
                 MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
 		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
@@ -59,7 +59,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 dataflashPresent = DATAFLASH.totalSize > 0,
                 blackboxSupport = false;
 
-            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(BF_CONFIG.features, 19)) {
+            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(FEATURES, 19)) {
                 blackboxSupport = true;
             }
 

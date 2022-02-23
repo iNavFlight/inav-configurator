@@ -2,7 +2,6 @@
 
 // define all the global variables that are uses to hold FC state
 var CONFIG,
-    BF_CONFIG,
     LED_STRIP,
     LED_COLORS,
     LED_MODE_COLORS,
@@ -65,7 +64,8 @@ var CONFIG,
     BRAKING_CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
-    CURRENT_METER_CONFIG;
+    CURRENT_METER_CONFIG,
+    FEATURES;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -129,17 +129,6 @@ var FC = {
             name: ''
         };
 
-        BF_CONFIG = {
-            mixerConfiguration: 0,
-            features: 0,
-            serialrx_type: 0,
-            board_align_roll: 0,
-            board_align_pitch: 0,
-            board_align_yaw: 0,
-            currentscale: 0,
-            currentoffset: 0
-        };
-
         BOARD_ALIGNMENT = {
             roll: 0,
             pitch: 0,
@@ -156,6 +145,8 @@ var FC = {
         LED_STRIP = [];
         LED_COLORS = [];
         LED_MODE_COLORS = [];
+
+        FEATURES = 0;
 
         PID = {
         };
@@ -621,7 +612,7 @@ var FC = {
             features = this.getFeatures();
         }
         for (var i = 0; i < features.length; i++) {
-            if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
+            if (features[i].name == featureName && bit_check(FEATURES, features[i].bit)) {
                 return true;
             }
         }

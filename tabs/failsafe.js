@@ -14,14 +14,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         MSP.send_message(MSPCodes.MSP_FAILSAFE_CONFIG, false, false, load_html);
     }
 
-    /* function load_config() {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, load_misc);
-    }
-
-    function load_misc() {
-        MSP.send_message(MSPCodes.MSP_MISC, false, false, load_html);
-    }*/
-
     function load_html() {
         GUI.load("./tabs/failsafe.html", Settings.processHtml(function() {
             GUI.simpleBind();
@@ -150,80 +142,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
         GUI.log(chrome.i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_failsafe a'));
     }
-
-    /*function process_html() {
-
-        // generate labels for assigned aux modes
-        var element;
-
-        
-
-        $('input[name="failsafe_throttle"]').val(FAILSAFE_CONFIG.failsafe_throttle);
-        $('input[name="failsafe_off_delay"]').val(FAILSAFE_CONFIG.failsafe_off_delay);
-        $('input[name="failsafe_throttle_low_delay"]').val(FAILSAFE_CONFIG.failsafe_throttle_low_delay);
-        $('input[name="failsafe_delay"]').val(FAILSAFE_CONFIG.failsafe_delay);
-        $('input[name="failsafe_min_distance"]').val(FAILSAFE_CONFIG.failsafe_min_distance);
-
-        
-
-        
-
-        
-
-        // Alternate, minimum distance failsafe procedure
-        GUI.fillSelect($failsafeMinDistanceProcedure, FC.getFailsafeProcedure(), FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-        $failsafeMinDistanceProcedure.val(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-        $failsafeMinDistanceProcedure.change(function () {
-            FAILSAFE_CONFIG.failsafe_min_distance_procedure = $failsafeMinDistanceProcedure.val();
-        });
-
-        $('a.save').click(function () {
-            FAILSAFE_CONFIG.failsafe_throttle = parseInt($('input[name="failsafe_throttle"]').val());
-            FAILSAFE_CONFIG.failsafe_off_delay = parseInt($('input[name="failsafe_off_delay"]').val());
-            FAILSAFE_CONFIG.failsafe_throttle_low_delay = parseInt($('input[name="failsafe_throttle_low_delay"]').val());
-            FAILSAFE_CONFIG.failsafe_delay = parseInt($('input[name="failsafe_delay"]').val());
-            FAILSAFE_CONFIG.failsafe_min_distance = parseInt($('input[name="failsafe_min_distance"]').val());
-
-            if ($('input[id="land"]').is(':checked')) {
-                FAILSAFE_CONFIG.failsafe_procedure = 0;
-            } else if ($('input[id="drop"]').is(':checked')) {
-                FAILSAFE_CONFIG.failsafe_procedure = 1;
-            } else if ($('input[id="rth"]').is(':checked')) {
-                FAILSAFE_CONFIG.failsafe_procedure = 2;
-            } else if ($('input[id="nothing"]').is(':checked')) {
-                FAILSAFE_CONFIG.failsafe_procedure = 3;
-            }
-
-            function save_failssafe_config() {
-                MSP.send_message(MSPCodes.MSP_SET_FAILSAFE_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FAILSAFE_CONFIG), false, save_bf_config);
-            }
-
-            function save_bf_config() {
-                MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, save_to_eeprom);
-            }
-
-            function save_to_eeprom() {
-                MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, reboot);
-            }
-
-            function reboot() {
-                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-
-                GUI.tab_switch_cleanup(function () {
-                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
-                });
-            }
-
-            function reinitialize() {
-                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                GUI.handleReconnect($('.tab_failsafe a'));
-            }
-
-            save_failssafe_config();
-        });
-
-        GUI.content_ready(callback);
-    }*/
 };
 
 TABS.failsafe.cleanup = function (callback) {
