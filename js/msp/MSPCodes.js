@@ -33,6 +33,8 @@ var MSPCodes = {
     MSP_SET_CHANNEL_FORWARDING: 33,
     MSP_MODE_RANGES:            34,
     MSP_SET_MODE_RANGE:         35,
+    MSP_BOARD_ALIGNMENT:        38,
+    MSP_SET_BOARD_ALIGNMENT:    39,
     MSP_RX_CONFIG:              44,
     MSP_SET_RX_CONFIG:          45,
     MSP_LED_COLORS:             46,

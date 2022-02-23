@@ -63,7 +63,8 @@ var CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
     BRAKING_CONFIG,
-    SAFEHOMES;
+    SAFEHOMES,
+    BOARD_ALIGNMENT;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -137,6 +138,12 @@ var FC = {
             currentscale: 0,
             currentoffset: 0
         };
+
+        BOARD_ALIGNMENT = {
+            roll: 0,
+            pitch: 0,
+            yaw: 0
+        }
 
         LED_STRIP = [];
         LED_COLORS = [];
