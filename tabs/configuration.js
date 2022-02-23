@@ -146,32 +146,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         }
         orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
 
-        // generate GPS
-        var gpsProtocols = FC.getGpsProtocols();
-        var gpsSbas = FC.getGpsSbasProviders();
-
-        var gps_protocol_e = $('#gps_protocol');
-        for (i = 0; i < gpsProtocols.length; i++) {
-            gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
-        }
-
-        gps_protocol_e.change(function () {
-            MISC.gps_type = parseInt($(this).val());
-        });
-
-        gps_protocol_e.val(MISC.gps_type);
-
-        var gps_ubx_sbas_e = $('#gps_ubx_sbas');
-        for (i = 0; i < gpsSbas.length; i++) {
-            gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
-        }
-
-        gps_ubx_sbas_e.change(function () {
-            MISC.gps_ubx_sbas = parseInt($(this).val());
-        });
-
-        gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
-
         // VTX
         var config_vtx = $('.config-vtx');
         if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
