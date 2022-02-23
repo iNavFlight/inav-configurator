@@ -1,4 +1,4 @@
-/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass,BOARD_ALIGNMENT,TABS*/
+/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass,BOARD_ALIGNMENT,TABS,MISC*/
 'use strict';
 
 TABS.configuration = {};
@@ -30,7 +30,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
-        mspHelper.loadBfConfig,
+        mspHelper.loadFeatures,
         mspHelper.loadArmingConfig,
         mspHelper.loadLoopTime,
         mspHelper.load3dConfig,
@@ -52,7 +52,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var saveChainer = new MSPChainerClass();
 
     var saveChain = [
-        mspHelper.saveBfConfig,
         mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
@@ -137,7 +136,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             });
         }
 
-        helper.features.updateUI($('.tab-configuration'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-configuration'), FEATURES);
 
         // translate to user-selected language
         localize();
@@ -328,13 +327,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             craftName = $('input[name="craft_name"]').val();
-
-            if (FC.isFeatureEnabled('GPS', features)) {
-                googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
-                googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
-            }
-
-            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
 
             googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());

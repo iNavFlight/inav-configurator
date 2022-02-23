@@ -12,7 +12,7 @@ TABS.gps.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
-        mspHelper.loadBfConfig,
+        mspHelper.loadFeatures,
         mspHelper.loadMiscV2
     ];
 
@@ -23,7 +23,6 @@ TABS.gps.initialize = function (callback) {
     var saveChainer = new MSPChainerClass();
 
     var saveChain = [
-        mspHelper.saveBfConfig,
         mspHelper.saveMiscV2,
         saveSettings,
         mspHelper.saveToEeprom
@@ -64,7 +63,7 @@ TABS.gps.initialize = function (callback) {
 
         var features = FC.getFeatures();
 
-        helper.features.updateUI($('.tab-gps'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-gps'), FEATURES);
 
         // generate GPS
         var gpsProtocols = FC.getGpsProtocols();

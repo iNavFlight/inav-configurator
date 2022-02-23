@@ -68,15 +68,6 @@ var mspHelper = (function (gui) {
             colorCount,
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
-            case MSPCodes.MSP_IDENT:
-                //FIXME remove this frame when proven not needed
-                console.log('Using deprecated msp command: MSP_IDENT');
-                // Deprecated
-                CONFIG.version = parseFloat((data.getUint8(0) / 100).toFixed(2));
-                CONFIG.multiType = data.getUint8(1);
-                CONFIG.msp_version = data.getUint8(2);
-                CONFIG.capability = data.getUint32(3, true);
-                break;
             case MSPCodes.MSP_STATUS:
                 console.log('Using deprecated msp command: MSP_STATUS');
                 CONFIG.cycleTime = data.getUint16(0, true);
@@ -292,14 +283,6 @@ var mspHelper = (function (gui) {
                 RC_tuning.manual_roll_rate = data.getUint8(offset++);
                 RC_tuning.manual_pitch_rate = data.getUint8(offset++);
                 RC_tuning.manual_yaw_rate = data.getUint8(offset++);
-                break;
-            case MSPCodes.MSP_PID:
-                // PID data arrived, we need to scale it and save to appropriate bank / array
-                for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 3); i++, needle += 3) {
-                    PIDs[i][0] = data.getUint8(needle);
-                    PIDs[i][1] = data.getUint8(needle + 1);
-                    PIDs[i][2] = data.getUint8(needle + 2);
-                }
                 break;
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
@@ -640,9 +623,6 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP_SET_RAW_GPS:
                 break;
-            case MSPCodes.MSP_SET_PID:
-                console.log('PID settings saved');
-                break;
             case MSPCodes.MSP2_SET_PID:
                 console.log('PID settings saved');
                 break;
@@ -735,21 +715,6 @@ var mspHelper = (function (gui) {
                 console.log('RCMAP saved');
                 break;
 
-            case MSPCodes.MSP_BF_CONFIG:
-                BF_CONFIG.mixerConfiguration = data.getUint8(0);
-                BF_CONFIG.features = data.getUint32(1, true);
-                BF_CONFIG.serialrx_type = data.getUint8(5);
-                BF_CONFIG.board_align_roll = data.getInt16(6, true); // -180 - 360
-                BF_CONFIG.board_align_pitch = data.getInt16(8, true); // -180 - 360
-                BF_CONFIG.board_align_yaw = data.getInt16(10, true); // -180 - 360
-                BF_CONFIG.currentscale = data.getInt16(12, true);
-                BF_CONFIG.currentoffset = data.getInt16(14, true);
-                break;
-
-            case MSPCodes.MSP_SET_BF_CONFIG:
-                console.log('BF_CONFIG saved');
-                break;
-
             case MSPCodes.MSP_BOARD_ALIGNMENT:
                 BOARD_ALIGNMENT.roll = data.getInt16(0, true); // -180 - 360
                 BOARD_ALIGNMENT.pitch = data.getInt16(2, true); // -180 - 360
@@ -769,6 +734,14 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP_SET_CURRENT_METER_CONFIG:
                 console.log('MSP_SET_CURRENT_METER_CONFIG saved');
+                break;
+
+            case MSPCodes.MSP_FEATURE:
+                FEATURES = data.getUint32(0, true);
+                break;
+
+            case MSPCodes.MSP_SET_FEATURE:
+                console.log('MSP_SET_FEATURE saved');
                 break;
 
             case MSPCodes.MSP_SET_REBOOT:
@@ -1561,6 +1534,13 @@ var mspHelper = (function (gui) {
 
         switch (code) {
 
+            case MSPCodes.MSP_SET_FEATURE:
+                buffer.push(specificByte(FEATURES, 0));
+                buffer.push(specificByte(FEATURES, 1));
+                buffer.push(specificByte(FEATURES, 2));
+                buffer.push(specificByte(FEATURES, 3));
+                break;
+
             case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
                 buffer.push(specificByte(BOARD_ALIGNMENT.roll, 0));
                 buffer.push(specificByte(BOARD_ALIGNMENT.roll, 1));
@@ -1580,24 +1560,6 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 1));
                 break;
                 
-            case MSPCodes.MSP_SET_BF_CONFIG:
-                buffer.push(BF_CONFIG.mixerConfiguration);
-                buffer.push(specificByte(BF_CONFIG.features, 0));
-                buffer.push(specificByte(BF_CONFIG.features, 1));
-                buffer.push(specificByte(BF_CONFIG.features, 2));
-                buffer.push(specificByte(BF_CONFIG.features, 3));
-                buffer.push(BF_CONFIG.serialrx_type);
-                buffer.push(specificByte(BF_CONFIG.board_align_roll, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_roll, 1));
-                buffer.push(specificByte(BF_CONFIG.board_align_pitch, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_pitch, 1));
-                buffer.push(specificByte(BF_CONFIG.board_align_yaw, 0));
-                buffer.push(specificByte(BF_CONFIG.board_align_yaw, 1));
-                buffer.push(lowByte(BF_CONFIG.currentscale));
-                buffer.push(highByte(BF_CONFIG.currentscale));
-                buffer.push(lowByte(BF_CONFIG.currentoffset));
-                buffer.push(highByte(BF_CONFIG.currentoffset));
-                break;
             case MSPCodes.MSP_SET_VTX_CONFIG:
                 if (VTX_CONFIG.band > 0) {
                     buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
@@ -1609,13 +1571,6 @@ var mspHelper = (function (gui) {
                 // Don't enable PIT mode
                 buffer.push(0);
                 buffer.push(VTX_CONFIG.low_power_disarm);
-                break;
-            case MSPCodes.MSP_SET_PID:
-                for (i = 0; i < PIDs.length; i++) {
-                    buffer.push(parseInt(PIDs[i][0]));
-                    buffer.push(parseInt(PIDs[i][1]));
-                    buffer.push(parseInt(PIDs[i][2]));
-                }
                 break;
             case MSPCodes.MSP2_SET_PID:
                 for (i = 0; i < PIDs.length; i++) {
@@ -2755,14 +2710,6 @@ var mspHelper = (function (gui) {
      * Basic sending methods used for chaining purposes
      */
 
-    /**
-     * @deprecated
-     * @param callback
-     */
-    self.loadMspIdent = function (callback) {
-        MSP.send_message(MSPCodes.MSP_IDENT, false, false, callback);
-    };
-
     self.loadINAVPidConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
     };
@@ -2803,8 +2750,8 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
     };
 
-    self.loadBfConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
+    self.loadFeatures = function (callback) {
+        MSP.send_message(MSPCodes.MSP_FEATURE, false, false, callback);
     };
 
     self.loadBoardAlignment = function (callback) {
@@ -2915,10 +2862,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_SET_PID_ADVANCED, mspHelper.crunch(MSPCodes.MSP_SET_PID_ADVANCED), false, callback);
     };
 
-    self.saveBfConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_BF_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_BF_CONFIG), false, callback);
+    self.saveFeatures = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_FEATURE, mspHelper.crunch(MSPCodes.MSP_SET_FEATURE), false, callback);
     };
-    
+
     self.saveCurrentMeterConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_CURRENT_METER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_CURRENT_METER_CONFIG), false, callback);
     };
