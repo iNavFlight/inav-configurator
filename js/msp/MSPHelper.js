@@ -284,14 +284,6 @@ var mspHelper = (function (gui) {
                 RC_tuning.manual_pitch_rate = data.getUint8(offset++);
                 RC_tuning.manual_yaw_rate = data.getUint8(offset++);
                 break;
-            case MSPCodes.MSP_PID:
-                // PID data arrived, we need to scale it and save to appropriate bank / array
-                for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 3); i++, needle += 3) {
-                    PIDs[i][0] = data.getUint8(needle);
-                    PIDs[i][1] = data.getUint8(needle + 1);
-                    PIDs[i][2] = data.getUint8(needle + 2);
-                }
-                break;
             case MSPCodes.MSP2_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (i = 0, needle = 0; i < (dataHandler.message_length_expected / 4); i++, needle += 4) {
@@ -630,9 +622,6 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RAW_RC:
                 break;
             case MSPCodes.MSP_SET_RAW_GPS:
-                break;
-            case MSPCodes.MSP_SET_PID:
-                console.log('PID settings saved');
                 break;
             case MSPCodes.MSP2_SET_PID:
                 console.log('PID settings saved');
@@ -1582,13 +1571,6 @@ var mspHelper = (function (gui) {
                 // Don't enable PIT mode
                 buffer.push(0);
                 buffer.push(VTX_CONFIG.low_power_disarm);
-                break;
-            case MSPCodes.MSP_SET_PID:
-                for (i = 0; i < PIDs.length; i++) {
-                    buffer.push(parseInt(PIDs[i][0]));
-                    buffer.push(parseInt(PIDs[i][1]));
-                    buffer.push(parseInt(PIDs[i][2]));
-                }
                 break;
             case MSPCodes.MSP2_SET_PID:
                 for (i = 0; i < PIDs.length; i++) {
