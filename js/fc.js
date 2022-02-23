@@ -576,7 +576,7 @@ var FC = {
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
             {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
+            {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},
