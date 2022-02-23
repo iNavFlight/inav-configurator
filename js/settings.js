@@ -1,7 +1,5 @@
 'use strict';
 
-const GulpClient = require("gulp");
-
 var Settings = (function () {
     let self = {};
 
