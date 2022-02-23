@@ -750,6 +750,16 @@ var mspHelper = (function (gui) {
                 console.log('BF_CONFIG saved');
                 break;
 
+            case MSPCodes.MSP_BOARD_ALIGNMENT:
+                BOARD_ALIGNMENT.roll = data.getInt16(0, true); // -180 - 360
+                BOARD_ALIGNMENT.pitch = data.getInt16(2, true); // -180 - 360
+                BOARD_ALIGNMENT.yaw = data.getInt16(4, true); // -180 - 360
+                break;
+            
+            case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
+                console.log('MSP_SET_BOARD_ALIGNMENT saved');
+                break;
+
             case MSPCodes.MSP_CURRENT_METER_CONFIG:
                 CURRENT_METER_CONFIG.scale = data.getInt16(0, true);
                 CURRENT_METER_CONFIG.offset = data.getInt16(2, true);
@@ -1550,6 +1560,16 @@ var mspHelper = (function (gui) {
             i;
 
         switch (code) {
+
+            case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
+                buffer.push(specificByte(BOARD_ALIGNMENT.roll, 0));
+                buffer.push(specificByte(BOARD_ALIGNMENT.roll, 1));
+                buffer.push(specificByte(BOARD_ALIGNMENT.pitch, 0));
+                buffer.push(specificByte(BOARD_ALIGNMENT.pitch, 1));
+                buffer.push(specificByte(BOARD_ALIGNMENT.yaw, 0));
+                buffer.push(specificByte(BOARD_ALIGNMENT.yaw, 1));
+                break;
+
             case MSPCodes.MSP_SET_CURRENT_METER_CONFIG:
                 buffer.push(specificByte(CURRENT_METER_CONFIG.scale, 0));
                 buffer.push(specificByte(CURRENT_METER_CONFIG.scale, 1));
@@ -1559,6 +1579,7 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 0));
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 1));
                 break;
+                
             case MSPCodes.MSP_SET_BF_CONFIG:
                 buffer.push(BF_CONFIG.mixerConfiguration);
                 buffer.push(specificByte(BF_CONFIG.features, 0));
@@ -2786,6 +2807,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, callback);
     };
 
+    self.loadBoardAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_BOARD_ALIGNMENT, false, false, callback);
+    };
+    
     self.loadCurrentMeterConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_CURRENT_METER_CONFIG, false, false, callback);
     };
@@ -2896,6 +2921,10 @@ var mspHelper = (function (gui) {
     
     self.saveCurrentMeterConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_CURRENT_METER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_CURRENT_METER_CONFIG), false, callback);
+    };
+
+    self.saveBoardAlignment = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SET_BOARD_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_BOARD_ALIGNMENT), false, callback);
     };
 
     self.saveMisc = function (callback) {

@@ -1,4 +1,4 @@
-/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass*/
+/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass,BOARD_ALIGNMENT,TABS*/
 'use strict';
 
 TABS.configuration = {};
@@ -39,6 +39,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
+        mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
         loadCraftName,
         mspHelper.loadMiscV2
@@ -60,6 +61,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
+        mspHelper.saveBoardAlignment,
         mspHelper.saveCurrentMeterConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
@@ -231,7 +233,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         // fill board alignment
-        $('input[name="board_align_yaw"]').val((BF_CONFIG.board_align_yaw / 10.0).toFixed(1));
+        $('input[name="board_align_yaw"]').val((BOARD_ALIGNMENT.yaw / 10.0).toFixed(1));
 
         // fill magnetometer
         $('#mag_declination').val(MISC.mag_declination);
@@ -352,7 +354,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
-                BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
+                BOARD_ALIGNMENT.yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
                 CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
                 CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();

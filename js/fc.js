@@ -64,6 +64,7 @@ var CONFIG,
     SETTINGS,
     BRAKING_CONFIG,
     SAFEHOMES,
+    BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG;
 
 var FC = {
@@ -137,6 +138,12 @@ var FC = {
             board_align_yaw: 0,
             currentscale: 0,
             currentoffset: 0
+        };
+
+        BOARD_ALIGNMENT = {
+            roll: 0,
+            pitch: 0,
+            yaw: 0
         };
 
         CURRENT_METER_CONFIG = {
