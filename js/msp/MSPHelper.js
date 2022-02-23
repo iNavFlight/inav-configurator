@@ -800,28 +800,6 @@ var mspHelper = (function (gui) {
                 console.log('Channel forwarding saved');
                 break;
 
-            case MSPCodes.MSP_CF_SERIAL_CONFIG:
-                SERIAL_CONFIG.ports = [];
-                var bytesPerPort = 1 + 2 + 4;
-                var serialPortCount = data.byteLength / bytesPerPort;
-
-                for (i = 0; i < serialPortCount; i++) {
-                    var BAUD_RATES = mspHelper.BAUD_RATES_post1_6_3;
-
-                    var serialPort = {
-                        identifier: data.getUint8(offset),
-                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint16(offset + 1, true)),
-                        msp_baudrate: BAUD_RATES[data.getUint8(offset + 3)],
-                        sensors_baudrate: BAUD_RATES[data.getUint8(offset + 4)],
-                        telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
-                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 6)]
-                    };
-
-                    offset += bytesPerPort;
-                    SERIAL_CONFIG.ports.push(serialPort);
-                }
-                break;
-
             case MSPCodes.MSP2_CF_SERIAL_CONFIG:
                 SERIAL_CONFIG.ports = [];
                 var bytesPerPort = 1 + 4 + 4;
@@ -844,7 +822,6 @@ var mspHelper = (function (gui) {
                 }
                 break;
 
-            case MSPCodes.MSP_SET_CF_SERIAL_CONFIG:
             case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
                 console.log('Serial config saved');
                 break;
@@ -1809,24 +1786,6 @@ var mspHelper = (function (gui) {
                         out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
                     }
                     buffer.push(out);
-                }
-                break;
-
-            case MSPCodes.MSP_SET_CF_SERIAL_CONFIG:
-                for (i = 0; i < SERIAL_CONFIG.ports.length; i++) {
-                    var serialPort = SERIAL_CONFIG.ports[i];
-
-                    buffer.push(serialPort.identifier);
-
-                    var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
-                    buffer.push(specificByte(functionMask, 0));
-                    buffer.push(specificByte(functionMask, 1));
-
-                    var BAUD_RATES = mspHelper.BAUD_RATES_post1_6_3;
-                    buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
                 }
                 break;
 
