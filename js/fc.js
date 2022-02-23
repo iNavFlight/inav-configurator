@@ -63,7 +63,8 @@ var CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
     BRAKING_CONFIG,
-    SAFEHOMES;
+    SAFEHOMES,
+    CURRENT_METER_CONFIG;
 
 var FC = {
     MAX_SERVO_RATE: 125,
@@ -136,6 +137,13 @@ var FC = {
             board_align_yaw: 0,
             currentscale: 0,
             currentoffset: 0
+        };
+
+        CURRENT_METER_CONFIG = {
+            scale: 0,
+            offset: 0,
+            type: 0,
+            capacity: 0
         };
 
         LED_STRIP = [];

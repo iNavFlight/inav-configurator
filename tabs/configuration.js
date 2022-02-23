@@ -39,6 +39,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadVTXConfig,
         mspHelper.loadMixerConfig,
+        mspHelper.loadCurrentMeterConfig,
         loadCraftName,
         mspHelper.loadMiscV2
     ];
@@ -59,6 +60,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
+        mspHelper.saveCurrentMeterConfig,
         saveCraftName,
         mspHelper.saveMiscV2,
         saveSettings,
@@ -244,8 +246,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#voltagescale').val(MISC.vbatscale);
 
         // fill current
-        $('#currentscale').val(BF_CONFIG.currentscale);
-        $('#currentoffset').val(BF_CONFIG.currentoffset / 10);
+        $('#currentscale').val(CURRENT_METER_CONFIG.scale);
+        $('#currentoffset').val(CURRENT_METER_CONFIG.offset / 10);
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
@@ -347,13 +349,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
             }
 
-
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
                 BF_CONFIG.board_align_yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
-                BF_CONFIG.currentscale = parseInt($('#currentscale').val());
-                BF_CONFIG.currentoffset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();
             });
         });
