@@ -2714,10 +2714,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_INAV_PID, false, false, callback);
     };
 
-    self.loadLoopTime = function (callback) {
-        MSP.send_message(MSPCodes.MSP_LOOP_TIME, false, false, callback);
-    };
-
     self.loadAdvancedConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_ADVANCED_CONFIG, false, false, callback);
     };
@@ -2832,10 +2828,6 @@ var mspHelper = (function (gui) {
 
     self.saveINAVPidConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, callback);
-    };
-
-    self.saveLooptimeConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_LOOP_TIME, mspHelper.crunch(MSPCodes.MSP_SET_LOOP_TIME), false, callback);
     };
 
     self.saveAdvancedConfig = function (callback) {
