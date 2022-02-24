@@ -38,7 +38,6 @@ var CONFIG,
     DATAFLASH,
     SDCARD,
     BLACKBOX,
-    TRANSPONDER,
     RC_deadband,
     SENSOR_ALIGNMENT,
     RX_CONFIG,
@@ -474,11 +473,6 @@ var FC = {
             blackboxDevice: 0,
             blackboxRateNum: 1,
             blackboxRateDenom: 1
-        };
-
-        TRANSPONDER = {
-            supported: false,
-            data: []
         };
 
         RC_deadband = {

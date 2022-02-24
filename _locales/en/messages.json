@@ -109,9 +109,6 @@
     "tabFailsafe": {
         "message": "Failsafe"
     },
-    "tabTransponder": {
-        "message": "Race Transponder"
-    },
     "tabGPS": {
         "message": "GPS"
     },
@@ -677,12 +674,6 @@
     },
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
-    },
-    "featureTRANSPONDER": {
-        "message": "Race Transponder"
-    },
-    "featureTRANSPONDERTip": {
-        "message": "Configure via the Race Transponder tab after enabling."
     },
     "featureSOFTSPI": {
         "message": "CPU based SPI"
@@ -1547,33 +1538,6 @@
     },
     "programmingEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
-    },
-    "transponderNotSupported": {
-        "message": "Your flight controller's firmware does not support transponder functionality."
-    },
-    "transponderHelp": {
-        "message": "Configure your transponder code here.  Note: Only valid codes will be recognised by race timing systems.  Valid transponder codes can be obtained from <a href=\"http://seriouslypro.com/transponder-codes\" target=\"_blank\">Seriously Pro</a>."
-    },
-    "transponderInformation": {
-        "message": "Transponders systems allow race organizers to time your laps.  The transponder is fitted to your aircraft and when your aircraft passes the timing gate the track-side receiver registers your code and records your laptime.  When fitting an IR based transponder your should ensure that it points outward from your aircraft towards the track-side receivers and that the light beam is not obstructed by your airframe, battery-straps, cables, propellers, etc."
-    },
-    "transponderConfiguration": {
-        "message": "Configuration"
-    },
-    "transponderData": {
-        "message": "Data"
-    },
-    "transponderDataHelp": {
-        "message": "Hexadecimal digits only, 0-9, A-F"
-    },
-    "transponderButtonSave": {
-        "message": "Save"
-    },
-    "transponderDataInvalid": {
-        "message": "Transponder data is <span style=\"color: red\">invalid</span>"
-    },
-    "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Transponder"
     },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"

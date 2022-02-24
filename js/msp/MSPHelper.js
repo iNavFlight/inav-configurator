@@ -1102,17 +1102,6 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_BLACKBOX_CONFIG:
                 console.log("Blackbox config saved");
                 break;
-            case MSPCodes.MSP_TRANSPONDER_CONFIG:
-                TRANSPONDER.supported = (data.getUint8(offset++) & 1) != 0;
-                TRANSPONDER.data = [];
-                var bytesRemaining = data.byteLength - offset;
-                for (i = 0; i < bytesRemaining; i++) {
-                    TRANSPONDER.data.push(data.getUint8(offset++));
-                }
-                break;
-            case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
-                console.log("Transponder config saved");
-                break;
             case MSPCodes.MSP_VTX_CONFIG:
                 VTX_CONFIG.device_type = data.getUint8(offset++);
                 if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
@@ -1742,12 +1731,6 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
                 buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-                break;
-
-            case MSPCodes.MSP_SET_TRANSPONDER_CONFIG:
-                for (i = 0; i < TRANSPONDER.data.length; i++) {
-                    buffer.push(TRANSPONDER.data[i]);
-                }
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
