@@ -68,27 +68,6 @@ var mspHelper = (function (gui) {
             colorCount,
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
-            case MSPCodes.MSP_STATUS:
-                console.log('Using deprecated msp command: MSP_STATUS');
-                CONFIG.cycleTime = data.getUint16(0, true);
-                CONFIG.i2cError = data.getUint16(2, true);
-                CONFIG.activeSensors = data.getUint16(4, true);
-                CONFIG.mode = data.getUint32(6, true);
-                CONFIG.profile = data.getUint8(10);
-                gui.updateProfileChange();
-                gui.updateStatusBar();
-                break;
-            case MSPCodes.MSP_STATUS_EX:
-                CONFIG.cycleTime = data.getUint16(0, true);
-                CONFIG.i2cError = data.getUint16(2, true);
-                CONFIG.activeSensors = data.getUint16(4, true);
-                CONFIG.profile = data.getUint8(10);
-                CONFIG.cpuload = data.getUint16(11, true);
-                CONFIG.armingFlags = data.getUint16(13, true);
-                gui.updateStatusBar();
-                gui.updateProfileChange();
-                break;
-
             case MSPCodes.MSPV2_INAV_STATUS:
                 CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
@@ -720,7 +699,7 @@ var mspHelper = (function (gui) {
                 BOARD_ALIGNMENT.pitch = data.getInt16(2, true); // -180 - 360
                 BOARD_ALIGNMENT.yaw = data.getInt16(4, true); // -180 - 360
                 break;
-            
+
             case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
                 console.log('MSP_SET_BOARD_ALIGNMENT saved');
                 break;
@@ -1520,7 +1499,7 @@ var mspHelper = (function (gui) {
 
                     // fire callback
                     if (callback) {
-                        callback({'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected});
+                        callback({ 'command': dataHandler.code, 'data': data, 'length': dataHandler.message_length_expected });
                     }
                     break;
                 }
@@ -1559,7 +1538,7 @@ var mspHelper = (function (gui) {
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 0));
                 buffer.push(specificByte(CURRENT_METER_CONFIG.capacity, 1));
                 break;
-                
+
             case MSPCodes.MSP_SET_VTX_CONFIG:
                 if (VTX_CONFIG.band > 0) {
                     buffer.push16(((VTX_CONFIG.band - 1) * 8) + (VTX_CONFIG.channel - 1));
@@ -2151,9 +2130,9 @@ var mspHelper = (function (gui) {
     };
 
     self.sendBlackboxConfiguration = function (onDataCallback) {
-    var buffer = [];
-    var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
-    buffer.push(BLACKBOX.blackboxDevice & 0xFF);
+        var buffer = [];
+        var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
+        buffer.push(BLACKBOX.blackboxDevice & 0xFF);
         messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
         buffer.push(lowByte(BLACKBOX.blackboxRateNum));
         buffer.push(highByte(BLACKBOX.blackboxRateNum));
@@ -2161,7 +2140,7 @@ var mspHelper = (function (gui) {
         buffer.push(highByte(BLACKBOX.blackboxRateDenom));
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
-        onDataCallback();
+            onDataCallback();
         });
     };
 
@@ -2742,10 +2721,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_PIDNAMES, false, false, callback);
     };
 
-    self.loadStatus = function (callback) {
-        MSP.send_message(MSPCodes.MSP_STATUS, false, false, callback);
-    };
-
     self.loadFeatures = function (callback) {
         MSP.send_message(MSPCodes.MSP_FEATURE, false, false, callback);
     };
@@ -2753,7 +2728,7 @@ var mspHelper = (function (gui) {
     self.loadBoardAlignment = function (callback) {
         MSP.send_message(MSPCodes.MSP_BOARD_ALIGNMENT, false, false, callback);
     };
-    
+
     self.loadCurrentMeterConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_CURRENT_METER_CONFIG, false, false, callback);
     };
@@ -2775,7 +2750,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadBatteryConfig = function (callback) {
-    MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
     self.loadArmingConfig = function (callback) {
@@ -2939,7 +2914,7 @@ var mspHelper = (function (gui) {
     };
 
     self.saveFwConfig = function (callback) {
-            MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
+        MSP.send_message(MSPCodes.MSP_SET_FW_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FW_CONFIG), false, callback);
     };
 
     self.getMissionInfo = function (callback) {
@@ -2991,7 +2966,7 @@ var mspHelper = (function (gui) {
 
         function nextSafehome() {
             safehomeId++;
-            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount() - 1) {
                 MSP.send_message(MSPCodes.MSP2_INAV_SAFEHOME, [safehomeId], false, nextSafehome);
             }
             else {
@@ -3006,7 +2981,7 @@ var mspHelper = (function (gui) {
 
         function nextSendSafehome() {
             safehomeId++;
-            if (safehomeId < SAFEHOMES.getMaxSafehomeCount()-1) {
+            if (safehomeId < SAFEHOMES.getMaxSafehomeCount() - 1) {
                 MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, nextSendSafehome);
             }
             else {
@@ -3065,7 +3040,7 @@ var mspHelper = (function (gui) {
                 for (var ii = setting.min; ii <= setting.max; ii++) {
                     values.push(result.data.readString());
                 }
-                setting.table = {values: values};
+                setting.table = { values: values };
             }
             SETTINGS[name] = setting;
             return setting;
@@ -3120,7 +3095,7 @@ var mspHelper = (function (gui) {
                     default:
                         throw "Unknown setting type " + setting.type;
                 }
-                return {setting: setting, value: value};
+                return { setting: setting, value: value };
             });
         });
     };
@@ -3209,8 +3184,8 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
     };
 
-    self.getCraftName = function(callback) {
-        MSP.send_message(MSPCodes.MSP_NAME, false, false, function(resp) {
+    self.getCraftName = function (callback) {
+        MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {
             var name = resp.data.readString();
             if (callback) {
                 callback(name);
@@ -3218,7 +3193,7 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.setCraftName = function(name, callback) {
+    self.setCraftName = function (name, callback) {
         var data = [];
         name = name || "";
         for (var ii = 0; ii < name.length; ii++) {
@@ -3239,26 +3214,26 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_VTX_CONFIG, false, false, callback);
     };
 
-    self.saveVTXConfig = function(callback) {
+    self.saveVTXConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_VTX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_VTX_CONFIG), false, callback);
     };
 
-    self.loadBrakingConfig = function(callback) {
+    self.loadBrakingConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
     }
 
-    self.saveBrakingConfig = function(callback) {
+    self.saveBrakingConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
     };
 
-    self.loadParameterGroups = function(callback) {
+    self.loadParameterGroups = function (callback) {
         MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {
             var groups = [];
             while (resp.data.offset < resp.data.byteLength) {
                 var id = resp.data.readU16();
                 var start = resp.data.readU16();
                 var end = resp.data.readU16();
-                groups.push({id: id, start: start, end: end});
+                groups.push({ id: id, start: start, end: end });
             }
             if (callback) {
                 callback(groups);
@@ -3266,7 +3241,7 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.loadBrakingConfig = function(callback) {
+    self.loadBrakingConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_MC_BRAKING, false, false, callback);
     }
 

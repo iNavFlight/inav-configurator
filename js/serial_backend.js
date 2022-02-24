@@ -62,7 +62,7 @@ $(document).ready(function () {
         } else {
 
             helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                MSP.send_message(MSPCodes.MSP_STATUS, false, false, function () {
+                MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('deviceReady'));
                     //noinspection JSValidateTypes
