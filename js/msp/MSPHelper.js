@@ -104,12 +104,7 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
-
-                if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
-                    SENSOR_STATUS.imu2HwStatus = data.getUint8(9);
-                } else {
-                    SENSOR_STATUS.imu2HwStatus = 0;
-                }
+                SENSOR_STATUS.imu2HwStatus = data.getUint8(9);
                 sensor_status_ex(SENSOR_STATUS);
                 break;
 
@@ -1253,11 +1248,9 @@ var mspHelper = (function (gui) {
                 CALIBRATION_DATA.magZero.Z = data.getInt16(17, true);
                 CALIBRATION_DATA.opflow.Scale = (data.getInt16(19, true) / 256.0);
 
-                if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-                    CALIBRATION_DATA.magGain.X = data.getInt16(21, true);
-                    CALIBRATION_DATA.magGain.Y = data.getInt16(23, true);
-                    CALIBRATION_DATA.magGain.Z = data.getInt16(25, true);
-                }
+                CALIBRATION_DATA.magGain.X = data.getInt16(21, true);
+                CALIBRATION_DATA.magGain.Y = data.getInt16(23, true);
+                CALIBRATION_DATA.magGain.Z = data.getInt16(25, true);
 
                 break;
 
@@ -1904,16 +1897,14 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
                 buffer.push(highByte(Math.round(CALIBRATION_DATA.opflow.Scale * 256)));
 
-                if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-                    buffer.push(lowByte(CALIBRATION_DATA.magGain.X));
-                    buffer.push(highByte(CALIBRATION_DATA.magGain.X));
+                buffer.push(lowByte(CALIBRATION_DATA.magGain.X));
+                buffer.push(highByte(CALIBRATION_DATA.magGain.X));
 
-                    buffer.push(lowByte(CALIBRATION_DATA.magGain.Y));
-                    buffer.push(highByte(CALIBRATION_DATA.magGain.Y));
+                buffer.push(lowByte(CALIBRATION_DATA.magGain.Y));
+                buffer.push(highByte(CALIBRATION_DATA.magGain.Y));
 
-                    buffer.push(lowByte(CALIBRATION_DATA.magGain.Z));
-                    buffer.push(highByte(CALIBRATION_DATA.magGain.Z));
-                }
+                buffer.push(lowByte(CALIBRATION_DATA.magGain.Z));
+                buffer.push(highByte(CALIBRATION_DATA.magGain.Z));
 
                 break;
 
@@ -2307,9 +2298,7 @@ var mspHelper = (function (gui) {
 
             buffer.push(conditionIndex);
             buffer.push(condition.getEnabled());
-            if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-                buffer.push(condition.getActivatorId());
-            }
+            buffer.push(condition.getActivatorId());
             buffer.push(condition.getOperation());
             buffer.push(condition.getOperandAType());
             buffer.push(specificByte(condition.getOperandAValue(), 0));
@@ -3010,9 +2999,7 @@ var mspHelper = (function (gui) {
             var setting = {};
 
             // Discard setting name
-            if (semver.gte(CONFIG.apiVersion, "2.4.0")) {
-                result.data.readString();
-            }
+            result.data.readString();
 
             // Discard PG ID
             result.data.readU16();
@@ -3250,19 +3237,11 @@ var mspHelper = (function (gui) {
     };
 
     self.loadGlobalVariablesStatus = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_GVAR_STATUS, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_GVAR_STATUS, false, false, callback);
     };
 
     self.loadProgrammingPidStatus = function (callback) {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
-        } else {
-            callback();
-        }
+        MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
     };
 
     return self;

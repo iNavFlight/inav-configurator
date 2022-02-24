@@ -334,12 +334,8 @@ function onConnect() {
     /*
      * Init PIDs bank with a length that depends on the version
      */
-    let pidCount;
-    if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-        pidCount = 11;
-    } else {
-        pidCount = 10;
-    }
+    let pidCount = 11;
+    
     for (let i = 0; i < pidCount; i++) {
         PIDs.push(new Array(4));
     }

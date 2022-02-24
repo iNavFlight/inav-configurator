@@ -77,13 +77,10 @@ var FC = {
         return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     isRpyFfComponentUsed: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
+        return true; // Currently all planes have roll, pitch and yaw FF
     },
     isRpyDComponentUsed: function () {
         return true; // Currently all platforms use D term
-    },
-    isCdComponentUsed: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -601,10 +598,6 @@ var FC = {
             {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true}
         ];
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0") && semver.lt(CONFIG.flightControllerVersion, "2.5.0")) {
-            features.push({bit: 5, group: 'other', name: 'DYNAMIC_FILTERS', haveTip: true, showNameInTip: true});
-        }
-
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
@@ -664,168 +657,69 @@ var FC = {
         ];
     },
     getEscProtocols: function () {
-
-        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
-            return {
-                0: {
-                    name: "STANDARD",
-                    message: null,
-                    defaultRate: 400,
-                    rates: {
-                        50: "50Hz",
-                        400: "400Hz"
-                    }
-                },
-                1: {
-                    name: "ONESHOT125",
-                    message: null,
-                    defaultRate: 1000,
-                    rates: {
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                2: {
-                    name: "MULTISHOT",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                3: {
-                    name: "BRUSHED",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz",
-                        16000: "16kHz",
-                        32000: "32kHz"
-                    }
-                },
-                4: {
-                    name: "DSHOT150",
-                    message: null,
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
-                },
-                5: {
-                    name: "DSHOT300",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz"
-                    }
-                },
-                6: {
-                    name: "DSHOT600",
-                    message: null,
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
+        return {
+            0: {
+                name: "STANDARD",
+                message: null,
+                defaultRate: 400,
+                rates: {
+                    50: "50Hz",
+                    400: "400Hz"
                 }
-            };
-        } else {
-            return {
-                0: {
-                    name: "STANDARD",
-                    message: null,
-                    defaultRate: 400,
-                    rates: {
-                        50: "50Hz",
-                        400: "400Hz"
-                    }
-                },
-                1: {
-                    name: "ONESHOT125",
-                    message: null,
-                    defaultRate: 1000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                2: {
-                    name: "ONESHOT42",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz",
-                        4000: "4kHz",
-                        8000: "8kHz"
-                    }
-                },
-                3: {
-                    name: "MULTISHOT",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz",
-                        4000: "4kHz",
-                        8000: "8kHz"
-                    }
-                },
-                4: {
-                    name: "BRUSHED",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz",
-                        16000: "16kHz",
-                        32000: "32kHz"
-                    }
-                },
-                5: {
-                    name: "DSHOT150",
-                    message: null,
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
-                },
-                6: {
-                    name: "DSHOT300",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz"
-                    }
-                },
-                7: {
-                    name: "DSHOT600",
-                    message: null,
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
-                },
-                8: {
-                    name: "DSHOT1200",
-                    message: "escProtocolNotAdvised",
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
-                },
-                9: {
-                    name: "SERIALSHOT",
-                    message: "escProtocolExperimental",
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
+            },
+            1: {
+                name: "ONESHOT125",
+                message: null,
+                defaultRate: 1000,
+                rates: {
+                    1000: "1kHz",
+                    2000: "2kHz"
                 }
-            };
-        }
+            },
+            2: {
+                name: "MULTISHOT",
+                message: null,
+                defaultRate: 2000,
+                rates: {
+                    1000: "1kHz",
+                    2000: "2kHz"
+                }
+            },
+            3: {
+                name: "BRUSHED",
+                message: null,
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz",
+                    16000: "16kHz",
+                    32000: "32kHz"
+                }
+            },
+            4: {
+                name: "DSHOT150",
+                message: null,
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
+            },
+            5: {
+                name: "DSHOT300",
+                message: null,
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz"
+                }
+            },
+            6: {
+                name: "DSHOT600",
+                message: null,
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
+            }
+        };
     },
     getServoRates: function () {
         return {
@@ -866,37 +760,6 @@ var FC = {
     getOsdDisabledFields: function () {
         return [];
     },
-    getAccelerometerNames: function () {
-        return [ "NONE", "AUTO", "MPU6050", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
-    },
-    getBarometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "DPS310", "MSP", "FAKE"];
-        } else {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "FAKE"];
-        }
-    },
-    getPitotNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE", "MSP"];
-        } else {
-            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
-        }
-    },
-    getRangefinderNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
-            return [ "NONE", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "Benewake TFmini", "VL53L1X", "US42"];
-        } else {
-            return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
-        }
-    },
-    getOpticalFlowNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
-            return [ "NONE", "CXOF", "MSP", "FAKE" ];
-        } else {
-            return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
-        }
-    },
     getArmingFlags: function () {
         return {
             0: "OK_TO_ARM",
@@ -933,7 +796,7 @@ var FC = {
         ]
     },
     getPidNames: function () {
-        let list = [
+        return [
             'Roll',
             'Pitch',
             'Yaw',
@@ -943,14 +806,9 @@ var FC = {
             'Surface',
             'Level',
             'Heading Hold',
-            'Velocity Z'
+            'Velocity Z',
+            'Nav Heading'
         ];
-
-        if (semver.gte(CONFIG.flightControllerVersion, '2.5.0')) {
-            list.push("Nav Heading")
-        }
-
-        return list;
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
