@@ -17,7 +17,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         TABS.led_strip.overlays = ['t', 's', 'i', 'w'];
     } else {
         TABS.led_strip.functions = ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l', 'o', 'n'];
-        TABS.led_strip.baseFuncs = ['c', 'f', 'a', 'l', 's', 'g', 'r'];
+        TABS.led_strip.baseFuncs = ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'];
         TABS.led_strip.overlays = ['t', 'o', 'b', 'n', 'i', 'w'];
     }
 
@@ -733,7 +733,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                 case "function-r":
                 case "function-o":
                 case "function-g":
-                    return true;
+                            return true;
                 break;
             }
         }
@@ -799,6 +799,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         $('.modifiers').hide();
         $('.blinkers').hide();
         $('.warningOverlay').hide();
+        $('.channel_info').hide();
 
         if (areOverlaysActive(activeFunction))
             $('.overlays').show();
@@ -866,6 +867,10 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                 case "function-a": // Arm state
                     $('.mode_color-6-0').show(); // disarmed
                     $('.mode_color-6-1').show(); // armed
+                    break;
+                case "function-h": // Channel
+                    $('.special_colors').hide();
+                    $('.channel_info').show();
                     break;
 
                 case "function-r": // Ring

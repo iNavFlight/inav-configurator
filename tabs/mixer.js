@@ -438,7 +438,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $("[data-role='role-servo-add']").click(function () {
             if (SERVO_RULES.hasFreeSlots()) {
-                SERVO_RULES.put(new ServoMixRule(0, 0, 100, 0));
+                SERVO_RULES.put(new ServoMixRule(SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
                 renderOutputMapping();
             }

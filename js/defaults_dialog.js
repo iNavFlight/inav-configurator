@@ -1,4 +1,4 @@
-/*global mspHelper,$,GUI,MSP,BF_CONFIG,chrome*/
+/*global mspHelper,$,GUI,MSP,chrome*/
 'use strict';
 
 var helper = helper || {};
@@ -733,7 +733,7 @@ helper.defaultsDialog = (function () {
                 savingDefaultsModal.close(); 
             }
 
-            mspHelper.loadBfConfig(function () {
+            mspHelper.loadFeatures(function () {
                 privateScope.setFeaturesBits(selectedDefaultPreset)
             });
         } else {
