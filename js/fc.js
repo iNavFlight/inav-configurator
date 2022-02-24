@@ -248,23 +248,6 @@ var FC = {
             packetCount: 0
         };
 
-        /* MISSION_PLANNER = {
-            maxWaypoints: 0,
-            isValidMission: 0,
-            countBusyPoints: 0,
-            bufferPoint: {
-                number: 0,
-                action: 0,
-                lat: 0,
-                lon: 0,
-                alt: 0,
-                endMission: 0,
-                p1: 0,
-                p2: 0,
-                p3: 0
-            }
-        }; */
-
         MISSION_PLANNER = new WaypointCollection();
 
         ANALOG = {
