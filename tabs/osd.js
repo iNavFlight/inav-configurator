@@ -405,6 +405,13 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
+function osdmAhdrawnPreview() {
+    let precision = Settings.getInputValue('osd_mah_used_precision');
+    let preview = "1215075".substring(0, precision);
+
+    return preview + FONT.symbol(SYM.MAH);
+}
+
 function osdCoordinatePreview(symbol, coordinate) {
     return function() {
         var digits = Settings.getInputValue('osd_coordinate_digits');
@@ -1250,8 +1257,10 @@ OSD.constants = {
                     preview: function() {
                         if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
                             return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
-                        } else {
+                        } else if (semver.lt(CONFIG.flightControllerVersion, '5.0.0')) {
                             return '1034' + FONT.symbol(SYM.MAH); // 4 chars
+                        } else {
+                            return osdmAhdrawnPreview();
                         }
                     }
                 },
