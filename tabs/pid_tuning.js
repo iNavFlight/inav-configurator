@@ -112,11 +112,6 @@ TABS.pid_tuning.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        if (FC.isCdComponentUsed()) {
-            $('th.feedforward').html(chrome.i18n.getMessage('pidTuning_ControlDerivative'));
-            $('th.feedforward').attr('title', chrome.i18n.getMessage('pidTuning_ControlDerivative'));
-        }
-
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
 
