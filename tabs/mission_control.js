@@ -1543,11 +1543,7 @@ TABS.mission_control.initialize = function (callback) {
          // * @param {Object=} opt_options Control options.
          // */
         app.PlannerMultiMissionControl = function (opt_options) {
-            let versionCheck = true;
-            if (CONFIG !== undefined && !semver.gte(CONFIG.flightControllerVersion, "4.0.0")) {
-                versionCheck = false;
-            }
-
+            
             var options = opt_options || {};
             var button = document.createElement('button');
 
@@ -1555,9 +1551,7 @@ TABS.mission_control.initialize = function (callback) {
             button.style = 'background: url(\'../images/icons/cf_icon_multimission_white.svg\') no-repeat 1px -1px;background-color: rgba(0,60,136,.5);';
 
             var handleShowSettings = function () {
-                if (versionCheck) {
-                    $('#missionPlannerMultiMission').fadeIn(300);
-                }
+                $('#missionPlannerMultiMission').fadeIn(300);
             };
 
             button.addEventListener('click', handleShowSettings, false);
@@ -1566,7 +1560,7 @@ TABS.mission_control.initialize = function (callback) {
             var element = document.createElement('div');
             element.className = 'mission-control-multimission ol-unselectable ol-control';
             element.appendChild(button);
-            element.title = versionCheck ? 'MP MultiMission' : 'Unavailable';
+            element.title = 'MP MultiMission';
 
             ol.control.Control.call(this, {
                 element: element,

@@ -32,7 +32,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChain = [
         mspHelper.loadFeatures,
         mspHelper.loadArmingConfig,
-        mspHelper.loadLoopTime,
         mspHelper.load3dConfig,
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
@@ -56,7 +55,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
         mspHelper.saveArmingConfig,
-        mspHelper.saveLooptimeConfig,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
@@ -328,7 +326,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
             craftName = $('input[name="craft_name"]').val();
 
-            googleAnalytics.sendEvent('Setting', 'Looptime', FC_CONFIG.loopTime);
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
             googleAnalytics.sendEvent('Board', 'Accelerometer', $('#sensor-acc').children("option:selected").text());
