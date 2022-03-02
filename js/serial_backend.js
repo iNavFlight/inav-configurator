@@ -62,7 +62,7 @@ $(document).ready(function () {
         } else {
 
             helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
-                MSP.send_message(MSPCodes.MSP_STATUS, false, false, function () {
+                MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
                     //noinspection JSUnresolvedVariable
                     GUI.log(chrome.i18n.getMessage('deviceReady'));
                     //noinspection JSValidateTypes
@@ -334,12 +334,8 @@ function onConnect() {
     /*
      * Init PIDs bank with a length that depends on the version
      */
-    let pidCount;
-    if (semver.gte(CONFIG.flightControllerVersion, "2.5.0")) {
-        pidCount = 11;
-    } else {
-        pidCount = 10;
-    }
+    let pidCount = 11;
+    
     for (let i = 0; i < pidCount; i++) {
         PIDs.push(new Array(4));
     }

@@ -53,7 +53,7 @@ TABS.calibration.initialize = function (callback) {
         googleAnalytics.sendAppView('Calibration');
     }
     loadChainer.setChain([
-        mspHelper.loadStatus,
+        mspHelper.queryFcStatus,
         mspHelper.loadSensorConfig,
         mspHelper.loadCalibrationData
     ]);
