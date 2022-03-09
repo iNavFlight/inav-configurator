@@ -2600,25 +2600,25 @@
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
     "landMaxAltVspd": {
-        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
+        "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
     },
     "landMaxAltVspdHelp": {
         "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+        "message": "When the craft has descended to <i>this</i> altitude. It will begin to slow down for landing."
     },
     "landSlowdownMaxAltHelp": {
         "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
     },
+    "landSlowdownMinAlt": {
+        "message": "When the craft has descended to <i>this</i> altitude, it will have slowed to the touch down speed."
+    },
     "landMinAltVspd": {
-        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+        "message": "This is the touch down speed."
     },
     "landMinAltVspdHelp": {
         "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
-    },
-    "landSlowdownMinAlt": {
-        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed"
