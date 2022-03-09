@@ -130,44 +130,52 @@ $(document).ready(function () {
                     helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
                     helper.mspBalancedInterval.flush();
 
-                    GUI.tab_switch_cleanup();
-                    GUI.tab_switch_in_progress = false;
-                    CONFIGURATOR.connectionValid = false;
-                    GUI.connected_to = false;
-                    GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
-
-                    /*
-                     * Flush
-                     */
-                    helper.mspQueue.flush();
-                    helper.mspQueue.freeHardLock();
-                    helper.mspQueue.freeSoftLock();
-
-                    serial.disconnect(onClosed);
-                    MSP.disconnect_cleanup();
-
-                    // Reset various UI elements
-                    $('span.i2c-error').text(0);
-                    $('span.cycle-time').text(0);
-                    $('span.cpu-load').text('');
-
-                    // unlock port select & baud
-                    $port.prop('disabled', false);
-                    $baud.prop('disabled', false);
-
-                    // reset connect / disconnect button
-                    $('div.connect_controls a.connect').removeClass('active');
-                    $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connect'));
-
-                    // reset active sensor indicators
-                    sensor_status(0);
-
-                    if (wasConnected) {
-                        // detach listeners and remove element data
-                        $('#content').empty();
+                    if (CONFIGURATOR.cliActive) {
+                        GUI.tab_switch_cleanup(finishDisconnect);
+                    } else {
+                        GUI.tab_switch_cleanup();
+                        finishDisconnect();
                     }
 
-                    $('#tabs .tab_landing a').click();
+                    function finishDisconnect() {
+                        GUI.tab_switch_in_progress = false;
+                        CONFIGURATOR.connectionValid = false;
+                        GUI.connected_to = false;
+                        GUI.allowedTabs = GUI.defaultAllowedTabsWhenDisconnected.slice();
+
+                        /*
+                         * Flush
+                         */
+                        helper.mspQueue.flush();
+                        helper.mspQueue.freeHardLock();
+                        helper.mspQueue.freeSoftLock();
+
+                        serial.disconnect(onClosed);
+                        MSP.disconnect_cleanup();
+
+                        // Reset various UI elements
+                        $('span.i2c-error').text(0);
+                        $('span.cycle-time').text(0);
+                        $('span.cpu-load').text('');
+
+                        // unlock port select & baud
+                        $port.prop('disabled', false);
+                        $baud.prop('disabled', false);
+
+                        // reset connect / disconnect button
+                        $('div.connect_controls a.connect').removeClass('active');
+                        $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connect'));
+
+                        // reset active sensor indicators
+                        sensor_status(0);
+
+                        if (wasConnected) {
+                            // detach listeners and remove element data
+                            $('#content').empty();
+                        }
+
+                        $('#tabs .tab_landing a').click();
+                    }
                 }
 
                 $(this).data("clicks", !clicks);
@@ -335,7 +343,7 @@ function onConnect() {
      * Init PIDs bank with a length that depends on the version
      */
     let pidCount = 11;
-    
+
     for (let i = 0; i < pidCount; i++) {
         PIDs.push(new Array(4));
     }
@@ -434,7 +442,7 @@ function sensor_status_hash(hw_status)
            hw_status.gpsHwStatus +
            hw_status.rangeHwStatus +
            hw_status.speedHwStatus +
-           hw_status.flowHwStatus + 
+           hw_status.flowHwStatus +
            hw_status.imu2HwStatus;
 }
 
