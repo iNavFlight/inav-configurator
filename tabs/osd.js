@@ -2436,14 +2436,16 @@ OSD.GUI.updateFields = function() {
         }
     }
 
-    $('#djiUnsupportedElements').prepend(
-        $('<input type="checkbox" class="toggle" />')
-        .attr('checked', OSD.data.isDjiHdFpv)
-        .on('change', function () {
-            OSD.GUI.updateDjiView(this.checked);
-            OSD.GUI.updatePreviews();
-        })
-     );
+    if ($('#djiUnsupportedElementsToggle').length == false) {
+        $('#djiUnsupportedElements').prepend(
+            $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
+            .attr('checked', OSD.data.isDjiHdFpv)
+            .on('change', function () {
+                OSD.GUI.updateDjiView(this.checked);
+                OSD.GUI.updatePreviews();
+            })
+        );
+    }
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
