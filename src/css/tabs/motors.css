@@ -456,3 +456,11 @@
 .tab-servos .short {
     width: 32px;
 } 
+
+.tab-motors .config-section .checkbox .switchery {
+    margin-right: 68px;
+}
+
+.tab-motors .config-section .number input {
+    margin-right: 4px;
+}
