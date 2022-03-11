@@ -236,6 +236,13 @@ function onInvalidFirmwareVersion()
 }
 
 function onOpen(openInfo) {
+
+    if (FC.restartRequired) {
+        GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+        $('div.connect_controls a').click(); // disconnect
+        return;
+    }
+
     if (openInfo) {
         // update connected_to
         GUI.connected_to = GUI.connecting_to;
@@ -268,7 +275,12 @@ function onOpen(openInfo) {
             if (!CONFIGURATOR.connectionValid) {
                 GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
-                $('div.connect_controls ').click(); // disconnect
+                helper.mspQueue.flush();
+                helper.mspQueue.freeHardLock();
+                helper.mspQueue.freeSoftLock();
+                serial.emptyOutputBuffer();
+
+                $('div.connect_controls a').click(); // disconnect
             }
         }, 10000);
 
@@ -276,11 +288,15 @@ function onOpen(openInfo) {
 
         // request configuration data. Start with MSPv1 and
         // upgrade to MSPv2 if possible.
-        MSP.protocolVersion = MSP.constants.PROTOCOL_V1;
+        MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
-            if (CONFIG.apiVersion && semver.gte(CONFIG.apiVersion, "2.0.0")) {
-                MSP.protocolVersion = MSP.constants.PROTOCOL_V2;
+            
+            if (CONFIG.apiVersion === "0.0.0") {
+                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                FC.restartRequired = true;
+                return;
             }
+
             GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
             MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {

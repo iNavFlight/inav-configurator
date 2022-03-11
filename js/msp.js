@@ -57,7 +57,7 @@ var MSP = {
         CHECKSUM_V1:                16,
         CHECKSUM_V2:                17,
     },
-    protocolVersion:            1, // this.constants.PROTOCOL_V1
+    protocolVersion:            2, // this.constants.PROTOCOL_V2
     state:                      0, // this.decoder_states.IDLE
     message_direction:          1,
     code:                       0,

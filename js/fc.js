@@ -67,6 +67,7 @@ var CONFIG,
     FEATURES;
 
 var FC = {
+    restartRequired: false,
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
     isAirplane: function () {
