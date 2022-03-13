@@ -4062,5 +4062,8 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "illegalStateRestartRequired": {
+        "message": "Illegal state. Restart required."
     }
 }
