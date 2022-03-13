@@ -2058,6 +2058,8 @@ var mspHelper = (function (gui) {
                 buffer.push(MIXER_CONFIG.hasFlaps);
                 buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
                 buffer.push(highByte(MIXER_CONFIG.appliedMixerPreset));
+                buffer.push(0); //Filler byte to match expect payload length
+                buffer.push(0); //Filler byte to match expect payload length
                 break;
 
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
