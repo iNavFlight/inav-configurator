@@ -1429,6 +1429,7 @@ var mspHelper = (function (gui) {
                 BLACKBOX.blackboxDevice = data.getUint8(1);
                 BLACKBOX.blackboxRateNum = data.getUint16(2);
                 BLACKBOX.blackboxRateDenom = data.getUint16(4);
+                BLACKBOX.blackboxIncludeFlags = data.getUint32(6,true);
                 break;
             case MSPCodes.MSP2_SET_BLACKBOX_CONFIG:
                 console.log("Blackbox config saved");
@@ -2112,6 +2113,7 @@ var mspHelper = (function (gui) {
         buffer.push(highByte(BLACKBOX.blackboxRateNum));
         buffer.push(lowByte(BLACKBOX.blackboxRateDenom));
         buffer.push(highByte(BLACKBOX.blackboxRateDenom));
+        buffer.push32(BLACKBOX.blackboxIncludeFlags);
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
             onDataCallback();

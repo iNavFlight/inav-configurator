@@ -4065,5 +4065,35 @@
     },
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."
+    },
+    "blackboxFields": {
+        "message": "Blackbox fields"
+    },
+    "BLACKBOX_FEATURE_NAV_ACC": {
+        "message": "Navigation accelerometer"
+    },
+    "BLACKBOX_FEATURE_NAV_POS": {
+        "message": "Navigation position estimation"
+    },
+    "BLACKBOX_FEATURE_NAV_PID": {
+        "message": "Navigation PID"
+    },
+    "BLACKBOX_FEATURE_MAG": {
+        "message": "Magnetometer"
+    },
+    "BLACKBOX_FEATURE_ACC": {
+        "message": "Accelerometer"
+    },
+    "BLACKBOX_FEATURE_ATTITUDE": {
+        "message": "Attitude"
+    },
+    "BLACKBOX_FEATURE_RC_DATA": {
+        "message": "RC data"
+    },
+    "BLACKBOX_FEATURE_RC_COMMAND": {
+        "message": "RC command"
+    },
+    "BLACKBOX_FEATURE_MOTORS": {
+        "message": "Motors output"
     }
 }
