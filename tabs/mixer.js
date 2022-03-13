@@ -95,10 +95,17 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         let mixerPreview = $('.mixerPreview');
         mixerPreview.find('.outputImageNumber').remove();
 
+        $(".mix-rule-servo").each(function() {
+            $(this).css("background-color", "");
+            $(this).css("font-weight", "");
+            $(this).css("color", "");
+        });
+
         if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
             if (outputMap != null && currentMixerPreset.hasOwnProperty('imageOutputsNumbers')) {
                 let outputPad = 1;
                 let outputArea = null;
+                let inputBoxes = null;
                 let surfaceSet = {
                     aileron: false,
                     elevator: false,
@@ -126,6 +133,16 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
+
+                                        inputBoxes = getServoNumberInput(servo.getTarget());
+                                        if (inputBoxes.length > 0) {
+                                            $.each(inputBoxes, function() {
+                                                $(this).css("background-color", outputArea.colour);
+                                                $(this).css("font-weight", "bold");
+                                                $(this).css("color", "#FFFFFF");
+                                            });
+                                        }
+
                                         surfaceSet.elevator = true;
                                     }
                                     break;
@@ -138,6 +155,16 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
+
+                                        inputBoxes = getServoNumberInput(servo.getTarget());
+                                        if (inputBoxes.length > 0) {
+                                            $.each(inputBoxes, function() {
+                                                $(this).css("background-color", outputArea.colour);
+                                                $(this).css("font-weight", "bold");
+                                                $(this).css("color", "#FFFFFF");
+                                            });
+                                        }
+
                                         surfaceSet.aileron = true;
                                     }
                                     break;
@@ -150,6 +177,16 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
+
+                                        inputBoxes = getServoNumberInput(servo.getTarget());
+                                        if (inputBoxes.length > 0) {
+                                            $.each(inputBoxes, function() {
+                                                $(this).css("background-color", outputArea.colour);
+                                                $(this).css("font-weight", "bold");
+                                                $(this).css("color", "#FFFFFF");
+                                            });
+                                        }
+
                                         surfaceSet.rudder = true;
                                     }
                                     break;
@@ -197,6 +234,18 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         }
 
         return returnArea;
+    }
+
+    function getServoNumberInput(target) {
+        let servoInputs = [];
+
+        $(".mix-rule-servo").each(function() {
+            if ($(this).val() == target) {
+                servoInputs.push($(this));
+            }
+        });
+
+        return servoInputs;
     }
 
     function renderServoMixRules() {
