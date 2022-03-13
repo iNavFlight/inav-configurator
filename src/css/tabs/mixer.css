@@ -96,3 +96,20 @@
 .mixer-fixed-value-col {
     display: none;
 }
+
+.outputImageNumber {
+    position: absolute;
+    background-color: #FFF;
+    font-family: 'open_sansbold', Arial, serif;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid #ff00ff;
+    border-radius: 4px;
+}
+
+.outputImageNumber.isMotor {
+    width: 29px;
+    height: 29px;
+    line-height: 27px;
+    border-radius: 20px;
+}

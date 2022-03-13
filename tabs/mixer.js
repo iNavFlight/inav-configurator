@@ -86,6 +86,116 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         for (let i = 1; i <= OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
         }
+
+        renderServoOutputImage(outputMap);
+    }
+
+    function renderServoOutputImage(outputMap) {
+        let mixerPreview = $('.mixerPreview');
+        mixerPreview.find('.outputImageNumber').remove();
+
+        if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
+            if (outputMap != null && currentMixerPreset.hasOwnProperty('imageOutputsNumbers')) {
+                let outputPad = 1;
+                let outputArea = null;
+                let surfaceSet = {
+                    aileron: false,
+                    elevator: false,
+                    rudder: false,
+                };
+                let motors = [];
+                let servoRules = SERVO_RULES;
+
+                for (let omIndex of outputMap) {
+                    if (omIndex != '-') {
+                        omIndex = omIndex.split(' ');
+                        if (omIndex[0] == "Motor") {
+                            motors.push(outputPad);
+                        } else {
+                            let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
+                            let divID = "servoPreview" + omIndex[1];
+
+                            switch (servo.getInput()) {
+                                case INPUT_STABILIZED_PITCH:
+                                case INPUT_RC_PITCH:
+                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaceSet.elevator);
+                                    if (outputArea != null) {
+                                        $("#"+divID).css("top", outputArea.top + "px");
+                                        $("#"+divID).css("left", outputArea.left + "px");
+                                        $("#"+divID).css("border-color", outputArea.colour);
+                                        surfaceSet.elevator = true;
+                                    }
+                                    break;
+                                case INPUT_STABILIZED_ROLL:
+                                case INPUT_RC_ROLL:
+                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaceSet.aileron);
+                                    if (outputArea != null) {
+                                        $("#"+divID).css("top", outputArea.top + "px");
+                                        $("#"+divID).css("left", outputArea.left + "px");
+                                        $("#"+divID).css("border-color", outputArea.colour);
+                                        surfaceSet.aileron = true;
+                                    }
+                                    break;
+                                case INPUT_STABILIZED_YAW:
+                                case INPUT_RC_YAW:
+                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaceSet.rudder);
+                                    if (outputArea != null) {
+                                        $("#"+divID).css("top", outputArea.top + "px");
+                                        $("#"+divID).css("left", outputArea.left + "px");
+                                        $("#"+divID).css("border-color", outputArea.colour);
+                                        surfaceSet.rudder = true;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+
+                    outputPad++;
+                }
+
+                if (motors.length > 0) {
+                    mixerPreview.append('<div id="motorsPreview" class="outputImageNumber isMotor">S' + motors.join('/') + '</div>');
+
+                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_THROTTLE, false);
+                    if (outputArea != null) {
+                        $("#motorsPreview").css("top", outputArea.top + "px");
+                        $("#motorsPreview").css("left", outputArea.left + "px");
+                        $("#motorsPreview").css("border-color", outputArea.colour);
+                    }
+                }
+            }
+        }
+    }
+
+    function getOutputImageArea(outputImageAreas, input, secondSurface) {
+        let returnArea = null;
+        let firstAileronFound = false;
+        let firstRuddervatorFound = false;
+        
+        for (let area of outputImageAreas) {
+            if (area.input == input) {
+                if ( input === INPUT_STABILIZED_THROTTLE
+                    || (input === INPUT_STABILIZED_YAW && !secondSurface) 
+                    || ((input === INPUT_STABILIZED_ROLL && !secondSurface) || (input === INPUT_STABILIZED_ROLL && secondSurface && firstAileronFound)) 
+                    || ((input === INPUT_STABILIZED_PITCH && !secondSurface) || (input === INPUT_STABILIZED_PITCH && secondSurface && firstRuddervatorFound)) 
+                ) {
+                    returnArea = area;
+                    break;
+                } else if (input === INPUT_STABILIZED_ROLL) {
+                    firstAileronFound = true;
+                } else if (input === INPUT_STABILIZED_PITCH) {
+                    firstRuddervatorFound = true;
+                }
+            }
+        }
+
+        return returnArea;
     }
 
     function renderServoMixRules() {
@@ -383,6 +493,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
+            
+            renderServoOutputImage();
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {
