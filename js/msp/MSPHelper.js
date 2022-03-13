@@ -2040,14 +2040,11 @@ var mspHelper = (function (gui) {
 
 
             case MSPCodes.MSP_WP_MISSION_SAVE:
-                // buffer.push(0);
-                console.log(buffer);
-
+                buffer.push(0);
                 break;
-            case MSPCodes.MSP_WP_MISSION_LOAD:
-                // buffer.push(0);
-                console.log(buffer);
 
+            case MSPCodes.MSP_WP_MISSION_LOAD:
+                buffer.push(0);
                 break;
 
             case MSPCodes.MSP2_INAV_SET_MIXER:
