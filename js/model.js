@@ -337,8 +337,8 @@ const mixerList = [
         model: 'flying_wing',
         image: 'flying_wing',
         imageOutputsNumbers: [
-            {input: INPUT_STABILIZED_ROLL, top: 123, left: 18, width: 18, height: 18, colour: "#ff0000"},
-            {input: INPUT_STABILIZED_ROLL, top: 123, left: 134, width: 18, height: 18, colour: "#00e000"},
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 134, colour: "#00e000"},
             {input: INPUT_STABILIZED_THROTTLE, top:93, left:71, colour: "#000000"},
         ],
         enabled: true,
