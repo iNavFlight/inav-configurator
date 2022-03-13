@@ -9,6 +9,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         saveChainer = new MSPChainerClass(),
         currentPlatform,
         currentMixerPreset,
+        loadedMixerPresetID,
         $servoMixTable,
         $servoMixTableBody,
         $motorMixTable,
@@ -115,13 +116,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
                             let divID = "servoPreview" + omIndex[1];
 
-                            switch (servo.getInput()) {
+                            switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
                                 case INPUT_RC_PITCH:
-                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
-
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaceSet.elevator);
                                     if (outputArea != null) {
+                                        mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
@@ -130,10 +131,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     break;
                                 case INPUT_STABILIZED_ROLL:
                                 case INPUT_RC_ROLL:
-                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
-
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaceSet.aileron);
                                     if (outputArea != null) {
+                                        mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
@@ -142,10 +143,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     break;
                                 case INPUT_STABILIZED_YAW:
                                 case INPUT_RC_YAW:
-                                    mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
-
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaceSet.rudder);
                                     if (outputArea != null) {
+                                        mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
+
                                         $("#"+divID).css("top", outputArea.top + "px");
                                         $("#"+divID).css("left", outputArea.left + "px");
                                         $("#"+divID).css("border-color", outputArea.colour);
@@ -241,6 +242,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
                     servoRule.setInput($(this).val());
                     updateFixedValueVisibility($row, $(this));
+
+                    renderOutputMapping();
                 });
 
                 $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
@@ -491,6 +494,18 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $wizardButton.parent().addClass("is-hidden");
             }
 
+            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
+                $("#refresh-mixer-button").parent().removeClass("is-hidden");
+
+                if (currentMixerPreset.id != loadedMixerPresetID) {
+                    $("#needToUpdateMixerMessage").removeClass("is-hidden");
+                } else {
+                    $("#needToUpdateMixerMessage").addClass("is-hidden");
+                }
+            } else {
+                $("#refresh-mixer-button").parent().addClass("is-hidden");
+            }
+
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
             
@@ -498,6 +513,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {
+            loadedMixerPresetID = MIXER_CONFIG.appliedMixerPreset;
+            $("#needToUpdateMixerMessage").addClass("is-hidden");
             $mixerPreset.val(MIXER_CONFIG.appliedMixerPreset).change();
         } else {
             $mixerPreset.change();
@@ -514,6 +531,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#execute-button').click(function () {
+            loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
             renderServoMixRules();
@@ -524,9 +542,21 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#load-mixer-button').click(function () {
+            loadedMixerPresetID = currentMixerPreset.id;
+            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
+                $("#needToUpdateMixerMessage").addClass("is-hidden");
+            }
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
             MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            renderServoMixRules();
+            renderMotorMixRules();
+            renderOutputMapping();
+        });
+
+        $('#refresh-mixer-button').click(function () {
+            currentMixerPreset = helper.mixer.getById(loadedMixerPresetID);
+            $mixerPreset.val(loadedMixerPresetID).change();
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();

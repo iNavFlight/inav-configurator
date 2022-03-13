@@ -3541,8 +3541,14 @@
     "mixerPreset": {
         "message": "Mixer preset"
     },
+    "mixerNotLoaded": {
+        "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
+    },
     "mixerLoadPresetRules": {
         "message": "Load mixer"
+    },
+    "mixerRefreshCurrentRules": {
+        "message": "Refresh mixer"
     },
     "mixerLoadAndApplyPresetRules": {
         "message": "Load and apply"

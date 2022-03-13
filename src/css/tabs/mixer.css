@@ -2,6 +2,8 @@
     position: absolute;
     right: 0;
     bottom: 1em;
+    margin-left: 185px;
+    width: calc(100% - 175px);
 }
 
 .mixer-load-button > div {
@@ -95,6 +97,10 @@
 
 .mixer-fixed-value-col {
     display: none;
+}
+
+#needToUpdateMixerMessage {
+    margin-bottom: 5px;
 }
 
 .outputImageNumber {
