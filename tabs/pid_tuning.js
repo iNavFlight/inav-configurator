@@ -129,9 +129,12 @@ TABS.pid_tuning.initialize = function (callback) {
           }
         });
 
-        $('#resetPIDs').on('click', function(){
-            MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
-	        updateActivatedTab();
+        $('#resetPIDs').on('click', function() {
+
+            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
+                MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
+                updateActivatedTab();
+            }
         });
 
         $('#resetDefaults').on('click', function() {
