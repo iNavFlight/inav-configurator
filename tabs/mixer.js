@@ -36,9 +36,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.saveMixerConfig,
         mspHelper.sendServoMixer,
         mspHelper.sendMotorMixer,
+        saveSettings,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(reboot);
+
+    function saveSettings(onComplete) {
+        Settings.saveInputs().then(onComplete);
+    }
 
     function reboot() {
         //noinspection JSUnresolvedVariable
@@ -56,7 +61,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        GUI.load("./tabs/mixer.html", processHtml);
+        GUI.load("./tabs/mixer.html", Settings.processHtml(processHtml));
     }
 
     function renderOutputTable() {
