@@ -543,17 +543,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $wizardButton.parent().addClass("is-hidden");
             }
 
-            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
-                $("#refresh-mixer-button").parent().removeClass("is-hidden");
-
-                if (currentMixerPreset.id != loadedMixerPresetID) {
-                    $("#needToUpdateMixerMessage").removeClass("is-hidden");
-                } else {
-                    $("#needToUpdateMixerMessage").addClass("is-hidden");
-                }
+            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
+                $("#needToUpdateMixerMessage").removeClass("is-hidden");
             } else {
-                $("#refresh-mixer-button").parent().addClass("is-hidden");
+                $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
+
+            updateRefreshButtonStatus();
 
             $('.mixerPreview img').attr('src', './resources/motor_order/'
                 + currentMixerPreset.image + '.svg');
@@ -591,20 +587,24 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#load-mixer-button').click(function () {
-            loadedMixerPresetID = currentMixerPreset.id;
             if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
+            loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
             MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
+            updateRefreshButtonStatus();
         });
 
         $('#refresh-mixer-button').click(function () {
             currentMixerPreset = helper.mixer.getById(loadedMixerPresetID);
+            MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
+            $platformSelect.val(MIXER_CONFIG.platformType).change();
             $mixerPreset.val(loadedMixerPresetID).change();
             renderServoMixRules();
             renderMotorMixRules();
@@ -662,6 +662,17 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
 
         GUI.content_ready(callback);
+    }
+
+    function updateRefreshButtonStatus() {
+        if (
+            (currentMixerPreset.id != loadedMixerPresetID && helper.mixer.getById(loadedMixerPresetID).platform == PLATFORM_AIRPLANE) ||
+            (currentMixerPreset.id == loadedMixerPresetID && currentMixerPreset.platform == PLATFORM_AIRPLANE)
+           ) {
+            $("#refresh-mixer-button").parent().removeClass("is-hidden");
+        } else {
+            $("#refresh-mixer-button").parent().addClass("is-hidden");
+        }
     }
 
     function getLogicConditionsStatus() {
