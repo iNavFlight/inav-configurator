@@ -2,6 +2,8 @@
     position: absolute;
     right: 0;
     bottom: 1em;
+    margin-left: 185px;
+    width: calc(100% - 175px);
 }
 
 .mixer-load-button > div {
@@ -95,4 +97,25 @@
 
 .mixer-fixed-value-col {
     display: none;
+}
+
+#needToUpdateMixerMessage {
+    margin-bottom: 5px;
+}
+
+.outputImageNumber {
+    position: absolute;
+    background-color: #FFF;
+    font-family: 'open_sansbold', Arial, serif;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid #ff00ff;
+    border-radius: 4px;
+}
+
+.outputImageNumber.isMotor {
+    width: 29px;
+    height: 29px;
+    line-height: 27px;
+    border-radius: 20px;
 }

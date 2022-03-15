@@ -3541,8 +3541,14 @@
     "mixerPreset": {
         "message": "Mixer preset"
     },
+    "mixerNotLoaded": {
+        "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
+    },
     "mixerLoadPresetRules": {
         "message": "Load mixer"
+    },
+    "mixerRefreshCurrentRules": {
+        "message": "Refresh mixer"
     },
     "mixerLoadAndApplyPresetRules": {
         "message": "Load and apply"
@@ -4071,5 +4077,35 @@
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+    },
+    "blackboxFields": {
+        "message": "Blackbox fields"
+    },
+    "BLACKBOX_FEATURE_NAV_ACC": {
+        "message": "Navigation accelerometer"
+    },
+    "BLACKBOX_FEATURE_NAV_POS": {
+        "message": "Navigation position estimation"
+    },
+    "BLACKBOX_FEATURE_NAV_PID": {
+        "message": "Navigation PID"
+    },
+    "BLACKBOX_FEATURE_MAG": {
+        "message": "Magnetometer"
+    },
+    "BLACKBOX_FEATURE_ACC": {
+        "message": "Accelerometer"
+    },
+    "BLACKBOX_FEATURE_ATTITUDE": {
+        "message": "Attitude"
+    },
+    "BLACKBOX_FEATURE_RC_DATA": {
+        "message": "RC data"
+    },
+    "BLACKBOX_FEATURE_RC_COMMAND": {
+        "message": "RC command"
+    },
+    "BLACKBOX_FEATURE_MOTORS": {
+        "message": "Motors output"
     }
 }
