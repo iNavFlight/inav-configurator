@@ -2223,7 +2223,9 @@ ol li {
 /* Position the unit to the right of the wrapper */
 .unit_wrapper::after {
     position: absolute;
-    top: 2px;
+    /*top: 2px;*/
+    bottom: -2px;
+    height: 100%;
     right: .5em;
     transition: all .05s ease-in-out;
 }
@@ -2245,4 +2247,20 @@ ol li {
 /* Set the unit abbreviation for each unit class */
 .unit::after {
     content: attr(data-unit) ;
+}
+
+.batteryProfileHighlight {
+    background-color: none;
+}
+
+.batteryProfileHighlightActive {
+    background-color: #fef2d5;
+}
+
+.controlProfileHighlight {
+    background-color:none;
+}
+
+.controlProfileHighlightActive {
+    background-color: #d5ebfe;
 }

@@ -28,7 +28,8 @@ let globalSettings = {
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
-    proxyLayer: null
+    proxyLayer: null,
+    showProfileParameters: null,
 };
 
 $(document).ready(function () {
@@ -64,6 +65,14 @@ $(document).ready(function () {
             result.proxylayer = 'your_proxy_layer_name';
         }
         globalSettings.proxyLayer = result.proxylayer;
+    });
+    chrome.storage.local.get('show_profile_parameters', function (result) {
+        if (typeof result.show_profile_parameters === 'undefined') {
+            result.show_profile_parameters = 1;
+        }
+        globalSettings.showProfileParameters = result.show_profile_parameters;
+        // Update CSS on to show highlighing or not
+        updateProfilesHighlightColours();
     });
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
@@ -194,6 +203,9 @@ $(document).ready(function () {
 
                 function content_ready() {
                     GUI.tab_switch_in_progress = false;
+
+                    // Update CSS on to show highlighing or not
+                    updateProfilesHighlightColours();
                 }
 
                 switch (tab) {
@@ -324,12 +336,28 @@ $(document).ready(function () {
                     googleAnalyticsConfig.setTrackingPermitted(check);
                 });
 
+                $('div.show_profile_parameters input').change(function () {
+                    globalSettings.showProfileParameters = $(this).is(':checked');
+                    chrome.storage.local.set({
+                        'show_profile_parameters': globalSettings.showProfileParameters
+                    });
+
+                    // Update CSS on select boxes
+                    updateProfilesHighlightColours();
+
+                    // Horrible way to reload the tab
+                    const activeTab = $('#tabs li.active'); 
+                    activeTab.removeClass('active');  
+                    activeTab.find('a').click(); 
+                });
+
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
-                $('#proxylayer').val(globalSettings.proxyLayer);        
-
+                $('#proxylayer').val(globalSettings.proxyLayer);   
+                $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+                
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
                 $('#ui-unit-type').change(function () {
@@ -505,7 +533,7 @@ $(document).ready(function () {
     profile_e.change(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
-            GUI.log(chrome.i18n.getMessage('pidTuningLoadedProfile', [profile + 1]));
+            GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
             updateActivatedTab();
         });
     });
@@ -537,6 +565,36 @@ function get_osd_settings() {
         prefs.readU8();
         globalSettings.osdUnits = prefs.readU8();
     });
+}
+
+function updateProfilesHighlightColours() {
+    if (globalSettings.showProfileParameters) {
+        $('.dropdown-dark #profilechange').addClass('showProfileParams');
+        $('.dropdown-dark #batteryprofilechange').addClass('showProfileParams');
+
+        $('.batteryProfileHighlight').each(function() {
+            $(this).addClass('batteryProfileHighlightActive');
+            $(this).removeClass('batteryProfileHighlight');
+        });
+
+        $('.controlProfileHighlight').each(function() {
+            $(this).addClass('controlProfileHighlightActive');
+            $(this).removeClass('controlProfileHighlight');
+        });
+    } else {
+        $('.dropdown-dark #profilechange').removeClass('showProfileParams');
+        $('.dropdown-dark #batteryprofilechange').removeClass('showProfileParams');
+
+        $('.batteryProfileHighlightActive').each(function() {
+            $(this).addClass('batteryProfileHighlight');
+            $(this).removeClass('batteryProfileHighlightActive');
+        });
+
+        $('.controlProfileHighlightActive').each(function() {
+            $(this).addClass('controlProfileHighlight');
+            $(this).removeClass('controlProfileHighlightActive');
+        });
+    }
 }
 
 function catch_startup_time(startTime) {

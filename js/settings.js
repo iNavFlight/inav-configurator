@@ -12,6 +12,16 @@ var Settings = (function () {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
 
+            if (globalSettings.showProfileParameters) {
+                if (FC.isBatteryProfileParameter(settingName)) {
+                    input.css("background-color","#fef2d5");
+                }
+
+                if (FC.isControlProfileParameter(settingName)) {
+                    input.css("background-color","#d5ebfe");
+                }
+            }
+
             return mspHelper.getSetting(settingName).then(function (s) {
                 // Check if the input declares a parent
                 // to be hidden in case of the setting not being available.
@@ -150,6 +160,10 @@ var Settings = (function () {
             // Angles
             'deg' : '&deg;',
             'decideg' : 'deci&deg;',
+            'decideg-lrg' : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            // Rotational speed
+            'degps' : '&deg; per second',
+            'decadegps' : 'deca&deg; per second',
             // Temperature
             'decidegc' : 'deci&deg;C',
             'degc' : '&deg;C',
@@ -217,6 +231,12 @@ var Settings = (function () {
             'decideg' : {
                 'deg' : 10
             },
+            'decideg-lrg' : {
+                'deg' : 10
+            },
+            'decadegps' : {
+                'degps' : 0.1
+            },
             'decidegc' : {
                 'degc' : 10,
                 'degf' : 'FAHREN'
@@ -233,7 +253,9 @@ var Settings = (function () {
                 'v-cms' : 'fts',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
+                'decideg-lrg' : 'deg',
                 'decidegc' : 'degf',
             },
             1: { //metric
@@ -244,7 +266,9 @@ var Settings = (function () {
                 'v-cms' : 'ms',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
+                'decideg-lrg' : 'deg',
                 'decidegc' : 'degc',
             },
             2: { //metric with MPH
@@ -253,7 +277,9 @@ var Settings = (function () {
                 'm-lrg' : 'km',
                 'cms' : 'mph',
                 'v-cms' : 'ms',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
+                'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'decidegc' : 'degc',
@@ -264,7 +290,9 @@ var Settings = (function () {
                 'm-lrg' : 'mi',
                 'cms' : 'mph',
                 'v-cms' : 'fts',
+                'decadegps' : 'degpd',
                 'decideg' : 'deg',
+                'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'decidegc' : 'degc',
@@ -275,18 +303,25 @@ var Settings = (function () {
                 'm-lrg' : 'nm',
                 'cms': 'kt',
                 'v-cms' : 'hftmin',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
+                'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'decidegc' : 'degc',
             },
-            default:{}//show base units
+            default: { //show base units
+                'decadegps' : 'degps',
+                'decideg-lrg' : 'deg',
+            }
         };
 
         //this returns the factor in which to multiply to convert a unit
         const getUnitMultiplier = () => {
-            if (conversionTable[uiUnitValue]){
-                const fromUnits = conversionTable[uiUnitValue];
+            let uiUnits = (uiUnitValue != -1) ? uiUnitValue : 'default';
+
+            if (conversionTable[uiUnits]){
+                const fromUnits = conversionTable[uiUnits];
                 if (fromUnits[inputUnit]){
                     const multiplier = unitRatioTable[inputUnit][fromUnits[inputUnit]];
                     return {'multiplier':multiplier, 'unitName':fromUnits[inputUnit]};
@@ -303,10 +338,23 @@ var Settings = (function () {
 
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            element.attr('step', ((multiplier != 1) ? '0.01' : '1'));
+            let step = element.attr('step') || 1;
+            let decimalPlaces = 0;
+            
+            step = step / multiplier;
+            
+            if (step < 1) {
+                decimalPlaces = step.toString().length - step.toString().indexOf(".") - 1;
+                if (parseInt(step.toString().slice(-1)) > 1 ) { 
+                    decimalPlaces--; 
+                }
+                step = 1 / Math.pow(10, decimalPlaces);
+            }
+            element.attr('step', step.toFixed(decimalPlaces));
+
             if (multiplier != 'FAHREN') {
-                element.attr('min', (element.attr('min') / multiplier).toFixed(2));
-                element.attr('max', (element.attr('max') / multiplier).toFixed(2));
+                element.attr('min', (element.attr('min') / multiplier).toFixed(decimalPlaces));
+                element.attr('max', (element.attr('max') / multiplier).toFixed(decimalPlaces));
             }
         }
 
