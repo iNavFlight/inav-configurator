@@ -138,9 +138,7 @@ hr {
 }
 
 .tab-configuration .mixerPreview img {
-    width: 90%;
-    height: 90%;
-    padding: 5%;
+    width: 175px;
 }
 
 .tab-configuration .gui_box {
