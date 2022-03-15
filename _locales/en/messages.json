@@ -3619,6 +3619,12 @@
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
     },
+    "confirm_select_defaults": {
+        "message": "This will allow to select new default values for all settings. Existing PID tune and other settings might be lost!\nDo you want to continue?"
+    },
+    "confirm_reset_pid": {
+        "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
+    },
     "mappingTableOutput": {
         "message": "Output"
     },
