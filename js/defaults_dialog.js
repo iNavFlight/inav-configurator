@@ -16,7 +16,12 @@ helper.defaultsDialog = (function () {
         "id": 2,
         "notRecommended": false,
         "reboot": true,
+        "mixerToApply": 3,
         "settings": [
+            {
+                key: "model_preview_type",
+                value: 3
+            },
             /*
             System
             */
@@ -198,7 +203,12 @@ helper.defaultsDialog = (function () {
         "notRecommended": false,
         "id": 3,
         "reboot": true,
+        "mixerToApply": 14,
         "settings": [
+            {
+                key: "model_preview_type",
+                value: 14
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -392,7 +402,12 @@ helper.defaultsDialog = (function () {
         "notRecommended": false,
         "id": 3,
         "reboot": true,
+        "mixerToApply": 8,
         "settings": [
+            {
+                key: "model_preview_type",
+                value: 8
+            },
             {
                 key: "platform_type",
                 value: "AIRPLANE"
@@ -586,7 +601,12 @@ helper.defaultsDialog = (function () {
         "id": 1,
         "notRecommended": false,
         "reboot": true,
+        "mixerToApply": 31,
         "settings": [
+            {
+                key: "model_preview_type",
+                value: 31
+            },
             {
                 key: "gyro_hardware_lpf",
                 value: "256HZ"
@@ -685,6 +705,24 @@ helper.defaultsDialog = (function () {
         }
     };
 
+    privateScope.finalize = function (selectedDefaultPreset) {
+        mspHelper.saveToEeprom(function () {
+            //noinspection JSUnresolvedVariable
+            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+
+            if (selectedDefaultPreset.reboot) {
+                GUI.tab_switch_cleanup(function () {
+                    MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                        //noinspection JSUnresolvedVariable
+                        savingDefaultsModal.close();
+                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.handleReconnect();
+                    });
+                });
+            }
+        });
+    };
+
     privateScope.setSettings = function (selectedDefaultPreset) {
         //Save analytics
         googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
@@ -694,21 +732,30 @@ helper.defaultsDialog = (function () {
             Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
                 return mspHelper.setSetting(input.key, input.value);
             }).then(function () {
-                mspHelper.saveToEeprom(function () {
-                    //noinspection JSUnresolvedVariable
-                    GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
 
-                    if (selectedDefaultPreset.reboot) {
-                        GUI.tab_switch_cleanup(function () {
-                            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                                //noinspection JSUnresolvedVariable
-                                savingDefaultsModal.close();
-                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                                GUI.handleReconnect();
-                            });
-                        });
-                    }
-                });
+                // If default preset is associated to a mixer, apply the mixer as well
+                if (selectedDefaultPreset.mixerToApply) {
+                    let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
+
+                    helper.mixer.loadServoRules(currentMixerPreset);
+                    helper.mixer.loadMotorRules(currentMixerPreset);
+
+                    SERVO_RULES.cleanup();
+                    SERVO_RULES.inflate();
+                    MOTOR_RULES.cleanup();
+                    MOTOR_RULES.inflate();
+
+                    mspHelper.sendServoMixer(function () {
+                        mspHelper.sendMotorMixer(function () {
+                            privateScope.finalize(selectedDefaultPreset);
+                        })
+                    });
+                } else {
+                    privateScope.finalize(selectedDefaultPreset);
+                }
+
+                
+
             })
         });
     };
