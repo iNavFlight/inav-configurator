@@ -12,13 +12,16 @@
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
     },
+    "options_showProfileParameters": {
+        "message": "Highlight parameters that change when switching battery or control profiles"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
     "options_render": {
         "message": "Configurator rendering options"
     },
-    
+
     "connect": {
         "message": "Connect"
     },
@@ -1140,79 +1143,238 @@
     "portsFunction_IMU2": {
         "message": "Secondary IMU"
     },
-    "pidTuningName": {
+    "pidTuning_ShowAllPIDs": {
+        "message": "Show all PIDs"
+    },
+    "pidTuning_SelectNewDefaults": {
+        "message": "Select New Defaults"
+    },
+    "pidTuning_ResetPIDController": {
+        "message": "Reset PID Controller"
+    },
+    "pidTuning_PIDgains": {
+        "message" :"PID gains"
+    },
+    "pidTuning_Name": {
         "message": "Name"
     },
-    "pidTuningProportional": {
+    "pidTuning_Proportional": {
         "message": "Proportional"
     },
-    "pidTuningIntegral": {
+    "pidTuning_Integral": {
         "message": "Integral"
     },
-    "pidTuningDerivative": {
+    "pidTuning_Derivative": {
         "message": "Derivative"
     },
-    "pidTuningFeedForward": {
+    "pidTuning_FeedForward": {
         "message": "FeedForward"
     },
-    "pidTuningControlDerivative": {
+    "pidTuning_ControlDerivative": {
         "message": "Control Derivative"
     },
-    "pidTuningRollPitchRate": {
+    "pidTuning_Basic": {
+        "message": "Basic/Acro"
+    },
+    "pidTuning_Level": {
+        "message": "Angle/Horizon"
+    },
+    "pidTuning_Altitude": {
+        "message": "Barometer & Sonar/Altitude"
+    },
+    "pidTuning_Mag": {
+        "message": "Magnometer/Heading"
+    },
+    "pidTuning_GPS": {
+        "message": "GPS Navigation"
+    },
+    "pidTuning_LevelP": {
+        "message": "Strength"
+    },
+    "pidTuning_LevelI": {
+        "message": "LPF cutoff (Hz)"
+    },
+    "pidTuning_LevelD": {
+        "message": "Transition (Horizon)"
+    },
+    "pidTuning_LevelHelp": {
+        "message": "The values below change the behaviour of the ANGLE and HORIZON flight modes. Different PID controllers handle the LEVEL values differently. Please check the documentation."
+    },
+    "pidTuning_RatesAndExpo": {
+        "message": "Rates & Expo"
+    },
+    "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
-    "pidTuningRollRate": {
+    "pidTuning_RollRate": {
         "message": "ROLL rate"
     },
-    "pidTuningPitchRate": {
+    "pidTuning_PitchRate": {
         "message": "PITCH rate"
     },
-    "pidTuningYawRate": {
+    "pidTuning_YawRate": {
         "message": "YAW rate"
     },
-    "pidTuningMaxRollAngle": {
+    "pidTuning_RollAndPitchExpo": {
+        "message": "Roll & Pitch Expo"
+    },
+    "pidTuning_YawExpo" : {
+        "message": "Yaw Expo"
+    },
+    "pidTuning_MaxRollAngle": {
         "message": "Max. ROLL angle"
     },
-    "pidTuningMaxRollAngleHelp": {
+    "pidTuning_MaxRollAngleHelp": {
         "message": "Maximum ROLL angle in ANGLE mode. This also constrains the maximum bank in navigation modes."
     },
-    "pidTuningMaxPitchAngle": {
+    "pidTuning_MaxPitchAngle": {
         "message": "Max. PITCH angle"
     },
-    "pidTuningMaxPitchAngleHelp": {
+    "pidTuning_MaxPitchAngleHelp": {
         "message": "Maximum PITCH angle in ANGLE mode. This also constrains the maximum climb and dive in navigation modes."
     },
-    "pidTuningManualRollRate": {
+    "pidTuning_ManualRollRate": {
         "message": "Manual ROLL rate"
     },
-    "pidTuningManualPitchRate": {
+    "pidTuning_ManualPitchRate": {
         "message": "Manual PITCH rate"
     },
-    "pidTuningManualYawRate": {
+    "pidTuning_ManualYawRate": {
         "message": "Manual YAW rate"
     },
-    "magHoldYawRate": {
-        "message": "MagHold rate"
+    "pidTuning_magHoldYawRate": {
+        "message": "Heading Hold rate limit"
     },
-    "pidTuningMagHoldYawRateHelp": {
+    "pidTuning_MagHoldYawRateHelp": {
         "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
     },
-    "pidTuningTPA": {
+    "pidTuning_Filters": {
+        "message": "Filters"
+    },
+    "pidTuning_mainFilters": {
+        "message": "Gyro filters"
+    },
+    "pidTuning_gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "pidTuning_gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "pidTuning_MatrixFilterMinFrequency": {
+        "message": "Matrix Filter Min Frequency"
+    },
+    "pidTuning_MatrixFilterMinFrequencyHelp": {
+        "message": "Minimum frequency for the Matrix Filter. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."
+    },
+    "pidTuning_MatrixFilterQFactor": {
+        "message": "Matrix Filter Q Factor"
+    },
+    "pidTuning_MatrixFilterQFactorHelp": {
+        "message": "The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended."
+    },
+    "pidTuning_UnicornFilterQFactor": {
+        "message": "Unicorn Filter Q Factor"
+    },
+    "pidTuning_dtermFilters": {
+        "message": "D-term filters"
+    },
+    "pidTuning_dtermLpfCutoffFrequency": {
+        "message": "D-term LPF cutoff frequency"
+    },
+    "pidTuning_dtermLpfCutoffFrequencyHelp": {
+        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
+    },
+    "pidTuning_rpmFilters": {
+        "message": "Gyro RPM filters"
+    },
+    "pidTuning_rpm_gyro_filter_enabled": {
+        "message": "Gyro RPM filter (requires ESC telemetry)"
+    },
+    "pidTuning_rpm_gyro_min_hz": {
+        "message": "Gyro RPM filter min. frequency"
+    },
+    "pidTuning_Mechanics": {
+        "message": "Mechanics"
+    },
+    "pidTuning_ITermMechanics": {
+        "message": "I-term mechanics"
+    },
+    "pidTuning_itermRelaxCutoff": {
+        "message": "Iterm Relax Cutoff Frequency"
+    },
+    "pidTuning_itermRelaxCutoffHelp": {
+        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
+    },
+    "pidTuning_antigravityGain": {
+        "message": "Antigravity Gain"
+    },
+    "pidTuning_antigravityAccelerator": {
+        "message": "Antigravity Accelerator"
+    },
+    "pidTuning_antigravityCutoff": {
+        "message": "Antigravity Cutoff Frequency"
+    },
+    "pidTuning_itermBankAngleFreeze": {
+        "message": "Yaw Iterm freeze bank angle"
+    },
+    "pidTuning_itermBankAngleFreezeHelp": {
+        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
+    },
+    "pidTuning_dTermMechanics": {
+        "message": "D-term mechanics"
+    },
+    "pidTuning_d_boost_min": {
+        "message": "D-Boost Min. Scale"
+    },
+    "pidTuning_d_boost_min_help": {
+        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
+    },
+    "pidTuning_d_boost_max": {
+        "message": "D-Boost Max. Scale"
+    },
+    "pidTuning_d_boost_max_help": {
+        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
+    },
+    "pidTuning_d_boost_max_at_acceleration": {
+        "message": "Top D-Boost at acceleration [dps^2]"
+    },
+    "pidTuning_d_boost_max_at_acceleration_help": {
+        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
+    },
+    "pidTuning_d_boost_gyro_delta_lpf_hz": {
+        "message": "D-Boost gyro LPF"
+    },
+    "pidTuning_d_boost_gyro_delta_lpf_hz_help": {
+        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
+    },
+    "pidTuning_tpaMechanics": {
+        "message": "Thrust PID attenuation"
+    },
+    "pidTuning_TPA": {
         "message": "Thrust PID Attenuation (TPA)"
     },
-    "pidTuningTPABreakPoint": {
+    "pidTuning_TPABreakPoint": {
         "message": "TPA Breakpoint"
     },
-    "pidTuningButtonSave": {
+    "pidTuning_fwLevelTrimMechanics": {
+        "message": "Fixed Wing Level Trim"
+    },
+    "pidTuning_fw_level_pitch_trim": {
+        "message": "Level Trim [deg]"
+    },
+    "pidTuning_fw_level_pitch_trim_help": {
+        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
+    },
+    "pidTuning_ButtonSave": {
         "message": "Save"
     },
-    "pidTuningButtonRefresh": {
+    "pidTuning_ButtonRefresh": {
         "message": "Refresh"
     },
-    "pidTuningProfileHead": {
+    "pidTuning_ProfileHead": {
         "message": "Profile"
     },
-    "pidTuningLoadedProfile": {
+    "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "loadedBatteryProfile": {
@@ -1712,6 +1874,15 @@
     "cliCopyToClipboardBtn": {
         "message": "Copy to clipboard"
     },
+    "cliExitBtn": {
+        "message": "EXIT"
+    },
+    "cliSaveSettingsBtn": {
+        "message": "SAVE SETTINGS"
+    },
+    "cliMscBtn": {
+        "message": "MSC"
+    },
     "cliCopySuccessful": {
         "message": "Copied!"
     },
@@ -2011,33 +2182,6 @@
     "radioChannelShort": {
         "message": "CH "
     },
-    "pidTuningBasic": {
-        "message": "Basic/Acro"
-    },
-    "pidTuningLevel": {
-        "message": "Angle/Horizon"
-    },
-    "pidTuningAltitude": {
-        "message": "Barometer & Sonar/Altitude"
-    },
-    "pidTuningMag": {
-        "message": "Magnometer/Heading"
-    },
-    "pidTuningGps": {
-        "message": "GPS Navigation"
-    },
-    "pidTuningLevelP": {
-        "message": "Strength"
-    },
-    "pidTuningLevelI": {
-        "message": "LPF cutoff (Hz)"
-    },
-    "pidTuningLevelD": {
-        "message": "Transition (Horizon)"
-    },
-    "pidTuningLevelHelp": {
-        "message": "The values below change the behaviour of the ANGLE and HORIZON flight modes. Different PID controllers handle the LEVEL values differently. Please check the documentation."
-    },
     "configHelp2": {
         "message": "Arbitrary board rotation in degrees, to allow mounting it sideways / upside down / rotated etc. When running external sensors, use the sensor alignments (Gyro, Acc, Mag) to define sensor position independent from board orientation. "
     },
@@ -2208,12 +2352,6 @@
     },
     "accLpfCutoffFrequency": {
         "message": "Accelerometer LPF cutoff frequency"
-    },
-    "dtermLpfCutoffFrequency": {
-        "message": "D-term LPF cutoff frequency"
-    },
-    "dtermLpfCutoffFrequencyHelp": {
-        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
     },
     "yawLpfCutoffFrequency": {
         "message": "Yaw LPF cutoff frequency"
@@ -2600,25 +2738,25 @@
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
     "landMaxAltVspd": {
-        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
+        "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
     },
     "landMaxAltVspdHelp": {
         "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+        "message": "When the craft has descended to <i>this</i> altitude. It will begin to slow down for landing."
     },
     "landSlowdownMaxAltHelp": {
         "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
     },
+    "landSlowdownMinAlt": {
+        "message": "When the craft has descended to <i>this</i> altitude, it will have slowed to the touch down speed."
+    },
     "landMinAltVspd": {
-        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+        "message": "This is the touch down speed."
     },
     "landMinAltVspdHelp": {
         "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
-    },
-    "landSlowdownMinAlt": {
-        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
     },
     "emergencyDescentRate": {
         "message": "Emergency landing speed"
@@ -3544,8 +3682,14 @@
     "mixerPreset": {
         "message": "Mixer preset"
     },
+    "mixerNotLoaded": {
+        "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
+    },
     "mixerLoadPresetRules": {
         "message": "Load mixer"
+    },
+    "mixerRefreshCurrentRules": {
+        "message": "Refresh mixer"
     },
     "mixerLoadAndApplyPresetRules": {
         "message": "Load and apply"
@@ -3615,6 +3759,12 @@
     },
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
+    },
+    "confirm_select_defaults": {
+        "message": "This will allow to select new default values for all settings. Existing PID tune and other settings might be lost!\nDo you want to continue?"
+    },
+    "confirm_reset_pid": {
+        "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
         "message": "Output"
@@ -3793,18 +3943,6 @@
     "itermRelaxHelp": {
         "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
     },
-    "itermRelaxCutoff": {
-        "message": "Iterm Relax Cutoff Frequency"
-    },
-    "itermRelaxCutoffHelp": {
-        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
-    },
-    "gyro_main_lpf_hz": {
-        "message": "Main gyro filter cutoff frequency"
-    },
-    "gyro_main_lpf_hz_help": {
-        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
-    },
     "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
@@ -3832,80 +3970,8 @@
     "tabFilteringAdvanced": {
         "message": "Other filters"
     },
-    "mainFilters": {
-        "message": "Gyro filters"
-    },
-    "rpmFilters": {
-        "message": "Gyro RPM filters"
-    },
-    "dtermFilters": {
-        "message": "D-term filters"
-    },
-    "rpm_gyro_filter_enabled": {
-        "message": "Gyro RPM filter (requires ESC telemetry)"
-    },
-    "rpm_gyro_min_hz": {
-        "message": "Gyro RPM filter min. frequency"
-    },
-    "dTermMechanics": {
-        "message": "D-term mechanics"
-    },
-    "tpaMechanics": {
-        "message": "Thrust PID attenuation"
-    },
-    "fw_level_pitch_trim": {
-        "message": "Level Trim [deg]"
-    },
-    "fw_level_pitch_trim_help": {
-        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
-    },
-    "fwLevelTrimMechanics": {
-        "message": "Fixed Wing Level Trim"
-    },
-    "d_boost_min": {
-        "message": "D-Boost Min. Scale"
-    },
-    "d_boost_min_help": {
-        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
-    },
-    "d_boost_max": {
-        "message": "D-Boost Max. Scale"
-    },
-    "d_boost_max_help": {
-        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
-    },
-    "d_boost_max_at_acceleration": {
-        "message": "Top D-Boost at acceleration [dps^2]"
-    },
-    "d_boost_max_at_acceleration_help": {
-        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
-    },
-    "d_boost_gyro_delta_lpf_hz": {
-        "message": "D-Boost gyro LPF"
-    },
-    "d_boost_gyro_delta_lpf_hz_help": {
-        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
-    },
-    "iTermMechanics": {
-        "message": "I-term mechanics"
-    },
     "gps_map_center": {
         "message": "Center"
-    },
-    "antigravityGain": {
-        "message": "Antigravity Gain"
-    },
-    "antigravityAccelerator": {
-        "message": "Antigravity Accelerator"
-    },
-    "antigravityCutoff": {
-        "message": "Antigravity Cutoff Frequency"
-    },
-    "itermBankAngleFreeze": {
-        "message": "Yaw Iterm freeze bank angle"
-    },
-    "itermBankAngleFreezeHelp": {
-        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
     },
     "ouptputsConfiguration": {
         "message": "Configuration"
@@ -4065,5 +4131,44 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "illegalStateRestartRequired": {
+        "message": "Illegal state. Restart required."
+    },
+    "motor_direction_inverted": {
+        "message": "Reversed motor direction / Props In configuration"
+    },
+    "motor_direction_inverted_hint": {
+        "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+    },
+    "blackboxFields": {
+        "message": "Blackbox fields"
+    },
+    "BLACKBOX_FEATURE_NAV_ACC": {
+        "message": "Navigation accelerometer"
+    },
+    "BLACKBOX_FEATURE_NAV_POS": {
+        "message": "Navigation position estimation"
+    },
+    "BLACKBOX_FEATURE_NAV_PID": {
+        "message": "Navigation PID"
+    },
+    "BLACKBOX_FEATURE_MAG": {
+        "message": "Magnetometer"
+    },
+    "BLACKBOX_FEATURE_ACC": {
+        "message": "Accelerometer"
+    },
+    "BLACKBOX_FEATURE_ATTITUDE": {
+        "message": "Attitude"
+    },
+    "BLACKBOX_FEATURE_RC_DATA": {
+        "message": "RC data"
+    },
+    "BLACKBOX_FEATURE_RC_COMMAND": {
+        "message": "RC command"
+    },
+    "BLACKBOX_FEATURE_MOTORS": {
+        "message": "Motors output"
     }
 }

@@ -1,0 +1,7 @@
+.tab-advanced-tuning .config-section select, .tab-advanced-tuning .spacer_box div input {
+    margin-right: 0 !important;
+}
+
+.tab-advanced-tuning .config-section .checkbox .switchery {
+    margin-right: 63px !important;
+}

@@ -1,11 +1,14 @@
 .rate-tpa_input {
-    margin: 4px;
-    width: 5em;
+    width: 150px;
+    height: 20px;
+    line-height: 20px;
     border: 1px solid silver;
     border-radius: 3px;
+    padding-left: 3px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: normal;
     display: inline-block;
-    line-height: 20px;
-    text-align: right;
 }
 
 .settings-table.settings-table--inav td,
@@ -73,6 +76,16 @@
 
 .settings-table tr:first-child td {
     border-top-right-radius: 5px;
+}
+
+.settings-table tr:last-child th {
+    border-bottom-left-radius: 5px;
+    border-bottom: none;
+}
+
+.settings-table tr:last-child td {
+    border-bottom-right-radius: 5px;
+    border-bottom: none;
 }
 
 .settings-table {
@@ -292,6 +305,12 @@
 .tab-pid_tuning .number:last-child {
     padding-bottom: 5px;
     border-bottom: 0;
+}
+
+.tab-pid_tuning .pidTuning_number {
+    clear: left;
+    padding: 4px;
+    float: left;
 }
 
 .tab-pid_tuning .number input {

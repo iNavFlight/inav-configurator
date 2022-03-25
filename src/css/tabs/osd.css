@@ -489,11 +489,11 @@ button {
 }
 
 .tab-osd .settings select {
-    width: 75px;
+    width: 80px;
 }
 
 .tab-osd .settings .switchery {
-    margin-right: 25px;
+    margin-right: 33px;
 }
 
 .tab-osd .settings .djiCraftNameElements {
@@ -529,4 +529,17 @@ button {
     float: right;
     width: auto !important;
     margin-right: 0 !important;
+}
+
+.tab-osd label > .i18n-replaced {
+    display: inline-block;
+    left: 108px;
+    width: calc(100% - 110px);
+}
+
+.tab-osd .settings select,
+.tab-osd .settings input, 
+.tab-osd .osd_settings .switchery,
+.tab-osd .unit_wrapper {
+    vertical-align: top;
 }

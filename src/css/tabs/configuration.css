@@ -40,7 +40,7 @@
 
 .config-section .string input,
 .tab-configuration .string input {
-    width: 130px;
+    width: 106px;
 }
 
 .tab-configuration .disabled {
@@ -49,7 +49,7 @@
 
 .config-section input,
 .tab-configuration input {
-    float: left;
+    /*float: left;*/
 }
 
 .config-section .spacer_box,
@@ -138,9 +138,7 @@ hr {
 }
 
 .tab-configuration .mixerPreview img {
-    width: 90%;
-    height: 90%;
-    padding: 5%;
+    width: 175px;
 }
 
 .tab-configuration .gui_box {
@@ -185,6 +183,12 @@ hr {
     width: 110px;
 }
 
+.tab-configuration #magalign {
+    width: 111px;
+    height: 22px;
+    margin-right: 4px;
+}
+
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
     .tab-configuration .gui_box span {
         line-height: 17px;
@@ -211,7 +215,12 @@ hr {
 .config-section .radio,
 .config-section .number {
     position: relative;
-    height: 22px;
+    min-height: 22px;
+}
+
+.config-section .select select,
+.config-section .number input {
+    vertical-align: top;
 }
 
 .config-section .checkbox label,
@@ -220,8 +229,8 @@ hr {
 }
 
 .config-section label {
-    position: absolute;
-    left: 108px;
+    display: inline-block;
+    width: calc(100% - 162px);
 }
 
 .config-section .radio label {
@@ -243,9 +252,21 @@ hr {
 }
 
 .config-section select {
-    width: 110px;
+    width: 111px;
+    height: 22px;
+    margin-right: 4px;
 }
 
 .config-section .helpicon {
+    margin-top: 3px;
+}
+
+.config-section .unit_wrapper {
+    vertical-align: top;
+}
+
+.config-section .checkbox .switchery {
+    margin-right: 72px;
+    vertical-align: top;
     margin-top: 3px;
 }

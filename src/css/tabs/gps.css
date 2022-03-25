@@ -113,6 +113,10 @@
     border-top-right-radius: 0;
 }
 
+.tab-gps .config-section .checkbox .switchery {
+    margin-right: 68px;
+}
+
 #gps-map {
     height: 400px;
     width: 100%;
