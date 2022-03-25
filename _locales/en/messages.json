@@ -772,13 +772,13 @@
         "message": "MAG Alignment"
     },
     "configurationSensorAlignmentMagRoll": {
-        "message": "Roll Degrees"
+        "message": "Roll"
     },
     "configurationSensorAlignmentMagPitch": {
-        "message": "Pitch Degrees"
+        "message": "Pitch"
     },
     "configurationSensorAlignmentMagYaw": {
-        "message": "Yaw Degrees"
+        "message": "Yaw"
     },
     "configurationAccelTrims": {
         "message": "Accelerometer Trim"
@@ -1706,6 +1706,18 @@
     },
     "magnetometerHead": {
         "message": "Magnetometer Alignment"
+    },
+    "magnetometerHelp": {
+        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> Axes are relative to the flight controller and not to the GPS module."
+    },
+    "magnetometerOrientationPreset": {
+        "message": "Orientation presets"
+    },
+    "magnetometerInfo": {
+        "message": "Select a preset or create a custom configuration moving the sliders"
+    },
+    "magnetometerElementToShow": {
+        "message": "Element to show"
     },
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
@@ -4119,5 +4131,8 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "reset": {
+        "message": "Reset"
     }
 }
