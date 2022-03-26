@@ -7,9 +7,9 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
 
     self.fromMsp = function (mspThrottle, mspRoll, mspPitch, mspYaw) {
         throttle = mspThrottle / 1000;
-        roll = (mspRoll / 1000) - 2;
-        pitch = (mspPitch / 1000) - 2;
-        yaw = (mspYaw / 1000) - 2;
+        roll = Math.round(((mspRoll / 1000) - 2) * 1000) / 1000;
+        pitch = Math.round(((mspPitch / 1000) - 2) * 1000) / 1000;
+        yaw = Math.round(((mspYaw / 1000) - 2) * 1000) / 1000;
     };
 
     self.isUsed = function () {

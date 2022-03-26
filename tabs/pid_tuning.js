@@ -15,7 +15,7 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig,
-        mspHelper.loadBfConfig
+        mspHelper.loadFeatures
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -101,7 +101,7 @@ TABS.pid_tuning.initialize = function (callback) {
       if (have_sensor(sensors_detected, 'mag')) {
         $('#pid_mag').show();
       }
-      if (bit_check(BF_CONFIG.features, 7)) {   //This will need to be reworked to remove BF_CONFIG reference eventually
+      if (bit_check(FEATURES, 7)) {
         $('#pid_gps').show();
       }
       if (have_sensor(sensors_detected, 'sonar')) {
@@ -112,27 +112,8 @@ TABS.pid_tuning.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        if (FC.isCdComponentUsed()) {
-            $('th.feedforward').html(chrome.i18n.getMessage('pidTuningControlDerivative'));
-            $('th.feedforward').attr('title', chrome.i18n.getMessage('pidTuningControlDerivative'));
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0")) {
-            $('.requires-v2_4').show();
-        } else {
-            $('.requires-v2_4').hide();
-        }
-
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            $('.requires-v2_6').show();
-            $('.hides-v2_6').hide();
-        } else {
-            $('.requires-v2_6').hide();
-            $('.hides-v2_6').show();
-        }
-
         helper.tabs.init($('.tab-pid_tuning'));
-        helper.features.updateUI($('.tab-pid_tuning'), BF_CONFIG.features);
+        helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
 
         hideUnusedPids(CONFIG.activeSensors);
 
@@ -148,24 +129,30 @@ TABS.pid_tuning.initialize = function (callback) {
           }
         });
 
-        $('#resetPIDs').on('click', function(){
-            MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
-	        updateActivatedTab();
+        $('#resetPIDs').on('click', function() {
+
+            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
+                MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
+                updateActivatedTab();
+            }
         });
 
         $('#resetDefaults').on('click', function() {
-            mspHelper.setSetting("applied_defaults", 0, function() { 
-                mspHelper.saveToEeprom( function () {
-                    GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
 
-                    GUI.tab_switch_cleanup(function () {
-                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
-                            GUI.handleReconnect();
+            if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
+                mspHelper.setSetting("applied_defaults", 0, function() { 
+                    mspHelper.saveToEeprom( function () {
+                        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+    
+                        GUI.tab_switch_cleanup(function () {
+                            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.handleReconnect();
+                            });
                         });
                     });
                 });
-            });
+            }
         });
 
         pid_and_rc_to_form();

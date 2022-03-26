@@ -37,10 +37,14 @@ a.disabled {
 }
 
 /* Help-Icon  */
+.gui_box_titlebar .helpicon {
+    margin-right: 10px;
+    margin-top: 5px !important;
+}
+
 .helpicon {
     float: right;
     margin-top: 7px;
-    margin-right: 7px;
     display: block;
     height: 14px;
     width: 14px;
@@ -900,18 +904,6 @@ li.active .ic_help {
 
 li.active .ic_flasher {
     background-image: url("../images/icons/cf_icon_flasher_white.svg");
-}
-
-.ic_transponder {
-    background-image: url("../images/icons/cf_icon_transponder_grey.svg");
-}
-
-.ic_transponder:hover {
-    background-image: url("../images/icons/cf_icon_transponder_white.svg");
-}
-
-li.active .ic_transponder {
-    background-image: url("../images/icons/cf_icon_transponder_white.svg");
 }
 
 .ic_calibration {
@@ -1974,7 +1966,6 @@ dialog {
     .helpicon {
         float: right;
         margin-top: 5px;
-        margin-right: 7px;
         height: 14px;
         width: 14px;
         transition: none;
@@ -2233,11 +2224,21 @@ ol li {
     position: relative;
 }
 
+.unit_wrapper input {
+    margin-right: 0 !important;
+}
+
+.unit_wrapper ~ label, select ~ label, input ~ label {
+    margin-left: 10px;
+}
+
 /* Position the unit to the right of the wrapper */
 .unit_wrapper::after {
     position: absolute;
-    top: 2px;
-    right: .7em;
+    /*top: 2px;*/
+    bottom: -2px;
+    height: 100%;
+    right: .5em;
     transition: all .05s ease-in-out;
 }
 
@@ -2245,17 +2246,33 @@ ol li {
      for arrow buttons will appear to the right of number inputs */
 .unit_wrapper:hover::after,
 .unit_wrapper:focus-within::after {
-    right: 1.3em;
+    right: 1.0em;
 }
 
 /* Handle Firefox (arrows always shown) */
 @supports (-moz-appearance:none) {
     .unit_wrapper::after {
-        right: 1.3em;
+        right: 1.0em;
     }
 }
 
 /* Set the unit abbreviation for each unit class */
 .unit::after {
     content: attr(data-unit) ;
+}
+
+.batteryProfileHighlight {
+    background-color: none;
+}
+
+.batteryProfileHighlightActive {
+    background-color: #fef2d5;
+}
+
+.controlProfileHighlight {
+    background-color:none;
+}
+
+.controlProfileHighlightActive {
+    background-color: #d5ebfe;
 }

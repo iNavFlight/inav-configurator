@@ -72,6 +72,21 @@ let ServoMixerRuleCollection = function () {
         return false;
     };
 
+    self.getServoMixRuleFromTarget = function(wantedTarget) {
+        let returnTarget = null;
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                if (data[ruleIndex].getTarget() == wantedTarget) {
+                    returnTarget = data[ruleIndex];
+                    break;
+                }
+            }
+        }
+
+        return returnTarget;
+    }
+
     self.getNumberOfConfiguredServos = function () {
         let count = 0;
         for (let i = 0; i < self.getServoCount(); i ++) {
@@ -97,6 +112,21 @@ let ServoMixerRuleCollection = function () {
         return unique.sort(function(a, b) {
             return a-b;
         });
+    }
+
+    self.getNextUnusedIndex = function() {
+        let nextTarget = 0;
+
+        for (let ruleIndex in data) {
+            if (data.hasOwnProperty(ruleIndex)) {
+                let target = data[ruleIndex].getTarget();
+                if (target > nextTarget) {
+                    nextTarget = target;
+                }
+            }
+        }
+
+        return nextTarget+1;
     }
 
     return self;

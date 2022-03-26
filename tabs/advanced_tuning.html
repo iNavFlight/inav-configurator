@@ -11,12 +11,12 @@
                     </div>
                     <div class="spacer_box settings">
                         <div class="number">
-                            <input type="number" id="launchIdleThr" data-setting="nav_fw_launch_idle_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input type="number" id="launchIdleThr" data-unit="us" data-setting="nav_fw_launch_idle_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="launchIdleThr"><span data-i18n="configurationLaunchIdleThr"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleThrHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchMaxAngle" data-setting="nav_fw_launch_max_angle" data-setting-multiplier="1" step="1" min="5" max="180" />
+                            <input type="number" id="launchMaxAngle" data-unit="deg" data-setting="nav_fw_launch_max_angle" data-setting-multiplier="1" step="1" min="5" max="180" />
                             <label for="launchMaxAngle"><span data-i18n="configurationLaunchMaxAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchMaxAngleHelp"></div>
                         </div>
@@ -26,7 +26,7 @@
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchVelocityHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchAccel" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="20000" />
+                            <input type="number" id="launchAccel" data-unit="cmss" data-setting="nav_fw_launch_accel" data-setting-multiplier="1" step="1" min="1000" max="20000" />
                             <label for="launchAccel"><span data-i18n="configurationLaunchAccel"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchAccelHelp"></div>
                         </div>
@@ -51,12 +51,12 @@
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchSpinupTimeHelp"></div>
                         </div>
                          <div class="number">
-                            <input type="number" id="launchThr" data-setting="nav_fw_launch_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input type="number" id="launchThr" data-unit="us" data-setting="nav_fw_launch_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="launchThr"><span data-i18n="configurationLaunchThr"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchThrHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="launchClimbAngle" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="45" />
+                            <input type="number" id="launchClimbAngle" data-unit="deg" data-setting="nav_fw_launch_climb_angle" data-setting-multiplier="1" step="1" min="0" max="45" />
                             <label for="launchClimbAngle"><span data-i18n="configurationLaunchClimbAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchClimbAngleHelp"></div>
                         </div>
@@ -84,12 +84,12 @@
                     </div>
                     <div class="spacer_box">
                         <div class="number">
-                            <input type="number" id="idlePower" data-setting="idle_power" data-setting-multiplier="1" step="1" min="0" max="65535" />
+                            <input type="number" id="idlePower" data-unit="cw" data-setting="idle_power" data-setting-multiplier="1" step="1" min="0" max="65535" />
                             <label for="idlePower"><span data-i18n="idlePower"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="idlePowerHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="cruisePower" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="4294967295" />
+                            <input type="number" id="cruisePower" data-unit="cw" data-setting="cruise_power" data-setting-multiplier="1" step="1" min="0" max="4294967295" />
                             <label for="cruisePower"><span data-i18n="cruisePower"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="cruisePowerHelp"></div>
                         </div>
@@ -99,7 +99,7 @@
                             <div class="helpicon cf_tip" data-i18n_title="cruiseSpeedHelp"></div>
                         </div>
                         <div class="number">
-                            <input type="number" id="rthEnergyMargin" data-setting="rth_energy_margin" data-setting-multiplier="1" step="1" min="0" max="100" />
+                            <input type="number" id="rthEnergyMargin" data-unit="percent" data-setting="rth_energy_margin" data-setting-multiplier="1" step="1" min="0" max="100" />
                             <label for="rthEnergyMargin"><span data-i18n="rthEnergyMargin"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="rthEnergyMarginHelp"></div>
                         </div>
@@ -116,7 +116,7 @@
                     <div class="spacer_box">
 
                         <div class="number">
-                            <input id="cruiseThrottle" type="number" data-setting="nav_fw_cruise_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input id="cruiseThrottle" type="number" data-unit="us" data-setting="nav_fw_cruise_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="cruiseThrottle"><span data-i18n="cruiseThrottle"></span></label>
                         </div>
 
@@ -133,12 +133,12 @@
                         </div>
 
                         <div class="number">
-                            <input id="minThrottle" type="number" data-setting="nav_fw_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input id="minThrottle" type="number" data-unit="us" data-setting="nav_fw_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="minThrottle"><span data-i18n="minThrottle"></span></label>
                         </div>
 
                         <div class="number">
-                            <input id="maxThrottle" type="number" data-setting="nav_fw_max_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input id="maxThrottle" type="number" data-unit="us" data-setting="nav_fw_max_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="maxThrottle"><span data-i18n="maxThrottle"></span></label>
                         </div>
 
@@ -149,7 +149,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="pitchToThrottleThreshold" type="number" data-setting="nav_fw_pitch2thr_threshold" data-setting-multiplier="1" step="1" min="0" max="900" />
+                            <input id="pitchToThrottleThreshold" type="number" data-unit="decideg" data-setting="nav_fw_pitch2thr_threshold" data-setting-multiplier="1" step="1" min="0" max="900" />
                             <label for="pitchToThrottleThreshold"><span data-i18n="pitchToThrottleThreshold"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="pitchToThrottleThresholdHelp"></div>
                         </div>
@@ -161,19 +161,19 @@
                         </div>
 
                         <div class="number">
-                            <input id="maxBankAngle" type="number" data-setting="nav_fw_bank_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
+                            <input id="maxBankAngle" type="number" data-unit="deg" data-setting="nav_fw_bank_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxBankAngle"><span data-i18n="maxBankAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="maxBankAngleHelp"></div>
                         </div>
 
                         <div class="number">
-                            <input id="maxClimbAngle" type="number" data-setting="nav_fw_climb_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
+                            <input id="maxClimbAngle" type="number" data-unit="deg" data-setting="nav_fw_climb_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxClimbAngle"><span data-i18n="maxClimbAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="maxClimbAngleHelp"></div>
                         </div>
 
                         <div class="number">
-                            <input id="maxDiveAngle" type="number" data-setting="nav_fw_dive_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
+                            <input id="maxDiveAngle" type="number" data-unit="deg" data-setting="nav_fw_dive_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxDiveAngle"><span data-i18n="maxDiveAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="maxDiveAngleHelp"></div>
                         </div>
@@ -230,7 +230,7 @@
                             <div class="helpicon cf_tip" data-i18n_title="posholdMaxManualSpeedHelp"></div>
                         </div>
                         <div class="number">
-                            <input id="max-bank-angle" type="number" data-setting="nav_mc_bank_angle" data-setting-multiplier="1" step="1" min="15" max="45" />
+                            <input id="max-bank-angle" type="number" data-unit="deg" data-setting="nav_mc_bank_angle" data-setting-multiplier="1" step="1" min="15" max="45" />
                             <label for="max-bank-angle"><span data-i18n="posholdMaxBankAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="posholdMaxBankAngleHelp"></div>
                         </div>
@@ -239,7 +239,7 @@
                             <label for="use-mid-throttle"><span data-i18n="posholdHoverMidThrottle"></span></label>
                         </div>
                         <div class="number">
-                            <input id="hover-throttle" type="number" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <input id="hover-throttle" type="number" data-unit="us" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="hover-throttle"><span data-i18n="posholdHoverThrottle"></span></label>
                         </div>
                         <div class="checkbox">
@@ -301,7 +301,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="brakingBankAngle" type="number" data-setting="nav_mc_braking_bank_angle" data-setting-multiplier="1" step="1" min="15" max="60" />
+                            <input id="brakingBankAngle" type="number" data-unit="deg" data-setting="nav_mc_braking_bank_angle" data-setting-multiplier="1" step="1" min="15" max="60" />
                             <label for="brakingBankAngle"><span data-i18n="brakingBankAngle"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="brakingBankAngleTip"></div>
                         </div>
@@ -393,13 +393,13 @@
                     </div>
                     <div class="spacer_box">
                         <div class="number">
-                            <input type="number" id="navManualClimbRate" data-unit="cms" data-setting="nav_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <input type="number" id="navManualClimbRate" data-unit="v-cms" data-setting="nav_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
                         </div>
 
                         <div class="number">
-                            <input type="number" id="navAutoClimbRate" data-unit="cms" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <input type="number" id="navAutoClimbRate" data-unit="v-cms" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
                         </div>
@@ -427,35 +427,30 @@
                     </div>
                 </div>
 
-                <div class="config-setion gui_box grey">
+                <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="autoLandingSettings"></div>
                     </div>
                     <div class="spacer_box">
-
                         <div class="number">
-                            <input id="landMaxAltVspd" type="number" data-setting="nav_land_maxalt_vspd" data-setting-multiplier="1" step="1" min="100" max="2000" />
+                            <input id="landMaxAltVspd" type="number" data-unit="v-cms" data-setting="nav_land_maxalt_vspd" data-setting-multiplier="1" step="1" min="100" max="2000" />
                             <label for="landMaxAltVspd"><span data-i18n="landMaxAltVspd"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="landMaxAltVspdHelp"></div>
                         </div>
-
                         <div class="number">
-                            <input id="landSlowdownMaxAlt" type="number" data-setting="nav_land_slowdown_maxalt" data-setting-multiplier="1" step="1" min="500" max="4000" />
+                            <input id="landSlowdownMaxAlt" type="number" data-unit="cm" data-setting="nav_land_slowdown_maxalt" data-setting-multiplier="1" step="1" min="500" max="4000" />
                             <label for="landSlowdownMaxAlt"><span data-i18n="landSlowdownMaxAlt"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="landSlowdownMaxAltHelp"></div>
                         </div>
-
                         <div class="number">
-                            <input id="landMinAltVspd" type="number" data-setting="nav_land_minalt_vspd" data-setting-multiplier="1" step="1" min="50" max="500" />
+                            <input id="landSlowdownMinAlt" type="number" data-unit="cm" data-setting="nav_land_slowdown_minalt" data-setting-multiplier="1" step="1" min="50" max="1000" />
+                            <label for="landSlowdownMinAlt"><span data-i18n="landSlowdownMinAlt"></span></label>
+                        </div>
+                        <div class="number">
+                            <input id="landMinAltVspd" type="number" data-unit="v-cms" data-setting="nav_land_minalt_vspd" data-setting-multiplier="1" step="1" min="50" max="500" />
                             <label for="landMinAltVspd"><span data-i18n="landMinAltVspd"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="landMinAltVspdHelp"></div>
                         </div>
-
-                        <div class="number">
-                            <input id="landSlowdownMinAlt" type="number" data-setting="nav_land_slowdown_minalt" data-setting-multiplier="1" step="1" min="50" max="1000" />
-                            <label for="landSlowdownMinAlt"><span data-i18n="landSlowdownMinAlt"></span></label>
-                        </div>
-
                         <div class="number">
                             <input id="emergencyDescentRate" type="number" data-unit="cms" data-setting="nav_emerg_landing_speed" data-setting-multiplier="1" step="1" min="100" max="2000" />
                             <label for="emergencyDescentRate"><span data-i18n="emergencyDescentRate"></span></label>

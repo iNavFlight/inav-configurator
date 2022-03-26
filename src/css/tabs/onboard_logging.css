@@ -296,3 +296,13 @@
     text-shadow: none;
     opacity: 0.5;
 }
+
+.tab-onboard_logging .leftWrapper {
+    float: left;
+    width: calc(50% - 20px);
+}
+
+.tab-onboard_logging .rightWrapper {
+    float: right;
+    width: calc(50%);
+}

@@ -25,11 +25,12 @@
             </div>
         </div>
         <div class="require-blackbox-supported">
-            <div class="gui_box grey require-blackbox-config-supported">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
-                </div>
-                <div class="spacer_box config-section">
+            <div class="leftWrapper">
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
+                    </div>
+                    <div class="spacer_box">
                     <div class="checkbox">
                             <input checked type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-2">
                             <label for="feature-19-2">
@@ -46,24 +47,31 @@
                         </select>
                         <span>Portion of flight loop iterations to log (logging rate)</span>
                     </div>
-                    <div class="line">
-                        <a href="#" class="save-settings regular-button" data-i18n="blackboxButtonSave"></a>
                     </div>
                 </div>
             </div>
-            
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar" align="left">
-                    <div class="spacer_box_title">
-                        Outboard serial logging device
+            <div class="rightWrapper">
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="blackboxFields"></div>
                     </div>
-                </div>
-                <div class="spacer_box">
-                    <p data-i18n="serialLoggingSupportedNote"></p>
+                    <div id="blackBoxFlagsDiv" class="spacer_box config-section">
                 </div>
             </div>
+        </div>
+
+        <div class="gui_box grey">
+            <div class="gui_box_titlebar" align="left">
+                <div class="spacer_box_title">
+                    Outboard serial logging device
+                </div>
+            </div>
+            <div class="spacer_box">
+                <p data-i18n="serialLoggingSupportedNote"></p>
+            </div>
+        </div>
             
-            <div class="gui_box grey require-dataflash-supported">
+        <div class="gui_box grey require-dataflash-supported">
                 <div class="gui_box_titlebar" align="left">
                     <div class="spacer_box_title">
                         Onboard dataflash chip
@@ -122,35 +130,40 @@
                     <p class="require-dataflash-not-present" data-i18n="dataflashNotPresentNote"></p>
                     <p class="require-dataflash-unsupported" data-i18n="dataflashFirmwareUpgradeRequired"></p>
                 </div>
-            </div>
-            <div class="require-sdcard-supported">
-                <div class="gui_box grey">
-                    <div class="gui_box_titlebar" align="left">
-                        <div class="spacer_box_title">
-                            Onboard SD card
-                        </div>
+        </div>
+        <div class="require-sdcard-supported">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar" align="left">
+                    <div class="spacer_box_title">
+                        Onboard SD card
                     </div>
-                    <div class="spacer_box">
-                            <div class="sdcard">
-                                <div class="sdcard-icon"></div>
-                                <div class="sdcard-status"></div>
-                            </div>
+                </div>
+                <div class="spacer_box">
+                        <div class="sdcard">
+                            <div class="sdcard-icon"></div>
+                            <div class="sdcard-status"></div>
+                        </div>
+                    
+                        <p data-i18n="sdcardNote"></p>
                         
-                            <p data-i18n="sdcardNote"></p>
-                            
-                            <div class="require-sdcard-ready">
-                                <ul class="sdcard-contents">
-                                    <li class="sdcard-other">
-                                        <div class="legend"></div>
-                                    </li>
-                                    <li class="sdcard-free">
-                                        <div class="legend"></div>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="require-sdcard-ready">
+                            <ul class="sdcard-contents">
+                                <li class="sdcard-other">
+                                    <div class="legend"></div>
+                                </li>
+                                <li class="sdcard-free">
+                                    <div class="legend"></div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="content_toolbar">
+        <div class="btn save_btn">
+            <a href="#" class="save-settings regular-button" data-i18n="blackboxButtonSave"></a>
+        </div>
+    </div>
+</div>

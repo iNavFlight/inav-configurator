@@ -1,4 +1,4 @@
-/*global mspHelper,BF_CONFIG*/
+/*global mspHelper,FEATURES,bit_clear,bit_set*/
 'use strict';
 
 var helper = helper || {};
@@ -67,20 +67,20 @@ helper.features = (function() {
 
     publicScope.execute = function(callback) {
         exitPoint = callback;
-        mspHelper.loadBfConfig(privateScope.setBits);
+        mspHelper.loadFeatures(privateScope.setBits);
     };
 
     privateScope.setBits = function () {
 
         for (const bit of toSet) {
-            BF_CONFIG.features = bit_set(BF_CONFIG.features, bit);
+            FEATURES = bit_set(FEATURES, bit);
         }
 
         for (const bit of toUnset) {
-            BF_CONFIG.features = bit_clear(BF_CONFIG.features, bit);
+            FEATURES = bit_clear(FEATURES, bit);
         }
 
-        mspHelper.saveBfConfig(exitPoint);
+        mspHelper.saveFeatures(exitPoint);
     }
 
     return publicScope;

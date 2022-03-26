@@ -397,11 +397,8 @@ function osdMainBatteryPreview() {
     if (Settings.getInputValue('osd_main_voltage_decimals') == 2) {
         s += '3';
     }
-    if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-        s += 'V';
-    } else {
-        s += FONT.symbol(SYM.VOLT);
-    }
+
+    s += FONT.symbol(SYM.VOLT);
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
@@ -781,28 +778,14 @@ OSD.constants = {
                     name: 'REMAINING_FLIGHT_DISTANCE',
                     id: 49,
                     preview: function(osd_data) {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
-                                case 4: // GA
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
-                                default:
-                                    // Metric
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
-                            }
-
-                        } else {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                                case 4: // GA
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                                default: // Metric
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
-                            }
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -1082,24 +1065,13 @@ OSD.constants = {
                     name: 'ALTITUDE',
                     id: 15,
                     preview: function () {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                case 4: // GA
-                                    return FONT.symbol(SYM.ALT_FT) + '375';
-                                default: // Metric
-                                    return FONT.symbol(SYM.ALT_M) + '114'
-                            }
-                        } else {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                case 4: // GA
-                                    return ' 375' + FONT.symbol(SYM.ALT_FT);
-                                default: // Metric
-                                    return ' 114' + FONT.symbol(SYM.ALT_M);
-                            }
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return ' 375' + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return ' 114' + FONT.symbol(SYM.ALT_M);
                         }
                     }
                 },
@@ -1237,55 +1209,35 @@ OSD.constants = {
                     name: 'CURRENT_DRAW',
                     id: 11,
                     preview: function() {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            return FONT.symbol(SYM.AMP) + FONT.embed_dot('42.1');
-                        } else {
-                            return FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP);
-                        }
+                        return FONT.embed_dot('42.1') + FONT.symbol(SYM.AMP);
                     }
                 },
                 {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
-                        } else {
-                            return '1034' + FONT.symbol(SYM.MAH); // 4 chars
-                        }
+                        return '1034' + FONT.symbol(SYM.MAH); // 4 chars
                     }
                 },
                 {
                     name: 'WH_DRAWN',
                     id: 36,
                     preview: function() {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            return FONT.symbol(SYM.WH) + FONT.embed_dot('1.25');
-                        } else {
-                            return FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
-                        }
+                        return FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
                     }
                 },
                 {
                     name: 'POWER',
                     id: 19,
                     preview: function() {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            return FONT.symbol(SYM.WATT) + '50 '; // 3 chars
-                        } else {
-                            return ' 69' + FONT.symbol(SYM.WATT); // 3 chars
-                        }
+                        return ' 69' + FONT.symbol(SYM.WATT); // 3 chars
                     }
                 },
                 {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
                     preview: function() {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            return FONT.symbol(SYM.MAH) + '690 '; // 4 chars
-                        } else {
-                            return '1276' + FONT.symbol(SYM.MAH); // 4 chars
-                        }
+                        return '1276' + FONT.symbol(SYM.MAH); // 4 chars
                     }
                 },
                 {
@@ -1350,24 +1302,13 @@ OSD.constants = {
                     name: 'MSL_ALTITUDE',
                     id: 96,
                     preview: function(osd_data) {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                case 4: // GA
-                                    return FONT.symbol(SYM.ALT_FT) + '375';
-                                default: // Metric
-                                    return FONT.symbol(SYM.ALT_M) + '114';
-                            }
-                        } else {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                case 4: // GA
-                                    return ' 375' + FONT.symbol(SYM.ALT_FT);
-                                default: // Metric
-                                    return ' 114' + FONT.symbol(SYM.ALT_M);
-                            }
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return ' 375' + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return ' 114' + FONT.symbol(SYM.ALT_M);
                         }
                     },
                 },
@@ -1483,26 +1424,14 @@ OSD.constants = {
                     name: 'DISTANCE_TO_HOME',
                     id: 23,
                     preview: function(osd_data) {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
-                                case 4: // GA
-                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
-                                default: // Metric
-                                    return FONT.symbol(SYM.HOME) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
-                            }
-                        } else {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                                case 4: // GA
-                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                                default: // Metric
-                                    return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                            }
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.HOME) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -1511,26 +1440,14 @@ OSD.constants = {
                     id: 40,
                     min_version: '1.9.1',
                     preview: function(osd_data) {
-                        if (semver.lt(CONFIG.flightControllerVersion, '2.2.0')) {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_MI) + FONT.embed_dot('0.98');
-                                case 4: // GA
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_NM) + FONT.embed_dot('0.85');
-                                default: // Metric
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.symbol(SYM.DIST_KM) + FONT.embed_dot('1.57');
-                            }
-                        } else {
-                            switch (OSD.data.preferences.units) {
-                                case 0: // Imperial
-                                case 3: // UK
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
-                                case 4: // GA
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
-                                default: // Metric
-                                    return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
-                            }
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -2011,13 +1928,18 @@ OSD.updateDisplaySize = function () {
         video_type = 'PAL';
     }
 
-	// save the original OSD element positions.
-	var origPos = [];
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-        origPos.push(OSD.msp.helpers.pack.position(OSD.data.items[ii]));
+    // save the original OSD element positions for all layouts
+    var osdLayouts = [];
+    for (var ii = 0; ii < OSD.data.layout_count; ii++) {
+        var items = OSD.data.layouts[ii];
+        var origPos = [];
+        for (var jj = 0; jj < OSD.data.items.length; jj++) {
+            origPos.push(OSD.msp.helpers.pack.position(items[jj]));
+        }
+        osdLayouts.push(origPos);
     }
 
-	// save the new video type and cols per line
+    // set the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
     OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
@@ -2028,16 +1950,20 @@ OSD.updateDisplaySize = function () {
         total: OSD.constants.VIDEO_BUFFER_CHARS[video_type]
     };
 
-	// recalculate the OSD element positions for the new cols per line
-    for (var ii = 0; ii < OSD.data.items.length; ii++) {
-		var item = OSD.msp.helpers.unpack.position(origPos[ii]);
-		// do not recalculate anything not visible or outside of the screen
-		if (item.isVisible && item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-			OSD.data.items[ii] = item;
-		}
-	}
-	
-	// set the preview size
+    // re-calculate the OSD element positions for each layout
+    for (var ii = 0; ii < OSD.data.layout_count; ii++) {
+        var origPos = osdLayouts[ii];
+        var items = OSD.data.layouts[ii];
+        for (var jj = 0; jj < OSD.data.item_count; jj++) {
+            var item = OSD.msp.helpers.unpack.position(origPos[jj]);
+            // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
+            if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
+                items[jj] = item; 
+            }
+        }
+    }
+
+    // set the preview size based on the video type
     $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
     $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
     $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
@@ -2094,7 +2020,7 @@ OSD.msp = {
         },
         pack: {
             position: function (display_item) {
-                return (display_item.isVisible ? 0x2000 : 0)
+                return (display_item.isVisible ? OSD.constants.VISIBLE : 0)
                 	| ((display_item.y & 0x3F) << 6) | (display_item.x & 0x3F);
             }
         }
@@ -2108,12 +2034,10 @@ OSD.msp = {
         result.push16(OSD.data.alarms.max_altitude);
         result.push16(OSD.data.alarms.dist);
         result.push16(OSD.data.alarms.max_neg_altitude);
-        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
-            result.push16(OSD.data.alarms.gforce);
-            result.push16(OSD.data.alarms.gforce_axis_min);
-            result.push16(OSD.data.alarms.gforce_axis_max);
-            result.push8(OSD.data.alarms.current);
-        }
+        result.push16(OSD.data.alarms.gforce);
+        result.push16(OSD.data.alarms.gforce_axis_min);
+        result.push16(OSD.data.alarms.gforce_axis_max);
+        result.push8(OSD.data.alarms.current);
         result.push16(OSD.data.alarms.imu_temp_alarm_min);
         result.push16(OSD.data.alarms.imu_temp_alarm_max);
         result.push16(OSD.data.alarms.baro_temp_alarm_min);
@@ -2129,12 +2053,10 @@ OSD.msp = {
         OSD.data.alarms.max_altitude = alarms.readU16();
         OSD.data.alarms.dist = alarms.readU16();
         OSD.data.alarms.max_neg_altitude = alarms.readU16();
-        if (semver.gte(CONFIG.flightControllerVersion, '2.2.0')) {
-            OSD.data.alarms.gforce = alarms.readU16();
-            OSD.data.alarms.gforce_axis_min = alarms.read16();
-            OSD.data.alarms.gforce_axis_max = alarms.read16();
-            OSD.data.alarms.current = alarms.readU8();
-        }
+        OSD.data.alarms.gforce = alarms.readU16();
+        OSD.data.alarms.gforce_axis_min = alarms.read16();
+        OSD.data.alarms.gforce_axis_max = alarms.read16();
+        OSD.data.alarms.current = alarms.readU8();
         OSD.data.alarms.imu_temp_alarm_min = alarms.read16();
         OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
@@ -2514,14 +2436,16 @@ OSD.GUI.updateFields = function() {
         }
     }
 
-    $('#djiUnsupportedElements').prepend(
-        $('<input type="checkbox" class="toggle" />')
-        .attr('checked', OSD.data.isDjiHdFpv)
-        .on('change', function () {
-            OSD.GUI.updateDjiView(this.checked);
-            OSD.GUI.updatePreviews();
-        })
-     );
+    if ($('#djiUnsupportedElementsToggle').length == false) {
+        $('#djiUnsupportedElements').prepend(
+            $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
+            .attr('checked', OSD.data.isDjiHdFpv)
+            .on('change', function () {
+                OSD.GUI.updateDjiView(this.checked);
+                OSD.GUI.updatePreviews();
+            })
+        );
+    }
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();

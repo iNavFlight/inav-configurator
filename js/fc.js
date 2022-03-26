@@ -2,7 +2,6 @@
 
 // define all the global variables that are uses to hold FC state
 var CONFIG,
-    BF_CONFIG,
     LED_STRIP,
     LED_COLORS,
     LED_MODE_COLORS,
@@ -39,7 +38,6 @@ var CONFIG,
     DATAFLASH,
     SDCARD,
     BLACKBOX,
-    TRANSPONDER,
     RC_deadband,
     SENSOR_ALIGNMENT,
     RX_CONFIG,
@@ -63,9 +61,13 @@ var CONFIG,
     OUTPUT_MAPPING,
     SETTINGS,
     BRAKING_CONFIG,
-    SAFEHOMES;
+    SAFEHOMES,
+    BOARD_ALIGNMENT,
+    CURRENT_METER_CONFIG,
+    FEATURES;
 
 var FC = {
+    restartRequired: false,
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
     isAirplane: function () {
@@ -75,13 +77,10 @@ var FC = {
         return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     isRpyFfComponentUsed: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE || MIXER_CONFIG.platformType == PLATFORM_ROVER || MIXER_CONFIG.platformType == PLATFORM_BOAT) || ((MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) && semver.gte(CONFIG.flightControllerVersion, "2.6.0"));
+        return true; // Currently all planes have roll, pitch and yaw FF
     },
     isRpyDComponentUsed: function () {
         return true; // Currently all platforms use D term
-    },
-    isCdComponentUsed: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
     resetState: function () {
         SENSOR_STATUS = {
@@ -127,20 +126,24 @@ var FC = {
             name: ''
         };
 
-        BF_CONFIG = {
-            mixerConfiguration: 0,
-            features: 0,
-            serialrx_type: 0,
-            board_align_roll: 0,
-            board_align_pitch: 0,
-            board_align_yaw: 0,
-            currentscale: 0,
-            currentoffset: 0
+        BOARD_ALIGNMENT = {
+            roll: 0,
+            pitch: 0,
+            yaw: 0
+        };
+
+        CURRENT_METER_CONFIG = {
+            scale: 0,
+            offset: 0,
+            type: 0,
+            capacity: 0
         };
 
         LED_STRIP = [];
         LED_COLORS = [];
         LED_MODE_COLORS = [];
+
+        FEATURES = 0;
 
         PID = {
         };
@@ -245,23 +248,6 @@ var FC = {
             timeouts: 0,
             packetCount: 0
         };
-
-        /* MISSION_PLANNER = {
-            maxWaypoints: 0,
-            isValidMission: 0,
-            countBusyPoints: 0,
-            bufferPoint: {
-                number: 0,
-                action: 0,
-                lat: 0,
-                lon: 0,
-                alt: 0,
-                endMission: 0,
-                p1: 0,
-                p2: 0,
-                p3: 0
-            }
-        }; */
 
         MISSION_PLANNER = new WaypointCollection();
 
@@ -473,11 +459,6 @@ var FC = {
             blackboxRateDenom: 1
         };
 
-        TRANSPONDER = {
-            supported: false,
-            data: []
-        };
-
         RC_deadband = {
             deadband: 0,
             yaw_deadband: 0,
@@ -576,7 +557,7 @@ var FC = {
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
             {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
-            {bit: 7, group: 'gps', name: 'GPS', haveTip: true},
+            {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
             {bit: 11, group: 'batteryCurrent', name: 'CURRENT_METER'},
             {bit: 12, group: 'other', name: 'REVERSIBLE_MOTORS', showNameInTip: true},
@@ -595,10 +576,6 @@ var FC = {
             {bit: 31, group: 'other', name: "FW_AUTOTRIM", haveTip: true, showNameInTip: true}
         ];
 
-        if (semver.gte(CONFIG.flightControllerVersion, "2.4.0") && semver.lt(CONFIG.flightControllerVersion, "2.5.0")) {
-            features.push({bit: 5, group: 'other', name: 'DYNAMIC_FILTERS', haveTip: true, showNameInTip: true});
-        }
-
         return features.reverse();
     },
     isFeatureEnabled: function (featureName, features) {
@@ -606,7 +583,7 @@ var FC = {
             features = this.getFeatures();
         }
         for (var i = 0; i < features.length; i++) {
-            if (features[i].name == featureName && bit_check(BF_CONFIG.features, features[i].bit)) {
+            if (features[i].name == featureName && bit_check(FEATURES, features[i].bit)) {
                 return true;
             }
         }
@@ -658,168 +635,69 @@ var FC = {
         ];
     },
     getEscProtocols: function () {
-
-        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
-            return {
-                0: {
-                    name: "STANDARD",
-                    message: null,
-                    defaultRate: 400,
-                    rates: {
-                        50: "50Hz",
-                        400: "400Hz"
-                    }
-                },
-                1: {
-                    name: "ONESHOT125",
-                    message: null,
-                    defaultRate: 1000,
-                    rates: {
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                2: {
-                    name: "MULTISHOT",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                3: {
-                    name: "BRUSHED",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz",
-                        16000: "16kHz",
-                        32000: "32kHz"
-                    }
-                },
-                4: {
-                    name: "DSHOT150",
-                    message: null,
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
-                },
-                5: {
-                    name: "DSHOT300",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz"
-                    }
-                },
-                6: {
-                    name: "DSHOT600",
-                    message: null,
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
+        return {
+            0: {
+                name: "STANDARD",
+                message: null,
+                defaultRate: 400,
+                rates: {
+                    50: "50Hz",
+                    400: "400Hz"
                 }
-            };
-        } else {
-            return {
-                0: {
-                    name: "STANDARD",
-                    message: null,
-                    defaultRate: 400,
-                    rates: {
-                        50: "50Hz",
-                        400: "400Hz"
-                    }
-                },
-                1: {
-                    name: "ONESHOT125",
-                    message: null,
-                    defaultRate: 1000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz"
-                    }
-                },
-                2: {
-                    name: "ONESHOT42",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz",
-                        4000: "4kHz",
-                        8000: "8kHz"
-                    }
-                },
-                3: {
-                    name: "MULTISHOT",
-                    message: null,
-                    defaultRate: 2000,
-                    rates: {
-                        400: "400Hz",
-                        1000: "1kHz",
-                        2000: "2kHz",
-                        4000: "4kHz",
-                        8000: "8kHz"
-                    }
-                },
-                4: {
-                    name: "BRUSHED",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz",
-                        16000: "16kHz",
-                        32000: "32kHz"
-                    }
-                },
-                5: {
-                    name: "DSHOT150",
-                    message: null,
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
-                },
-                6: {
-                    name: "DSHOT300",
-                    message: null,
-                    defaultRate: 8000,
-                    rates: {
-                        8000: "8kHz"
-                    }
-                },
-                7: {
-                    name: "DSHOT600",
-                    message: null,
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
-                },
-                8: {
-                    name: "DSHOT1200",
-                    message: "escProtocolNotAdvised",
-                    defaultRate: 16000,
-                    rates: {
-                        16000: "16kHz"
-                    }
-                },
-                9: {
-                    name: "SERIALSHOT",
-                    message: "escProtocolExperimental",
-                    defaultRate: 4000,
-                    rates: {
-                        4000: "4kHz"
-                    }
+            },
+            1: {
+                name: "ONESHOT125",
+                message: null,
+                defaultRate: 1000,
+                rates: {
+                    1000: "1kHz",
+                    2000: "2kHz"
                 }
-            };
-        }
+            },
+            2: {
+                name: "MULTISHOT",
+                message: null,
+                defaultRate: 2000,
+                rates: {
+                    1000: "1kHz",
+                    2000: "2kHz"
+                }
+            },
+            3: {
+                name: "BRUSHED",
+                message: null,
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz",
+                    16000: "16kHz",
+                    32000: "32kHz"
+                }
+            },
+            4: {
+                name: "DSHOT150",
+                message: null,
+                defaultRate: 4000,
+                rates: {
+                    4000: "4kHz"
+                }
+            },
+            5: {
+                name: "DSHOT300",
+                message: null,
+                defaultRate: 8000,
+                rates: {
+                    8000: "8kHz"
+                }
+            },
+            6: {
+                name: "DSHOT600",
+                message: null,
+                defaultRate: 16000,
+                rates: {
+                    16000: "16kHz"
+                }
+            }
+        };
     },
     getServoRates: function () {
         return {
@@ -860,37 +738,6 @@ var FC = {
     getOsdDisabledFields: function () {
         return [];
     },
-    getAccelerometerNames: function () {
-        return [ "NONE", "AUTO", "MPU6050", "LSM303DLHC", "MPU6000", "MPU6500", "MPU9250", "BMI160", "ICM20689", "FAKE"];
-    },
-    getBarometerNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "DPS310", "MSP", "FAKE"];
-        } else {
-            return ["NONE", "AUTO", "BMP085", "MS5611", "BMP280", "MS5607", "LPS25H", "SPL06", "BMP388", "FAKE"];
-        }
-    },
-    getPitotNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.6.0")) {
-            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE", "MSP"];
-        } else {
-            return ["NONE", "AUTO", "MS4525", "ADC", "VIRTUAL", "FAKE"];
-        }
-    },
-    getRangefinderNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "3.1.0")) {
-            return [ "NONE", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "Benewake TFmini", "VL53L1X", "US42"];
-        } else {
-            return [ "NONE", "HCSR04", "SRF10", "INAV_I2C", "VL53L0X", "MSP", "UIB", "Benewake TFmini"];
-        }
-    },
-    getOpticalFlowNames: function () {
-        if (semver.gte(CONFIG.flightControllerVersion, "2.7.0")) {
-            return [ "NONE", "CXOF", "MSP", "FAKE" ];
-        } else {
-            return [ "NONE", "PMW3901", "CXOF", "MSP", "FAKE" ];
-        }
-    },
     getArmingFlags: function () {
         return {
             0: "OK_TO_ARM",
@@ -927,7 +774,7 @@ var FC = {
         ]
     },
     getPidNames: function () {
-        let list = [
+        return [
             'Roll',
             'Pitch',
             'Yaw',
@@ -937,14 +784,9 @@ var FC = {
             'Surface',
             'Level',
             'Heading Hold',
-            'Velocity Z'
+            'Velocity Z',
+            'Nav Heading'
         ];
-
-        if (semver.gte(CONFIG.flightControllerVersion, '2.5.0')) {
-            list.push("Nav Heading")
-        }
-
-        return list;
     },
     getRthAltControlMode: function () {
         return ["Current", "Extra", "Fixed", "Max", "At least", "At least, linear descent"];
@@ -1045,222 +887,266 @@ var FC = {
         return {
             0: {
                 name: "True",
+                operandType: "Active",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             1: {
                 name: "Equal",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
                 name: "Greater Than",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
                 name: "Lower Than",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             4: {
                 name: "Low",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             5: {
                 name: "Mid",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             6: {
                 name: "High",
+                operandType: "RC Switch Check",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             7: {
                 name: "AND",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             8: {
                 name: "OR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             9: {
                 name: "XOR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             10: {
                 name: "NAND",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             11: {
                 name: "NOR",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             12: {
                 name: "NOT",
+                operandType: "Logic Switches",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             13: {
-                name: "STICKY",
+                name: "Sticky",
+                operandType: "Logic Switches",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             14: {
-                name: "ADD",
+                name: "Basic: Add",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             15: {
-                name: "SUB",
+                name: "Basic: Subtract",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             16: {
-                name: "MUL",
+                name: "Basic: Multiply",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             17: {
-                name: "DIV",
+                name: "Basic: Divide",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             40: {
-                name: "MOD",
+                name: "Modulo",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             18: {
-                name: "GVAR SET",
+                name: "Set GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             19: {
-                name: "GVAR INC",
+                name: "Increase GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             20: {
-                name: "GVAR DEC",
+                name: "Decrease GVAR",
+                operandType: "Variables",
                 hasOperand: [true, true],
                 output: "none"
             },
             21: {
-                name: "IO PORT SET",
+                name: "Set IO Port",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, true],
                 output: "none"
             },
             22: {
-                name: "OVERRIDE ARMING SAFETY",
+                name: "Override Arming Safety",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             23: {
-                name: "OVERRIDE THROTTLE SCALE",
+                name: "Override Throttle Scale",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             29: {
-                name: "OVERRIDE THROTTLE",
+                name: "Override Throttle",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             24: {
-                name: "SWAP ROLL & YAW",
+                name: "Swap Roll & Yaw",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             25: {
-                name: "SET VTX POWER LEVEL",
+                name: "Set VTx Power Level",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             30: {
-                name: "SET VTX BAND",
+                name: "Set VTx Band",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             31: {
-                name: "SET VTX CHANNEL",
+                name: "Set VTx Channel",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             26: {
-                name: "INVERT ROLL",
+                name: "Invert Roll",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             27: {
-                name: "INVERT PITCH",
+                name: "Invert Pitch",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             28: {
-                name: "INVERT YAW",
+                name: "Invert Yaw",
+                operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
                 output: "boolean"
             },
             32: {
-                name: "SET OSD LAYOUT",
+                name: "Set OSD Layout",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             33: {
-                name: "SIN",
+                name: "Trigonometry: Sine",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             34: {
-                name: "COS",
+                name: "Trigonometry: Cosine",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             35: {
-                name: "TAN",
+                name: "Trigonometry: Tangent",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             36: {
-                name: "MAP INPUT",
+                name: "Map Input",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             37: {
-                name: "MAP OUTPUT",
+                name: "Map Output",
+                operandType: "Maths",
                 hasOperand: [true, true],
                 output: "raw"
             },
             38: {
-                name: "RC CHANNEL OVERRIDE",
+                name: "Override RC Channel",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, true],
                 output: "boolean"
             },
 
             41: {
-                name: "LOITER RADIUS OVERRIDE",
+                name: "Override Loiter Radius",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             42: {
-                name: "SET PROFILE",
+                name: "Set Profile",
+                operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "boolean"
             },
             43: {
-                name: "MIN",
+                name: "Use Lowest Value",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "raw"
             },
             44: {
-                name: "MAX",
+                name: "Use Highest Value",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "raw"
             },
@@ -1324,6 +1210,7 @@ var FC = {
                     34: "GPS Valid Fix",
                     35: "Loiter Radius [cm]",
                     36: "Active Profile",
+                    37: "Battery cells",
                 }
             },
             3: {
@@ -1363,5 +1250,162 @@ var FC = {
                 default: 0
             }
         }
+    },
+    getBatteryProfileParameters: function () {
+        return [
+            'bat_cells',
+            'vbat_cell_detect_voltage',
+            'vbat_max_cell_voltage',
+            'vbat_min_cell_voltage',
+            'vbat_warning_cell_voltage',
+            'battery_capacity',
+            'battery_capacity_warning',
+            'battery_capacity_critical',
+            'battery_capacity_unit',
+            'controlrate_profile',
+            'throttle_scale',
+            'throttle_idle',
+            'turtle_mode_power_factor',
+            'failsafe_throttle',
+            'fw_min_throttle_down_pitch',
+            'nav_mc_hover_thr',
+            'nav_fw_cruise_thr',
+            'nav_fw_min_thr',
+            'nav_fw_max_thr',
+            'nav_fw_pitch2thr',
+            'nav_fw_launch_thr',
+            'nav_fw_launch_idle_thr',
+            'limit_cont_current',
+            'limit_burst_current',
+            'limit_burst_current_time',
+            'limit_burst_current_falldown_time',
+            'limit_cont_power',
+            'limit_burst_power',
+            'limit_burst_power_time',
+            'limit_burst_power_falldown_time'
+        ];
+    },
+    isBatteryProfileParameter: function(paramName) {
+        return ($.inArray(paramName,this.getBatteryProfileParameters()) != -1);
+    },
+    getControlProfileParameters: function () {
+        return [
+            'mc_p_pitch',
+            'mc_i_pitch',
+            'mc_d_pitch',
+            'mc_cd_pitch',
+            'mc_p_roll',
+            'mc_i_roll',
+            'mc_d_roll',
+            'mc_cd_roll',
+            'mc_p_yaw',
+            'mc_i_yaw',
+            'mc_d_yaw',
+            'mc_cd_yaw',
+            'mc_p_level',
+            'mc_i_level',
+            'mc_d_level',
+            'fw_p_pitch',
+            'fw_i_pitch',
+            'fw_d_pitch',
+            'fw_ff_pitch',
+            'fw_p_roll',
+            'fw_i_roll',
+            'fw_d_roll',
+            'fw_ff_roll',
+            'fw_p_yaw',
+            'fw_i_yaw',
+            'fw_d_yaw',
+            'fw_ff_yaw',
+            'fw_p_level',
+            'fw_i_level',
+            'fw_d_level',
+            'max_angle_inclination_rll',
+            'max_angle_inclination_pit',
+            'dterm_lpf_hz',
+            'dterm_lpf_type',
+            'dterm_lpf2_hz',
+            'dterm_lpf2_type',
+            'yaw_lpf_hz',
+            'fw_iterm_throw_limit',
+            'fw_loiter_direction',
+            'fw_reference_airspeed',
+            'fw_turn_assist_yaw_gain',
+            'fw_turn_assist_pitch_gain',
+            'fw_iterm_limit_stick_position',
+            'fw_yaw_iterm_freeze_bank_angle',
+            'pidsum_limit',
+            'pidsum_limit_yaw',
+            'iterm_windup',
+            'rate_accel_limit_roll_pitch',
+            'rate_accel_limit_yaw',
+            'heading_hold_rate_limit',
+            'nav_mc_pos_z_p',
+            'nav_mc_vel_z_p',
+            'nav_mc_vel_z_i',
+            'nav_mc_vel_z_d',
+            'nav_mc_pos_xy_p',
+            'nav_mc_vel_xy_p',
+            'nav_mc_vel_xy_i',
+            'nav_mc_vel_xy_d',
+            'nav_mc_vel_xy_ff',
+            'nav_mc_heading_p',
+            'nav_mc_vel_xy_dterm_lpf_hz',
+            'nav_mc_vel_xy_dterm_attenuation',
+            'nav_mc_vel_xy_dterm_attenuation_start',
+            'nav_mc_vel_xy_dterm_attenuation_end',
+            'nav_fw_pos_z_p',
+            'nav_fw_pos_z_i',
+            'nav_fw_pos_z_d',
+            'nav_fw_pos_xy_p',
+            'nav_fw_pos_xy_i',
+            'nav_fw_pos_xy_d',
+            'nav_fw_heading_p',
+            'nav_fw_pos_hdg_p',
+            'nav_fw_pos_hdg_i',
+            'nav_fw_pos_hdg_d',
+            'nav_fw_pos_hdg_pidsum_limit',
+            'mc_iterm_relax',
+            'mc_iterm_relax_cutoff',
+            'd_boost_min',
+            'd_boost_max',
+            'd_boost_max_at_acceleration',
+            'd_boost_gyro_delta_lpf_hz',
+            'antigravity_gain',
+            'antigravity_accelerator',
+            'antigravity_cutoff_lpf_hz',
+            'pid_type',
+            'mc_cd_lpf_hz',
+            'fw_level_pitch_trim',
+            'smith_predictor_strength',
+            'smith_predictor_delay',
+            'smith_predictor_lpf_hz',
+            'fw_level_pitch_gain',
+            'thr_mid',
+            'thr_expo',
+            'tpa_rate',
+            'tpa_breakpoint',
+            'fw_tpa_time_constant',
+            'rc_expo',
+            'rc_yaw_expo',
+            'roll_rate',
+            'pitch_rate',
+            'yaw_rate',
+            'manual_rc_expo',
+            'manual_rc_yaw_expo',
+            'manual_roll_rate',
+            'manual_pitch_rate',
+            'manual_yaw_rate',
+            'fpv_mix_degrees',
+            'rate_dynamics_center_sensitivity',
+            'rate_dynamics_end_sensitivity',
+            'rate_dynamics_center_correction',
+            'rate_dynamics_end_correction',
+            'rate_dynamics_center_weight',
+            'rate_dynamics_end_weight'
+        ];
+    },
+    isControlProfileParameter: function(paramName) {
+        return ($.inArray(paramName, this.getControlProfileParameters()) != -1);
     }
 };

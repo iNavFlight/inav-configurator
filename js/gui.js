@@ -18,7 +18,6 @@ var GUI_control = function () {
     ];
     this.defaultAllowedTabsWhenConnected = [
         'failsafe',
-        'transponder',
         'adjustments',
         'auxiliary',
         'cli',

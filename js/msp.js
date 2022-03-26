@@ -57,7 +57,7 @@ var MSP = {
         CHECKSUM_V1:                16,
         CHECKSUM_V2:                17,
     },
-    protocolVersion:            1, // this.constants.PROTOCOL_V1
+    protocolVersion:            2, // this.constants.PROTOCOL_V2
     state:                      0, // this.decoder_states.IDLE
     message_direction:          1,
     code:                       0,
@@ -72,7 +72,7 @@ var MSP = {
 
     ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],        // in LSB bit order
     ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l'], // in LSB bit order
-    ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r'], // in LSB bit
+    ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'], // in LSB bit
     ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w'], // in LSB bit
 
     last_received_timestamp:   null,
