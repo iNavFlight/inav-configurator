@@ -31,3 +31,5 @@ Select you joined object and head to the top menu with __File__ > __Export__ > *
 ![Immagine 2022-03-28 115931](https://user-images.githubusercontent.com/40276199/160375086-ef0eb587-9574-4f4e-b101-ce24e27e0e12.png)
 
 You can then put the .gltf model in the Configurator __/resources/models/__ folder, and ammend the code to display the model.
+
+The old .json files was converted to .glTF using this [tool](https://gist.github.com/donmccurdy/c090dc53c7bfb704ef9de654ecc07632)
