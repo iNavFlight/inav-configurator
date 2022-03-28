@@ -1831,7 +1831,7 @@
         "message": "Magnetometer Alignment"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> Axes are relative to the flight controller and not to the GPS module."
+        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
     },
     "magnetometerOrientationPreset": {
         "message": "Orientation presets"
@@ -1847,6 +1847,9 @@
     },
     "magnetometerStatHead": {
         "message": "Mag Statistics"
+    },
+    "tabMAGNETOMETER": {
+        "message": "Magnetometer"
     },
     "motors": {
         "message": "Motors"

@@ -263,8 +263,7 @@ TABS.setup.initialize3D = function () {
     loader.load('./resources/models/' + model_file + '.gltf',  (obj) =>{
         model = obj.scene;
         model.scale.set(15, 15, 15);
-        //modelWrapper.add(obj);
-        scene.add(model);
+        modelWrapper.add(model);
     });
 
     // stationary camera
