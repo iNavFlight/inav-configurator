@@ -44,6 +44,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             }
 
             return {
+                raw_target: match[2],
                 target: match[2].replace("_", " "),
                 format: match[3],
             };
@@ -60,7 +61,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                 var target = $(this);
                 //alert("Comparing " + searchText + " with " + target.text());
                 if (searchText.length > 0 && i !== 0) { 
-                    if (target.text().toLowerCase().includes(searchText)) {
+                    if (target.text().toLowerCase().includes(searchText) || target.val().toLowerCase().includes(searchText)) {
                         target.show();
                     } else {
                         target.hide();
@@ -130,6 +131,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                         "version"   : release.tag_name,
                         "url"       : asset.browser_download_url,
                         "file"      : asset.name,
+                        "raw_target": result.raw_target,
                         "target"    : result.target,
                         "date"      : formattedDate,
                         "notes"     : release.body,
@@ -147,7 +149,8 @@ TABS.firmware_flasher.initialize = function (callback) {
                         if($.inArray(target, selectTargets) == -1) {
                             selectTargets.push(target);
                             var select_e =
-                                    $("<option value='{0}'>{0}</option>".format(
+                                    $("<option value='{0}'>{1}</option>".format(
+                                            descriptor.raw_target,
                                             descriptor.target
                                     )).data('summary', descriptor);
                             boards_e.append(select_e);
@@ -165,7 +168,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             $('select[name="board"]').change(function() {
 
                 $("a.load_remote_file").addClass('disabled');
-                var target = $(this).val();
+                var target = $(this).children("option:selected").text();
 
                 if (!GUI.connect_lock) {
                     $('.progress').val(0).removeClass('valid invalid');

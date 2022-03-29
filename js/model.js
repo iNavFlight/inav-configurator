@@ -2,10 +2,12 @@
 
 const SERVO_GIMBAL_PITCH = 0,
     SERVO_GIMBAL_ROLL = 1,
-    SERVO_ELEVATOR = 2,
-    SERVO_FLAPPERON_1 = 3,
-    SERVO_FLAPPERON_2 = 4,
-    SERVO_RUDDER = 5,
+    SERVO_ELEVATOR = 1,
+    SERVO_ELEVON_1 = 1,
+    SERVO_ELEVON_2 = 2,
+    SERVO_FLAPPERON_1 = 2,
+    SERVO_FLAPPERON_2 = 3,
+    SERVO_RUDDER = 4,
     SERVO_BICOPTER_LEFT = 4,
     SERVO_BICOPTER_RIGHT = 5,
     SERVO_DUALCOPTER_LEFT = 4,
@@ -42,6 +44,7 @@ const
 
 // generate mixer
 const mixerList = [
+    // ** Multirotor
     {
         id: 1,
         name: 'Tricopter',
@@ -58,7 +61,7 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(SERVO_RUDDER, INPUT_STABILIZED_YAW, 100, 0),
         ]
-    },            // 1
+    }, // 1
     {
         id: 3,
         name: 'Quad X',
@@ -74,7 +77,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, -1.0, -1.0),          // FRONT_L
         ],
         servoMixer: []
-    },               // 3
+    }, // 3
     {
         id: 2,
         name: 'Quad +',
@@ -90,7 +93,7 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, -1.0, -1.0),         // FRONT
         ],
         servoMixer: []
-    },               // 2
+    }, // 2
     {
         id: 4,
         name: 'Bicopter',
@@ -101,18 +104,7 @@ const mixerList = [
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
-    },           // 4
-    {
-        id: 5,
-        name: 'Gimbal',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM_OTHER,
-        motorMixer: [],
-        servoMixer: []
-    },               // 5
+    }, // 4
     {
         id: 6,
         name: 'Y6',
@@ -130,7 +122,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, -0.666667, 1.0),     // UNDER_LEFT
         ],
         servoMixer: []
-    },                           // 6
+    }, // 6
     {
         id: 7,
         name: 'Hex +',
@@ -148,45 +140,7 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 1.0, -1.0),          // REAR
         ],
         servoMixer: []
-    },               // 7
-    {
-        id: 8,
-        name: 'Flying Wing',
-        model: 'flying_wing',
-        image: 'flying_wing',
-        enabled: true,
-        legacy: true,
-        platform: PLATFORM_AIRPLANE,
-        motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-        ],
-        servoMixer: [
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
-        ]
-    },     // 8
-    {
-        id: 27,
-        name: 'Flying Wing with differential thrust',
-        model: 'flying_wing',
-        image: 'flying_wing',
-        enabled: true,
-        legacy: false,
-        platform: PLATFORM_AIRPLANE,
-        motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.1),
-            new MotorMixRule(1.0, 0.0, 0.0, -0.1)
-        ],
-        servoMixer: [
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -50, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 50, 0),
-        ]
-    },     // 27
+    }, // 7
     {
         id: 9,
         name: 'Y4',
@@ -202,7 +156,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, -1.0, 0.0),          // FRONT_L CW
         ],
         servoMixer: []
-    },                           // 9
+    }, // 9
     {
         id: 10,
         name: 'Hex X',
@@ -220,7 +174,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, 0.0, 1.0),     // LEFT
         ],
         servoMixer: []
-    },                  // 10
+    }, // 10
     {
         id: 11,
         name: 'Octo X8',
@@ -240,7 +194,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, -1.0, 1.0),          // UNDER_FRONT_L
         ],
         servoMixer: []
-    },             // 11
+    }, // 11
     {
         id: 12,
         name: 'Octo Flat +',
@@ -260,7 +214,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, 0.0, -1.0),              // LEFT
         ],
         servoMixer: []
-    },     // 12
+    }, // 12
     {
         id: 13,
         name: 'Octo Flat X',
@@ -280,50 +234,7 @@ const mixerList = [
             new MotorMixRule(1.0, 1.0, 0.414178, -1.0),      // MIDREAR_L
         ],
         servoMixer: []
-    },     // 13
-    {
-        id: 14,
-        name: 'Airplane',
-        model: 'twin_plane',
-        image: 'airplane',
-        enabled: true,
-        legacy: true,
-        platform: PLATFORM_AIRPLANE,
-        motorMixer: [
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
-        ],
-        servoMixer: [
-            new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
-            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
-        ]
-    },           // 14
-    {
-        id: 15,
-        name: 'Heli 120',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM_HELICOPTER,
-        motorMixer: [],
-        servoMixer: []
-    },             // 15
-    {
-        id: 16,
-        name: 'Heli 90',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM_HELICOPTER,
-        motorMixer: [],
-        servoMixer: []
-    },              // 16
+    }, // 13
     {
         id: 17,
         name: 'V-tail Quad',
@@ -357,18 +268,7 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),     // LEFT
         ],
         servoMixer: []
-    },                // 18
-    {
-        id: 19,
-        name: 'PPM to SERVO',
-        model: 'custom',
-        image: 'custom',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM_OTHER,
-        motorMixer: [],
-        servoMixer: []
-    },         // 19
+    }, // 18
     {
         id: 20,
         name: 'Dualcopter',
@@ -379,7 +279,7 @@ const mixerList = [
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
-    },           // 20
+    }, // 20
     {
         id: 21,
         name: 'Singlecopter',
@@ -390,7 +290,7 @@ const mixerList = [
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
-    },         // 21
+    }, // 21
     {
         id: 22,
         name: 'A-tail Quad',
@@ -417,18 +317,7 @@ const mixerList = [
         platform: PLATFORM_MULTIROTOR,
         motorMixer: [],
         servoMixer: []
-    },               // 23
-    {
-        id: 24,
-        name: 'Custom Airplane',
-        model: 'twin_plane',
-        image: 'airplane',
-        enabled: false,
-        legacy: true,
-        platform: PLATFORM_AIRPLANE,
-        motorMixer: [],
-        servoMixer: []
-    },      // 24
+    }, // 23
     {
         id: 25,
         name: 'Custom Tricopter',
@@ -439,15 +328,100 @@ const mixerList = [
         platform: PLATFORM_TRICOPTER,
         motorMixer: [],
         servoMixer: []
-    },      // 25
+    }, // 25
+
+    // ** Fixed Wing ** 
+    {
+        id: 8,
+        name: 'Flying Wing',
+        model: 'flying_wing',
+        image: 'flying_wing',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_THROTTLE, top:93, left:71, colour: "#000000"},
+        ],
+        enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_ROLL,  50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_ROLL, -50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_PITCH, 50, 0),
+        ]
+    }, // 8
+    {
+        id: 27,
+        name: 'Flying Wing with differential thrust',
+        model: 'flying_wing',
+        image: 'flying_wing',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 123, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_THROTTLE, top:93, left:71, colour: "#000000"},
+        ],
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.1),
+            new MotorMixRule(1.0, 0.0, 0.0, -0.1)
+        ],
+        servoMixer: [
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_ROLL,  50, 0),
+            new ServoMixRule(SERVO_ELEVON_1, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_ROLL, -50, 0),
+            new ServoMixRule(SERVO_ELEVON_2, INPUT_STABILIZED_PITCH, 50, 0),
+        ]
+    }, // 27
+    {
+        id: 14,
+        name: 'Airplane',
+        model: 'twin_plane',
+        image: 'airplane',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_PITCH, top: 151, left: 126, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_YAW, top: 126, left: 52, colour: "#00a6ff"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
+        enabled: true,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.0),
+        ],
+        servoMixer: [
+            new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
+            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
+            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),*/
+            new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
+        ]
+    }, // 14
     {
         id: 26,
         name: 'Airplane with differential thrust',
         model: 'twin_plane',
         image: 'airplane',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_PITCH, top: 151, left: 126, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_YAW, top: 126, left: 52, colour: "#00a6ff"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
             new MotorMixRule(1.0, 0.0, 0.0, -0.3)
@@ -455,37 +429,84 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,   -100, 0),*/
             new ServoMixRule(SERVO_RUDDER,      INPUT_STABILIZED_YAW,   100, 0),
         ]
-    },
+    }, // 26
     {
         id: 28,
-        name: 'Airplane V-tail (individual aileron servos)',
+        name: 'Airplane V-tail',
         model: 'vtail_plane',
         image: 'airplane_vtail',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 20, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 132, colour: "#00a6ff"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
+            new ServoMixRule(1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_PITCH, 50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
-            new ServoMixRule(5, INPUT_STABILIZED_PITCH, -50, 0),
-            new ServoMixRule(5, INPUT_STABILIZED_YAW,   -50, 0)
+            /*new ServoMixRule(2, INPUT_FEATURE_FLAPS,    100, 0),*/
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0)
         ]
-    },
+    }, // 28
+    {
+        id: 34,
+        name: 'Airplane V-tail with differential thrust',
+        model: 'vtail_plane',
+        image: 'airplane_vtail',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 20, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 132, colour: "#00a6ff"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
+        enabled: true,
+        legacy: false,
+        platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
+        motorMixer: [
+            new MotorMixRule(1.0, 0.0, 0.0, 0.3),
+            new MotorMixRule(1.0, 0.0, 0.0, -0.3)
+        ],
+        servoMixer: [
+            new ServoMixRule(1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(1, INPUT_FEATURE_FLAPS,    100, 0),*/
+            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(2, INPUT_FEATURE_FLAPS,    100, 0),*/
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
+            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0)
+        ]
+    }, // 34
     {
         id: 29,
         name: 'Airplane V-tail (single aileron servo)',
         model: 'vtail_single_servo_plane',
         image: 'airplane_vtail_single',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 20, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_PITCH, top: 154, left: 132, colour: "#00e000"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
@@ -493,30 +514,83 @@ const mixerList = [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
-            new ServoMixRule(2, INPUT_STABILIZED_ROLL,  100, 0),
-            new ServoMixRule(3, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(1, INPUT_STABILIZED_ROLL,  100, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_PITCH, 50, 0),
+            new ServoMixRule(2, INPUT_STABILIZED_YAW,   -50, 0),
+            new ServoMixRule(3, INPUT_STABILIZED_PITCH, -50, 0),
             new ServoMixRule(3, INPUT_STABILIZED_YAW,   -50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_PITCH, -50, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_YAW,   -50, 0),
         ]
-    },
+    }, //29
     {
         id: 30,
         name: 'Airplane without rudder',
         model: 'rudderless_plane',
         image: 'airplane_norudder',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_PITCH, top: 151, left: 126, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
         servoMixer: [
             new ServoMixRule(SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_1, INPUT_FEATURE_FLAPS,    100, 0),*/
             new ServoMixRule(SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0),
+            /*new ServoMixRule(SERVO_FLAPPERON_2, INPUT_FEATURE_FLAPS,    100, 0),*/
         ]
-    },
+    }, // 30
+    {
+        id: 24,
+        name: 'Custom Airplane',
+        model: 'twin_plane',
+        image: 'airplane',
+        imageOutputsNumbers: [
+            {input: INPUT_STABILIZED_PITCH, top: 151, left: 126, colour: "#ff7f00"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 18, colour: "#ff0000"},
+            {input: INPUT_STABILIZED_ROLL, top: 96, left: 134, colour: "#00e000"},
+            {input: INPUT_STABILIZED_YAW, top: 126, left: 52, colour: "#00a6ff"},
+            {input: INPUT_STABILIZED_THROTTLE, top:5, left:71, colour: "#000000"},
+        ],
+        enabled: false,
+        legacy: true,
+        platform: PLATFORM_AIRPLANE,
+        motorMixer: [],
+        servoMixer: []
+    }, // 24
+
+    // ** Helicopter **
+    {
+        id: 15,
+        name: 'Heli 120',
+        model: 'custom',
+        image: 'custom',
+        enabled: false,
+        legacy: true,
+        platform: PLATFORM_HELICOPTER,
+        motorMixer: [],
+        servoMixer: []
+    }, // 15
+    {
+        id: 16,
+        name: 'Heli 90',
+        model: 'custom',
+        image: 'custom',
+        enabled: false,
+        legacy: true,
+        platform: PLATFORM_HELICOPTER,
+        motorMixer: [],
+        servoMixer: []
+    }, // 16
+
+    // ** Other platforms **
     {
         id: 31,
         name: 'Rover',
@@ -546,8 +620,8 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(3, INPUT_STABILIZED_YAW,  100, 0),
         ]
-    }    
-    ,
+    },
+    // ** Misc **
     {
         id: 33,
         name: 'Other',
@@ -562,7 +636,29 @@ const mixerList = [
         servoMixer: [
             new ServoMixRule(3, INPUT_STABILIZED_YAW,  100, 0),
         ]
-    }                 
+    },
+    {
+        id: 5,
+        name: 'Gimbal',
+        model: 'custom',
+        image: 'custom',
+        enabled: false,
+        legacy: true,
+        platform: PLATFORM_OTHER,
+        motorMixer: [],
+        servoMixer: []
+    }, // 5
+    {
+        id: 19,
+        name: 'PPM to SERVO',
+        model: 'custom',
+        image: 'custom',
+        enabled: false,
+        legacy: true,
+        platform: PLATFORM_OTHER,
+        motorMixer: [],
+        servoMixer: []
+    }, // 19               
 ];
 
 const platformList = [

@@ -33,6 +33,12 @@ var MSPCodes = {
     MSP_SET_CHANNEL_FORWARDING: 33,
     MSP_MODE_RANGES:            34,
     MSP_SET_MODE_RANGE:         35,
+    MSP_FEATURE:                36,
+    MSP_SET_FEATURE:            37,
+    MSP_BOARD_ALIGNMENT:        38,
+    MSP_SET_BOARD_ALIGNMENT:    39,
+    MSP_CURRENT_METER_CONFIG:   40,
+    MSP_SET_CURRENT_METER_CONFIG: 41,
     MSP_RX_CONFIG:              44,
     MSP_SET_RX_CONFIG:          45,
     MSP_LED_COLORS:             46,
@@ -44,8 +50,6 @@ var MSPCodes = {
     MSP_CF_SERIAL_CONFIG:       54,
     MSP_SET_CF_SERIAL_CONFIG:   55,
     MSP_SONAR:                  58,
-    MSP_PID_CONTROLLER:         59,
-    MSP_SET_PID_CONTROLLER:     60,
     MSP_ARMING_CONFIG:          61,
     MSP_SET_ARMING_CONFIG:      62,
     MSP_DATAFLASH_SUMMARY:      70,
@@ -60,8 +64,6 @@ var MSPCodes = {
     MSP_SDCARD_SUMMARY:         79,
     MSP_BLACKBOX_CONFIG:        80,
     MSP_SET_BLACKBOX_CONFIG:    81,
-    MSP_TRANSPONDER_CONFIG:     82,
-    MSP_SET_TRANSPONDER_CONFIG: 83,
     MSP_OSD_CONFIG:             84,
     MSP_SET_OSD_CONFIG:         85,
     MSP_OSD_CHAR_READ:          86,
@@ -103,7 +105,7 @@ var MSPCodes = {
     MSP_RC_DEADBAND:        125,
     MSP_SENSOR_ALIGNMENT:   126,
     MSP_LED_STRIP_MODECOLOR:127,
-    MSP_STATUS_EX:          150,
+    MSP_STATUS_EX:          150,    // Deprecated, do not use.
     MSP_SENSOR_STATUS:      151,
 
     MSP_SET_RAW_RC:         200,
@@ -149,10 +151,10 @@ var MSPCodes = {
     // Additional private MSP for baseflight configurator (yes thats us \o/)
     MSP_RX_MAP:              64, // get channel map (also returns number of channels total)
     MSP_SET_RX_MAP:          65, // set rc map, numchannels to set comes from MSP_RX_MAP
-    MSP_BF_CONFIG:             66, // baseflight-specific settings that aren't covered elsewhere
-    MSP_SET_BF_CONFIG:         67, // baseflight-specific settings save
+    MSP_BF_CONFIG:             66, // Depreciated
+    MSP_SET_BF_CONFIG:         67, // Depreciated
     MSP_SET_REBOOT:         68, // reboot settings
-    MSP_BF_BUILD_INFO:          69,  // build date as well as some space for future expansion
+    MSP_BF_BUILD_INFO:          69,  // Depreciated
 
     // INAV specific codes
     MSPV2_SETTING:                      0x1003,

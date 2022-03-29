@@ -74,6 +74,12 @@
     border-color: rgb(52, 155, 255);
 }
 
+.tab-led-strip .gPoint.function-h { /* Channel */
+    background: skyblue;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, .7);
+    border-color: black;
+}
+
 .tab-led-strip .gPoint.function-c .overlay-color,
 .tab-led-strip .gPoint.function-r .overlay-color {
     float: left;
@@ -210,6 +216,7 @@
 .tab-led-strip .select .function-g {    background: green;}
 /* .tab-led-strip .select .function-b {    background: white;    color:black;} */
 .tab-led-strip .select .function-r {    background: #acacac;}
+.tab-led-strip .select .function-h {    background: skyblue;}
 
 .tab-led-strip .select .functionSelect option {
     background: white;

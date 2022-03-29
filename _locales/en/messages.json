@@ -12,13 +12,16 @@
     "options_improve_configurator": {
         "message": "Send anonymous usage data to the developer team"
     },
+    "options_showProfileParameters": {
+        "message": "Highlight parameters that change when switching battery or control profiles"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
     "options_render": {
         "message": "Configurator rendering options"
     },
-    
+
     "connect": {
         "message": "Connect"
     },
@@ -108,9 +111,6 @@
     },
     "tabFailsafe": {
         "message": "Failsafe"
-    },
-    "tabTransponder": {
-        "message": "Race Transponder"
     },
     "tabGPS": {
         "message": "GPS"
@@ -678,12 +678,6 @@
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
     },
-    "featureTRANSPONDER": {
-        "message": "Race Transponder"
-    },
-    "featureTRANSPONDERTip": {
-        "message": "Configure via the Race Transponder tab after enabling."
-    },
     "featureSOFTSPI": {
         "message": "CPU based SPI"
     },
@@ -871,79 +865,79 @@
         "message": "Fixed Wing Auto Launch Settings"
     },
     "configurationLaunchVelocity": {
-        "message": "Threshold Velocity [cm/s]"
+        "message": "Threshold Velocity"
     },
     "configurationLaunchVelocityHelp": {
         "message": "Forward velocity threshold for swing-launch detection. Default: 300 [100-10000]"
     },
     "configurationLaunchAccel": {
-        "message": "Threshold Acceleration [cm/s/s]"
+        "message": "Threshold Acceleration"
     },
     "configurationLaunchAccelHelp": {
         "message": "Forward acceleration threshold for bungee launch or throw launch, 1G = 981 cm/s/s. Default: 1863 [1000-20000]"
     },
     "configurationLaunchMaxAngle": {
-        "message": "Max Throw Angle [&deg;]"
+        "message": "Max Throw Angle"
     },
     "configurationLaunchMaxAngleHelp": {
         "message": "Max throw angle (pitch/roll combined) to consider launch successful. Set to 180 to disable completely. Default: 45 [5-180]"
     },
     "configurationLaunchDetectTime": {
-        "message": "Detect Time [ms]"
+        "message": "Detect Time"
     },
     "configurationLaunchDetectTimeHelp": {
         "message": "Time for which thresholds have to breached to consider launch happened. Default: 40 [10-1000]"
     },
     "configurationLaunchThr": {
-        "message": "Launch Throttle [uS]"
+        "message": "Launch Throttle"
     },
     "configurationLaunchThrHelp": {
         "message": "Launch throttle - throttle to be set during launch sequence. Default: 1700 [1000-2000]"
     },
     "configurationLaunchIdleThr": {
-        "message": "Idle Throttle [uS]"
+        "message": "Idle Throttle"
     },
     "configurationLaunchIdleThrHelp": {
         "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
     "configurationLaunchMotorDelay": {
-        "message": "Motor Delay [ms]"
+        "message": "Motor Delay"
     },
     "configurationLaunchMotorDelayHelp": {
         "message": "Delay between detected launch and launch sequence start and throttling up. Default: 500 [0-5000]"
     },
     "configurationLaunchSpinupTime": {
-        "message": "Motor Spinup Time [ms]"
+        "message": "Motor Spinup Time"
     },
     "configurationLaunchSpinupTimeHelp": {
         "message": "Time to bring power from minimum throttle to nav_fw_launch_thr, to avoid big stress on ESC and large torque from propeller. Default: 100 [0-1000]"
     },
     "configurationLaunchMinTime": {
-        "message": "Minimum Launch Time [ms]"
+        "message": "Minimum Launch Time"
     },
     "configurationLaunchMinTimeHelp": {
         "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
     },
     "configurationLaunchTimeout": {
-        "message": "Launch Timeout [ms]"
+        "message": "Launch Timeout"
     },
     "configurationLaunchTimeoutHelp": {
         "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
     },
     "configurationLaunchEndTime": {
-        "message": "End Transition Time [ms]"
+        "message": "End Transition Time"
     },
     "configurationLaunchEndTimeHelp": {
         "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
     },
     "configurationLaunchMaxAltitude": {
-        "message": "Maximum Altitude [cm]"
+        "message": "Maximum Altitude"
     },
     "configurationLaunchMaxAltitudeHelp": {
         "message": "Altitude at which LAUNCH mode will be turned off and regular flight mode will take over. Default: 0 [0-60000]"
     },
     "configurationLaunchClimbAngle": {
-        "message": "Climb Angle [&deg;]"
+        "message": "Climb Angle"
     },
     "configurationLaunchClimbAngleHelp": {
         "message": "Climb angle (attitude of model, not climb slope) for launch sequence (degrees), is also restrained by global max_angle_inclination_pit. Default: 18 [5-45]"
@@ -973,7 +967,7 @@
         "message": "Cycles/Sec (Hz)"
     },
     "configurationGPS": {
-        "message": "GPS"
+        "message": "Configuration"
     },
     "configurationGPSProtocol": {
         "message": "Protocol"
@@ -1143,82 +1137,244 @@
     "portsFunction_DJI_FPV": {
         "message": "DJI FPV VTX"
     },
+    "portsFunction_HDZERO_VTX": {
+        "message": "HDZero VTX"
+    },
     "portsFunction_IMU2": {
         "message": "Secondary IMU"
     },
-    "pidTuningName": {
+    "pidTuning_ShowAllPIDs": {
+        "message": "Show all PIDs"
+    },
+    "pidTuning_SelectNewDefaults": {
+        "message": "Select New Defaults"
+    },
+    "pidTuning_ResetPIDController": {
+        "message": "Reset PID Controller"
+    },
+    "pidTuning_PIDgains": {
+        "message" :"PID gains"
+    },
+    "pidTuning_Name": {
         "message": "Name"
     },
-    "pidTuningProportional": {
+    "pidTuning_Proportional": {
         "message": "Proportional"
     },
-    "pidTuningIntegral": {
+    "pidTuning_Integral": {
         "message": "Integral"
     },
-    "pidTuningDerivative": {
+    "pidTuning_Derivative": {
         "message": "Derivative"
     },
-    "pidTuningFeedForward": {
+    "pidTuning_FeedForward": {
         "message": "FeedForward"
     },
-    "pidTuningControlDerivative": {
+    "pidTuning_ControlDerivative": {
         "message": "Control Derivative"
     },
-    "pidTuningRollPitchRate": {
+    "pidTuning_Basic": {
+        "message": "Basic/Acro"
+    },
+    "pidTuning_Level": {
+        "message": "Angle/Horizon"
+    },
+    "pidTuning_Altitude": {
+        "message": "Barometer & Sonar/Altitude"
+    },
+    "pidTuning_Mag": {
+        "message": "Magnometer/Heading"
+    },
+    "pidTuning_GPS": {
+        "message": "GPS Navigation"
+    },
+    "pidTuning_LevelP": {
+        "message": "Strength"
+    },
+    "pidTuning_LevelI": {
+        "message": "LPF cutoff (Hz)"
+    },
+    "pidTuning_LevelD": {
+        "message": "Transition (Horizon)"
+    },
+    "pidTuning_LevelHelp": {
+        "message": "The values below change the behaviour of the ANGLE and HORIZON flight modes. Different PID controllers handle the LEVEL values differently. Please check the documentation."
+    },
+    "pidTuning_RatesAndExpo": {
+        "message": "Rates & Expo"
+    },
+    "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
-    "pidTuningRollRate": {
+    "pidTuning_RollRate": {
         "message": "ROLL rate"
     },
-    "pidTuningPitchRate": {
+    "pidTuning_PitchRate": {
         "message": "PITCH rate"
     },
-    "pidTuningYawRate": {
+    "pidTuning_YawRate": {
         "message": "YAW rate"
     },
-    "pidTuningMaxRollAngle": {
+    "pidTuning_RollAndPitchExpo": {
+        "message": "Roll & Pitch Expo"
+    },
+    "pidTuning_YawExpo" : {
+        "message": "Yaw Expo"
+    },
+    "pidTuning_MaxRollAngle": {
         "message": "Max. ROLL angle"
     },
-    "pidTuningMaxRollAngleHelp": {
+    "pidTuning_MaxRollAngleHelp": {
         "message": "Maximum ROLL angle in ANGLE mode. This also constrains the maximum bank in navigation modes."
     },
-    "pidTuningMaxPitchAngle": {
+    "pidTuning_MaxPitchAngle": {
         "message": "Max. PITCH angle"
     },
-    "pidTuningMaxPitchAngleHelp": {
+    "pidTuning_MaxPitchAngleHelp": {
         "message": "Maximum PITCH angle in ANGLE mode. This also constrains the maximum climb and dive in navigation modes."
     },
-    "pidTuningManualRollRate": {
+    "pidTuning_ManualRollRate": {
         "message": "Manual ROLL rate"
     },
-    "pidTuningManualPitchRate": {
+    "pidTuning_ManualPitchRate": {
         "message": "Manual PITCH rate"
     },
-    "pidTuningManualYawRate": {
+    "pidTuning_ManualYawRate": {
         "message": "Manual YAW rate"
     },
-    "magHoldYawRate": {
-        "message": "MagHold rate"
+    "pidTuning_magHoldYawRate": {
+        "message": "Heading Hold rate limit"
     },
-    "pidTuningMagHoldYawRateHelp": {
+    "pidTuning_MagHoldYawRateHelp": {
         "message": "Maximum YAW rotation rate that MagHold controller can request from UAV. Used only when MagHold mode is enabled, during RTH and WAYPOINT navigation. Values below 30dps gives nice \"cinematic\" turns"
     },
-    "pidTuningTPA": {
+    "pidTuning_Filters": {
+        "message": "Filters"
+    },
+    "pidTuning_mainFilters": {
+        "message": "Gyro filters"
+    },
+    "pidTuning_gyro_main_lpf_hz": {
+        "message": "Main gyro filter cutoff frequency"
+    },
+    "pidTuning_gyro_main_lpf_hz_help": {
+        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
+    },
+    "pidTuning_MatrixFilterMinFrequency": {
+        "message": "Matrix Filter Min Frequency"
+    },
+    "pidTuning_MatrixFilterMinFrequencyHelp": {
+        "message": "Minimum frequency for the Matrix Filter. Value should depends on propeller size. 150Hz work fine with 5&quot; and smaller. For 7&quot; and above lower even below 100Hz."
+    },
+    "pidTuning_MatrixFilterQFactor": {
+        "message": "Matrix Filter Q Factor"
+    },
+    "pidTuning_MatrixFilterQFactorHelp": {
+        "message": "The higher value, the higher selectivity of the Matrix Filter. Values between 150 and 300 are recommended."
+    },
+    "pidTuning_UnicornFilterQFactor": {
+        "message": "Unicorn Filter Q Factor"
+    },
+    "pidTuning_dtermFilters": {
+        "message": "D-term filters"
+    },
+    "pidTuning_dtermLpfCutoffFrequency": {
+        "message": "D-term LPF cutoff frequency"
+    },
+    "pidTuning_dtermLpfCutoffFrequencyHelp": {
+        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
+    },
+    "pidTuning_rpmFilters": {
+        "message": "Gyro RPM filters"
+    },
+    "pidTuning_rpm_gyro_filter_enabled": {
+        "message": "Gyro RPM filter (requires ESC telemetry)"
+    },
+    "pidTuning_rpm_gyro_min_hz": {
+        "message": "Gyro RPM filter min. frequency"
+    },
+    "pidTuning_Mechanics": {
+        "message": "Mechanics"
+    },
+    "pidTuning_ITermMechanics": {
+        "message": "I-term mechanics"
+    },
+    "pidTuning_itermRelaxCutoff": {
+        "message": "Iterm Relax Cutoff Frequency"
+    },
+    "pidTuning_itermRelaxCutoffHelp": {
+        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
+    },
+    "pidTuning_antigravityGain": {
+        "message": "Antigravity Gain"
+    },
+    "pidTuning_antigravityAccelerator": {
+        "message": "Antigravity Accelerator"
+    },
+    "pidTuning_antigravityCutoff": {
+        "message": "Antigravity Cutoff Frequency"
+    },
+    "pidTuning_itermBankAngleFreeze": {
+        "message": "Yaw Iterm freeze bank angle"
+    },
+    "pidTuning_itermBankAngleFreezeHelp": {
+        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
+    },
+    "pidTuning_dTermMechanics": {
+        "message": "D-term mechanics"
+    },
+    "pidTuning_d_boost_min": {
+        "message": "D-Boost Min. Scale"
+    },
+    "pidTuning_d_boost_min_help": {
+        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
+    },
+    "pidTuning_d_boost_max": {
+        "message": "D-Boost Max. Scale"
+    },
+    "pidTuning_d_boost_max_help": {
+        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
+    },
+    "pidTuning_d_boost_max_at_acceleration": {
+        "message": "Top D-Boost at acceleration [dps^2]"
+    },
+    "pidTuning_d_boost_max_at_acceleration_help": {
+        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
+    },
+    "pidTuning_d_boost_gyro_delta_lpf_hz": {
+        "message": "D-Boost gyro LPF"
+    },
+    "pidTuning_d_boost_gyro_delta_lpf_hz_help": {
+        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
+    },
+    "pidTuning_tpaMechanics": {
+        "message": "Thrust PID attenuation"
+    },
+    "pidTuning_TPA": {
         "message": "Thrust PID Attenuation (TPA)"
     },
-    "pidTuningTPABreakPoint": {
+    "pidTuning_TPABreakPoint": {
         "message": "TPA Breakpoint"
     },
-    "pidTuningButtonSave": {
+    "pidTuning_fwLevelTrimMechanics": {
+        "message": "Fixed Wing Level Trim"
+    },
+    "pidTuning_fw_level_pitch_trim": {
+        "message": "Level Trim [deg]"
+    },
+    "pidTuning_fw_level_pitch_trim_help": {
+        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
+    },
+    "pidTuning_ButtonSave": {
         "message": "Save"
     },
-    "pidTuningButtonRefresh": {
+    "pidTuning_ButtonRefresh": {
         "message": "Refresh"
     },
-    "pidTuningProfileHead": {
+    "pidTuning_ProfileHead": {
         "message": "Profile"
     },
-    "pidTuningLoadedProfile": {
+    "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
     "loadedBatteryProfile": {
@@ -1545,33 +1701,6 @@
     "programmingEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Programming"
     },
-    "transponderNotSupported": {
-        "message": "Your flight controller's firmware does not support transponder functionality."
-    },
-    "transponderHelp": {
-        "message": "Configure your transponder code here.  Note: Only valid codes will be recognised by race timing systems.  Valid transponder codes can be obtained from <a href=\"http://seriouslypro.com/transponder-codes\" target=\"_blank\">Seriously Pro</a>."
-    },
-    "transponderInformation": {
-        "message": "Transponders systems allow race organizers to time your laps.  The transponder is fitted to your aircraft and when your aircraft passes the timing gate the track-side receiver registers your code and records your laptime.  When fitting an IR based transponder your should ensure that it points outward from your aircraft towards the track-side receivers and that the light beam is not obstructed by your airframe, battery-straps, cables, propellers, etc."
-    },
-    "transponderConfiguration": {
-        "message": "Configuration"
-    },
-    "transponderData": {
-        "message": "Data"
-    },
-    "transponderDataHelp": {
-        "message": "Hexadecimal digits only, 0-9, A-F"
-    },
-    "transponderButtonSave": {
-        "message": "Save"
-    },
-    "transponderDataInvalid": {
-        "message": "Transponder data is <span style=\"color: red\">invalid</span>"
-    },
-    "transponderEepromSaved": {
-        "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: Transponder"
-    },
     "servosChangeDirection": {
         "message": "Change Direction in TX To Match"
     },
@@ -1621,10 +1750,10 @@
         "message":"<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
     },
     "gpsHead": {
-        "message": "GPS"
+        "message": "Position"
     },
     "gpsStatHead": {
-        "message": "GPS Statistics"
+        "message": "Statistics"
     },
     "gpsMapHead": {
         "message": "Current GPS location"
@@ -1744,6 +1873,15 @@
     },
     "cliCopyToClipboardBtn": {
         "message": "Copy to clipboard"
+    },
+    "cliExitBtn": {
+        "message": "EXIT"
+    },
+    "cliSaveSettingsBtn": {
+        "message": "SAVE SETTINGS"
+    },
+    "cliMscBtn": {
+        "message": "MSC"
     },
     "cliCopySuccessful": {
         "message": "Copied!"
@@ -2044,33 +2182,6 @@
     "radioChannelShort": {
         "message": "CH "
     },
-    "pidTuningBasic": {
-        "message": "Basic/Acro"
-    },
-    "pidTuningLevel": {
-        "message": "Angle/Horizon"
-    },
-    "pidTuningAltitude": {
-        "message": "Barometer & Sonar/Altitude"
-    },
-    "pidTuningMag": {
-        "message": "Magnometer/Heading"
-    },
-    "pidTuningGps": {
-        "message": "GPS Navigation"
-    },
-    "pidTuningLevelP": {
-        "message": "Strength"
-    },
-    "pidTuningLevelI": {
-        "message": "LPF cutoff (Hz)"
-    },
-    "pidTuningLevelD": {
-        "message": "Transition (Horizon)"
-    },
-    "pidTuningLevelHelp": {
-        "message": "The values below change the behaviour of the ANGLE and HORIZON flight modes. Different PID controllers handle the LEVEL values differently. Please check the documentation."
-    },
     "configHelp2": {
         "message": "Arbitrary board rotation in degrees, to allow mounting it sideways / upside down / rotated etc. When running external sensors, use the sensor alignments (Gyro, Acc, Mag) to define sensor position independent from board orientation. "
     },
@@ -2123,7 +2234,7 @@
         "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
     },
     "failsafeDelayItem": {
-        "message": "Guard time for activation after signal lost [1 = 0.1 sec.]"
+        "message": "Guard time for activation after signal lost [For deciseconds (ds): 1 = 0.1 sec.]"
     },
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
@@ -2132,7 +2243,7 @@
         "message": "Throttle value used while landing"
     },
     "failsafeOffDelayItem": {
-        "message": "Delay for turning off the Motors during Failsafe [1 = 0.1 sec.]"
+        "message": "Delay for turning off the Motors during Failsafe [For deciseconds (ds):1 = 0.1 sec.]"
     },
     "failsafeOffDelayHelp": {
         "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
@@ -2241,12 +2352,6 @@
     },
     "accLpfCutoffFrequency": {
         "message": "Accelerometer LPF cutoff frequency"
-    },
-    "dtermLpfCutoffFrequency": {
-        "message": "D-term LPF cutoff frequency"
-    },
-    "dtermLpfCutoffFrequencyHelp": {
-        "message": "Lowpass cutoff filter for Dterm for all PID controllers"
     },
     "yawLpfCutoffFrequency": {
         "message": "Yaw LPF cutoff frequency"
@@ -2507,16 +2612,16 @@
         "message": "User Control Mode"
     },
     "posholdDefaultSpeed": {
-        "message": "Default navigation speed [cm/s]"
+        "message": "Default navigation speed"
     },
     "posholdDefaultSpeedHelp": {
         "message": "Default speed during RTH, also used for WP navigation if no speed set for WP leg. Limited to Max. navigation speed"
     },
     "posholdMaxSpeed": {
-        "message": "Max. navigation speed [cm/s]"
+        "message": "Max. navigation speed"
     },
     "posholdMaxManualSpeed": {
-        "message": "Max. CRUISE speed [cm/s]"
+        "message": "Max. CRUISE speed"
     },
     "posholdMaxManualSpeedHelp": {
         "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
@@ -2528,7 +2633,7 @@
         "message": "Max. ALTHOLD climb rate [cm/s]"
     },
     "posholdMaxBankAngle": {
-        "message": "Multirotor max. banking angle [degrees]"
+        "message": "Multirotor max. banking angle"
     },
     "posholdMaxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
@@ -2585,7 +2690,7 @@
         "message": "Automatic landing settings"
     },
     "minRthDistance": {
-        "message": "Min. RTH distance [cm]"
+        "message": "Min. RTH distance"
     },
     "minRthDistanceHelp": {
         "message": "If UAV is within this distance from the home point, it will land instead of RTH then land"
@@ -2615,46 +2720,46 @@
         "message": "RTH altitude mode"
     },
     "rthAbortThreshold": {
-        "message": "RTH abort threshold [cm]"
+        "message": "RTH abort threshold"
     },
     "rthAbortThresholdHelp": {
         "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
     },
     "rthAltitude": {
-        "message": "RTH altitude [cm]"
+        "message": "RTH altitude"
     },
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
     "rthHomeAltitudeLabel": {
-        "message": "RTH Home altitude [cm]"
+        "message": "RTH Home altitude"
     },
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
     "landMaxAltVspd": {
-        "message": "<strong>Initial landing speed</strong> until <strong>Slow down altitude</strong> is reached"
+        "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
     },
     "landMaxAltVspdHelp": {
         "message": "After RTH if autolanding is enabled the aircraft will start to descend at this speed until reaching <strong>Slow down altitude</strong>"
     },
     "landSlowdownMaxAlt": {
-        "message": "<strong>Slow down altitude</strong>. Altitude bellow which the aircraft will start to slow down"
+        "message": "When the craft has descended to <i>this</i> altitude. It will begin to slow down for landing."
     },
     "landSlowdownMaxAltHelp": {
         "message": "When the aircraft reaches this altitude it will start to slow down linearly between the <strong>Initial landing speed</strong> and <strong>Final landing speed</strong> to reach it at <strong>Final approach altitude</strong>"
     },
+    "landSlowdownMinAlt": {
+        "message": "When the craft has descended to <i>this</i> altitude, it will have slowed to the touch down speed."
+    },
     "landMinAltVspd": {
-        "message": "<strong>Final landing speed</strong>. Speed the aircraft will take until touchdown when the <strong>Final approach altitutde</strong> is reached"
+        "message": "This is the touch down speed."
     },
     "landMinAltVspdHelp": {
         "message": "The aircraft vertical speed target will be this value when the aircraft reaches the <strong>Final approach altitude</strong> after having slowed down linearly from the <strong>Slow down altitude</strong> at <strong>Initial landing speed</strong>"
     },
-    "landSlowdownMinAlt": {
-        "message": "<strong>Final approach altitude</strong>. Altitude under which the aircraft will go down at <strong>Final landing speed</strong> until touchdown"
-    },
     "emergencyDescentRate": {
-        "message": "Emergency landing speed [cm/s]"
+        "message": "Emergency landing speed"
     },
     "cruiseThrottle": {
         "message": "Cruise throttle"
@@ -2678,31 +2783,31 @@
         "message": "Max. throttle"
     },
     "maxBankAngle": {
-        "message": "Max. navigation bank angle [degrees]"
+        "message": "Max. navigation bank angle"
     },
     "maxBankAngleHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
     },
     "maxClimbAngle": {
-        "message": "Max. navigation climb angle [degrees]"
+        "message": "Max. navigation climb angle"
     },
     "maxClimbAngleHelp": {
         "message": "Maximum climb angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "navManualClimbRate": {
-        "message": "Max. Alt-hold climb rate [cm/s]"
+        "message": "Max. Alt-hold climb rate"
     },
     "navManualClimbRateHelp": {
         "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
     },
     "navAutoClimbRate": {
-        "message": "Max. navigation climb rate [cm/s]"
+        "message": "Max. navigation climb rate"
     },
     "navAutoClimbRateHelp": {
         "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
     },
     "maxDiveAngle": {
-        "message": "Max. navigation dive angle [degrees]"
+        "message": "Max. navigation dive angle"
     },
     "maxDiveAngleHelp": {
         "message": "Maximum dive angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
@@ -2720,13 +2825,13 @@
         "message": "How smoothly the autopilot adjusts the throttle level in response to pitch angle changes [0-9]."
     },
     "pitchToThrottleThreshold": {
-        "message": "Instantaneous throttle adjustment threshold [centidegrees]"
+        "message": "Instantaneous throttle adjustment threshold"
     },
     "pitchToThrottleThresholdHelp": {
         "message": "The autopilot will instantly adjust the throttle level without smoothing according to pitch to throttle if the pitch angle is more this many centidegrees from the filtered value."
     },
     "loiterRadius": {
-        "message": "Loiter radius [cm]"
+        "message": "Loiter radius"
     },
     "loiterDirectionLabel": {
         "message": "Loiter direction"
@@ -2744,25 +2849,25 @@
         "message": "Battery Estimation Settings"
     },
     "idlePower": {
-        "message": "Idle power [cW]"
+        "message": "Idle power"
     },
     "idlePowerHelp": {
         "message": "Power draw at zero throttle used for remaining flight time/distance estimation in 0.01W unit"
     },
     "cruisePower": {
-        "message": "Cruise power [cW]"
+        "message": "Cruise power"
     },
     "cruisePowerHelp": {
         "message": "Power draw at cruise throttle used for remaining flight time/distance estimation in 0.01W unit"
     },
     "cruiseSpeed": {
-        "message": "Cruise speed [cm/s]"
+        "message": "Cruise speed"
     },
     "cruiseSpeedHelp": {
         "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
     },
     "rthEnergyMargin": {
-        "message": "RTH energy margin [%]"
+        "message": "RTH energy margin"
     },
     "rthEnergyMarginHelp": {
         "message": "Energy margin wanted after getting home (percent of battery energy capacity). Use for the remaining flight time/distance calculation."
@@ -2774,13 +2879,13 @@
         "message": "Waypoint Navigation Settings"
     },
     "waypointRadius": {
-        "message": "Waypoint radius [cm]"
+        "message": "Waypoint radius"
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
     },
     "waypointSafeDistance": {
-        "message": "Waypoint safe distance [cm]."
+        "message": "Waypoint safe distance"
     },
     "waypointSafeDistanceHelp": {
         "message": "The maximum distance between the home point and the first waypoint."
@@ -2891,16 +2996,16 @@
         "message": "Fly Time (minutes)"
     },
     "osd_alt_alarm": {
-        "message": "Altitude (meters)"
+        "message": "Altitude"
     },
     "osd_dist_alarm": {
-        "message": "Distance (meters)"
+        "message": "Distance"
     },
     "osdAlarmDIST_HELP": {
         "message": "The distance to home indicator will flash when the distance is greater than this value. Zero disables this alarm."
     },
     "osd_neg_alt_alarm": {
-        "message": "Negative Altitude (meters)"
+        "message": "Negative Altitude"
     },
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
@@ -3571,14 +3676,17 @@
     "platformConfiguration": {
         "message": "Platform configuration"
     },
-    "platformHasFlaps": {
-        "message": "Has flaps"
-    },
     "mixerPreset": {
         "message": "Mixer preset"
     },
+    "mixerNotLoaded": {
+        "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
+    },
     "mixerLoadPresetRules": {
         "message": "Load mixer"
+    },
+    "mixerRefreshCurrentRules": {
+        "message": "Refresh mixer"
     },
     "mixerLoadAndApplyPresetRules": {
         "message": "Load and apply"
@@ -3649,6 +3757,12 @@
     "confirm_reset_settings": {
         "message": "Do you really want to reset all settings?\nATTENTION: All settings are lost! You have to setup the whole aircraft after this operation!"
     },
+    "confirm_select_defaults": {
+        "message": "This will allow to select new default values for all settings. Existing PID tune and other settings might be lost!\nDo you want to continue?"
+    },
+    "confirm_reset_pid": {
+        "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
+    },
     "mappingTableOutput": {
         "message": "Output"
     },
@@ -3677,49 +3791,49 @@
         "message": "Distance to home"
     },
     "brakingSpeedThreshold": {
-        "message": "Min. speed threshold [cm/s]"
+        "message": "Min. speed threshold"
     },
     "brakingSpeedThresholdTip": {
         "message": "Braking will be enabled only if actual speed if higher than threshold"
     },
     "brakingDisengageSpeed": {
-        "message": "Braking disengage speed [cm/s]"
+        "message": "Braking disengage speed"
     },
     "brakingDisengageSpeedTip": {
         "message": "Braking will end when speed goes below this value"
     },
     "brakingTimeout": {
-        "message": "Max. braking duration [ms]"
+        "message": "Max. braking duration"
     },
     "brakingTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking can be active."
     },
     "brakingBoostFactor": {
-        "message": "Boost factor [%]"
+        "message": "Boost factor"
     },
     "brakingBoostFactorTip": {
         "message": "Defines how strong the braking boost will be. 100% means the navigation engine is allowed to double the banking speed and acceleration"
     },
     "brakingBoostTimeout": {
-        "message": "Max. braking boost duration [ms]"
+        "message": "Max. braking boost duration"
     },
     "brakingBoostTimeoutTip": {
         "message": "Safety measure. This is the longest period of time braking boost can be active."
     },
     "brakingBoostSpeedThreshold": {
-        "message": "Boost min. speed threshold [cm/s]"
+        "message": "Boost min. speed threshold"
     },
     "brakingBoostSpeedThresholdTip": {
         "message": "Braking boost will be enabled only if actual speed if higher than threshold"
     },
     "brakingBoostDisengageSpeed": {
-        "message": "Braking boost disengage speed [cm/s]"
+        "message": "Braking boost disengage speed"
     },
     "brakingBoostDisengageSpeedTip": {
         "message": "Braking boost will end when speed goes below this value"
     },
     "brakingBankAngle": {
-        "message": "Max. bank angle [degrees]"
+        "message": "Max. bank angle"
     },
     "brakingBankAngleTip": {
         "message": "Max bank angle allowed during braking phase"
@@ -3826,18 +3940,6 @@
     "itermRelaxHelp": {
         "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
     },
-    "itermRelaxCutoff": {
-        "message": "Iterm Relax Cutoff Frequency"
-    },
-    "itermRelaxCutoffHelp": {
-        "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."
-    },
-    "gyro_main_lpf_hz": {
-        "message": "Main gyro filter cutoff frequency"
-    },
-    "gyro_main_lpf_hz_help": {
-        "message": "Higher values offer lower delay but more noise. Lower values offer less noise, but more dalay on the gyro processing"
-    },
     "gyro_main_lpf_type": {
         "message": "Gyro LPF type"
     },
@@ -3865,80 +3967,8 @@
     "tabFilteringAdvanced": {
         "message": "Other filters"
     },
-    "mainFilters": {
-        "message": "Gyro filters"
-    },
-    "rpmFilters": {
-        "message": "Gyro RPM filters"
-    },
-    "dtermFilters": {
-        "message": "D-term filters"
-    },
-    "rpm_gyro_filter_enabled": {
-        "message": "Gyro RPM filter (requires ESC telemetry)"
-    },
-    "rpm_gyro_min_hz": {
-        "message": "Gyro RPM filter min. frequency"
-    },
-    "dTermMechanics": {
-        "message": "D-term mechanics"
-    },
-    "tpaMechanics": {
-        "message": "Thrust PID attenuation"
-    },
-    "fw_level_pitch_trim": {
-        "message": "Level Trim [deg]"
-    },
-    "fw_level_pitch_trim_help": {
-        "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
-    },
-    "fwLevelTrimMechanics": {
-        "message": "Fixed Wing Level Trim"
-    },
-    "d_boost_min": {
-        "message": "D-Boost Min. Scale"
-    },
-    "d_boost_min_help": {
-        "message": "Defines the max allowed Dterm attenuation during stick acceleration phase. Value 1.0 mean Dterm is not attenuate. 0.5 mean it's allowed to shrink by half. Lower values result in faster response during fast stick movement."
-    },
-    "d_boost_max": {
-        "message": "D-Boost Max. Scale"
-    },
-    "d_boost_max_help": {
-        "message": "Defines the maximum Dterm boost when maximum angular acceleration is reached. 1.0 means D-Boost is disabled, 2.0 means Dterm is allowed to grow by 100%. Values between 1.5 and 1.7 are usually the sweet spot."
-    },
-    "d_boost_max_at_acceleration": {
-        "message": "Top D-Boost at acceleration [dps^2]"
-    },
-    "d_boost_max_at_acceleration_help": {
-        "message": "D-Boost is fully active when angular acceleration (either detected by gyro or rate target) reached given acceleration. Between 0 and this value, D-Boost factor is scaled lineary"
-    },
-    "d_boost_gyro_delta_lpf_hz": {
-        "message": "D-Boost gyro LPF"
-    },
-    "d_boost_gyro_delta_lpf_hz_help": {
-        "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
-    },
-    "iTermMechanics": {
-        "message": "I-term mechanics"
-    },
     "gps_map_center": {
         "message": "Center"
-    },
-    "antigravityGain": {
-        "message": "Antigravity Gain"
-    },
-    "antigravityAccelerator": {
-        "message": "Antigravity Accelerator"
-    },
-    "antigravityCutoff": {
-        "message": "Antigravity Cutoff Frequency"
-    },
-    "itermBankAngleFreeze": {
-        "message": "Yaw Iterm freeze bank angle"
-    },
-    "itermBankAngleFreezeHelp": {
-        "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
     },
     "ouptputsConfiguration": {
         "message": "Configuration"
@@ -4098,5 +4128,44 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "illegalStateRestartRequired": {
+        "message": "Illegal state. Restart required."
+    },
+    "motor_direction_inverted": {
+        "message": "Reversed motor direction / Props In configuration"
+    },
+    "motor_direction_inverted_hint": {
+        "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+    },
+    "blackboxFields": {
+        "message": "Blackbox fields"
+    },
+    "BLACKBOX_FEATURE_NAV_ACC": {
+        "message": "Navigation accelerometer"
+    },
+    "BLACKBOX_FEATURE_NAV_POS": {
+        "message": "Navigation position estimation"
+    },
+    "BLACKBOX_FEATURE_NAV_PID": {
+        "message": "Navigation PID"
+    },
+    "BLACKBOX_FEATURE_MAG": {
+        "message": "Magnetometer"
+    },
+    "BLACKBOX_FEATURE_ACC": {
+        "message": "Accelerometer"
+    },
+    "BLACKBOX_FEATURE_ATTITUDE": {
+        "message": "Attitude"
+    },
+    "BLACKBOX_FEATURE_RC_DATA": {
+        "message": "RC data"
+    },
+    "BLACKBOX_FEATURE_RC_COMMAND": {
+        "message": "RC command"
+    },
+    "BLACKBOX_FEATURE_MOTORS": {
+        "message": "Motors output"
     }
 }

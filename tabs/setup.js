@@ -1,4 +1,4 @@
-/*global $,chrome,FC,helper,mspHelper,MIXER_CONFIG,BF_CONFIG*/
+/*global $,chrome,FC,helper,mspHelper,MIXER_CONFIG*/
 'use strict';
 
 TABS.setup = {
@@ -22,12 +22,12 @@ TABS.setup.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
-        mspHelper.loadBfConfig,
+        mspHelper.loadFeatures,
         mspHelper.queryFcStatus,
-        mspHelper.loadMixerConfig
+        mspHelper.loadMixerConfig,
+        mspHelper.loadMiscV2
     ];
 
-    loadChain.push(mspHelper.loadMiscV2);
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();

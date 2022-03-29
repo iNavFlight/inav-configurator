@@ -6,6 +6,18 @@ It runs as an app within Google Chrome and allows you to configure the INAV soft
 
 Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
 
+# Support
+
+INAV Configurator comes `as is`, without any warranty and support from authors. If you found a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
+
+GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to setup
+everything, hardware is not working or have any other _support_ problem, please consult:
+
+* [INAV Discord Server](https://discord.gg/peg2hhbYwN)
+* [INAV Official on Facebook](https://www.facebook.com/groups/INAVOfficial)
+* [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
+* [INAV Official on Telegram](https://t.me/INAVFlight)
+
 ## INAV Configurator start minimized, what should I do?
 
 You have to remove `C:\Users%Your_UserNname%\AppData\Local\inav-configurator` folder and all its content.
@@ -42,11 +54,7 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Run INAV Configurator
 1. Configurator is not signed, so you have to allow Mac to run untrusted application. There might be a monit for it during first run 
 
-### ChromeOS
-
-**INAV Configurator** form ChromeOS is available in [Chrome Web Store](https://chrome.google.com/webstore/detail/inav-configurator/fmaidjmgkdkpafmbnmigkpdnpdhopgel)
-
-### Building and running INAV Configurator locally (for development or Linux users)
+## Building and running INAV Configurator locally (for development or Linux users)
 
 For local development, **node.js** build system is used.
 
@@ -68,7 +76,13 @@ in the `./dist/` directory.
 directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
 for the Windows app. If you don't have Wine installed you can create a release by running the **release-only-linux** task.
 
-     To build a specific release, use the command `release --platform="win64"` for example.
+To build a specific release, use the command `release --platform="win64"` for example.
+
+### Running with debug | Inspector
+
+To be able to open Inspector, you will need SDK flavours of NW.js
+
+`npm install nw@0.61.0 --nwjs_build_type=sdk`
 
 ## Different map providers
 
@@ -103,15 +117,6 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
 1. Once completed, you can zoom in on area you will be flying in while connected to the internet in either GPS or Mission Control tab to save the cache for offline use
 
-## Authors
-
-Konstantin Sharlaimov/DigitalEntity - maintainer of the INAV firmware and configurator.
-
-INAV Configurator was originally a [fork](#credits) of Cleanflight Configurator with support for INAV instead of Cleanflight.
-
-This configurator is the only configurator with support for INAV specific features. It will likely require that you run the latest firmware on the flight controller.
-If you are experiencing any problems please make sure you are running the [latest firmware version](https://github.com/iNavFlight/inav/releases).
-
 ## Notes
 
 ### WebGL
@@ -122,14 +127,6 @@ Make sure Settings -> System -> "User hardware acceleration when available" is c
 
 1. Dont forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
 2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
-
-## Support
-
-GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to setup
-everything, hardware is not working or have any other _support_ problem, please consult:
-
-* [rcgroups main thread](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
-* [Telegram Group](https://t.me/INAVFlight)
 
 ## Issue trackers
 
@@ -144,8 +141,3 @@ https://github.com/iNavFlight/inav/issues
 ## Developers
 
 We accept clean and reasonable patches, submit them!
-
-## Credits
-
-ctn - primary author and maintainer of Baseflight Configurator.
-Hydra - author and maintainer of Cleanflight Configurator from which this project was forked.

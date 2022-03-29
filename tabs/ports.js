@@ -94,6 +94,12 @@ TABS.ports.initialize = function (callback) {
     );
 
     functionRules.push({
+        name: 'HDZERO_VTX',
+        groups: ['peripherals'],
+        maxPorts: 1 }
+    );
+
+    functionRules.push({
         name: 'SMARTPORT_MASTER',
         groups: ['peripherals'],
         maxPorts: 1 }
@@ -118,15 +124,6 @@ TABS.ports.initialize = function (callback) {
     ];
 
     var gpsBaudRates = [
-        '9600',
-        '19200',
-        '38400',
-        '57600',
-        '115200'
-    ];
-
-    var telemetryBaudRates_pre1_6_3 = [
-        'AUTO',
         '9600',
         '19200',
         '38400',
@@ -204,9 +201,8 @@ TABS.ports.initialize = function (callback) {
         }
 
         $elements = $('select.telemetry_baudrate');
-        var telemetryBaudRates = semver.gte(CONFIG.flightControllerVersion, "1.6.3") ? telemetryBaudRates_post1_6_3 : telemetryBaudRates_pre1_6_3;
-        for (i = 0; i < telemetryBaudRates.length; i++) {
-            $elements.append('<option value="' + telemetryBaudRates[i] + '">' + telemetryBaudRates[i] + '</option>');
+        for (i = 0; i < telemetryBaudRates_post1_6_3.length; i++) {
+            $elements.append('<option value="' + telemetryBaudRates_post1_6_3[i] + '">' + telemetryBaudRates_post1_6_3[i] + '</option>');
         }
 
         $elements = $('select.blackbox_baudrate');

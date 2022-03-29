@@ -18,15 +18,7 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_rc_data() {
-        if (SERIAL_CONFIG.ports.length == 0) {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, get_serial_config);
-        } else {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
-        }
-    }
-
-    function get_serial_config() {
-        MSP.send_message(MSPCodes.MSP_CF_SERIAL_CONFIG, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
     }
 
     function load_html() {
@@ -36,32 +28,19 @@ TABS.auxiliary.initialize = function (callback) {
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
 
+    // This object separates out the dividers. This is also used to order the modes
     const modeSections = {};
-        modeSections["ARM"] = "Arming";
-        modeSections["ANGLE"] = "Flight Modes";
-        modeSections["NAV RTH"] = "Navigation Modes";
-        modeSections["NAV ALTHOLD"] = "Flight Mode Modifiers";
-        modeSections["AUTO TUNE"] = "Fixed Wing";
-        modeSections["FPV ANGLE MIX"] = "Multi-rotor";
-        modeSections["OSD OFF"] = "OSD Modes";
-        modeSections["CAMSTAB"] = "FPV Camera Modes";
-        modeSections["BEEPER"] = "Misc Modes";
+        modeSections["Arming"] = ["ARM", "PREARM"];
+        modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL"];
+        modeSections["Navigation Modes"] = ["NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV"];
+        modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE"];
+        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON", "TURN ASSIST"];
+        modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
+        modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
+        modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
+        modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"];
 
     function sort_modes_for_display() {
-        // This array defines the order that the modes are displayed in the configurator modes page
-        const configuratorBoxOrder = [
-            "ARM", "PREARM",                                                                                        // Arming
-            "ANGLE", "HORIZON", "MANUAL",                                                                           // Flight modes
-            "NAV RTH", "NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV WP", "GCS NAV",                         // Navigation modes
-            "NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE",                                        // Flight mode modifiers
-            "AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON", "TURN ASSIST",  // Fixed wing specific
-            "FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ",                                         // Multi-rotor specific
-            "OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3",                                                       // OSD
-            "CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",                                  // FPV Camera
-            "BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "BLACKBOX", "FAILSAFE", "KILLSWITCH",       // Misc
-                "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"
-        ];
-
         // Sort the modes
         var tmpAUX_CONFIG = [];
         var tmpAUX_CONFIG_IDS =[];
@@ -76,19 +55,22 @@ TABS.auxiliary.initialize = function (callback) {
         AUX_CONFIG = [];
         AUX_CONFIG_IDS = [];
 
-        for (i=0; i<configuratorBoxOrder.length; i++) {
-            for(j=0; j<tmpAUX_CONFIG.length; j++) {
-                if (configuratorBoxOrder[i] === tmpAUX_CONFIG[j]) {
-                    AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
-                    AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
-                    ORIG_AUX_CONFIG_IDS[sortedID++] = j;
-
-                    break;
+        for (let categoryModesIndex in modeSections) {
+            let categoryModes = modeSections[categoryModesIndex];
+            for (cM=0; cM<categoryModes.length; cM++){
+                for(j=0; j<tmpAUX_CONFIG.length; j++) {
+                    if (categoryModes[cM] === tmpAUX_CONFIG[j]) {
+                        AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
+                        AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
+                        ORIG_AUX_CONFIG_IDS[sortedID++] = j;
+    
+                        break;
+                    }
                 }
             }
         }
 
-        // There are modes that are missing from the configuratorBoxOrder array. Add them to the end until they are ordered correctly.
+        // There are modes that are missing from the modeSections object. Add them to the end until they are ordered correctly.
         if (tmpAUX_CONFIG.length > AUX_CONFIG.length) {
             for (i=0; i<tmpAUX_CONFIG.length; i++) {
                 found = false;
@@ -214,11 +196,23 @@ TABS.auxiliary.initialize = function (callback) {
 
         configureRangeTemplate(auxChannelCount);
 
-        var modeTableBodyElement = $('.tab-auxiliary .modes tbody')
+        var modeTableBodyElement = $('.tab-auxiliary .modes tbody');
+        let modeSelectionID = "";
+        let modeSelectionRange = "";
+
         for (var modeIndex = 0; modeIndex < AUX_CONFIG.length; modeIndex++) {
 
-            if (AUX_CONFIG[modeIndex] in modeSections) {
-                var newSection = createModeSection(modeSections[AUX_CONFIG[modeIndex]]);
+            // Get current mode category
+            for (modeSelectionRange in modeSections) {
+                if (modeSections[modeSelectionRange].indexOf(AUX_CONFIG[modeIndex]) != -1) {
+                    break;
+                }
+            }
+
+            // Create divider if needed
+            if (modeSelectionRange != modeSelectionID) {
+                modeSelectionID = modeSelectionRange;
+                var newSection = createModeSection(modeSelectionRange);
                 modeTableBodyElement.append(newSection);
             }
 

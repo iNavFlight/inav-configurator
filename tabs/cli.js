@@ -179,6 +179,18 @@ TABS.cli.initialize = function (callback) {
             });
         });
 
+        $('.tab-cli .exit').click(function() {
+            self.send(getCliCommand('exit\r', TABS.cli.cliBuffer));
+        });
+
+        $('.tab-cli .savecmd').click(function() {
+            self.send(getCliCommand('save\r', TABS.cli.cliBuffer));
+        });
+
+        $('.tab-cli .msc').click(function() {
+            self.send(getCliCommand('msc\r', TABS.cli.cliBuffer));
+        });
+
         $('.tab-cli .clear').click(function() {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();

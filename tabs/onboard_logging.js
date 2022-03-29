@@ -1,4 +1,4 @@
-/*global $,MSP,MSPCodes,BF_CONFIG,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
+/*global $,MSP,MSPCodes,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
 'use strict';
 
 var
@@ -11,13 +11,26 @@ TABS.onboard_logging.initialize = function (callback) {
     let
         saveCancelled, eraseCancelled;
 
+    //Add future blackbox values here and in messages.json, the checkbox are drawn by js
+    const blackBoxFields = [
+        "BLACKBOX_FEATURE_NAV_ACC",
+        "BLACKBOX_FEATURE_NAV_POS",
+        "BLACKBOX_FEATURE_NAV_PID",
+        "BLACKBOX_FEATURE_MAG",
+        "BLACKBOX_FEATURE_ACC",
+        "BLACKBOX_FEATURE_ATTITUDE",
+        "BLACKBOX_FEATURE_RC_DATA",
+        "BLACKBOX_FEATURE_RC_COMMAND",
+        "BLACKBOX_FEATURE_MOTORS",
+    ];
+
     if (GUI.active_tab != 'onboard_logging') {
         GUI.active_tab = 'onboard_logging';
         googleAnalytics.sendAppView('onboard_logging');
     }
 
     if (CONFIGURATOR.connectionValid) {
-        MSP.send_message(MSPCodes.MSP_BF_CONFIG, false, false, function() {
+        MSP.send_message(MSPCodes.MSP_FEATURE, false, false, function() {
             MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function() {
                 MSP.send_message(MSPCodes.MSP_SDCARD_SUMMARY, false, false, function() {
 		            MSP.send_message(MSPCodes.MSP2_BLACKBOX_CONFIG, false, false, load_html);
@@ -59,7 +72,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 dataflashPresent = DATAFLASH.totalSize > 0,
                 blackboxSupport = false;
 
-            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(BF_CONFIG.features, 19)) {
+            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(FEATURES, 19)) {
                 blackboxSupport = true;
             }
 
@@ -97,13 +110,36 @@ TABS.onboard_logging.initialize = function (callback) {
                     BLACKBOX.blackboxRateNum = parseInt(rate[0], 10);
                     BLACKBOX.blackboxRateDenom = parseInt(rate[1], 10);
                     BLACKBOX.blackboxDevice = parseInt($(".blackboxDevice select").val(), 10);
-
+                    BLACKBOX.blackboxIncludeFlags = getIncludeFlags();
                     helper.features.reset();
                     helper.features.fromUI($('.require-blackbox-supported'));
                     helper.features.execute(function () {
                         mspHelper.sendBlackboxConfiguration(save_to_eeprom);
                     });
                 });
+            }
+
+            //Add checkboxes for each blackbox field
+            const blackboxFieldsDiv = $("#blackBoxFlagsDiv");
+            for (let i = 0; i < blackBoxFields.length; i++) {
+                const FIELD_ID = blackBoxFields[i];
+                const isEnabled = (BLACKBOX.blackboxIncludeFlags & 1<<i) !==0;
+                const input = $('<input type="checkbox" class="toggle feature" />')
+                input.attr("id",FIELD_ID);
+                input.attr("checked",isEnabled);
+
+                const label = $("<label></label>");
+                label.attr("for",FIELD_ID)
+
+                const span = $('<span></span>');
+                span.html(chrome.i18n.getMessage(FIELD_ID))
+                label.append(span);
+
+                const checkbox = $('<div class="checkbox"></div>')
+                    .append([
+                        input,label
+                    ])
+                blackboxFieldsDiv.append(checkbox);
             }
 
             populateLoggingRates();
@@ -388,6 +424,19 @@ TABS.onboard_logging.initialize = function (callback) {
     function flash_erase_cancel() {
         eraseCancelled = true;
         $(".dataflash-confirm-erase")[0].close();
+    }
+
+    function getIncludeFlags(){
+        let flags = 0;
+        for (let i = 0; i < blackBoxFields.length; i++) {
+            const FIELD_ID = blackBoxFields[i];
+
+            const checkbox = $("#"+FIELD_ID);
+            if(checkbox.prop("checked")){
+                flags=flags|1<<i;
+            }
+        }
+        return flags;
     }
 };
 

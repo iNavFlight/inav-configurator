@@ -415,8 +415,42 @@ button {
     border-bottom: 0;
 }
 
+.tab-osd .third_left {
+	float: left;
+	width: calc(50% - 197px);
+}
+
+.tab-osd .third_right {
+    float: right;
+	width: calc(50% - 197px);
+}
+
 .tab-osd .preview {
     width: 360px;
+    left: calc(50% - 197px);
+}
+
+.tab-osd .preview_hd {
+    width: 600px !important;
+    left: calc(50% - 317px) !important;
+}
+
+.tab-osd .hd_43_left {
+	border-left: 1px solid red;
+	position: absolute;
+	left: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_43_right {
+	border-right: 1px solid red;
+	position: absolute;
+	right: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_hd_side {
+	width: calc(50% - 317px) !important;
 }
 
 .tab-osd .preview {
@@ -443,25 +477,23 @@ button {
 }
 
 .tab-osd .settings input {
-    width: 55px;
+    width: 75px;
     padding-left: 3px;
     height: 18px;
     line-height: 20px;
     text-align: left;
     border: 1px solid silver;
     border-radius: 3px;
-    margin-right: 11px;
     font-size: 11px;
     font-weight: normal;
 }
 
 .tab-osd .settings select {
-    width: 75px;
-    margin-right: 11px;
+    width: 80px;
 }
 
 .tab-osd .settings .switchery {
-    margin-right: 25px;
+    margin-right: 33px;
 }
 
 .tab-osd .settings .djiCraftNameElements {
@@ -497,4 +529,17 @@ button {
     float: right;
     width: auto !important;
     margin-right: 0 !important;
+}
+
+.tab-osd label > .i18n-replaced {
+    display: inline-block;
+    left: 108px;
+    width: calc(100% - 110px);
+}
+
+.tab-osd .settings select,
+.tab-osd .settings input, 
+.tab-osd .osd_settings .switchery,
+.tab-osd .unit_wrapper {
+    vertical-align: top;
 }
