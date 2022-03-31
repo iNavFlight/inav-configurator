@@ -31,7 +31,7 @@ helper.periodicStatusUpdater = (function () {
 
     privateScope.updateView = function () {
 
-        var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(serial.bitrate) * 3);
+        var active = ((Date.now() - MSP.analog_last_received_timestamp) < publicScope.getUpdateInterval(CONFIGURATOR.connection.bitrate) * 3);
 
         if (FC.isModeEnabled('ARM'))
             $(".armedicon").css({

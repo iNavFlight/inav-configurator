@@ -19,7 +19,7 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    serial.getDevices(function(current_ports) {
+    ConnectionSerial.getDevices(function(current_ports) {
         // port got removed or initial_ports wasn't initialized yet
         if (self.array_difference(self.initial_ports, current_ports).length > 0 || !self.initial_ports) {
             var removed_ports = self.array_difference(self.initial_ports, current_ports);
@@ -66,13 +66,16 @@ PortHandler.check = function () {
                 chrome.storage.local.get('last_used_port', function (result) {
                     // if last_used_port was set, we try to select it
                     if (result.last_used_port) {
-                        current_ports.forEach(function(port) {
-                            if (port == result.last_used_port) {
-                                console.log('Selecting last used port: ' + result.last_used_port);
-
-                                $('#port').val(result.last_used_port);
-                            }
-                        });
+                        if (result.last_used_port == "ble" || result.last_used_port == "tcp" || result.last_used_port == "udp") {
+                            $('#port').val(result.last_used_port);
+                        } else {
+                            current_ports.forEach(function(port) {
+                                if (port == result.last_used_port) {
+                                    console.log('Selecting last used port: ' + result.last_used_port);
+                                    $('#port').val(result.last_used_port);
+                                }
+                            });
+                        }
                     } else {
                         console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
                     }
@@ -175,6 +178,9 @@ PortHandler.update_port_select = function (ports) {
     }
 
     $('div#port-picker #port').append($("<option/>", {value: 'manual', text: 'Manual Selection', data: {isManual: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {
