@@ -514,6 +514,18 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             motorWizardModal.close();
         });
 
+        const drawImage = function () {
+            const isReversed = $("#motor_direction_inverted").is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+
+            const path = './resources/motor_order/'
+                + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
+            $('.mixerPreview img').attr('src', path);
+
+            renderServoOutputImage();
+        };
+
+        $("#motor_direction_inverted").change(drawImage);
+
         $platformSelect.find("*").remove();
 
         for (let i in platforms) {
@@ -556,10 +568,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             updateRefreshButtonStatus();
 
-            $('.mixerPreview img').attr('src', './resources/motor_order/'
-                + currentMixerPreset.image + '.svg');
-            
-            renderServoOutputImage();
+            drawImage();
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {

@@ -785,6 +785,15 @@
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
     },
+    "configurationSensorAlignmentMagRoll": {
+        "message": "Roll"
+    },
+    "configurationSensorAlignmentMagPitch": {
+        "message": "Pitch"
+    },
+    "configurationSensorAlignmentMagYaw": {
+        "message": "Yaw"
+    },
     "configurationAccelTrims": {
         "message": "Accelerometer Trim"
     },
@@ -1840,6 +1849,30 @@
     },
     "gpsSignalStr": {
         "message": "Signal Strength"
+    },
+    "magnetometerHead": {
+        "message": "Magnetometer Alignment"
+    },
+    "magnetometerHelp": {
+        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+    },
+    "magnetometerOrientationPreset": {
+        "message": "Orientation presets"
+    },
+    "magnetometerInfo": {
+        "message": "Select a preset or create a custom configuration moving the sliders"
+    },
+    "magnetometerElementToShow": {
+        "message": "Element to show"
+    },
+    "configurationMagnetometerHelp": {
+        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
+    },
+    "magnetometerStatHead": {
+        "message": "Mag Statistics"
+    },
+    "tabMAGNETOMETER": {
+        "message": "Magnetometer"
     },
     "motors": {
         "message": "Motors"
@@ -4151,6 +4184,9 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "reset": {
+        "message": "Reset"
     },
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."
