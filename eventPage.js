@@ -21,10 +21,11 @@ function startApplication() {
         createdWindow.onClosed.addListener(function () {
             // automatically close the port when application closes
             // save connectionId in separate variable before createdWindow.contentWindow is destroyed
-            var connectionId = createdWindow.contentWindow.serial.connectionId,
+            var connectionId = createdWindow.contentWindow.CONFIGURATOR.connection.connectionId,
                 valid_connection = createdWindow.contentWindow.CONFIGURATOR.connectionValid,
                 mincommand = createdWindow.contentWindow.MISC.mincommand;
 
+            console.log("EP:" + connectionId);
             if (connectionId && valid_connection) {
                 // code below is handmade MSP message (without pretty JS wrapper), it behaves exactly like MSP.send_message
                 // sending exit command just in case the cli tab was open.

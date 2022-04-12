@@ -74,7 +74,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
     }
 
     if (self.options.no_reboot) {
-        serial.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
+        CONFIGURATOR.connection.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
             if (openInfo) {
                 // we are connected, disabling connect button in the UI
                 GUI.connect_lock = true;
@@ -85,7 +85,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
             }
         });
     } else {
-        serial.connect(port, {bitrate: self.options.reboot_baud}, function (openInfo) {
+        CONFIGURATOR.connection.connect(port, {bitrate: self.options.reboot_baud}, function (openInfo) {
             if (openInfo) {
                 console.log('Sending ascii "R" to reboot');
 
@@ -97,8 +97,8 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
                 bufferView[0] = 0x52;
 
-                serial.send(bufferOut, function () {
-                    serial.disconnect(function (result) {
+                CONFIGURATOR.connection.send(bufferOut, function () {
+                    CONFIGURATOR.connection.disconnect(function (result) {
                         if (result) {
                             var intervalMs = 200;
                             var retries = 0;
@@ -119,12 +119,12 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                                         return;
                                     }
                                     // Check for the serial port
-                                    serial.getDevices(function(devices) {
+                                    ConnectionSerial.getDevices(function(devices) {
                                         if (devices && devices.includes(port)) {
                                             // Serial port might briefly reappear on DFU devices while
                                             // the FC is rebooting, so we don't clear the interval
                                             // until we succesfully connect.
-                                            serial.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
+                                            CONFIGURATOR.connection.connect(port, {bitrate: self.baud, parityBit: 'even', stopBits: 'one'}, function (openInfo) {
                                                 if (openInfo) {
                                                     clearInterval(interval);
                                                     self.initialize();
@@ -170,7 +170,7 @@ STM32_protocol.prototype.initialize = function () {
     // lock some UI elements TODO needs rework
     $('select[name="release"]').prop('disabled', true);
 
-    serial.onReceive.addListener(function (info) {
+    CONFIGURATOR.connection.onReceive.addListener(function (info) {
         self.read(info);
     });
 
@@ -253,7 +253,7 @@ STM32_protocol.prototype.send = function (Array, bytes_to_read, callback) {
     this.receive_buffer = [];
 
     // send over the actual data
-    serial.send(bufferOut, function (writeInfo) {});
+    CONFIGURATOR.connection.send(bufferOut, function (writeInfo) {});
 };
 
 // val = single byte to be verified
@@ -772,7 +772,7 @@ STM32_protocol.prototype.upload_procedure = function (step) {
             helper.interval.remove('STM32_timeout'); // stop STM32 timeout timer (everything is finished now)
 
             // close connection
-            serial.disconnect(function (result) {
+            CONFIGURATOR.connection.disconnect(function (result) {
 
                 // unlocking connect button
                 GUI.connect_lock = false;

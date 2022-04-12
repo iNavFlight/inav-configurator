@@ -141,18 +141,41 @@
     },
 
     "serialPortOpened": {
-        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
+        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
-        "message": "<span style=\"color: red\">Failed</span> to open serial port"
+        "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
     },
     "serialPortClosedOk": {
-        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> closed"
+        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> closed"
     },
     "serialPortClosedFail": {
-        "message": "<span style=\"color: red\">Failed</span> to close serial port"
+        "message": "<span style=\"color: red\">Failed</span> to close MSP connection"
     },
-
+    "serialPortUnrecoverable": {
+        "message": "Unrecoverable <span style=\"color: red\">failure</span> of serial connection, disconnecting...'"
+    },
+    "connectionConnected": {
+        "message": "Connected to: $1"
+    },
+    "connectionBleType": {
+        "message": "BLE device type: $1"
+    },
+    "connectionBleNotSupported" : {
+        "message": "<span style=\"color: red\">Connection error:</span> Firmware doesn't support BLE connections. Abort."
+    },
+    "connectionBleInterrupted": {
+        "message": "The connection was unexpectedly interrupted."
+    },
+    "connectionBleError": {
+        "message": "Error while opening BLE device: $1"
+    },
+    "connectionBleCliEnter": {
+        "message": "Connection over BLE active, output might be slower than usual."
+    },
+    "connectionUdpTimeout": {
+        "message": "UDP connection timed out."
+    },
     "usbDeviceOpened": {
         "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },

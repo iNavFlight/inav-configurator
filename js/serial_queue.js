@@ -2,7 +2,7 @@
 
 var helper = helper || {};
 
-helper.mspQueue = (function (serial, MSP) {
+helper.mspQueue = (function (MSP) {
 
     var publicScope = {},
         privateScope = {};
@@ -101,7 +101,7 @@ helper.mspQueue = (function (serial, MSP) {
         if (code == MSPCodes.MSP_SET_REBOOT || code == MSPCodes.MSP_EEPROM_WRITE) {
             return 5000;
         } else {
-            return serial.getTimeout();
+            return CONFIGURATOR.connection.getTimeout();
         }
     };
 
@@ -128,7 +128,7 @@ helper.mspQueue = (function (serial, MSP) {
         /*
          * if port is blocked or there is no connection, do not process the queue
          */
-        if (publicScope.isLocked() || serial.connectionId === false) {
+        if (publicScope.isLocked() || CONFIGURATOR.connection === false) {
             helper.eventFrequencyAnalyzer.put("port in use");
             return false;
         }
@@ -178,7 +178,7 @@ helper.mspQueue = (function (serial, MSP) {
             /*
              * Send data to serial port
              */
-            serial.send(request.messageBody, function (sendInfo) {
+            CONFIGURATOR.connection.send(request.messageBody, function (sendInfo) {
                 if (sendInfo.bytesSent == request.messageBody.byteLength) {
                     /*
                      * message has been sent, check callbacks and free resource
@@ -305,4 +305,4 @@ helper.mspQueue = (function (serial, MSP) {
     setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency));
 
     return publicScope;
-})(serial, MSP);
+})(MSP);
