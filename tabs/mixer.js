@@ -566,6 +566,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
 
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('#motor_direction_inverted').parent().removeClass("is-hidden");
+                $('#platform-type').parent('.select').removeClass('no-bottom-border');
+            } else {
+                $('#motor_direction_inverted').parent().addClass("is-hidden");
+                $('#platform-type').parent('.select').addClass('no-bottom-border');
+            }
+
             updateRefreshButtonStatus();
 
             drawImage();
