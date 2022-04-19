@@ -3090,6 +3090,9 @@ var mspHelper = (function (gui) {
                         (new Uint32Array(buf))[0] = fi32;
                         value = (new Float32Array(buf))[0];
                         break;
+                    case "string":
+                        value = resp.data.readString();
+                        break;
                     default:
                         throw "Unknown setting type " + setting.type;
                 }
@@ -3132,6 +3135,11 @@ var mspHelper = (function (gui) {
                     (new Float32Array(buf))[0] = value;
                     var if32 = (new Uint32Array(buf))[0];
                     data.push32(if32);
+                    break;
+                case "string":
+                    for (var ii = 0; ii < value.length; ii++) {
+                        data.push(value.charCodeAt(ii));
+                    }
                     break;
                 default:
                     throw "Unknown setting type " + setting.type;
