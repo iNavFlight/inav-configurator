@@ -258,16 +258,12 @@ TABS.setup.initialize3D = function () {
 
     // setup scene
     scene = new THREE.Scene();
-
-    loader = new THREE.JSONLoader();
-    loader.load('./resources/models/' + model_file + '.json', function (geometry, materials) {
-        var modelMaterial = new THREE.MeshFaceMaterial(materials);
-        model = new THREE.Mesh(geometry, modelMaterial);
-
+    const manager = new THREE.LoadingManager();
+    loader = new THREE.GLTFLoader(manager);
+    loader.load('./resources/models/' + model_file + '.gltf',  (obj) =>{
+        model = obj.scene;
         model.scale.set(15, 15, 15);
-
         modelWrapper.add(model);
-        scene.add(modelWrapper);
     });
 
     // stationary camera

@@ -180,15 +180,15 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .exit').click(function() {
-            self.send(getCliCommand('exit\r', TABS.cli.cliBuffer));
+            self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
         });
 
         $('.tab-cli .savecmd').click(function() {
-            self.send(getCliCommand('save\r', TABS.cli.cliBuffer));
+            self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
         });
 
         $('.tab-cli .msc').click(function() {
-            self.send(getCliCommand('msc\r', TABS.cli.cliBuffer));
+            self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
         });
 
         $('.tab-cli .clear').click(function() {
@@ -306,9 +306,23 @@ TABS.cli.initialize = function (callback) {
 
             bufView[0] = 0x23; // #
 
-            serial.send(bufferOut);
+            CONFIGURATOR.connection.send(bufferOut);
         }, 250);
 
+        if (CONFIGURATOR.connection.type == ConnectionType.UDP) {
+            CONFIGURATOR.connection.isCli = true;
+        }
+
+        if (CONFIGURATOR.connection.type == ConnectionType.BLE) {
+            let delay = CONFIGURATOR.connection.deviceDescription.delay;
+            if (delay > 0) {    
+                helper.timeout.add('cli_delay', () =>  {
+                    self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand('# ' + chrome.i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                }, 400);
+            } 
+        }
+    
         GUI.content_ready(callback);
     });
 };
@@ -454,7 +468,7 @@ TABS.cli.send = function (line, callback) {
         bufView[c_key] = line.charCodeAt(c_key);
     }
 
-    serial.send(bufferOut, callback);
+    CONFIGURATOR.connection.send(bufferOut, callback);
 };
 
 TABS.cli.cleanup = function (callback) {

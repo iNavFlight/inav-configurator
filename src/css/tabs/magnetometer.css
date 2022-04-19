@@ -1,0 +1,201 @@
+/* TODO This needs a LOT of work. It's basically just the GPS tab copied */
+
+.tab-magnetometer progress {
+    width: 100%;
+    border-radius: 3px;
+}
+
+.tab-magnetometer .magnetometer_info .head, .tab-magnetometer .magnetometer_signal_strength .head {
+    display: block;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    border-bottom: 1px solid silver;
+    background-color: #ececec;
+}
+
+.tab-magnetometer #connect {
+    display: none;
+    text-align: center;
+    padding-top: 40%;
+}
+
+.tab-magnetometer #waiting {
+    margin-top: 0;
+    display: none;
+    text-align: center;
+    padding-top: 0;
+    background-size: 15%;
+    min-height: 400px;
+    background: url(../../../images/loading-bars.svg) no-repeat center 40%;
+    float: left;
+    width: 100%;
+}
+
+.tab-magnetometer #waiting .info {
+    margin-top: 30%;
+}
+
+/* .tab-magnetometer #loadmap {
+    margin-top: 0;
+    display: none;
+} */
+
+.tab-magnetometer #connect a {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.tab-magnetometer #loadmap {
+    height: 100%;
+    width: 100%;
+    float: left;
+}
+
+.map-button {
+  z-index:1;
+  position: absolute;
+  background-color: #37A8DB;
+  color: white;
+  padding: 5px;
+  left: 10px;
+  bottom: 10px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #E4E4E4;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.map-button:hover {
+  opacity: 1;
+}
+
+.tab-magnetometer #loadmap .controls {
+    width: 100%;
+    float: left;
+    height: 33px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    background-color: #D1D1D1;
+}
+
+.tab-magnetometer #loadmap .controls a {
+    background-color: white;
+    border-radius: 4px;
+    border: 1px silver solid;
+    color: grey;
+    height: 10px;
+    width: 10px;
+    text-align: center;
+    font-size: 20px;
+    line-height: 10px;
+    padding: 6px;
+    margin-top: 5px;
+    float: right;
+}
+
+.tab-magnetometer #loadmap .controls a:hover {
+    background-color: #f5f5f5;
+}
+
+.tab-magnetometer #loadmap .controls a:active {
+    background-color: #e6e6e6;
+}
+
+.tab-magnetometer #loadmap .controls a:first-child {
+    margin-left: -1px;
+    margin-right: 5px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.tab-magnetometer #loadmap .controls a:last-child {
+    margin-right: 0;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.tab-magnetometer .axis-table {
+    width: 100%;
+    table-layout: auto;
+    text-align: center;
+}
+
+.tab-magnetometer .slider {
+    width: calc(100% - 40px);
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab-magnetometer input {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab-magnetometer #interactive_block {
+    position: absolute;
+    width: calc(100% - 40px);
+    height: calc(100% - 245px);
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #e4e4e4;
+    margin-bottom: 10px;
+}
+
+#magnetometer-map {
+    height: 400px;
+    width: 100%;
+    float: left;
+    position: relative;
+}
+
+.tab-magnetometer .buttons a {
+    background-color: #fff;
+    color: black;
+    opacity: 0.8;
+    transition: all ease 0.3s;
+    text-align: center;
+    font-weight: bold;
+
+}
+
+.tab-magnetometer .buttons a:hover {
+    background-color: #fff;
+    color: black;
+    opacity: 0.8;
+    transition: all ease 0.3s;
+}
+
+.tab-magnetometer .info {
+    background-color: #e4e4e4;
+}
+
+.tab-magnetometer .table-title {
+    font-weight: bold;
+}
+/*noinspection ALL*/
+progress[value]::-webkit-progress-bar {
+    background-color: #d2d2d2;
+    border-radius: 2px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.25) inset;
+}
+
+/*noinspection ALL*/
+progress[value]::-webkit-progress-value {
+    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .15)),
+    -webkit-linear-gradient(left, #39a9dc, #39a9dc);
+    border-radius: 2px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.25) inset;
+}
+
+@media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
+
+    #magnetometer-map {
+        height: 347px;
+        width: 100%;
+        float: left;
+    }
+
+}

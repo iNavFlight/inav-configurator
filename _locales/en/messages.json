@@ -141,18 +141,41 @@
     },
 
     "serialPortOpened": {
-        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
+        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
-        "message": "<span style=\"color: red\">Failed</span> to open serial port"
+        "message": "<span style=\"color: red\">Failed</span> to open MSP connection"
     },
     "serialPortClosedOk": {
-        "message": "Serial port <span style=\"color: #37a8db\">successfully</span> closed"
+        "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> closed"
     },
     "serialPortClosedFail": {
-        "message": "<span style=\"color: red\">Failed</span> to close serial port"
+        "message": "<span style=\"color: red\">Failed</span> to close MSP connection"
     },
-
+    "serialPortUnrecoverable": {
+        "message": "Unrecoverable <span style=\"color: red\">failure</span> of serial connection, disconnecting...'"
+    },
+    "connectionConnected": {
+        "message": "Connected to: $1"
+    },
+    "connectionBleType": {
+        "message": "BLE device type: $1"
+    },
+    "connectionBleNotSupported" : {
+        "message": "<span style=\"color: red\">Connection error:</span> Firmware doesn't support BLE connections. Abort."
+    },
+    "connectionBleInterrupted": {
+        "message": "The connection was unexpectedly interrupted."
+    },
+    "connectionBleError": {
+        "message": "Error while opening BLE device: $1"
+    },
+    "connectionBleCliEnter": {
+        "message": "Connection over BLE active, output might be slower than usual."
+    },
+    "connectionUdpTimeout": {
+        "message": "UDP connection timed out."
+    },
     "usbDeviceOpened": {
         "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
@@ -761,6 +784,15 @@
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
+    },
+    "configurationSensorAlignmentMagRoll": {
+        "message": "Roll"
+    },
+    "configurationSensorAlignmentMagPitch": {
+        "message": "Pitch"
+    },
+    "configurationSensorAlignmentMagYaw": {
+        "message": "Yaw"
     },
     "configurationAccelTrims": {
         "message": "Accelerometer Trim"
@@ -1817,6 +1849,30 @@
     },
     "gpsSignalStr": {
         "message": "Signal Strength"
+    },
+    "magnetometerHead": {
+        "message": "Magnetometer Alignment"
+    },
+    "magnetometerHelp": {
+        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+    },
+    "magnetometerOrientationPreset": {
+        "message": "Orientation presets"
+    },
+    "magnetometerInfo": {
+        "message": "Select a preset or create a custom configuration moving the sliders"
+    },
+    "magnetometerElementToShow": {
+        "message": "Element to show"
+    },
+    "configurationMagnetometerHelp": {
+        "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
+    },
+    "magnetometerStatHead": {
+        "message": "Mag Statistics"
+    },
+    "tabMAGNETOMETER": {
+        "message": "Magnetometer"
     },
     "motors": {
         "message": "Motors"
@@ -3436,6 +3492,21 @@
     "osdElement_ESC_TEMPERATURE_HELP": {
         "message": "Temperature of the ESC read from DSHOT telemetry"
     },
+    "osdGroupSwitchIndicators": {
+        "message": "Switch Indicators"
+    },
+    "osdElement_SWITCH_INDICATOR_0": {
+        "message": "Switch Indicator 1"
+    },
+    "osdElement_SWITCH_INDICATOR_1": {
+        "message": "Switch Indicator 2"
+    },
+    "osdElement_SWITCH_INDICATOR_2": {
+        "message": "Switch Indicator 3"
+    },
+    "osdElement_SWITCH_INDICATOR_3": {
+        "message": "Switch Indicator 4"
+    },
     "osdGroupGVars": {
         "message": "Global Variables"
     },
@@ -3516,6 +3587,24 @@
     },
     "osd_dji_cn_alternating_duration": {
         "message" : "Craft Name alternating duration (in 1/10 sec)"
+    },
+    "osd_switch_indicator_settings": {
+        "message" : "Switch Indicator Settings"
+    },
+    "osd_switch_indicators_align_left": {
+        "message" : "Align switch names to left of switches"
+    },
+    "osdSwitchInd0": {
+        "message" : "Switch 1"
+    },
+    "osdSwitchInd1": {
+        "message" : "Switch 2"
+    },
+    "osdSwitchInd2": {
+        "message" : "Switch 3"
+    },
+    "osdSwitchInd3": {
+        "message" : "Switch 4"
     },
     "osd_font_default": {
         "message" : "Default"
@@ -4131,6 +4220,9 @@
     },
     "pidOutput": {
         "message": "Output"
+    },
+    "reset": {
+        "message": "Reset"
     },
     "illegalStateRestartRequired": {
         "message": "Illegal state. Restart required."

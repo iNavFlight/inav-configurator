@@ -36,7 +36,7 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Download Configurator for Windows platform (win32 or win64 is present)
 1. Extract ZIP archive
 1. Run INAV Configurator app from unpacked folder
-1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run 
+1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run
 
 ### Linux
 
@@ -46,13 +46,19 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Make the inav-configurator file executable (chmod +x inav-configurator)
 1. Run INAV Configurator app from unpacked folder
 
+On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:
+
+* Arch Linux: `sudo pacman -S --needed libatomic_ops`
+* Debian / Ubuntu: `sudo apt install libatomic1`
+* Fedora: `sudo dnf install libatomic`
+
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
 1. Download Configurator for Mac platform
 1. Extract ZIP archive
 1. Run INAV Configurator
-1. Configurator is not signed, so you have to allow Mac to run untrusted application. There might be a monit for it during first run 
+1. Configurator is not signed, so you have to allow Mac to run untrusted application. There might be a monit for it during first run
 
 ## Building and running INAV Configurator locally (for development or Linux users)
 
@@ -86,8 +92,8 @@ To be able to open Inspector, you will need SDK flavours of NW.js
 
 ## Different map providers
 
-INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps, and MapProxy map providers. 
-INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configuerator by himself. 
+INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps, and MapProxy map providers.
+INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configuerator by himself.
 
 ### How to choose Map provider
 
@@ -98,15 +104,15 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 
 ### How to get Bing Maps API key
 
-1. Go to the Bing Maps Dev Center at [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/). 
+1. Go to the Bing Maps Dev Center at [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/).
     * If you have a Bing Maps account, sign in with the Microsoft account that you used to create the account or create a new one. For new accounts, follow the instructions in [Creating a Bing Maps Account](https://msdn.microsoft.com/library/gg650598.aspx).
 1. Select **My keys** under **My Account**.
 1. Select the option to create a new key.
 1. Provide the following information to create a key:
     1. Application name: Required. The name of the application.
     1. Application URL: The URL of the application. This is an optional field which is useful in helping you remember the purpose of that key in the future.
-    1. Key type: Required. Select the key type that you want to create. You can find descriptions of key and application types here. 
-    1. Application type: Required. Select the application type that best represents the application that will use this key. You can find descriptions of key and application types [here](https://www.microsoft.com/maps/create-a-bing-maps-key.aspx). 
+    1. Key type: Required. Select the key type that you want to create. You can find descriptions of key and application types here.
+    1. Application type: Required. Select the application type that best represents the application that will use this key. You can find descriptions of key and application types [here](https://www.microsoft.com/maps/create-a-bing-maps-key.aspx).
 1. Click the **Create** button. The new key displays in the list of available keys. Use this key to authenticate your Bing Maps application as described in the documentation for the Bing Maps API you are using.
 
 ### How to setup a MapProxy server for offline caching and mission planning

@@ -101,6 +101,7 @@ SYM.WH_NM = 0x70;
 SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
+SYM.SWITCH_INDICATOR_HIGH = 0xD2;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1622,6 +1623,35 @@ OSD.constants = {
             ]
         },
         {
+            name: 'osdGroupSwitchIndicators',
+            items: [
+                {
+                    name: 'SWITCH_INDICATOR_0',
+                    id: 130,
+                    positionable: true,
+                    preview: 'SWI1' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_1',
+                    id: 131,
+                    positionable: true,
+                    preview: 'SWI2' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_2',
+                    id: 132,
+                    positionable: true,
+                    preview: 'SWI3' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                },
+                {
+                    name: 'SWITCH_INDICATOR_3',
+                    id: 133,
+                    positionable: true,
+                    preview: 'SWI4' + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH)
+                }
+            ]
+        },
+        {
             name: 'osdGroupGVars',
             items: [
                 {
@@ -2456,6 +2486,9 @@ OSD.GUI.updateFields = function() {
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
+
+     // Update the OSD preview
+     refreshOSDSwitchIndicators();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2810,6 +2843,32 @@ TABS.osd.initialize = function (callback) {
             });
         });
 
+
+        // Setup switch indicators
+        $(".osdSwitchInd_channel option").each(function() {
+            $(this).text("Ch " + $(this).text());
+        });
+
+        // Function when text for switch indicators change
+        $('.osdSwitchIndName').on('keyup', function() {
+            // Make sure that the switch hint only contains A to Z
+            let testExp = new RegExp('^[A-Za-z0-9]');
+            let testText = $(this).val();
+            if (testExp.test(testText.slice(-1))) {
+                $(this).val(testText.toUpperCase());
+            } else {
+                $(this).val(testText.slice(0, -1));
+            }
+
+            // Update the OSD preview
+            refreshOSDSwitchIndicators();
+        });
+
+        // Function to update the OSD layout when the switch text alignment changes
+        $("#switchIndicators_alignLeft").on('change', function() {
+            refreshOSDSwitchIndicators();
+        });
+
         // font preview window
         var $preview = $('.font-preview');
 
@@ -2948,6 +3007,29 @@ TABS.osd.initialize = function (callback) {
         });
     }));
 };
+
+function refreshOSDSwitchIndicators() {
+    let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupSwitchIndicators";
+      })[0];
+    for (let si = 0; si < group.items.length; si++) {
+        let item = group.items[si];
+        if ($("#osdSwitchInd" + si +"_name").val() != undefined) {
+            let switchIndText = $("#osdSwitchInd" + si +"_name").val();
+            if (switchIndText == "") {
+                item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+            } else {
+                if ($("#switchIndicators_alignLeft").prop('checked')) {
+                    item.preview = switchIndText + FONT.symbol(SYM.SWITCH_INDICATOR_HIGH);
+                } else {
+                    item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH) + switchIndText;
+                }
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+}
 
 TABS.osd.cleanup = function (callback) {
     PortHandler.flush_callbacks();

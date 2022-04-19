@@ -514,6 +514,18 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             motorWizardModal.close();
         });
 
+        const drawImage = function () {
+            const isReversed = $("#motor_direction_inverted").is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+
+            const path = './resources/motor_order/'
+                + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
+            $('.mixerPreview img').attr('src', path);
+
+            renderServoOutputImage();
+        };
+
+        $("#motor_direction_inverted").change(drawImage);
+
         $platformSelect.find("*").remove();
 
         for (let i in platforms) {
@@ -554,12 +566,17 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
 
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('#motor_direction_inverted').parent().removeClass("is-hidden");
+                $('#platform-type').parent('.select').removeClass('no-bottom-border');
+            } else {
+                $('#motor_direction_inverted').parent().addClass("is-hidden");
+                $('#platform-type').parent('.select').addClass('no-bottom-border');
+            }
+
             updateRefreshButtonStatus();
 
-            $('.mixerPreview img').attr('src', './resources/motor_order/'
-                + currentMixerPreset.image + '.svg');
-            
-            renderServoOutputImage();
+            drawImage();
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {

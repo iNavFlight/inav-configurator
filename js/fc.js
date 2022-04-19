@@ -1150,6 +1150,18 @@ var FC = {
                 hasOperand: [true, true],
                 output: "raw"
             },
+            45: {
+                name: "Flight Axis Angle Override",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            46: {
+                name: "Flight Axis Rate Override",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
