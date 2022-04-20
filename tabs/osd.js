@@ -492,6 +492,7 @@ OSD.DjiElements =  {
         "PowerLimits"
     ],
     supportedSettings: [
+        "craft_name",
         "units"
     ],
     supportedAlarms: [
@@ -2482,6 +2483,7 @@ OSD.GUI.updateFields = function() {
 
      // Update the OSD preview
      refreshOSDSwitchIndicators();
+     updateCraftName();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2500,6 +2502,8 @@ OSD.GUI.removeBottomLines = function(){
         }
     });
 };
+
+
 
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
@@ -2862,6 +2866,21 @@ TABS.osd.initialize = function (callback) {
             refreshOSDSwitchIndicators();
         });
 
+        // Function for when text for craft name changes
+        $('#craft_name').on('keyup', function() {
+            // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+            let testText = $(this).val();
+            if (testExp.test(testText.slice(-1))) {
+                $(this).val(testText.toUpperCase());
+            } else {
+                $(this).val(testText.slice(0, -1));
+            }
+
+            // Update the OSD preview
+            updateCraftName();
+        });
+
         // font preview window
         var $preview = $('.font-preview');
 
@@ -3017,6 +3036,30 @@ function refreshOSDSwitchIndicators() {
                 } else {
                     item.preview = FONT.symbol(SYM.SWITCH_INDICATOR_HIGH) + switchIndText;
                 }
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+}
+
+function updateCraftName() {
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupGeneral";
+      })[0];
+
+
+    if ($('#craft_name').val() != undefined) {
+        for (let si = 0; si < generalGroup.items.length; si++) {
+            if (generalGroup.items[si].name == "CRAFT_NAME") {
+                let craftNameText = $('#craft_name').val();
+                
+                if (craftNameText == "") {
+                    generalGroup.items[si].preview = "CRAFT_NAME";
+                } else {
+                    generalGroup.items[si].preview = craftNameText;
+                }
+                break;
             }
         }
     }

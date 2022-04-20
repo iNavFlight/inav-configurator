@@ -10,23 +10,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         googleAnalytics.sendAppView('Configuration');
     }
 
-    var craftName = null;
-    var loadCraftName = function (callback) {
-        if (!CONFIG.name || CONFIG.name.trim() === '') {
-            mspHelper.getCraftName(function (name) {
-                craftName = name;
-                callback();
-            });
-        } else {
-            craftName = CONFIG.name;
-            callback();
-        }
-    };
-
-    var saveCraftName = function (callback) {
-        mspHelper.setCraftName(craftName, callback);
-    };
-
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
@@ -40,7 +23,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
-        loadCraftName,
         mspHelper.loadMiscV2
     ];
 
@@ -60,7 +42,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.saveVTXConfig,
         mspHelper.saveBoardAlignment,
         mspHelper.saveCurrentMeterConfig,
-        saveCraftName,
         mspHelper.saveMiscV2,
         saveSettings,
         mspHelper.saveToEeprom
@@ -290,15 +271,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
         $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
         $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
-        
-        // Craft name
-        if (craftName != null) {
-            $('.config-personalization').show();
-            $('input[name="craft_name"]').val(craftName);
-        } else {
-            // craft name not supported by the firmware
-            $('.config-personalization').hide();
-        }
 
         $('a.save').click(function () {
             MISC.mag_declination = parseFloat($('#mag_declination').val());
@@ -323,8 +295,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
 
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
-
-            craftName = $('input[name="craft_name"]').val();
 
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
