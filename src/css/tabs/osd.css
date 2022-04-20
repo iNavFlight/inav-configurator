@@ -403,7 +403,7 @@ button {
     font-family: 'open_sansregular', 'Segoe UI', Tahoma, sans-serif;
 }
 
-.spacer_box div input {
+.spacer_box div input[type="radio"] {
     margin-right: 5px;
 }
 
