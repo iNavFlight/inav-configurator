@@ -35,6 +35,11 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.loadOutputMapping,
         mspHelper.loadRcData,
         mspHelper.loadAdvancedConfig,
+        function(callback) {
+            mspHelper.getSetting("motor_direction_inverted").then((data)=>{
+                self.motorDirectionInverted=data.value;
+            }).then(callback)
+        }
     ]);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
@@ -260,8 +265,12 @@ TABS.outputs.initialize = function (callback) {
     function update_model(val) {
         if (MIXER_CONFIG.appliedMixerPreset == -1) return;
 
-        $('.mixerPreview img').attr('src', './resources/motor_order/'
-            + helper.mixer.getById(val).image + '.svg');
+        const isMotorInverted = self.motorDirectionInverted;
+        const isReversed = isMotorInverted && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+
+        const path = './resources/motor_order/'
+            + helper.mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
+        $('.mixerPreview img').attr('src', path);
     }
 
     function process_servos() {

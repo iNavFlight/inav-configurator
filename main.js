@@ -147,7 +147,11 @@ $(document).ready(function () {
          }
     });
 
-    appUpdater.checkRelease(chrome.runtime.getManifest().version);
+    chrome.storage.local.get('update_notify', function(result) {
+        if (typeof result.update_notify === 'undefined' || result.update_notify) {
+            appUpdater.checkRelease(chrome.runtime.getManifest().version);
+        }
+    });
 
     // log library versions in console to make version tracking easier
     console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);
@@ -256,6 +260,9 @@ $(document).ready(function () {
                         break;
                     case 'gps':
                         TABS.gps.initialize(content_ready);
+                        break;
+                    case 'magnetometer':
+                        TABS.magnetometer.initialize(content_ready);
                         break;
                     case 'mission_control':
                         TABS.mission_control.initialize(content_ready);

@@ -72,20 +72,45 @@ $(document).ready(function () {
         }
     };
 
+    
+
     GUI.updateManualPortVisibility = function(){
         var selected_port = $port.find('option:selected');
-        if (selected_port.data().isManual) {
+        if (selected_port.data().isManual || selected_port.data().isTcp || selected_port.data().isUdp) {
             $('#port-override-option').show();
         }
         else {
             $('#port-override-option').hide();
         }
-        if (selected_port.data().isDFU) {
+
+        if (selected_port.data().isTcp || selected_port.data().isUdp) {
+            $('#port-override-label').text("IP:Port");
+        } else {
+            $('#port-override-label').text("Port");
+        }
+
+        if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
             $baud.hide();
         }
         else {
             $baud.show();
+        }        
+
+        if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
+            $('.tab_firmware_flasher').hide();
+        } else {
+            $('.tab_firmware_flasher').show();
         }
+        var type = ConnectionType.Serial;
+        if (selected_port.data().isBle) {
+            type = ConnectionType.BLE;
+        } else if (selected_port.data().isTcp) {
+            type = ConnectionType.TCP;
+        } else if (selected_port.data().isUdp) {
+            type = ConnectionType.UDP;
+        } 
+        CONFIGURATOR.connection = Connection.create(type);
+        
     };
 
     GUI.updateManualPortVisibility();
@@ -110,6 +135,7 @@ $(document).ready(function () {
             var selected_port = $port.find('option:selected').data().isManual ?
                     $portOverride.val() :
                     String($port.val());
+            
             if (selected_port === 'DFU') {
                 GUI.log(chrome.i18n.getMessage('dfu_connect_message'));
             }
@@ -122,7 +148,11 @@ $(document).ready(function () {
                     $('#port, #baud, #delay').prop('disabled', true);
                     $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connecting'));
 
-                    serial.connect(selected_port, {bitrate: selected_baud}, onOpen);
+                    if (selected_port == 'tcp' || selected_port == 'udp') {
+                        CONFIGURATOR.connection.connect($portOverride.val(), {}, onOpen);
+                    } else {
+                        CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, onOpen);
+                    }
                 } else {
                     var wasConnected = CONFIGURATOR.connectionValid;
 
@@ -135,6 +165,7 @@ $(document).ready(function () {
                     } else {
                         GUI.tab_switch_cleanup();
                         finishDisconnect();
+
                     }
 
                     function finishDisconnect() {
@@ -150,7 +181,7 @@ $(document).ready(function () {
                         helper.mspQueue.freeHardLock();
                         helper.mspQueue.freeSoftLock();
 
-                        serial.disconnect(onClosed);
+                        CONFIGURATOR.connection.disconnect(onClosed);
                         MSP.disconnect_cleanup();
 
                         // Reset various UI elements
@@ -235,6 +266,12 @@ function onInvalidFirmwareVersion()
     $('#tabs .tab_cli a').click();
 }
 
+function onBleNotSupported() {
+    GUI.log(chrome.i18n.getMessage('connectionBleNotSupported'));
+    CONFIGURATOR.connection.abort();
+}
+
+
 function onOpen(openInfo) {
 
     if (FC.restartRequired) {
@@ -265,10 +302,10 @@ function onOpen(openInfo) {
             }
         });
 
-        chrome.storage.local.set({last_used_bps: serial.bitrate});
+        chrome.storage.local.set({last_used_bps: CONFIGURATOR.connection.bitrate});
         chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
 
-        serial.onReceive.addListener(read_serial);
+        CONFIGURATOR.connection.addOnReceiveListener(read_serial);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
@@ -278,7 +315,7 @@ function onOpen(openInfo) {
                 helper.mspQueue.flush();
                 helper.mspQueue.freeHardLock();
                 helper.mspQueue.freeSoftLock();
-                serial.emptyOutputBuffer();
+                CONFIGURATOR.connection.emptyOutputBuffer();
 
                 $('div.connect_controls a').click(); // disconnect
             }
@@ -305,12 +342,16 @@ function onOpen(openInfo) {
                         googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
                         GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
                         if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
-                            mspHelper.getCraftName(function(name) {
-                                if (name) {
-                                    CONFIG.name = name;
-                                }
-                                onValidFirmware();
-                            });
+                            if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(CONFIG.flightControllerVersion, "5.0.0")) {  
+                                onBleNotSupported();
+                            } else {
+                                mspHelper.getCraftName(function(name) {
+                                    if (name) {
+                                        CONFIG.name = name;
+                                    }
+                                    onValidFirmware();  
+                                });
+                            }
                         } else  {
                             onInvalidFirmwareVersion();
                         }
@@ -372,7 +413,7 @@ function onConnect() {
         $('#drop-rate').text("Drop ratio: " + helper.mspQueue.getDropRatio().toFixed(0) + "%");
     }, 100);
 
-    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(serial.bitrate), false);
+    helper.interval.add('global_data_refresh', helper.periodicStatusUpdater.run, helper.periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
 }
 
 function onClosed(result) {

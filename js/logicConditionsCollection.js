@@ -6,6 +6,12 @@ let LogicConditionsCollection = function () {
         data = [],
         $container;
 
+    let max_logicConditions = 32;
+
+    self.getMaxLogicConditionCount = function () {
+        return max_logicConditions;
+    }
+
     self.put = function (element) {
         data.push(element);
     };

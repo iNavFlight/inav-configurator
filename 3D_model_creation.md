@@ -1,17 +1,12 @@
 # Creating a 3D model for Configurator
-I recently made a couple of 3D models for the setup page of configurator, so thought I'd document the process of getting them in to iNav.
+
+INAV configurator uses the [glTF](https://en.wikipedia.org/wiki/GlTF) format for the 3d models, so any software that can export in this format is fine.
+
+In this tutorial we see how to export glTF from Blender
+
 ## Pre-requisites
-- Your prefered 3D modeling package. You can use anything, so long as you can export to .obj files, or any other format that can be imported in to Blender.
-- [Blender 2.79](https://www.blender.org/download/releases/2-79/). This version is needed for the JSON exporter.
-- [Three.js version 0.92](https://github.com/mrdoob/three.js/releases/tag/r92). This is the last version with the Blender addon included.
-### Installing Three.js
-- Install Blender
-- Extract the Three.js zip file, and navigate to __/three.js-r92/utils/exporters/blender/addons__
-- Copy the __io_three__ folder and navigate to __install_drive://Program Files/Blender Foundation/Blender/2.79/scripts/addons__
-- Paste the __io_three__ folder in to the blender __addons__ folder
-- Open Blender and from the menu, head to __File__ > __User Preferences...__
-- Go to the __Addons__ tab and type Thr in to the search box
-- Check the box to enable the Three.js addon, then click the __Save User Settings__ button
+- [Blender](https://www.blender.org/), when i wrote this tutorial i was using the version 3.1, but also the next versions should be fine.
+
 ## Creating the model
 Create the model in your preferred 3D package. I use Fusion 360 and created quite large models. The size doesn't matter, it can be resized in Blender. I simply created the model, combined most parts, and added colour where I wanted it. The annoying thing is that the materials don't copy across in to Blender. But it's easier to get everything set with the package you're comfortable with. I would also highly reccomend naming each object in the model, as it will make things simpler later on. I also name the materials, as I'm sure Blender understands the material names. Once you're happy with the model, export it as an .obj file.
 ## Basic modification in Blender
@@ -31,8 +26,10 @@ Next up, you will want to replicate the materials that you selected when designi
 
 ### Joining
 The final stage before exporting the model is joining all the individual parts. You can still edit things afterwards. But if you don't do this, you will only export the last selected part. First, select all the parts of the 3D model that you want visible in configurator. Click on the triangle to the left of the object name, in the obkect list in the top right of the screen. Hold the __shift__ key to select multiples. Once they're all selected, hold __Ctrl__ and press __J__. The parts should all now join, and you will see only one object in the list (objects not selected to be joined will of course still be there). If it didn't work, try __Ctrl__ + __J__ again, as sometimes I have had to issue the command twice.
-## Exporting the model to JSON
-Select you joined object and head to the top menu with __File__ > __Export__ > __Three.js (.json)__. Selecting the export folder and giving it a name should be pretty straight forward. However, you'll be wanting the __Export THREE__ export settings. These have worked fine for me.
-![image](https://user-images.githubusercontent.com/17590174/120716222-a28dd800-c4bd-11eb-99c7-a5c5dd9da32d.png)
+## Exporting the model to glTF
+Select you joined object and head to the top menu with __File__ > __Export__ > **glTF 2.0 (.glb/.gltf)**. Select the format **glTF Embedded (.gltf)**, Select the export folder and give it a name should be pretty straight forward. These export settings have worked fine for me.
+![Immagine 2022-03-28 115931](https://user-images.githubusercontent.com/40276199/160375086-ef0eb587-9574-4f4e-b101-ce24e27e0e12.png)
 
-You can then put the .json model in the Configurator __/resources/models/__ folder, and ammend the code to display the model.
+You can then put the .gltf model in the Configurator __/resources/models/__ folder, and ammend the code to display the model.
+
+The old .json files was converted to .glTF using this [tool](https://gist.github.com/donmccurdy/c090dc53c7bfb704ef9de654ecc07632)

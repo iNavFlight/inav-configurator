@@ -7,5 +7,6 @@ var CONFIGURATOR = {
     'connectionValid': false,
     'connectionValidCliOnly': false,
     'cliActive': false,
-    'cliValid': false
+    'cliValid': false,
+    'connection': false
 };
