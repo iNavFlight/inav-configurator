@@ -29,6 +29,10 @@ SYM.MAH_KM_0 = 0x6B;
 SYM.MAH_KM_1 = 0x6C;
 SYM.MAH_MI_0 = 0x93;
 SYM.MAH_MI_1 = 0x94;
+SYM.MAH_V_FM_0 = 0xD5;
+SYM.MAH_V_FT_1 = 0xD6;
+SYM.MAH_V_M_0 = 0xD7;
+SYM.MAH_V_M_1 = 0xD8;
 SYM.WH_KM = 0x6E;
 SYM.WH_MI = 0x6F;
 SYM.GPS_SAT1 = 0x08;
@@ -909,13 +913,13 @@ OSD.constants = {
                 },
                 {
                     name: 'GLIDE_TIME',
-                    id: 130,
+                    id: 134,
                     min_version: '5.0.0',
                     preview: FONT.symbol(SYM.GLIDE_MINS) + '102',
                 },
                 {
                     name: 'GLIDE_RANGE',
-                    id: 131,
+                    id: 135,
                     min_version: '5.0.0',
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -1296,7 +1300,22 @@ OSD.constants = {
                                 return FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM);
                         }
                     }
-                }
+                },
+                {
+                    name: 'CLIMB_EFFICIENCY',
+                    id: 136,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.embed_dot('0.76') + FONT.symbol(SYM.MAH_V_FT_0) + FONT.symbol(SYM.MAH_V_FT_1);
+                            default: // Metric & Metric + MPH
+                                return FONT.embed_dot('1.23') + FONT.symbol(SYM.MAH_V_M_0) + FONT.symbol(SYM.MAH_V_M_1);
+                        }
+                    }
+                },
             ]
         },
         {
