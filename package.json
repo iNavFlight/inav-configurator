@@ -1,6 +1,6 @@
 {
-  "name": "inav-configurator",
-  "description": "INAV Configurator",
+  "name": "inav-configurator-lite",
+  "description": "INAV Configurator Lite",
   "version": "5.0.0",
   "main": "main.html",
   "default_locale": "en",
@@ -10,7 +10,7 @@
     "nw": "nw"
   },
   "window": {
-    "title": "INAV Configurator",
+    "title": "INAV Configurator Lite",
     "icon": "images/inav_icon_128.png",
     "toolbar": true,
     "width": 1024,
