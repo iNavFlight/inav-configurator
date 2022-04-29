@@ -63,12 +63,12 @@
 }
 
 .tab-firmware_flasher .info .progress.valid::-webkit-progress-bar {
-    background-color: #37a8db;
+    background-color: #4CB944;
     border-radius: 4px;
 }
 
 .tab-firmware_flasher .info .progress.valid::-webkit-progress-value {
-    background-color: #37a8db;
+    background-color: #4CB944;
     border-radius: 4px;
 }
 

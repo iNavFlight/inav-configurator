@@ -1,6 +1,6 @@
-# INAV Configurator Lite
+# MiX AIR
 
-INAV Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
+MiX AIR Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
 It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
 

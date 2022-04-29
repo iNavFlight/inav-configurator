@@ -714,7 +714,7 @@ TABS.outputs.initialize = function (callback) {
                 color = parseInt(data * 0.009);
 
                 $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
-                $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
+                $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#4CB944' + color + ')' });
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
@@ -725,7 +725,7 @@ TABS.outputs.initialize = function (callback) {
                 color = parseInt(data * 0.009);
 
                 $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
-                $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
+                $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#4CB944' + color + ')' });
             }
             //keep the following here so at least we get a visual cue of our motor setup
             update_arm_status();

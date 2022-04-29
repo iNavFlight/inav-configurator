@@ -86,7 +86,7 @@
        d="M 40,40 160,160 M 40,160 160,40"
        id="path21" />
     <path
-       style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#4CB944;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 188,160 c 0,-15.46484 -12.53516,-28 -28,-28 -15.46484,0 -28,12.53516 -28,28 0,15.46484 12.53516,28 28,28 15.46484,0 28,-12.53516 28,-28 M 179.80078,140.19922 177.78516,157 m 2.01562,-16.80078 h 16.80078"
        id="path23" />
     <g
@@ -101,7 +101,7 @@
          height="100%" />
     </g>
     <path
-       style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#4CB944;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 188,40 c 0,-15.464844 -12.53516,-28 -28,-28 -15.46484,0 -28,12.535156 -28,28 0,15.464844 12.53516,28 28,28 15.46484,0 28,-12.535156 28,-28 M 179.80078,59.800781 177.78516,43 m 2.01562,16.800781 h 16.80078"
        id="path29" />
     <g
@@ -116,7 +116,7 @@
          height="100%" />
     </g>
     <path
-       style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#4CB944;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 68,160 c 0,-15.46484 -12.535156,-28 -28,-28 -15.464844,0 -28,12.53516 -28,28 0,15.46484 12.535156,28 28,28 15.464844,0 28,-12.53516 28,-28 M 20.199219,140.19922 22.214844,157 M 20.199219,140.19922 H 3.398438"
        id="path35" />
     <g
@@ -131,7 +131,7 @@
          height="100%" />
     </g>
     <path
-       style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#4CB944;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="M 68,40 C 68,24.535156 55.464844,12 40,12 24.535156,12 12,24.535156 12,40 12,55.464844 24.535156,68 40,68 55.464844,68 68,55.464844 68,40 M 20.199219,59.800781 22.214844,43 M 20.199219,59.800781 H 3.398438"
        id="path41" />
     <g

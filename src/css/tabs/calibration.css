@@ -62,11 +62,11 @@
 }
 
 .tab-calibration .active .steptitle {
-    background-color: #37a8db;
+    background-color: #4CB944;
 }
 
 .tab-calibration .active {
-    border: solid 1px #37a8db;
+    border: solid 1px #4CB944;
     background-color: white;
     box-shadow: 0 0 10px #ccc;
 

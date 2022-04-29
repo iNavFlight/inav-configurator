@@ -9,17 +9,17 @@
 }
 
 .tab-auxiliary .range .marker, .tab-auxiliary .channel-slider .noUi-connect {
-    background: #37a8db;
+    background: #4CB944;
     border-radius: 3px;
 }
 
 .tab-auxiliary .mode.on .info {
-    background: #37a8db;
+    background: #4CB944;
     color: white;
 }
 
 .tab-auxiliary .mode.on:nth-child(odd) .info {
-    background: #37a8db;
+    background: #4CB944;
 }
 
 .tab-auxiliary .mode.inRange .info {
@@ -55,7 +55,7 @@
 }
 
 .tab-auxiliary .modeSectionArea {
-    background-color: #37a8db;
+    background-color: #4CB944;
     color: white;
     font-weight: bold;
     font-size: 1.1em;
@@ -241,7 +241,7 @@
 }
 
 .tab-auxiliary .acroEnabled.on {
-    background-color: #37a8db;
+    background-color: #4CB944;
 }
 
 .tab-auxiliary .acroEnabled.off {

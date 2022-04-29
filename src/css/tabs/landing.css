@@ -9,7 +9,7 @@
     min-height: 100%;
     height: 100%;
     overflow-y: auto;
-    background-color: #104156;
+    background-color: #333333;
 }
 
 .tab-landing .content_top {
@@ -50,7 +50,7 @@
 }
 
 .tab-landing .content_mid {
-    background-color: #37a8db;
+    background-color: #4CB944;
     overflow: hidden;
 }
 

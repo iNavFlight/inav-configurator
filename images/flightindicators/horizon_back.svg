@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="400.667px" height="400.666px" viewBox="0 0 400.667 400.666" enable-background="new 0 0 400.667 400.666"
-	 xml:space="preserve">
-	<linearGradient id="backHorizon_1_" gradientUnits="userSpaceOnUse" x1="200.667" y1="350.0991" x2="200.667" y2="50.5659">
-		<stop  offset="0.4999" style="stop-color:#503723"/>
-		<stop  offset="0.5001" style="stop-color:#558EBB"/>
-	</linearGradient>
-	<circle id="backHorizon" fill="url(#backHorizon_1_)" cx="200.667" cy="200.333" r="149.767"/>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 400.7 400.7" style="enable-background:new 0 0 400.7 400.7;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#4CB944;}
+	.st1{fill:#333333;}
+</style>
+<circle id="backHorizon" class="st0" cx="200.7" cy="200.3" r="149.8"/>
+<path class="st1" d="M200.7,350.1c82.7,0,149.8-67.1,149.8-149.8H50.9C50.9,283,118,350.1,200.7,350.1z"/>
 </svg>

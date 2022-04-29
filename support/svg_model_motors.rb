@@ -47,7 +47,7 @@ class Model
 
   # Colours
   BODY_GREY='#bababa'
-  CIRCLE_GREEN = '#37a8db'
+  CIRCLE_GREEN = '#4CB944'
   ARROW_RED = '#fa0700'
 
   # We use StringIO in order to be able to add a (non-)copyright statement

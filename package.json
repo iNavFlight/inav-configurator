@@ -1,6 +1,6 @@
 {
-  "name": "inav-configurator-lite",
-  "description": "INAV Configurator Lite",
+  "name": "mixair-configurator-lite",
+  "description": "MiX AIR Configurator Lite",
   "version": "5.0.0",
   "main": "main.html",
   "default_locale": "en",
@@ -10,7 +10,7 @@
     "nw": "nw"
   },
   "window": {
-    "title": "INAV Configurator Lite",
+    "title": "MiX AIR",
     "icon": "images/inav_icon_128.png",
     "toolbar": true,
     "width": 1024,
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/iNavFlight/inav-configurator"
+    "url": "github.com/EduardTheThird/inav-configurator-lite"
   },
   "author": "iNavFlight",
   "license": "GPL-3.0",

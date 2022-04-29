@@ -3,9 +3,9 @@
     /*margin-top: 0;*/
     /*margin-bottom: 0;*/
     /*margin-right: 20px;*/
-    background-color: #37a8db;
+    background-color: #4CB944;
     border-radius: 3px;
-    border: 1px solid #3394b5;
+    border: 1px solid #4CB944;
     color: #fff;
     /*float: right;*/
     display: block;
@@ -29,7 +29,7 @@
    text-align: center;
 }
 .tab-mission-control .btn a:hover {
-    background-color: #3394b5;
+    background-color: #4CB944;
     transition: all ease 0.2s;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .tab-mission-control .btn a:active {
-    background-color: #37a8db;
+    background-color: #4CB944;
     transition: all ease 0.0s;
     box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
 }
@@ -416,9 +416,9 @@
     /*margin-top: 0;*/
     /*margin-bottom: 0;*/
     /*margin-right: 20px;*/
-    background-color: #37a8db;
+    background-color: #4CB944;
     border-radius: 3px;
-    border: 1px solid #3394b5;
+    border: 1px solid #4CB944;
     color: #fff;
     /*float: right;*/
     display: block;
@@ -433,7 +433,7 @@
 }
 
 .tab-mission-control .btnMenu a:hover {
-    background-color: #3394b5;
+    background-color: #4CB944;
     transition: all ease 0.2s;
 }
 
@@ -458,9 +458,9 @@
     /*margin-top: 0;*/
     /*margin-bottom: 0;*/
     /*margin-right: 20px;*/
-    background-color: #37a8db;
+    background-color: #4CB944;
     border-radius: 3px;
-    border: 1px solid #3394b5;
+    border: 1px solid #4CB944;
     color: #fff;
     /*float: right;*/
     display: block;
@@ -475,7 +475,7 @@
 }
 
 .tab-mission-control .btnTable a:hover {
-    background-color: #3394b5;
+    background-color: #4CB944;
     transition: all ease 0.2s;
 }
 

@@ -4,7 +4,7 @@
 }
 
 .tab-configuration .preset__head {
-    color: #37a8db;
+    color: #4CB944;
     margin-top: 15px;
 }
 
@@ -24,7 +24,7 @@
 .tab-configuration .preset__feature {
     list-style: inside disc;
     list-style-type: afar;
-    color: #37a8db;
+    color: #4CB944;
 }
 
 .tab-configuration .preset__feature-text {
@@ -51,7 +51,7 @@
     background-color: #525252;
     background: #525252 -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.35));
     min-height: 400px;
-    border-right: 3px solid #37a8db;
+    border-right: 3px solid #4CB944;
     overflow:hidden;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
@@ -100,7 +100,7 @@
 }
      
 .tab-configuration .list-menu li.active a {
-    background-color: #37a8db;
+    background-color: #4CB944;
     text-shadow: 0 1px rgba(0, 0, 0, 0.45);
     color: white;
 
