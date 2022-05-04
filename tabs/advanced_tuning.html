@@ -12,9 +12,16 @@
                     <div class="spacer_box settings">
                         <div class="number">
                             <input type="number" id="launchIdleThr" data-unit="us" data-setting="nav_fw_launch_idle_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                            <label for="launchIdleThr"><span data-i18n="configurationLaunchIdleThr"></span></label>
+                            <label for="launchIdleThr">D <span data-i18n="configurationLaunchIdleThr"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleThrHelp"></div>
                         </div>
+
+                        <div class="number">
+                            <input type="number" id="launchIdleDelay" data-unit="ms" data-setting="nav_fw_launch_idle_motor_delay" data-setting-multiplier="1" step="1" min="0" max="60000" />
+                            <label for="launchIdleDelay"><span data-i18n="configurationLaunchIdleDelay"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="configurationLaunchIdleDelayHelp"></div>
+                        </div>
+
                         <div class="number">
                             <input type="number" id="launchMaxAngle" data-unit="deg" data-setting="nav_fw_launch_max_angle" data-setting-multiplier="1" step="1" min="5" max="180" />
                             <label for="launchMaxAngle"><span data-i18n="configurationLaunchMaxAngle"></span></label>
