@@ -932,6 +932,12 @@
     "configurationLaunchIdleThrHelp": {
         "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
+    "configurationLaunchIdleDelay": {
+        "message": "Idle Throttle Delay"
+    },
+    "configurationLaunchIdleDelayHelp": {
+        "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
+    },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
     },
@@ -2966,6 +2972,9 @@
     },
     "osd_main_voltage_decimals": {
         "message" : "Voltage Decimals"
+    },
+    "osd_mah_used_precision": {
+        "message" : "mAh Used Precision"
     },
     "osd_coordinate_digits": {
         "message" : "Coordinate Digits"

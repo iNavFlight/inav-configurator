@@ -126,8 +126,16 @@ SYM_HEADING_DIVIDED_LINE   | SYM.HEADING_DIVIDED_LINE     | Heading graphic     
 SYM_HEADING_LINE           | SYM.HEADING_LINE             | Heading graphic                       | 205        | 0xCD
 SYM_MAX                    | SYM.MAX                      | Max icon                              | 206	       | 0xCE
 SYM_PROFILE		           | SYM.PROFILE		          | Profile icon			              | 207	       | 0xCF
-SYM_GLIDE_DIST		       | SYM.GLIDE_DIST				  | Glide Distance                        | 208        | 0xD0
-SYM_GLIDE_MINS		       | SYM.GLIDE_MINS				  | Glide Time Mins                       | 209        | 0xD1
+SYM_SWITCH_INDICATOR_LOW   | N/A        		          | Switch: down                          | 208	       | 0xD0
+SYM_SWITCH_INDICATOR_LOW   | N/A        		          | Switch: middle                        | 209	       | 0xD1
+SYM_SWITCH_INDICATOR_LOW   | SYM.SWITCH_INDICATOR_HIGH    | Switch: up                            | 210	       | 0xD2
+SYM_AH  		   		   | SYM.AHI    		  		  | Amp Hours icon			              | 211	       | 0xD3
+SYM_GLIDE_DIST		       | SYM.GLIDE_DIST				  | Glide Distance                        | 212        | 0xD4
+SYM_GLIDE_MINS		       | SYM.GLIDE_MINS				  | Glide Time Mins                       | 213        | 0xD5
+SYM_AH_V_FT_0              | SYM.AH_V_FT_0                | Climb efficiency: imperial L side     | 214        | 0xD6
+SYM_AH_V_FT_1              | SYM.AH_V_FT_1                | Climb efficiency: imperial R side     | 215        | 0xD7
+SYM_AH_V_M_0               | SYM.AH_V_M_0                 | Climb efficiency: metric L side       | 216        | 0xD8
+SYM_AH_V_M_1               | SYM.AH_V_M_1                 | Climb efficiency: metric R side       | 217        | 0xD9
  | | | | 
 SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C

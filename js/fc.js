@@ -1223,6 +1223,9 @@ var FC = {
                     35: "Loiter Radius [cm]",
                     36: "Active Profile",
                     37: "Battery cells",
+                    38: "AGL status [0/1]",
+                    39: "AGL [cm]",
+                    40: "Rangefinder [cm]",
                 }
             },
             3: {
