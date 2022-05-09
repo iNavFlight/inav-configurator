@@ -41,8 +41,7 @@
     "plotly": "^1.0.6",
     "temp": "^0.8.3",
     "three": "0.139.0",
-    "xml2js": "^0.4.19",
-    "nouislider": "15.6.0"
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "nw-builder": "^3.5.7",
