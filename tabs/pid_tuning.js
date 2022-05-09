@@ -186,12 +186,6 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-        function scaleRangeInt(x, srcMin, srcMax, destMin, destMax) {
-            let a = (destMax - destMin) * (x - srcMin);
-            let b = srcMax - srcMin;
-            return Math.round((a / b) + destMin);
-        }
-
         $(".pid-slider-row [name='value-slider']").on('input', function () {
             let val = $(this).val();
             let normalMax = parseInt($(this).data('normal-max'));
@@ -236,14 +230,6 @@ TABS.pid_tuning.initialize = function (callback) {
             });
         
             axis++;
-        });
-
-        let $magHoldYawRate                 = $("#magHoldYawRate");
-
-        $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
-
-        $magHoldYawRate.change(function () {
-            INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
         });
 
         if (!FC.isRpyFfComponentUsed()) {
