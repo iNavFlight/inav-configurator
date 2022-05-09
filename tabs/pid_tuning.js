@@ -194,11 +194,12 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $(".pid-slider-row [name='value-slider']").on('input', function () {
             let val = $(this).val();
+            let normalMax = parseInt($(this).data('normal-max'));
 
             if (val <= 800) {
-                val = scaleRangeInt(val, 0, 800, 0, 110);
+                val = scaleRangeInt(val, 0, 800, 0, normalMax);
             } else {
-                val = scaleRangeInt(val, 801, 1000, 111, 255);
+                val = scaleRangeInt(val, 801, 1000, normalMax + 1, 255);
             }
 
             $(this).parent().find('input[name="value-input"]').val(val);
@@ -208,11 +209,12 @@ TABS.pid_tuning.initialize = function (callback) {
         $(".pid-slider-row [name='value-input']").on('change', function () {
             let val = $(this).val();
             let newVal;
+            let normalMax = parseInt($(this).parent().find('input[name="value-slider"]').data('normal-max'));
 
             if (val <= 110) {
-                newVal = scaleRangeInt(val, 0, 110, 0, 800);
+                newVal = scaleRangeInt(val, 0, normalMax, 0, 800);
             } else {
-                newVal = scaleRangeInt(val, 111, 255, 801, 1000);
+                newVal = scaleRangeInt(val, normalMax + 1, 255, 801, 1000);
             }
 
             $(this).parent().find('input[name="value-slider"]').val(newVal);
