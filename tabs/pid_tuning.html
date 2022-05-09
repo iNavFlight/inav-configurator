@@ -22,6 +22,93 @@
             </div>
             <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_PIDgains"></div>
             <div class="clear-both"></div>
+
+            <div class="cf_column" id="pid-sliders">
+                <div class="pid-sliders-axis" data-axis="roll">
+                    <h3 data-i18n="axisRoll"></h3>
+                    <div class="pid-slider-row" data-axis="roll" data-component="p">
+                        <span data-i18n="pidTuning_Proportional"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="roll" data-component="i">
+                        <span data-i18n="pidTuning_Integral"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="roll" data-component="d">
+                        <span data-i18n="pidTuning_Derivative"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="roll" data-component="ff">
+                        <span data-i18n="pidTuning_FeedForward"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                </div>
+
+                <div class="pid-sliders-axis" data-axis="pitch">
+                    <h3 data-i18n="axisPitch"></h3>
+                    <div class="pid-slider-row" data-axis="pitch" data-component="p">
+                        <span data-i18n="pidTuning_Proportional"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="pitch" data-component="i">
+                        <span data-i18n="pidTuning_Integral"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="pitch" data-component="d">
+                        <span data-i18n="pidTuning_Derivative"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="pitch" data-component="ff">
+                        <span data-i18n="pidTuning_FeedForward"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                </div>
+
+                <div class="pid-sliders-axis" data-axis="yaw">
+                    <h3 data-i18n="axisYaw"></h3>
+                    <div class="pid-slider-row" data-axis="yaw" data-component="p">
+                        <span data-i18n="pidTuning_Proportional"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="yaw" data-component="i">
+                        <span data-i18n="pidTuning_Integral"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="yaw" data-component="d">
+                        <span data-i18n="pidTuning_Derivative"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                    <div class="pid-slider-row" data-axis="yaw" data-component="ff">
+                        <span data-i18n="pidTuning_FeedForward"></span>
+                        <input type="number" name="value-input" value="42" min="0" max="255" step="1" class="controlProfileHighlightActive">
+                        <input type="range" name="value-slider" value="42" min="0" max="1000" step="1">
+                    </div>
+
+                </div>
+            </div>
+
             <div class="cf_column pid-section">
                 <div class="gui_box grey">
                     <table class="pid_titlebar">
@@ -34,12 +121,12 @@
                         </tr>
                     </table>
                     <table id="pid_main" class="pid_tuning">
-                        <tr>
+                        <tr class="is-hidden">
                             <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuning_Basic"></div>
                             </th>
                         </tr>
-                        <tr class="ROLL" data-pid-bank-position="0">
+                        <tr class="is-hidden" class="ROLL" data-pid-bank-position="0">
                             <!-- 0 -->
                             <td></td>
                             <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>
@@ -47,7 +134,7 @@
                             <td><input class="controlProfileHighlight" type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
                             <td><input class="controlProfileHighlight" type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
                         </tr>
-                        <tr class="PITCH" data-pid-bank-position="1">
+                        <tr class="is-hidden" class="PITCH" data-pid-bank-position="1">
                             <!-- 1 -->
                             <td></td>
                             <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>
@@ -55,7 +142,7 @@
                             <td><input class="controlProfileHighlight" type="number" class="rpy_d" name="d" step="1" min="0" max="255" /></td>
                             <td><input class="controlProfileHighlight" type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
                         </tr>
-                        <tr class="YAW" data-pid-bank-position="2">
+                        <tr class="is-hidden" class="YAW" data-pid-bank-position="2">
                             <!-- 2 -->
                             <td></td>
                             <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>

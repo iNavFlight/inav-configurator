@@ -52,7 +52,8 @@ sources.css = [
     './js/libraries/jbox/jBox.css',
     './node_modules/openlayers/dist/ol.css',
     './src/css/logic.css',
-    './src/css/defaults_dialog.css'
+    './src/css/defaults_dialog.css',
+    './node_modules/nouislider/dist/nouislider.min.css',
 ];
 
 sources.js = [
@@ -133,7 +134,8 @@ sources.js = [
     './js/waypointCollection.js',
     './js/waypoint.js',
     './node_modules/openlayers/dist/ol.js',
-    './js/libraries/plotly-latest.min.js'
+    './js/libraries/plotly-latest.min.js',
+    './node_modules/nouislider/dist/nouislider.min.js',
 ];
 
 sources.receiverCss = [

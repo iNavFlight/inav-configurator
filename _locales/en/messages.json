@@ -4262,5 +4262,14 @@
     },
     "BLACKBOX_FEATURE_MOTORS": {
         "message": "Motors output"
+    },
+    "axisRoll": {
+        "message": "Roll"
+    },
+    "axisPitch": {
+        "message": "Pitch"
+    },
+    "axisYaw": {
+        "message": "Yaw"
     }
 }

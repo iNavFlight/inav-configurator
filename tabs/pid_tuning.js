@@ -66,8 +66,13 @@ TABS.pid_tuning.initialize = function (callback) {
     function form_to_pid_and_rc() {
 
         $('[data-pid-bank-position]').each(function () {
+            
             var $this = $(this),
                 bankPosition = $this.data('pid-bank-position');
+
+            if ($this.hasClass('is-hidden')) {
+                return;
+            }
 
             if (PIDs[bankPosition]) {
                 $this.find('input').each(function (index) {
@@ -156,6 +161,56 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         pid_and_rc_to_form();
+
+        function scaleRangeInt(x, srcMin, srcMax, destMin, destMax) {
+            let a = (destMax - destMin) * (x - srcMin);
+            let b = srcMax - srcMin;
+            return Math.round((a / b) + destMin);
+        }
+
+        $(".pid-slider-row [name='value-slider']").on('input', function () {
+            let val = $(this).val();
+
+            if (val <= 800) {
+                val = scaleRangeInt(val, 0, 800, 0, 110);
+            } else {
+                val = scaleRangeInt(val, 801, 1000, 111, 255);
+            }
+
+            $(this).parent().find('input[name="value-input"]').val(val);
+            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
+        });
+
+        $(".pid-slider-row [name='value-input']").on('change', function () {
+            let val = $(this).val();
+            let newVal;
+
+            if (val <= 110) {
+                newVal = scaleRangeInt(val, 0, 110, 0, 800);
+            } else {
+                newVal = scaleRangeInt(val, 111, 255, 801, 1000);
+            }
+
+            $(this).parent().find('input[name="value-slider"]').val(newVal);
+            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
+        });
+
+        let axis = 0;
+        $('#pid-sliders').find('.pid-sliders-axis').each(function () {
+        
+            let $this = $(this);
+            let bank = 0;
+
+            $this.find('.pid-slider-row').each(function () {
+                let $this = $(this);
+                $this.data('axis', axis);
+                $this.data('bank', bank);
+                $this.find('input[name="value-input"]').val(PIDs[axis][bank]).trigger('change');
+                bank++;
+            });
+        
+            axis++;
+        });
 
         let $magHoldYawRate                 = $("#magHoldYawRate");
 
