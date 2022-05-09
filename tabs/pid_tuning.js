@@ -162,6 +162,30 @@ TABS.pid_tuning.initialize = function (callback) {
 
         pid_and_rc_to_form();
 
+        let $theOtherPids = $('#the-other-pids');
+        let $showAdvancedPids = $('#show-advanced-pids');
+
+        chrome.storage.local.get('showOtherPids', function (result) {
+            if (result.showOtherPids) {
+                $theOtherPids.removeClass("is-hidden");
+                $showAdvancedPids.prop('checked', true);
+            } else {
+                $theOtherPids.addClass("is-hidden");
+                $showAdvancedPids.prop('checked', false);
+            }
+            $showAdvancedPids.change();
+        });
+
+        $showAdvancedPids.on('change', function() {
+            if ($showAdvancedPids.is(':checked')) {
+                $theOtherPids.removeClass("is-hidden");
+                chrome.storage.local.set({ showOtherPids: true });
+            } else {
+                $theOtherPids.addClass("is-hidden");
+                chrome.storage.local.set({ showOtherPids: false });
+            }
+        });
+
         function scaleRangeInt(x, srcMin, srcMax, destMin, destMax) {
             let a = (destMax - destMin) * (x - srcMin);
             let b = srcMax - srcMin;

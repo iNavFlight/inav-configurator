@@ -403,7 +403,8 @@
 
 .pid-slider-row span {
     margin-right: 2em;
-    width: 150px;
+    width: 120px;
+    line-height: 22px;;
 }
 
 .pid-slider-row input[type="number"] {
@@ -419,6 +420,11 @@
 .pid-slider-row input[type="range"] {
     display: block;
     flex-grow: 100;
+}
+
+.pid-sliders-axis {
+    padding: 0.5em;
+    margin-bottom: 1em;
 }
 
 .pid-sliders-axis h3 {

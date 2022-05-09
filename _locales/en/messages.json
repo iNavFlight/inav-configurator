@@ -4271,5 +4271,8 @@
     },
     "axisYaw": {
         "message": "Yaw"
+    },
+    "showAdvancedPIDs": {
+        "message": "Show advanced PID controllers"
     }
 }
