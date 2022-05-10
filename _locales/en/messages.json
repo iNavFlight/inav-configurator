@@ -1385,6 +1385,12 @@
     "pidTuning_TPABreakPoint": {
         "message": "TPA Breakpoint"
     },
+    "pidTuning_FW_TPATimeConstant": {
+        "message": "Fixed Wing TPA Time Constant"
+    },
+    "pidTuning_FW_TPATimeConstantHelp": {
+        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane. Planes with low thrust/weight ratio generally need higher time constant."
+    },
     "pidTuning_fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
     },
@@ -1720,6 +1726,9 @@
     },
     "adjustmentsFunction56": {
         "message": "Control Smoothness Adjustment"
+    },
+    "adjustmentsFunction57": {
+        "message": "Fixed Wing TPA Time Constant"
     },
     "adjustmentsSave": {
         "message": "Save"
