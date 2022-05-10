@@ -58,3 +58,9 @@ function generateFilename(prefix, suffix) {
 
     return filename + '.' + suffix;
 }
+
+function scaleRangeInt(x, srcMin, srcMax, destMin, destMax) {
+    let a = (destMax - destMin) * (x - srcMin);
+    let b = srcMax - srcMin;
+    return Math.round((a / b) + destMin);
+} 
