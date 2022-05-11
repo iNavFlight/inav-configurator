@@ -1826,6 +1826,11 @@ OSD.constants = {
                     id: 118,
                     preview: 'CTL S 3'
                 },
+                {
+                    name: 'TPA_TIME_CONSTANT',
+                    id: 134,
+                    preview: 'TPA TC   10'
+                },
             ]
         },
         {
