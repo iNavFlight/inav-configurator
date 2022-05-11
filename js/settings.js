@@ -66,6 +66,91 @@ var Settings = (function () {
                 } else if (s.setting.type == 'string') {
                     input.val(s.value);
                     input.attr('maxlength', s.setting.max);
+                } else if (input.data('presentation') == 'range') {
+                    
+                    let scaledMax;
+                    let scalingThreshold;
+
+                    if (input.data('normal-max')) {
+                        scaledMax = s.setting.max * 2;
+                        scalingThreshold = Math.round(scaledMax * 0.8);
+                    } else {
+                        scaledMax = s.setting.max;
+                        scalingThreshold = scaledMax;
+                    }
+
+                    
+                    let $range = $('<input type="range" min="' + s.setting.min + '" max="' + scaledMax + '" value="' + s.value + '"/>');
+                    if (input.data('step')) {
+                        $range.attr('step', input.data('step'));
+                    }
+                    $range.css({
+                        'display': 'block',
+                        'flex-grow': 100,
+                        'margin-left': '1em',
+                        'margin-right': '1em',
+                    });
+                    
+                    input.attr('min', s.setting.min);
+                    input.attr('max', s.setting.max);
+                    input.val(parseInt(s.value));
+                    input.css({
+                        'width': 'auto',
+                        'min-width': '75px',
+                    });
+                    
+                    input.parent().css({
+                        'display': 'flex',
+                        'width': '100%'
+                    });
+                    $range.insertAfter(input);
+
+                    input.parent().find('.helpicon').css({
+                        'top': '5px',
+                        'left': '-10px'
+                    });
+
+                    /*
+                     * Update slider to input
+                     */
+                    $range.on('input', function() {
+                        let val = $(this).val();
+                        let normalMax = parseInt(input.data('normal-max'));
+
+                        console.log(val, normalMax);
+
+                        if (normalMax) {
+                            if (val <= scalingThreshold) {
+                                val = scaleRangeInt(val, 0, scalingThreshold, 0, normalMax);
+                            } else {
+                                val = scaleRangeInt(val, scalingThreshold + 1, scaledMax, normalMax + 1, s.setting.max);
+                            }
+                        }
+                        console.log(val);
+
+                        input.val(val);
+                    });
+
+                    input.on('change', function() {
+
+                        let val = $(this).val();
+                        let newVal;
+                        let normalMax = parseInt(input.data('normal-max'));
+                        if (normalMax) {
+                            if (val <= normalMax) {
+                                newVal = scaleRangeInt(val, 0, normalMax, 0, scalingThreshold);
+                            } else {
+                                newVal = scaleRangeInt(val, normalMax + 1, s.setting.max, scalingThreshold + 1, scaledMax);
+                            }
+                        } else {
+                            newVal = val;
+                        }
+
+                        $range.val(newVal);
+                    });
+
+                    input.trigger('change');
+
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
 
@@ -80,6 +165,7 @@ var Settings = (function () {
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
                     input.val(s.value.toFixed(2));
+
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
 
