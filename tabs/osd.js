@@ -2827,6 +2827,8 @@ TABS.osd.initialize = function (callback) {
         OSD.GUI.jbox = new jBox('Modal', {
             width: 708,
             height: 240,
+            position: {y:'bottom'},
+            offset: {y:-50},
             closeButton: 'title',
             animation: false,
             attach: $('#fontmanager'),
