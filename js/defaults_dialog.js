@@ -105,7 +105,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "d_boost_min",
-                value: 0.5
+                value: 0.8
             },
             {
                 key: "d_boost_max",
@@ -195,6 +195,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "applied_defaults",
                 value: 2
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
             }
         ]
     },
