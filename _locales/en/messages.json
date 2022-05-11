@@ -1389,7 +1389,7 @@
         "message": "Fixed Wing TPA Time Constant"
     },
     "pidTuning_FW_TPATimeConstantHelp": {
-        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane. Planes with low thrust/weight ratio generally need higher time constant."
+        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
     },
     "pidTuning_fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
