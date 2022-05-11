@@ -395,3 +395,54 @@
 .settings-table tbody {
     /* background: #D6D6D6 linear-gradient(-45deg, rgba(255, 255, 255, .2) 10%, transparent 10%, transparent 20%, rgba(255, 255, 255, .2) 20%, rgba(255, 255, 255, .2) 30%, transparent 30%, transparent 40%, rgba(255, 255, 255, .2) 40%, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent 60%, rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .2) 70%, transparent 70%, transparent 80%, rgba(255, 255, 255, .2) 80%, rgba(255, 255, 255, .2) 90%, transparent 90%, transparent 100%, rgba(255, 255, 255, .2) 100%, transparent); */
 }
+
+.pid-slider-row {
+    display: flex;
+    padding: 4px;
+}
+
+.pid-slider-row span {
+    margin-right: 2em;
+    width: 120px;
+    line-height: 22px;;
+}
+
+.pid-slider-row input[type="number"] {
+    font-family: 'open_sansregular', 'Segoe UI', Tahoma, sans-serif;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+    border-radius: 3px;
+    padding: 0.3em;
+    margin-right: 2em;            
+}
+
+.pid-slider-row input[type="range"] {
+    display: block;
+    flex-grow: 100;
+}
+
+.pid-sliders-axis {
+    padding: 0.5em;
+    margin-bottom: 1em;
+}
+
+.pid-sliders-axis h3 {
+    padding: 4px;
+}
+
+.pid-sliders-axis[data-axis="roll"] {
+    background-color: #afe4fe;
+}
+
+.pid-sliders-axis[data-axis="pitch"] {
+    background-color: #C4B5FF;
+}
+
+.pid-sliders-axis[data-axis="yaw"] {
+    background-color: #E6B6F0;
+}
+
+#pid-sliders {
+    margin-bottom: 1em;
+}
