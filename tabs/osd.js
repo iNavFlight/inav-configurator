@@ -1831,6 +1831,11 @@ OSD.constants = {
                     id: 134,
                     preview: 'TPA TC   10'
                 },
+                {
+                    name: 'FW_LEVEL_TRIM',
+                    id: 135,
+                    preview: 'LEVEL  ' + FONT.embed_dot('5.4')
+                },
             ]
         },
         {
