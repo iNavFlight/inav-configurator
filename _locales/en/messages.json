@@ -1730,6 +1730,9 @@
     "adjustmentsFunction57": {
         "message": "Fixed Wing TPA Time Constant"
     },
+    "adjustmentsFunction58": {
+        "message": "Fixed Wing Level Trim"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
