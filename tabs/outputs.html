@@ -67,12 +67,32 @@
                         <span data-i18n="motor_poles"></span>
                     </label>
                 </div>
-                <div id="reversible-esc-info" data-i18n="reversibleEscWarning" class="info-box"></div>
+                <div data-i18n="reversibleEscWarning" class="info-box for-reversible-motors"></div>
                 <div class="checkbox">
                     <input type="checkbox" data-bit="12" class="feature toggle" name="REVERSIBLE_MOTORS" title="REVERSIBLE_MOTORS" id="feature-12">
                     <label for="feature-12">
                         <span data-i18n="featureREVERSIBLE_MOTORS"></span>
                     </label>
+                </div>
+                <div class="for-reversible-motors">
+                    <div class="number">
+                        <input type="number" id="3ddeadbandlow" name="3ddeadbandlow" step="1" min="1425" max="1500" />
+                        <label for="3ddeadbandlow">
+                            <span data-i18n="configuration3dDeadbandLow"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="3ddeadbandhigh" name="3ddeadbandhigh" step="1" min="1500" max="1575" />
+                        <label for="3ddeadbandhigh">
+                            <span data-i18n="configuration3dDeadbandHigh"></span>
+                        </label>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="3dneutral" name="3dneutral" step="1" min="1475" max="1525" />
+                        <label for="3dneutral">
+                            <span data-i18n="configuration3dNeutral"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
