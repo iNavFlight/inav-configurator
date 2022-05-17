@@ -799,6 +799,22 @@ helper.mixer = (function (mixerList) {
         }
     }
 
+    publicScope.countSurfaceType = function(mixer, surface) {
+        let count = 0;
+
+        for (const i in mixer.servoMixer) {
+            if (mixer.servoMixer.hasOwnProperty(i)) {
+                const s = mixer.servoMixer[i];
+
+                if (s.getInput() === surface) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
     return publicScope;
 })(mixerList);
 

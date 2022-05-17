@@ -1870,6 +1870,16 @@ OSD.constants = {
                     id: 118,
                     preview: 'CTL S 3'
                 },
+                {
+                    name: 'TPA_TIME_CONSTANT',
+                    id: 134,
+                    preview: 'TPA TC   10'
+                },
+                {
+                    name: 'FW_LEVEL_TRIM',
+                    id: 135,
+                    preview: 'LEVEL  ' + FONT.embed_dot('5.4')
+                },
             ]
         },
         {
@@ -2871,6 +2881,8 @@ TABS.osd.initialize = function (callback) {
         OSD.GUI.jbox = new jBox('Modal', {
             width: 708,
             height: 240,
+            position: {y:'bottom'},
+            offset: {y:-50},
             closeButton: 'title',
             animation: false,
             attach: $('#fontmanager'),

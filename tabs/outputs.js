@@ -52,6 +52,7 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.sendServoConfigurations,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveMiscV2,
+        mspHelper.save3dConfig,
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
@@ -96,7 +97,7 @@ TABS.outputs.initialize = function (callback) {
             $idlePercent = $('#throttle_idle'),
             $idleInfoBox = $("#throttle_idle-info"),
             $motorStopWarningBox = $("#motor-stop-warning"),
-            $reversibleMotorBox = $("#reversible-esc-info")
+            $reversibleMotorBox = $(".for-reversible-motors");
 
         function buildMotorRates() {
             var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
@@ -221,6 +222,10 @@ TABS.outputs.initialize = function (callback) {
         }
         $motorStopCheckbox.change(showHideMotorStopWarning);
         showHideMotorStopWarning();
+
+        $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
+        $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
+        $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
     }
 
     function update_arm_status() {
@@ -364,6 +369,10 @@ TABS.outputs.initialize = function (callback) {
                 }
                 SERVO_CONFIG[info.obj].rate = rate;
             });
+
+            REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
+            REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
+            REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
 
             //Save configuration to FC
             saveChainer.execute();

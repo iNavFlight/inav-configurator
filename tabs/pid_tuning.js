@@ -66,8 +66,13 @@ TABS.pid_tuning.initialize = function (callback) {
     function form_to_pid_and_rc() {
 
         $('[data-pid-bank-position]').each(function () {
+            
             var $this = $(this),
                 bankPosition = $this.data('pid-bank-position');
+
+            if ($this.hasClass('is-hidden')) {
+                return;
+            }
 
             if (PIDs[bankPosition]) {
                 $this.find('input').each(function (index) {
@@ -157,12 +162,74 @@ TABS.pid_tuning.initialize = function (callback) {
 
         pid_and_rc_to_form();
 
-        let $magHoldYawRate                 = $("#magHoldYawRate");
+        let $theOtherPids = $('#the-other-pids');
+        let $showAdvancedPids = $('#show-advanced-pids');
 
-        $magHoldYawRate.val(INAV_PID_CONFIG.magHoldRateLimit);
+        chrome.storage.local.get('showOtherPids', function (result) {
+            if (result.showOtherPids) {
+                $theOtherPids.removeClass("is-hidden");
+                $showAdvancedPids.prop('checked', true);
+            } else {
+                $theOtherPids.addClass("is-hidden");
+                $showAdvancedPids.prop('checked', false);
+            }
+            $showAdvancedPids.change();
+        });
 
-        $magHoldYawRate.change(function () {
-            INAV_PID_CONFIG.magHoldRateLimit = parseInt($magHoldYawRate.val(), 10);
+        $showAdvancedPids.on('change', function() {
+            if ($showAdvancedPids.is(':checked')) {
+                $theOtherPids.removeClass("is-hidden");
+                chrome.storage.local.set({ showOtherPids: true });
+            } else {
+                $theOtherPids.addClass("is-hidden");
+                chrome.storage.local.set({ showOtherPids: false });
+            }
+        });
+
+        $(".pid-slider-row [name='value-slider']").on('input', function () {
+            let val = $(this).val();
+            let normalMax = parseInt($(this).data('normal-max'));
+
+            if (val <= 800) {
+                val = scaleRangeInt(val, 0, 800, 0, normalMax);
+            } else {
+                val = scaleRangeInt(val, 801, 1000, normalMax + 1, 255);
+            }
+
+            $(this).parent().find('input[name="value-input"]').val(val);
+            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
+        });
+
+        $(".pid-slider-row [name='value-input']").on('change', function () {
+            let val = $(this).val();
+            let newVal;
+            let normalMax = parseInt($(this).parent().find('input[name="value-slider"]').data('normal-max'));
+
+            if (val <= 110) {
+                newVal = scaleRangeInt(val, 0, normalMax, 0, 800);
+            } else {
+                newVal = scaleRangeInt(val, normalMax + 1, 255, 801, 1000);
+            }
+
+            $(this).parent().find('input[name="value-slider"]').val(newVal);
+            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
+        });
+
+        let axis = 0;
+        $('#pid-sliders').find('.pid-sliders-axis').each(function () {
+        
+            let $this = $(this);
+            let bank = 0;
+
+            $this.find('.pid-slider-row').each(function () {
+                let $this = $(this);
+                $this.data('axis', axis);
+                $this.data('bank', bank);
+                $this.find('input[name="value-input"]').val(PIDs[axis][bank]).trigger('change');
+                bank++;
+            });
+        
+            axis++;
         });
 
         if (!FC.isRpyFfComponentUsed()) {

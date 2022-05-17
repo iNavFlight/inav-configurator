@@ -1385,6 +1385,12 @@
     "pidTuning_TPABreakPoint": {
         "message": "TPA Breakpoint"
     },
+    "pidTuning_FW_TPATimeConstant": {
+        "message": "Fixed Wing TPA Time Constant"
+    },
+    "pidTuning_FW_TPATimeConstantHelp": {
+        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
+    },
     "pidTuning_fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
     },
@@ -1720,6 +1726,12 @@
     },
     "adjustmentsFunction56": {
         "message": "Control Smoothness Adjustment"
+    },
+    "adjustmentsFunction57": {
+        "message": "Fixed Wing TPA Time Constant"
+    },
+    "adjustmentsFunction58": {
+        "message": "Fixed Wing Level Trim"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -4262,5 +4274,17 @@
     },
     "BLACKBOX_FEATURE_MOTORS": {
         "message": "Motors output"
+    },
+    "axisRoll": {
+        "message": "Roll"
+    },
+    "axisPitch": {
+        "message": "Pitch"
+    },
+    "axisYaw": {
+        "message": "Yaw"
+    },
+    "showAdvancedPIDs": {
+        "message": "Show advanced PID controllers"
     }
 }
