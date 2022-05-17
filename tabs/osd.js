@@ -920,13 +920,13 @@ OSD.constants = {
                 },
                 {
                     name: 'GLIDE_TIME',
-                    id: 134,
+                    id: 136,
                     min_version: '5.0.0',
                     preview: FONT.symbol(SYM.GLIDE_MINS) + '102',
                 },
                 {
                     name: 'GLIDE_RANGE',
-                    id: 135,
+                    id: 137,
                     min_version: '5.0.0',
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -1310,7 +1310,7 @@ OSD.constants = {
                 },
                 {
                     name: 'CLIMB_EFFICIENCY',
-                    id: 136,
+                    id: 138,
                     min_version: '5.0.0',
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
