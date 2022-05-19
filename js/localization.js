@@ -41,6 +41,20 @@ function localize() {
         element.addClass('i18n_title-replaced');
     });
 
+    $('[i18n_label]:not(.i18n_label-replaced)').each(function() {
+        var element = $(this);
+
+        element.attr('label', translate(element.attr('i18n_label')));
+        element.addClass('i18n_label-replaced');
+    });
+
+    $('[data-i18n_label]:not(.i18n_label-replaced)').each(function() {
+        var element = $(this);
+
+        element.attr('label', translate(element.data('i18n_label')));
+        element.addClass('i18n_label-replaced');
+    });
+
     $('[i18n_value]:not(.i18n_value-replaced)').each(function() {
         var element = $(this);
 

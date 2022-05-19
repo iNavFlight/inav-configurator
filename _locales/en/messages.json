@@ -1556,6 +1556,18 @@
     "adjustmentsMax": {
         "message": "Max"
     },
+    "adjustmentsGroupRates": {
+        "message": "Rates & Expo"
+    },
+    "adjustmentsGroupPIDTuning": {
+        "message": "PID Tuning"
+    },
+    "adjustmentsGroupNavigationFlight" : {
+        "message": "Navigation and Flight"
+    },
+    "adjustmentsGroupMisc": {
+        "message": "Misc"
+    },
     "adjustmentsFunction0": {
         "message": "No changes"
     },
