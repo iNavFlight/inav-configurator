@@ -509,7 +509,6 @@ var Settings = (function () {
         return function() {
             self.configureInputs().then(callback);
             self.linkHelpIcons();
-            //self.configureInputs().then(self.linkHelpIcons().then(callback));
         };
     };
 
