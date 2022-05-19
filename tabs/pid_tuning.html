@@ -300,22 +300,22 @@
                         <tr>
                             <th data-i18n="pidTuning_MaxRollAngle"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-unit="decideg-lrg" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_MaxRollAngleHelp"></div>
+                                <div class="pidTuning_number"><input id="maxRollInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-unit="decideg-lrg" /></div>
+                                <div for="maxRollInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxRollAngleHelp"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuning_MaxPitchAngle"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_MaxPitchAngleHelp"></div>
+                                <div class="pidTuning_number"><input id="maxPitchInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
+                                <div for="maxPitchInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxPitchAngleHelp"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuning_magHoldYawRate"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_MagHoldYawRateHelp"></div>
+                                <div class="pidTuning_number"><input id="headingHoldRate" type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
+                                <div for="headingHoldRate" class="helpicon cf_tip" data-i18n_title="pidTuning_MagHoldYawRateHelp"></div>
                             </td>
                         </tr>
                         <tr>
@@ -351,8 +351,8 @@
                             <th data-i18n="pidTuning_gyro_main_lpf_hz"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input data-setting="gyro_main_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="250" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_main_lpf_hz_help"></div>
+                                    <input id="gyroLPFHz" data-setting="gyro_main_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="250" />
+                                    <div for="gyroLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_main_lpf_hz_help"></div>
                                 </div>
                             </td>
                         </tr>
@@ -360,8 +360,8 @@
                             <th data-i18n="pidTuning_MatrixFilterMinFrequency"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input data-setting="dynamic_gyro_notch_min_hz" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="150" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterMinFrequencyHelp"></div>
+                                    <input id="gyroNotchMinHz" data-setting="dynamic_gyro_notch_min_hz" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="150" />
+                                    <div for="gyroNotchMinHz" class="helpicon cf_tip" data-i18n_title="pidTuning_MatrixFilterMinFrequencyHelp"></div>
                                 </div>
                             </td>
                         </tr>
@@ -369,8 +369,8 @@
                             <th data-i18n="pidTuning_MatrixFilterQFactor"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input data-setting="dynamic_gyro_notch_q" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="300" />
-                                    <div class="helpicon cf_tip" title=""></div>
+                                    <input id="gyroNotchQ" data-setting="dynamic_gyro_notch_q" data-presentation="range" type="number" class="rate-tpa_input" data-normal-max="300" />
+                                    <div for="gyroNotchQ" class="helpicon cf_tip" title=""></div>
                                 </div>
                             </td>
                         </tr>
@@ -395,8 +395,8 @@
                             <th data-i18n="pidTuning_dtermLpfCutoffFrequency"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input data-setting="dterm_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="200" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_dtermLpfCutoffFrequencyHelp"></div>
+                                    <input id="dTermLPFHz" data-setting="dterm_lpf_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="200" />
+                                    <div for="dTermLPFHz" class="helpicon cf_tip" data-i18n_title="pidTuning_dtermLpfCutoffFrequencyHelp"></div>
                                 </div>
                             </td>
                         </tr>
@@ -438,8 +438,8 @@
                             <th data-i18n="pidTuning_itermRelaxCutoff"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input type="number" data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input"  data-presentation="range" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_itermRelaxCutoffHelp"></div>
+                                    <input id="mcITermRelaxCutoff" type="number" data-setting="mc_iterm_relax_cutoff" class="rate-tpa_input"  data-presentation="range" />
+                                    <div for="mcITermRelaxCutoff" class="helpicon cf_tip" data-i18n_title="pidTuning_itermRelaxCutoffHelp"></div>
                                 </div>
                             </td>
                         </tr>
@@ -465,8 +465,8 @@
                             <th data-i18n="pidTuning_itermBankAngleFreeze"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input type="number" class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></div>
+                                    <input id="fwYawItermFreeze" type="number" class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
+                                    <div for="fwYawItermFreeze" class="helpicon cf_tip" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></div>
                                 </div>
                             </td>
                         </tr>
@@ -482,30 +482,30 @@
                         <tr>
                             <th data-i18n="pidTuning_d_boost_min"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="d_boost_min" data-step="0.001" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_min_help"></div>
+                                <div class="pidTuning_number"><input id="dBoostMin" type="number" class="rate-tpa_input" data-setting="d_boost_min" data-step="0.001" /></div>
+                                <div for="dBoostMin" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_min_help"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuning_d_boost_max"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="d_boost_max" data-step="0.001" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_help"></div>
+                                <div class="pidTuning_number"><input id="dBoostMax" type="number" class="rate-tpa_input" data-setting="d_boost_max" data-step="0.001" /></div>
+                                <div for="dBoostMax" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_help"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuning_d_boost_max_at_acceleration"></th>
                             <td>
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="d_boost_max_at_acceleration" data-step="0.001" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_at_acceleration_help"></div>
+                                <div class="pidTuning_number"><input id="dBoostMaxAccel" type="number" class="rate-tpa_input" data-setting="d_boost_max_at_acceleration" data-step="0.001" /></div>
+                                <div for="dBoostMaxAccel" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_max_at_acceleration_help"></div>
                             </td>
                         </tr>
                         <tr>
                             <th data-i18n="pidTuning_d_boost_gyro_delta_lpf_hz"></th>
                             <td>
                                 <div class="pidTuning_number">
-                                    <input type="number" class="rate-tpa_input" data-setting="d_boost_gyro_delta_lpf_hz" data-presentation="range" data-normal-max="160" />
-                                    <div class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_gyro_delta_lpf_hz_help"></div>
+                                    <input id="dBoostGyroDelta" type="number" class="rate-tpa_input" data-setting="d_boost_gyro_delta_lpf_hz" data-presentation="range" data-normal-max="160" />
+                                    <div for="dBoostGyroDelta" class="helpicon cf_tip" data-i18n_title="pidTuning_d_boost_gyro_delta_lpf_hz_help"></div>
                                 </div>
                             </td>
                         </tr>
@@ -521,8 +521,8 @@
                         <th data-i18n="pidTuning_TPA"></th>
                         <td>
                             <div class="pidTuning_number">
-                                <input type="number" class="rate-tpa_input" data-setting="tpa_rate" data-unit="percent"  data-presentation="range" />
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
+                                <input id="tpaRate" type="number" class="rate-tpa_input" data-setting="tpa_rate" data-unit="percent"  data-presentation="range" />
+                                <div for="tpaRate" class="helpicon cf_tip" data-i18n_title="pidTuningTPAHelp"></div>
                             </div>
                         </td>
                     </tr>
@@ -530,16 +530,16 @@
                         <th data-i18n="pidTuning_TPABreakPoint"></th>
                         <td>
                             <div class="pidTuning_number">
-                                <input type="number" class="rate-tpa_input" data-setting="tpa_breakpoint" data-presentation="range" data-step="5" />
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
+                                <input id="tpaBreakpoint" type="number" class="rate-tpa_input" data-setting="tpa_breakpoint" data-presentation="range" data-step="5" />
+                                <div for="tpaBreakpoint" class="helpicon cf_tip" data-i18n_title="pidTuningTPABreakPointHelp"></div>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <th data-i18n="pidTuning_FW_TPATimeConstant"></th>
                         <td>
-                            <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="fw_tpa_time_constant" data-unit="ms" /></div>
-                            <div class="helpicon cf_tip" data-i18n_title="pidTuning_FW_TPATimeConstantHelp"></div>
+                            <div class="pidTuning_number"><input id="tpaTimeConstant" type="number" class="rate-tpa_input" data-setting="fw_tpa_time_constant" data-unit="ms" /></div>
+                            <div for="tpaTimeConstant" class="helpicon cf_tip" data-i18n_title="pidTuning_FW_TPATimeConstantHelp"></div>
                         </td>
                     </tr>
                 </table>
@@ -552,8 +552,8 @@
                         <tr>
                             <th data-i18n="pidTuning_fw_level_pitch_trim"></th>
                             <td>
-                                <div class="pidTuning_number"><input class="rate-tpa_input" data-setting="fw_level_pitch_trim" data-unit="deg" /></div>
-                                <div class="helpicon cf_tip" data-i18n_title="pidTuning_fw_level_pitch_trim_help"></div>
+                                <div class="pidTuning_number"><input id="fwLevelTrim" class="rate-tpa_input" data-setting="fw_level_pitch_trim" data-unit="deg" /></div>
+                                <div for="fwLevelTrim" class="helpicon cf_tip" data-i18n_title="pidTuning_fw_level_pitch_trim_help"></div>
                             </td>
                         </tr>
                     </tbody>

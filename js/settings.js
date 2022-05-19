@@ -508,11 +508,38 @@ var Settings = (function () {
     self.processHtml = function(callback) {
         return function() {
             self.configureInputs().then(callback);
+            self.linkHelpIcons();
+            //self.configureInputs().then(self.linkHelpIcons().then(callback));
         };
     };
 
     self.getInputValue = function(settingName) {
         return $('[data-setting="' + settingName + '"]').val();
+    };
+
+    self.linkHelpIcons = function() {
+        var helpIcons = [];
+        $('.helpicon').each(function(){
+            helpIcons.push($(this));
+        });
+
+        return Promise.mapSeries(helpIcons, function(helpIcon, ii) {
+            let forAtt = helpIcon.attr('for');
+
+            if (typeof forAtt !== "undefined" && forAtt !== "") {
+                let dataSettingName = $('#' + forAtt).data("setting");
+
+                if (typeof dataSettingName === "undefined" || dataSettingName === "") {
+                    dataSettingName = $('#' + forAtt).data("setting-placeholder");
+                }
+
+                if (typeof dataSettingName !== "undefined" && dataSettingName !== "") {
+                    helpIcon.wrap('<a class="helpiconLink" href="https://github.com/iNavFlight/inav/blob/master/docs/Settings.md#' + dataSettingName + '" target="_blank"></a>');
+                }
+            }
+
+            return;
+        });
     };
 
     return self;
