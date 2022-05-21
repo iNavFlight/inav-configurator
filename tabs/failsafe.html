@@ -7,9 +7,9 @@
             </div>
             <div class="spacer_box">
                 <div class="number">
-                     <input type="number" name="failsafe_delay" data-unit="dsec" data-setting="failsafe_delay" min="0" max="200" />
+                     <input id="failsafeDelay" type="number" name="failsafe_delay" data-unit="dsec" data-setting="failsafe_delay" min="0" max="200" />
                      <label><span data-i18n="failsafeDelayItem"></span></label>
-                    <div class="helpicon cf_tip" data-i18n_title="failsafeDelayHelp"></div>
+                    <div for="failsafeDelay" class="helpicon cf_tip" data-i18n_title="failsafeDelayHelp"></div>
                 </div>
                 <!-- radio buttons  -->
                 <div class="subline" data-i18n="failsafeSubTitle1"></div>
@@ -28,9 +28,9 @@
                             <label><span data-i18n="failsafeThrottleItem"></span></label>
                         </div>
                         <div class="number">
-                            <input type="number" name="failsafe_off_delay" data-setting="failsafe_off_delay" data-unit="dsec" min="0" max="200" />
+                            <input id="failsafeOffDelay" type="number" name="failsafe_off_delay" data-setting="failsafe_off_delay" data-unit="dsec" min="0" max="200" />
                             <label><span data-i18n="failsafeOffDelayItem"></span></label>
-                            <div class="helpicon cf_tip" data-i18n_title="failsafeOffDelayHelp"></div>
+                            <div for="failsafeOffDelay" class="helpicon cf_tip" data-i18n_title="failsafeOffDelayHelp"></div>
                         </div>
                     </div>
                 </div>
@@ -51,19 +51,19 @@
                     </div>
                     <label for="failsafe_use_minimum_distance"><span data-i18n="failsafeUseMinimumDistanceItem"></span>
                     </label>
-                    <div class="helpicon cf_tip" data-i18n_title="failsafeUseMinimumDistanceHelp"></div>
+                    <div for="failsafe_use_minimum_distance" class="helpicon cf_tip" data-i18n_title="failsafeUseMinimumDistanceHelp"></div>
                 </div>
 
                 <div class="number" id="failsafe_min_distance_elements">
                     <input class="minimumDistance" id="failsafe_min_distance" type="number" data-unit="cm" data-setting="failsafe_min_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
                     <label for="failsafe_min_distance"><span data-i18n="failsafeMinDistanceItem"></span></label>
-                    <div class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceHelp"></div>
+                    <div for="failsafe_min_distance" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceHelp"></div>
                 </div>
 
                 <div class="select" id="failsafe_min_distance_procedure_elements">
                     <select id="failsafe_min_distance_procedure" class="minimumDistance" data-setting="failsafe_min_distance_procedure"></select>
                     <label for="failsafe_min_distance_procedure"> <span data-i18n="failsafeMinDistanceProcedureItem"></span></label>
-                    <div class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceProcedureHelp"></div>
+                    <div for="failsafe_min_distance_procedure" class="helpicon cf_tip" data-i18n_title="failsafeMinDistanceProcedureHelp"></div>
                 </div>
             </div>
         </div>
