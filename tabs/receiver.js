@@ -297,6 +297,8 @@ TABS.receiver.initialize = function (callback) {
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
 
+            googleAnalytics.sendEvent('Setting', 'RcProtocol', $('#receiver_type option:selected').text() + ":" + $('#serialrx_provider option:selected').text());
+
             // catch rssi aux
             MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());
 
