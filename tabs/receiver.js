@@ -178,11 +178,6 @@ TABS.receiver.initialize = function (callback) {
         // set current value
         $rcMap.val(str);
 
-        /*
-         * Send tracking event so we can know if users are using different mappings than EATR
-         */
-        googleAnalytics.sendEvent('Setting', 'RcMappingRead', str);
-
         // validation / filter
         var last_valid = str;
 
