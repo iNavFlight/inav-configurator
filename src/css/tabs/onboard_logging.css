@@ -125,6 +125,7 @@
 .tab-onboard_logging dialog {
     width: 40em;
     border-radius: 5px;
+    height: fit-content;
 }
 
 .tab-onboard_logging dialog .buttons {
