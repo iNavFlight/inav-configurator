@@ -64,10 +64,10 @@ TABS.adjustments.initialize = function (callback) {
 
         // update list of selected functions
         var functionListOptions = $(functionList).find('option');
-        var availableFunctionCount = 57; // Set this to highest adjustment value + 1
+        var availableFunctionCount = 59; // Set this to highest adjustment value + 1
 
         var functionListOptions = $(functionListOptions).slice(0,availableFunctionCount);
-        functionList.empty().append(functionListOptions);
+        //functionList.empty().append(functionListOptions);
 
         functionList.val(adjustmentRange.adjustmentFunction);
 

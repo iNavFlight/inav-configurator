@@ -2274,5 +2274,5 @@ ol li {
 }
 
 .controlProfileHighlightActive {
-    background-color: #d5ebfe;
+    background-color: #d5ebfe !important ;
 }

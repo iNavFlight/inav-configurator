@@ -105,11 +105,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "d_boost_min",
-                value: 0.5
+                value: 0.8
             },
             {
                 key: "d_boost_max",
-                value: 1.5
+                value: 1.2
             },
             {
                 key: "antigravity_gain",
@@ -124,11 +124,11 @@ helper.defaultsDialog = (function () {
             */
             {
                 key: "rc_yaw_expo",
-                value: 70
+                value: 75
             },
             {
                 key: "rc_expo",
-                value: 70
+                value: 75
             },
             {
                 key: "roll_rate",
@@ -195,6 +195,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "applied_defaults",
                 value: 2
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
             }
         ]
     },

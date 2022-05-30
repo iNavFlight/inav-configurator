@@ -49,7 +49,7 @@
                         <label for="i2c_speed">
                             <span data-i18n="configurationI2cSpeed"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationI2cSpeedHelp"></div>
+                        <div for="i2c_speed" class="helpicon cf_tip" data-i18n_title="configurationI2cSpeedHelp"></div>
                     </div>
 
                 </div>
@@ -77,67 +77,14 @@
                 </div>
             </div>
 
-            <div class="config-section gui_box grey">
+            <div class="config-section gui_box grey other">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configuration3d"></div>
+                    <div class="spacer_box_title" data-i18n="configurationFeatures"></div>
                 </div>
+
                 <div class="spacer_box">
-                    <div class="number">
-                        <input type="number" id="3ddeadbandlow" name="3ddeadbandlow" step="1" min="1425" max="1500" />
-                        <label for="3ddeadbandlow">
-                            <span data-i18n="configuration3dDeadbandLow"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="3ddeadbandhigh" name="3ddeadbandhigh" step="1" min="1500" max="1575" />
-                        <label for="3ddeadbandhigh">
-                            <span data-i18n="configuration3dDeadbandHigh"></span>
-                        </label>
-                    </div>
-                    <div class="number">
-                        <input type="number" id="3dneutral" name="3dneutral" step="1" min="1475" max="1525" />
-                        <label for="3dneutral">
-                            <span data-i18n="configuration3dNeutral"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-section gui_box grey config-vtx">
-                <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationVTX"></div>
-                </div>
-                <div class="spacer_box">
-                    <div class="info-box" data-i18n="vtxDisclaimer"></div>
-                    <div class="note" id="vtx_no_band">
-                        <div class="note_spacer">
-                            <p data-i18n="configurationVTXNoBandHelp"></p>
-                        </div>
-                    </div>
-
-                    <div class="select vtx_band_wrapper">
-                        <select id="vtx_band"></select>
-                        <label for="vtx_band">
-                            <span data-i18n="configurationVTXBand"></span>
-                        </label>
-                    </div>
-
-                    <div class="select vtx_channel_wrapper">
-                        <select id="vtx_channel"></select>
-                        <label for="vtx_channel"> <span data-i18n="configurationVTXChannel"></span></label>
-                    </div>
-
-                    <div class="select">
-                        <select id="vtx_power"></select>
-                        <label for="vtx_power"><span data-i18n="configurationVTXPower"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationVTXPowerHelp"></div>
-                    </div>
-
-                    <div class="select">
-                        <select id="vtx_low_power_disarm"></select>
-                        <label for="vtx_power"><span data-i18n="configurationVTXLowerPowerDisarm"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationVTXLowerPowerDisarmHelp"></div>
-                    </div>
+                    <div class="features other"></div>
+                    <!--feature list generated content-->
                 </div>
             </div>
 
@@ -159,14 +106,14 @@
                         </label>
                     </div>
                     <div class="select">
-                        <select id="voltagesource" class="voltagesource">
+                        <select id="voltagesource" class="voltagesource" data-setting-placeholder="bat_voltage_src">
                             <option value="0">Raw</option>
                             <option value="1">Sag compensated</option>
                         </select>
                         <label for="voltagesource">
                             <span data-i18n="configurationVoltageSource"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
+                        <div for="voltagesource" class="helpicon cf_tip" data-i18n_title="configurationVoltageSourceHelp"></div>
                     </div>
                     
                     <div class="number">
@@ -189,11 +136,11 @@
                         </label>
                     </div>
                     <div class="number">
-                        <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" />
+                        <input type="number" id="currentscale" name="currentscale" step="1" min="-10000" max="10000" data-setting-placeholder="current_meter_scale" />
                         <label for="currentscale">
                             <span data-i18n="configurationCurrentScale"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
+                        <div for="currentscale" class="helpicon cf_tip" data-i18n_title="configurationCurrentScaleHelp"></div>
                     </div>
                     <div class="number">
                         <input type="number" id="currentoffset" name="currentoffset" step="0.1" min="-3276.8" max="3276.7" />
@@ -216,14 +163,14 @@
                 </div>
                 <div class="spacer_box">
                     <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="cells" name="cells" step="1" min="0" max="12" />
+                        <input type="number" class="batteryProfileHighlight" id="cells" name="cells" step="1" min="0" max="12" data-setting-placeholder="bat_cells" />
                         <label for="cells"><span data-i18n="configurationBatteryCells"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
+                        <div for="cells" class="helpicon cf_tip" data-i18n_title="configurationBatteryCellsHelp"></div>
                     </div>
                     <div class="number">
-                        <input type="number" class="batteryProfileHighlight" id="celldetectvoltage" name="celldetectvoltage" step="0.01" min="1" max="5" />
+                        <input type="number" class="batteryProfileHighlight" id="celldetectvoltage" name="celldetectvoltage" step="0.01" min="1" max="5" data-setting-placeholder="vbat_cell_detect_voltage" />
                         <label for="celldetectvoltage"><span data-i18n="configurationBatteryCellDetectVoltage"></span></label>
-                        <div class="helpicon cf_tip" data-i18n_title="configurationBatteryCellDetectVoltageHelp"></div>
+                        <div for="celldetectvoltage" class="helpicon cf_tip" data-i18n_title="configurationBatteryCellDetectVoltageHelp"></div>
                     </div>
                     <div class="number">
                         <input type="number" class="batteryProfileHighlight" id="mincellvoltage" name="mincellvoltage" step="0.01" min="1" max="5" />
@@ -271,14 +218,41 @@
                 </div>
             </div>
 
-            <div class="config-section gui_box grey other">
+            <div class="config-section gui_box grey config-vtx">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="configurationFeatures"></div>
+                    <div class="spacer_box_title" data-i18n="configurationVTX"></div>
                 </div>
-
                 <div class="spacer_box">
-                    <div class="features other"></div>
-                    <!--feature list generated content-->
+                    <div class="info-box" data-i18n="vtxDisclaimer"></div>
+                    <div class="note" id="vtx_no_band">
+                        <div class="note_spacer">
+                            <p data-i18n="configurationVTXNoBandHelp"></p>
+                        </div>
+                    </div>
+
+                    <div class="select vtx_band_wrapper">
+                        <select id="vtx_band"></select>
+                        <label for="vtx_band">
+                            <span data-i18n="configurationVTXBand"></span>
+                        </label>
+                    </div>
+
+                    <div class="select vtx_channel_wrapper">
+                        <select id="vtx_channel"></select>
+                        <label for="vtx_channel"> <span data-i18n="configurationVTXChannel"></span></label>
+                    </div>
+
+                    <div class="select">
+                        <select id="vtx_power" data-setting-placeholder="vtx_power"></select>
+                        <label for="vtx_power"><span data-i18n="configurationVTXPower"></span></label>
+                        <div for="vtx_power" class="helpicon cf_tip" data-i18n_title="configurationVTXPowerHelp"></div>
+                    </div>
+
+                    <div class="select">
+                        <select id="vtx_low_power_disarm" data-setting-placeholder="vtx_low_power_disarm"></select>
+                        <label for="vtx_low_power_disarm"><span data-i18n="configurationVTXLowerPowerDisarm"></span></label>
+                        <div for="vtx_low_power_disarm" class="helpicon cf_tip" data-i18n_title="configurationVTXLowerPowerDisarmHelp"></div>
+                    </div>
                 </div>
             </div>
 

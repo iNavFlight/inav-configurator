@@ -43,7 +43,9 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
 1. Download Configurator for Linux platform (linux32 and linux64 are present)
 1. Extract tar.gz archive
-1. Make the inav-configurator file executable (chmod +x inav-configurator)
+1. Make the following files executable:
+   * inav-configurator `chmod +x inav-configurator`
+   * (5.0.0+) chrome_crashpad_handler `chmod +x chrome_crashpad_handler`
 1. Run INAV Configurator app from unpacked folder
 
 On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:

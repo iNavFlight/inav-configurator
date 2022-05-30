@@ -932,6 +932,12 @@
     "configurationLaunchIdleThrHelp": {
         "message": "Idle throttle - throttle to be set before launch sequence is initiated. If set below minimum throttle it will force motor stop or at idle throttle (depending if the MOTOR_STOP is enabled). If set above minimum throttle it will force throttle to this value (if MOTOR_STOP is enabled it will be handled according to throttle stick position). Default: 1000 [1000-2000]"
     },
+    "configurationLaunchIdleDelay": {
+        "message": "Idle Throttle Delay"
+    },
+    "configurationLaunchIdleDelayHelp": {
+        "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
+    },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
     },
@@ -1379,6 +1385,12 @@
     "pidTuning_TPABreakPoint": {
         "message": "TPA Breakpoint"
     },
+    "pidTuning_FW_TPATimeConstant": {
+        "message": "Fixed Wing TPA Time Constant"
+    },
+    "pidTuning_FW_TPATimeConstantHelp": {
+        "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
+    },
     "pidTuning_fwLevelTrimMechanics": {
         "message": "Fixed Wing Level Trim"
     },
@@ -1543,6 +1555,18 @@
     },
     "adjustmentsMax": {
         "message": "Max"
+    },
+    "adjustmentsGroupRates": {
+        "message": "Rates & Expo"
+    },
+    "adjustmentsGroupPIDTuning": {
+        "message": "PID Tuning"
+    },
+    "adjustmentsGroupNavigationFlight" : {
+        "message": "Navigation and Flight"
+    },
+    "adjustmentsGroupMisc": {
+        "message": "Misc"
     },
     "adjustmentsFunction0": {
         "message": "No changes"
@@ -1714,6 +1738,12 @@
     },
     "adjustmentsFunction56": {
         "message": "Control Smoothness Adjustment"
+    },
+    "adjustmentsFunction57": {
+        "message": "Fixed Wing TPA Time Constant"
+    },
+    "adjustmentsFunction58": {
+        "message": "Fixed Wing Level Trim"
     },
     "adjustmentsSave": {
         "message": "Save"
@@ -2966,6 +2996,9 @@
     },
     "osd_main_voltage_decimals": {
         "message" : "Voltage Decimals"
+    },
+    "osd_mah_used_precision": {
+        "message" : "mAh Used Precision"
     },
     "osd_coordinate_digits": {
         "message" : "Coordinate Digits"
@@ -4253,5 +4286,17 @@
     },
     "BLACKBOX_FEATURE_MOTORS": {
         "message": "Motors output"
+    },
+    "axisRoll": {
+        "message": "Roll"
+    },
+    "axisPitch": {
+        "message": "Pitch"
+    },
+    "axisYaw": {
+        "message": "Yaw"
+    },
+    "showAdvancedPIDs": {
+        "message": "Show advanced PID controllers"
     }
 }

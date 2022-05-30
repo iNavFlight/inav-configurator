@@ -15,12 +15,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var loadChain = [
         mspHelper.loadFeatures,
         mspHelper.loadArmingConfig,
-        mspHelper.load3dConfig,
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
-        mspHelper.loadINAVPidConfig,
         mspHelper.loadVTXConfig,
-        mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
         mspHelper.loadMiscV2
@@ -33,12 +30,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var saveChainer = new MSPChainerClass();
 
     var saveChain = [
-        mspHelper.save3dConfig,
         mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
         mspHelper.saveArmingConfig,
         mspHelper.saveAdvancedConfig,
-        mspHelper.saveINAVPidConfig,
         mspHelper.saveVTXConfig,
         mspHelper.saveBoardAlignment,
         mspHelper.saveCurrentMeterConfig,
@@ -268,10 +263,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $i2cSpeed.change();
 
-        $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
-        $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
-        $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
-
         $('a.save').click(function () {
             MISC.mag_declination = parseFloat($('#mag_declination').val());
 
@@ -289,10 +280,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
-
-            REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
-            REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
-            REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
 
             SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 

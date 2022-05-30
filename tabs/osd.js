@@ -403,6 +403,13 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
+function osdmAhdrawnPreview() {
+    let precision = Settings.getInputValue('osd_mah_used_precision');
+    let preview = "1215075".substring(0, precision);
+
+    return preview + FONT.symbol(SYM.MAH);
+}
+
 function osdCoordinatePreview(symbol, coordinate) {
     return function() {
         var digits = Settings.getInputValue('osd_coordinate_digits');
@@ -1218,7 +1225,7 @@ OSD.constants = {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        return '1034' + FONT.symbol(SYM.MAH); // 4 chars
+                        return osdmAhdrawnPreview();
                     }
                 },
                 {
@@ -1818,6 +1825,16 @@ OSD.constants = {
                     name: 'CONTROL_SMOOTHNESS',
                     id: 118,
                     preview: 'CTL S 3'
+                },
+                {
+                    name: 'TPA_TIME_CONSTANT',
+                    id: 134,
+                    preview: 'TPA TC   10'
+                },
+                {
+                    name: 'FW_LEVEL_TRIM',
+                    id: 135,
+                    preview: 'LEVEL  ' + FONT.embed_dot('5.4')
                 },
             ]
         },
@@ -2820,6 +2837,8 @@ TABS.osd.initialize = function (callback) {
         OSD.GUI.jbox = new jBox('Modal', {
             width: 708,
             height: 240,
+            position: {y:'bottom'},
+            offset: {y:-50},
             closeButton: 'title',
             animation: false,
             attach: $('#fontmanager'),

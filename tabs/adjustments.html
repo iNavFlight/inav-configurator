@@ -64,63 +64,77 @@
                     </div>
                 </td>
                 <td class="functionSelection"><select class="function">
-                        <option value="0" i18n="adjustmentsFunction0"></option>
-                        <option value="1" i18n="adjustmentsFunction1"></option>
-                        <option value="2" i18n="adjustmentsFunction2"></option>
-                        <option value="3" i18n="adjustmentsFunction3"></option>
-                        <option value="4" i18n="adjustmentsFunction4"></option>
-                        <option value="5" i18n="adjustmentsFunction5"></option>
-                        <option value="6" i18n="adjustmentsFunction6"></option>
-                        <option value="7" i18n="adjustmentsFunction7"></option>
-                        <option value="8" i18n="adjustmentsFunction8"></option>
-                        <option value="9" i18n="adjustmentsFunction9"></option>
-                        <option value="10" i18n="adjustmentsFunction10"></option>
-                        <option value="11" i18n="adjustmentsFunction11"></option>
-                        <option value="12" i18n="adjustmentsFunction12"></option>
-                        <option value="13" i18n="adjustmentsFunction13"></option>
-                        <option value="14" i18n="adjustmentsFunction14"></option>
-                        <option value="15" i18n="adjustmentsFunction15"></option>
-                        <option value="16" i18n="adjustmentsFunction16"></option>
-                        <option value="17" i18n="adjustmentsFunction17"></option>
-                        <option value="18" i18n="adjustmentsFunction18"></option>
-                        <option value="19" i18n="adjustmentsFunction19"></option>
-                        <option value="20" i18n="adjustmentsFunction20"></option>
-                        <option value="21" i18n="adjustmentsFunction21"></option>
-                        <option value="23" i18n="adjustmentsFunction23"></option>
-                        <option value="24" i18n="adjustmentsFunction24"></option>
-                        <option value="25" i18n="adjustmentsFunction25"></option>
-                        <option value="26" i18n="adjustmentsFunction26"></option>
-                        <option value="27" i18n="adjustmentsFunction27"></option>
-                        <option value="28" i18n="adjustmentsFunction28"></option>
-                        <option value="29" i18n="adjustmentsFunction29"></option>
-                        <option value="30" i18n="adjustmentsFunction30"></option>
-                        <option value="31" i18n="adjustmentsFunction31"></option>
-                        <option value="32" i18n="adjustmentsFunction32"></option>
-                        <option value="33" i18n="adjustmentsFunction33"></option>
-                        <option value="34" i18n="adjustmentsFunction34"></option>
-                        <option value="35" i18n="adjustmentsFunction35"></option>
-                        <option value="36" i18n="adjustmentsFunction36"></option>
-                        <option value="37" i18n="adjustmentsFunction37"></option>
-                        <option value="38" i18n="adjustmentsFunction38"></option>
-                        <option value="39" i18n="adjustmentsFunction39"></option>
-                        <option value="40" i18n="adjustmentsFunction40"></option>
-                        <option value="41" i18n="adjustmentsFunction41"></option>
-                        <option value="42" i18n="adjustmentsFunction42"></option>
-                        <option value="43" i18n="adjustmentsFunction43"></option>
-                        <option value="44" i18n="adjustmentsFunction44"></option>
-                        <option value="45" i18n="adjustmentsFunction45"></option>
-                        <option value="46" i18n="adjustmentsFunction46"></option>
-                        <option value="47" i18n="adjustmentsFunction47"></option>
-                        <option value="48" i18n="adjustmentsFunction48"></option>
-                        <option value="49" i18n="adjustmentsFunction49"></option>
-                        <option value="50" i18n="adjustmentsFunction50"></option>
-                        <option value="51" i18n="adjustmentsFunction51"></option>
-                        <option value="52" i18n="adjustmentsFunction52"></option>
-                        <option value="53" i18n="adjustmentsFunction53"></option>
-                        <option value="54" i18n="adjustmentsFunction54"></option>
-                        <option value="55" i18n="adjustmentsFunction55"></option>
-                        <option value="56" i18n="adjustmentsFunction56"></option>
-                </select></td>
+                        <option value="0" i18n="adjustmentsFunction0"></option>   <!-- No Changes-->
+                        <optgroup i18n_label="adjustmentsGroupRates">
+                            <option value="1" i18n="adjustmentsFunction1"></option>   <!-- RC Rate -->
+                            <option value="2" i18n="adjustmentsFunction2"></option>   <!-- RC Pitch/Roll Expo -->
+                            <option value="25" i18n="adjustmentsFunction25"></option> <!-- RC Yaw Expo -->
+                            <option value="3" i18n="adjustmentsFunction3"></option>   <!-- Throttle Expo -->
+                            <option value="4" i18n="adjustmentsFunction4"></option>   <!-- Pitch & Roll Rate -->
+                            <option value="23" i18n="adjustmentsFunction23"></option> <!-- Pitch Rate -->
+                            <option value="24" i18n="adjustmentsFunction24"></option> <!-- Roll Rate -->
+                            <option value="5" i18n="adjustmentsFunction5"></option>   <!-- Yaw Rate -->
+                            <option value="28" i18n="adjustmentsFunction28"></option> <!-- Manual Pitch/Roll Rate-->
+                            <option value="30" i18n="adjustmentsFunction30"></option> <!-- Manual Pitch Rate -->
+                            <option value="29" i18n="adjustmentsFunction29"></option> <!-- Manual Roll Rate-->
+                            <option value="31" i18n="adjustmentsFunction31"></option> <!-- Manual Yaw Rate -->
+                            <option value="26" i18n="adjustmentsFunction26"></option> <!-- Manual RC Pitch/Roll Expo -->
+                            <option value="27" i18n="adjustmentsFunction27"></option> <!-- Manual RC Yaw Expo -->
+                        </optgroup>
+                        
+                        <optgroup i18n_label="adjustmentsGroupPIDTuning">
+                            <option value="6" i18n="adjustmentsFunction6"></option>   <!-- Pitch & Roll P -->
+                            <option value="7" i18n="adjustmentsFunction7"></option>   <!-- Pitch & Roll I -->
+                            <option value="8" i18n="adjustmentsFunction8"></option>   <!-- Pitch & Roll D -->
+                            <option value="9" i18n="adjustmentsFunction9"></option>   <!-- Pitch & Roll CD/FF -->
+                            <option value="10" i18n="adjustmentsFunction10"></option> <!-- Pitch P -->
+                            <option value="11" i18n="adjustmentsFunction11"></option> <!-- Pitch I -->
+                            <option value="12" i18n="adjustmentsFunction12"></option> <!-- Pitch D -->
+                            <option value="13" i18n="adjustmentsFunction13"></option> <!-- Pitch CD/FF -->
+                            <option value="14" i18n="adjustmentsFunction14"></option> <!-- Roll P -->
+                            <option value="15" i18n="adjustmentsFunction15"></option> <!-- Roll I -->
+                            <option value="16" i18n="adjustmentsFunction16"></option> <!-- Roll D -->
+                            <option value="17" i18n="adjustmentsFunction17"></option> <!-- Roll CD/FF -->
+                            <option value="18" i18n="adjustmentsFunction18"></option> <!-- Yaw P -->
+                            <option value="19" i18n="adjustmentsFunction19"></option> <!-- Yaw I -->
+                            <option value="20" i18n="adjustmentsFunction20"></option> <!-- Yaw D -->
+                            <option value="21" i18n="adjustmentsFunction21"></option> <!-- Yaw CD/FF -->
+                            <option value="54" i18n="adjustmentsFunction54"></option> <!-- TPA -->
+                            <option value="55" i18n="adjustmentsFunction55"></option> <!-- TPA Breakpoint -->
+                            <option value="57" i18n="adjustmentsFunction57"></option> <!-- FW TPA Time Const -->
+                        </optgroup>
+                        
+                        <optgroup i18n_label="adjustmentsGroupNavigationFlight">
+                            <option value="34" i18n="adjustmentsFunction34"></option> <!-- Board Roll-->
+                            <option value="35" i18n="adjustmentsFunction35"></option> <!-- Board Pitch-->
+                            <option value="58" i18n="adjustmentsFunction58"></option> <!-- FW Level Trim -->
+                            <option value="32" i18n="adjustmentsFunction32"></option> <!-- FW Cruise Throttle -->
+                            <option value="33" i18n="adjustmentsFunction33"></option> <!-- FW Pitch to Throttle -->
+                            <option value="52" i18n="adjustmentsFunction52"></option> <!-- FW min thr down pitch -->
+                            <option value="56" i18n="adjustmentsFunction56"></option> <!-- Control Smoothness -->
+                            
+                            <option value="36" i18n="adjustmentsFunction36"></option> <!-- Level P -->
+                            <option value="37" i18n="adjustmentsFunction37"></option> <!-- Level I -->
+                            <option value="38" i18n="adjustmentsFunction38"></option> <!-- Level D -->
+                            <option value="39" i18n="adjustmentsFunction39"></option> <!-- POS XY P -->
+                            <option value="40" i18n="adjustmentsFunction40"></option> <!-- POS XY I -->
+                            <option value="41" i18n="adjustmentsFunction41"></option> <!-- POS XY D-->
+                            <option value="42" i18n="adjustmentsFunction42"></option> <!-- POS Z P -->
+                            <option value="43" i18n="adjustmentsFunction43"></option> <!-- POS Z I -->
+                            <option value="44" i18n="adjustmentsFunction44"></option> <!-- POS Z D -->
+                            <option value="45" i18n="adjustmentsFunction45"></option> <!-- Heading P -->
+                            <option value="46" i18n="adjustmentsFunction46"></option> <!-- VEL XY P -->
+                            <option value="47" i18n="adjustmentsFunction47"></option> <!-- VEL XY I -->
+                            <option value="48" i18n="adjustmentsFunction48"></option> <!-- VEL XY D -->
+                            <option value="49" i18n="adjustmentsFunction49"></option> <!-- VEL Z P -->
+                            <option value="50" i18n="adjustmentsFunction50"></option> <!-- VEL Z I -->
+                            <option value="51" i18n="adjustmentsFunction51"></option> <!-- VEL Z D -->
+                        </optgroup>
+                        
+                        <optgroup i18n_label="adjustmentsGroupMisc">
+                            <option value="53" i18n="adjustmentsFunction53"></option> <!-- VTX Power --> 
+                        </optgroup>
+                    </select></td>
                 <td class="adjustmentSlot"><select class="slot">
                         <option value="0" i18n="adjustmentsSlot0"></option>
                         <option value="1" i18n="adjustmentsSlot1"></option>

@@ -58,31 +58,35 @@
                                 <span data-i18n="osd_craft_name"></span>
                             </label>
                             <label class="units">
-                                <select id="unit_mode" name="unit_mode"></select>
+                                <select id="unit_mode" name="unit_mode" data-setting-placeholder="osd_units"></select>
                                 <span data-i18n="osd_units"></span>
-                                <div class="helpicon cf_tip" style="margin-top: 2px"></div>
+                                <div for="unit_mode" class="helpicon cf_tip" style="margin-top: 2px"></div>
                             </label>
                             <label>
                                 <select class="update_preview" data-setting="osd_main_voltage_decimals" data-live="true"></select>
                                 <span data-i18n="osd_main_voltage_decimals"></span>
                             </label>
                             <label>
+                                <select class="update_preview" data-setting="osd_mah_used_precision" data-live="true"></select>
+                                <span data-i18n="osd_mah_used_precision"></span>
+                            </label>
+                            <label>
                                 <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
                                 <span data-i18n="osd_coordinate_digits"></span>
                             </label>
-                            <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
+                            <div for="plusCodeDigits" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_DIGITS_HELP"></div>
                             <label>
-                                <select class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
+                                <select id="plusCodeDigits" class="update_preview" data-setting="osd_plus_code_digits" data-live="true"></select>
                                 <span data-i18n="osd_plus_code_digits"></span>
                             </label>
-                            <div class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
+                            <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
                             <label>
-                                <select class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
+                                <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
                                 <span data-i18n="osd_plus_code_short"></span> 
                             </label>
-                            <div class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
+                            <div for="rpmPrecision" class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
                             <label>
-                                <select class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
+                                <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
                                 <span data-i18n="osd_esc_rpm_precision"></span> 
                             </label>
                             <label>
@@ -97,9 +101,9 @@
                                 <select class="update_preview" data-setting="osd_right_sidebar_scroll" data-live="true"></select>
                                 <span data-i18n="osd_right_sidebar_scroll"></span>
                             </label>
-                            <div class="helpicon cf_tip" data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
+                            <div for="crsfLQFormat" class="helpicon cf_tip" data-i18n_title="osdSettingCRSF_LQ_FORMAT_HELP"></div>
                             <label>
-                                <select class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select>
+                                <select id="crsfLQFormat" class="update_preview" data-setting="osd_crsf_lq_format" data-live="true"></select>
                                 <span data-i18n="osd_crsf_lq_format"></span>
                             </label>
                             <label>
@@ -130,32 +134,32 @@
                             <input id="osd_alt_alarm" data-setting="osd_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_alt_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmMAX_NEG_ALTITUDE_HELP"></div>
+                        <div for="osd_neg_alt_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmMAX_NEG_ALTITUDE_HELP"></div>
                         <label for="osd_neg_alt_alarm">
                             <input id="osd_neg_alt_alarm" data-setting="osd_neg_alt_alarm" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_neg_alt_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmDIST_HELP"></div>
+                        <div for="osd_dist_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmDIST_HELP"></div>
                         <label for="osd_dist_alarm">
                             <input id="osd_dist_alarm" data-setting="osd_dist_alarm" data-unit="m-lrg" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_dist_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_HELP"></div>
+                        <div for="osd_gforce_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_HELP"></div>
                         <label for="osd_gforce_alarm">
                             <input id="osd_gforce_alarm" data-setting="osd_gforce_alarm" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MIN_HELP"></div>
+                        <div for="osd_gforce_axis_alarm_min" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MIN_HELP"></div>
                         <label for="osd_gforce_axis_alarm_min">
                             <input id="osd_gforce_axis_alarm_min" data-setting="osd_gforce_axis_alarm_min" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_axis_alarm_min"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MAX_HELP"></div>
+                        <div for="osd_gforce_axis_alarm_max" class="helpicon cf_tip" data-i18n_title="osdAlarmGFORCE_AXIS_MAX_HELP"></div>
                         <label for="osd_gforce_axis_alarm_max">
                             <input id="osd_gforce_axis_alarm_max" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_axis_alarm_max"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdAlarmCURRENT_HELP"></div>
+                        <div for="osd_current_alarm" class="helpicon cf_tip" data-i18n_title="osdAlarmCURRENT_HELP"></div>
                         <label for="osd_current_alarm">
                             <input id="osd_current_alarm" data-setting="osd_current_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_current_alarm"></span>
@@ -184,17 +188,17 @@
                             <input id="esc_temp_alarm_max" data-setting="osd_esc_temp_alarm_max" data-unit="decidegc" data-setting-multiplier="1" type="number" data-step="0.5" />
                             <span data-i18n="osd_esc_temp_alarm_max"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdalarmLQ_HELP"></div>
+                        <div for="link_quality_alarm" class="helpicon cf_tip" data-i18n_title="osdalarmLQ_HELP"></div>
                         <label for="link_quality_alarm">
                             <input id="link_quality_alarm" data-setting="osd_link_quality_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_link_quality_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
+                        <div for="rssi_dbm_alarm" class="helpicon cf_tip" data-i18n_title="osd_rssi_dbm_alarm_HELP"></div>
                         <label for="rssi_dbm_alarm">
                             <input id="rssi_dbm_alarm" data-setting="osd_rssi_dbm_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_rssi_dbm_alarm"></span>
                         </label>
-                        <div class="helpicon cf_tip" data-i18n_title="osdalarmSNR_HELP"></div>
+                        <div for="snr_alarm" class="helpicon cf_tip" data-i18n_title="osdalarmSNR_HELP"></div>
                         <label for="snr_alarm">
                             <input id="snr_alarm" data-setting="osd_snr_alarm" data-setting-multiplier="1" type="number" data-step="1" />
                             <span data-i18n="osd_snr_alarm"></span>
@@ -250,25 +254,25 @@
                         </label>
                         <label>
                             <input type="text" class="osdSwitchIndName" id="osdSwitchInd0_name" data-setting="osd_switch_indicator_zero_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_zero_channnel" data-live="true"></select>
+                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_zero_channel" data-live="true"></select>
                             <span data-i18n="osdSwitchInd0"></span>
                         </label>
 
                         <label>
                             <input type="text" class="osdSwitchIndName" id="osdSwitchInd1_name" data-setting="osd_switch_indicator_one_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_one_channnel" data-live="true"></select>
+                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_one_channel" data-live="true"></select>
                             <span data-i18n="osdSwitchInd1"></span>
                         </label>
 
                         <label>
                             <input type="text" class="osdSwitchIndName" id="osdSwitchInd2_name" data-setting="osd_switch_indicator_two_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_two_channnel" data-live="true"></select>
+                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_two_channel" data-live="true"></select>
                             <span data-i18n="osdSwitchInd2"></span>
                         </label>
 
                         <label>
                             <input type="text" class="osdSwitchIndName" id="osdSwitchInd3_name" data-setting="osd_switch_indicator_three_name" />
-                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_three_channnel" data-live="true"></select>
+                            <select class="osdSwitchInd_channel" data-setting="osd_switch_indicator_three_channel" data-live="true"></select>
                             <span data-i18n="osdSwitchInd3"></span>
                         </label>
                     </div>
