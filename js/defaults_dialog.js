@@ -37,20 +37,48 @@ helper.defaultsDialog = (function (data) {
         }
     };
 
+    privateScope.saveWizardStep = function (selectedDefaultPreset, wizardStep) {
+        //TODO add saving logic
+
+        privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
+    };
+
     privateScope.wizard = function (selectedDefaultPreset, wizardStep) {
 
         const steps = selectedDefaultPreset.wizardPages;
         const stepsCount = selectedDefaultPreset.wizardPages.length;
         const stepName = steps[wizardStep];
-
+        
         console.log(steps[wizardStep], wizardStep, stepsCount);
 
-        if (wizardStep >= stepsCount) {
+        if (wizardStep >= stepsCount - 1) {
             //This is the last step, time to finalize
+            $container.hide();
             privateScope.saveAndReboot();
         } else {
+            const $content = $container.find('.defaults-dialog__wizard');
 
+            $.get("./wizard/" + stepName + ".html", function(data) {
+                $content.html(data);
+            });
 
+            $.get("./wizard/buttons.html", function(data) {
+                $(data).appendTo($content);
+            });
+
+            $container.on('click', '#wizard-next', function () {
+                privateScope.saveWizardStep(selectedDefaultPreset, wizardStep);
+            });
+
+            $container.on('click', '#wizard-skip', function () {
+                privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
+            });
+
+            $container.find('.defaults-dialog__content').hide();
+            $container.find('.defaults-dialog__wizard').show();
+            
+            savingDefaultsModal.close();
+            $container.show();
 
         }
 
@@ -150,6 +178,8 @@ helper.defaultsDialog = (function (data) {
     };
 
     privateScope.render = function () {
+        $container.find('.defaults-dialog__content').show();
+        $container.find('.defaults-dialog__wizard').hide();
         let $place = $container.find('.defaults-dialog__options');
         $place.html("");
         for (let i in data) {

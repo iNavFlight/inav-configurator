@@ -6,7 +6,7 @@ helper.defaultsDialogData = [{
     "notRecommended": false,
     "reboot": true,
     "mixerToApply": 3,
-    "wizardPages": ['receiver', 'motors', 'gps', 'filter', 'pid'],
+    "wizardPages": ['receiver', 'outputs', 'gps', 'filters', 'pids'],
     "settings": [
         {
             key: "model_preview_type",
