@@ -127,6 +127,7 @@ sources.js = [
     './js/peripherals.js',
     './js/appUpdater.js',
     './js/feature_framework.js',
+    './js/defaults_dialog_entries.js',
     './js/defaults_dialog.js',
     './js/safehomeCollection.js',
     './js/safehome.js',
