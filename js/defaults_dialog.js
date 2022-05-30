@@ -49,54 +49,57 @@ helper.defaultsDialog = (function (data) {
 
     },
 
-        privateScope.wizard = function (selectedDefaultPreset, wizardStep) {
+    privateScope.wizard = function (selectedDefaultPreset, wizardStep) {
 
-            const steps = selectedDefaultPreset.wizardPages;
-            const stepsCount = selectedDefaultPreset.wizardPages.length;
-            const stepName = steps[wizardStep];
+        const steps = selectedDefaultPreset.wizardPages;
+        const stepsCount = selectedDefaultPreset.wizardPages.length;
+        const stepName = steps[wizardStep];
 
-            console.log(steps[wizardStep], wizardStep, stepsCount);
+        console.log(steps[wizardStep], wizardStep, stepsCount);
 
-            if (wizardStep >= stepsCount - 1) {
-                //This is the last step, time to finalize
-                $container.hide();
-                privateScope.saveAndReboot();
-            } else {
-                const $content = $container.find('.defaults-dialog__wizard');
+        if (wizardStep >= stepsCount) {
+            //This is the last step, time to finalize
+            $container.hide();
+            privateScope.saveAndReboot();
+        } else {
+            const $content = $container.find('.defaults-dialog__wizard');
 
-                $.get("./wizard/" + stepName + ".html", function (data) {
+            $content.unbind();
+
+            $.get("./wizard/" + stepName + ".html", function (data) {
+                $content.html("");
+                $(data).appendTo($content);
+
+                $.get("./wizard/buttons.html", function (data) {
                     $(data).appendTo($content);
 
-                    $.get("./wizard/buttons.html", function (data) {
-                        $(data).appendTo($content);
-
-                        $container.on('click', '#wizard-next', function () {
-                            privateScope.saveWizardStep(selectedDefaultPreset, wizardStep);
-                        });
-
-                        $container.on('click', '#wizard-skip', function () {
-                            privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
-                        });
-
-                        if (stepName == "receiver") {
-                            privateScope.handleTabLoadReceiver($container);
-                        }
-
-                        Settings.configureInputs().then(
-                            function () {
-                                console.log('configure done');
-                                $container.find('.defaults-dialog__content').hide();
-                                $container.find('.defaults-dialog__wizard').show();
-
-                                savingDefaultsModal.close();
-                                $container.show();
-                            }
-                        );
+                    $content.on('click', '#wizard-next', function () {
+                        privateScope.saveWizardStep(selectedDefaultPreset, wizardStep);
                     });
-                });
-            }
 
-        };
+                    $content.on('click', '#wizard-skip', function () {
+                        privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
+                    });
+
+                    if (stepName == "receiver") {
+                        privateScope.handleTabLoadReceiver($content);
+                    }
+
+                    Settings.configureInputs().then(
+                        function () {
+                            console.log('configure done');
+                            $container.find('.defaults-dialog__content').hide();
+                            $container.find('.defaults-dialog__wizard').show();
+
+                            savingDefaultsModal.close();
+                            $container.show();
+                        }
+                    );
+                });
+            });
+        }
+
+    };
 
     privateScope.saveAndReboot = function () {
         GUI.tab_switch_cleanup(function () {

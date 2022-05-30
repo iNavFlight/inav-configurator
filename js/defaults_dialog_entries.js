@@ -1,24 +1,5 @@
 var helper = helper || {};
 
-helper.defaultsDialogReceivers = {
-        0: "SPEK1024",
-        1: "SPEK2048",
-        2: "SBUS",
-        3: "SUMD",
-        4: "SUMH",
-        5: "XB-B",
-        6: "XB-B-RJ01",
-        7: "IBUS",
-        8: "JETIEXBUS",
-        9: "CRSF",
-        10: "FPORT",
-        11: "SBUS_FAST",
-        12: "FPORT2",
-        13: "SRXL2",
-        14: "GHST",
-        15: "MAVLINK"
-}
-
 helper.defaultsDialogData = [
     {
         "title": 'Test',
