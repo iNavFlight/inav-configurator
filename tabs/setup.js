@@ -25,7 +25,8 @@ TABS.setup.initialize = function (callback) {
         mspHelper.loadFeatures,
         mspHelper.queryFcStatus,
         mspHelper.loadMixerConfig,
-        mspHelper.loadMiscV2
+        mspHelper.loadMiscV2,
+        mspHelper.loadSerialPorts
     ];
 
     loadChainer.setChain(loadChain);
