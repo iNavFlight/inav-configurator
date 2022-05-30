@@ -107,8 +107,8 @@ SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
-SYM.GLIDE_MINS = 0xD4;
-SYM.GLIDE_RANGE = 0xD5;
+SYM.GLIDE_MINS = 0xD5;
+SYM.GLIDE_RANGE = 0xD4;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -922,7 +922,7 @@ OSD.constants = {
                     name: 'GLIDE_TIME',
                     id: 136,
                     min_version: '5.0.0',
-                    preview: FONT.symbol(SYM.GLIDE_MINS) + '102',
+                    preview: FONT.symbol(SYM.GLIDE_MINS) + '02:34',
                 },
                 {
                     name: 'GLIDE_RANGE',
