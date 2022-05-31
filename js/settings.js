@@ -69,18 +69,21 @@ var Settings = (function () {
                 } else if (input.data('presentation') == 'range') {
                     
                     let scaledMax;
+                    let scaledMin;
                     let scalingThreshold;
 
                     if (input.data('normal-max')) {
                         scaledMax = s.setting.max * 2;
                         scalingThreshold = Math.round(scaledMax * 0.8);
+                        scaledMin = s.setting.min *2;
                     } else {
                         scaledMax = s.setting.max;
+                        scaledMin = s.setting.min;
                         scalingThreshold = scaledMax;
                     }
 
                     
-                    let $range = $('<input type="range" min="' + s.setting.min + '" max="' + scaledMax + '" value="' + s.value + '"/>');
+                    let $range = $('<input type="range" min="' + scaledMin + '" max="' + scaledMax + '" value="' + s.value + '"/>');
                     if (input.data('step')) {
                         $range.attr('step', input.data('step'));
                     }
@@ -117,16 +120,13 @@ var Settings = (function () {
                         let val = $(this).val();
                         let normalMax = parseInt(input.data('normal-max'));
 
-                        console.log(val, normalMax);
-
                         if (normalMax) {
                             if (val <= scalingThreshold) {
-                                val = scaleRangeInt(val, 0, scalingThreshold, 0, normalMax);
+                                val = scaleRangeInt(val, scaledMin, scalingThreshold, s.setting.min, normalMax);
                             } else {
                                 val = scaleRangeInt(val, scalingThreshold + 1, scaledMax, normalMax + 1, s.setting.max);
                             }
                         }
-                        console.log(val);
 
                         input.val(val);
                     });
@@ -138,7 +138,7 @@ var Settings = (function () {
                         let normalMax = parseInt(input.data('normal-max'));
                         if (normalMax) {
                             if (val <= normalMax) {
-                                newVal = scaleRangeInt(val, 0, normalMax, 0, scalingThreshold);
+                                newVal = scaleRangeInt(val, s.setting.min, normalMax, scaledMin, scalingThreshold);
                             } else {
                                 newVal = scaleRangeInt(val, normalMax + 1, s.setting.max, scalingThreshold + 1, scaledMax);
                             }
@@ -242,6 +242,7 @@ var Settings = (function () {
             'cmss' : 'cm/s/s',
             // Time
             'msec' : 'ms',
+            'msec-nc' : 'ms', // Milliseconds, but not converted.
             'dsec' : 'ds',
             'sec' : 's',
             // Angles
@@ -308,6 +309,9 @@ var Settings = (function () {
                 'ms' : 100,
                 'hftmin' : 50.8,
                 'fts' : 30.48
+            },
+            'msec-nc' : {
+                'msec-nc' : 1
             },
             'msec' : {
                 'sec' : 1000
