@@ -336,33 +336,141 @@ gulp.task('release-osx64', function(done) {
         codesignArgs.push('-e', 'entitlements.plist');
         codesignArgs.push(src)
         execSync.apply(this, codesignArgs);
+
+        // Check if the bundle is signed
+        const codesignCheckArgs = [ 'codesign', '-vvv', '--deep', '--strict', src ];
+        execSync.apply(this, codesignCheckArgs);        
     }
-    const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
-    var output = fs.createWriteStream(zipFilename);
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator.app');
-    output.on('close', function() {
-        if (getArguments().notarize) {
-            const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
-            const notarizationUsername = getArguments()['notarization-username'];
-            if (notarizationUsername) {
-                notarizeArgs.push('-u', notarizationUsername)
+
+    // 'old' .zip mode
+    if (getArguments().zip) {
+        const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
+        console.log('Creating ZIP file: ' + zipFilename);
+        var output = fs.createWriteStream(zipFilename);
+        var archive = archiver('zip', {
+            zlib: { level: 9 }
+        });
+        archive.on('warning', function(err) { throw err; });
+        archive.on('error', function(err) { throw err; });
+        archive.pipe(output);
+        archive.directory(src, 'INAV Configurator.app');
+        output.on('close', function() {
+            if (getArguments().notarize) {
+                console.log('Notarizing DMG file: ' + zipFilename);
+                const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
+                const notarizationUsername = getArguments()['notarization-username'];
+                if (notarizationUsername) {
+                    notarizeArgs.push('-u', notarizationUsername)
+                }
+                const notarizationPassword = getArguments()['notarization-password'];
+                if (notarizationPassword) {
+                    notarizeArgs.push('-p', notarizationPassword)
+                }
+                notarizeArgs.push(zipFilename)
+                execSync.apply(this, notarizeArgs);
             }
-            const notarizationPassword = getArguments()['notarization-password'];
-            if (notarizationPassword) {
-                notarizeArgs.push('-p', notarizationPassword)
-            }
-            notarizeArgs.push(zipFilename)
-            execSync.apply(this, notarizeArgs);
+            done();
+        });
+        archive.finalize();
+    } 
+    // 'new' .dmg mode
+    else {
+        const appdmg = require('appdmg');
+
+        var target = path.join(appsDir, get_release_filename('macOS', 'dmg'));
+        console.log('Creating DMG file: ' + target);
+        var basepath = path.join(appsDir, pkg.name, 'osx64');
+        console.log('Base path: ' + basepath);
+
+        if (fs.existsSync(target)) {
+            fs.unlinkSync(target);
         }
-        done();
-    });
-    archive.finalize();
+
+        var specs = {};
+
+        specs["title"] = "INAV Configurator";
+        specs["contents"] = [
+            { "x": 448, "y": 342, "type": "link", "path": "/Applications" },
+            { "x": 192, "y": 344, "type": "file", "path": pkg.name + ".app", "name": "INAV Configurator.app" },
+        ];
+        specs["background"] = path.join(__dirname, 'assets/osx/dmg-background.png');
+        specs["format"] = "UDZO";
+        specs["window"] = {
+            "size": {
+                "width": 638,
+                "height": 479,
+            }
+        };
+
+        const codesignIdentity = getArguments()['codesign-identity'];
+        if (getArguments().codesign) {
+            specs['code-sign'] = {
+                'signing-identity': codesignIdentity,
+            }
+        }
+
+        const ee = appdmg({
+            target: target,
+            basepath: basepath,
+            specification: specs,
+        });
+
+        ee.on('progress', function(info) {
+            //console.log(info);
+        });
+
+        ee.on('error', function(err) {
+            console.log(err);
+        });
+
+        ee.on('finish', function() {
+            if (getArguments().codesign) {
+                // Check if the bundle is signed
+                const codesignCheckArgs = [ 'codesign', '-vvv', '--deep', '--strict', target ];
+                execSync.apply(this, codesignCheckArgs);
+            }
+            if (getArguments().notarize) {
+                console.log('Notarizing DMG file: ' + target);
+                const notarizeArgs = ['xcrun', 'notarytool', 'submit'];
+                notarizeArgs.push(target);
+                const notarizationUsername = getArguments()['notarization-username'];
+                if (notarizationUsername) {
+                    notarizeArgs.push('--apple-id', notarizationUsername)
+                } else {
+                    throw new Error('Missing notarization username');
+                }
+                const notarizationPassword = getArguments()['notarization-password'];
+                if (notarizationPassword) {
+                    notarizeArgs.push('--password', notarizationPassword)
+                } else {
+                    throw new Error('Missing notarization password');
+                }
+                const notarizationTeamId = getArguments()['notarization-team-id'];
+                if (notarizationTeamId) {
+                    notarizeArgs.push('--team-id', notarizationTeamId)
+                } else {
+                    throw new Error('Missing notarization Team ID');
+                }
+                notarizeArgs.push('--wait');
+
+                const notarizationWebhook = getArguments()['notarization-webhook'];
+                if (notarizationWebhook) {
+                    notarizeArgs.push('--webhook', notarizationWebhook);
+                }
+                execSync.apply(this, notarizeArgs);
+
+                console.log('Stapling DMG file: ' + target);
+                const stapleArgs = ['xcrun', 'stapler', 'staple'];
+                stapleArgs.push(target);
+                execSync.apply(this, stapleArgs);
+
+                console.log('Checking DMG file: ' + target);
+                const checkArgs = ['spctl', '-vvv', '--assess', '--type', 'install', target];
+                execSync.apply(this, checkArgs);
+            }
+            done();
+        });
+    }
 });
 
 function releaseLinux(bits) {
