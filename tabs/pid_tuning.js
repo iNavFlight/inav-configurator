@@ -135,16 +135,24 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         $('#resetPIDs').on('click', function() {
-
             if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
-                MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
-                updateActivatedTab();
+                resettingPIDsModal = new jBox('Modal', {
+                    width: 400,
+                    height: 100,
+                    animation: false,
+                    closeOnClick: false,
+                    closeOnEsc: false,
+                    content: $('#modal-resetting-pids')
+                }).open();
+
+                helper.defaultsDialog.resetSettings();
             }
         });
 
         $('#resetDefaults').on('click', function() {
-
             if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
+                helper.features.reset();
+                helper.features.fromUI($('.tab-pid_tuning'));
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
