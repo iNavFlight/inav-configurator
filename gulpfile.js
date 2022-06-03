@@ -289,107 +289,65 @@ function get_release_filename(platform, ext, addition = '') {
     return 'INAV-Configurator_' + platform + addition + '_' + pkg.version + '.' + ext;
 }
 
-gulp.task('release-win32', function(done) {
-    var pkg = require('./package.json');
-
-    // Create ZIP
-    console.log('Creating x86 ZIP file...');
-    var src = path.join(appsDir, pkg.name, 'win32');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip', '-portable')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    archive.finalize();
-
-    // Create Installer
-    console.log('Creating x86 Installer...');
-    const innoSetup = require('@quanle94/innosetup');
-        
-    const APPS_DIR = './apps/';
-    var arch = 'win32';
-
-    // Parameters passed to the installer script
-    const parameters = [];
-
-    // Extra parameters to replace inside the iss file
-    parameters.push(`/Dversion=${pkg.version}`);
-    parameters.push(`/DarchName=${arch}`);
-    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
-    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
-    parameters.push(`/DsourceFolder=${APPS_DIR}`);
-    parameters.push(`/DtargetFolder=${APPS_DIR}`);
-
-    // Show only errors in console
-    parameters.push(`/Q`);
-
-    // Script file to execute
-    parameters.push("assets/windows/installer.iss");
-
-    innoSetup(parameters, {},
-    function(error) {
-        if (error != null) {
-            console.error(`Installer for platform ${arch} finished with error ${error}`);
-        } else {
-            console.log(`Installer for platform ${arch} finished`);
-        }
-        done();
-    });
-});
-
-gulp.task('release-win64', function(done) {
-    var pkg = require('./package.json');
+function build_win_zip(arch) {
+    return function build_win_zip_proc(done) {
+        var pkg = require('./package.json');
     
-    // Create ZIP
-    console.log('Creating x64 ZIP file...');
-    var src = path.join(appsDir, pkg.name, 'win64');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip', '-portable')));
-    var archive = archiver('zip', {
-            zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    archive.finalize();
-        
-    // Create Installer
-    console.log('Creating x64 Installer...');
-    const innoSetup = require('@quanle94/innosetup');
-        
-    const APPS_DIR = './apps/';
-    var arch = 'win64';
+        // Create ZIP
+        console.log(`Creating ${arch} ZIP file...`);
+        var src = path.join(appsDir, pkg.name, arch);
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip', '-portable')));
+        var archive = archiver('zip', {
+                zlib: { level: 9 }
+        });
+        archive.on('warning', function(err) { throw err; });
+        archive.on('error', function(err) { throw err; });
+        archive.pipe(output);
+        archive.directory(src, 'INAV Configurator');
+        return archive.finalize();
+    }
+}
 
-    // Parameters passed to the installer script
-    const parameters = [];
+function build_win_iss(arch) {
+    return function build_win_iss_proc(done) {
+        // Create Installer
+        console.log(`Creating ${arch} Installer...`);
+        const innoSetup = require('@quanle94/innosetup');
+            
+        const APPS_DIR = './apps/';
+        const pkg = require('./package.json');
 
-    // Extra parameters to replace inside the iss file
-    parameters.push(`/Dversion=${pkg.version}`);
-    parameters.push(`/DarchName=${arch}`);
-    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
-    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
-    parameters.push(`/DsourceFolder=${APPS_DIR}`);
-    parameters.push(`/DtargetFolder=${APPS_DIR}`);
+        // Parameters passed to the installer script
+        const parameters = [];
 
-    // Show only errors in console
-    parameters.push(`/Q`);
+        // Extra parameters to replace inside the iss file
+        parameters.push(`/Dversion=${pkg.version}`);
+        parameters.push(`/DarchName=${arch}`);
+        parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+        parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+        parameters.push(`/DsourceFolder=${APPS_DIR}`);
+        parameters.push(`/DtargetFolder=${APPS_DIR}`);
 
-    // Script file to execute
-    parameters.push("assets/windows/installer.iss");
+        // Show only errors in console
+        parameters.push(`/Q`);
 
-    innoSetup(parameters, {},
-    function(error) {
-        if (error != null) {
-            console.error(`Installer for platform ${arch} finished with error ${error}`);
-        } else {
-            console.log(`Installer for platform ${arch} finished`);
-        }
-        done();
-    });
-});
+        // Script file to execute
+        parameters.push("assets/windows/installer.iss");
+
+        innoSetup(parameters, {},
+        function(error) {
+            if (error != null) {
+                console.error(`Installer for platform ${arch} finished with error ${error}`);
+            } else {
+                console.log(`Installer for platform ${arch} finished`);
+            }
+            done();
+        });
+    }
+}
+
+gulp.task('release-win32', gulp.series(build_win_zip('win32'), build_win_iss('win32')));
+gulp.task('release-win64', gulp.series(build_win_zip('win64'), build_win_iss('win64')));
 
 gulp.task('release-osx64', function(done) {
     var pkg = require('./package.json');
