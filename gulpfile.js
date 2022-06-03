@@ -284,15 +284,18 @@ function get_nw_version() {
     return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
 }
 
-function get_release_filename(platform, ext) {
+function get_release_filename(platform, ext, addition = '') {
     var pkg = require('./package.json');
-    return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+    return 'INAV-Configurator_' + platform + addition + '_' + pkg.version + '.' + ext;
 }
 
-gulp.task('release-win32', function() {
+gulp.task('release-win32', function(done) {
     var pkg = require('./package.json');
+
+    // Create ZIP
+    console.log('Creating x86 ZIP file...');
     var src = path.join(appsDir, pkg.name, 'win32');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip', '-portable')));
     var archive = archiver('zip', {
         zlib: { level: 9 }
     });
@@ -300,21 +303,92 @@ gulp.task('release-win32', function() {
     archive.on('error', function(err) { throw err; });
     archive.pipe(output);
     archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
+    archive.finalize();
+
+    // Create Installer
+    console.log('Creating x86 Installer...');
+    const innoSetup = require('@quanle94/innosetup');
+        
+    const APPS_DIR = './apps/';
+    var arch = 'win32';
+
+    // Parameters passed to the installer script
+    const parameters = [];
+
+    // Extra parameters to replace inside the iss file
+    parameters.push(`/Dversion=${pkg.version}`);
+    parameters.push(`/DarchName=${arch}`);
+    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+    parameters.push(`/DsourceFolder=${APPS_DIR}`);
+    parameters.push(`/DtargetFolder=${APPS_DIR}`);
+
+    // Show only errors in console
+    parameters.push(`/Q`);
+
+    // Script file to execute
+    parameters.push("assets/windows/installer.iss");
+
+    innoSetup(parameters, {},
+    function(error) {
+        if (error != null) {
+            console.error(`Installer for platform ${arch} finished with error ${error}`);
+        } else {
+            console.log(`Installer for platform ${arch} finished`);
+        }
+        done();
+    });
 });
 
-gulp.task('release-win64', function() {
+gulp.task('release-win64', function(done) {
     var pkg = require('./package.json');
+    
+    // Create ZIP
+    console.log('Creating x64 ZIP file...');
     var src = path.join(appsDir, pkg.name, 'win64');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip')));
+    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip', '-portable')));
     var archive = archiver('zip', {
-        zlib: { level: 9 }
+            zlib: { level: 9 }
     });
     archive.on('warning', function(err) { throw err; });
     archive.on('error', function(err) { throw err; });
     archive.pipe(output);
     archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
+    archive.finalize();
+        
+    // Create Installer
+    console.log('Creating x64 Installer...');
+    const innoSetup = require('@quanle94/innosetup');
+        
+    const APPS_DIR = './apps/';
+    var arch = 'win64';
+
+    // Parameters passed to the installer script
+    const parameters = [];
+
+    // Extra parameters to replace inside the iss file
+    parameters.push(`/Dversion=${pkg.version}`);
+    parameters.push(`/DarchName=${arch}`);
+    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+    parameters.push(`/DsourceFolder=${APPS_DIR}`);
+    parameters.push(`/DtargetFolder=${APPS_DIR}`);
+
+    // Show only errors in console
+    parameters.push(`/Q`);
+
+    // Script file to execute
+    parameters.push("assets/windows/installer.iss");
+
+    innoSetup(parameters, {},
+    function(error) {
+        if (error != null) {
+            console.error(`Installer for platform ${arch} finished with error ${error}`);
+        } else {
+            console.log(`Installer for platform ${arch} finished`);
+        }
+        done();
+    });
 });
 
 gulp.task('release-osx64', function(done) {
@@ -340,7 +414,7 @@ gulp.task('release-osx64', function(done) {
     const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
     var output = fs.createWriteStream(zipFilename);
     var archive = archiver('zip', {
-        zlib: { level: 9 }
+            zlib: { level: 9 }
     });
     archive.on('warning', function(err) { throw err; });
     archive.on('error', function(err) { throw err; });

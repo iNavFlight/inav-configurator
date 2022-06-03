@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "nw-builder": "^3.5.7",
-    "semver": "6.3.0"
+    "semver": "6.3.0",
+    "@quanle94/innosetup": "^6.0.2"
   }
 }
