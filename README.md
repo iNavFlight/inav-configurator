@@ -83,6 +83,7 @@ in the `./dist/` directory.
 - **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
 directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
 for the Windows app. If you don't have Wine installed you can create a release by running the **release-only-linux** task.
+<br>In addition MacOS version can be built as zipped application (.zip), not Disk Image (.dmg) using `--zip` option.
 
 To build a specific release, use the command `release --platform="win64"` for example.
 
