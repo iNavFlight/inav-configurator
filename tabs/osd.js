@@ -111,6 +111,8 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
+var video_type = null;
+
 var FONT = FONT || {};
 
 FONT.initData = function () {
@@ -1971,7 +1973,7 @@ OSD.updateSelectedLayout = function(new_layout) {
 };
 
 OSD.updateDisplaySize = function () {
-    var video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
+    video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
@@ -2674,10 +2676,12 @@ OSD.GUI.updatePreviews = function() {
         centerPosition += OSD.data.display_size.x / 2;
     }
 
+    let hudCenterPosition = centerPosition + (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
+
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
         for (i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
 
@@ -2686,21 +2690,21 @@ OSD.GUI.updatePreviews = function() {
         crsHNumber = Settings.getInputValue('osd_crosshairs_style');
        if (crsHNumber == 1) {
             // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 2, SYM.AH_AIRCRAFT4);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
         } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
             // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
         }
     }
 
@@ -2709,12 +2713,12 @@ OSD.GUI.updatePreviews = function() {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
         for (i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
         // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth - 1, SYM.AH_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
     OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);

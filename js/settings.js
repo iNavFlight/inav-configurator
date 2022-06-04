@@ -3,6 +3,24 @@
 var Settings = (function () {
     let self = {};
 
+    self.fillSelectOption = function(s, ii) {
+        var name = (s.setting.table ? s.setting.table.values[ii] : null);
+        if (name) {
+            var localizedName = chrome.i18n.getMessage(name);
+            if (localizedName) {
+                name = localizedName;
+            }
+        } else {
+            // Fallback to the number itself
+            name = ii;
+        }
+        var option = $('<option/>').attr('value', ii).text(name);
+        if (ii == s.value) {
+            option.prop('selected', true);
+        }
+        return option;
+    }
+
     self.configureInputs = function() {
         var inputs = [];
         $('[data-setting!=""][data-setting]').each(function() {
@@ -45,22 +63,21 @@ var Settings = (function () {
                         input.prop('checked', s.value > 0);
                     } else {
                         input.empty();
-                        for (var ii = s.setting.min; ii <= s.setting.max; ii++) {
-                            var name = (s.setting.table ? s.setting.table.values[ii] : null);
-                            if (name) {
-                                var localizedName = chrome.i18n.getMessage(name);
-                                if (localizedName) {
-                                    name = localizedName;
-                                }
-                            } else {
-                                // Fallback to the number itself
-                                name = ii;
+                        let option = null;
+                        if (input.data('invert-select') === true) {
+                            for (var ii = s.setting.max; ii >= s.setting.min; ii--) {
+                                option = null;
+                                option = self.fillSelectOption(s, ii);
+
+                                option.appendTo(input);
                             }
-                            var option = $('<option/>').attr('value', ii).text(name);
-                            if (ii == s.value) {
-                                option.prop('selected', true);
+                        } else {
+                            for (var ii = s.setting.min; ii <= s.setting.max; ii++) {
+                                option = null;
+                                option = self.fillSelectOption(s, ii);
+
+                                option.appendTo(input);
                             }
-                            option.appendTo(input);
                         }
                     }
                 } else if (s.setting.type == 'string') {

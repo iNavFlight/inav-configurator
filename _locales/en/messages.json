@@ -3018,6 +3018,12 @@
     "osd_crosshairs_style": {
         "message" : "Crosshairs Style"
     },
+    "osd_horizon_offset": {
+        "message" : "AHI & HUD offset"
+    },
+    "osd_horizon_offset_help" : {
+        "message" : "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span style='color:red;'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
+    },
     "osd_left_sidebar_scroll": {
         "message" : "Left Sidebar Scroll"
     },
