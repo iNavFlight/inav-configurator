@@ -312,6 +312,11 @@ function build_win_zip(arch) {
 
 function build_win_iss(arch) {
     return function build_win_iss_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
         // Create Installer
         console.log(`Creating ${arch} Installer...`);
         const innoSetup = require('@quanle94/innosetup');
@@ -377,7 +382,7 @@ gulp.task('release-osx64', function(done) {
     }
 
     // 'old' .zip mode
-    if (getArguments().zip) {
+    if (!getArguments().installer) {
         const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
         console.log('Creating ZIP file: ' + zipFilename);
         var output = fs.createWriteStream(zipFilename);
@@ -533,6 +538,11 @@ function createDirIfNotExists(dir) {
 
 function release_deb(arch) {
     return function release_deb_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
         // Check if dpkg-deb exists
         if (!commandExistsSync('dpkg-deb')) {
             console.warn(`dpkg-deb command not found, not generating deb package for ${arch}`);
@@ -574,6 +584,11 @@ function release_deb(arch) {
 
 function release_rpm(arch) {
     return function release_rpm_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
         // Check if rpmbuild exists
         if (!commandExistsSync('rpmbuild')) {
             console.warn(`rpmbuild command not found, not generating rpm package for ${arch}`);
