@@ -599,7 +599,6 @@ var FC = {
             'I2C-NAV',
             'DJI NAZA',
             'UBLOX7',
-            'MTK',
             'MSP'
         ];
     },
