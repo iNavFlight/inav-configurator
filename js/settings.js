@@ -284,17 +284,18 @@ var Settings = (function () {
             // Time
             'us' : "Microseconds",
             'msec' : 'Milliseconds',
+            'msec-nc' : 'Milliseconds',
             'dsec' : 'Deciseconds',
             'sec' : 'Seconds',
             // Angles
             'deg' : 'Degrees',
-            'decideg' : 'Decidegrees',
-            'decideg-lrg' : 'Decidegrees',
+            'decideg' : 'DeciDegrees',
+            'decideg-lrg' : 'DeciDegrees',
             // Rotational speed
             'degps' : 'Degrees per second',
-            'decadegps' : 'Decadegrees per second',
+            'decadegps' : 'DecaDegrees per second',
             // Temperature
-            'decidegc' : 'Decidegrees Celsius',
+            'decidegc' : 'DeciDegrees Celsius',
             'degc' : 'Degrees Celsius',
             'degf' : 'Degrees Fahrenheit',
             // Speed
