@@ -4287,6 +4287,9 @@
     "BLACKBOX_FEATURE_MOTORS": {
         "message": "Motors output"
     },
+    "BLACKBOX_FEATURE_GYRO_RAW": {
+        "message": "Gyro RAW (no filtering)"
+    },
     "axisRoll": {
         "message": "Roll"
     },
