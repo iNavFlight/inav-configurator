@@ -657,7 +657,7 @@ function updateActivatedTab() {
 
 function updateFirmwareVersion() {
     if (CONFIGURATOR.connectionValid) {
-        $('#logo .firmware_version').text(CONFIG.flightControllerVersion);
+        $('#logo .firmware_version').text(CONFIG.flightControllerVersion + " [" + CONFIG.target + "]");
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
     }
