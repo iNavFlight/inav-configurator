@@ -242,6 +242,7 @@ var Settings = (function () {
             'cmss' : 'cm/s/s',
             // Time
             'msec' : 'ms',
+            'msec-nc' : 'ms', // Milliseconds, but not converted.
             'dsec' : 'ds',
             'sec' : 's',
             // Angles
@@ -308,6 +309,9 @@ var Settings = (function () {
                 'ms' : 100,
                 'hftmin' : 50.8,
                 'fts' : 30.48
+            },
+            'msec-nc' : {
+                'msec-nc' : 1
             },
             'msec' : {
                 'sec' : 1000
