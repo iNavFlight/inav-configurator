@@ -22,6 +22,7 @@ TABS.onboard_logging.initialize = function (callback) {
         "BLACKBOX_FEATURE_RC_DATA",
         "BLACKBOX_FEATURE_RC_COMMAND",
         "BLACKBOX_FEATURE_MOTORS",
+        "BLACKBOX_FEATURE_GYRO_RAW",
     ];
 
     if (GUI.active_tab != 'onboard_logging') {
