@@ -276,8 +276,13 @@ TABS.cli.initialize = function (callback) {
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
 
-                var outputArray = out_string.split("\n");
-                Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
+                if (out_string.trim().toLowerCase() == "cls") {
+                    self.outputHistory = "";
+                    $('.tab-cli .window .wrapper').empty();
+                } else {
+                    var outputArray = out_string.split("\n");
+                    Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
+                }
 
                 textarea.val('');
             }
