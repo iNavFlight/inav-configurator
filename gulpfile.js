@@ -13,6 +13,8 @@ var semver = require('semver');
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 
+const commandExistsSync = require('command-exists').sync;
+
 // Each key in the *sources* variable must be an array of
 // the source files that will be combined into a single
 // file and stored in *outputDir*. Each key in *sources*
@@ -284,38 +286,75 @@ function get_nw_version() {
     return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
 }
 
-function get_release_filename(platform, ext) {
+function get_release_filename(platform, ext, addition = '') {
     var pkg = require('./package.json');
-    return 'INAV-Configurator_' + platform + '_' + pkg.version + '.' + ext;
+    return 'INAV-Configurator_' + platform + addition + '_' + pkg.version + '.' + ext;
 }
 
-gulp.task('release-win32', function() {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'win32');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win32', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
-});
+function build_win_zip(arch) {
+    return function build_win_zip_proc(done) {
+        var pkg = require('./package.json');
+    
+        // Create ZIP
+        console.log(`Creating ${arch} ZIP file...`);
+        var src = path.join(appsDir, pkg.name, arch);
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip', '-portable')));
+        var archive = archiver('zip', {
+                zlib: { level: 9 }
+        });
+        archive.on('warning', function(err) { throw err; });
+        archive.on('error', function(err) { throw err; });
+        archive.pipe(output);
+        archive.directory(src, 'INAV Configurator');
+        return archive.finalize();
+    }
+}
 
-gulp.task('release-win64', function() {
-    var pkg = require('./package.json');
-    var src = path.join(appsDir, pkg.name, 'win64');
-    var output = fs.createWriteStream(path.join(appsDir, get_release_filename('win64', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator');
-    return archive.finalize();
-});
+function build_win_iss(arch) {
+    return function build_win_iss_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
+        // Create Installer
+        console.log(`Creating ${arch} Installer...`);
+        const innoSetup = require('@quanle94/innosetup');
+            
+        const APPS_DIR = './apps/';
+        const pkg = require('./package.json');
+
+        // Parameters passed to the installer script
+        const parameters = [];
+
+        // Extra parameters to replace inside the iss file
+        parameters.push(`/Dversion=${pkg.version}`);
+        parameters.push(`/DarchName=${arch}`);
+        parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+        parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+        parameters.push(`/DsourceFolder=${APPS_DIR}`);
+        parameters.push(`/DtargetFolder=${APPS_DIR}`);
+
+        // Show only errors in console
+        parameters.push(`/Q`);
+
+        // Script file to execute
+        parameters.push("assets/windows/installer.iss");
+
+        innoSetup(parameters, {},
+        function(error) {
+            if (error != null) {
+                console.error(`Installer for platform ${arch} finished with error ${error}`);
+            } else {
+                console.log(`Installer for platform ${arch} finished`);
+            }
+            done();
+        });
+    }
+}
+
+gulp.task('release-win32', gulp.series(build_win_zip('win32'), build_win_iss('win32')));
+gulp.task('release-win64', gulp.series(build_win_zip('win64'), build_win_iss('win64')));
 
 gulp.task('release-osx64', function(done) {
     var pkg = require('./package.json');
@@ -336,37 +375,295 @@ gulp.task('release-osx64', function(done) {
         codesignArgs.push('-e', 'entitlements.plist');
         codesignArgs.push(src)
         execSync.apply(this, codesignArgs);
+
+        // Check if the bundle is signed
+        const codesignCheckArgs = [ 'codesign', '-vvv', '--deep', '--strict', src ];
+        execSync.apply(this, codesignCheckArgs);        
     }
-    const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
-    var output = fs.createWriteStream(zipFilename);
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
-    });
-    archive.on('warning', function(err) { throw err; });
-    archive.on('error', function(err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'INAV Configurator.app');
-    output.on('close', function() {
-        if (getArguments().notarize) {
-            const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
-            const notarizationUsername = getArguments()['notarization-username'];
-            if (notarizationUsername) {
-                notarizeArgs.push('-u', notarizationUsername)
+
+    // 'old' .zip mode
+    if (!getArguments().installer) {
+        const zipFilename = path.join(appsDir, get_release_filename('macOS', 'zip'));
+        console.log('Creating ZIP file: ' + zipFilename);
+        var output = fs.createWriteStream(zipFilename);
+        var archive = archiver('zip', {
+            zlib: { level: 9 }
+        });
+        archive.on('warning', function(err) { throw err; });
+        archive.on('error', function(err) { throw err; });
+        archive.pipe(output);
+        archive.directory(src, 'INAV Configurator.app');
+        output.on('close', function() {
+            if (getArguments().notarize) {
+                console.log('Notarizing DMG file: ' + zipFilename);
+                const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
+                const notarizationUsername = getArguments()['notarization-username'];
+                if (notarizationUsername) {
+                    notarizeArgs.push('-u', notarizationUsername)
+                }
+                const notarizationPassword = getArguments()['notarization-password'];
+                if (notarizationPassword) {
+                    notarizeArgs.push('-p', notarizationPassword)
+                }
+                notarizeArgs.push(zipFilename)
+                execSync.apply(this, notarizeArgs);
             }
-            const notarizationPassword = getArguments()['notarization-password'];
-            if (notarizationPassword) {
-                notarizeArgs.push('-p', notarizationPassword)
-            }
-            notarizeArgs.push(zipFilename)
-            execSync.apply(this, notarizeArgs);
+            done();
+        });
+        archive.finalize();
+    } 
+    // 'new' .dmg mode
+    else {
+        const appdmg = require('appdmg');
+
+        var target = path.join(appsDir, get_release_filename('macOS', 'dmg'));
+        console.log('Creating DMG file: ' + target);
+        var basepath = path.join(appsDir, pkg.name, 'osx64');
+        console.log('Base path: ' + basepath);
+
+        if (fs.existsSync(target)) {
+            fs.unlinkSync(target);
         }
-        done();
-    });
-    archive.finalize();
+
+        var specs = {};
+
+        specs["title"] = "INAV Configurator";
+        specs["contents"] = [
+            { "x": 448, "y": 342, "type": "link", "path": "/Applications" },
+            { "x": 192, "y": 344, "type": "file", "path": pkg.name + ".app", "name": "INAV Configurator.app" },
+        ];
+        specs["background"] = path.join(__dirname, 'assets/osx/dmg-background.png');
+        specs["format"] = "UDZO";
+        specs["window"] = {
+            "size": {
+                "width": 638,
+                "height": 479,
+            }
+        };
+
+        const codesignIdentity = getArguments()['codesign-identity'];
+        if (getArguments().codesign) {
+            specs['code-sign'] = {
+                'signing-identity': codesignIdentity,
+            }
+        }
+
+        const ee = appdmg({
+            target: target,
+            basepath: basepath,
+            specification: specs,
+        });
+
+        ee.on('progress', function(info) {
+            //console.log(info);
+        });
+
+        ee.on('error', function(err) {
+            console.log(err);
+        });
+
+        ee.on('finish', function() {
+            if (getArguments().codesign) {
+                // Check if the bundle is signed
+                const codesignCheckArgs = [ 'codesign', '-vvv', '--deep', '--strict', target ];
+                execSync.apply(this, codesignCheckArgs);
+            }
+            if (getArguments().notarize) {
+                console.log('Notarizing DMG file: ' + target);
+                const notarizeArgs = ['xcrun', 'notarytool', 'submit'];
+                notarizeArgs.push(target);
+                const notarizationUsername = getArguments()['notarization-username'];
+                if (notarizationUsername) {
+                    notarizeArgs.push('--apple-id', notarizationUsername)
+                } else {
+                    throw new Error('Missing notarization username');
+                }
+                const notarizationPassword = getArguments()['notarization-password'];
+                if (notarizationPassword) {
+                    notarizeArgs.push('--password', notarizationPassword)
+                } else {
+                    throw new Error('Missing notarization password');
+                }
+                const notarizationTeamId = getArguments()['notarization-team-id'];
+                if (notarizationTeamId) {
+                    notarizeArgs.push('--team-id', notarizationTeamId)
+                } else {
+                    throw new Error('Missing notarization Team ID');
+                }
+                notarizeArgs.push('--wait');
+
+                const notarizationWebhook = getArguments()['notarization-webhook'];
+                if (notarizationWebhook) {
+                    notarizeArgs.push('--webhook', notarizationWebhook);
+                }
+                execSync.apply(this, notarizeArgs);
+
+                console.log('Stapling DMG file: ' + target);
+                const stapleArgs = ['xcrun', 'stapler', 'staple'];
+                stapleArgs.push(target);
+                execSync.apply(this, stapleArgs);
+
+                console.log('Checking DMG file: ' + target);
+                const checkArgs = ['spctl', '-vvv', '--assess', '--type', 'install', target];
+                execSync.apply(this, checkArgs);
+            }
+            done();
+        });
+    }
 });
+
+function post_build(arch, folder) {
+    return function post_build_linux(done) {
+        if ((arch === 'linux32') || (arch === 'linux64')) {
+            const metadata = require('./package.json');
+            // Copy Ubuntu launcher scripts to destination dir
+            const launcherDir = path.join(folder, metadata.name, arch);
+            console.log(`Copy Ubuntu launcher scripts to ${launcherDir}`);
+            return gulp.src('assets/linux/**')
+                    .pipe(gulp.dest(launcherDir));
+        }
+
+        return done();
+    }
+}
+
+// Create the dir directory, with write permissions
+function createDirIfNotExists(dir) {
+    fs.mkdir(dir, '0775', function(err) {
+        if (err && err.code !== 'EEXIST') {
+            throw err;
+        }
+    });
+}
+
+function release_deb(arch) {
+    return function release_deb_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
+        // Check if dpkg-deb exists
+        if (!commandExistsSync('dpkg-deb')) {
+            console.warn(`dpkg-deb command not found, not generating deb package for ${arch}`);
+            done();
+            return null;
+        }
+
+        const deb = require('gulp-debian');
+        const LINUX_INSTALL_DIR = '/opt/inav';
+        const metadata = require('./package.json');
+
+        console.log(`Generating deb package for ${arch}`);
+
+        return gulp.src([path.join(appsDir, metadata.name, arch, '*')])
+            .pipe(deb({
+                package: metadata.name,
+                version: metadata.version,
+                section: 'base',
+                priority: 'optional',
+                architecture: getLinuxPackageArch('deb', arch),
+                maintainer: metadata.author,
+                description: metadata.description,
+                preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${metadata.name}`],
+                postinst: [
+                    `chown root:root ${LINUX_INSTALL_DIR}`,
+                    `chown -R root:root ${LINUX_INSTALL_DIR}/${metadata.name}`,
+                    `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${metadata.name}/${metadata.name}.desktop`,
+                ],
+                prerm: [`xdg-desktop-menu uninstall ${metadata.name}.desktop`],
+                depends: ['libgconf-2-4', 'libatomic1'],
+                changelog: [],
+                _target: `${LINUX_INSTALL_DIR}/${metadata.name}`,
+                _out: appsDir,
+                _copyright: 'assets/linux/copyright',
+                _clean: true,
+        }));
+    }
+}
+
+function release_rpm(arch) {
+    return function release_rpm_proc(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+
+        // Check if rpmbuild exists
+        if (!commandExistsSync('rpmbuild')) {
+            console.warn(`rpmbuild command not found, not generating rpm package for ${arch}`);
+            done();
+            return;
+        }
+
+        const buildRpm = require('rpm-builder');
+        const NAME_REGEX = /-/g;
+        const LINUX_INSTALL_DIR = '/opt/inav';
+        const metadata = require('./package.json');
+
+        console.log(`Generating rpm package for ${arch}`);
+
+        // The buildRpm does not generate the folder correctly, manually
+        createDirIfNotExists(appsDir);
+
+        const options = {
+            name: metadata.name,
+            version: metadata.version.replace(NAME_REGEX, '_'), // RPM does not like release candidate versions
+            buildArch: getLinuxPackageArch('rpm', arch),
+            vendor: metadata.author,
+            summary: metadata.description,
+            license: 'GNU General Public License v3.0',
+            requires: ['libgconf-2-4', 'libatomic1'],
+            prefix: '/opt',
+            files: [{
+                cwd: path.join(appsDir, metadata.name, arch),
+                src: '*',
+                dest: `${LINUX_INSTALL_DIR}/${metadata.name}`,
+            }],
+            postInstallScript: [`xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${metadata.name}/${metadata.name}.desktop`],
+            preUninstallScript: [`xdg-desktop-menu uninstall ${metadata.name}.desktop`],
+            tempDir: path.join(appsDir, `tmp-rpm-build-${arch}`),
+            keepTemp: false,
+            verbose: false,
+            rpmDest: appsDir,
+            execOpts: { maxBuffer: 1024 * 1024 * 16 },
+        };
+
+        buildRpm(options, function(err) {
+            if (err) {
+                console.error(`Error generating rpm package: ${err}`);
+            }
+            done();
+        });
+    }
+}
+
+function getLinuxPackageArch(type, arch) {
+    let packArch;
+
+    switch (arch) {
+    case 'linux32':
+        packArch = 'i386';
+        break;
+    case 'linux64':
+        if (type === 'rpm') {
+            packArch = 'x86_64';
+        } else {
+            packArch = 'amd64';
+        }
+        break;
+    default:
+        console.error(`Package error, arch: ${arch}`);
+        process.exit(1);
+        break;
+    }
+
+    return packArch;
+}
 
 function releaseLinux(bits) {
     return function() {
+        console.log(`Generating zip package for linux${bits}`);
         var dirname = 'linux' + bits;
         var pkg = require('./package.json');
         var src = path.join(appsDir, pkg.name, dirname);
@@ -383,8 +680,8 @@ function releaseLinux(bits) {
     }
 }
 
-gulp.task('release-linux32', releaseLinux(32));
-gulp.task('release-linux64', releaseLinux(64));
+gulp.task('release-linux32', gulp.series(releaseLinux(32), post_build('linux32', appsDir), release_deb('linux32')));
+gulp.task('release-linux64', gulp.series(releaseLinux(64), post_build('linux64', appsDir), release_deb('linux64'), release_rpm('linux64')));
 
 // Create distributable .zip files in ./apps
 gulp.task('release', gulp.series('apps',  getPlatforms().map(function(v) { return 'release-' + v; })));
