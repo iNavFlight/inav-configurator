@@ -927,10 +927,10 @@ helper.defaultsDialog = (function () {
                         if (input.allow_reset) {
                             return mspHelper.setSetting(input.key, input.value);
                         }
-                    });
-                }).then(setTimeout( function() { 
-                    privateScope.finalize(selectedDefaultPreset);
-                }, 6000));
+                    }).then(setTimeout( function() { 
+                        privateScope.finalize(selectedDefaultPreset);
+                    }, 6000));
+                });
             }
         }); 
     };
