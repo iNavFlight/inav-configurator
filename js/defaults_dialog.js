@@ -176,58 +176,42 @@ helper.defaultsDialog = (function () {
             {
                 key: "mc_p_pitch",
                 value: 44, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "mc_i_pitch",
                 value: 75, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "mc_d_pitch",
                 value: 25, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "mc_p_roll",
                 value: 40, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "mc_i_roll",
                 value: 60, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "mc_d_roll",
                 value: 23, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "mc_p_yaw",
                 value: 35, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "mc_i_yaw",
                 value: 80, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 1
+                allow_reset: true
             },
             /*
              * TPA
@@ -364,23 +348,17 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_fw_pos_z_p",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 3, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "nav_fw_pos_z_d",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 3, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "nav_fw_pos_xy_p",
                 value: 60, 
-                allow_reset: true,
-                pid_axis: 8, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_turn_assist_pitch_gain",
@@ -400,86 +378,62 @@ helper.defaultsDialog = (function () {
             {
                 key: "fw_p_pitch",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_pitch",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_pitch",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_pitch",
                 value: 80, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "fw_p_roll",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_roll",
                 value: 3, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_roll",
                 value: 7, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_roll",
                 value: 50, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "fw_p_yaw",
                 value: 20, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_yaw",
                 value: 0, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_yaw",
                 value: 0, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_yaw",
                 value: 100, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "imu_acc_ignore_rate",
@@ -639,23 +593,17 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_fw_pos_z_p",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 3, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "nav_fw_pos_z_d",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 3, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "nav_fw_pos_xy_p",
                 value: 60, 
-                allow_reset: true,
-                pid_axis: 8, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_turn_assist_pitch_gain",
@@ -675,86 +623,62 @@ helper.defaultsDialog = (function () {
             {
                 key: "fw_p_pitch",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_pitch",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_pitch",
                 value: 5, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_pitch",
                 value: 70, 
-                allow_reset: true,
-                pid_axis: 1, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "fw_p_roll",
                 value: 15, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_roll",
                 value: 3, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_roll",
                 value: 7, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_roll",
                 value: 50, 
-                allow_reset: true,
-                pid_axis: 0, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "fw_p_yaw",
                 value: 20, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 0
+                allow_reset: true
             },
             {
                 key: "fw_i_yaw",
                 value: 0, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 1
+                allow_reset: true
             },
             {
                 key: "fw_d_yaw",
                 value: 0, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 2
+                allow_reset: true
             },
             {
                 key: "fw_ff_yaw",
                 value: 100, 
-                allow_reset: true,
-                pid_axis: 2, 
-                pid_bank: 3
+                allow_reset: true
             },
             {
                 key: "imu_acc_ignore_rate",
@@ -959,6 +883,7 @@ helper.defaultsDialog = (function () {
 
     privateScope.setSettings = function (selectedDefaultPreset) {
         //Save analytics
+        var currentProfile = parseInt($("#profilechange").val());
         googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
         Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
             return mspHelper.getSetting(input.key);
@@ -980,43 +905,34 @@ helper.defaultsDialog = (function () {
 
                     mspHelper.sendServoMixer(function () {
                         mspHelper.sendMotorMixer(function () {
-                            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, privateScope.finalize(selectedDefaultPreset));
+                            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentProfile], false, privateScope.finalize(selectedDefaultPreset));
                         })
                     });
                 } else {
-                    MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, privateScope.finalize(selectedDefaultPreset));
+                    MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentProfile], false, privateScope.finalize(selectedDefaultPreset));
                 }
             })
         });
     };
 
     publicScope.resetSettings = function () {
-        mspHelper.getSetting("applied_defaults").then(function(aD){
+        mspHelper.getSetting("applied_defaults").then(function(aD) {
             let selectedDefaultPreset = privateScope.getDefaults(aD.value);
-            
+
             if (selectedDefaultPreset && selectedDefaultPreset.settings) {
                 Promise.mapSeries(selectedDefaultPreset.settings, function (input) {
-                    if (input.allow_reset) {
-                        let logStr = "Setting " + input.key + " ...";
-                        if ( 'pid_axis' in input && 'pid_bank' in input) {
-                            logStr += " <span style='color:orange;'>Current PIDs[" + input.pid_axis + "][" + input.pid_bank + "] = " + PIDs[input.pid_axis][input.pid_bank] + "</span> |";
-                            PIDs[input.pid_axis][input.pid_bank] = input.value;
-                            logStr += " <span style='color:green;'>Setting PIDs[" + input.pid_axis + "][" + input.pid_bank + "] = " + input.value + "</span> |";
-                        }
-                        logStr += " <span style='color:cyan;'>set " + input.key + " = " + input.value + "<span>";
-                        privateScope.setSetting(input.key, input.value);
-
-                        GUI.log(logStr);
-                    }
-                    return;
+                    return mspHelper.getSetting(input.key);
                 }).then(function () {
-                    //MSP.savePidData(
-                        //privateScope.finalize(selectedDefaultPreset);
-                    //);
-                });
+                    Promise.mapSeries(selectedDefaultPreset.settings, function (input) {
+                        if (input.allow_reset) {
+                            return mspHelper.setSetting(input.key, input.value);
+                        }
+                    });
+                }).then(setTimeout( function() { 
+                    privateScope.finalize(selectedDefaultPreset);
+                }, 6000));
             }
-        });
-        return false;
+        }); 
     };
 
     privateScope.setSetting = function (key, value) {
@@ -1025,7 +941,7 @@ helper.defaultsDialog = (function () {
                 MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [1], false, function () {
                     mspHelper.setSetting(key, value, function() {
                         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [2], false, function () {
-                            mspHelper.setSetting(key, value).then();
+                            mspHelper.setSetting(key, value);
                         });
                     });
                 });

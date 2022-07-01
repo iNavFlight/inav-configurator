@@ -93,6 +93,7 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
         RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
     }
+
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
       $('#pid_main').show();
@@ -113,6 +114,7 @@ TABS.pid_tuning.initialize = function (callback) {
         $('#pid_baro').show();
       }
     }
+
     function process_html() {
         // translate to user-selected language
         localize();
