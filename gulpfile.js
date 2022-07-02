@@ -77,6 +77,7 @@ sources.js = [
     './js/helpers.js',
     './node_modules/inflection/inflection.min.js',
     './node_modules/bluebird/js/browser/bluebird.min.js',
+    './js/presets.js',
     './js/injected_methods.js',
     './js/intervals.js',
     './js/timeouts.js',
