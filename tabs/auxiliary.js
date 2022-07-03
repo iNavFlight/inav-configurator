@@ -18,7 +18,11 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, get_ports_data);
+        if (SERIAL_CONFIG.ports.length == 0) {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, get_ports_data);
+        } else {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        }
     }
 
     function get_ports_data() {
