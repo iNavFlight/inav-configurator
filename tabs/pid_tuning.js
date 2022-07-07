@@ -9,6 +9,8 @@ TABS.pid_tuning.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
+    let filterPresetWizard;
+
     var loadChain = [
         mspHelper.loadPidNames,
         mspHelper.loadPidData,
@@ -239,6 +241,40 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.rpy_d').prop('disabled', 'disabled');
         }
 
+        let $wizardButton = $('#filter-presets');
+
+        /*
+        * generate all the presets in the wizard
+        */
+        let $presetContent = $('#filterPresetContent .filterPresetContent_wrapper');
+        let presets = helper.presets.getByType('filter');
+
+        for (let i = 0; i < presets.length; i++) {
+            let preset = presets[i];
+
+            let html = "<div data-preset='" + preset.id + "'>" +
+                "<div class='filterPresetContent_title'>" + preset.name + "</div>" +
+                "<div class='filterPresetContent_description'>" + preset.description + "</div>" +
+                "</div>";
+
+            $presetContent.append(html);
+            // console.log(preset);
+        }
+
+        filterPresetWizard = new jBox('Modal', {
+            width: 480,
+            height: 410,
+            closeButton: 'title',
+            animation: false,
+            attach: $wizardButton,
+            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
+            content: $('#filterPresetContent')
+        });
+
+        $('#filter-presets').on('click', function (event) {
+            event.preventDefault();
+        });
+
         GUI.simpleBind();
 
         // UI Hooks
@@ -295,6 +331,8 @@ TABS.pid_tuning.initialize = function (callback) {
 };
 
 TABS.pid_tuning.cleanup = function (callback) {
+    delete filterPresetWizard;
+    $('.jBox-wrapper').remove();
     if (callback) {
         callback();
     }

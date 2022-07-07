@@ -4298,5 +4298,8 @@
     },
     "showAdvancedPIDs": {
         "message": "Show advanced PID controllers"
+    },
+    "filterPresets": {
+        "message": "Filter presets"
     }
 }
