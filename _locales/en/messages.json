@@ -4290,6 +4290,15 @@
     "BLACKBOX_FEATURE_GYRO_RAW": {
         "message": "Gyro RAW (no filtering)"
     },
+    "BLACKBOX_FEATURE_GYRO_PEAKS_ROLL": {
+        "message": "Gyro Noise peak freq. Roll"
+    },
+    "BLACKBOX_FEATURE_GYRO_PEAKS_PITCH": {
+        "message": "Gyro Noise peak freq. Pitch"
+    },
+    "BLACKBOX_FEATURE_GYRO_PEAKS_YAW": {
+        "message": "Gyro Noise peak freq. Yaw"
+    },
     "axisRoll": {
         "message": "Roll"
     },
