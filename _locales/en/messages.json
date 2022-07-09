@@ -49,6 +49,9 @@
     "savingDefaults": {
         "message": "Device - <span style=\"color: red\">Saving default settings</span>"
     },
+    "resettingPIDs": {
+        "message": "Device - <span style=\"color: red\">Resetting PID & related settings</span>"
+    },
     "fcNotConnected": {
         "message": "Not connected"
     },
@@ -3877,7 +3880,7 @@
         "message": "This will allow to select new default values for all settings. Existing PID tune and other settings might be lost!\nDo you want to continue?"
     },
     "confirm_reset_pid": {
-        "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
+        "message": "This will reset all PID settings for the current profile to platform default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
         "message": "Output"
