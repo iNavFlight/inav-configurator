@@ -233,15 +233,16 @@ var Settings = (function () {
 
         const oldValue = element.val();
 
-        //display names for the units
-        const unitDisplayDames = {
+        // Display names for the units
+        const unitDisplayNames = {
             // Misc
-            'us' : "uS",
             'cw' : 'cW',
             'percent' : '%',
             'cmss' : 'cm/s/s',
             // Time
+            'us' : "uS",
             'msec' : 'ms',
+            'msec-nc' : 'ms', // Milliseconds, but not converted.
             'dsec' : 'ds',
             'sec' : 's',
             // Angles
@@ -274,6 +275,47 @@ var Settings = (function () {
             'nm' : 'NM'
         }
 
+        // Hover full descriptions for the units
+        const unitExpandedNames = {
+            // Misc
+            'cw' : 'CentiWatts',
+            'percent' : 'Percent',
+            'cmss' : 'Centimetres per second, per second',
+            // Time
+            'us' : "Microseconds",
+            'msec' : 'Milliseconds',
+            'msec-nc' : 'Milliseconds',
+            'dsec' : 'Deciseconds',
+            'sec' : 'Seconds',
+            // Angles
+            'deg' : 'Degrees',
+            'decideg' : 'DeciDegrees',
+            'decideg-lrg' : 'DeciDegrees',
+            // Rotational speed
+            'degps' : 'Degrees per second',
+            'decadegps' : 'DecaDegrees per second',
+            // Temperature
+            'decidegc' : 'DeciDegrees Celsius',
+            'degc' : 'Degrees Celsius',
+            'degf' : 'Degrees Fahrenheit',
+            // Speed
+            'cms' : 'Centimetres per second',
+            'v-cms' : 'Centimetres per second',
+            'ms' : 'Metres per second',
+            'kmh' : 'Kilometres per hour',
+            'mph' : 'Miles per hour',
+            'hftmin' : 'Hundred feet per minute',
+            'fts' : 'Feet per second',
+            'kt' : 'Knots',
+            // Distance
+            'cm' : 'Centimetres',
+            'm' : 'Metres',
+            'km' : 'Kilometres',
+            'm-lrg' : 'Metres',
+            'ft' : 'Feet',
+            'mi' : 'Miles',
+            'nm' : 'Nautical Miles'
+        }
 
         // Ensure we can do conversions
         if (!inputUnit || !oldValue || !element) {
@@ -308,6 +350,9 @@ var Settings = (function () {
                 'ms' : 100,
                 'hftmin' : 50.8,
                 'fts' : 30.48
+            },
+            'msec-nc' : {
+                'msec-nc' : 1
             },
             'msec' : {
                 'sec' : 1000
@@ -459,7 +504,7 @@ var Settings = (function () {
         element.data('setting-multiplier', multiplier);
 
         // Now wrap the input in a display that shows the unit
-        element.wrap(`<div data-unit="${unitDisplayDames[unitName]}" class="unit_wrapper unit"></div>`);
+        element.wrap(`<div data-unit="${unitDisplayNames[unitName]}" title="${unitExpandedNames[unitName]}" class="unit_wrapper unit"></div>`);
 
         function toFahrenheit(decidegC) {
             return (decidegC / 10) * 1.8 + 32;

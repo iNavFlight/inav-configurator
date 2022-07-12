@@ -99,24 +99,7 @@ TABS.outputs.initialize = function (callback) {
             $motorStopWarningBox = $("#motor-stop-warning"),
             $reversibleMotorBox = $(".for-reversible-motors");
 
-        function buildMotorRates() {
-            var protocolData = escProtocols[ADVANCED_CONFIG.motorPwmProtocol];
-
-            $escRate.find('option').remove();
-
-            for (var i in protocolData.rates) {
-                if (protocolData.rates.hasOwnProperty(i)) {
-                    $escRate.append('<option value="' + i + '">' + protocolData.rates[i] + '</option>');
-                }
-            }
-
-            /*
-             *  If rate from FC is not on the list, add a new entry
-             */
-            if ($escRate.find('[value="' + ADVANCED_CONFIG.motorPwmRate + '"]').length == 0) {
-                $escRate.append('<option value="' + ADVANCED_CONFIG.motorPwmRate + '">' + ADVANCED_CONFIG.motorPwmRate + 'Hz</option>');
-            }
-
+        function handleIdleMessageBox() {
             $idleInfoBox.hide();
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
                 $('.hide-for-shot').hide();
@@ -133,18 +116,10 @@ TABS.outputs.initialize = function (callback) {
                     $idleInfoBox.show();
                 }
             }
-
-            if (protocolData.message !== null) {
-                $('#esc-protocol-warning').html(chrome.i18n.getMessage(protocolData.message));
-                $('#esc-protocol-warning').show();
-            } else {
-                $('#esc-protocol-warning').hide();
-            }
-
         }
 
         let $escProtocol = $('#esc-protocol');
-        let $escRate = $('#esc-rate');
+        
         for (i in escProtocols) {
             if (escProtocols.hasOwnProperty(i)) {
                 var protocolData = escProtocols[i];
@@ -153,21 +128,13 @@ TABS.outputs.initialize = function (callback) {
         }
 
         $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
-        buildMotorRates();
-        $escRate.val(ADVANCED_CONFIG.motorPwmRate);
 
         $escProtocol.change(function () {
             ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
-            buildMotorRates();
-            ADVANCED_CONFIG.motorPwmRate = escProtocols[ADVANCED_CONFIG.motorPwmProtocol].defaultRate;
-            $escRate.val(ADVANCED_CONFIG.motorPwmRate);
         });
 
-        $escRate.change(function () {
-            ADVANCED_CONFIG.motorPwmRate = $(this).val();
-        });
-
-        $idlePercent.change(buildMotorRates);
+        $idlePercent.change(handleIdleMessageBox);
+        handleIdleMessageBox();
 
         $("#esc-protocols").show();
 

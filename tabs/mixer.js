@@ -130,6 +130,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
+                                case STABILIZED_PITCH_POSITIVE:
+                                case STABILIZED_PITCH_NEGATIVE:
                                 case INPUT_RC_PITCH:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaces.elevatorSet);
                                     if (outputArea != null) {
@@ -152,6 +154,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_ROLL:
+                                case STABILIZED_ROLL_POSITIVE:
+                                case STABILIZED_ROLL_NEGATIVE:
                                 case INPUT_RC_ROLL:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaces.aileronSet);
                                     if (outputArea != null) {
@@ -174,6 +178,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_YAW:
+                                case STABILIZED_YAW_POSITIVE:
+                                case STABILIZED_YAW_NEGATIVE:
                                 case INPUT_RC_YAW:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaces.rudderSet);
                                     if (outputArea != null) {

@@ -178,11 +178,6 @@ TABS.receiver.initialize = function (callback) {
         // set current value
         $rcMap.val(str);
 
-        /*
-         * Send tracking event so we can know if users are using different mappings than EATR
-         */
-        googleAnalytics.sendEvent('Setting', 'RcMappingRead', str);
-
         // validation / filter
         var last_valid = str;
 
@@ -296,6 +291,8 @@ TABS.receiver.initialize = function (callback) {
             for (var i = 0; i < RC_MAP.length; i++) {
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
+
+            googleAnalytics.sendEvent('Setting', 'RcProtocol', $('#receiver_type option:selected').text() + ":" + $('#serialrx_provider option:selected').text());
 
             // catch rssi aux
             MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());
