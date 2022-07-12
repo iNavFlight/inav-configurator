@@ -1,6 +1,6 @@
 {
-  "name": "inav-configurator",
-  "description": "INAV Configurator",
+  "name": "mix-air",
+  "description": "MiX AiR",
   "version": "6.0.0",
   "main": "main.html",
   "default_locale": "en",
@@ -54,4 +54,5 @@
   "optionalDependencies": {
     "appdmg": "^0.6.2"
   }
+
 }
