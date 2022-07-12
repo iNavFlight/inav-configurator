@@ -4313,5 +4313,17 @@
     },
     "showAdvancedPIDs": {
         "message": "Show advanced PID controllers"
+    },
+    "rc_filter_lpf_hz": {
+        "message": "Manual LPF Hz"
+    },
+    "rc_filter_smoothing_factor": {
+        "message": "Auto Smoothing Factor"
+    },
+    "rc_filter_auto": {
+        "message": "Use automatic RC smoothing"
+    },
+    "rcSmoothing": {
+        "message": "RC Smoothing"
     }
 }
