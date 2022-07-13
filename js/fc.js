@@ -64,7 +64,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    ESC_SENSOR_DATA;
 
 var FC = {
     restartRequired: false,
@@ -532,7 +533,7 @@ var FC = {
             boostSpeedThreshold: null,
             boostDisengageSpeed: null,
             bankAngle: null
-        }
+        };
 
         RXFAIL_CONFIG = [];
 
@@ -541,6 +542,11 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        ESC_SENSOR_DATA = {
+            motors: 0,
+            rpm: []
+        }
     },
     getOutputUsages: function() {
         return {

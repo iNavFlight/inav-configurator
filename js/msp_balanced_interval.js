@@ -55,7 +55,6 @@ helper.mspBalancedInterval = (function (mspQueue, intervalHandler) {
                 );
             }
         }
-
     };
 
     /**

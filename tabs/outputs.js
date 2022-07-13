@@ -20,7 +20,16 @@ TABS.outputs.initialize = function (callback) {
         googleAnalytics.sendAppView('Outputs');
     }
 
-    var loadChainer = new MSPChainerClass();
+    var loadChainer = new MSPChainerClass(),
+        statusChainer = new MSPChainerClass();
+
+    statusChainer.setChain([
+        mspHelper.loadEscRpm,
+        mspHelper.loadImuRaw,
+        mspHelper.loadMotors,
+        mspHelper.loadServos
+    ]);
+    statusChainer.setExitPoint(onStatusPullDone);
 
     loadChainer.setChain([
         mspHelper.loadMiscV2,
@@ -68,13 +77,125 @@ TABS.outputs.initialize = function (callback) {
         Settings.saveInputs().then(onComplete);
     }
 
+    let samples_accel_i = 0,
+        accel_data = initDataArray(3),
+        accel_max_read = [0, 0, 0],
+        accel_offset = [0, 0, 0],
+        accel_offset_established = false,
+        full_block_scale = MISC.maxthrottle - MISC.mincommand;
+
+    let motors_wrapper,
+        servos_wrapper,
+        $motorTitles,
+        $motorSliders,
+        $motorValues;
+
+    function update_accel_graph() {
+
+        if (!accel_offset_established) {
+            for (var i = 0; i < 3; i++) {
+                accel_offset[i] = SENSOR_DATA.accelerometer[i] * -1;
+            }
+
+            accel_offset_established = true;
+        }
+
+        var accel_with_offset = [
+            accel_offset[0] + SENSOR_DATA.accelerometer[0],
+            accel_offset[1] + SENSOR_DATA.accelerometer[1],
+            accel_offset[2] + SENSOR_DATA.accelerometer[2]
+        ];
+
+        samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
+
+        // Compute RMS of acceleration in displayed period of time
+        // This is particularly useful for motor balancing as it
+        // eliminates the need for external tools
+        var sum = 0.0;
+        for (var j = 0; j < accel_data.length; j++)
+            for (var k = 0; k < accel_data[j].length; k++)
+                sum += accel_data[j][k][1] * accel_data[j][k][1];
+
+        let rms = Math.sqrt(sum / (accel_data[0].length + accel_data[1].length + accel_data[2].length));
+        $(".acc-rms").text(rms.toFixed(4));
+
+        for (var i = 0; i < 3; i++) {
+            if (Math.abs(accel_with_offset[i]) > Math.abs(accel_max_read[i])) accel_max_read[i] = accel_with_offset[i];
+        }
+    }
+
+    function updateMotorsAndServos() {
+        var previousArmState = self.armed,
+            block_height = $('div.m-block:first').height(),
+            data,
+            margin_top,
+            height,
+            color,
+            i;
+
+        for (i = 0; i < MOTOR_DATA.length; i++) {
+            data = MOTOR_DATA[i] - MISC.mincommand;
+            margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
+            height = (data * (block_height / full_block_scale)).clamp(0, block_height);
+            color = parseInt(data * 0.009);
+
+            $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
+            $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
+        }
+
+        // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
+        for (i = 0; i < SERVO_DATA.length; i++) {
+            data = SERVO_DATA[i] - 1000;
+            margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
+            height = (data * (block_height / 1000)).clamp(0, block_height);
+            color = parseInt(data * 0.009);
+
+            $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
+            $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
+        }
+        //keep the following here so at least we get a visual cue of our motor setup
+        update_arm_status();
+        if (!self.allowTestMode) return;
+
+        if (self.armed) {
+            $motorsEnableTestMode.prop('disabled', true);
+            $motorsEnableTestMode.prop('checked', false);
+        } else {
+            if (self.allowTestMode) {
+                $motorsEnableTestMode.prop('disabled', false);
+            }
+        }
+
+        if (previousArmState != self.armed) {
+            console.log('arm state change detected');
+            $motorsEnableTestMode.change();
+        }
+    }
+
+    function onStatusPullDone() {
+
+        update_accel_graph();
+
+        $(".current-current").html(ANALOG.amperage.toFixed(2));
+        $(".current-voltage").html(ANALOG.voltage.toFixed(2));
+
+        updateMotorsAndServos();
+    }
+
     function onLoad() {
 
         self.feature3DEnabled = bit_check(FEATURES, 12);
 
+        // Always start with default/empty sensor data array, clean slate all
+        initSensorData();
+
         process_motors();
         process_servos();
         processConfiguration();
+
+        helper.mspBalancedInterval.add('data_pull', 75, 4, function () {
+            statusChainer.execute();
+        });
 
         finalize();
     }
@@ -165,8 +286,6 @@ TABS.outputs.initialize = function (callback) {
         let $reversibleMotorCheckbox = $('#feature-12');
         function showHideReversibleMotorInfo() {
             const reversibleMotorEnabled = $reversibleMotorCheckbox.is(':checked');
-
-            console.log(reversibleMotorEnabled);
 
             if (reversibleMotorEnabled) {
                 $reversibleMotorBox.show();
@@ -397,6 +516,12 @@ TABS.outputs.initialize = function (callback) {
     function process_motors() {
         $motorsEnableTestMode = $('#motorsEnableTestMode');
 
+        motors_wrapper = $('.motors .bar-wrapper'),
+        servos_wrapper = $('.servos .bar-wrapper'),
+        $motorTitles = $('.motor-titles'),
+        $motorSliders = $('.motor-sliders'),
+        $motorValues = $('.motor-values');
+
         if (self.feature3DEnabled && !self.feature3DSupported) {
             self.allowTestMode = false;
         }
@@ -405,82 +530,6 @@ TABS.outputs.initialize = function (callback) {
         $motorsEnableTestMode.prop('disabled', true);
 
         update_model(MIXER_CONFIG.appliedMixerPreset);
-
-        // Always start with default/empty sensor data array, clean slate all
-        initSensorData();
-
-        // Setup variables
-        var samples_accel_i = 0,
-            accel_data = initDataArray(3),
-            accel_max_read = [0, 0, 0],
-            accel_offset = [0, 0, 0],
-            accel_offset_established = false;
-
-        let $rmsHelper = $(".acc-rms"),
-            $currentHelper = $(".current-current"),
-            $voltageHelper = $(".current-voltage");
-
-        // timer initialization
-        helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
-        helper.mspBalancedInterval.flush();
-
-        helper.interval.add('IMU_pull', function () {
-
-            /*
-            * Enable balancer
-            */
-            if (helper.mspQueue.shouldDrop()) {
-                update_accel_graph();
-                return;
-            }
-
-            MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
-        }, 25, true);
-
-        helper.interval.add('ANALOG_pull', function () {
-            $currentHelper.html(ANALOG.amperage.toFixed(2));
-            $voltageHelper.html(ANALOG.voltage.toFixed(2));
-        }, 100, true);
-
-        function update_accel_graph() {
-
-            if (!accel_offset_established) {
-                for (var i = 0; i < 3; i++) {
-                    accel_offset[i] = SENSOR_DATA.accelerometer[i] * -1;
-                }
-
-                accel_offset_established = true;
-            }
-
-            var accel_with_offset = [
-                accel_offset[0] + SENSOR_DATA.accelerometer[0],
-                accel_offset[1] + SENSOR_DATA.accelerometer[1],
-                accel_offset[2] + SENSOR_DATA.accelerometer[2]
-            ];
-
-            samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
-
-            // Compute RMS of acceleration in displayed period of time
-            // This is particularly useful for motor balancing as it
-            // eliminates the need for external tools
-            var sum = 0.0;
-            for (var j = 0; j < accel_data.length; j++)
-                for (var k = 0; k < accel_data[j].length; k++)
-                    sum += accel_data[j][k][1] * accel_data[j][k][1];
-
-            let rms = Math.sqrt(sum / (accel_data[0].length + accel_data[1].length + accel_data[2].length));
-            $rmsHelper.text(rms.toFixed(4));
-
-            for (var i = 0; i < 3; i++) {
-                if (Math.abs(accel_with_offset[i]) > Math.abs(accel_max_read[i])) accel_max_read[i] = accel_with_offset[i];
-            }
-        }
-
-        let motors_wrapper = $('.motors .bar-wrapper'),
-            servos_wrapper = $('.servos .bar-wrapper'),
-            $motorTitles = $('.motor-titles'),
-            $motorSliders = $('.motor-sliders'),
-            $motorValues = $('.motor-values');
 
         for (let i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
             const motorNumber = i + 1;
@@ -651,79 +700,7 @@ TABS.outputs.initialize = function (callback) {
             }
         }
 
-        $motorsEnableTestMode.change();
-
-        function getPeriodicMotorOutput() {
-
-            if (helper.mspQueue.shouldDrop()) {
-                getPeriodicServoOutput();
-                return;
-            }
-
-            MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
-        }
-
-        function getPeriodicServoOutput() {
-            if (helper.mspQueue.shouldDrop()) {
-                update_ui();
-                return;
-            }
-
-            MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
-        }
-
-        var full_block_scale = MISC.maxthrottle - MISC.mincommand;
-
-        function update_ui() {
-            var previousArmState = self.armed,
-                block_height = $('div.m-block:first').height(),
-                data,
-                margin_top,
-                height,
-                color,
-                i;
-
-            for (i = 0; i < MOTOR_DATA.length; i++) {
-                data = MOTOR_DATA[i] - MISC.mincommand;
-                margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
-                height = (data * (block_height / full_block_scale)).clamp(0, block_height);
-                color = parseInt(data * 0.009);
-
-                $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
-                $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
-            }
-
-            // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
-            for (i = 0; i < SERVO_DATA.length; i++) {
-                data = SERVO_DATA[i] - 1000;
-                margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
-                height = (data * (block_height / 1000)).clamp(0, block_height);
-                color = parseInt(data * 0.009);
-
-                $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
-                $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
-            }
-            //keep the following here so at least we get a visual cue of our motor setup
-            update_arm_status();
-            if (!self.allowTestMode) return;
-
-            if (self.armed) {
-                $motorsEnableTestMode.prop('disabled', true);
-                $motorsEnableTestMode.prop('checked', false);
-            } else {
-                if (self.allowTestMode) {
-                    $motorsEnableTestMode.prop('disabled', false);
-                }
-            }
-
-            if (previousArmState != self.armed) {
-                console.log('arm state change detected');
-                $motorsEnableTestMode.change();
-            }
-        }
-
-        // enable Status and Motor data pulling
-        helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 100, true);
+        $motorsEnableTestMode.change();    
     }
 
     function finalize() {

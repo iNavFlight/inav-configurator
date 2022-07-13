@@ -58,7 +58,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
             GUI.log(chrome.i18n.getMessage('programmingEepromSaved'));
         });
 
-        helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
+        helper.mspBalancedInterval.add('logic_conditions_pull', 100, 3, function () {
             statusChainer.execute();
         });
 

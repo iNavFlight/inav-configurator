@@ -1465,6 +1465,14 @@ var mspHelper = (function (gui) {
                 console.log('Safehome points saved');
                 break;
 
+            case MSPCodes.MSP2_INAV_ESC_RPM:
+                ESC_SENSOR_DATA.motors = dataHandler.message_length_expected / 4;
+
+                for (i = 0; i < ESC_SENSOR_DATA.motors; i++) {
+                    ESC_SENSOR_DATA.rpm[i] = data.getUint32((i * 4), true);
+                }
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -3190,6 +3198,10 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
     };
 
+    self.loadServos = function (callback) {
+        MSP.send_message(MSPCodes.MSP_SERVO, false, false, callback);
+    };
+
     self.getCraftName = function (callback) {
         MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {
             var name = resp.data.readString();
@@ -3263,6 +3275,13 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
     };
 
+    self.loadEscRpm = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_ESC_RPM, false, false, callback);
+    }
+
+    self.loadImuRaw = function (callback) {
+        MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, callback);
+    }
 
     return self;
 })(GUI);
