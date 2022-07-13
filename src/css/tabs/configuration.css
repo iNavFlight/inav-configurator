@@ -233,6 +233,11 @@ hr {
     width: calc(100% - 162px);
 }
 
+.config-section--full-width label {
+    display: block;
+    width: auto;
+}
+
 .config-section .radio label {
     left: 2em;
 }
