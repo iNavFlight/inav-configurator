@@ -25,8 +25,7 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
             default:
                 return defaultName;
         }
-    } 
+    }
     
-    return defaultName;
-    
+    return defaultName;  
 }
