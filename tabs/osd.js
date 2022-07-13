@@ -2791,6 +2791,7 @@ OSD.GUI.updateAll = function() {
         layouts.on('change', function() {
             OSD.updateSelectedLayout(parseInt(layouts.val()));
             OSD.GUI.updateFields();
+            OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
             OSD.GUI.updatePreviews();
         });
     } else {

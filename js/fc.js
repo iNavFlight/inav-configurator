@@ -596,10 +596,7 @@ var FC = {
         return [
             'NMEA',
             'UBLOX',
-            'I2C-NAV',
-            'DJI NAZA',
             'UBLOX7',
-            'MTK',
             'MSP'
         ];
     },
