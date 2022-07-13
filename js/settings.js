@@ -64,7 +64,7 @@ var Settings = (function () {
                     } else {
                         input.empty();
                         let option = null;
-                        if (input.data('invert-select') === true) {
+                        if (input.data('setting-invert-select') === true) {
                             for (var ii = s.setting.max; ii >= s.setting.min; ii--) {
                                 option = null;
                                 option = self.fillSelectOption(s, ii);

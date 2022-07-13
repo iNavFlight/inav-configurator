@@ -2676,7 +2676,7 @@ OSD.GUI.updatePreviews = function() {
         centerPosition += OSD.data.display_size.x / 2;
     }
 
-    let hudCenterPosition = centerPosition + (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
+    let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
