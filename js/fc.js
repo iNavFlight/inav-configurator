@@ -596,7 +596,6 @@ var FC = {
         return [
             'NMEA',
             'UBLOX',
-            'DJI NAZA',
             'UBLOX7',
             'MSP'
         ];
