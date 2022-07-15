@@ -302,7 +302,7 @@ function build_win_zip(arch) {
         // Create ZIP
         console.log(`Creating ${arch} ZIP file...`);
         var src = path.join(appsDir, pkg.name, arch);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip', '-portable')));
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip')));
         var archive = archiver('zip', {
                 zlib: { level: 9 }
         });
