@@ -262,6 +262,8 @@ var Settings = (function () {
             'msec-nc' : 'ms', // Milliseconds, but not converted.
             'dsec' : 'ds',
             'sec' : 's',
+            'mins' : 'm',
+            'hours' : 'h',
             // Angles
             'deg' : '&deg;',
             'decideg' : 'deci&deg;',
@@ -304,6 +306,8 @@ var Settings = (function () {
             'msec-nc' : 'Milliseconds',
             'dsec' : 'Deciseconds',
             'sec' : 'Seconds',
+            'mins' : 'Minutes',
+            'hours' : 'Hours',
             // Angles
             'deg' : 'Degrees',
             'decideg' : 'DeciDegrees',
@@ -377,6 +381,9 @@ var Settings = (function () {
             'dsec' : {
                 'sec' : 10
             },
+            'mins' : {
+                'hours' : 60
+            },
             'decideg' : {
                 'deg' : 10
             },
@@ -402,6 +409,7 @@ var Settings = (function () {
                 'v-cms' : 'fts',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -415,6 +423,7 @@ var Settings = (function () {
                 'v-cms' : 'ms',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -431,6 +440,7 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
                 'decidegc' : 'degc',
             },
             3:{ //UK
@@ -444,6 +454,7 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
                 'decidegc' : 'degc',
             },
             4: { //General aviation
@@ -457,11 +468,13 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
                 'decidegc' : 'degc',
             },
             default: { //show base units
                 'decadegps' : 'degps',
                 'decideg-lrg' : 'deg',
+                'mins' : 'hours',
             }
         };
 
