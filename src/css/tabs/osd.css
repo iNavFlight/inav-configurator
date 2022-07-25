@@ -436,17 +436,49 @@ button {
 }
 
 .tab-osd .hd_43_left {
-	border-left: 1px solid red;
+	border-left: 2px solid red;
 	position: absolute;
 	left: 60px;
 	height: calc(100% - 27px);
 }
 
 .tab-osd .hd_43_right {
-	border-right: 1px solid red;
+	border-right: 2px solid red;
 	position: absolute;
 	right: 60px;
 	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_3016_top {
+    border-top: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    left: 120px;
+    width: 360px;
+}
+
+.tab-osd .hd_3016_bottom {
+    border-bottom: 2px solid blue;
+    position: absolute;
+    bottom: 18px;
+    left: 120px;
+    width: 360px;
+}
+
+.tab-osd .hd_3016_left {
+    border-left: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    left: 120px;
+    height: 288px;
+}
+
+.tab-osd .hd_3016_right {
+    border-right: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    right: 120px;
+    height: 288px;
 }
 
 .tab-osd .preview_hd_side {

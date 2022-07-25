@@ -3594,6 +3594,15 @@
     "osdSettingCRSF_LQ_FORMAT_HELP": {
         "message": "TYPE1 shows LQ% as used by TBS hardware. TYPE2 shows RF Profile Modes (2=150Hz, 1=50Hz, 0=4Hz update rates) and LQ % [0..100%]. Tracer shows RFMode 1 (1=250Hz) and LQ % [0..100%]."
     },
+    "osd_hdzero_FPV": {
+        "message" : "HDZero Video Format"
+    },
+       "osd_hdzero_show_guides": {
+        "message": "Show preview guides"
+    },
+    "osd_hdzero_HELP": {
+        "message": "Keep within the red lines for 4:3, and within the blue box for a higher refresh rate."
+    },
     "osd_dji_HD_FPV": {
         "message" : "DJI HD FPV"
     },
