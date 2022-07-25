@@ -2365,6 +2365,18 @@ TABS.mission_control.initialize = function (callback) {
             getWaypointsFromFC(false);
         });
 
+        $('#flyMiXAirPointMission').on('click', function () {
+            removeAllWaypoints();
+            GUI.log('Starting MiX Air Recovery Mission');
+            if (!fileLoadMultiMissionCheck()) return;
+
+            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
+            nwdialog.setContext(document);
+            nwdialog.openFileDialog(function(result) {
+                loadMissionFile(result);
+            })
+        });
+
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
                 alert(chrome.i18n.getMessage('no_waypoints_to_save'));
