@@ -10,7 +10,7 @@
     "nw": "nw"
   },
   "window": {
-    "title": "INAV Configurator",
+    "title": "MiX Air",
     "icon": "images/inav_icon_128.png",
     "toolbar": true,
     "width": 1024,

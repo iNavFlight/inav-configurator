@@ -49,6 +49,10 @@
     background-image: url(../images/icons/cf_icon_MP_loadFile_grey.svg);
 }
 
+.tab-mission-control .ic_mixairrecoverymission {
+    background-image: url(../images/icons/cf_icon_mixairmission.svg);
+}
+
 .tab-mission-control .ic_save2Eprom {
     background-image: url(../images/icons/cf_icon_MP_save2Eprom_grey.svg);
 }

@@ -2366,15 +2366,22 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#flyMiXAirPointMission').on('click', function () {
-            removeAllWaypoints();
+            $('#flyMiXAirPointMission').addClass('disabled');
             GUI.log('Starting MiX Air Recovery Mission');
-            if (!fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog(function(result) {
-                loadMissionFile(result);
-            })
+            $('#loadFileMissionButton').click();
+
+            if (CONFIGURATOR.connectionValid) 
+            {
+                $('#saveMissionButton').click();
+                $('#saveEepromMissionButton').click();
+            }
+            else
+            {
+                GUI.log('No connection to Drone, upload mission file manually');
+            }
+
+            $('#flyMiXAirPointMission').removeClass('disabled');
         });
 
         $('#saveMissionButton').on('click', function () {
@@ -2438,7 +2445,6 @@ TABS.mission_control.initialize = function (callback) {
     function loadMissionFile(filename) {
         const fs = require('fs');
         if (!window.xml2js) return GUI.log('<span style="color: red">Error reading file (xml2js not found)</span>');
-
         fs.readFile(filename, (err, data) => {
             if (err) {
                 GUI.log('<span style="color: red">Error reading file</span>');
