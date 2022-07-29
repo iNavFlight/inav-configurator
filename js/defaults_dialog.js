@@ -393,6 +393,22 @@ helper.defaultsDialog = (function () {
                 key: "nav_wp_radius",
                 value: 5000
             },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 90
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
+                value: 5000
+            },
+            {
+                key: "nav_fw_launch_climb_angle",
+                value: 25
+            },
         ],
         "features": [
             {
@@ -591,6 +607,22 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_wp_radius",
                 value: 5000
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 90
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
+                value: 5000
+            },
+            {
+                key: "nav_fw_launch_climb_angle",
+                value: 25
             },
         ],
         "features": [
