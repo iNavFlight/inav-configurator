@@ -42,12 +42,27 @@ function generateFilename(prefix, suffix) {
 
     if (CONFIG) {
         if (CONFIG.flightControllerIdentifier) {
-            filename = CONFIG.flightControllerIdentifier + '_' + filename;
-        }
+            filename = CONFIG.flightControllerIdentifier + '_' + CONFIG.flightControllerVersion + "_" + filename;
+        } 
         if (CONFIG.name && CONFIG.name.trim() !== '') {
             filename = filename + '_' + CONFIG.name.trim().replace(' ', '_');
         }
+    } else {
+        // Attempt to get the version number and 
+        MSPHelper.getSetting("version").then(function (data) {
+            if (data.value) {
+                let version = data.value.split('/')[0] + "_" + data.value.split(' ')[1];
+                filename = "" + version + "_" + filename;
+            }
+        });
+
+        MSPHelper.getSetting("name").then(function (data) {
+            if (data.value && data.value.trim() !== '') {
+                filename += "_" + data.value.trim().replace(' ', '_');
+            }
+        });
     }
+
 
     filename = filename + '_' + date.getFullYear()
         + zeroPad(date.getMonth() + 1, 2)
