@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <title>Test Html Page</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <script type="text/javascript">
+
+        jQuery(document).ready(function () {
+            getMiXAirMissionFromApi();
+        });
+
+        function getMiXAirMissionFromApi() {
+            var currentGroundStationlat;
+            var currentGroundStationlng;
+
+            currentGroundStationlat = -33.9788289;
+            currentGroundStationlng = 18.841198;
+            console.log('No connection to Drone, faking home position');
+
+            //Get mission from UI API
+            //Send current gps to ui api for first point
+            //Replace content in mixair.mission with mission from UI API
+
+            function getMiXAirMissionFromApi() {
+                $.ajax({
+                    async: true,
+                    crossDomain: true,
+                    url: "http://localhost:5122/Mission/GetRecoveryMissionXML",
+                    type: "GET",
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded"
+                    },
+                    data: {
+                        "lat": currentGroundStationlat,
+                        "lng": currentGroundStationlng
+                    },
+                    cache: false,
+                    success: function (data) {
+                        alert.log(data);
+                        $("#result").text(data);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Status: " + textStatus); 
+                        alert("Error: " + errorThrown);
+                    }
+                }).fail(function (jqXHR, textStatus, error) {
+    // Handle error here
+    alert(jqXHR.responseText);
+    console.log(jqXHR.responseText)
+});;
+            };
+
+        };
+
+    </script>
+</head>
+
+<body>
+
+    <p id="result"></p>
+
+
+</body>
+
+</html>

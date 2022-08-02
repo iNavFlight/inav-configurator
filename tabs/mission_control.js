@@ -2368,21 +2368,78 @@ TABS.mission_control.initialize = function (callback) {
         $('#flyMiXAirPointMission').on('click', function () {
             $('#flyMiXAirPointMission').addClass('disabled');
             GUI.log('Starting MiX Air Recovery Mission');
-
-            $('#loadFileMissionButton').click();
-
-            if (CONFIGURATOR.connectionValid) 
-            {
-                $('#saveMissionButton').click();
-                $('#saveEepromMissionButton').click();
-            }
-            else
-            {
-                GUI.log('No connection to Drone, upload mission file manually');
-            }
+            getMiXAirMissionFromApi();
 
             $('#flyMiXAirPointMission').removeClass('disabled');
         });
+
+
+        function getMiXAirMissionFromApi()
+        {            
+            var currentGroundStationlat;
+            var currentGroundStationlng;
+
+            if (CONFIGURATOR.connectionValid) 
+            {
+             GUI.log('Drone found, loading home GPS position');
+             var gpsPos = get_raw_gps_data();
+             let lat = GPS_DATA.lat / 10000000;
+             let lon = GPS_DATA.lon / 10000000;
+
+             currentGroundStationlat = lat;
+             currentGroundStationlng = lon;
+            }
+            else
+            {
+                currentGroundStationlat = -33.9788289;
+                currentGroundStationlng = 18.841198;
+                GUI.log('No connection to Drone, faking home position');
+            }
+
+            //Get mission from UI API
+            //Send current gps to ui api for first point
+            //Replace content in mixair.mission with mission from UI API
+
+            function getMiXAirMissionFromApi() {
+                var request = $.ajax({
+                    async: true,
+                    crossDomain: true,
+                    url: "https://mixairapi.mixdevelopment.com/Mission/GetRecoveryMissionXML",
+                    method: "GET",
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded"
+                    },
+                    data: {
+                        "lat": currentGroundStationlat,
+                        "lng": currentGroundStationlng
+                    },
+                });
+    
+                request.done(function (msg) {
+                    GUI.log(msg);
+                    //We now have the new mission from the UI API 
+                    //We have to replace the mixair.mission with the new mission
+                    //Currently nothing is being saved
+    
+                    $('#loadFileMissionButton').click();
+    
+                    if (CONFIGURATOR.connectionValid) 
+                    {
+                        $('#saveMissionButton').click();
+                        $('#saveEepromMissionButton').click();
+                    }
+                    else
+                    {
+                        GUI.log('No connection to Drone, upload mission file manually');
+                    }
+                });
+    
+                request.fail(function (jqXHR, textStatus) {
+                    GUI.log("MiX Air Mission Request failed: " + textStatus);
+                });
+            };
+
+        };
 
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
