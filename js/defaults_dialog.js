@@ -395,7 +395,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_launch_max_angle",
-                value: 90
+                value: 45
             },
             {
                 key: "nav_fw_launch_motor_delay",
@@ -610,7 +610,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_launch_max_angle",
-                value: 90
+                value: 75
             },
             {
                 key: "nav_fw_launch_motor_delay",
