@@ -40,7 +40,6 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     }
 
     function processHtml() {
-
         LOGIC_CONDITIONS.init($('#subtab-lc'));
         LOGIC_CONDITIONS.render();
 

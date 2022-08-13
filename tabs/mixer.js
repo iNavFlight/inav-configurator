@@ -295,6 +295,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     function () {
                         servoRule.setConditionId($(this).val());
                     },
+                    true,
                     true
                 );
 
