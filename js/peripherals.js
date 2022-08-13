@@ -16,11 +16,6 @@ function isPeripheralSelected(peripheralName) {
 function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
     if (isPeripheralSelected("RUNCAM_DEVICE_CONTROL")) {
         switch (modeId) {
-            case 11: // NAV POSHOLD
-                if (FC.isAirplane()) {
-                    return "LOITER";
-                }
-                break;
             case 39: // BOXCAMERA1
                 return "CAMERA WI-FI";
             case 40: // BOXCAMERA2
@@ -28,10 +23,15 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
             case 41: // BOXCAMERA3
                 return "CAMERA CHANGE MODE";
             default:
-                return defaultName;
+                break;
         }
-    } 
+    }
     
-    return defaultName;
-    
+    if (modeId === 11) {
+        if (FC.isAirplane()) {
+            return "NAV LOITER";
+        }
+    }
+
+    return defaultName;  
 }
