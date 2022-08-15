@@ -588,6 +588,10 @@ function release_deb(arch) {
 
 function post_release_deb(arch) {
     return function post_release_linux_deb(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
         if ((arch === 'linux32') || (arch === 'linux64')) {
             var rename = require("gulp-rename");
             const metadata = require('./package.json');
