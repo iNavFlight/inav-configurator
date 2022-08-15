@@ -14,7 +14,7 @@
 #define CompanyUrl "https://github.com/iNavFlight/inav"
 #define ExecutableFileName "inav-configurator.exe"
 #define GroupName "INAV"
-#define InstallerFileName "INAV-Configurator_" + archName + "-installer" + "_" + version
+#define InstallerFileName "INAV-Configurator_" + archName + "_" + version
 #define SourcePath "..\..\" + sourceFolder + "\inav-configurator\" + archName
 #define TargetFolderName "INAV-Configurator"
 #define UpdatesUrl "https://github.com/iNavFlight/inav-configurator/releases"
