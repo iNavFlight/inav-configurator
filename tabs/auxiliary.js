@@ -103,7 +103,9 @@ TABS.auxiliary.initialize = function (callback) {
         var modeTemplate = $('#tab-auxiliary-templates .mode');
         var newMode = modeTemplate.clone();
         var modeName = AUX_CONFIG[modeIndex];
-        // if user choose the runcam split at peripheral column, then adjust the boxname(BOXCAMERA1, BOXCAMERA2, BOXCAMERA3)
+        
+        // If the runcam split peripheral is used, then adjust the boxname(BOXCAMERA1, BOXCAMERA2, BOXCAMERA3)
+        // If platform is fixed wing, rename POS HOLD to LOITER
         modeName = adjustBoxNameIfPeripheralWithModeID(modeId, modeName);
  
         $(newMode).attr('id', 'mode-' + modeIndex);
