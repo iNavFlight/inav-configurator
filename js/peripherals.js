@@ -23,10 +23,15 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
             case 41: // BOXCAMERA3
                 return "CAMERA CHANGE MODE";
             default:
-                return defaultName;
+                break;
         }
-    } 
+    }
     
-    return defaultName;
-    
+    if (modeId === 11) {
+        if (FC.isAirplane()) {
+            return "NAV LOITER";
+        }
+    }
+
+    return defaultName;  
 }
