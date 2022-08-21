@@ -286,9 +286,13 @@ function get_nw_version() {
     return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
 }
 
+function get_release_filename_base(platform) {
+    return 'INAV-Configurator_' + platform;
+}
+
 function get_release_filename(platform, ext, addition = '') {
     var pkg = require('./package.json');
-    return 'INAV-Configurator_' + platform + addition + '_' + pkg.version + '.' + ext;
+    return get_release_filename_base(platform) + addition + '_' + pkg.version + '.' + ext;
 }
 
 function build_win_zip(arch) {
@@ -298,7 +302,7 @@ function build_win_zip(arch) {
         // Create ZIP
         console.log(`Creating ${arch} ZIP file...`);
         var src = path.join(appsDir, pkg.name, arch);
-        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip', '-portable')));
+        var output = fs.createWriteStream(path.join(appsDir, get_release_filename(arch, 'zip')));
         var archive = archiver('zip', {
                 zlib: { level: 9 }
         });
@@ -582,6 +586,28 @@ function release_deb(arch) {
     }
 }
 
+function post_release_deb(arch) {
+    return function post_release_linux_deb(done) {
+        if (!getArguments().installer) {
+            done();
+            return null;
+        }
+        if ((arch === 'linux32') || (arch === 'linux64')) {
+            var rename = require("gulp-rename");
+            const metadata = require('./package.json');
+            const renameFrom = path.join(appsDir, metadata.name + '_' + metadata.version + '_' + getLinuxPackageArch('.deb', arch) + '.deb');
+            const renameTo = path.join(appsDir, get_release_filename_base(arch) + '_' + metadata.version + '.deb');
+            // Rename .deb build to common naming
+            console.log(`Renaming .deb installer ${renameFrom} to ${renameTo}`);
+            return gulp.src(renameFrom)
+                    .pipe(rename(renameTo))
+                    .pipe(gulp.dest("."));
+        }
+
+        return done();
+    }
+}
+
 function release_rpm(arch) {
     return function release_rpm_proc(done) {
         if (!getArguments().installer) {
@@ -607,7 +633,7 @@ function release_rpm(arch) {
         createDirIfNotExists(appsDir);
 
         const options = {
-            name: metadata.name,
+            name: get_release_filename_base(arch), // metadata.name,
             version: metadata.version.replace(NAME_REGEX, '_'), // RPM does not like release candidate versions
             buildArch: getLinuxPackageArch('rpm', arch),
             vendor: metadata.author,
@@ -680,8 +706,8 @@ function releaseLinux(bits) {
     }
 }
 
-gulp.task('release-linux32', gulp.series(releaseLinux(32), post_build('linux32', appsDir), release_deb('linux32')));
-gulp.task('release-linux64', gulp.series(releaseLinux(64), post_build('linux64', appsDir), release_deb('linux64'), release_rpm('linux64')));
+gulp.task('release-linux32', gulp.series(releaseLinux(32), post_build('linux32', appsDir), release_deb('linux32'), post_release_deb('linux32')));
+gulp.task('release-linux64', gulp.series(releaseLinux(64), post_build('linux64', appsDir), release_deb('linux64'), post_release_deb('linux64'), release_rpm('linux64')));
 
 // Create distributable .zip files in ./apps
 gulp.task('release', gulp.series('apps',  getPlatforms().map(function(v) { return 'release-' + v; })));

@@ -93,7 +93,6 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
         RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
     }
-
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
       $('#pid_main').show();
@@ -114,7 +113,6 @@ TABS.pid_tuning.initialize = function (callback) {
         $('#pid_baro').show();
       }
     }
-
     function process_html() {
         // translate to user-selected language
         localize();
@@ -137,24 +135,16 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         $('#resetPIDs').on('click', function() {
-            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
-                resettingPIDsModal = new jBox('Modal', {
-                    width: 400,
-                    height: 100,
-                    animation: false,
-                    closeOnClick: false,
-                    closeOnEsc: false,
-                    content: $('#modal-resetting-pids')
-                }).open();
 
-                helper.defaultsDialog.resetSettings();
+            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
+                MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
+                updateActivatedTab();
             }
         });
 
         $('#resetDefaults').on('click', function() {
+
             if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
-                helper.features.reset();
-                helper.features.fromUI($('.tab-pid_tuning'));
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
                         GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
