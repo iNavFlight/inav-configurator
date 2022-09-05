@@ -1885,7 +1885,7 @@ OSD.constants = {
                 {
                     name: 'MISSION_INDEX',
                     id: 139,
-                    preview: 'WP I 7'
+                    preview: 'WP NO 7'
                 },
             ]
         },
