@@ -250,7 +250,7 @@ gulp.task('dist-build', gulp.series('build', function() {
         './src/css/opensans_webfontkit/*.{eot,svg,ttf,woff,woff2}',
         './resources/*.json',
         './resources/models/*',
-        './resources/osd/*.mcm',
+        './resources/osd/analogue/*.mcm',
         './resources/motor_order/*.svg',
     ];
     return gulp.src(distSources, { base: '.' })
