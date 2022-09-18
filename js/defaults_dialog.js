@@ -287,19 +287,23 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 25
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 8
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 55
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.5
+                value: 0.4
             },
             {
                 key: "max_angle_inclination_rll",
@@ -359,11 +363,19 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "imu_acc_ignore_rate",
-                value: 9
+                value: 7
             },
             {
                 key: "imu_acc_ignore_slope",
-                value: 5
+                value: 4
+            },
+            {
+                key: "imu_dcm_kp",
+                value: 1000
+            },
+            {
+                key: "imu_dcm_ki",
+                value: 0
             },
             {
                 key: "airmode_type",
@@ -392,6 +404,22 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_wp_radius",
                 value: 5000
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 45
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
+                value: 5000
+            },
+            {
+                key: "nav_fw_launch_climb_angle",
+                value: 25
             },
         ],
         "features": [
@@ -486,19 +514,23 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 35
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 10
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 70
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.2
+                value: 0.3
             },
             {
                 key: "max_angle_inclination_rll",
@@ -565,6 +597,14 @@ helper.defaultsDialog = (function () {
                 value: 5
             },
             {
+                key: "imu_dcm_kp",
+                value: 1000
+            },
+            {
+                key: "imu_dcm_ki",
+                value: 0
+            },
+            {
                 key: "airmode_type",
                 value: "STICK_CENTER_ONCE"
             },
@@ -591,6 +631,22 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_wp_radius",
                 value: 5000
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 75
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
+                value: 5000
+            },
+            {
+                key: "nav_fw_launch_climb_angle",
+                value: 25
             },
         ],
         "features": [

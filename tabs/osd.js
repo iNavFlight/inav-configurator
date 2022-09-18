@@ -502,6 +502,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -2617,6 +2618,8 @@ OSD.GUI.updateDjiView = function(on) {
                 $(element).hide();
             }
         });
+
+        $('.switch-indicator-container').hide();
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
             $('#osdGroup' + groupName).show();
@@ -2629,6 +2632,8 @@ OSD.GUI.updateDjiView = function(on) {
         $('.settings-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
+
+        $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
 };

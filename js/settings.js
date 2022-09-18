@@ -173,19 +173,20 @@ var Settings = (function () {
 
                     let dataStep = input.data("step");
 
-                    if (dataStep !== undefined) {
-                        input.attr('step', dataStep);
-                    } else {
-                        input.attr('step', "0.01");
+                    if (typeof dataStep === 'undefined') {
+                        dataStep = self.countDecimals(s.value);
+                        dataStep = 1 / Math.pow(10, dataStep);
+                        input.data("step", dataStep);
                     }
 
+                    input.attr('step', dataStep);
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
-                    input.val(s.value.toFixed(2));
-
+                    input.val(s.value.toFixed(self.countDecimals(dataStep)));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
 
+                    input.data("step", 1);
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
                     input.attr('type', 'number');
                     if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
@@ -449,7 +450,7 @@ var Settings = (function () {
                 'm-lrg' : 'mi',
                 'cms' : 'mph',
                 'v-cms' : 'fts',
-                'decadegps' : 'degpd',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
@@ -498,38 +499,33 @@ var Settings = (function () {
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
 
+        let decimalPlaces = 0;
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            let step = element.attr('step') || 1;
-            let decimalPlaces = 0;
+            let step = parseFloat(element.attr('step')) || 1;
             
-            step = step / multiplier;
-            
-            if (step < 1) {
-                decimalPlaces = step.toString().length - step.toString().indexOf(".") - 1;
-                if (parseInt(step.toString().slice(-1)) > 1 ) { 
-                    decimalPlaces--; 
-                }
+            if (multiplier !== 1) { 
+                decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
                 step = 1 / Math.pow(10, decimalPlaces);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
-            if (multiplier != 'FAHREN') {
-                element.attr('min', (element.attr('min') / multiplier).toFixed(decimalPlaces));
-                element.attr('max', (element.attr('max') / multiplier).toFixed(decimalPlaces));
+            if (multiplier !== 'FAHREN' && multiplier !== 1) {
+                element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
+                element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
         }
 
         // Update the input with a new formatted unit
         let newValue = "";
-        if (multiplier == 'FAHREN') {
-            element.attr('min', toFahrenheit(element.attr('min')).toFixed(2));
-            element.attr('max', toFahrenheit(element.attr('max')).toFixed(2));
-            newValue = toFahrenheit(oldValue).toFixed(2);
+        if (multiplier === 'FAHREN') {
+            element.attr('min', toFahrenheit(element.attr('min')).toFixed(decimalPlaces));
+            element.attr('max', toFahrenheit(element.attr('max')).toFixed(decimalPlaces));
+            newValue = toFahrenheit(oldValue).toFixed(decimalPlaces);
         } else {
-            const convertedValue = Number((oldValue / multiplier).toFixed(2));
-            newValue = Number.isInteger(convertedValue) ? Math.round(convertedValue) : convertedValue;
+            newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
+
         element.val(newValue);
         element.data('setting-multiplier', multiplier);
 
@@ -564,10 +560,34 @@ var Settings = (function () {
                 value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
             } else {
                 multiplier = parseFloat(multiplier);
-                value = Math.round(parseFloat(input.val()) * multiplier);
+                
+                let presicion = input.data("step") || 1; // data-step is always based on the default firmware units.
+                presicion = self.countDecimals(presicion);
+
+                if (presicion === 0) {
+                    value = Math.round(parseFloat(input.val()) * multiplier);
+                } else {
+                    value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, presicion)) / Math.pow(10, presicion);
+                }
             }
         }
+
         return mspHelper.setSetting(settingName, value);
+    };
+
+    self.countDecimals = function(value) {
+        let text = value.toString()
+        // verify if number 0.000005 is represented as "5e-6"
+        if (text.indexOf('e-') > -1) {
+          let [base, trail] = text.split('e-');
+          let deg = parseInt(trail, 10);
+          return deg;
+        }
+        // count decimals for number in representation like "0.123456"
+        if (Math.floor(value) !== value) {
+          return value.toString().split(".")[1].length || 0;
+        }
+        return 0;
     };
 
     self.saveInputs = function() {

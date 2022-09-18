@@ -18,7 +18,15 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_rc_data() {
-        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        if (SERIAL_CONFIG.ports.length == 0) {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, get_ports_data);
+        } else {
+            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
+        }
+    }
+
+    function get_ports_data() {
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, load_html);
     }
 
     function load_html() {
@@ -33,8 +41,8 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["Arming"] = ["ARM", "PREARM"];
         modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL"];
         modeSections["Navigation Modes"] = ["NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV"];
-        modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE"];
-        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON", "TURN ASSIST"];
+        modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE", "TURN ASSIST"];
+        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
         modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
@@ -203,7 +211,6 @@ TABS.auxiliary.initialize = function (callback) {
         let modeSelectionRange = "";
 
         for (var modeIndex = 0; modeIndex < AUX_CONFIG.length; modeIndex++) {
-
             // Get current mode category
             for (modeSelectionRange in modeSections) {
                 if (modeSections[modeSelectionRange].indexOf(AUX_CONFIG[modeIndex]) != -1) {
