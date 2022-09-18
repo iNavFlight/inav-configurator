@@ -2962,7 +2962,7 @@ TABS.osd.initialize = function (callback) {
             }
             $fontPicker.removeClass('active');
             $(this).addClass('active');
-            $.get('/resources/osd/' + $(this).data('font-file') + '.mcm', function (data) {
+            $.get('/resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
                 FONT.preview($preview);
                 OSD.GUI.update();
