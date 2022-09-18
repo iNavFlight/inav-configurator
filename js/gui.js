@@ -279,11 +279,27 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
                     $t.append('<option value="' + i + '">' + i + '</option>');
                 }
             } else if (operandMetadata.type == "dictionary") {
-                for (let k in operandMetadata.values) {
-                    if (operandMetadata.values.hasOwnProperty(k)) {
-                        $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
+                let operandValues = [];
+
+                for (let j in operandMetadata.values) {
+                    if (operandMetadata.values.hasOwnProperty(j)) {
+                        operandValues[parseInt(j,10)] = {
+                            id: parseInt(j, 10),
+                            name: operandMetadata.values[j],
+                        };
                     }
                 }
+
+                operandValues.sort((a, b) => {
+                    let ovAN = a.name.toLowerCase(),
+                        ovBN = b.name.toLowerCase();
+
+                    return (ovAN < ovBN) ? -1 : 1;
+                });
+                
+                operandValues.forEach( val => {
+                    $t.append('<option value="' + val.id + '">' + val.name + '</option>');
+                });
             }
 
             $t.val(value);
