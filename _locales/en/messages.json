@@ -1745,6 +1745,9 @@
     "adjustmentsFunction58": {
         "message": "Fixed Wing Level Trim"
     },
+    "adjustmentsFunction59": {
+        "message": "Multi Mission Index Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
