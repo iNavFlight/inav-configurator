@@ -49,6 +49,11 @@
     -webkit-appearance: none;
 }
 
+.tab-firmware_flasher .autoselect_description {
+    margin-left: 10px;
+    line-height: 25px;
+}
+
 /*noinspection ALL*/
 .tab-firmware_flasher .info .progress::-webkit-progress-bar {
     background-color: #4f4f4f;

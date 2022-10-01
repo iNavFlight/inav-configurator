@@ -502,6 +502,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -1882,6 +1883,11 @@ OSD.constants = {
                     id: 135,
                     preview: 'LEVEL  ' + FONT.embed_dot('5.4')
                 },
+                {
+                    name: 'MISSION_INDEX',
+                    id: 139,
+                    preview: 'WP NO 7'
+                },
             ]
         },
         {
@@ -2052,7 +2058,7 @@ OSD.updateDisplaySize = function () {
             var item = OSD.msp.helpers.unpack.position(origPos[jj]);
             // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
             if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-                items[jj] = item; 
+                items[jj] = item;
             }
         }
     }
@@ -2617,6 +2623,8 @@ OSD.GUI.updateDjiView = function(on) {
                 $(element).hide();
             }
         });
+
+        $('.switch-indicator-container').hide();
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
             $('#osdGroup' + groupName).show();
@@ -2629,6 +2637,8 @@ OSD.GUI.updateDjiView = function(on) {
         $('.settings-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
+
+        $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
 };
@@ -3121,7 +3131,7 @@ function updateCraftName() {
         for (let si = 0; si < generalGroup.items.length; si++) {
             if (generalGroup.items[si].name == "CRAFT_NAME") {
                 let craftNameText = $('#craft_name').val();
-                
+
                 if (craftNameText == "") {
                     generalGroup.items[si].preview = "CRAFT_NAME";
                 } else {
