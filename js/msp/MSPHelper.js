@@ -477,9 +477,9 @@ var mspHelper = (function (gui) {
                             data.getInt8(i + 13)
                         ));
                     }
-                }   
+                }
                 break;
-            
+
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
                 LOGIC_CONDITIONS.put(new LogicCondition(
                     data.getInt8(0),
@@ -788,7 +788,7 @@ var mspHelper = (function (gui) {
                     }
                     CONFIG.target = targetName;
                 }
-                
+
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
@@ -2282,8 +2282,8 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self.loadLogicConditions = function (callback) {   
-        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {        
+    self.loadLogicConditions = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {
             LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);

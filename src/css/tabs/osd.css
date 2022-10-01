@@ -453,6 +453,29 @@ button {
 	width: calc(50% - 317px) !important;
 }
 
+.tab-osd .preview_dji_hd {
+    width: 720px !important;
+    left: calc(50% - 377px) !important;
+}
+
+.tab-osd .dji_hd_43_left {
+	border-left: 1px solid red;
+	position: absolute;
+	left: 72px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .dji_hd_43_right {
+	border-right: 1px solid red;
+	position: absolute;
+	right: 72px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_dji_hd_side {
+	width: calc(50% - 377px) !important;
+}
+
 .tab-osd .preview {
     /* please don't copy the generic background image from another project
      * and replace the one that @nathantsoi took :)
@@ -538,7 +561,7 @@ button {
 }
 
 .tab-osd .settings select,
-.tab-osd .settings input, 
+.tab-osd .settings input,
 .tab-osd .osd_settings .switchery,
 .tab-osd .unit_wrapper {
     vertical-align: top;

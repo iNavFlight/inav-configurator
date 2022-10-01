@@ -532,22 +532,26 @@ OSD.constants = {
         'AUTO',
         'PAL',
         'NTSC',
-        'HD'
+        'HDZERO',
+        'DJIWTF'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
-        HD: 18
+        HDZERO: 18,
+        DJIWTF: 22
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
-        HD: 50
+        HDZERO: 50,
+        DJIWTF: 60
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
-        HD: 900
+        HDZERO: 900,
+        DJIWTF: 1320
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2063,12 +2067,19 @@ OSD.updateDisplaySize = function () {
         }
     }
 
+    // set the preview size if dji wtf
+    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.left_43_margin').toggleClass('dji_hd_43_left', video_type == 'DJIWTF')
+    $('.right_43_margin').toggleClass('dji_hd_43_right', video_type == 'DJIWTF')
+
     // set the preview size based on the video type
-    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
-    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
-    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
+    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HDZERO'))
+    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HDZERO'))
+    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HDZERO'))
+    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HDZERO'))
+    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HDZERO'))
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2354,7 +2365,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
 OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
-    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length - 2; i++) {
 
         $videoTypes.append(
             $('<label/>')
@@ -2363,6 +2374,28 @@ OSD.GUI.updateVideoMode = function() {
                 .data('type', i)
             )
         );
+    }
+
+    // Add HD modes if MSP Displayport is selected
+    var isHdOsd = false;
+
+    $.each(SERIAL_CONFIG.ports, function(index, port){
+        if(port.functions.includes('MSP_DISPLAYPORT')) {
+            isHdOsd = true;
+        }
+    });
+
+    if (isHdOsd) {
+        for (var i = OSD.constants.VIDEO_TYPES.length - 2; i < OSD.constants.VIDEO_TYPES.length; i++) {
+
+            $videoTypes.append(
+                $('<label/>')
+                .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                    .prop('checked', i === OSD.data.preferences.video_system)
+                    .data('type', i)
+                )
+            );
+        }
     }
 
     $videoTypes.find(':radio').click(function () {

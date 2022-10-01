@@ -67,7 +67,7 @@ TABS.ports.initialize = function (callback) {
         name: 'VTX_FFPV',
         groups: ['peripherals'],
         maxPorts: 1 }
-    ); 
+    );
 
     functionRules.push({
         name: 'OPFLOW',
@@ -335,7 +335,7 @@ TABS.ports.initialize = function (callback) {
         });
 
         MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
-        
+
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
         }
