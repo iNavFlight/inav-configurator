@@ -4331,5 +4331,11 @@
     },
     "rcSmoothing": {
         "message": "RC Smoothing"
+    },
+    "throttle_scale": {
+        "message": "Throttle scale"
+    },
+    "throttle_scale_help": {
+        "message": "Allow to limit effective power fed to the motors. Throttle Scale 1 mean there is no power limiting. Throttle Scale 0.5 means throttle position will be cut in half before passed to the motors."
     }
 }
