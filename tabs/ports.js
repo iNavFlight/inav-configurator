@@ -94,7 +94,7 @@ TABS.ports.initialize = function (callback) {
     );
 
     functionRules.push({
-        name: 'HDZERO_VTX',
+        name: 'MSP_DISPLAYPORT',
         groups: ['peripherals'],
         maxPorts: 1 }
     );
