@@ -2179,6 +2179,9 @@
     "firmwareFlasherOptionLabelSelectFirmwareVersionFor": {
         "message": "Choose a Firmware version for"
     },
+    "firmwareFlasherButtonAutoSelect": {
+        "message": "Auto-select Target"
+    },
     "firmwareFlasherButtonLoadLocal": {
         "message": "Load Firmware [Local]"
     },
