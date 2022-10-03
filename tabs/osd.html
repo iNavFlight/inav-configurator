@@ -31,10 +31,14 @@
                 </div>
                 <div class="display-layout">
                     <div class="col right">
-	                    <div class="left_43_margin"></div>
-    	                <div class="right_43_margin"></div>
-                        <div class="preview">
-                        </div>
+                        <div class="hd_43_margin_left"></div>
+                        <div class="hd_43_margin_right"></div>
+                        <div class="hd_3016_box_top"></div>
+                        <div class="hd_3016_box_bottom"></div>
+                        <div class="hd_3016_box_left"></div>
+                        <div class="hd_3016_box_right"></div>
+                        <div class="pal_ntsc_box_bottom"></div>
+                        <div class="preview"></div>
                     </div>
                 </div>
             </div>
@@ -45,6 +49,12 @@
                     </div>
                     <div class="spacer_box">
                         <div class="video-types"></div>
+                    </div>
+                    <div class="spacer_box settings">
+                        <div for="osd_video_show_guides" class="helpicon cf_tip" data-i18n_title="osd_video_HELP"></div>
+                        <label id="videoGuides">
+                           <span data-i18n="osd_video_show_guides"></span>
+                        </label>
                     </div>
                 </div>
                 <div class="gui_box grey settings-container">
@@ -82,12 +92,12 @@
                             <div for="plusCodeShort" class="helpicon cf_tip" data-i18n_title="osdSettingPLUS_CODE_SHORT_HELP"></div>
                             <label>
                                 <select id="plusCodeShort" class="update_preview" data-setting="osd_plus_code_short" data-live="true"></select>
-                                <span data-i18n="osd_plus_code_short"></span> 
+                                <span data-i18n="osd_plus_code_short"></span>
                             </label>
                             <div for="rpmPrecision" class="helpicon cf_tip" data-i18n_title="osd_esc_rpm_precision_help"></div>
                             <label>
                                 <select id="rpmPrecision" class="update_preview" data-setting="osd_esc_rpm_precision" data-live="true"></select>
-                                <span data-i18n="osd_esc_rpm_precision"></span> 
+                                <span data-i18n="osd_esc_rpm_precision"></span>
                             </label>
                             <label>
                                 <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
@@ -210,7 +220,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="gui_box grey dji-hd-container"> 
+                <div class="gui_box grey dji-hd-container" id="dji_settings">
                     <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="osd_dji_HD_FPV"></div>
                     </div>
@@ -231,7 +241,7 @@
                             <span data-i18n="osd_dji_GPS_source"></span>
                         </label>
                         <label>
-                            <select data-setting="dji_message_speed_source" data-live="true"></select> 
+                            <select data-setting="dji_message_speed_source" data-live="true"></select>
                             <span data-i18n="osd_dji_speed_source"></span>
                         </label>
                         <label class="djiCraftNameElements">
@@ -281,7 +291,7 @@
                             <span data-i18n="osdSwitchInd3"></span>
                         </label>
                     </div>
-                </div> 
+                </div>
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
                 <div class="font-picker" style="margin-bottom: 10px;">
