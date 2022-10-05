@@ -2362,6 +2362,9 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
+const mspVideoSystem = [1,3,4];     // indexes of PAL, HDZERO, & DJIWTF
+const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
+
 OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
@@ -2371,29 +2374,44 @@ OSD.GUI.updateVideoMode = function() {
     }
 
     if (OSD.data.isMspDisplay) {
-        if (OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] != 'HDZERO') {
+        if (mspVideoSystem.includes(OSD.data.preferences.video_system) == false) {
             OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('HDZERO');
             OSD.updateDisplaySize();
             OSD.GUI.saveConfig();
         }
     } else {
-        if (OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF') {
+        if (analogVideoSystem.includes(OSD.data.preferences.video_system) == false) {
             OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('AUTO')
             OSD.updateDisplaySize();
             OSD.GUI.saveConfig();
         }
     }
 
-    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
-        if ((OSD.constants.VIDEO_TYPES[i] != 'HDZERO' && OSD.constants.VIDEO_TYPES[i] != 'DJIWTF') || OSD.data.isMspDisplay)
-        {
-            $videoTypes.append(
-                $('<label/>')
-                .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                    .prop('checked', i === OSD.data.preferences.video_system)
-                    .data('type', i)
-                )
-            );
+    if (OSD.data.isMspDisplay) {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (mspVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<label/>')
+                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                        .prop('checked', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                    )
+                );
+            }
+        }
+    } else {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (analogVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<label/>')
+                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                        .prop('checked', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                    )
+                );
+            }
         }
     }
 
