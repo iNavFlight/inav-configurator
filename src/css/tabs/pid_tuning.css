@@ -313,6 +313,11 @@
     float: left;
 }
 
+.tab-pid_tuning .pidTuning_select {
+    clear: left;
+    padding: 2px 6px 2px 1px;
+}
+
 .tab-pid_tuning .number input {
     width: 50px;
     padding-left: 3px;

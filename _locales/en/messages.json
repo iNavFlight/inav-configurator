@@ -4340,5 +4340,11 @@
     },
     "throttle_scale_help": {
         "message": "Allow to limit effective power fed to the motors. Throttle Scale 1 mean there is no power limiting. Throttle Scale 0.5 means throttle position will be cut in half before passed to the motors."
+    },
+    "pidTuning_MatrixFilterType": {
+        "message": "Matrix Filter Type"
+    },
+    "pidTuning_MatrixFilterTypeHelp": {
+        "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
     }
 }
