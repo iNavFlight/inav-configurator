@@ -104,16 +104,19 @@
                         <div class="spacer_box_title" data-i18n="fixedWingNavigationConfiguration"></div>
                     </div>
                     <div class="spacer_box">
+                        <div class="number">
+                            <input id="minThrottle" type="number" data-unit="us" data-setting="nav_fw_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <label for="minThrottle"><span data-i18n="minThrottle"></span></label>
+                        </div>
+
+                        <div class="number">
+                            <input id="maxThrottle" type="number" data-unit="us" data-setting="nav_fw_max_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <label for="maxThrottle"><span data-i18n="maxThrottle"></span></label>
+                        </div>
 
                         <div class="number">
                             <input id="cruiseThrottle" type="number" data-unit="us" data-setting="nav_fw_cruise_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="cruiseThrottle"><span data-i18n="cruiseThrottle"></span></label>
-                        </div>
-
-                        <div class="number">
-                            <input id="pitchToThrottle" type="number" data-unit="us" data-setting="nav_fw_pitch2thr" data-setting-multiplier="1" step="1" min="0" max="100" />
-                            <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
-                            <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
                         </div>
 
                         <div class="checkbox">
@@ -123,13 +126,15 @@
                         </div>
 
                         <div class="number">
-                            <input id="minThrottle" type="number" data-unit="us" data-setting="nav_fw_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                            <label for="minThrottle"><span data-i18n="minThrottle"></span></label>
+                            <input id="minThrottleDownPitch" type="number" data-unit="decideg" data-setting="fw_min_throttle_down_pitch" data-setting-multiplier="1" step="1" min="0" max="450" />
+                            <label for="minThrottleDownPitch"><span data-i18n="minThrottleDownPitch"></span></label>
+                            <div for="minThrottleDownPitch" class="helpicon cf_tip" data-i18n_title="minThrottleDownPitchHelp"></div>
                         </div>
 
                         <div class="number">
-                            <input id="maxThrottle" type="number" data-unit="us" data-setting="nav_fw_max_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                            <label for="maxThrottle"><span data-i18n="maxThrottle"></span></label>
+                            <input id="pitchToThrottle" type="number" data-unit="us" data-setting="nav_fw_pitch2thr" data-setting-multiplier="1" step="1" min="0" max="100" />
+                            <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
+                            <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
                         </div>
 
                         <div class="number">
@@ -142,12 +147,6 @@
                             <input id="pitchToThrottleThreshold" type="number" data-unit="decideg" data-setting="nav_fw_pitch2thr_threshold" data-setting-multiplier="1" step="1" min="0" max="900" />
                             <label for="pitchToThrottleThreshold"><span data-i18n="pitchToThrottleThreshold"></span></label>
                             <div for="pitchToThrottleThreshold" class="helpicon cf_tip" data-i18n_title="pitchToThrottleThresholdHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
-                            <label for="cruiseYawRate"><span data-i18n="cruiseYawRateLabel"></span></label>
-                            <div for="cruiseYawRate" class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
                         </div>
 
                         <div class="number">
@@ -166,6 +165,12 @@
                             <input id="maxDiveAngle" type="number" data-unit="deg" data-setting="nav_fw_dive_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxDiveAngle"><span data-i18n="maxDiveAngle"></span></label>
                             <div for="maxDiveAngle" class="helpicon cf_tip" data-i18n_title="maxDiveAngleHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
+                            <label for="cruiseYawRate"><span data-i18n="cruiseYawRateLabel"></span></label>
+                            <div for="cruiseYawRate" class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
                         </div>
 
                         <div class="number">
