@@ -260,6 +260,10 @@ helper.defaultsDialog = (function () {
                 value: "ON"
             },
             {
+                key: "dynamic_gyro_notch_mode",
+                value: "3D"
+            },
+            {
                 key: "dynamic_gyro_notch_q",
                 value: 250
             },
