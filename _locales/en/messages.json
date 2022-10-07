@@ -2901,6 +2901,12 @@
     "pitchToThrottleHelp": {
         "message": "In navigation modes, each degree of climb will add this many units to the cruise throttle. Conversely, each degree of diving will substract from it."
     },
+    "minThrottleDownPitch": {
+        "message": "Min Throttle Down Pitch"
+    },
+    "minThrottleDownPitchHelp": {
+        "message": "Automatic pitch down angle when throttle is at 0 in angle mode. Progressively applied between cruise throttle and zero throttle."
+    },
     "pitchToThrottleSmoothing": {
         "message": "Throttle smoothing"
     },
