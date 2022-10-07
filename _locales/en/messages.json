@@ -3804,6 +3804,9 @@
     "platformConfiguration": {
         "message": "Platform configuration"
     },
+    "output_modeTitle": {
+        "message": "Output mode"
+    },
     "mixerPreset": {
         "message": "Mixer preset"
     },
