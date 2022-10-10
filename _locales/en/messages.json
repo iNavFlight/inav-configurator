@@ -2590,10 +2590,13 @@
         "message": "Acc Gain"
     },
     "NoteCalibration": {
-        "message": "Note: If the flightcontroller is mounted in another angle or upside down, do the calibration steps with the flightcontroller pointing as shown in the pictures, not the quad (otherwise calibration won´t work)."
+        "message": "Note: If the IMU is mounted in another angle or on the underside of the flight controller. Do the calibration steps with the IMU pointing as shown in the pictures, not the quad (otherwise calibration won´t work)."
     },
     "AccBtn": {
         "message": "Calibrate Accelerometer"
+    },
+    "AccResetBtn": {
+        "message": "Reset Accelerometer Calibration"
     },
     "MagCalText": {
         "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."

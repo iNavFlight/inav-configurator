@@ -139,13 +139,17 @@
 #calib_btn {
     margin-top: 5px;
     margin-left: 5px;
-    }
+}
     
 #calib_btn a {
     height:30px;
     padding-top: 20px;
     width: calc(100% - 5px);
-    }
+ }
+
+ #calib_btn a.resetCalibration {
+    background-color: #2e2e2e;
+ }
  
 .tab-calibration input {
     width: 57px;
