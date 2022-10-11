@@ -175,6 +175,50 @@ TABS.calibration.initialize = function (callback) {
         }
     }
 
+    function setupCalibrationButton(callback) {
+        let showCalibrate = false;
+        var flagNames = FC.getArmingFlags();
+        if (flagNames.hasOwnProperty(13)) {
+            if (bit_check(CONFIG.armingFlags, 13)) {
+                showCalibrate = true;
+            }
+        }
+    
+        if (showCalibrate) {
+            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').addClass("calibrate");
+            $('#calibrate-start-button').removeClass("resetCalibration");
+        } else {
+            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').removeClass("calibrate");
+            $('#calibrate-start-button').addClass("resetCalibration");
+        }
+    
+        if (callback) callback();
+    }
+    
+    function actionCalibrateButton(callback) {
+        if ($('#calibrate-start-button').hasClass("resetCalibration")) {
+            resetAccCalibration();
+        } else {
+            calibrateNew();
+        }
+    
+        if (callback) callback();
+    }
+
+    function resetAccCalibration() {
+        var pos = ['X', 'Y', 'Z'];
+        pos.forEach(function (item) {
+            CALIBRATION_DATA.accGain[item] = 4096;
+            CALIBRATION_DATA.accZero[item] = 0;
+        });
+
+        saveChainer.execute();
+    }
+
     function processHtml() {
         $('#calibrateButtonSave').on('click', function () {
             CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
@@ -278,7 +322,9 @@ TABS.calibration.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
-        $('#calibrate-start-button').on('click', calibrateNew);
+        setupCalibrationButton();
+        $('#calibrate-start-button').on('click', actionCalibrateButton);
+       
         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
 
         GUI.content_ready(callback);
