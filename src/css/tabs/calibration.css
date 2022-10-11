@@ -148,7 +148,13 @@
  }
 
  #calib_btn a.resetCalibration {
-    background-color: #2e2e2e;
+    background-color: #860000;
+    color: #e4e4e4;
+ }
+
+ #calib_btn a.resetCalibration:hover {
+    background-color: #e60000;
+    color: #ffffff;
  }
  
 .tab-calibration input {
