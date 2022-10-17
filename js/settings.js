@@ -255,88 +255,92 @@ var Settings = (function () {
         const unitDisplayNames = {
             // Misc
             'cw' : 'cW',
-            'percent' : '%',
-            'cmss' : 'cm/s/s',
+            'percent'   : '%',
+            'cmss'      : 'cm/s/s',
             // Time
-            'us' : "uS",
-            'msec' : 'ms',
-            'msec-nc' : 'ms', // Milliseconds, but not converted.
-            'dsec' : 'ds',
-            'sec' : 's',
-            'mins' : 'm',
-            'hours' : 'h',
+            'us'        : "uS",
+            'msec'      : 'ms',
+            'msec-nc'   : 'ms', // Milliseconds, but not converted.
+            'dsec'      : 'ds',
+            'sec'       : 's',
+            'mins'      : 'm',
+            'hours'     : 'h',
+            'tzmins'    : 'm',
+            'tzhours'   : 'hh:mm',
             // Angles
-            'deg' : '&deg;',
-            'decideg' : 'deci&deg;',
-            'decideg-lrg' : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            'deg'           : '&deg;',
+            'decideg'       : 'deci&deg;',
+            'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
             // Rotational speed
-            'degps' : '&deg; per second',
+            'degps'     : '&deg; per second',
             'decadegps' : 'deca&deg; per second',
             // Temperature
-            'decidegc' : 'deci&deg;C',
-            'degc' : '&deg;C',
-            'degf' : '&deg;F',
+            'decidegc'  : 'deci&deg;C',
+            'degc'      : '&deg;C',
+            'degf'      : '&deg;F',
             // Speed
-            'cms' : 'cm/s',
-            'v-cms' : 'cm/s',
-            'ms' : 'm/s',
-            'kmh' : 'Km/h',
-            'mph' : 'mph',
-            'hftmin' : 'x100 ft/min',
-            'fts' : 'ft/s',
-            'kt' : 'Kt',
+            'cms'       : 'cm/s',
+            'v-cms'     : 'cm/s',
+            'ms'        : 'm/s',
+            'kmh'       : 'Km/h',
+            'mph'       : 'mph',
+            'hftmin'    : 'x100 ft/min',
+            'fts'       : 'ft/s',
+            'kt'        : 'Kt',
             // Distance
-            'cm' : 'cm',
-            'm' : 'm',
-            'km' : 'Km',
+            'cm'    : 'cm',
+            'm'     : 'm',
+            'km'    : 'Km',
             'm-lrg' : 'm', // Metres, but converted to larger units
-            'ft' : 'ft',
-            'mi' : 'mi',
-            'nm' : 'NM'
+            'ft'    : 'ft',
+            'mi'    : 'mi',
+            'nm'    : 'NM'
         }
 
         // Hover full descriptions for the units
         const unitExpandedNames = {
             // Misc
-            'cw' : 'CentiWatts',
-            'percent' : 'Percent',
-            'cmss' : 'Centimetres per second, per second',
+            'cw'        : 'CentiWatts',
+            'percent'   : 'Percent',
+            'cmss'      : 'Centimetres per second, per second',
             // Time
-            'us' : "Microseconds",
-            'msec' : 'Milliseconds',
-            'msec-nc' : 'Milliseconds',
-            'dsec' : 'Deciseconds',
-            'sec' : 'Seconds',
-            'mins' : 'Minutes',
-            'hours' : 'Hours',
+            'us'        : "Microseconds",
+            'msec'      : 'Milliseconds',
+            'msec-nc'   : 'Milliseconds',
+            'dsec'      : 'Deciseconds',
+            'sec'       : 'Seconds',
+            'mins'      : 'Minutes',
+            'hours'     : 'Hours',
+            'tzmins'    : 'Minutes',
+            'tzhours'   : 'Hours:Minutes',
             // Angles
-            'deg' : 'Degrees',
-            'decideg' : 'DeciDegrees',
-            'decideg-lrg' : 'DeciDegrees',
+            'deg'           : 'Degrees',
+            'decideg'       : 'DeciDegrees',
+            'decideg-lrg'   : 'DeciDegrees',
             // Rotational speed
-            'degps' : 'Degrees per second',
+            'degps'     : 'Degrees per second',
             'decadegps' : 'DecaDegrees per second',
             // Temperature
-            'decidegc' : 'DeciDegrees Celsius',
-            'degc' : 'Degrees Celsius',
-            'degf' : 'Degrees Fahrenheit',
+            'decidegc'  : 'DeciDegrees Celsius',
+            'degc'      : 'Degrees Celsius',
+            'degf'      : 'Degrees Fahrenheit',
             // Speed
-            'cms' : 'Centimetres per second',
-            'v-cms' : 'Centimetres per second',
-            'ms' : 'Metres per second',
-            'kmh' : 'Kilometres per hour',
-            'mph' : 'Miles per hour',
-            'hftmin' : 'Hundred feet per minute',
-            'fts' : 'Feet per second',
-            'kt' : 'Knots',
+            'cms'       : 'Centimetres per second',
+            'v-cms'     : 'Centimetres per second',
+            'ms'        : 'Metres per second',
+            'kmh'       : 'Kilometres per hour',
+            'mph'       : 'Miles per hour',
+            'hftmin'    : 'Hundred feet per minute',
+            'fts'       : 'Feet per second',
+            'kt'        : 'Knots',
             // Distance
-            'cm' : 'Centimetres',
-            'm' : 'Metres',
-            'km' : 'Kilometres',
+            'cm'    : 'Centimetres',
+            'm'     : 'Metres',
+            'km'    : 'Kilometres',
             'm-lrg' : 'Metres',
-            'ft' : 'Feet',
-            'mi' : 'Miles',
-            'nm' : 'Nautical Miles'
+            'ft'    : 'Feet',
+            'mi'    : 'Miles',
+            'nm'    : 'Nautical Miles'
         }
 
         // Ensure we can do conversions
@@ -385,6 +389,9 @@ var Settings = (function () {
             'mins' : {
                 'hours' : 60
             },
+            'tzmins' : {
+                'tzhours' : 'TZHOURS'
+            },
             'decideg' : {
                 'deg' : 10
             },
@@ -411,6 +418,7 @@ var Settings = (function () {
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -425,6 +433,7 @@ var Settings = (function () {
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -442,6 +451,7 @@ var Settings = (function () {
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             3:{ //UK
@@ -456,6 +466,7 @@ var Settings = (function () {
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             4: { //General aviation
@@ -470,12 +481,13 @@ var Settings = (function () {
                 'msec' : 'sec',
                 'dsec' : 'sec',
                 'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             default: { //show base units
                 'decadegps' : 'degps',
                 'decideg-lrg' : 'deg',
-                'mins' : 'hours',
+                'tzmins' : 'tzhours',
             }
         };
 
@@ -510,7 +522,7 @@ var Settings = (function () {
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
-            if (multiplier !== 'FAHREN' && multiplier !== 1) {
+            if (multiplier !== 'FAHREN' && multiplier !== 'TZHOURS' && multiplier !== 1) {
                 element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
                 element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
@@ -522,6 +534,13 @@ var Settings = (function () {
             element.attr('min', toFahrenheit(element.attr('min')).toFixed(decimalPlaces));
             element.attr('max', toFahrenheit(element.attr('max')).toFixed(decimalPlaces));
             newValue = toFahrenheit(oldValue).toFixed(decimalPlaces);
+        } else if (multiplier === 'TZHOURS') {
+            element.attr('type', 'text');
+            element.removeAttr('step');
+            element.attr('pattern', '([0-9]{2}|[-,0-9]{3}):([0-9]{2})');
+            let hours = Math.floor(oldValue/60);
+            let mins = oldValue - (hours*60);
+            newValue = ((hours < 0) ? padZeros(hours, 3) : padZeros(hours, 2)) + ':' + padZeros(mins, 2);
         } else {
             newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
@@ -558,6 +577,17 @@ var Settings = (function () {
             var multiplier = input.data('setting-multiplier') || 1;
             if (multiplier == 'FAHREN') {
                 value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
+            } else if (multiplier === 'TZHOURS') {
+                let inputTZ = input.val().split(':');
+                value = (parseInt(inputTZ[0]) * 60) + parseInt(inputTZ[1]);
+                
+                if (value > parseInt(input.attr('max'))) {
+                    value = parseInt(input.attr('max'));
+                }
+
+                if (value < parseInt(input.attr('min'))) {
+                    value = parseInt(input.attr('min'));
+                }
             } else {
                 multiplier = parseFloat(multiplier);
                 

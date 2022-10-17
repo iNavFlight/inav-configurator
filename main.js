@@ -649,6 +649,21 @@ String.prototype.format = function () {
     });
 };
 
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 function updateActivatedTab() {
     var activeTab = $('#tabs > ul li.active');
     activeTab.removeClass('active');
