@@ -522,7 +522,7 @@ var Settings = (function () {
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
-            if ((multiplier !== 'FAHREN' || multiplier !== 'TZHOURS') && multiplier !== 1) {
+            if (multiplier !== 'FAHREN' && multiplier !== 'TZHOURS' && multiplier !== 1) {
                 element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
                 element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
@@ -535,13 +535,12 @@ var Settings = (function () {
             element.attr('max', toFahrenheit(element.attr('max')).toFixed(decimalPlaces));
             newValue = toFahrenheit(oldValue).toFixed(decimalPlaces);
         } else if (multiplier === 'TZHOURS') {
-            element.removeAttr('min');
-            element.removeAttr('max');
             element.attr('type', 'text');
-            element.attr('pattern', '[0-9]{2}:[0-9]{2}');
+            element.removeAttr('step');
+            element.attr('pattern', '([0-9]{2}|[-,0-9]{3}):([0-9]{2})');
             let hours = Math.floor(oldValue/60);
             let mins = oldValue - (hours*60);
-            newValue = padZeros(hours, 2) + ':' + padZeros(mins, 2);
+            newValue = ((hours < 0) ? padZeros(hours, 3) : padZeros(hours, 2)) + ':' + padZeros(mins, 2);
         } else {
             newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
@@ -581,6 +580,14 @@ var Settings = (function () {
             } else if (multiplier === 'TZHOURS') {
                 let inputTZ = input.val().split(':');
                 value = (parseInt(inputTZ[0]) * 60) + parseInt(inputTZ[1]);
+                
+                if (value > parseInt(input.attr('max'))) {
+                    value = parseInt(input.attr('max'));
+                }
+
+                if (value < parseInt(input.attr('min'))) {
+                    value = parseInt(input.attr('min'));
+                }
             } else {
                 multiplier = parseFloat(multiplier);
                 
