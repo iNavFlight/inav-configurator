@@ -1014,7 +1014,7 @@
         "message": "Gps use Galileo Satellites"
     },
     "tzOffset": {
-        "message": "Timezone Offset [Mins]"
+        "message": "Timezone Offset"
     },
     "tzOffsetHelp": {
         "message": "Time zone offset from UTC, in minutes. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0)"
