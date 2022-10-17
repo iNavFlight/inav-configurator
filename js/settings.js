@@ -312,7 +312,7 @@ var Settings = (function () {
             'mins'      : 'Minutes',
             'hours'     : 'Hours',
             'tzmins'    : 'Minutes',
-            'tzhours'   : 'Hours:Mins'
+            'tzhours'   : 'Hours:Minutes',
             // Angles
             'deg'           : 'Degrees',
             'decideg'       : 'DeciDegrees',
@@ -537,10 +537,11 @@ var Settings = (function () {
         } else if (multiplier === 'TZHOURS') {
             element.removeAttr('min');
             element.removeAttr('max');
+            element.attr('type', 'text');
             element.attr('pattern', '[0-9]{2}:[0-9]{2}');
             let hours = Math.floor(oldValue/60);
             let mins = oldValue - (hours*60);
-            newValue = hours + ':' + mins;
+            newValue = padZeros(hours, 2) + ':' + padZeros(mins, 2);
         } else {
             newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
@@ -579,7 +580,7 @@ var Settings = (function () {
                 value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
             } else if (multiplier === 'TZHOURS') {
                 let inputTZ = input.val().split(':');
-                value = (inputTZ[0] * 60) + inputTZ[1];
+                value = (parseInt(inputTZ[0]) * 60) + parseInt(inputTZ[1]);
             } else {
                 multiplier = parseFloat(multiplier);
                 

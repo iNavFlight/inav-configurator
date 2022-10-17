@@ -649,6 +649,11 @@ String.prototype.format = function () {
     });
 };
 
+function padZeros(val, length) {
+    let str = val.toString();
+    return str.length < length ? padZeros("0" + str, length) : str;
+};
+
 function updateActivatedTab() {
     var activeTab = $('#tabs > ul li.active');
     activeTab.removeClass('active');

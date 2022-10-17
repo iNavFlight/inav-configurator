@@ -1017,7 +1017,7 @@
         "message": "Timezone Offset"
     },
     "tzOffsetHelp": {
-        "message": "Time zone offset from UTC, in minutes. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0)"
+        "message": "Time zone offset from UTC. This is applied to the GPS time for logging and time-stamping of Blackbox logs. (Default = 0 mins)"
     },
     "tzAutomaticDST": {
         "message": "Automatic Daylight Savings Time"
