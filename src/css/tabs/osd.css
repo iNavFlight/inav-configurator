@@ -430,23 +430,50 @@ button {
     left: calc(50% - 197px);
 }
 
-.tab-osd .preview_hd {
+.tab-osd .preview_hdzero {
     width: 600px !important;
     left: calc(50% - 317px) !important;
 }
 
-.tab-osd .hd_43_left {
+.tab-osd .hdzero_43_left {
 	border-left: 2px solid red;
 	position: absolute;
 	left: 60px;
 	height: calc(100% - 27px);
 }
 
-.tab-osd .hd_43_right {
+.tab-osd .hdzero_43_right {
 	border-right: 2px solid red;
 	position: absolute;
 	right: 60px;
 	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_hdzero_side {
+	width: calc(50% - 317px) !important;
+}
+
+.tab-osd .preview_dji_hd {
+    width: 720px !important;
+    left: calc(50% - 377px) !important;
+}
+
+.tab-osd .dji_hd_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	left: 84px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .dji_hd_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	right: 84px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_dji_hd_side {
+	width: calc(50% - 377px) !important;
 }
 
 .tab-osd .hd_3016_top {
@@ -481,8 +508,12 @@ button {
     height: 288px;
 }
 
-.tab-osd .preview_hd_side {
-	width: calc(50% - 317px) !important;
+.tab-osd .ntsc_bottom {
+    border-bottom: 2px solid green;
+    position: absolute;
+    bottom: 54px;
+    left: 0px;
+    width: 100%;
 }
 
 .tab-osd .preview {
@@ -570,7 +601,7 @@ button {
 }
 
 .tab-osd .settings select,
-.tab-osd .settings input, 
+.tab-osd .settings input,
 .tab-osd .osd_settings .switchery,
 .tab-osd .unit_wrapper {
     vertical-align: top;

@@ -649,6 +649,21 @@ String.prototype.format = function () {
     });
 };
 
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 function updateActivatedTab() {
     var activeTab = $('#tabs > ul li.active');
     activeTab.removeClass('active');
@@ -657,7 +672,7 @@ function updateActivatedTab() {
 
 function updateFirmwareVersion() {
     if (CONFIGURATOR.connectionValid) {
-        $('#logo .firmware_version').text(CONFIG.flightControllerVersion);
+        $('#logo .firmware_version').text(CONFIG.flightControllerVersion + " [" + CONFIG.target + "]");
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
     }

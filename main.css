@@ -2010,6 +2010,10 @@ select {
     padding: 1px;
 }
 
+.lc_disabled {
+    color: #aaa;
+}
+
 .ic_osd {
     background-image: url("../images/icons/icon_osd.svg");
     background-position-y: 4px;

@@ -300,16 +300,27 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
  * @param  {function} onChange
  * @param  {boolean} withAlways
  */
-GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways) {
+GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
     let $select = $container.append('<select class="mix-rule-condition">').find("select"),
         lcCount = logicConditions.getCount();
+        option  = "";
 
     if (withAlways) {
         $select.append('<option value="-1">Always</option>')
     }
     for (let i = 0; i < lcCount ; i++) {
-        $select.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
+        if (!onlyEnabled || i === current || (logicConditions.isEnabled(i))) {
+            option = '<option';
+
+            if (i === current && !logicConditions.isEnabled(i)) {
+                option+= ' class="lc_disabled"';
+            }
+            
+            option+= ' value="' + i + '">Logic Condition ' + i + ' </option>';
+
+            $select.append(option);
+        }
     }
 
     $select.val(current).change(onChange);
