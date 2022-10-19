@@ -457,6 +457,18 @@ helper.defaultsDialog = (function () {
                 value: "STANDARD"
             },
             {
+                key: "imu_acc_ignore_rate",
+                value: 15
+            },
+            {
+                key: "imu_acc_ignore_slope",
+                value: 10
+            },
+            {
+                key: "imu_inertia_comp_method",
+                value: ADAPTIVE
+            },
+            {
                 key: "throttle_idle",
                 value: 5.0
             },
@@ -542,7 +554,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_p_yaw",
-                value: 20
+                value: 50
             },
             {
                 key: "fw_i_yaw",
@@ -550,27 +562,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_d_yaw",
-                value: 0
+                value: 20
             },
             {
                 key: "fw_ff_yaw",
-                value: 100
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 7
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 4
-            },
-            {
-                key: "imu_dcm_kp",
-                value: 1000
-            },
-            {
-                key: "imu_dcm_ki",
-                value: 0
+                value: 255
             },
             {
                 key: "airmode_type",
@@ -684,6 +680,18 @@ helper.defaultsDialog = (function () {
                 value: "STANDARD"
             },
             {
+                key: "imu_acc_ignore_rate",
+                value: 15
+            },
+            {
+                key: "imu_acc_ignore_slope",
+                value: 10
+            },
+            {
+                key: "imu_inertia_comp_method",
+                value: ADAPTIVE
+            },
+            {
                 key: "throttle_idle",
                 value: 5.0
             },
@@ -782,22 +790,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "fw_ff_yaw",
                 value: 100
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 9
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 5
-            },
-            {
-                key: "imu_dcm_kp",
-                value: 1000
-            },
-            {
-                key: "imu_dcm_ki",
-                value: 0
             },
             {
                 key: "airmode_type",
