@@ -457,6 +457,18 @@ helper.defaultsDialog = (function () {
                 value: "STANDARD"
             },
             {
+                key: "imu_acc_ignore_rate",
+                value: 15
+            },
+            {
+                key: "imu_acc_ignore_slope",
+                value: 10
+            },
+            {
+                key: "imu_inertia_comp_method",
+                value: ADAPTIVE
+            },
+            {
                 key: "throttle_idle",
                 value: 5.0
             },
@@ -666,6 +678,18 @@ helper.defaultsDialog = (function () {
             {
                 key: "motor_pwm_protocol",
                 value: "STANDARD"
+            },
+            {
+                key: "imu_acc_ignore_rate",
+                value: 15
+            },
+            {
+                key: "imu_acc_ignore_slope",
+                value: 10
+            },
+            {
+                key: "imu_inertia_comp_method",
+                value: ADAPTIVE
             },
             {
                 key: "throttle_idle",
