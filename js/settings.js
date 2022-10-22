@@ -173,19 +173,20 @@ var Settings = (function () {
 
                     let dataStep = input.data("step");
 
-                    if (dataStep !== undefined) {
-                        input.attr('step', dataStep);
-                    } else {
-                        input.attr('step', "0.01");
+                    if (typeof dataStep === 'undefined') {
+                        dataStep = self.countDecimals(s.value);
+                        dataStep = 1 / Math.pow(10, dataStep);
+                        input.data("step", dataStep);
                     }
 
+                    input.attr('step', dataStep);
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
-                    input.val(s.value.toFixed(2));
-
+                    input.val(s.value.toFixed(self.countDecimals(dataStep)));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
 
+                    input.data("step", 1);
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
                     input.attr('type', 'number');
                     if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
@@ -254,84 +255,92 @@ var Settings = (function () {
         const unitDisplayNames = {
             // Misc
             'cw' : 'cW',
-            'percent' : '%',
-            'cmss' : 'cm/s/s',
+            'percent'   : '%',
+            'cmss'      : 'cm/s/s',
             // Time
-            'us' : "uS",
-            'msec' : 'ms',
-            'msec-nc' : 'ms', // Milliseconds, but not converted.
-            'dsec' : 'ds',
-            'sec' : 's',
+            'us'        : "uS",
+            'msec'      : 'ms',
+            'msec-nc'   : 'ms', // Milliseconds, but not converted.
+            'dsec'      : 'ds',
+            'sec'       : 's',
+            'mins'      : 'm',
+            'hours'     : 'h',
+            'tzmins'    : 'm',
+            'tzhours'   : 'hh:mm',
             // Angles
-            'deg' : '&deg;',
-            'decideg' : 'deci&deg;',
-            'decideg-lrg' : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            'deg'           : '&deg;',
+            'decideg'       : 'deci&deg;',
+            'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
             // Rotational speed
-            'degps' : '&deg; per second',
+            'degps'     : '&deg; per second',
             'decadegps' : 'deca&deg; per second',
             // Temperature
-            'decidegc' : 'deci&deg;C',
-            'degc' : '&deg;C',
-            'degf' : '&deg;F',
+            'decidegc'  : 'deci&deg;C',
+            'degc'      : '&deg;C',
+            'degf'      : '&deg;F',
             // Speed
-            'cms' : 'cm/s',
-            'v-cms' : 'cm/s',
-            'ms' : 'm/s',
-            'kmh' : 'Km/h',
-            'mph' : 'mph',
-            'hftmin' : 'x100 ft/min',
-            'fts' : 'ft/s',
-            'kt' : 'Kt',
+            'cms'       : 'cm/s',
+            'v-cms'     : 'cm/s',
+            'ms'        : 'm/s',
+            'kmh'       : 'Km/h',
+            'mph'       : 'mph',
+            'hftmin'    : 'x100 ft/min',
+            'fts'       : 'ft/s',
+            'kt'        : 'Kt',
             // Distance
-            'cm' : 'cm',
-            'm' : 'm',
-            'km' : 'Km',
+            'cm'    : 'cm',
+            'm'     : 'm',
+            'km'    : 'Km',
             'm-lrg' : 'm', // Metres, but converted to larger units
-            'ft' : 'ft',
-            'mi' : 'mi',
-            'nm' : 'NM'
+            'ft'    : 'ft',
+            'mi'    : 'mi',
+            'nm'    : 'NM'
         }
 
         // Hover full descriptions for the units
         const unitExpandedNames = {
             // Misc
-            'cw' : 'CentiWatts',
-            'percent' : 'Percent',
-            'cmss' : 'Centimetres per second, per second',
+            'cw'        : 'CentiWatts',
+            'percent'   : 'Percent',
+            'cmss'      : 'Centimetres per second, per second',
             // Time
-            'us' : "Microseconds",
-            'msec' : 'Milliseconds',
-            'msec-nc' : 'Milliseconds',
-            'dsec' : 'Deciseconds',
-            'sec' : 'Seconds',
+            'us'        : "Microseconds",
+            'msec'      : 'Milliseconds',
+            'msec-nc'   : 'Milliseconds',
+            'dsec'      : 'Deciseconds',
+            'sec'       : 'Seconds',
+            'mins'      : 'Minutes',
+            'hours'     : 'Hours',
+            'tzmins'    : 'Minutes',
+            'tzhours'   : 'Hours:Minutes',
             // Angles
-            'deg' : 'Degrees',
-            'decideg' : 'DeciDegrees',
-            'decideg-lrg' : 'DeciDegrees',
+            'deg'           : 'Degrees',
+            'decideg'       : 'DeciDegrees',
+            'decideg-lrg'   : 'DeciDegrees',
             // Rotational speed
-            'degps' : 'Degrees per second',
+            'degps'     : 'Degrees per second',
             'decadegps' : 'DecaDegrees per second',
             // Temperature
-            'decidegc' : 'DeciDegrees Celsius',
-            'degc' : 'Degrees Celsius',
-            'degf' : 'Degrees Fahrenheit',
+            'decidegc'  : 'DeciDegrees Celsius',
+            'degc'      : 'Degrees Celsius',
+            'degf'      : 'Degrees Fahrenheit',
             // Speed
-            'cms' : 'Centimetres per second',
-            'v-cms' : 'Centimetres per second',
-            'ms' : 'Metres per second',
-            'kmh' : 'Kilometres per hour',
-            'mph' : 'Miles per hour',
-            'hftmin' : 'Hundred feet per minute',
-            'fts' : 'Feet per second',
-            'kt' : 'Knots',
+            'cms'       : 'Centimetres per second',
+            'v-cms'     : 'Centimetres per second',
+            'ms'        : 'Metres per second',
+            'kmh'       : 'Kilometres per hour',
+            'mph'       : 'Miles per hour',
+            'hftmin'    : 'Hundred feet per minute',
+            'fts'       : 'Feet per second',
+            'kt'        : 'Knots',
             // Distance
-            'cm' : 'Centimetres',
-            'm' : 'Metres',
-            'km' : 'Kilometres',
+            'cm'    : 'Centimetres',
+            'm'     : 'Metres',
+            'km'    : 'Kilometres',
             'm-lrg' : 'Metres',
-            'ft' : 'Feet',
-            'mi' : 'Miles',
-            'nm' : 'Nautical Miles'
+            'ft'    : 'Feet',
+            'mi'    : 'Miles',
+            'nm'    : 'Nautical Miles'
         }
 
         // Ensure we can do conversions
@@ -377,6 +386,12 @@ var Settings = (function () {
             'dsec' : {
                 'sec' : 10
             },
+            'mins' : {
+                'hours' : 60
+            },
+            'tzmins' : {
+                'tzhours' : 'TZHOURS'
+            },
             'decideg' : {
                 'deg' : 10
             },
@@ -402,6 +417,8 @@ var Settings = (function () {
                 'v-cms' : 'fts',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -415,6 +432,8 @@ var Settings = (function () {
                 'v-cms' : 'ms',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
@@ -431,6 +450,8 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             3:{ //UK
@@ -439,11 +460,13 @@ var Settings = (function () {
                 'm-lrg' : 'mi',
                 'cms' : 'mph',
                 'v-cms' : 'fts',
-                'decadegps' : 'degpd',
+                'decadegps' : 'degps',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             4: { //General aviation
@@ -457,11 +480,14 @@ var Settings = (function () {
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             default: { //show base units
                 'decadegps' : 'degps',
                 'decideg-lrg' : 'deg',
+                'tzmins' : 'tzhours',
             }
         };
 
@@ -485,38 +511,40 @@ var Settings = (function () {
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
 
+        let decimalPlaces = 0;
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            let step = element.attr('step') || 1;
-            let decimalPlaces = 0;
+            let step = parseFloat(element.attr('step')) || 1;
             
-            step = step / multiplier;
-            
-            if (step < 1) {
-                decimalPlaces = step.toString().length - step.toString().indexOf(".") - 1;
-                if (parseInt(step.toString().slice(-1)) > 1 ) { 
-                    decimalPlaces--; 
-                }
+            if (multiplier !== 1) { 
+                decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
                 step = 1 / Math.pow(10, decimalPlaces);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
-            if (multiplier != 'FAHREN') {
-                element.attr('min', (element.attr('min') / multiplier).toFixed(decimalPlaces));
-                element.attr('max', (element.attr('max') / multiplier).toFixed(decimalPlaces));
+            if (multiplier !== 'FAHREN' && multiplier !== 'TZHOURS' && multiplier !== 1) {
+                element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
+                element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
         }
 
         // Update the input with a new formatted unit
         let newValue = "";
-        if (multiplier == 'FAHREN') {
-            element.attr('min', toFahrenheit(element.attr('min')).toFixed(2));
-            element.attr('max', toFahrenheit(element.attr('max')).toFixed(2));
-            newValue = toFahrenheit(oldValue).toFixed(2);
+        if (multiplier === 'FAHREN') {
+            element.attr('min', toFahrenheit(element.attr('min')).toFixed(decimalPlaces));
+            element.attr('max', toFahrenheit(element.attr('max')).toFixed(decimalPlaces));
+            newValue = toFahrenheit(oldValue).toFixed(decimalPlaces);
+        } else if (multiplier === 'TZHOURS') {
+            element.attr('type', 'text');
+            element.removeAttr('step');
+            element.attr('pattern', '([0-9]{2}|[-,0-9]{3}):([0-9]{2})');
+            let hours = Math.floor(oldValue/60);
+            let mins = oldValue - (hours*60);
+            newValue = ((hours < 0) ? padZeros(hours, 3) : padZeros(hours, 2)) + ':' + padZeros(mins, 2);
         } else {
-            const convertedValue = Number((oldValue / multiplier).toFixed(2));
-            newValue = Number.isInteger(convertedValue) ? Math.round(convertedValue) : convertedValue;
+            newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
+
         element.val(newValue);
         element.data('setting-multiplier', multiplier);
 
@@ -549,12 +577,47 @@ var Settings = (function () {
             var multiplier = input.data('setting-multiplier') || 1;
             if (multiplier == 'FAHREN') {
                 value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
+            } else if (multiplier === 'TZHOURS') {
+                let inputTZ = input.val().split(':');
+                value = (parseInt(inputTZ[0]) * 60) + parseInt(inputTZ[1]);
+                
+                if (value > parseInt(input.attr('max'))) {
+                    value = parseInt(input.attr('max'));
+                }
+
+                if (value < parseInt(input.attr('min'))) {
+                    value = parseInt(input.attr('min'));
+                }
             } else {
                 multiplier = parseFloat(multiplier);
-                value = Math.round(parseFloat(input.val()) * multiplier);
+                
+                let presicion = input.data("step") || 1; // data-step is always based on the default firmware units.
+                presicion = self.countDecimals(presicion);
+
+                if (presicion === 0) {
+                    value = Math.round(parseFloat(input.val()) * multiplier);
+                } else {
+                    value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, presicion)) / Math.pow(10, presicion);
+                }
             }
         }
+
         return mspHelper.setSetting(settingName, value);
+    };
+
+    self.countDecimals = function(value) {
+        let text = value.toString()
+        // verify if number 0.000005 is represented as "5e-6"
+        if (text.indexOf('e-') > -1) {
+          let [base, trail] = text.split('e-');
+          let deg = parseInt(trail, 10);
+          return deg;
+        }
+        // count decimals for number in representation like "0.123456"
+        if (Math.floor(value) !== value) {
+          return value.toString().split(".")[1].length || 0;
+        }
+        return 0;
     };
 
     self.saveInputs = function() {

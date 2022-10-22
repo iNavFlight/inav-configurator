@@ -29,12 +29,17 @@ SYM.MAH_KM_0 = 0x6B;
 SYM.MAH_KM_1 = 0x6C;
 SYM.MAH_MI_0 = 0x93;
 SYM.MAH_MI_1 = 0x94;
+SYM.AH_V_FT_0 = 0xD6;
+SYM.AH_V_FT_1 = 0xD7;
+SYM.AH_V_M_0 = 0xD8;
+SYM.AH_V_M_1 = 0xD9;
 SYM.WH_KM = 0x6E;
 SYM.WH_MI = 0x6F;
 SYM.GPS_SAT1 = 0x08;
 SYM.GPS_SAT2 = 0x09;
 SYM.GPS_HDP1 = 0x0E;
 SYM.GPS_HDP2 = 0x0F;
+SYM.KM = 0x83;
 SYM.KMH = 0x90;
 SYM.KMH_3D = 0x88;
 SYM.MPH = 0x91;
@@ -102,6 +107,8 @@ SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
+SYM.GLIDE_MINS = 0xD5;
+SYM.GLIDE_RANGE = 0xD4;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -462,7 +469,8 @@ OSD.initData = function () {
         items: [],
         groups: {},
         preview: [],
-        isDjiHdFpv: false
+        isDjiHdFpv: false,
+        isMspDisplay: false
     };
 };
 
@@ -495,6 +503,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -524,22 +533,26 @@ OSD.constants = {
         'AUTO',
         'PAL',
         'NTSC',
-        'HD'
+        'HDZERO',
+        'DJIWTF'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
-        HD: 18
+        HDZERO: 18,
+        DJIWTF: 22
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
-        HD: 50
+        HDZERO: 50,
+        DJIWTF: 60
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
-        HD: 900
+        HDZERO: 900,
+        DJIWTF: 1320
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -914,6 +927,28 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
                 },
                 {
+                    name: 'GLIDE_TIME',
+                    id: 136,
+                    min_version: '5.0.0',
+                    preview: FONT.symbol(SYM.GLIDE_MINS) + '02:34',
+                },
+                {
+                    name: 'GLIDE_RANGE',
+                    id: 137,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 12') + FONT.symbol(SYM.MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 11') + FONT.symbol(SYM.NM);
+                            default: // Metric & Metric + MPH
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 21') + FONT.symbol(SYM.KM);
+                        }
+                    }
+                },
+                {
                     name: 'MISSION INFO',
                     id: 129,
                     min_version: '4.0.0',
@@ -1280,7 +1315,22 @@ OSD.constants = {
                                 return FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM);
                         }
                     }
-                }
+                },
+                {
+                    name: 'CLIMB_EFFICIENCY',
+                    id: 138,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.embed_dot('0.76') + FONT.symbol(SYM.AH_V_FT_0) + FONT.symbol(SYM.AH_V_FT_1);
+                            default: // Metric & Metric + MPH
+                                return FONT.embed_dot('1.23') + FONT.symbol(SYM.AH_V_M_0) + FONT.symbol(SYM.AH_V_M_1);
+                        }
+                    }
+                },
             ]
         },
         {
@@ -1838,6 +1888,11 @@ OSD.constants = {
                     id: 135,
                     preview: 'LEVEL  ' + FONT.embed_dot('5.4')
                 },
+                {
+                    name: 'MISSION_INDEX',
+                    id: 139,
+                    preview: 'WP NO 7'
+                },
             ]
         },
         {
@@ -1936,6 +1991,9 @@ OSD.reload = function(callback) {
             if(port.functions.includes('DJI_FPV')) {
                 OSD.data.isDjiHdFpv = true;
             }
+            if(port.functions.includes('MSP_DISPLAYPORT')) {
+                OSD.data.isMspDisplay = true;
+            }
         });
     });
 
@@ -1991,7 +2049,6 @@ OSD.updateDisplaySize = function () {
 
     // set the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
-    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
     // set the new display size
     OSD.data.display_size = {
@@ -2008,17 +2065,21 @@ OSD.updateDisplaySize = function () {
             var item = OSD.msp.helpers.unpack.position(origPos[jj]);
             // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
             if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-                items[jj] = item; 
+                items[jj] = item;
             }
         }
     }
 
+    // set the preview size if dji wtf
+    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+
     // set the preview size based on the video type
-    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
-    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
-    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
+    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
+    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2301,18 +2362,57 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
+const mspVideoSystem = [1,3,4];     // indexes of PAL, HDZERO, & DJIWTF
+const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
+
 OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
-    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
 
-        $videoTypes.append(
-            $('<label/>')
-            .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                .prop('checked', i === OSD.data.preferences.video_system)
-                .data('type', i)
-            )
-        );
+    if (!OSD.data.isDjiHdFpv) {
+        $('#dji_settings').hide();
+    }
+
+    if (OSD.data.isMspDisplay) {
+        if (mspVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('HDZERO');
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    } else {
+        if (analogVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('AUTO')
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    }
+
+    if (OSD.data.isMspDisplay) {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (mspVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<label/>')
+                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                        .prop('checked', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                    )
+                );
+            }
+        }
+    } else {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (analogVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<label/>')
+                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
+                        .prop('checked', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                    )
+                );
+            }
+        }
     }
 
     $videoTypes.find(':radio').click(function () {
@@ -2452,6 +2552,7 @@ OSD.GUI.updateFields = function() {
                             // Ensure the element is inside the viewport, at least partially.
                             // In that case move it to the very first row/col, otherwise there's
                             // no way to reposition items that are outside the viewport.
+                            OSD.msp.helpers.calculate.coords(itemData);
                             if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
                                 itemData.x = itemData.y = itemData.position = 0;
                             }
@@ -2486,10 +2587,21 @@ OSD.GUI.updateFields = function() {
         }
     }
 
+    if ($('#videoGuidesToggle').length == false) {
+        $('#videoGuides').prepend(
+            $('<input id="videoGuidesToggle" type="checkbox" class="toggle" />')
+            .attr('checked', false)
+            .on('change', function () {
+                OSD.GUI.updateGuidesView(this.checked);
+                OSD.GUI.updatePreviews();
+            })
+        );
+    }
+
     if ($('#djiUnsupportedElementsToggle').length == false) {
         $('#djiUnsupportedElements').prepend(
             $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
-            .attr('checked', OSD.data.isDjiHdFpv)
+            .attr('checked', OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay)
             .on('change', function () {
                 OSD.GUI.updateDjiView(this.checked);
                 OSD.GUI.updatePreviews();
@@ -2544,6 +2656,23 @@ OSD.GUI.updateDjiMessageElements = function(on) {
     OSD.GUI.removeBottomLines();
 };
 
+OSD.GUI.updateGuidesView = function(on) {
+    isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
+    $('.hd_43_margin_left').toggleClass('hdzero_43_left', (isHdZero && on))
+    $('.hd_43_margin_right').toggleClass('hdzero_43_right', (isHdZero && on))
+    $('.hd_3016_box_top').toggleClass('hd_3016_top', (isHdZero && on))
+    $('.hd_3016_box_bottom').toggleClass('hd_3016_bottom', (isHdZero && on))
+    $('.hd_3016_box_left').toggleClass('hd_3016_left', (isHdZero && on))
+    $('.hd_3016_box_right').toggleClass('hd_3016_right', (isHdZero && on))
+
+    isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
+    $('.hd_43_margin_left').toggleClass('dji_hd_43_left', (isDJIWTF && on))
+    $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
+
+    isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
+    $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
+};
+
 OSD.GUI.updateDjiView = function(on) {
     if (on) {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
@@ -2573,6 +2702,8 @@ OSD.GUI.updateDjiView = function(on) {
                 $(element).hide();
             }
         });
+
+        $('.switch-indicator-container').hide();
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
             $('#osdGroup' + groupName).show();
@@ -2585,6 +2716,8 @@ OSD.GUI.updateDjiView = function(on) {
         $('.settings-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
+
+        $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
 };
@@ -2791,6 +2924,7 @@ OSD.GUI.updateAll = function() {
         layouts.on('change', function() {
             OSD.updateSelectedLayout(parseInt(layouts.val()));
             OSD.GUI.updateFields();
+            OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
             OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
             OSD.GUI.updatePreviews();
         });
@@ -2806,7 +2940,8 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
-    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv);
+    OSD.GUI.updateGuidesView(false);
+    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay);
 };
 
 OSD.GUI.update = function() {
@@ -2918,7 +3053,7 @@ TABS.osd.initialize = function (callback) {
             }
             $fontPicker.removeClass('active');
             $(this).addClass('active');
-            $.get('/resources/osd/' + $(this).data('font-file') + '.mcm', function (data) {
+            $.get('/resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
                 FONT.preview($preview);
                 OSD.GUI.update();
@@ -3077,7 +3212,7 @@ function updateCraftName() {
         for (let si = 0; si < generalGroup.items.length; si++) {
             if (generalGroup.items[si].name == "CRAFT_NAME") {
                 let craftNameText = $('#craft_name').val();
-                
+
                 if (craftNameText == "") {
                     generalGroup.items[si].preview = "CRAFT_NAME";
                 } else {

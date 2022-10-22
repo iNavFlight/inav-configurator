@@ -1246,7 +1246,7 @@ var FC = {
             4: {
                 name: "Logic Condition",
                 type: "range",
-                range: [0, 31],
+                range: [0, (LOGIC_CONDITIONS.getMaxLogicConditionCount()-1)],
                 default: 0
             },
             5: {

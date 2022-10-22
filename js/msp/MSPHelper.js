@@ -44,7 +44,7 @@ var mspHelper = (function (gui) {
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
         'IMU2': 24,
-        'HDZERO_VTX': 25,
+        'MSP_DISPLAYPORT': 25,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -477,9 +477,9 @@ var mspHelper = (function (gui) {
                             data.getInt8(i + 13)
                         ));
                     }
-                }   
+                }
                 break;
-            
+
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
                 LOGIC_CONDITIONS.put(new LogicCondition(
                     data.getInt8(0),
@@ -777,6 +777,18 @@ var mspHelper = (function (gui) {
                 CONFIG.boardIdentifier = identifier;
                 CONFIG.boardVersion = data.getUint16(offset, 1);
                 offset += 2;
+                if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {
+                    CONFIG.osdUsed = data.getUint8(offset++);
+                    CONFIG.commCompatability = data.getUint8(offset++);
+                    let targetNameLen = data.getUint8(offset++);
+                    let targetName = "";
+                    targetNameLen += offset;
+                    for (offset = offset; offset < targetNameLen; offset++) {
+                        targetName += String.fromCharCode(data.getUint8(offset));
+                    }
+                    CONFIG.target = targetName;
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
@@ -2270,8 +2282,8 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self.loadLogicConditions = function (callback) {   
-        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {        
+    self.loadLogicConditions = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {
             LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
@@ -3189,6 +3201,15 @@ var mspHelper = (function (gui) {
     self.loadMotors = function (callback) {
         MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
     };
+
+    self.getTarget = function(callback) {
+        MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function(resp){
+            var target = resp.data.readString();
+            if (callback) {
+                callback(target);
+            }
+        });
+    }
 
     self.getCraftName = function (callback) {
         MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {

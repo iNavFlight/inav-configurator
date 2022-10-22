@@ -28,6 +28,10 @@ let LogicConditionsCollection = function () {
         return data.length
     };
 
+    self.isEnabled = function (lcID) {
+        return data[lcID].getEnabled();
+    }
+
     self.open = function () {
         self.render();
         $container.show();
