@@ -466,7 +466,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "imu_inertia_comp_method",
-                value: ADAPTIVE
+                value: "ADAPTIVE"
             },
             {
                 key: "throttle_idle",
@@ -689,7 +689,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "imu_inertia_comp_method",
-                value: ADAPTIVE
+                value: "ADAPTIVE"
             },
             {
                 key: "throttle_idle",
