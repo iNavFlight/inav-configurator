@@ -136,12 +136,6 @@
                             <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
                             <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
                         </div>
-                        
-                        <div class="select">
-                            <select id="navMotorStop" data-setting="nav_overrides_motor_stop"></select>
-                            <label for="navMotorStop"><span data-i18n="navMotorStop"></span></label>
-                            <div for="navMotorStop" class="helpicon cf_tip" data-i18n_title="navMotorStopHelp"></div>
-                        </div>
 
                         <div class="number">
                             <input id="pitchToThrottleSmoothing" type="number" data-setting="nav_fw_pitch2thr_smoothing" data-setting-multiplier="1" step="0" min="0" max="9" />
@@ -171,24 +165,6 @@
                             <input id="maxDiveAngle" type="number" data-unit="deg" data-setting="nav_fw_dive_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxDiveAngle"><span data-i18n="maxDiveAngle"></span></label>
                             <div for="maxDiveAngle" class="helpicon cf_tip" data-i18n_title="maxDiveAngleHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
-                            <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
-                            <div for="wpTrackingAccuracy" class="helpicon cf_tip" data-i18n_title="wpTrackingAccuracyHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="wpTrackingAngle" data-unit="deg" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
-                            <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
-                            <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
-                        </div>
-                        
-                        <div class="select">
-                            <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
-                            <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
-                            <div for="wpTurnSmoothing" class="helpicon cf_tip" data-i18n_title="wpTurnSmoothingHelp"></div>
                         </div>
 
                         <div class="number">
@@ -487,6 +463,12 @@
                             <label for="navMaxAltitude"><span data-i18n="navMaxAltitude"></span></label>
                             <div for="navMaxAltitude" class="helpicon cf_tip" data-i18n_title="navMaxAltitudeHelp"></div>
                         </div>
+                        
+                        <div class="select">
+                            <select id="navMotorStop" data-setting="nav_overrides_motor_stop"></select>
+                            <label for="navMotorStop"><span data-i18n="navMotorStop"></span></label>
+                            <div for="navMotorStop" class="helpicon cf_tip" data-i18n_title="navMotorStopHelp"></div>
+                        </div>
 
                     </div>
                 </div>
@@ -519,6 +501,24 @@
                             <input type="number" id="wpEnforceAlt" data-unit="cm" data-setting="nav_wp_enforce_altitude" data-setting-multiplier="1" step="1" min="0" max="2000" />
                             <label for="wpEnforceAlt"><span data-i18n="wpEnforceAlt"></span></label>
                             <div for="wpEnforceAlt" class="helpicon cf_tip" data-i18n_title="wpEnforceAltHelp"></div>
+                        </div>
+                        
+                        <div class="number">
+                            <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
+                            <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
+                            <div for="wpTrackingAccuracy" class="helpicon cf_tip" data-i18n_title="wpTrackingAccuracyHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpTrackingAngle" data-unit="deg" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
+                            <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
+                            <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
+                        </div>
+                        
+                        <div class="select">
+                            <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
+                            <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
+                            <div for="wpTurnSmoothing" class="helpicon cf_tip" data-i18n_title="wpTurnSmoothingHelp"></div>
                         </div>
 
                         <div class="select">
