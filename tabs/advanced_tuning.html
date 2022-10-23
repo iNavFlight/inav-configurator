@@ -168,6 +168,18 @@
                         </div>
 
                         <div class="number">
+                            <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
+                            <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
+                            <div for="wpTrackingAccuracy" class="helpicon cf_tip" data-i18n_title="wpTrackingAccuracyHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpTrackingAngle" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
+                            <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
+                            <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
+                        </div>
+
+                        <div class="number">
                             <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
                             <label for="cruiseYawRate"><span data-i18n="cruiseYawRateLabel"></span></label>
                             <div for="cruiseYawRate" class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
@@ -188,16 +200,6 @@
                             <input type="number" id="controlSmoothness" data-setting="nav_fw_control_smoothness" data-setting-multiplier="1" step="1" min="0" max="9" />
                             <label for="controlSmoothness"><span data-i18n="controlSmoothness"></span></label>
                             <div for="controlSmoothness" class="helpicon cf_tip" data-i18n_title="controlSmoothnessHelp"></div>
-                        </div>
-                        <div class="number">
-                            <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
-                            <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
-                            <div for="wpTrackingAccuracy" class="helpicon cf_tip" data-i18n_title="wpTrackingAccuracyHelp"></div>
-                        </div>
-                        <div class="number">
-                            <input type="number" id="wpTrackingAngle" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
-                            <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
-                            <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
                         </div>
                     </div>
                 </div>
@@ -381,6 +383,12 @@
                             <input id="rthAbortThreshold" type="number" data-unit="cm" data-setting="nav_rth_abort_threshold" data-setting-multiplier="1" step="1" min="0" max="65000" />
                             <label for="rthAbortThreshold"><span data-i18n="rthAbortThreshold"></span></label>
                             <div for="rthAbortThreshold" class="helpicon cf_tip" data-i18n_title="rthAbortThresholdHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input id="fsMissionDelay" type="number" data-unit="cm" data-setting="failsafe_mission_delay" data-setting-multiplier="1" step="1" min="-1" max="600" />
+                            <label for="fsMissionDelay"><span data-i18n="fsMissionDelay"></span></label>
+                            <div for="fsMissionDelay" class="helpicon cf_tip" data-i18n_title="fsMissionDelayHelp"></div>
                         </div>
 
                     </div>

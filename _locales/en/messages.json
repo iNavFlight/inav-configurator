@@ -2811,6 +2811,12 @@
     "rthAbortThresholdHelp": {
         "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
     },
+    "fsMissionDelay": {
+        "message": "Failsafe Mission Delay"
+    },
+    "fsMissionDelayHelp": {
+        "message": "Defines a delay in seconds, how long INAV has to wait before Failsafe RTH is engaged, if the Aircraft is in a waypoint mission. Set to -1 to disable Failsafe entirely [0-600s]"
+    },
     "rthAltitude": {
         "message": "RTH altitude"
     },
