@@ -2817,6 +2817,12 @@
     "fsMissionDelayHelp": {
         "message": "Defines a delay in seconds, how long INAV has to wait before Failsafe RTH is engaged, if the Aircraft is in a waypoint mission. Set to -1 to disable Failsafe entirely [0-600s]"
     },
+    "drNavigation": {
+        "message": "Dead Reckoning Navigation"
+    },
+    "drNavigationHelp": {
+        "message": "Allows INAV to continue navigation (Waypoint, Return to Home, Cruise, Coursehold, etc.) during short GPS outages. This feature needs compass and airspeed sensor enabled on Fixed Wing aircraft."
+    },
     "rthAltitude": {
         "message": "RTH altitude"
     },
