@@ -2994,8 +2994,38 @@
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
     },
+    "wpLoadBoot": {
+        "message": "Load Waypoints on Boot"
+    },
+    "wpLoadBootHelp": {
+        "message": "If enabled, Waypoint Missions in EEPROM will be loaded automatically after bootup."
+    },
+    "wpEnforceAlt": {
+        "message": "Enforce Altitude at Waypoint"
+    },
+    "wpEnforceAltHelp": {
+        "message": "Ensures that the altitude at each waypoint is reached before continue to the next one. Craft will hold position [loiter for fixed wing] and climb/decent until the altitude is within the set range [1-2000 cm] from the waypoint altitude. Set to [0] to disable. Fixed wing crafts should not be set below 500cm."
+    },
     "waypointRadius": {
         "message": "Waypoint radius"
+    },
+    "wpRestartMission": {
+        "message": "Restart Waypoint Mission"
+    },
+    "wpRestartMissionHelp": {
+        "message": "Sets restart behaviour for a WP mission when interrupted mid mission. START from first WP, RESUME from last active WP or SWITCH between START and RESUME each time WP Mode is reselected ON. SWITCH effectively allows resuming once only from a previous mid mission waypoint after which the mission will restart from the first waypoint."
+    },
+    "wpTurnSmoothing": {
+        "message": "Waypoint Turn Smoothing"
+    },
+    "wpTurnSmoothingHelp": {
+        "message": "Smooths turns during WP missions by switching to a loiter turn at waypoints. When set to ON the craft will reach the waypoint during the turn. When set to ON-CUT the craft will turn inside the waypoint without actually reaching it (cuts the corner)."
+    },
+    "navMotorStop": {
+        "message": "Navigation Motor Stop Override"
+    },
+    "navMotorStopHelp": {
+        "message": "When set to OFF the navigation system will not take over the control of the motor if the throttle is low (motor will stop). When set to OFF_ALWAYS the navigation system will not take over the control of the motor if the throttle was low even when failsafe is triggered. When set to AUTO_ONLY the navigation system will only take over the control of the throttle in autonomous navigation modes (NAV WP and NAV RTH). When set to ALL_NAV (default) the navigation system will take over the control of the motor completely and never allow the motor to stop even when the throttle is low. This setting only has an effect on NAV modes which take control of the throttle when combined with MOTOR_STOP and is likely to cause a stall if fw_min_throttle_down_pitch isn't set correctly or the pitch estimation is wrong for fixed wing models when not set to ALL_NAV."
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."

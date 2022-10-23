@@ -136,6 +136,12 @@
                             <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
                             <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
                         </div>
+                        
+                        <div class="select">
+                            <select id="navMotorStop" data-setting="nav_overrides_motor_stop"></select>
+                            <label for="navMotorStop"><span data-i18n="navMotorStop"></span></label>
+                            <div for="navMotorStop" class="helpicon cf_tip" data-i18n_title="navMotorStopHelp"></div>
+                        </div>
 
                         <div class="number">
                             <input id="pitchToThrottleSmoothing" type="number" data-setting="nav_fw_pitch2thr_smoothing" data-setting-multiplier="1" step="0" min="0" max="9" />
@@ -174,9 +180,15 @@
                         </div>
 
                         <div class="number">
-                            <input type="number" id="wpTrackingAngle" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
+                            <input type="number" id="wpTrackingAngle" data-unit="deg" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
                             <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
                             <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
+                        </div>
+                        
+                        <div class="select">
+                            <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
+                            <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
+                            <div for="wpTurnSmoothing" class="helpicon cf_tip" data-i18n_title="wpTurnSmoothingHelp"></div>
                         </div>
 
                         <div class="number">
@@ -420,6 +432,7 @@
                             <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
                             <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
                         </div>
+
                     </div>
                 </div>
 
@@ -439,6 +452,24 @@
                             <input type="number" id="waypointSafeDistance" data-unit="cm" data-setting="nav_wp_safe_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
                             <label for="waypointSafeDistance"><span data-i18n="waypointSafeDistance"></span></label>
                             <div for="waypointSafeDistance" class="helpicon cf_tip" data-i18n_title="waypointSafeDistanceHelp"></div>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="wpLoadBoot" data-setting="nav_wp_load_on_boot" data-live="true" />
+                            <label for="wpLoadBoot"><span data-i18n="wpLoadBoot"></span></label>
+                            <div for="wpLoadBoot" class="helpicon cf_tip" data-i18n_title="wpLoadBootHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpEnforceAlt" data-unit="cm" data-setting="nav_wp_enforce_altitude" data-setting-multiplier="1" step="1" min="0" max="2000" />
+                            <label for="wpEnforceAlt"><span data-i18n="wpEnforceAlt"></span></label>
+                            <div for="wpEnforceAlt" class="helpicon cf_tip" data-i18n_title="wpEnforceAltHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="wpRestartMission" data-setting="nav_wp_mission_restart"></select>
+                            <label for="wpRestartMission"><span data-i18n="wpRestartMission"></span></label>
+                            <div for="wpRestartMission" class="helpicon cf_tip" data-i18n_title="wpRestartMissionHelp"></div>
                         </div>
 
                     </div>
