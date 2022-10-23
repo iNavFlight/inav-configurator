@@ -43,7 +43,6 @@ var mspHelper = (function (gui) {
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
-        'IMU2': 24,
         'MSP_DISPLAYPORT': 25,
     };
 
@@ -104,7 +103,6 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
-                SENSOR_STATUS.imu2HwStatus = data.getUint8(9);
                 sensor_status_ex(SENSOR_STATUS);
                 break;
 

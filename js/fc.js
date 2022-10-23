@@ -92,8 +92,7 @@ var FC = {
             gpsHwStatus: 0,
             rangeHwStatus: 0,
             speedHwStatus: 0,
-            flowHwStatus: 0,
-            imu2HwStatus: 0
+            flowHwStatus: 0
         };
 
         SENSOR_CONFIG = {

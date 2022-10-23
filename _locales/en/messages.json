@@ -1169,9 +1169,6 @@
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP Displayport"
     },
-    "portsFunction_IMU2": {
-        "message": "Secondary IMU"
-    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
