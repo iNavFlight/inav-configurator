@@ -213,6 +213,19 @@
                             <label for="controlSmoothness"><span data-i18n="controlSmoothness"></span></label>
                             <div for="controlSmoothness" class="helpicon cf_tip" data-i18n_title="controlSmoothnessHelp"></div>
                         </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="soarMotorStop" data-setting="nav_fw_soaring_motor_stop"  data-live="true" />
+                            <label for="soarMotorStop"><span data-i18n="soarMotorStop"></span></label>
+                            <div for="soarMotorStop" class="helpicon cf_tip" data-i18n_title="soarMotorStopHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="soarPitchDeadband" data-unit="deg" data-setting="nav_fw_soaring_pitch_deadband" data-setting-multiplier="1" step="1" min="0" max="15" />
+                            <label for="soarPitchDeadband"><span data-i18n="soarPitchDeadband"></span></label>
+                            <div for="soarPitchDeadband" class="helpicon cf_tip" data-i18n_title="soarPitchDeadbandHelp"></div>
+                        </div>
+
                     </div>
                 </div>
             </div> <!-- right wrapper -->
@@ -364,6 +377,18 @@
                             <div for="rth-climb-first" class="helpicon cf_tip" data-i18n_title="rthClimbFirstHelp"></div>
                         </div>
 
+                        <div class="select">
+                            <select id="rthTwoStage" data-setting="nav_rth_climb_first_stage_mode"></select>
+                            <label for="rthTwoStage"><span data-i18n="rthTwoStage"></span></label>
+                            <div for="rthTwoStage" class="helpicon cf_tip" data-i18n_title="rthTwoStageHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTwoStageAlt" data-unit="cm" data-setting="nav_rth_home_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="rthTwoStageAlt"><span data-i18n="rthTwoStageAlt"></span></label>
+                            <div for="rthTwoStageAlt" class="helpicon cf_tip" data-i18n_title="rthTwoStageAltHelp"></div>
+                        </div>
+
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="rthClimbIgnoreEmergency" data-setting="nav_rth_climb_ignore_emerg" data-live="true" />
                             <label for="rthClimbIgnoreEmergency"><span data-i18n="rthClimbIgnoreEmergency"></span></label>
@@ -373,6 +398,30 @@
                             <input type="checkbox" class="toggle update_preview" id="rthAltControlOverride" data-setting="nav_rth_alt_control_override" data-live="true" />
                             <label for="rthAltControlOverride"><span data-i18n="rthAltControlOverride"></span></label>
                             <div for="rthAltControlOverride" class="helpicon cf_tip" data-i18n_title="rthAltControlOverrideHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="rthTrackBack" data-setting="nav_rth_trackback_mode"></select>
+                            <label for="rthTrackBack"><span data-i18n="rthTrackBack"></span></label>
+                            <div for="rthTrackBack" class="helpicon cf_tip" data-i18n_title="rthTrackBackHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTrackBackDistance" data-unit="m" data-setting="nav_rth_home_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="rthTrackBackDistance"><span data-i18n="rthTrackBackDistance"></span></label>
+                            <div for="rthTrackBackDistance" class="helpicon cf_tip" data-i18n_title="rthTrackBackDistanceHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="rthSafeHome" data-setting="safehome_usage_mode"></select>
+                            <label for="rthSafeHome"><span data-i18n="rthSafeHome"></span></label>
+                            <div for="rthSafeHome" class="helpicon cf_tip" data-i18n_title="rthSafeHomeHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTrackBackDistance" data-unit="cm" data-setting="safehome_max_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="rthSafeHomeDistance"><span data-i18n="rthSafeHomeDistance"></span></label>
+                            <div for="rthSafeHomeDistance" class="helpicon cf_tip" data-i18n_title="rthSafeHomeDistanceHelp"></div>
                         </div>
 
                         <div class="checkbox notFixedWingTuning">
@@ -431,6 +480,12 @@
                             <input type="number" id="navAutoClimbRate" data-unit="v-cms" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
                             <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
+                        </div>
+                        
+                        <div class="number">
+                            <input type="number" id="navMaxAltitude" data-unit="cm" data-setting="nav_max_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="navMaxAltitude"><span data-i18n="navMaxAltitude"></span></label>
+                            <div for="navMaxAltitude" class="helpicon cf_tip" data-i18n_title="navMaxAltitudeHelp"></div>
                         </div>
 
                     </div>

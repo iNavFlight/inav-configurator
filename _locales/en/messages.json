@@ -2829,11 +2829,53 @@
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
+    "rthTrackBack": {
+    "message": "RTH Track Back Mode"
+    },
+    "rthTrackBackHelp": {
+    "message": "When enabled, the Aircraft will follow its last path backwards instead of flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Trackback. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
+    },
+    "rthTrackBackDistance": {
+    "message": "RTH Track Back Distance"
+    },
+    "rthSafeHome": {
+    "message": "Safe Home Mode"
+    },
+    "rthSafeHomeHelp": {
+    "message": "Used to control when safehomes will be used. Possible values are OFF, RTH and RTH_FS. See Safehome documentation for more information."
+    },
+    "rthSafeHomeDistance": {
+    "message": "Safe Home Max Distance"
+    },
+    "rthSafeHomeDistanceHelp": {
+    "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
+    },
+    "rthTrackBackDistanceHelp": {
+    "message": "Maximum distance allowed for RTH trackback. Normal RTH is executed once this distance is exceeded [m]."
+    },
+    "navMaxAltitude": {
+    "message": "Max Altitude for Navigation"
+    },
+    "navMaxAltitudeHelp": {
+    "message": "Max allowed altitude (above Home Point) that applies to all NAV modes (including Altitude Hold). 0 means limit is disabled"
+    },
     "rthHomeAltitudeLabel": {
         "message": "RTH Home altitude"
     },
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
+    },
+    "rthTwoStage": {
+    "message": "Climb First Stage Method"
+    },
+    "rthTwoStageHelp": {
+    "message": "Staged Return To Home Function if Climb First is enabled. Set Climb First Stage Altitude to 0, to use classic Single-Stage RTH."
+    },
+    "rthTwoStageAlt": {
+    "message": "Climb First Stage Altitude"
+    },
+    "rthTwoStageAltHelp": {
+    "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
     },
     "landMaxAltVspd": {
         "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
@@ -3026,6 +3068,18 @@
     },
     "navMotorStopHelp": {
         "message": "When set to OFF the navigation system will not take over the control of the motor if the throttle is low (motor will stop). When set to OFF_ALWAYS the navigation system will not take over the control of the motor if the throttle was low even when failsafe is triggered. When set to AUTO_ONLY the navigation system will only take over the control of the throttle in autonomous navigation modes (NAV WP and NAV RTH). When set to ALL_NAV (default) the navigation system will take over the control of the motor completely and never allow the motor to stop even when the throttle is low. This setting only has an effect on NAV modes which take control of the throttle when combined with MOTOR_STOP and is likely to cause a stall if fw_min_throttle_down_pitch isn't set correctly or the pitch estimation is wrong for fixed wing models when not set to ALL_NAV."
+    },
+    "soarMotorStop": {
+        "message": "Soaring Mode Motor Stop"
+    },
+    "soarMotorStopHelp": {
+        "message": "Stops motor when Soaring mode enabled."
+    },
+    "soarPitchDeadband": {
+        "message": "Soaring Mode Pitch Deadband"
+    },
+    "soarPitchDeadbandHelp": {
+        "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
