@@ -2937,6 +2937,18 @@
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
     },
+    "wpTrackingAccuracy": {
+        "message": "Waypoint Tracking Accuracy"
+    },
+    "wpTrackingAccuracyHelp": {
+        "message": "How precise the craft tries to follow a waypoint track. Lower values means higher precision but can cause overshoots. 6 is a good starting point [0-10]."
+    },
+    "wpTrackingAngle": {
+        "message": "Waypoint Tracking Angle"
+    },
+    "wpTrackingAngleHelp": {
+        "message": "The angle the craft approaches the waypoint track. Lower values make the approach longer while higher values can cause overshoot. 45° is a good starting point [30-80]."
+    },
     "powerConfiguration": {
         "message": "Battery Estimation Settings"
     },
