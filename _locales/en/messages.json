@@ -2833,10 +2833,13 @@
     "message": "RTH Track Back Mode"
     },
     "rthTrackBackHelp": {
-    "message": "When enabled, the Aircraft will follow its last path backwards instead of flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Trackback. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
+    "message": "When enabled, the aircraft will follow its last path backwards first before flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Track Back. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
     },
     "rthTrackBackDistance": {
     "message": "RTH Track Back Distance"
+    },
+    "rthTrackBackDistanceHelp": {
+    "message": "Distance flown during Track Back. Normal RTH is executed once this total flight distance is exceeded [m]."
     },
     "rthSafeHome": {
     "message": "Safe Home Mode"
@@ -2849,9 +2852,6 @@
     },
     "rthSafeHomeDistanceHelp": {
     "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
-    },
-    "rthTrackBackDistanceHelp": {
-    "message": "Maximum distance allowed for RTH trackback. Normal RTH is executed once this distance is exceeded [m]."
     },
     "navMaxAltitude": {
     "message": "Max Altitude for Navigation"
