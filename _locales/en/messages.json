@@ -3001,7 +3001,7 @@
         "message": "Waypoint Tracking Angle"
     },
     "wpTrackingAngleHelp": {
-        "message": "The angle the craft approaches the waypoint track. Lower values make the approach longer while higher values can cause overshoot. 45° is a good starting point [30-80]."
+        "message": "The angle the craft approaches the waypoint track. Lower values make the approach longer while higher values can cause overshoot. 60° is a good starting point [30-80]."
     },
     "powerConfiguration": {
         "message": "Battery Estimation Settings"
