@@ -708,24 +708,21 @@ TABS.firmware_flasher.onOpen = function(openInfo) {
             MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
                 if (CONFIG.flightControllerIdentifier == 'INAV') {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
-                        if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
-                            if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(CONFIG.flightControllerVersion, "5.0.0")) {  
-                                onBleNotSupported();
-                            } else {
-                                mspHelper.getCraftName(function(name) {
-                                    if (name) {
-                                        CONFIG.name = name;
-                                    }
-                                    TABS.firmware_flasher.onValidFirmware();  
-                                });
-                            }
-                        } else  {
-                            onInvalidFirmwareVersion();
+                        if (semver.lt(CONFIG.flightControllerVersion, "5.0.0")) {
+                            GUI.log("Cannot prefetch target: INAV Firmware too old");
+                            TABS.firmware_flasher.closeTempConnection();
+                        } else {
+                            mspHelper.getCraftName(function(name) {
+                                if (name) {
+                                    CONFIG.name = name;
+                                }
+                                TABS.firmware_flasher.onValidFirmware();  
+                            });
                         }
                     });
                 } else {
                     GUI.log("Cannot prefetch target: Non-INAV Firmware");
-                    onInvalidFirmwareVariant();
+                    TABS.firmware_flasher.closeTempConnection();
                 }
             });
         });

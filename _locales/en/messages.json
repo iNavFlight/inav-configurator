@@ -2125,8 +2125,7 @@
         "message": "No reboot sequence"
     },
     "firmwareFlasherOnlineSelectBoardDescription": {
-
-        "message": "Select your board to see available online firmware releases - Select the correct firmware appropriate for your board."
+        "message": "Select your board to see available online firmware releases - Select the correct firmware appropriate for your board. Please note that <strong>Auto-select Target</strong> will only work for INAV firmwares 5.0 and newer."
     },
     "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
         "message": "Select firmware version for your board."
