@@ -2666,11 +2666,12 @@ var mspHelper = (function (gui) {
             buffer.push(ledIndex);
 
             var mask = 0;
+            var extra = 0;
             /*
                 ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],      // in LSB bit order
                 ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l'], // in LSB bit order
                 ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'], // in LSB bit
-                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w'], // in LSB bit
+                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w', 'e'], // in LSB bit
 
                 */
             mask |= (led.y << 0);
@@ -2688,29 +2689,32 @@ var mspHelper = (function (gui) {
 
                 bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 12);
+                    mask |= bit_set(mask, bitIndex + 16);
                 }
 
             }
 
-            mask |= (led.color << 18);
+            mask |= (led.color << 24);
 
             for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
 
                 bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 22);
+                    if(bitIndex < 2) {
+                        mask |= bit_set(mask, bitIndex + 2);
+                    } else {
+                        extra |= bit_set(exta, bitIndex - 2);
+                    }
                 }
-
             }
 
-            mask |= (0 << 28); // parameters
-
+            extra |= (0 << 4); // parameters
 
             buffer.push(specificByte(mask, 0));
             buffer.push(specificByte(mask, 1));
             buffer.push(specificByte(mask, 2));
             buffer.push(specificByte(mask, 3));
+            buffer.push(specificByte(extra, 0));
 
             // prepare for next iteration
             ledIndex++;
@@ -2718,7 +2722,7 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_CONFIG, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }
     };
 

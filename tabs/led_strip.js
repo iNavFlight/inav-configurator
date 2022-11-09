@@ -23,7 +23,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function load_led_config() {
-        MSP.send_message(MSPCodes.MSP_LED_STRIP_CONFIG, false, false, load_led_colors);
+        MSP.send_message(MSPCodes.MSP_LED_STRIP_CONFIG_EX, false, false, load_led_colors);
     }
 
     function load_led_colors() {
