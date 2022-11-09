@@ -13,7 +13,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     TABS.led_strip.functions = ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l', 'o', 'n'];
     TABS.led_strip.baseFuncs = ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'];
-    TABS.led_strip.overlays = ['t', 'o', 'b', 'n', 'i', 'w'];
+    TABS.led_strip.overlays = ['t', 'o', 'b', 'n', 'i', 'w', 'e'];
 
     TABS.led_strip.wireMode = false;
 

@@ -1028,8 +1028,65 @@ var mspHelper = (function (gui) {
                     }
                 }
                 break;
+            case MSPCodes.MSP_LED_STRIP_CONFIG_EX:
+                //noinspection JSUndeclaredVariable
+                LED_STRIP = [];
+
+                var ledCount = data.byteLength / 5;
+                var directionMask,
+                    directions,
+                    directionLetterIndex,
+                    functions,
+                    led;
+
+                for (i = 0; offset < data.byteLength && i < ledCount; i++) {
+                    var mask = data.getUint32(offset, 1);
+                    offset += 4;
+                    var extra = data.getUint8(offset, 1);
+                    offset++;
+
+                    var functionId = (mask >> 8) & 0xFF;
+
+                    functions = [];
+                    for (var baseFunctionLetterIndex = 0; baseFunctionLetterIndex < MSP.ledBaseFunctionLetters.length; baseFunctionLetterIndex++) {
+                        if (functionId == baseFunctionLetterIndex) {
+                            functions.push(MSP.ledBaseFunctionLetters[baseFunctionLetterIndex]);
+                            break;
+                        }
+                    }
+
+                    var overlayMask = (mask >> 16) & 0xFF;
+                    for (var overlayLetterIndex = 0; overlayLetterIndex < MSP.ledOverlayLetters.length; overlayLetterIndex++) {
+                        if (bit_check(overlayMask, overlayLetterIndex)) {
+                            functions.push(MSP.ledOverlayLetters[overlayLetterIndex]);
+                        }
+                    }
+
+                    directionMask = (mask >> 28) & 0xF | ((extra & 0x3) << 4);
+
+                    directions = [];
+                    for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        if (bit_check(directionMask, directionLetterIndex)) {
+                            directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
+                        }
+                    }
+                    led = {
+                        y: (mask) & 0xF,
+                        x: (mask >> 4) & 0xF,
+                        functions: functions,
+                        color: (mask >> 24) & 0xF,
+                        directions: directions,
+                        parameters: (extra >> 2) & 0x3F
+                    };
+
+                    LED_STRIP.push(led);
+                }
+                break;
             case MSPCodes.MSP_SET_LED_STRIP_CONFIG:
                 console.log('Led strip config saved');
+                break;
+            case MSPCodes.MSP_SET_LED_STRIP_CONFIG_EX:
+                console.log('Led strip extended config saved');
                 break;
             case MSPCodes.MSP_LED_COLORS:
 
