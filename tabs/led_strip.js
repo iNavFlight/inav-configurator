@@ -425,6 +425,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                                         p.addClass('function-' + letter);
                                     break;
                                 case 'b':
+                                case 'e':
                                 case 'n':
                                     if (areBlinkersActive('function-' + f))
                                         p.addClass('function-' + letter);
