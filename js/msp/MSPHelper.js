@@ -1028,7 +1028,7 @@ var mspHelper = (function (gui) {
                     }
                 }
                 break;
-            case MSPCodes.MSP_LED_STRIP_CONFIG_EX:
+            case MSPCodes.MSP2_INAV_LED_STRIP_CONFIG_EX:
                 //noinspection JSUndeclaredVariable
                 LED_STRIP = [];
 
@@ -1085,7 +1085,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_LED_STRIP_CONFIG:
                 console.log('Led strip config saved');
                 break;
-            case MSPCodes.MSP_SET_LED_STRIP_CONFIG_EX:
+            case MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX:
                 console.log('Led strip extended config saved');
                 break;
             case MSPCodes.MSP_LED_COLORS:
@@ -2722,7 +2722,7 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }
     };
 
