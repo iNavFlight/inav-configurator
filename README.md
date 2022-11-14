@@ -95,7 +95,7 @@ To be able to open Inspector, you will need SDK flavours of NW.js
 
 ## Different map providers
 
-INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps, and MapProxy map providers.
+INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps (Aerial View), and MapProxy map providers.
 INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configuerator by himself.
 
 ### How to choose Map provider
