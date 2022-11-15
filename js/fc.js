@@ -1239,7 +1239,10 @@ var FC = {
                     7: "Horizon",
                     8: "Air",
                     9: "USER 1",
-                    10: "USER 2"
+                    10: "USER 2",
+                    11: "Course Hold",
+                    12: "USER 3",
+                    13: "USER 4",
                 }
             },
             4: {
