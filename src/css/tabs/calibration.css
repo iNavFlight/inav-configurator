@@ -149,7 +149,7 @@
 
  #calib_btn a.resetCalibration {
     background-color: grey;
-    color: rgb(100, 100, 100);
+    color: rgb(212, 212, 212);
  }
 
  #calib_btn a.resetCalibration:hover {
