@@ -148,8 +148,8 @@
  }
 
  #calib_btn a.resetCalibration {
-    background-color: #860000;
-    color: #e4e4e4;
+    background-color: grey;
+    color: rgb(100, 100, 100);
  }
 
  #calib_btn a.resetCalibration:hover {
