@@ -534,25 +534,29 @@ OSD.constants = {
         'PAL',
         'NTSC',
         'HDZERO',
-        'DJIWTF'
+        'DJIWTF',
+        'AVATAR'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
         HDZERO: 18,
-        DJIWTF: 22
+        DJIWTF: 22,
+        AVATAR: 20
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
         HDZERO: 50,
-        DJIWTF: 60
+        DJIWTF: 60,
+        AVATAR: 54
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
         HDZERO: 900,
-        DJIWTF: 1320
+        DJIWTF: 1320,
+        AVATAR: 1080
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2362,7 +2366,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4];     // indexes of PAL, HDZERO, & DJIWTF
+const mspVideoSystem = [1,3,4,5];   // indexes of PAL, HDZERO, DJIWTF, & AVATAR
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
