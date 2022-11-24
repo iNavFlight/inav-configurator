@@ -1268,7 +1268,7 @@ var FC = {
                     0: "Is WP",
                     1: "Current Waypoint Index",
                     2: "Current Waypoint Action",
-                    3: "Next Waypoint Distance [m]",
+                    3: "Distance to next Waypoint [m]",
                     4: "Distance from Waypoint [m]",
                     5: "User Action 1",
                     6: "User Action 2",
