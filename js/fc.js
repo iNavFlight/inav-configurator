@@ -1158,6 +1158,12 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
