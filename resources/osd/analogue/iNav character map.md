@@ -137,7 +137,7 @@ SYM_AH_V_FT_1              | SYM.AH_V_FT_1                | Climb efficiency: im
 SYM_AH_V_M_0               | SYM.AH_V_M_0                 | Climb efficiency: metric L side       | 216        | 0xD8
 SYM_AH_V_M_1               | SYM.AH_V_M_1                 | Climb efficiency: metric R side       | 217        | 0xD9
  | | | | 
-SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
+SYM_LOGO_START             |                              | INAV Logo                             | 257 - 296  | 0x101 - 0x128
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
 SYM_AH_RIGHT               | SYM.AH_RIGHT                 | AHI Arrow right                       | 301        | 0x12D
 SYM_AH_DECORATION_MIN      |                              | AHI Scrolling graphics                | 302 - 307  | 0x12E - 0x133
