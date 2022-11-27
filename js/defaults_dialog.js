@@ -597,7 +597,7 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
-                key: "nav_wp_safe_distance",
+                key: "nav_wp_max_safe_distance",
                 value: 500
             },
             {
@@ -824,7 +824,7 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
-                key: "nav_wp_safe_distance",
+                key: "nav_wp_max_safe_distance",
                 value: 500
             },
             {
@@ -891,7 +891,7 @@ helper.defaultsDialog = (function () {
                 value: "ROVER"
             },
             {
-                key: "nav_wp_safe_distance",
+                key: "nav_wp_max_safe_distance",
                 value: 500
             },
             {
