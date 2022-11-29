@@ -597,6 +597,10 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
                 key: "nav_fw_launch_max_angle",
                 value: 45
             },
@@ -820,6 +824,10 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
                 key: "nav_fw_launch_max_angle",
                 value: 75
             },
@@ -883,8 +891,8 @@ helper.defaultsDialog = (function () {
                 value: "ROVER"
             },
             {
-                key: "nav_wp_safe_distance",
-                value: 50000
+                key: "nav_wp_max_safe_distance",
+                value: 500
             },
             {
                 key: "nav_fw_loiter_radius",
