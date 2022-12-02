@@ -1177,7 +1177,7 @@ var FC = {
                 output: "boolean"
             },
             50: {
-                name: "Delta (|A| > B)",
+                name: "Delta (|A| >= B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
