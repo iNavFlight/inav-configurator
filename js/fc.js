@@ -888,19 +888,19 @@ var FC = {
                 output: "boolean"
             },
             1: {
-                name: "Equal",
+                name: "Equal (A = B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
-                name: "Greater Than",
+                name: "Greater Than (A > B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
-                name: "Lower Than",
+                name: "Lower Than (A < B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
@@ -1155,6 +1155,36 @@ var FC = {
             46: {
                 name: "Flight Axis Rate Override",
                 operandType: "Set Flight Parameter",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            48: {
+                name: "Delay",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            49: {
+                name: "Timer",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            50: {
+                name: "Delta (|A| >= B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            51: {
+                name: "Approx Equals (A ~ B)",
+                operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
