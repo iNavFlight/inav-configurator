@@ -144,7 +144,7 @@ SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error   
 SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD
 SYM_BLACKBOX               | SYM.BLACKBOX                 | Blackbox                              | 254        | 0xFE
  | | | |
-SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
+SYM_LOGO_START             |                              | INAV Logo                             | 257 - 296  | 0x101 - 0x128
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
 SYM_AH_RIGHT               | SYM.AH_RIGHT                 | AHI Arrow right                       | 301        | 0x12D
 SYM_AH_DECORATION_MIN      |                              | AHI Scrolling graphics                | 302 - 307  | 0x12E - 0x133
