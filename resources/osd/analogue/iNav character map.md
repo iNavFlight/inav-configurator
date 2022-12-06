@@ -139,7 +139,7 @@ SYM_AH_V_M_1               | SYM.AH_V_M_1                 | Climb efficiency: me
 SYM_FLIGHT_MINS_REMAINING  | SYM.FLIGHT_MINS_REMAINING    | Flight time (mins) remaining          | 218        | 0xDA
 SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB
  | | | | 
-SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
+SYM_LOGO_START             |                              | INAV Logo                             | 257 - 296  | 0x101 - 0x128
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
 SYM_AH_RIGHT               | SYM.AH_RIGHT                 | AHI Arrow right                       | 301        | 0x12D
 SYM_AH_DECORATION_MIN      |                              | AHI Scrolling graphics                | 302 - 307  | 0x12E - 0x133
