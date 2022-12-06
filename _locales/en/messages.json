@@ -2574,7 +2574,7 @@
         "message": "Optic Flow Calibration"
     },
     "OpflowCalText": {
-        "message": "After pressing the button you have 30 seconds to hold the copter in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
+        "message": "After pressing the button you have 30 seconds to hold the model in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
     },
     "OpflowCalBtn": {
         "message": "Calibrate Optic Flow sensor"
@@ -2595,7 +2595,7 @@
         "message": "Reset Accelerometer Calibration"
     },
     "MagCalText": {
-        "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
+        "message": "After pressing the button you have 30 seconds to hold the model in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth. Be sure that your compass is not near magnets or electromagnets when installed in the craft or performing the calibration."
     },
     "MagBtn": {
         "message": "Calibrate Compass"

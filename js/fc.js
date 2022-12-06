@@ -888,19 +888,19 @@ var FC = {
                 output: "boolean"
             },
             1: {
-                name: "Equal",
+                name: "Equal (A = B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
-                name: "Greater Than",
+                name: "Greater Than (A > B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
-                name: "Lower Than",
+                name: "Lower Than (A < B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
@@ -1158,6 +1158,36 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            48: {
+                name: "Delay",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            49: {
+                name: "Timer",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            50: {
+                name: "Delta (|A| >= B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            51: {
+                name: "Approx Equals (A ~ B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1281,7 +1311,6 @@ var FC = {
             'throttle_idle',
             'turtle_mode_power_factor',
             'failsafe_throttle',
-            'fw_min_throttle_down_pitch',
             'nav_mc_hover_thr',
             'nav_fw_cruise_thr',
             'nav_fw_min_thr',
@@ -1342,7 +1371,6 @@ var FC = {
             'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
-            'fw_loiter_direction',
             'fw_reference_airspeed',
             'fw_turn_assist_yaw_gain',
             'fw_turn_assist_pitch_gain',

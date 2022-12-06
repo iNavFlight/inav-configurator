@@ -109,6 +109,8 @@ SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
 SYM.GLIDE_MINS = 0xD5;
 SYM.GLIDE_RANGE = 0xD4;
+SYM.FLIGHT_MINS_REMAINING = 0xDA;
+SYM.FLIGHT_DIST_REMAINING = 0x167;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -796,7 +798,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_TIME',
                     id: 48,
-                    preview: FONT.symbol(SYM.FLY_M) + '10:35'
+                    preview: FONT.symbol(SYM.FLIGHT_MINS_REMAINING) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
@@ -805,11 +807,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
