@@ -518,11 +518,17 @@ var Settings = (function () {
             
             if (multiplier !== 1) { 
                 decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
+                // Add extra decimal place for non-integer conversions.
+                if (multiplier % 1 != 0 && decimalPlaces < 3) {
+                    decimalPlaces++;
+                }
                 step = 1 / Math.pow(10, decimalPlaces);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
             if (multiplier !== 'FAHREN' && multiplier !== 'TZHOURS' && multiplier !== 1) {
+                element.data('default-min', element.attr('min'));
+                element.data('default-max', element.attr('max'));
                 element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
                 element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
@@ -591,13 +597,21 @@ var Settings = (function () {
             } else {
                 multiplier = parseFloat(multiplier);
                 
-                let presicion = input.data("step") || 1; // data-step is always based on the default firmware units.
-                presicion = self.countDecimals(presicion);
+                let precision = input.data("step") || 1; // data-step is always based on the default firmware units.
+                precision = self.countDecimals(precision);
 
-                if (presicion === 0) {
+                if (precision === 0) {
                     value = Math.round(parseFloat(input.val()) * multiplier);
                 } else {
-                    value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, presicion)) / Math.pow(10, presicion);
+                    value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, precision)) / Math.pow(10, precision);
+                }
+
+                if (value > parseInt(input.data('default-max'))) {
+                    value = parseInt(input.data('default-max'));
+                }
+
+                if (value < parseInt(input.data('default-min'))) {
+                    value = parseInt(input.data('default-min'));
                 }
             }
         }
