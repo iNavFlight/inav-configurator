@@ -763,6 +763,24 @@ var FC = {
 
         return retVal;
     },
+    getAccelerometerCalibrated: function () {
+        var calibrated = true;
+        var flagNames = FC.getArmingFlags();
+
+        if (CALIBRATION_DATA.accGain.X === 4096 && CALIBRATION_DATA.accGain.Y === 4096 && CALIBRATION_DATA.accGain.Z === 4096 && 
+            CALIBRATION_DATA.accZero.X === 0 && CALIBRATION_DATA.accZero.Y === 0 && CALIBRATION_DATA.accZero.Z === 0
+           ) {
+            calibrated = false;
+        }
+
+        if ((calibrated) && flagNames.hasOwnProperty(13)) {
+            if (bit_check(CONFIG.armingFlags, 13)) {
+                calibrated = false;
+            }
+        }
+
+        return calibrated;
+    },
     getUserControlMode: function () {
         return [
             "Attitude",

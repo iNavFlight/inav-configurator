@@ -176,24 +176,16 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function setupCalibrationButton(callback) {
-        let showCalibrate = false;
-        var flagNames = FC.getArmingFlags();
-        if (flagNames.hasOwnProperty(13)) {
-            if (bit_check(CONFIG.armingFlags, 13)) {
-                showCalibrate = true;
-            }
-        }
-    
-        if (showCalibrate) {
-            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccBtn"));
-            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccBtn"));
-            $('#calibrate-start-button').addClass("calibrate");
-            $('#calibrate-start-button').removeClass("resetCalibration");
-        } else {
+        if (FC.getAccelerometerCalibrated()) {
             $('#calibrate-start-button').html(chrome.i18n.getMessage("AccResetBtn"));
             $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccResetBtn"));
             $('#calibrate-start-button').removeClass("calibrate");
             $('#calibrate-start-button').addClass("resetCalibration");
+        } else {
+            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').addClass("calibrate");
+            $('#calibrate-start-button').removeClass("resetCalibration");
         }
     
         if (callback) callback();
