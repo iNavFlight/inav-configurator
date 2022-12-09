@@ -430,6 +430,29 @@ button {
     left: calc(50% - 197px);
 }
 
+.tab-osd .preview_avatar {
+    width: 636px !important; /* 12 X char width */
+    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.tab-osd .avatar_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	left: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .avatar_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	right: 60px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_avatar_side {
+	width: calc(50% - 335px) !important;
+}
+
 .tab-osd .preview_hdzero {
     width: 600px !important;
     left: calc(50% - 317px) !important;

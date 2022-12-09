@@ -549,14 +549,14 @@ OSD.constants = {
         NTSC: 30,
         HDZERO: 50,
         DJIWTF: 60,
-        AVATAR: 54
+        AVATAR: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
         HDZERO: 900,
         DJIWTF: 1320,
-        AVATAR: 1080
+        AVATAR: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2074,15 +2074,20 @@ OSD.updateDisplaySize = function () {
         }
     }
 
-    // set the preview size if dji wtf
+    // set the preview size based on the video type
+    // -- AVATAR
+    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
+    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    // -- DJI WTF
     $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
     $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
     $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-
-    // set the preview size based on the video type
+    // -- HD ZERO
     $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
     $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -2810,7 +2815,7 @@ OSD.GUI.updatePreviews = function() {
 
     var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
     if (OSD.data.display_size.y % 2 == 0) {
-        centerPosition += OSD.data.display_size.x / 2;
+        centerPosition += Math.floor(OSD.data.display_size.x / 2);
     }
 
     let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
