@@ -2392,7 +2392,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5];     // indexes of PAL, HDZERO, & DJIWTF
+const mspVideoSystem = [1,3,4,5];   // indexes of PAL, HDZERO, DJIWTF, & BF43COMPAT
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
