@@ -341,6 +341,9 @@
     "statusbar_cpu_load": {
         "message": "CPU Load: $1%"
     },
+    "statusbar_arming_flags": {
+        "message": "Arming Flags:"
+    },
 
     "dfu_connect_message": {
         "message": "Please use the Firmware Flasher to access DFU devices"
