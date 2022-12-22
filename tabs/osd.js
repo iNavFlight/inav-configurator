@@ -109,6 +109,10 @@ SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
 SYM.GLIDE_MINS = 0xD5;
 SYM.GLIDE_RANGE = 0xD4;
+SYM.FLIGHT_MINS_REMAINING = 0xDA;
+SYM.FLIGHT_DIST_REMAINING = 0x167;
+SYM.GROUND_COURSE = 0xDC;
+SYM.CROSS_TRACK_ERROR = 0xFC;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -535,28 +539,32 @@ OSD.constants = {
         'NTSC',
         'HDZERO',
         'DJIWTF',
-        'AVATAR'
+        'AVATAR',
+        'BF43COMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
         HDZERO: 18,
         DJIWTF: 22,
-        AVATAR: 20
+        AVATAR: 20,
+        BF43COMPAT: 16,
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
         HDZERO: 50,
         DJIWTF: 60,
-        AVATAR: 53
+        AVATAR: 53,
+        BF43COMPAT: 30
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
         HDZERO: 900,
         DJIWTF: 1320,
-        AVATAR: 1060
+        AVATAR: 1060,
+        BF43COMPAT: 480
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -800,7 +808,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_TIME',
                     id: 48,
-                    preview: FONT.symbol(SYM.FLY_M) + '10:35'
+                    preview: FONT.symbol(SYM.FLIGHT_MINS_REMAINING) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
@@ -809,11 +817,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -1574,6 +1582,28 @@ OSD.constants = {
                     name: 'COURSE_HOLD_ADJUSTMENT',
                     id: 52,
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'GROUND COURSE',
+                    id: 140,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'CROSS TRACK ERROR',
+                    id: 141,
+                    min_version: '6.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 },
             ]
         },
@@ -2371,7 +2401,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5];   // indexes of PAL, HDZERO, DJIWTF, & AVATAR
+const mspVideoSystem = [1,3,4,5,6];   // indexes of PAL, HDZERO, DJIWTF,AVATAR, & BF43COMPAT
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {

@@ -136,8 +136,15 @@ SYM_AH_V_FT_0              | SYM.AH_V_FT_0                | Climb efficiency: im
 SYM_AH_V_FT_1              | SYM.AH_V_FT_1                | Climb efficiency: imperial R side     | 215        | 0xD7
 SYM_AH_V_M_0               | SYM.AH_V_M_0                 | Climb efficiency: metric L side       | 216        | 0xD8
 SYM_AH_V_M_1               | SYM.AH_V_M_1                 | Climb efficiency: metric R side       | 217        | 0xD9
- | | | | 
-SYM_LOGO_START             |                              | INAV Logo                             | 257 - 280  | 0x101 - 0x118
+SYM_FLIGHT_MINS_REMAINING  | SYM.FLIGHT_MINS_REMAINING    | Flight time (mins) remaining          | 218        | 0xDA
+SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB
+SYM_GROUND_COURSE          | SYM.GROUND_COURSE            | Ground course                         | 220        | 0xDC
+SYM_TERRAIN_FOLLOWING      | SYM.TERRAIN_FOLLOWING        | Terrain following                     | 251        | 0xFB
+SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error                     | 252        | 0xFC
+SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD
+SYM_BLACKBOX               | SYM.BLACKBOX                 | Blackbox                              | 254        | 0xFE
+ | | | |
+SYM_LOGO_START             |                              | INAV Logo                             | 257 - 296  | 0x101 - 0x128
 SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C
 SYM_AH_RIGHT               | SYM.AH_RIGHT                 | AHI Arrow right                       | 301        | 0x12D
 SYM_AH_DECORATION_MIN      |                              | AHI Scrolling graphics                | 302 - 307  | 0x12E - 0x133
@@ -175,6 +182,7 @@ SYM_HUD_SIGNAL_3           |                              | HUD signal 75% icon 
 SYM_HUD_SIGNAL_4           |                              | HUD signal 100% icon                  | 356        | 0x164
 SYM_HOME_DIST              |                              | Home distance icon                    | 357        | 0x165
 SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166
+SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167
 SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192
 SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195
 SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198
