@@ -1,6 +1,6 @@
 # Characters
 
-| Preview                                                            | Firmware                   | Configurator                 | Description                           | Decimal ID | HEX ID       |
+| Preview                                                            | Firmware Variable          | Configurator Variable        | Description                           | Decimal ID | HEX ID       |
 |--------------------------------------------------------------------|----------------------------|------------------------------|---------------------------------------|------------|--------------|
 | ![None](/resources/osd/digital/default/12x18/000.png)              | SYM_NONE                   |                              | Completely transparent icon           | 000        | 0x00         |
 | ![RSSI](/resources/osd/digital/default/12x18/001.png)              | SYM_RSSI                   | SYM.RSSI                     | RSSI Icon                             | 001        | 0x01         |
@@ -26,6 +26,13 @@
 | ![AHI up arrow](/resources/osd/digital/default/12x18/021.png)      | SYM_AH_DECORATION_UP       | SYM.AH_DECORATION_UP         | AHi up arrow                          | 021        | 0x15         |
 | ![AHI down arrow](/resources/osd/digital/default/12x18/022.png)    | SYM_AH_DECORATION_DOWN     |                              | AHI down arrow                        | 022        | 0x16         |
 | ![Direction](/resources/osd/digital/default/12x18/023.png)         | SYM_DECORATION             | SYM.DIRECTION                | Direction little arrows               | 023 - 030  | 0x17 - 0x1E  |
+| ![Direction](/resources/osd/digital/default/12x18/024.png)         |                            |                              |                                       | 024        | 0x18         |
+| ![Direction](/resources/osd/digital/default/12x18/025.png)         |                            |                              |                                       | 025        | 0x19         |
+| ![Direction](/resources/osd/digital/default/12x18/026.png)         |                            |                              |                                       | 026        | 0x1A         |
+| ![Direction](/resources/osd/digital/default/12x18/027.png)         |                            |                              |                                       | 027        | 0x1B         |
+| ![Direction](/resources/osd/digital/default/12x18/028.png)         |                            |                              |                                       | 028        | 0x1C         |
+| ![Direction](/resources/osd/digital/default/12x18/029.png)         |                            |                              |                                       | 029        | 0x1D         |
+| ![Direction](/resources/osd/digital/default/12x18/030.png)         |                            |                              |                                       | 030        | 0x1E         |
 | ![Volts](/resources/osd/digital/default/12x18/031.png)             | SYM_VOLT                   | SYM.VOLT                     | Volts symbol                          | 031        | 0x1F         |
 | ![Blank](/resources/osd/digital/default/12x18/032.png)             | SYM_BLANK _*_              | SYM.BLANK                    | Empty                                 | 032        | 0x20         |
 | ![Exclamation](/resources/osd/digital/default/12x18/033.png)       | _ASCII_ _*_                |                              | !                                     | 033        | 0x21         |
@@ -36,8 +43,61 @@
 | ![Ampersand](/resources/osd/digital/default/12x18/038.png)         | _ASCII_ _*_                |                              | &                                     | 038        | 0x26         |
 | ![VTX Power](/resources/osd/digital/default/12x18/039.png)         | SYM_VTX_POWER              | SYM.VTX_POWER                | VTx Power                             | 039        | 0x27         |
 | ![ASCII Numbers](/resources/osd/digital/default/12x18/040.png)     | _ASCII_ _*_                |                              | Symbols and numbers                   | 040 - 062  | 0x28 - 0x3E  |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/041.png)     | _ASCII_ _*_                |                              |                                       | 041        | 0x29         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/042.png)     | _ASCII_ _*_                |                              |                                       | 042        | 0x2A         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/043.png)     | _ASCII_ _*_                |                              |                                       | 043        | 0x2B         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/044.png)     | _ASCII_ _*_                |                              |                                       | 044        | 0x2C         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/045.png)     | _ASCII_ _*_                |                              |                                       | 045        | 0x2D         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/046.png)     | _ASCII_ _*_                |                              |                                       | 046        | 0x2E         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/047.png)     | _ASCII_ _*_                |                              |                                       | 047        | 0x2F         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/048.png)     | _ASCII_ _*_                |                              |                                       | 048        | 0x30         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/049.png)     | _ASCII_ _*_                |                              |                                       | 049        | 0x31         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/050.png)     | _ASCII_ _*_                |                              |                                       | 050        | 0x32         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/051.png)     | _ASCII_ _*_                |                              |                                       | 051        | 0x33         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/052.png)     | _ASCII_ _*_                |                              |                                       | 052        | 0x34         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/053.png)     | _ASCII_ _*_                |                              |                                       | 053        | 0x35         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/054.png)     | _ASCII_ _*_                |                              |                                       | 054        | 0x36         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/055.png)     | _ASCII_ _*_                |                              |                                       | 055        | 0x37         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/056.png)     | _ASCII_ _*_                |                              |                                       | 056        | 0x38         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/057.png)     | _ASCII_ _*_                |                              |                                       | 057        | 0x39         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/058.png)     | _ASCII_ _*_                |                              |                                       | 058        | 0x3A         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/059.png)     | _ASCII_ _*_                |                              |                                       | 059        | 0x3B         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/060.png)     | _ASCII_ _*_                |                              |                                       | 060        | 0x3C         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/061.png)     | _ASCII_ _*_                |                              |                                       | 061        | 0x3D         |
+| ![ASCII Numbers](/resources/osd/digital/default/12x18/062.png)     | _ASCII_ _*_                |                              |                                       | 062        | 0x3E         |
 | ![Ah/Nautical Mile](/resources/osd/digital/default/12x18/063.png)  | SYM_AH_NM                  | SYM.AH_NM                    | Ah per Nautical Mile                  | 063        | 0x3F         |
 | ![ASCII Alphabet](/resources/osd/digital/default/12x18/064.png)    | _ASCII_ _*_                |                              | Alphabet and symbols                  | 064 - 095  | 0x40 - 0x5F  |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/065.png)    | _ASCII_ _*_                |                              |                                       | 065        | 0x41         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/066.png)    | _ASCII_ _*_                |                              |                                       | 066        | 0x42         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/067.png)    | _ASCII_ _*_                |                              |                                       | 067        | 0x43         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/068.png)    | _ASCII_ _*_                |                              |                                       | 068        | 0x44         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/069.png)    | _ASCII_ _*_                |                              |                                       | 069        | 0x45         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/070.png)    | _ASCII_ _*_                |                              |                                       | 070        | 0x46         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/071.png)    | _ASCII_ _*_                |                              |                                       | 071        | 0x47         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/072.png)    | _ASCII_ _*_                |                              |                                       | 072        | 0x48         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/073.png)    | _ASCII_ _*_                |                              |                                       | 073        | 0x49         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/074.png)    | _ASCII_ _*_                |                              |                                       | 074        | 0x4A         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/075.png)    | _ASCII_ _*_                |                              |                                       | 075        | 0x4B         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/076.png)    | _ASCII_ _*_                |                              |                                       | 076        | 0x4C         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/077.png)    | _ASCII_ _*_                |                              |                                       | 077        | 0x4D         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/078.png)    | _ASCII_ _*_                |                              |                                       | 078        | 0x4E         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/079.png)    | _ASCII_ _*_                |                              |                                       | 079        | 0x4F         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/080.png)    | _ASCII_ _*_                |                              |                                       | 080        | 0x50         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/081.png)    | _ASCII_ _*_                |                              |                                       | 081        | 0x51         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/082.png)    | _ASCII_ _*_                |                              |                                       | 082        | 0x52         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/083.png)    | _ASCII_ _*_                |                              |                                       | 083        | 0x53         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/084.png)    | _ASCII_ _*_                |                              |                                       | 084        | 0x54         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/085.png)    | _ASCII_ _*_                |                              |                                       | 085        | 0x55         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/086.png)    | _ASCII_ _*_                |                              |                                       | 086        | 0x56         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/087.png)    | _ASCII_ _*_                |                              |                                       | 087        | 0x57         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/088.png)    | _ASCII_ _*_                |                              |                                       | 088        | 0x58         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/089.png)    | _ASCII_ _*_                |                              |                                       | 089        | 0x59         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/090.png)    | _ASCII_ _*_                |                              |                                       | 090        | 0x5A         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/091.png)    | _ASCII_ _*_                |                              |                                       | 091        | 0x5B         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/092.png)    | _ASCII_ _*_                |                              |                                       | 092        | 0x5C         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/093.png)    | _ASCII_ _*_                |                              |                                       | 093        | 0x5D         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/094.png)    | _ASCII_ _*_                |                              |                                       | 094        | 0x5E         |
+| ![ASCII Alphabet](/resources/osd/digital/default/12x18/095.png)    | _ASCII_ _*_                |                              |                                       | 095        | 0x5F         |
 | ![mAh per NM](/resources/osd/digital/default/12x18/096-097.png)    | SYM_MAH_NM_0               | SYM.MAH_NM_0                 | mAh per Nautical mile, left side      | 096        | 0x60         |
 |                                                                    | SYM_MAH_NM_1               | SYM.MAH_NM_1                 | mAh per Nautical mile, right side     | 097        | 0x61         |
 | ![milliOhm](/resources/osd/digital/default/12x18/098.png)          | SYM_MILLIOHM               | SYM.MILLIOHM                 | MilliOhm symbol                       | 098        | 0x62         |
@@ -67,6 +127,10 @@
 | ![Altitude kFt](/resources/osd/digital/default/12x18/121.png)      | SYM_ALT_KFT                |                              | Altitude in thousand Feet             | 121        | 0x79         |
 | ![Distance Metres](/resources/osd/digital/default/12x18/122.png)   | SYM_DIST_M                 |                              | Distance in Metres                    | 122        | 0x7A         |
 | ![ASCII (-)](/resources/osd/digital/default/12x18/123.png)         | _ASCII_ _*_                |                              | Bracket symbols                       | 123 - 125  | 0x7B - 0x7D  |
+| ![ASCII (-)](/resources/osd/digital/default/12x18/124.png)         | _ASCII_ _*_                |                              |                                       | 124        | 0x7C         |
+| ![ASCII (-)](/resources/osd/digital/default/12x18/125.png)         | _ASCII_ _*_                |                              |                                       | 125        | 0x7D         |
+| ![Distance Km](/resources/osd/digital/default/12x18/126.png)       | SYM_DIST_KM                | SYM.DIST_KM                  | Distance in Kilometres                | 126        | 0x7E         |
+| ![Distance Feet](/resources/osd/digital/default/12x18/127.png)     | SYM_DIST_FT                |                              | Distance in Feet                      | 127        | 0x7F         |
 | ![Distance Miles](/resources/osd/digital/default/12x18/128.png)    | SYM_DIST_MI                | SYM.DIST_MI                  | Distance in Miles                     | 128        | 0x80         |
 | ![Distance N Miles](/resources/osd/digital/default/12x18/129.png)  | SYM_DIST_NM                | SYM.DIST_NM                  | Distance in Nautical Miles            | 129        | 0x81         |
 | ![Metres](/resources/osd/digital/default/12x18/130.png)            | SYM_M                      | SYM.M                        | Metres symbol                         | 130        | 0x82         |
@@ -101,6 +165,15 @@
 | ![Flying Minutes](/resources/osd/digital/default/12x18/159.png)    | SYM_FLY_M                  | SYM.FLY_M                    | Flying minutes                        | 159        | 0x9F         |
 | ![Clock](/resources/osd/digital/default/12x18/160.png)             | SYM_CLOCK                  | SYM.CLOCK                    | Clock                                 | 160        | 0xA0         |
 | ![Numbers .](/resources/osd/digital/default/12x18/161.png)         | SYM_ZERO_HALF_TRAILING_DOT | SYM.ZERO_HALF_TRAILING_DOT   | Numbers with trailing dots            | 161 - 170  | 0xA1 - 0xAA  |
+| ![Numbers .](/resources/osd/digital/default/12x18/162.png)         |                            |                              |                                       | 162        | 0xA2         |
+| ![Numbers .](/resources/osd/digital/default/12x18/163.png)         |                            |                              |                                       | 163        | 0xA3         |
+| ![Numbers .](/resources/osd/digital/default/12x18/164.png)         |                            |                              |                                       | 164        | 0xA4         |
+| ![Numbers .](/resources/osd/digital/default/12x18/165.png)         |                            |                              |                                       | 165        | 0xA5         |
+| ![Numbers .](/resources/osd/digital/default/12x18/166.png)         |                            |                              |                                       | 166        | 0xA6         |
+| ![Numbers .](/resources/osd/digital/default/12x18/167.png)         |                            |                              |                                       | 167        | 0xA7         |
+| ![Numbers .](/resources/osd/digital/default/12x18/168.png)         |                            |                              |                                       | 168        | 0xA8         |
+| ![Numbers .](/resources/osd/digital/default/12x18/169.png)         |                            |                              |                                       | 169        | 0xA9         |
+| ![Numbers .](/resources/osd/digital/default/12x18/170.png)         |                            |                              |                                       | 170        | 0xAA         |
 | ![AutoThrottle](/resources/osd/digital/default/12x18/171-172.png)  | SYM_AUTO_THR0              |                              | Auto-throttle symbol, left side       | 171        | 0xAB         |
 |                                                                    | SYM_AUTO_THR1              |                              | Auto-throttle symbol, right side      | 172        | 0xAC         |
 | ![Roll Left](/resources/osd/digital/default/12x18/173.png)         | SYM_ROLL_LEFT              | SYM.ROLL_LEFT                | roll left symbol                      | 173        | 0xAD         |
@@ -108,6 +181,15 @@
 | ![Roll Right](/resources/osd/digital/default/12x18/175.png)        | SYM_ROLL_RIGHT             | SYM.ROLL_RIGHT               | roll right symbol                     | 175        | 0xAF         |
 | ![Pitch Up](/resources/osd/digital/default/12x18/176.png)          | SYM_PITCH_UP               | SYM.PITCH_UP                 | Pitch up symbol                       | 176        | 0xB0         |
 | ![. Numbers](/resources/osd/digital/default/12x18/177.png)         | SYM_ZERO_HALF_LEADING_DOT  | SYM.ZERO_HALF_LEADING_DOT    | Numbers with leading dots             | 177 - 186  | 0xB1 - 0xBA  |
+| ![. Numbers](/resources/osd/digital/default/12x18/178.png)         |                            |                              |                                       | 178        | 0xB2         |
+| ![. Numbers](/resources/osd/digital/default/12x18/179.png)         |                            |                              |                                       | 179        | 0xB3         |
+| ![. Numbers](/resources/osd/digital/default/12x18/180.png)         |                            |                              |                                       | 180        | 0xB4         |
+| ![. Numbers](/resources/osd/digital/default/12x18/181.png)         |                            |                              |                                       | 181        | 0xB5         |
+| ![. Numbers](/resources/osd/digital/default/12x18/182.png)         |                            |                              |                                       | 182        | 0xB6         |
+| ![. Numbers](/resources/osd/digital/default/12x18/183.png)         |                            |                              |                                       | 183        | 0xB7         |
+| ![. Numbers](/resources/osd/digital/default/12x18/184.png)         |                            |                              |                                       | 184        | 0xB8         |
+| ![. Numbers](/resources/osd/digital/default/12x18/185.png)         |                            |                              |                                       | 185        | 0xB9         |
+| ![. Numbers](/resources/osd/digital/default/12x18/186.png)         |                            |                              |                                       | 186        | 0xBA         |
 | ![Pitch Down](/resources/osd/digital/default/12x18/187.png)        | SYM_PITCH_DOWN             | SYM.PITCH_DOWN               | Pitch down symbol                     | 187        | 0xBB         |
 | ![G-Force](/resources/osd/digital/default/12x18/188.png)           | SYM_GFORCE                 | SYM.GFORCE                   | Gforce (all axis)                     | 188        | 0xBC         |
 | ![G-Force X](/resources/osd/digital/default/12x18/189.png)         | SYM_GFORCE_X               | SYM.GFORCE_X                 | Gforce X                              | 189        | 0xBD         |
@@ -147,7 +229,10 @@
 | ![AH left arrow](/resources/osd/digital/default/12x18/300.png)    | SYM_AH_LEFT                | SYM.AH_LEFT                  | AHI Arrow left                        | 300        | 0x12C         |
 | ![AH right arrow](/resources/osd/digital/default/12x18/301.png)   | SYM_AH_RIGHT               | SYM.AH_RIGHT                 | AHI Arrow right                       | 301        | 0x12D         |
 | ![AH scroll sides](/resources/osd/digital/default/12x18/302.png)  | SYM_AH_DECORATION_MIN      |                              | AHI Scrolling graphics                | 302 - 307  | 0x12E - 0x133 |
+| ![AH scroll sides](/resources/osd/digital/default/12x18/303.png)  |                            |                              |                                       | 303        | 0x12F         |
+| ![AH scroll sides](/resources/osd/digital/default/12x18/304.png)  |                            |                              |                                       | 304        | 0x130         |
 | ![AH scroll sides](/resources/osd/digital/default/12x18/305.png)  | SYM_AH_DECORATION          | SYM.AH_DECORATION            | AHI Scrolling graphics                | 305        | 0x131         |
+| ![AH scroll sides](/resources/osd/digital/default/12x18/306.png)  |                            |                              |                                       | 306        | 0x132         |
 | ![AH scroll sides](/resources/osd/digital/default/12x18/307.png)  | SYM_AH_DECORATION_MAX      |                              | AHI Scrolling graphics                | 307        | 0x133         |
 | ![Crosshair left](/resources/osd/digital/default/12x18/314.png)   | SYM_AH_CH_LEFT             | SYM.AH_CENTER_LINE           | Crosshair left                        | 314        | 0x13A         |
 | ![Crosshair right](/resources/osd/digital/default/12x18/315.png)  | SYM_AH_CH_RIGHT            | SYM.AH_CENTER_LINE_RIGHT     | Crosshair right                       | 315        | 0x13B         |
@@ -168,12 +253,25 @@
 | ![Dir arrow 315°](/resources/osd/digital/default/12x18/330.png)   | SYM_ARROW_15               |                              | Direction arrow 315°                  | 330        | 0x14A         |
 | ![Dir arrow 337.5°](/resources/osd/digital/default/12x18/331.png) | SYM_ARROW_16               |                              | Direction arrow 337.5°                | 331        | 0x14B         |
 | ![AHI](/resources/osd/digital/default/12x18/332.png)              | SYM_AH_H_START             | SYM.AH_BAR9_0                | Horizontal AHI                        | 332 - 340  | 0x14C - 0x154 |
+| ![AHI](/resources/osd/digital/default/12x18/333.png)              |                            |                              | Horizontal AHI                        | 333        | 0x14D         |
+| ![AHI](/resources/osd/digital/default/12x18/334.png)              |                            |                              | Horizontal AHI                        | 334        | 0x14E         |
+| ![AHI](/resources/osd/digital/default/12x18/335.png)              |                            |                              | Horizontal AHI                        | 335        | 0x14F         |
+| ![AHI](/resources/osd/digital/default/12x18/336.png)              |                            |                              | Horizontal AHI                        | 336        | 0x150         |
+| ![AHI](/resources/osd/digital/default/12x18/337.png)              |                            |                              | Horizontal AHI                        | 337        | 0x151         |
+| ![AHI](/resources/osd/digital/default/12x18/338.png)              |                            |                              | Horizontal AHI                        | 338        | 0x152         |
+| ![AHI](/resources/osd/digital/default/12x18/339.png)              |                            |                              | Horizontal AHI                        | 339        | 0x153         |
+| ![AHI](/resources/osd/digital/default/12x18/340.png)              |                            |                              | Horizontal AHI                        | 340        | 0x154         |
 | ![Vario 2 up](/resources/osd/digital/default/12x18/341.png)       | SYM_VARIO_UP_2A            | SYM.VARIO_UP_2A              | Vario up up                           | 341        | 0x155         |
 | ![Vario 1 up](/resources/osd/digital/default/12x18/342.png)       | SYM_VARIO_UP_1A            |                              | Vario up                              | 342        | 0x156         |
 | ![Vario 1 down](/resources/osd/digital/default/12x18/343.png)     | SYM_VARIO_DOWN_1A          |                              | Vario down                            | 343        | 0x157         |
 | ![Vario 2 down](/resources/osd/digital/default/12x18/344.png)     | SYM_VARIO_DOWN_2A          |                              | Vario down down                       | 344        | 0x158         |
 | ![Altitude](/resources/osd/digital/default/12x18/345.png)         | SYM_ALT                    |                              | Altitude symbol                       | 345        | 0x159         |
 | ![Vertical AHI](/resources/osd/digital/default/12x18/346.png)     | SYM_AH_V_START             |                              | Vertical AHI                          | 346 - 351  | 0x15A - 0x159 |
+| ![Vertical AHI](/resources/osd/digital/default/12x18/347.png)     |                            |                              |                                       | 347        | 0x15B         |
+| ![Vertical AHI](/resources/osd/digital/default/12x18/348.png)     |                            |                              |                                       | 348        | 0x15C         |
+| ![Vertical AHI](/resources/osd/digital/default/12x18/349.png)     |                            |                              |                                       | 349        | 0x15D         |
+| ![Vertical AHI](/resources/osd/digital/default/12x18/350.png)     |                            |                              |                                       | 350        | 0x15E         |
+| ![Vertical AHI](/resources/osd/digital/default/12x18/351.png)     |                            |                              |                                       | 351        | 0x15F         |
 | ![HUD Signal lost](/resources/osd/digital/default/12x18/352.png)  | SYM_HUD_SIGNAL_0           |                              | HUD signal lost icon                  | 352        | 0x160         |
 | ![HUD Signal 25%](/resources/osd/digital/default/12x18/353.png)   | SYM_HUD_SIGNAL_1           |                              | HUD signal 25% icon                   | 353        | 0x161         |
 | ![HUD Signal 50%](/resources/osd/digital/default/12x18/354.png)   | SYM_HUD_SIGNAL_2           |                              | HUD signal 50% icon                   | 354        | 0x162         |
@@ -182,13 +280,13 @@
 | ![Home distance](/resources/osd/digital/default/12x18/357.png)    | SYM_HOME_DIST              |                              | Home distance icon                    | 357        | 0x165         |
 | ![Crosshair centre](/resources/osd/digital/default/12x18/358.png) | SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166         |
 | ![Flight dist rem](/resources/osd/digital/default/12x18/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
-| ![Crosshair 3](/resources/osd/digital/default/12x18/400-402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
-| ![Crosshair 4](/resources/osd/digital/default/12x18/403-405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
-| ![Crosshair 5](/resources/osd/digital/default/12x18/406-408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |
-| ![Crosshair 6](/resources/osd/digital/default/12x18/409-411.png)  | SYM_AH_CH_TYPE6            | SYM.AH_CROSSHAIRS            | Crosshair type 6                      | 409 - 411  | 0x199 - 0x19B |
-| ![Crosshair 7](/resources/osd/digital/default/12x18/412-414.png)  | SYM_AH_CH_TYPE7            | SYM.AH_CROSSHAIRS            | Crosshair type 7                      | 412 - 414  | 0x19C - 0x19E |
-| ![Crosshair 8](/resources/osd/digital/default/12x18/415-417.png)  | SYM_AH_CH_TYPE8            | SYM.AH_CROSSHAIRS            | Crosshair type 8                      | 415 - 417  | 0x19F - 0x1A1 |
-| ![Crosshair 9](/resources/osd/digital/default/12x18/418-422.png)  | SYM_AH_CH_AIRCRAFT0        | SYM.AH_AIRCRAFT0             | Aircraft crosshair left               | 418        | 0x1A2         |
+| ![Crosshair 3](/resources/osd/digital/default/12x18/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
+| ![Crosshair 4](/resources/osd/digital/default/12x18/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
+| ![Crosshair 5](/resources/osd/digital/default/12x18/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |
+| ![Crosshair 6](/resources/osd/digital/default/12x18/409_411.png)  | SYM_AH_CH_TYPE6            | SYM.AH_CROSSHAIRS            | Crosshair type 6                      | 409 - 411  | 0x199 - 0x19B |
+| ![Crosshair 7](/resources/osd/digital/default/12x18/412_414.png)  | SYM_AH_CH_TYPE7            | SYM.AH_CROSSHAIRS            | Crosshair type 7                      | 412 - 414  | 0x19C - 0x19E |
+| ![Crosshair 8](/resources/osd/digital/default/12x18/415_417.png)  | SYM_AH_CH_TYPE8            | SYM.AH_CROSSHAIRS            | Crosshair type 8                      | 415 - 417  | 0x19F - 0x1A1 |
+| ![Crosshair 9](/resources/osd/digital/default/12x18/418_422.png)  | SYM_AH_CH_AIRCRAFT0        | SYM.AH_AIRCRAFT0             | Aircraft crosshair left               | 418        | 0x1A2         |
 |                                                                   | SYM_AH_CH_AIRCRAFT1        | SYM.AH_AIRCRAFT1             | Aircraft crosshair                    | 419        | 0x1A3         |
 |                                                                   | SYM_AH_CH_AIRCRAFT2        | SYM.AH_AIRCRAFT2             | Aircraft crosshair centre             | 420        | 0x1A4         |
 |                                                                   | SYM_AH_CH_AIRCRAFT3        | SYM.AH_AIRCRAFT3             | Aircraft crosshair                    | 421        | 0x1A5         |
@@ -206,6 +304,17 @@
 | ![HUD Arrows D2](/resources/osd/digital/default/12x18/440.png)    | SYM_HUD_ARROWS_D2          |                              | 2 arrows down                         | 440        | 0x1B8         |
 | ![HUD Arrows D3](/resources/osd/digital/default/12x18/441.png)    | SYM_HUD_ARROWS_D3          |                              | 3 arrows down                         | 441        | 0x1B9         |
 | ![Cardinal S](/resources/osd/digital/default/12x18/442.png)       | SYM_HUD_CARDINAL           |                              | Cardinal indicators                   | 442 - 453  | 0x1BA - 0x1C5 |
+| ![Cardinal S](/resources/osd/digital/default/12x18/443.png)       |                            |                              |                                       | 443        | 0x1BB         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/444.png)       |                            |                              |                                       | 444        | 0x1BC         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/445.png)       |                            |                              |                                       | 445        | 0x1BD         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/446.png)       |                            |                              |                                       | 446        | 0x1BE         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/447.png)       |                            |                              |                                       | 447        | 0x1BF         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/448.png)       |                            |                              |                                       | 448        | 0x1C0         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/449.png)       |                            |                              |                                       | 449        | 0x1C1         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/450.png)       |                            |                              |                                       | 450        | 0x1C2         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/451.png)       |                            |                              |                                       | 451        | 0x1C3         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/452.png)       |                            |                              |                                       | 452        | 0x1C4         |
+| ![Cardinal S](/resources/osd/digital/default/12x18/453.png)       |                            |                              |                                       | 453        | 0x1C5         |
 | ![Pan centred](/resources/osd/digital/default/12x18/454.png)      | SYM_SERVO_PAN_IS_CENTRED   |                              | Pan servo is centred                  | 454        | 0x1C6         |
 | ![Pan Left](/resources/osd/digital/default/12x18/455.png)         | SYM_SERVO_PAN_IS_OFFSET_L  | SYM.PAN_SERVO_IS_OFFSET_L    | Pan servo is moved to the left        | 455        | 0x1C7         |
 | ![Pan Right](/resources/osd/digital/default/12x18/456.png)        | SYM_SERVO_PAN_IS_OFFSET_R  |                              | Pan servo is moved to the right       | 456        | 0x1C8         |
