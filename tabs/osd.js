@@ -113,6 +113,7 @@ SYM.FLIGHT_MINS_REMAINING = 0xDA;
 SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.CROSS_TRACK_ERROR = 0xFC;
+SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -964,6 +965,12 @@ OSD.constants = {
                                 return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 21') + FONT.symbol(SYM.KM);
                         }
                     }
+                },
+                {
+                    name: 'PAN_SERVO_CENTRED',
+                    id: 142,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
                 },
                 {
                     name: 'MISSION INFO',
@@ -2533,7 +2540,7 @@ OSD.GUI.updateFields = function() {
             $('<div class="helpicon cf_tip"></div>')
                 .css('margin-top', '1px')
                 .attr('title', groupHelp)
-                .appendTo(groupTitleContainer)
+                .appendTo(groupTitleContainer.parent())
                 .jBox('Tooltip', {
                     delayOpen: 100,
                     delayClose: 100,
@@ -2656,6 +2663,7 @@ OSD.GUI.updateFields = function() {
     // Update the OSD preview
     refreshOSDSwitchIndicators();
     updatePilotAndCraftNames();
+    updatePanServoPreview();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -3079,6 +3087,17 @@ TABS.osd.initialize = function (callback) {
             refreshOSDSwitchIndicators();
         });
 
+        // Functions for when pan servo settings change
+        $('#osdPanServoIndicatorShowDegrees').on('change', function() {
+            // Update the OSD preview
+            updatePanServoPreview();
+        });
+
+        $('#panServoOutput').on('change', function() {
+            // Update the OSD preview
+            updatePanServoPreview();
+        });
+
         // Function for when text for craft name changes
         $('#craft_name').on('keyup', function() {
             // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -3273,7 +3292,7 @@ function refreshOSDSwitchIndicators() {
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
-
+    
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
@@ -3305,6 +3324,46 @@ function updatePilotAndCraftNames() {
             if (foundCraftName && foundPilotName) {
                 break;
             }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+}
+
+function updatePanServoPreview() {
+    // Show or hide the settings, based on of the feature is active.
+    if ($('#panServoOutput').val() === "0") {
+        $('#osd_pan_settings').hide();
+        $('#panServoOutput').parent().addClass('no-bottom');
+    } else {
+        $('#osd_pan_settings').show();
+        $('#panServoOutput').parent().removeClass('no-bottom');
+    }
+
+    // Update the panServoOutput select to be visibly easier to use
+    $('#panServoOutput option').each(function() {
+        if ($(this).val() === "0") {
+            $(this).text("OFF");
+        } else {
+            $(this).text("S" + $(this).val());
+        }
+    });
+
+    // Update the OSD preview based on settings
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupGeneral";
+      })[0];
+
+    for (let si = 0; si < generalGroup.items.length; si++) {
+        if (generalGroup.items[si].name == "PAN_SERVO_CENTRED") {
+            let craftNameText = $('#craft_name').val();
+
+            if ($('#osdPanServoIndicatorShowDegrees').prop('checked')) {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES);
+            } else {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L);
+            }
+            break;
         }
     }
 

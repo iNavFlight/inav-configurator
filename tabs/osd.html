@@ -301,6 +301,36 @@
                         </label>
                     </div>
                 </div>
+                <div class="gui_box grey pan-servo-container"> 
+                    <div class="gui_box_titlebar">
+                        <div for="osd_pan_servo_settings" class="helpicon cf_tip" data-i18n_title="osd_pan_servo_settings_HELP"></div>
+                        <div class="spacer_box_title" data-i18n="osd_pan_servo_settings"></div>
+                    </div>
+                    <div class="spacer_box settings">
+                        <div for="panServoOutput" class="helpicon cf_tip" data-i18n_title="osdPanServoIndex_HELP"></div>
+                        <label>
+                            <select id="panServoOutput" data-setting="osd_pan_servo_index" data-live="true"></select>
+                            <span data-i18n="osdPanServoIndex"></span>
+                        </label>
+
+                        <div id="osd_pan_settings">
+                            <div for="osdPanServoPwm2centideg" class="helpicon cf_tip" data-i18n_title="osdPanServoPwm2centideg_HELP"></div>
+                            <label for="osdPanServoPwm2centideg">
+                                <input id="osdPanServoPwm2centideg" data-setting="osd_pan_servo_pwm2centideg" data-unit="centideg-deg" data-setting-multiplier="1" type="number" data-step="1" />
+                                <span data-i18n="osdPanServoPwm2centideg"></span>
+                            </label>
+                            <label for="osdPanServoIndicatorShowDegrees">
+                                <input type="checkbox" id="osdPanServoIndicatorShowDegrees" data-setting="osd_pan_servo_indicator_show_degrees" data-live="true" class="toggle"></select>
+                                <span data-i18n="osdPanServoIndicatorShowDegrees"></span>
+                            </label>
+                            <div for="osdPanServoOffcentreWarning" class="helpicon cf_tip" data-i18n_title="osdPanServoOffcentreWarning_HELP"></div>
+                            <label for="osdPanServoOffcentreWarning">
+                                <input id="osdPanServoOffcentreWarning" data-setting="osd_pan_servo_offcentre_warning" data-unit="deg" data-setting-multiplier="1" type="number" data-step="1" />
+                                <span data-i18n="osdPanServoOffcentreWarning"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
                 <div class="font-picker" style="margin-bottom: 10px;">
