@@ -1,6 +1,6 @@
 # INAV HD fonts
 
-These font character images are for use with HD FPV systems. These are the master images for editing, adding new symbols, or deriving alternate fonts from. Use https://github.com/MrD-RC/hdosd-font-tool to compile these font character images in to specific files, for use with HD FPV video system.
+These font character images are for use with HD FPV systems. These are the master images for editing, adding new symbols, or deriving alternate fonts from. Use the [HD OSD Font Tool](https://github.com/MrD-RC/hdosd-font-tool) to compile these font character images in to specific files, for use with HD FPV video system.
 
 ## Use
 This is the **font root** directory. The __default__ subdirectory contains the default INAV HD fonts. This is where new symbols should be added, and the default font maintained. Within __default__ there are three subdirectories:
