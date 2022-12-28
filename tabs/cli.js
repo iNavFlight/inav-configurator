@@ -191,6 +191,12 @@ TABS.cli.initialize = function (callback) {
             self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
         });
 
+        $('.tab-cli .diffall').click(function() {
+            self.outputHistory = "";
+            $('.tab-cli .window .wrapper').empty();
+            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
+        });
+
         $('.tab-cli .clear').click(function() {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
@@ -276,7 +282,7 @@ TABS.cli.initialize = function (callback) {
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
 
-                if (out_string.trim().toLowerCase() == "cls") {
+                if (out_string.trim().toLowerCase() == "cls" || out_string.trim().toLowerCase() == "clear") {
                     self.outputHistory = "";
                     $('.tab-cli .window .wrapper').empty();
                 } else {
