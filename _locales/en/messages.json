@@ -1949,7 +1949,7 @@
         "message": "Clear Screen"
     },
     "cliCopyToClipboardBtn": {
-        "message": "Copy to clipboard"
+        "message": "Copy to Clipboard"
     },
     "cliExitBtn": {
         "message": "Exit"
@@ -1970,7 +1970,7 @@
         "message": "Copied!"
     },
     "cliLoadFromFileBtn": {
-        "message": "Load from file"
+        "message": "Load from File"
     },
     "cliConfirmSnippetDialogTitle": {
         "message": "Review loaded commands"
