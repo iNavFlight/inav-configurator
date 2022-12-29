@@ -123,7 +123,7 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
 var video_type = null;
-
+var isGuidesChecked = false;
 var FONT = FONT || {};
 
 FONT.initData = function () {
@@ -2431,11 +2431,9 @@ OSD.GUI.updateVideoMode = function() {
             if (mspVideoSystem.includes(i))
             {
                 $videoTypes.append(
-                    $('<label/>')
-                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                        .prop('checked', i === OSD.data.preferences.video_system)
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
                         .data('type', i)
-                    )
                 );
             }
         }
@@ -2444,18 +2442,16 @@ OSD.GUI.updateVideoMode = function() {
             if (analogVideoSystem.includes(i))
             {
                 $videoTypes.append(
-                    $('<label/>')
-                    .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                        .prop('checked', i === OSD.data.preferences.video_system)
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
                         .data('type', i)
-                    )
                 );
             }
         }
     }
 
-    $videoTypes.find(':radio').click(function () {
-        OSD.data.preferences.video_system = $(this).data('type');
+    $videoTypes.change(function () {
+        OSD.data.preferences.video_system = $(this).find(':selected').data('type');
         OSD.updateDisplaySize();
         OSD.GUI.saveConfig();
     });
@@ -2629,9 +2625,10 @@ OSD.GUI.updateFields = function() {
     if ($('#videoGuidesToggle').length == false) {
         $('#videoGuides').prepend(
             $('<input id="videoGuidesToggle" type="checkbox" class="toggle" />')
-            .attr('checked', false)
+            .attr('checked', isGuidesChecked)
             .on('change', function () {
                 OSD.GUI.updateGuidesView(this.checked);
+                chrome.storage.local.set({'showOSDGuides': this.checked});
                 OSD.GUI.updatePreviews();
             })
         );
@@ -2651,9 +2648,9 @@ OSD.GUI.updateFields = function() {
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-     // Update the OSD preview
-     refreshOSDSwitchIndicators();
-     updateCraftName();
+    // Update the OSD preview
+    refreshOSDSwitchIndicators();
+    updateCraftName();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2672,8 +2669,6 @@ OSD.GUI.removeBottomLines = function(){
         }
     });
 };
-
-
 
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
@@ -2979,7 +2974,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
-    OSD.GUI.updateGuidesView(false);
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
     OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay);
 };
 
@@ -3038,6 +3033,12 @@ TABS.osd.initialize = function (callback) {
             });
         });
 
+        // Initialise guides checkbox
+        chrome.storage.local.get('showOSDGuides', function (result) {
+            if (typeof result.showOSDGuides !== 'undefined') {
+                isGuidesChecked = result.showOSDGuides;
+            }     
+        });
 
         // Setup switch indicators
         $(".osdSwitchInd_channel option").each(function() {
