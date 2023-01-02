@@ -80,15 +80,14 @@ TABS.outputs.initialize = function (callback) {
     }
 
     function getMotorOutputValue(value) {
-
-        if (!self.feature3DEnabled) {
-            let valueNormalized = value - MISC.mincommand;
-            let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;
-
-            return Math.round(100 * valueNormalized / maxThrottleNormalized) + "%";
-        } else {
-            return value;
-        }
+        return value;
+//        if (!self.feature3DEnabled) {
+//            let valueNormalized = value - MISC.mincommand;
+//            let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;
+//            return Math.round(100 * valueNormalized / maxThrottleNormalized) + "%";
+//        } else {
+//            return value;
+//        }
     }
 
     function processConfiguration() {

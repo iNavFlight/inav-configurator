@@ -312,7 +312,10 @@
     "fcInfoReceived": {
         "message": "Flight controller info, identifier: <strong>$1</strong>, version: <strong>$2</strong>"
     },
-
+    "targetInfoReceived": {
+        "message": "Target variant: <strong>$1</strong>, is variable pitch: <strong>$2</strong>"
+    },
+    
     "notifications_app_just_updated_to_version": {
         "message": "Application just updated to version: $1"
     },
@@ -2255,6 +2258,12 @@
     },
     "controlAxisThrottle": {
         "message": "Throttle [T]"
+    },    
+    "controlAxisCollective": {
+        "message": "Collective [C]"
+    },
+    "controlGyroGain": {
+        "message": "Gyro gain [G]"
     },
     "radioChannelShort": {
         "message": "CH "

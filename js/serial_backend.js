@@ -228,6 +228,7 @@ function onValidFirmware()
 
             googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
             GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
+            GUI.log(chrome.i18n.getMessage('targetInfoReceived', [TARGET.fullIdentifier, TARGET.isVariablePitch])); // sibi?
 
             MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
 

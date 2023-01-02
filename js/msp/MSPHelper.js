@@ -777,6 +777,13 @@ var mspHelper = (function (gui) {
                 CONFIG.boardIdentifier = identifier;
                 CONFIG.boardVersion = data.getUint16(offset, 1);
                 offset += 2;
+                //sibi?
+                offset += 3;
+                TARGET.fullIdentifier = "";
+                for (let i = offset; i < data.byteLength; i++) {
+                    TARGET.fullIdentifier += String.fromCharCode(data.getUint8(i));
+                }
+                TARGET.isVariablePitch = TARGET.fullIdentifier.includes('_VP');
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:

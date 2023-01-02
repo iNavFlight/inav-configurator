@@ -75,6 +75,14 @@ TABS.receiver.initialize = function (callback) {
     function process_html() {
         // translate to user-selected language
         localize();
+        
+        const rcMapElement = document.getElementById('rcmap_element');
+        if (TARGET.isVariablePitch) {
+            rcMapElement.innerHTML = `
+                    <option value="AECR12TG">Default</option>
+                    <option value="CAER12TG">Collective Pitch / Spektrum</option>
+                    <option value="AECR12TG">Collective Pitch / Futaba</option>`.trim();
+        }
 
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
@@ -104,22 +112,22 @@ TABS.receiver.initialize = function (callback) {
         $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
         $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
 
-        // generate bars
+        // generate bars sibi?
         var bar_names = [
                 chrome.i18n.getMessage('controlAxisRoll'),
                 chrome.i18n.getMessage('controlAxisPitch'),
                 chrome.i18n.getMessage('controlAxisYaw'),
-                chrome.i18n.getMessage('controlAxisThrottle')
+                chrome.i18n.getMessage('controlAxisThrottle'),
+                'Aux 1 [1]',
+                'Aux 2 [2]',
+                TARGET.isVariablePitch ? chrome.i18n.getMessage('controlAxisCollective') : 'Aux 3 [3]',
+                TARGET.isVariablePitch ? chrome.i18n.getMessage('controlGyroGain') : 'Aux 4 [4]',
             ],
             bar_container = $('.tab-receiver .bars');
 
         for (var i = 0; i < RC.active_channels; i++) {
             var name;
-            if (i < bar_names.length) {
-                name = bar_names[i];
-            } else {
-                name = chrome.i18n.getMessage("radioChannelShort") + (i + 1);
-            }
+            name = (i < bar_names.length && bar_names[i]) ? bar_names[i] : chrome.i18n.getMessage("radioChannelShort") + (i + 1);
 
             bar_container.append('\
                 <ul>\
@@ -294,6 +302,8 @@ TABS.receiver.initialize = function (callback) {
             googleAnalytics.sendEvent('Setting', 'RcMappingSave', rcMapValue);
 
             for (var i = 0; i < RC_MAP.length; i++) {
+                //strBuffer[i] = (strBuffer[i] == 'C') ? '3' : strBuffer[i]; // sibi? TODO: could be removed if
+                //strBuffer[i] = (strBuffer[i] == 'G') ? '4' : strBuffer[i]; // the FC accepted those letters 
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
 

@@ -1,6 +1,11 @@
 'use strict';
 
 // define all the global variables that are uses to hold FC state
+const TARGET = {  // sibi?
+    fullIdentifier: "",
+    isVariablePitch: false,
+}
+
 var CONFIG,
     LED_STRIP,
     LED_COLORS,
@@ -801,7 +806,7 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        return ['A', 'E', 'R', 'T', '1', '2', '3', '4'];
+        return TARGET.isVariablePitch ? ['A', 'E', 'R', 'T', '1', '2', 'C', 'G'] : ['A', 'E', 'R', 'T', '1', '2', '3', '4']; // sibi?
     },
     isRcMapValid: function (val) {
         var strBuffer = val.split(''),
@@ -812,6 +817,8 @@ var FC = {
 
         // check if characters inside are all valid, also check for duplicity
         for (var i = 0; i < val.length; i++) {
+            //strBuffer[i] = (strBuffer[i] == 'C') ? '3' : strBuffer[i]; // sibi?
+            //strBuffer[i] = (strBuffer[i] == 'G') ? '4' : strBuffer[i];
             if (FC.getRcMapLetters().indexOf(strBuffer[i]) < 0)
                 return false;
 
@@ -835,8 +842,8 @@ var FC = {
             'RC Throttle',          // 7
             'RC Channel 5',         // 8
             'RC Channel 6',         // 9
-            'RC Channel 7',         // 10
-            'RC Channel 8',         // 11
+            TARGET.isVariablePitch ? 'RC Collective Pitch' : 'RC Channel 7',    // 10
+            TARGET.isVariablePitch ? 'RC Gyro Gain' : 'RC Channel 8',           // 11
             'Gimbal Pitch',         // 12
             'Gimbal Roll',          // 13
             'Flaperon Mode',        // 14
