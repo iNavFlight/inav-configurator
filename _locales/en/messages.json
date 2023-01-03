@@ -2574,7 +2574,7 @@
         "message": "Optic Flow Calibration"
     },
     "OpflowCalText": {
-        "message": "After pressing the button you have 30 seconds to hold the copter in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
+        "message": "After pressing the button you have 30 seconds to hold the model in the air and tilt it to sides without moving it horizontally. Note that optic flow sensor needs to observe the surface at all times."
     },
     "OpflowCalBtn": {
         "message": "Calibrate Optic Flow sensor"
@@ -2595,7 +2595,7 @@
         "message": "Reset Accelerometer Calibration"
     },
     "MagCalText": {
-        "message": "After pressing the button you have 30 seconds to hold the copter in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth."
+        "message": "After pressing the button you have 30 seconds to hold the model in the air and rotate it so that each side (front, back, left, right, top and bottom) points down towards the earth. Be sure that your compass is not near magnets or electromagnets when installed in the craft or performing the calibration."
     },
     "MagBtn": {
         "message": "Calibrate Compass"
@@ -2807,17 +2807,71 @@
     "rthAbortThresholdHelp": {
         "message": "RTH sanity checking feature will notice if the distance to home is increasing during RTH and if it exceeds the threshold defined by this parameter, instead of continuing RTH the UAV will enter emergency landing. Default is 500m which is safe enough for both multirotors and airplanes."
     },
+    "fsMissionDelay": {
+        "message": "Failsafe Mission Delay"
+    },
+    "fsMissionDelayHelp": {
+        "message": "Defines a delay in seconds, how long INAV has to wait before Failsafe RTH is engaged, if the Aircraft is in a waypoint mission. Set to -1 to disable Failsafe entirely [0-600s]"
+    },
+    "drNavigation": {
+        "message": "Dead Reckoning Navigation"
+    },
+    "drNavigationHelp": {
+        "message": "Allows INAV to continue navigation (Waypoint, Return to Home, Cruise, Coursehold, etc.) during short GPS outages. This feature needs compass and airspeed sensor enabled on Fixed Wing aircraft."
+    },
     "rthAltitude": {
         "message": "RTH altitude"
     },
     "rthAltitudeHelp": {
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
+    "rthTrackBack": {
+    "message": "RTH Track Back Mode"
+    },
+    "rthTrackBackHelp": {
+    "message": "When enabled, the aircraft will follow its last path backwards first before flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Track Back. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
+    },
+    "rthTrackBackDistance": {
+    "message": "RTH Track Back Distance"
+    },
+    "rthTrackBackDistanceHelp": {
+    "message": "Distance flown during Track Back. Normal RTH is executed once this total flight distance is exceeded [m]."
+    },
+    "rthSafeHome": {
+    "message": "Safe Home Mode"
+    },
+    "rthSafeHomeHelp": {
+    "message": "Used to control when safehomes will be used. Possible values are OFF, RTH and RTH_FS. See Safehome documentation for more information."
+    },
+    "rthSafeHomeDistance": {
+    "message": "Safe Home Max Distance"
+    },
+    "rthSafeHomeDistanceHelp": {
+    "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
+    },
+    "navMaxAltitude": {
+    "message": "Max Altitude for Navigation"
+    },
+    "navMaxAltitudeHelp": {
+    "message": "Max allowed altitude (above Home Point) that applies to all NAV modes (including Altitude Hold). 0 means limit is disabled"
+    },
     "rthHomeAltitudeLabel": {
         "message": "RTH Home altitude"
     },
     "rthHomeAltitudeHelp": {
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
+    },
+    "rthTwoStage": {
+    "message": "Climb First Stage Method"
+    },
+    "rthTwoStageHelp": {
+    "message": "Staged Return To Home Function if Climb First is enabled. Set Climb First Stage Altitude to 0, to use classic Single-Stage RTH."
+    },
+    "rthTwoStageAlt": {
+    "message": "Climb First Stage Altitude"
+    },
+    "rthTwoStageAltHelp": {
+    "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
     },
     "landMaxAltVspd": {
         "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
@@ -2933,6 +2987,18 @@
      "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
     },
+    "wpTrackingAccuracy": {
+        "message": "Waypoint Tracking Accuracy"
+    },
+    "wpTrackingAccuracyHelp": {
+        "message": "How precise the craft tries to follow a waypoint track. Lower values means higher precision but can cause overshoots. 6 is a good starting point [0-10]."
+    },
+    "wpTrackingAngle": {
+        "message": "Waypoint Tracking Angle"
+    },
+    "wpTrackingAngleHelp": {
+        "message": "The angle the craft approaches the waypoint track. Lower values make the approach longer while higher values can cause overshoot. 60° is a good starting point [30-80]."
+    },
     "powerConfiguration": {
         "message": "Battery Estimation Settings"
     },
@@ -2966,8 +3032,50 @@
     "waypointConfiguration": {
         "message": "Waypoint Navigation Settings"
     },
+    "wpLoadBoot": {
+        "message": "Load Waypoints on Boot"
+    },
+    "wpLoadBootHelp": {
+        "message": "If enabled, Waypoint Missions in EEPROM will be loaded automatically after bootup."
+    },
+    "wpEnforceAlt": {
+        "message": "Enforce Altitude at Waypoint"
+    },
+    "wpEnforceAltHelp": {
+        "message": "Ensures that the altitude at each waypoint is reached before continue to the next one. Craft will hold position [loiter for fixed wing] and climb/decent until the altitude is within the set range [1-2000 cm] from the waypoint altitude. Set to [0] to disable. Fixed wing crafts should not be set below 500cm."
+    },
     "waypointRadius": {
         "message": "Waypoint radius"
+    },
+    "wpRestartMission": {
+        "message": "Restart Waypoint Mission"
+    },
+    "wpRestartMissionHelp": {
+        "message": "Sets restart behaviour for a WP mission when interrupted mid mission. START from first WP, RESUME from last active WP or SWITCH between START and RESUME each time WP Mode is reselected ON. SWITCH effectively allows resuming once only from a previous mid mission waypoint after which the mission will restart from the first waypoint."
+    },
+    "wpTurnSmoothing": {
+        "message": "Waypoint Turn Smoothing"
+    },
+    "wpTurnSmoothingHelp": {
+        "message": "Smooths turns during WP missions by switching to a loiter turn at waypoints. When set to ON the craft will reach the waypoint during the turn. When set to ON-CUT the craft will turn inside the waypoint without actually reaching it (cuts the corner)."
+    },
+    "navMotorStop": {
+        "message": "Navigation Motor Stop Override"
+    },
+    "navMotorStopHelp": {
+        "message": "When set to OFF the navigation system will not take over the control of the motor if the throttle is low (motor will stop). When set to OFF_ALWAYS the navigation system will not take over the control of the motor if the throttle was low even when failsafe is triggered. When set to AUTO_ONLY the navigation system will only take over the control of the throttle in autonomous navigation modes (NAV WP and NAV RTH). When set to ALL_NAV (default) the navigation system will take over the control of the motor completely and never allow the motor to stop even when the throttle is low. This setting only has an effect on NAV modes which take control of the throttle when combined with MOTOR_STOP and is likely to cause a stall if fw_min_throttle_down_pitch isn't set correctly or the pitch estimation is wrong for fixed wing models when not set to ALL_NAV."
+    },
+    "soarMotorStop": {
+        "message": "Soaring Mode Motor Stop"
+    },
+    "soarMotorStopHelp": {
+        "message": "Stops motor when Soaring mode enabled."
+    },
+    "soarPitchDeadband": {
+        "message": "Soaring Mode Pitch Deadband"
+    },
+    "soarPitchDeadbandHelp": {
+        "message": "Pitch Angle deadband when soaring mode enabled (deg). Angle mode inactive within deadband allowing pitch to free float whilst soaring."
     },
     "waypointRadiusHelp": {
         "message": "This sets the distance away from a waypoint that triggers the waypoint as reached."
@@ -4278,7 +4386,11 @@
         "message": "Illegal state. Restart required."
     },
     "motor_direction_inverted": {
-        "message": "Reversed motor direction / Props In configuration"
+        "message": "Normal motor direction / Props In configuration"
+    },
+    "motor_direction_isInverted" :
+    {
+        "message" : "Reversed motor direction / Props Out configuration"
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
