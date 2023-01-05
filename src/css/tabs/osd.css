@@ -435,17 +435,17 @@ button {
     left: calc(50% - 335px) !important; /* width / 2 + 17 */
 }
 
-.tab-osd .avatar_43_left {
+.tab-osd .hd_avatar_43_left {
 	border-left: 2px solid red;
 	position: absolute;
-	left: 60px;
+	left: 77.5px;
 	height: calc(100% - 27px);
 }
 
-.tab-osd .avatar_43_right {
+.tab-osd .hd_avatar_43_right {
 	border-right: 2px solid red;
 	position: absolute;
-	right: 60px;
+	right: 77.5px;
 	height: calc(100% - 27px);
 }
 

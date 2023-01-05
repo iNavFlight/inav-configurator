@@ -2704,6 +2704,8 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
 
     isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
+    $('.hd_43_margin_left').toggleClass('hd_avatar_43_left', (isAvatar && on))
+    $('.hd_43_margin_right').toggleClass('hd_avatar_43_right', (isAvatar && on))
     $('.hd_avatar_bottom_bar').toggleClass('hd_avatar_bottom', (isAvatar && on))
     $('.hd_avatar_storage_box_top').toggleClass('hd_avatar_storagebox_t', (isAvatar && on))
     $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
