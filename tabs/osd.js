@@ -112,6 +112,7 @@ SYM.GLIDE_RANGE = 0xD4;
 SYM.FLIGHT_MINS_REMAINING = 0xDA;
 SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
@@ -967,6 +968,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 142,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
