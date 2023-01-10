@@ -146,6 +146,8 @@ TABS.cli.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
+
         CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');

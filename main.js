@@ -24,12 +24,16 @@ let globalSettings = {
     // Used to depict how the units are displayed within the UI
     unitType: null,
     // Used to convert units within the UI
-    osdUnits: null,    
+    osdUnits: null,
+    // Map  
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
+    // Show colours for profiles
     showProfileParameters: null,
+    // tree target for documents
+    docsTreeLocation: 'master',
 };
 
 $(document).ready(function () {
@@ -673,7 +677,21 @@ function updateActivatedTab() {
 function updateFirmwareVersion() {
     if (CONFIGURATOR.connectionValid) {
         $('#logo .firmware_version').text(CONFIG.flightControllerVersion + " [" + CONFIG.target + "]");
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/' + CONFIG.flightControllerVersion + '/docs/';
+
+        // If this is a master branch firmware, this will find a 404 as there is no tag tree. So default to master for docs.
+        $.ajax({
+            url : globalSettings.docsTreeLocation + 'Settings.md',
+            method: "HEAD",
+            statusCode: {
+                404: function() {
+                    globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
+                }
+            }
+        });
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
+        
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
 }

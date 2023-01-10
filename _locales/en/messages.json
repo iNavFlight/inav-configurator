@@ -1933,6 +1933,9 @@
     "cliReboot": {
         "message": "CLI reboot detected"
     },
+    "cliDocsBtn": {
+        "message": "CLI Command Docs"
+    },
     "cliSaveToFileBtn": {
         "message": "Save to File"
     },
