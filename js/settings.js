@@ -672,7 +672,7 @@ var Settings = (function () {
                 }
 
                 if (typeof dataSettingName !== "undefined" && dataSettingName !== "") {
-                    helpIcon.wrap('<a class="helpiconLink" href="https://github.com/iNavFlight/inav/blob/master/docs/Settings.md#' + dataSettingName + '" target="_blank"></a>');
+                    helpIcon.wrap('<a class="helpiconLink" href="' + globalSettings.docsTreeLocation + 'Settings.md#' + dataSettingName + '" target="_blank"></a>');
                 }
             }
 
