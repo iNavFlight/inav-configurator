@@ -3218,6 +3218,18 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osd_airspeed_min_alarm" : {
+        "message": "Minimum Airspeed"
+    },
+    "osd_airspeed_min_alarm_HELP" : {
+        "message": "The airspeed indicator will flash when the airspeed is below this threshold. Zero disables this alarm."
+    },
+    "osd_airspeed_max_alarm" : {
+        "message": "Maximum Airspeed"
+    },
+    "osd_airspeed_max_alarm_HELP" : {
+        "message": "The airspeed indicator will flash when the airspeed is above this threshold. Zero disables this alarm."
+    },
     "osd_gforce_alarm": {
         "message": "g force"
     },
