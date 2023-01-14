@@ -430,6 +430,31 @@ button {
     left: calc(50% - 197px);
 }
 
+.tab-osd .preview_avatar {
+    width: 636px !important; /* 12 X char width */
+    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.tab-osd .hd_avatar_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	/*left: 77.5px; // Calculated correct position */
+    left: 30px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_avatar_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	/* right: 77.5px; // Calculated correct position */
+    right: 36px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_avatar_side {
+	width: calc(50% - 335px) !important;
+}
+
 .tab-osd .preview_hdzero {
     width: 600px !important;
     left: calc(50% - 317px) !important;
@@ -506,6 +531,50 @@ button {
     top: 46px;
     right: 120px;
     height: 288px;
+}
+
+.tab-osd .hd_avatar_bottom {
+    border-bottom: 2px solid purple;
+    position: absolute;
+    bottom: 33px;
+    left: 0px;
+    right: 0px;
+}
+
+.tab-osd .hd_avatar_storagebox_t {
+    border-top: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 1px;
+    right: 34px;
+    width: 48px;
+}
+
+.tab-osd .hd_avatar_storagebox_b {
+    border-bottom: 2px solid purple;
+    position: absolute;
+    top: 88px;
+    height: 1px;
+    right: 34px;
+    width: 48px;
+}
+
+.tab-osd .hd_avatar_storagebox_l {
+    border-left: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 35px;
+    right: 80px;
+    width: 1px;
+}
+
+.tab-osd .hd_avatar_storagebox_r {
+    border-right: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 35px;
+    right: 32px;
+    width: 1px;
 }
 
 .tab-osd .ntsc_bottom {
