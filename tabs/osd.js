@@ -540,7 +540,8 @@ OSD.constants = {
         'HDZERO',
         'DJIWTF',
         'AVATAR',
-        'BF43COMPAT'
+        'BF43COMPAT',
+	'BFHDCOMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -549,6 +550,7 @@ OSD.constants = {
         DJIWTF: 22,
         AVATAR: 20,
         BF43COMPAT: 16,
+        BFHDCOMPAT: 20
     },
     VIDEO_COLS: {
         PAL: 30,
@@ -556,7 +558,8 @@ OSD.constants = {
         HDZERO: 50,
         DJIWTF: 60,
         AVATAR: 53,
-        BF43COMPAT: 30
+        BF43COMPAT: 30,
+	BFHDCOMPAT: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -564,7 +567,8 @@ OSD.constants = {
         HDZERO: 900,
         DJIWTF: 1320,
         AVATAR: 1060,
-        BF43COMPAT: 480
+        BF43COMPAT: 480,
+	BFHDCOMPAT: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2401,7 +2405,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6];   // indexes of PAL, HDZERO, DJIWTF,AVATAR, & BF43COMPAT
+const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
