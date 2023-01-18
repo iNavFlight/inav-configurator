@@ -137,8 +137,15 @@ TABS.auxiliary.initialize = function (callback) {
         var channelList = $(rangeTemplate).find('.channel');
         var channelOptionTemplate = $(channelList).find('option');
         channelOptionTemplate.remove();
+
+        //add value to autodetect channel
+        let channelOption = channelOptionTemplate.clone();
+        channelOption.text(chrome.i18n.getMessage('auxiliaryAutoChannelSelect'));
+        channelOption.val(-1);
+        channelList.append(channelOption);
+
         for (var channelIndex = 0; channelIndex < auxChannelCount; channelIndex++) {
-            var channelOption = channelOptionTemplate.clone();
+            channelOption = channelOptionTemplate.clone();
             channelOption.text('CH ' + (channelIndex + 5));
             channelOption.val(channelIndex);
             channelList.append(channelOption);
@@ -444,9 +451,49 @@ TABS.auxiliary.initialize = function (callback) {
                 }
             }
 
+           auto_select_channel(RC.channels, RC.active_channels, MISC.rssi_channel);
+
             $(".modeSection").each(function() {
                 $(this).toggle(!hideUnused);
             });
+        }
+
+        /**
+         * Autodetect channel based on maximum deference with previous value
+         * minimum value to autodetect is 100
+         */
+        function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
+            const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
+            if (auto_option.length === 0) {
+                prevChannelsValues = null;
+                return;
+            }
+
+            const fillPrevChannelsValues = function () {
+                prevChannelsValues = RC_channels.slice(0); //clone array
+            };
+
+            if (!prevChannelsValues || RC_channels.length === 0) return fillPrevChannelsValues();
+
+            let diff_array = RC_channels.map(function(currentValue, index) {
+                return Math.abs(prevChannelsValues[index] - currentValue);
+            });
+
+            diff_array = diff_array.slice(0, activeChannels);
+
+            const largest = diff_array.reduce(function(x,y){
+                return (x > y) ? x : y;
+            }, 0);
+
+            //minimum change to autoselect is 100
+            if (largest < 100) return fillPrevChannelsValues();
+
+            const indexOfMaxValue = diff_array.indexOf(largest);
+            if (indexOfMaxValue >= 4 && indexOfMaxValue != RSSI_channel - 1){ //set channel
+                auto_option.parent().val(indexOfMaxValue - 4);
+            }
+
+            return fillPrevChannelsValues();
         }
 
         let hideUnusedModes = false;
