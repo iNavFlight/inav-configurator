@@ -841,6 +841,11 @@ OSD.constants = {
                     preview: '[CRAFT_NAME]'
                 },
                 {
+                    name: 'PILOT_NAME',
+                    id: 142,
+                    preview: '[PILOT_NAME]'
+                },
+                {
                     name: 'FLYMODE',
                     id: 7,
                     preview: 'ACRO'
@@ -2650,7 +2655,7 @@ OSD.GUI.updateFields = function() {
 
     // Update the OSD preview
     refreshOSDSwitchIndicators();
-    updateCraftName();
+    updatePilotAndCraftNames();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -3086,7 +3091,21 @@ TABS.osd.initialize = function (callback) {
             }
 
             // Update the OSD preview
-            updateCraftName();
+            updatePilotAndCraftNames();
+        });
+
+        $('#pilot_name').on('keyup', function() {
+            // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+            let testText = $(this).val();
+            if (testExp.test(testText.slice(-1))) {
+                $(this).val(testText.toUpperCase());
+            } else {
+                $(this).val(testText.slice(0, -1));
+            }
+
+            // Update the OSD preview
+            updatePilotAndCraftNames();
         });
 
         // font preview window
@@ -3251,22 +3270,39 @@ function refreshOSDSwitchIndicators() {
     OSD.GUI.updatePreviews();
 }
 
-function updateCraftName() {
+function updatePilotAndCraftNames() {
+    let foundPilotName = ($('#pilot_name').val() == undefined);
+    let foundCraftName = ($('#craft_name').val() == undefined);
+
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
-      })[0];
+    })[0];
 
-
-    if ($('#craft_name').val() != undefined) {
+    if (($('#craft_name').val() != undefined) || ($('#pilot_name').val() != undefined)) {
         for (let si = 0; si < generalGroup.items.length; si++) {
             if (generalGroup.items[si].name == "CRAFT_NAME") {
-                let craftNameText = $('#craft_name').val();
+                let nameText = $('#craft_name').val();
 
-                if (craftNameText == "") {
+                if (nameText == "") {
                     generalGroup.items[si].preview = "CRAFT_NAME";
                 } else {
-                    generalGroup.items[si].preview = craftNameText;
+                    generalGroup.items[si].preview = nameText;
                 }
+                foundCraftName = true;
+            }
+
+            if (generalGroup.items[si].name == "PILOT_NAME") {
+                let nameText = $('#pilot_name').val();
+
+                if (nameText == "") {
+                    generalGroup.items[si].preview = "PILOT_NAME";
+                } else {
+                    generalGroup.items[si].preview = nameText;
+                }
+                foundPilotName = true;
+            }
+
+            if (foundCraftName && foundPilotName) {
                 break;
             }
         }
