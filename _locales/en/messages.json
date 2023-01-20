@@ -3116,6 +3116,9 @@
     "osd_craft_name": {
         "message" : "Craft Name"
     },
+    "osd_pilot_name" : {
+        "message" : "Pilot's Name"
+    },
     "osd_units": {
         "message" : "Units"
     },
