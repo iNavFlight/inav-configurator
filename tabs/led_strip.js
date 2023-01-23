@@ -13,7 +13,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     TABS.led_strip.functions = ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l', 'o', 'n'];
     TABS.led_strip.baseFuncs = ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'];
-    TABS.led_strip.overlays = ['t', 'o', 'b', 'n', 'i', 'w'];
+    TABS.led_strip.overlays = ['t', 'o', 'b', 'n', 'i', 'w', 'e'];
 
     TABS.led_strip.wireMode = false;
 
@@ -23,7 +23,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function load_led_config() {
-        MSP.send_message(MSPCodes.MSP_LED_STRIP_CONFIG, false, false, load_led_colors);
+        MSP.send_message(MSPCodes.MSP2_INAV_LED_STRIP_CONFIG_EX, false, false, load_led_colors);
     }
 
     function load_led_colors() {
@@ -425,6 +425,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                                         p.addClass('function-' + letter);
                                     break;
                                 case 'b':
+                                case 'e':
                                 case 'n':
                                     if (areBlinkersActive('function-' + f))
                                         p.addClass('function-' + letter);
@@ -713,6 +714,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
             case "function-c":
             case "function-a":
             case "function-f":
+            case "function-e":
                 return true;
             break;
         }

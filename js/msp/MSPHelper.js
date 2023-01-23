@@ -1028,8 +1028,65 @@ var mspHelper = (function (gui) {
                     }
                 }
                 break;
+            case MSPCodes.MSP2_INAV_LED_STRIP_CONFIG_EX:
+                //noinspection JSUndeclaredVariable
+                LED_STRIP = [];
+
+                var ledCount = data.byteLength / 5;
+                var directionMask,
+                    directions,
+                    directionLetterIndex,
+                    functions,
+                    led;
+
+                for (i = 0; offset < data.byteLength && i < ledCount; i++) {
+                    var mask = data.getUint32(offset, 1);
+                    offset += 4;
+                    var extra = data.getUint8(offset, 1);
+                    offset++;
+
+                    var functionId = (mask >> 8) & 0xFF;
+
+                    functions = [];
+                    for (var baseFunctionLetterIndex = 0; baseFunctionLetterIndex < MSP.ledBaseFunctionLetters.length; baseFunctionLetterIndex++) {
+                        if (functionId == baseFunctionLetterIndex) {
+                            functions.push(MSP.ledBaseFunctionLetters[baseFunctionLetterIndex]);
+                            break;
+                        }
+                    }
+
+                    var overlayMask = (mask >> 16) & 0xFF;
+                    for (var overlayLetterIndex = 0; overlayLetterIndex < MSP.ledOverlayLetters.length; overlayLetterIndex++) {
+                        if (bit_check(overlayMask, overlayLetterIndex)) {
+                            functions.push(MSP.ledOverlayLetters[overlayLetterIndex]);
+                        }
+                    }
+
+                    directionMask = (mask >> 28) & 0xF | ((extra & 0x3) << 4);
+
+                    directions = [];
+                    for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        if (bit_check(directionMask, directionLetterIndex)) {
+                            directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
+                        }
+                    }
+                    led = {
+                        y: (mask) & 0xF,
+                        x: (mask >> 4) & 0xF,
+                        functions: functions,
+                        color: (mask >> 24) & 0xF,
+                        directions: directions,
+                        parameters: (extra >> 2) & 0x3F
+                    };
+
+                    LED_STRIP.push(led);
+                }
+                break;
             case MSPCodes.MSP_SET_LED_STRIP_CONFIG:
                 console.log('Led strip config saved');
+                break;
+            case MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX:
+                console.log('Led strip extended config saved');
                 break;
             case MSPCodes.MSP_LED_COLORS:
 
@@ -2609,11 +2666,12 @@ var mspHelper = (function (gui) {
             buffer.push(ledIndex);
 
             var mask = 0;
+            var extra = 0;
             /*
                 ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],      // in LSB bit order
                 ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l'], // in LSB bit order
                 ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'], // in LSB bit
-                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w'], // in LSB bit
+                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w', 'e'], // in LSB bit
 
                 */
             mask |= (led.y << 0);
@@ -2631,29 +2689,32 @@ var mspHelper = (function (gui) {
 
                 bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 12);
+                    mask |= bit_set(mask, bitIndex + 16);
                 }
 
             }
 
-            mask |= (led.color << 18);
+            mask |= (led.color << 24);
 
             for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
 
                 bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 22);
+                    if(bitIndex < 2) {
+                        mask |= bit_set(mask, bitIndex + 2);
+                    } else {
+                        extra |= bit_set(exta, bitIndex - 2);
+                    }
                 }
-
             }
 
-            mask |= (0 << 28); // parameters
-
+            extra |= (0 << 4); // parameters
 
             buffer.push(specificByte(mask, 0));
             buffer.push(specificByte(mask, 1));
             buffer.push(specificByte(mask, 2));
             buffer.push(specificByte(mask, 3));
+            buffer.push(specificByte(extra, 0));
 
             // prepare for next iteration
             ledIndex++;
@@ -2661,7 +2722,7 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_CONFIG, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }
     };
 
