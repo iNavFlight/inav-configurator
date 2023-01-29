@@ -968,7 +968,7 @@ OSD.constants = {
                 },
                 {
                     name: 'PAN_SERVO_CENTRED',
-                    id: 142,
+                    id: 143,
                     min_version: '6.0.0',
                     preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
                 },
