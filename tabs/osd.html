@@ -38,6 +38,11 @@
                         <div class="hd_3016_box_left"></div>
                         <div class="hd_3016_box_right"></div>
                         <div class="pal_ntsc_box_bottom"></div>
+                        <div class="hd_avatar_storage_box_top"></div>
+                        <div class="hd_avatar_storage_box_bottom"></div>
+                        <div class="hd_avatar_storage_box_left"></div>
+                        <div class="hd_avatar_storage_box_right"></div>
+                        <div class="hd_avatar_bottom_bar"></div>
                         <div class="preview"></div>
                     </div>
                 </div>
@@ -48,7 +53,7 @@
                         <div class="spacer_box_title" data-i18n="osd_video_format"></div>
                     </div>
                     <div class="spacer_box">
-                        <div class="video-types"></div>
+                        <select class="video-types"></select>
                     </div>
                     <div class="spacer_box settings">
                         <div for="osd_video_show_guides" class="helpicon cf_tip" data-i18n_title="osd_video_HELP"></div>
@@ -63,6 +68,10 @@
                     </div>
                     <div class="spacer_box">
                         <div class="settings">
+                            <label class="pilot_name">
+                                <input type="text" id="pilot_name" data-setting="pilot_name" data-live="true" />
+                                <span data-i18n="osd_pilot_name"></span>
+                            </label>
                             <label class="craft_name">
                                 <input type="text" id="craft_name" data-setting="name" data-live="true" />
                                 <span data-i18n="osd_craft_name"></span>

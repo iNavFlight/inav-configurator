@@ -1486,7 +1486,7 @@
     "auxiliaryHelp": {
         "message": "Use ranges to define the switches on your transmitter and corresponding mode assignments.  A receiver channel that gives a reading between a range min/max will activate the mode.  Remember to save your settings using the Save button."
     },
-	    "auxiliaryToggleUnused": {
+	"auxiliaryToggleUnused": {
         "message": "Hide unused modes"
     },
     "auxiliaryMin": {
@@ -1497,6 +1497,9 @@
     },
     "auxiliaryAddRange": {
         "message": "Add Range"
+    },
+    "auxiliaryAutoChannelSelect" : {
+        "message": "AUTO"
     },
     "auxiliaryButtonSave": {
         "message": "Save"
@@ -1933,6 +1936,9 @@
     "cliReboot": {
         "message": "CLI reboot detected"
     },
+    "cliDocsBtn": {
+        "message": "CLI Command Docs"
+    },
     "cliSaveToFileBtn": {
         "message": "Save to File"
     },
@@ -2128,7 +2134,7 @@
         "message": "Select your board to see available online firmware releases - Select the correct firmware appropriate for your board. Please note that <strong>Auto-select Target</strong> will only work for INAV firmwares 5.0 and newer."
     },
     "firmwareFlasherOnlineSelectFirmwareVersionDescription": {
-        "message": "Select firmware version for your board."
+        "message": "Select firmware version for your board.<br />Note: even though you can flash different versions of the firmware using this Configurator. When setting up the flight controller, you should match the major and minor version numbers for both firmware and Configurator."
     },
     "firmwareFlasherNoRebootDescription": {
         "message": "Enable if you powered your FC while the bootloader pins are jumpered or have your FC's BOOT button pressed."
@@ -3109,6 +3115,9 @@
     },
     "osd_craft_name": {
         "message" : "Craft Name"
+    },
+    "osd_pilot_name" : {
+        "message" : "Pilot's Name"
     },
     "osd_units": {
         "message" : "Units"
