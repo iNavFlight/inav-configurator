@@ -1,7 +1,10 @@
 'use strict';
 
 var usbDevices = {
-    STM32DFU: {'vendorId': 1155, 'productId': 57105}
+    filters: [
+        {'vendorId': 1155, 'productId': 57105}, 
+        {'vendorId': 11836, 'productId': 57105}
+    ]
 };
 
 var PortHandler = new function () {
@@ -152,7 +155,7 @@ PortHandler.check = function () {
 };
 
 PortHandler.check_usb_devices = function (callback) {
-    chrome.usb.getDevices(usbDevices.STM32DFU, function (result) {
+    chrome.usb.getDevices(usbDevices, function (result) {
         if (result.length) {
             if (!$("div#port-picker #port [value='DFU']").length) {
                 $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
@@ -166,7 +169,7 @@ PortHandler.check_usb_devices = function (callback) {
             self.dfu_available = false;
         }
 
-        if(callback) callback(self.dfu_available);
+        if (callback) callback(self.dfu_available);
     });
 };
 
