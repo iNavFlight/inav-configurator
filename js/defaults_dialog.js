@@ -257,7 +257,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "gyro_dyn_lpf_curve_expo",
-                value: 1
+                value: 3
             },
             /*
             D-term
