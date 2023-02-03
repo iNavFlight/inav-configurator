@@ -240,6 +240,28 @@ helper.defaultsDialog = (function () {
                 key: "gyro_main_lpf_type",
                 value: "PT1"
             },
+            /*
+            Dynamic gyro LPF
+            */
+            {
+                key: "gyro_use_dyn_lpf",
+                value: "ON"
+            },
+            {
+                key: "gyro_dyn_lpf_min_hz",
+                value: 85
+            },
+            {
+                key: "gyro_dyn_lpf_max_hz",
+                value: 300
+            },
+            {
+                key: "gyro_dyn_lpf_curve_expo",
+                value: 1
+            },
+            /*
+            D-term
+            */
             {
                 key: "dterm_lpf_hz",
                 value: 110
@@ -266,7 +288,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "dynamic_gyro_notch_min_hz",
-                value: 120
+                value: 100
             },
             {
                 key: "setpoint_kalman_enabled",
@@ -297,11 +319,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "d_boost_min",
-                value: 0.8
+                value: 1.0
             },
             {
                 key: "d_boost_max",
-                value: 1.2
+                value: 1.0
             },
             {
                 key: "antigravity_gain",
@@ -339,27 +361,27 @@ helper.defaultsDialog = (function () {
             */
             {
                 key: "mc_p_pitch",
-                value: 44
-            },
-            {
-                key: "mc_i_pitch",
-                value: 75
-            },
-            {
-                key: "mc_d_pitch",
-                value: 25
-            },
-            {
-                key: "mc_p_roll",
                 value: 40
             },
             {
+                key: "mc_i_pitch",
+                value: 90
+            },
+            {
+                key: "mc_d_pitch",
+                value: 27
+            },
+            {
+                key: "mc_p_roll",
+                value: 36
+            },
+            {
                 key: "mc_i_roll",
-                value: 60
+                value: 80
             },
             {
                 key: "mc_d_roll",
-                value: 23
+                value: 25
             },
             {
                 key: "mc_p_yaw",
