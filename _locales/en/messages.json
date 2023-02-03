@@ -1409,6 +1409,27 @@
     "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
+    "pidTuning_gyro_use_dyn_lpf": {
+        "message": "Dynamic gyro LPF"
+    },
+    "pidTuning_gyro_use_dyn_lpf_help": {
+        "message": "When enabled, main gyro LPF frequency is automatically adjusted based on the current throttle position. When disabled, static LPF cutoff frequency is used."
+    },
+    "pidTuning_gyro_dyn_lpf_min_hz": {
+        "message": "Dynamic gyro LPF min. cutoff"
+    },
+    "pidTuning_gyro_dyn_lpf_max_hz": {
+        "message": "Dynamic gyro LPF max. cutoff"
+    },
+    "pidTuning_gyro_dyn_lpf_curve_expo": {
+        "message": "Dynamic gyro LPF curve expo"
+    },
+    "pidTuning_gyro_dyn_lpf_min_hz_help": {
+        "message": "Defines the gyro LPF cutoff frequency at minimum throttle. When throttle is increased, LPF cutoff frequency is increased as well, up to the maximum cutoff frequency."
+    },
+    "pidTuning_gyro_dyn_lpf_max_hz_help": {
+        "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
+    },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
