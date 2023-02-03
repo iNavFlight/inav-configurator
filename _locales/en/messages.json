@@ -1167,7 +1167,7 @@
         "message": "DJI FPV VTX"
     },
     "portsFunction_MSP_DISPLAYPORT": {
-        "message": "MSP Displayport"
+        "message": "MSP DisplayPort"
     },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
