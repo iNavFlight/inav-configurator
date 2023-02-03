@@ -1280,6 +1280,9 @@
     "pidTuning_mainFilters": {
         "message": "Gyro filters"
     },
+    "pidTuning_advancedFilters": {
+        "message": "Advanced gyro filters"
+    },
     "pidTuning_gyro_main_lpf_hz": {
         "message": "Main gyro filter cutoff frequency"
     },
