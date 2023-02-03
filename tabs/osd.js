@@ -122,10 +122,16 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
+var useESCTelemetry = false;
+var useBaro         = false;
+var useCRSFRx       = false;
+var usePitot        = false;
+
 var video_type = null;
 var isGuidesChecked = false;
 var FONT = FONT || {};
 
+var FONT = FONT || {};
 FONT.initData = function () {
     if (FONT.data) {
         return;
@@ -877,7 +883,7 @@ OSD.constants = {
                     name: 'AIR_SPEED',
                     id: 27,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return usePitot;
                     },
                     preview: function(osd_data) {
                         var speed;
@@ -902,7 +908,7 @@ OSD.constants = {
                     name: 'AIR_MAX_SPEED',
                     id: 127,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return usePitot;
                     },
                     preview: function(osd_data) {
                         // 3 chars
@@ -932,6 +938,9 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
+                    enabled: function() {
+                        return useESCTelemetry;
+                    },
                     preview: function(){
                         let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
                         return FONT.symbol(SYM.RPM) + rpmPreview;
@@ -997,6 +1006,9 @@ OSD.constants = {
                 {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
+                    enabled: function() {
+                        return useBaro;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -1010,6 +1022,9 @@ OSD.constants = {
                     name: 'ESC_TEMPERATURE',
                     id: 107,
                     min_version: '2.5.0',
+                    enabled: function() {
+                        return useESCTelemetry;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -1677,6 +1692,9 @@ OSD.constants = {
         },
         {
             name: 'osdGroupCRSF',
+            enabled: function() {
+                return useCRSFRx;
+            },
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',
@@ -2649,6 +2667,7 @@ OSD.GUI.updateFields = function() {
             })
         );
     }
+
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
@@ -2768,6 +2787,13 @@ OSD.GUI.updateDjiView = function(on) {
         $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
+};
+
+OSD.GUI.updateAlarms = function() {
+    $(".osd_use_airspeed_alarm").toggle(usePitot);
+    $(".osd_use_baro_temp_alarm").toggle(useBaro);
+    $(".osd_use_esc_telemetry").toggle(useESCTelemetry);
+    $(".osd_use_crsf").toggle(useCRSFRx);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -2980,6 +3006,7 @@ OSD.GUI.updateAll = function() {
         layouts.hide();
         layouts.off('change');
     }
+
     $('.osd_search').on('input', function() {
         OSD.GUI.updateFields();
     });
@@ -2990,6 +3017,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updatePreviews();
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
     OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay);
+    OSD.GUI.updateAlarms();
 };
 
 OSD.GUI.update = function() {
@@ -3239,9 +3267,28 @@ TABS.osd.initialize = function (callback) {
             OSD.GUI.updateDjiMessageElements(this.checked);
         });
 
+        // Update RX data for Crossfire detection
+        mspHelper.loadRxConfig(function() {
+            useCRSFRx = (RX_CONFIG.serialrx_provider == 6);
+        });
+
+        // Get status of ESC Telemetry
+        useESCTelemetry = false;
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
+            for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
+                var serialPort = SERIAL_CONFIG.ports[portIndex];
+                if (serialPort.functions.indexOf("ESC") >= 0) {
+                    useESCTelemetry = true;
+                    break;
+                }
+            }
+        });
+
         // Update SENSOR_CONFIG, used to detect
         // OSD_AIR_SPEED
         mspHelper.loadSensorConfig(function () {
+            useBaro  = (SENSOR_CONFIG.barometer != 0);
+            usePitot = (SENSOR_CONFIG.pitot != 0);
             GUI.content_ready(callback);
         });
     }));
@@ -3268,7 +3315,7 @@ function refreshOSDSwitchIndicators() {
     }
 
     OSD.GUI.updatePreviews();
-}
+};
 
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
@@ -3309,7 +3356,7 @@ function updatePilotAndCraftNames() {
     }
 
     OSD.GUI.updatePreviews();
-}
+};
 
 TABS.osd.cleanup = function (callback) {
     PortHandler.flush_callbacks();
