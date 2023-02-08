@@ -1288,6 +1288,8 @@ var FC = {
                     11: "Course Hold",
                     12: "USER 3",
                     13: "USER 4",
+                    14: "Acro",
+                    15: "Waypoint Mission",
                 }
             },
             4: {
