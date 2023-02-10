@@ -3049,6 +3049,8 @@ OSD.GUI.saveConfig = function() {
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
+    mspHelper.loadServoMixRules();
+
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
     }
@@ -3388,11 +3390,20 @@ function updatePanServoPreview() {
     }
 
     // Update the panServoOutput select to be visibly easier to use
+    let servoRules = SERVO_RULES;
     $('#panServoOutput option').each(function() {
-        if ($(this).val() === "0") {
+        let servoIndex = $(this).val();
+        
+        if (servoIndex === "0") {
             $(this).text("OFF");
         } else {
-            $(this).text("S" + $(this).val());
+            let servo = servoRules.getServoMixRuleFromTarget(servoIndex);
+            if (servo == null) {
+                $(this).remove();
+            } else {
+                let servoInputIndex = parseInt(servo.getInput());
+                $(this).text("Servo " + servoIndex + ": " + FC.getServoMixInputName(servoInputIndex));
+            }
         }
     });
 
