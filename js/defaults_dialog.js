@@ -671,15 +671,7 @@ helper.defaultsDialog = (function () {
                 value: "STANDARD"
             },
             {
-                key: "imu_acc_ignore_rate",
-                value: 15
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 10
-            },
-            {
-                key: "imu_inertia_comp_method",
+                key: "ahrs_inertia_comp_method",
                 value: "ADAPTIVE"
             },
             {
@@ -898,15 +890,7 @@ helper.defaultsDialog = (function () {
                 value: "STANDARD"
             },
             {
-                key: "imu_acc_ignore_rate",
-                value: 15
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 10
-            },
-            {
-                key: "imu_inertia_comp_method",
+                key: "ahrs_inertia_comp_method",
                 value: "ADAPTIVE"
             },
             {
