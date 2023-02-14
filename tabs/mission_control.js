@@ -2109,7 +2109,7 @@ TABS.mission_control.initialize = function (callback) {
             if (selectedMarker) {
                 selectedMarker.setP2(Number($('#pointP2').val()));
                 mission.updateWaypoint(selectedMarker);
-                mission.update(singleMissionActive());setAlt
+                mission.update(singleMissionActive());
                 redrawLayer();
             }
         });
