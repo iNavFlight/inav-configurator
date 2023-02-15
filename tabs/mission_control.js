@@ -2811,13 +2811,14 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
-     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
-    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, P3Datum) {
+     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting
+     ^ AbsAltCheck : check value for whether or not to use absolute altitude. This can be the P3 bitset or excplicitly set to true or false */
+    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, AbsAltCheck) {
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
-        let altUsingAbsolute = (typeof P3Datum == "boolean") ? P3Datum : TABS.mission_control.isBitSet(P3Datum, MWNP.P3.ALT_TYPE);
+        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : TABS.mission_control.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
 
-        if (altUsingAbsolute) {
+        if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
