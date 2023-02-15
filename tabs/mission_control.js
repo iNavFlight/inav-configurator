@@ -54,7 +54,6 @@ var dictOfLabelParameterPoint = {
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
-var initParam3 = 0;
 
 ////////////////////////////////////
 //
@@ -1818,14 +1817,12 @@ TABS.mission_control.initialize = function (callback) {
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
                 let P3Value = selectedMarker.getP3();
-                initParam3 = 0; // Reset init bits for P3 before setting up checkboxes
 
                 changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
                 changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
                 changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
                 changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
-                initParam3 = 31; // Set all bits for above P3 params to true, after setting checkboxes
 
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
@@ -2951,12 +2948,7 @@ TABS.mission_control.isBitSet = function(bits, testBit) {
 }
 
 TABS.mission_control.setBit = function(bits, bit, value) {
-    if ((initParam3 & (1 << bit)) != 0) {
-        value = value ? 1 : 0;
-        bits &= ~(1 << bit);
-        bits |= (value << bit);
-    }
-    return bits;
+    return value ? bits |= (1 << bit) : bits &= ~(1 << bit);
 }
 
 // window.addEventListener("error", handleError, true);
