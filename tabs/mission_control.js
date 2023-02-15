@@ -2123,12 +2123,13 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
-                selectedMarker.setP3(P3Value);
                 (async () => {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
                     if (P3Value != selectedMarker.getP3()) {
+                        selectedMarker.setP3(P3Value);
+                        
                         if ($('#pointP3Alt').prop("checked")) {
                             if (altitude < 0) {
                                 altitude = settings.alt;
