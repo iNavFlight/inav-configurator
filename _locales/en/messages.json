@@ -2879,6 +2879,18 @@
     "rthTwoStageAltHelp": {
     "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
     },
+    "rthUseLinearDescent" : {
+        "message": "Use Linear Descent"
+    },
+    "rthUseLinearDescentHelp": {
+        "message": "If enabled, the aircraft will slowly descent to the RTH Home Altitude on the heading home leg of RTH."
+    },
+    "rthLinearDescentStart": {
+        "message": "Linear Descent Start Distance"
+    },
+    "rthLinearDescentStartHelp": {
+        "message": "This is the distance away from the home position to start the linear descent. If set to 0, the linear descent will start immediately."
+    },
     "landMaxAltVspd": {
         "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
     },
