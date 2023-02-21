@@ -105,7 +105,6 @@ TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
 TABS.advanced_tuning.checkRequirements_LinearDescent = function() {
     let rthHomeAlt = $('#rthHomeAltitude');
     let minRthHomeAlt = 1000.0 / rthHomeAlt.data('setting-multiplier'); // 10 metres minimum recommended for safety.
-    GUI.log("Min RTH Home Alt = " + minRthHomeAlt);
     
     if ($('#rthUseLinearDescent').is(":checked") && (rthHomeAlt.val() == "" || parseFloat(rthHomeAlt.val()) < minRthHomeAlt)) {
         rthHomeAlt.addClass('inputRequiredWarning');
