@@ -1202,19 +1202,26 @@ helper.defaultsDialog = (function () {
 
                     helper.mixer.loadServoRules(currentMixerPreset);
                     helper.mixer.loadMotorRules(currentMixerPreset);
+                    
+                    MIXER_CONFIG.platformType = currentMixerPreset.platform;
+                    MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+                    MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
                     SERVO_RULES.cleanup();
                     SERVO_RULES.inflate();
                     MOTOR_RULES.cleanup();
                     MOTOR_RULES.inflate();
 
-                    mspHelper.sendServoMixer(function () {
-                        mspHelper.sendMotorMixer(function () {
-                            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
+                    mspHelper.saveMixerConfig(function() {
+                        mspHelper.sendServoMixer(function () {
+                            mspHelper.sendMotorMixer(function () {
+                                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
+                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
+                                });
                             });
                         });
                     });
+                    
                 } else {
                     MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
                         MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
