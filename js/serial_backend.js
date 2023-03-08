@@ -5,7 +5,8 @@ $(document).ready(function () {
 
     var $port = $('#port'),
         $baud = $('#baud'),
-        $portOverride = $('#port-override');
+        $portOverride = $('#port-override'),
+        isDemoRunning = false;
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
@@ -89,14 +90,14 @@ $(document).ready(function () {
             $('#port-override-label').text("Port");
         }
 
-        if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
+        if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
             $baud.hide();
         }
         else {
             $baud.show();
         }        
 
-        if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
+        if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
             $('.tab_firmware_flasher').hide();
         } else {
             $('.tab_firmware_flasher').show();
@@ -104,7 +105,7 @@ $(document).ready(function () {
         var type = ConnectionType.Serial;
         if (selected_port.data().isBle) {
             type = ConnectionType.BLE;
-        } else if (selected_port.data().isTcp) {
+        } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
             type = ConnectionType.TCP;
         } else if (selected_port.data().isUdp) {
             type = ConnectionType.UDP;
@@ -150,10 +151,24 @@ $(document).ready(function () {
 
                     if (selected_port == 'tcp' || selected_port == 'udp') {
                         CONFIGURATOR.connection.connect($portOverride.val(), {}, onOpen);
+                    } else if (selected_port == 'sitl') {
+                        CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, onOpen);
+                    } else if (selected_port == 'sitl-demo') {
+                        if (SITLProcess.isRunning) {
+                            SITLProcess.stop();
+                        }
+                        SITLProcess.start("demo.bin");
+                        this.isDemoRunning = true;
+                        CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, onOpen);
                     } else {
                         CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, onOpen);
                     }
                 } else {
+                     if (this.isDemoRunning) {
+                        SITLProcess.stop();
+                        this.isDemoRunning = false;
+                     }
+                    
                     var wasConnected = CONFIGURATOR.connectionValid;
 
                     helper.timeout.killAll();
