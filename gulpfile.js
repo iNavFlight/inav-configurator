@@ -136,6 +136,7 @@ sources.js = [
     './js/waypoint.js',
     './node_modules/openlayers/dist/ol.js',
     './js/libraries/plotly-latest.min.js',
+    './js/sitl.js',
 ];
 
 sources.receiverCss = [
@@ -252,6 +253,8 @@ gulp.task('dist-build', gulp.series('build', function() {
         './resources/models/*',
         './resources/osd/analogue/*.mcm',
         './resources/motor_order/*.svg',
+        './resources/sitl/windows/*',
+        './resources/sitl/linux/*'
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(distDir));
@@ -268,7 +271,8 @@ gulp.task('apps', gulp.series('dist', function(done) {
         flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
-        version: get_nw_version()
+        version: get_nw_version(),
+        zip: false
     });
     builder.on('log', console.log);
     builder.build(function (err) {

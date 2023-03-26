@@ -1,0 +1,157 @@
+<div class="tab-sitl toolbar_fixed_bottom">
+    <div class="content_wrapper">
+        <div class="tab_title" data-i18n="tabSitl">SITL</div>
+        <div class="note" style="margin-bottom: 20px;">
+            <div class="note_spacer">
+                <p data-i18n="sitlHelp"></p>
+            </div>
+        </div>
+        <div class="leftWrapper">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlProfiles"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="sitlProfilesHelp"></div>
+                </div>
+                <div class="sitlProfile_box">
+                    <div class="sitlProfile_select">
+                        <select id="sitlProfile"></select>
+                    </div>
+                    <div class="default_btn sitlnarrow">
+                        <a id="sitlProfileNew" href="#" i18n="sitlNew"></a>
+                    </div>
+                    <div class="default_btn sitlnarrow">
+                        <a id="sitlProfileSave" href="#" i18n="sitlSave"></a>
+                    </div>
+                    <div class="default_btn sitlnarrow">
+                        <a id="sitlProfileDelete" href="#" i18n="sitlDelete"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlOptions"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="checkbox">
+                        <input type="checkbox" id="sitlEnableSim" class="toggle" data-live="true">
+                        <label for="enableSim"><span data-i18n="sitlEnableSim"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlEnableSimulatorHelp"></div>
+                    </div>
+                    <div class="select">
+                        <select id="simulator"></select>
+                        <label for="simulator"> <span data-i18n="sitlSimulator"></span></label>
+                    </div>
+                    <div class="number">    
+                        <input type="text" id="simIP" data-setting="simip" data-live="true" />
+                        <label for="simIP" class="sitlNumber"><span data-i18n="sitlSimIP"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlIpHelp"></div>
+                    </div>
+                    <div class="number">
+                        <input type="number" id="simPort" data-setting-multiplier="1" step="1" min="1" max="64500" />
+                        <label for="sitlPort" class="sitlNumber"><span data-i18n="sitlPort"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlPortHelp"></div>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" id="sitlUseImu" class="sitlUseImu toggle" data-live="true">
+                        <label for="sitlUseImu"><span data-i18n="sitlUseImu"></span></label>
+                        <div class="helpicon cf_tip" data-i18n_title="sitlUseImuHelp"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlLog"></div>
+                </div>
+                <div class="spacer_box">
+                    <textarea readonly id="sitlLog" rows="25"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="rightWrapper">
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlChannelMap"></div>
+                </div>
+                <div class="spacer_box">
+                    <table id="channelMap-table" class="map-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px" data-i18n="sitlSimInput"></th>
+                                <th style="width: 100px" data-i18n="sitlInavOutput"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="mapTableBody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="config-section gui_box grey">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="sitlSerialToTCP"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="sitlSer2TcpHelp"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="checkbox">
+                        <input type="checkbox" id="serialTcpEnable" class="toggle" data-live="true">
+                        <label for="serialTcpEnable"><span data-i18n="sitlSerialTcpEnable"></span></label>
+                    </div>
+                    <span id="serialTcpOptions"> 
+                        <div class="select">
+                            <select id="sitlSerialPort"></select>
+                            <label for="sitlSerialPort"> <span data-i18n="sitlSerialPort"></span></label>
+                        </div>
+                        <div class="select">
+                            <select id="serialTCPPort">
+                                <option value="5760">5760 (UART1)</option>
+                                <option value="5761">5761 (UART2)</option>
+                                <option value="5762">5762 (UART3)</option>
+                                <option value="5763">5763 (UART4)</option>
+                                <option value="5764">5764 (UART5)</option>
+                                <option value="5765">5765 (UART6)</option>
+                                <option value="5766">5766 (UART7)</option>
+                                <option value="5767">5767 (UART8)</option>
+                            </select>
+                            <label for="serialTCPPort"> <span data-i18n="sitlSerialTCPPort"></span></label>
+                        </div>
+                        <div class="select">
+                            <select id="serialProtocoll"></select>
+                            <label for="serialProtocoll"> <span data-i18n="sitlSerialProtocoll"></span></label>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="sitlBaud" class="sitlBaud" data-setting-multiplier="1" step="1" min="1" max="256000" />
+                            <label for="sitlBaud" class="sitlNumber"><span data-i18n="configurationGPSBaudrate"></span></label>
+                        </div>
+                        <div class="select">
+                            <select id="serialStopbits">
+                                <option value="None">0</option>
+                                <option value="One">1</option>
+                                <option value="OnePointFive">1.5</option>
+                                <option value="Two">2</option>
+                            </select>
+                            <label for="serialStopbits"> <span data-i18n="sitlSerialStopbits"></span></label>
+                        </div>
+                        <div class="select">
+                            <select id="serialParity">
+                                <option value="None">None</option>
+                                <option value="Even">Even</option>
+                                <option value="Mark">Mark</option>
+                                <option value="Odd">Odd</option>
+                                <option value="Space">Space</option>
+                            </select>
+                            <label for="serialParity"> <span data-i18n="sitlSerialParity"></span></label>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content_toolbar" style="position: unset;">
+        <div class="btn">
+            <a class="sitlStop disabled" href="#" i18n="sitlStop"></a>
+        </div>
+        <div class="btn">
+            <a class="sitlStart" href="#" i18n="sitlStart"></a>
+        </div>
+    </div>
+</div>

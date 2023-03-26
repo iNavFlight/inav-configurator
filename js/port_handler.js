@@ -69,7 +69,7 @@ PortHandler.check = function () {
                 chrome.storage.local.get('last_used_port', function (result) {
                     // if last_used_port was set, we try to select it
                     if (result.last_used_port) {
-                        if (result.last_used_port == "ble" || result.last_used_port == "tcp" || result.last_used_port == "udp") {
+                        if (result.last_used_port == "ble" || result.last_used_port == "tcp" || result.last_used_port == "udp" || result.last_used_port == "sitl" || result.last_used_port == "sitl-demo") {
                             $('#port').val(result.last_used_port);
                         } else {
                             current_ports.forEach(function(port) {
@@ -184,6 +184,8 @@ PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {
