@@ -22,6 +22,14 @@ MWNP.WPTYPE = {
     LAND:               8
 };
 
+MWNP.P3 = {
+    ALT_TYPE:       0,  // Altitude (alt) : Relative (to home altitude) (0) or Absolute (AMSL) (1).
+    USER_ACTION_1:  1,  // WP Action 1
+    USER_ACTION_2:  2,  // WP Action 2
+    USER_ACTION_3:  3,  // WP Action 3
+    USER_ACTION_4:  4,  // WP Action 4
+}
+
 // Reverse WayPoint type dictionary
 function swap(dict) {
     let rev_dict = {};
@@ -46,7 +54,6 @@ var dictOfLabelParameterPoint = {
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
-var initParam3 = 0;
 
 ////////////////////////////////////
 //
@@ -1809,13 +1816,21 @@ TABS.mission_control.initialize = function (callback) {
 
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
+                let P3Value = selectedMarker.getP3();
+
+                changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
                 if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
                     (async () => {
                         const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                         $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
                         selectedMarker.setAlt(returnAltitude);
                         plotElevation();
                     })()
@@ -1832,15 +1847,6 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
 
-                let P3Value = selectedMarker.getP3();
-                initParam3 = 0; // Reset init bits for P3 before setting up checkboxes
-
-                changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, 0));
-                changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, 1));
-                changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, 2));
-                changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, 3));
-                changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, 4));
-                initParam3 = 31; // Set all bits for above P3 params to true, after setting checkboxes
                 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -1862,7 +1868,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
 
                         mission.insertWaypoint(tempWp, tempMarker.number);
                         mission.update(singleMissionActive());
@@ -1897,7 +1903,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
 
                         mission.put(tempWp);
                         mission.update(singleMissionActive());
@@ -2110,19 +2116,17 @@ TABS.mission_control.initialize = function (callback) {
                 P3Value = selectedMarker.getP3();
                 
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, 0));
+                    changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
 
-                P3Value = TABS.mission_control.setBit(P3Value, 0, $('#pointP3Alt').prop("checked"));
-                selectedMarker.setP3(P3Value);
-
-                P3Value = TABS.mission_control.setBit(P3Value, 0, $('#pointP3Alt').prop("checked"));
-                selectedMarker.setP3(P3Value);
+                P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
                     if (P3Value != selectedMarker.getP3()) {
+                        selectedMarker.setP3(P3Value);
+                        
                         if ($('#pointP3Alt').prop("checked")) {
                             if (altitude < 0) {
                                 altitude = settings.alt;
@@ -2149,10 +2153,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction1').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), 1));
+                    changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), 1, $('#pointP3UserAction1').prop("checked"));
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
     
                 mission.updateWaypoint(selectedMarker);
@@ -2164,10 +2168,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction2').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), 2));
+                    changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
                 }
 
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), 2, $('#pointP3UserAction2').prop("checked"));
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2179,10 +2183,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction3').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), 3));
+                    changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
     
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), 3, $('#pointP3UserAction3').prop("checked"));
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2194,10 +2198,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3UserAction4').on('change', function(event){
             if (selectedMarker) {
                 if (disableMarkerEdit) {
-                    changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), 4));
+                    changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
     
-                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), 4, $('#pointP3UserAction4').prop("checked"));
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
                 mission.updateWaypoint(selectedMarker);
@@ -2410,7 +2414,7 @@ TABS.mission_control.initialize = function (callback) {
 
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             nwdialog.setContext(document);
-            nwdialog.openFileDialog(function(result) {
+            nwdialog.openFileDialog('.mission', function(result) {
                 loadMissionFile(result);
             })
         });
@@ -2805,11 +2809,14 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
-     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
-    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, P3Datum) {
+     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting
+     ^ AbsAltCheck : check value for whether or not to use absolute altitude. This can be the P3 bitset or excplicitly set to true or false */
+    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, AbsAltCheck) {
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
-        if (P3Datum) {
+        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : TABS.mission_control.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
+
+        if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
@@ -2941,11 +2948,7 @@ TABS.mission_control.isBitSet = function(bits, testBit) {
 }
 
 TABS.mission_control.setBit = function(bits, bit, value) {
-    if ((initParam3 & (1 << bit)) != 0) {
-        bits &= ~(0 << bit);
-        bits |= (value << bit);
-    }
-    return bits;
+    return value ? bits |= (1 << bit) : bits &= ~(1 << bit);
 }
 
 // window.addEventListener("error", handleError, true);

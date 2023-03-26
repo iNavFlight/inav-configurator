@@ -79,6 +79,21 @@ TABS.receiver.initialize = function (callback) {
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
 
+        // Order Serial Rx providers
+        let serialRxProviders = $('#serialrx_provider option');
+        let selectedRxProvider = $('#serialrx_provider').val();
+        serialRxProviders.sort(function(a,b) {
+            if (a.text > b.text) {
+                return 1;
+            } else if (a.text < b.text) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        $("#serialrx_provider").empty().append(serialRxProviders);
+        $('#serialrx_provider').val(selectedRxProvider);
+
         $receiverMode.change(function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();

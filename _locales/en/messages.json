@@ -1167,7 +1167,7 @@
         "message": "DJI FPV VTX"
     },
     "portsFunction_MSP_DISPLAYPORT": {
-        "message": "MSP Displayport"
+        "message": "MSP DisplayPort"
     },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
@@ -1279,6 +1279,9 @@
     },
     "pidTuning_mainFilters": {
         "message": "Gyro filters"
+    },
+    "pidTuning_advancedFilters": {
+        "message": "Advanced gyro filters"
     },
     "pidTuning_gyro_main_lpf_hz": {
         "message": "Main gyro filter cutoff frequency"
@@ -1408,6 +1411,27 @@
     },
     "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "pidTuning_gyro_use_dyn_lpf": {
+        "message": "Dynamic gyro LPF"
+    },
+    "pidTuning_gyro_use_dyn_lpf_help": {
+        "message": "When enabled, main gyro LPF frequency is automatically adjusted based on the current throttle position. When disabled, static LPF cutoff frequency is used."
+    },
+    "pidTuning_gyro_dyn_lpf_min_hz": {
+        "message": "Dynamic gyro LPF min. cutoff"
+    },
+    "pidTuning_gyro_dyn_lpf_max_hz": {
+        "message": "Dynamic gyro LPF max. cutoff"
+    },
+    "pidTuning_gyro_dyn_lpf_curve_expo": {
+        "message": "Dynamic gyro LPF curve expo"
+    },
+    "pidTuning_gyro_dyn_lpf_min_hz_help": {
+        "message": "Defines the gyro LPF cutoff frequency at minimum throttle. When throttle is increased, LPF cutoff frequency is increased as well, up to the maximum cutoff frequency."
+    },
+    "pidTuning_gyro_dyn_lpf_max_hz_help": {
+        "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
     },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
@@ -3227,6 +3251,18 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
+    "osd_airspeed_min_alarm" : {
+        "message": "Minimum Airspeed"
+    },
+    "osd_airspeed_min_alarm_HELP" : {
+        "message": "The airspeed indicator will flash when the airspeed is below this threshold. Zero disables this alarm."
+    },
+    "osd_airspeed_max_alarm" : {
+        "message": "Maximum Airspeed"
+    },
+    "osd_airspeed_max_alarm_HELP" : {
+        "message": "The airspeed indicator will flash when the airspeed is above this threshold. Zero disables this alarm."
+    },
     "osd_gforce_alarm": {
         "message": "g force"
     },
@@ -3539,6 +3575,12 @@
     "osdElement_GLIDESLOPE_HELP": {
         "message": "Amount of horizontal distance traveled per unit of lost altitude"
     },
+    "osdElement_PAN_SERVO_CENTRED": {
+        "message": "Pan Servo Centred"
+    },
+    "osdElement_PAN_SERVO_CENTRED_HELP": {
+        "message": "Displays if the pan servo is centred (0) or offset (arrows). Check the <b>osd_pan_servo_</b> settings for configuring the pan servo."
+    },
     "osdElement_VTX_CHANNEL": {
         "message": "Video TX Band and Channel"
     },
@@ -3664,6 +3706,33 @@
     },
     "osdElement_SWITCH_INDICATOR_3": {
         "message": "Switch Indicator 4"
+    },
+    "osd_pan_servo_settings": {
+        "message": "Pan Servo OSD Settings"
+    },
+    "osd_pan_servo_settings_HELP": {
+        "message": "This section enables and configures the pan servo offset feature. It is used to keep OSD elements, like the home arrow and POIs, pointing to or in the correct direction. Even when you have panned the camera around."
+    },
+    "osdPanServoIndex": {
+        "message": "Pan Servo Output"
+    },
+    "osdPanServoIndex_HELP": {
+        "message": "Set the is to the output number of the pan servo; as shown in the mixer outputs table. For example output S6."
+    },
+    "osdPanServoPwm2centideg": {
+        "message": "Total degrees of movement of the pan servo"
+    },
+    "osdPanServoPwm2centideg_HELP": {
+        "message": "Degrees of pan servo rotation. A servo with 180 degrees of rotation from 1000 to 2000 us PWM typically needs 180 for this setting. Make the value negative to inverse the direction."
+    },
+    "osdPanServoIndicatorShowDegrees": {
+        "message": "Show degrees of offset next to pan indicator"
+    },
+    "osdPanServoOffcentreWarning": {
+        "message": "Off-centre warning"
+    },
+    "osdPanServoOffcentreWarning_HELP": {
+        "message": "Degrees either side of the pan servo centre; where it is assumed camera is wanted to be facing forwards, but isn't at 0. If in this range and not 0 for longer than 10 seconds, the pan servo offset OSD element will blink. 0 means the warning is disabled."
     },
     "osdGroupGVars": {
         "message": "Global Variables"
