@@ -290,6 +290,18 @@ TABS.pid_tuning.initialize = function (callback) {
             });
         });
 
+        $('#gyro_use_dyn_lpf').on('change', function () {
+
+            if ($(this).is(':checked')) {
+                $('.for_dynamic_gyro_lpf').show();
+                $('.for_static_gyro_lpf').hide();
+            } else {
+                $('.for_dynamic_gyro_lpf').hide();
+                $('.for_static_gyro_lpf').show();
+            }
+
+        }).trigger('change');
+
         GUI.content_ready(callback);
     }
 };

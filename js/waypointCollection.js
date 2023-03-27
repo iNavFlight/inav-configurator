@@ -360,7 +360,8 @@ let WaypointCollection = function () {
                 }
                 altPoint2measure.push(self.getWaypoint(nStart).getAlt());
                 namePoint2measure.push(self.getWaypoint(nStart).getLayerNumber()+1);
-                refPoint2measure.push(self.getWaypoint(nStart).getP3());
+                let useAbsoluteAlt = (self.getWaypoint(nStart).getP3() & (1 << 0));
+                refPoint2measure.push(useAbsoluteAlt);
                 nStart++;
             }
             else if (self.getWaypoint(nStart).getAction() == MWNP.WPTYPE.JUMP) {
