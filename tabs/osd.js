@@ -182,7 +182,7 @@ FONT.parseMCMFontFile = function (data) {
 
     // make sure the font file is valid
     if (data.shift().trim() != 'MAX7456') {
-        var msg = 'that font file doesnt have the MAX7456 header, giving up';
+        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
         Promise.reject(msg);
     }
@@ -548,7 +548,7 @@ OSD.constants = {
         'DJIWTF',
         'AVATAR',
         'BF43COMPAT',
-	'BFHDCOMPAT'
+        'BFHDCOMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -566,7 +566,7 @@ OSD.constants = {
         DJIWTF: 60,
         AVATAR: 53,
         BF43COMPAT: 30,
-	BFHDCOMPAT: 53
+        BFHDCOMPAT: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -575,7 +575,7 @@ OSD.constants = {
         DJIWTF: 1320,
         AVATAR: 1060,
         BF43COMPAT: 480,
-	BFHDCOMPAT: 1060
+        BFHDCOMPAT: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -2140,17 +2140,21 @@ OSD.updateDisplaySize = function () {
 
     // set the preview size based on the video type
     // -- AVATAR
-    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
-    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
-    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'));
+    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'));
+    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'));
     // -- DJI WTF
-    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
-    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
-    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF');
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF');
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF');
     // -- HD ZERO
-    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
-    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'));
+    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'));
+    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'));
+    // -- BFHDCOMPAT
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
@@ -2747,6 +2751,18 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
+
+    ifBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    /*
+    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on))
+    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on))
+    $('.hd_bfhdcompat').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on))
+    $('.hd_bfhdcompat_storage_box_top').toggleClass('hd_bfhdcompat_storagebox_t', (isBfHdCompat && on))
+    $('.hd_bfhdcompat_storage_box_bottom').toggleClass('hd_bfhdcompat_storagebox_b', (isBfHdCompat && on))
+    $('.hd_bfhdcompat_storage_box_left').toggleClass('hd_bfhdcompat_storagebox_l', (isBfHdCompat && on))
+    $('.hd_bfhdcompat_storage_box_right').toggleClass('hd_bfhdcompat_storagebox_r', (isBfHdCompat && on))
+    */
+
 
     isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
     $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))

@@ -430,6 +430,31 @@ button {
     left: calc(50% - 197px);
 }
 
+.tab-osd .preview_bfhdcompat {
+    width: 636px !important; /* 12 X char width */
+    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.tab-osd .hd_bfhdcompat_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	/*left: 77.5px; // Calculated correct position */
+    left: 30px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_bfhdcompat_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	/* right: 77.5px; // Calculated correct position */
+    right: 36px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_bfhdcompat_side {
+	width: calc(50% - 335px) !important;
+}
+
 .tab-osd .preview_avatar {
     width: 636px !important; /* 12 X char width */
     left: calc(50% - 335px) !important; /* width / 2 + 17 */
