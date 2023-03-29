@@ -576,33 +576,6 @@ button {
     width: 80px;
 }
 
-.tab-osd .hd_bfhdcompat_storagebox_b {
-    border-bottom: 2px solid purple;
-    position: absolute;
-    top: 158px;
-    height: 1px;
-    right: 10px;
-    width: 71px;
-}
-
-.tab-osd .hd_bfhdcompat_storagebox_l {
-    border-left: 2px solid purple;
-    position: absolute;
-    top: 125px;
-    height: 35px;
-    right: 79px;
-    width: 1px;
-}
-
-.tab-osd .hd_bfhdcompat_storagebox_r {
-    border-right: 2px solid purple;
-    position: absolute;
-    top: 125px;
-    height: 35px;
-    right: 10px;
-    width: 1px;
-}
-
 .tab-osd .hd_avatar_bottom {
     border-bottom: 2px solid purple;
     position: absolute;
