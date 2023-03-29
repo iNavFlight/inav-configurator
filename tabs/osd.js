@@ -2140,13 +2140,13 @@ OSD.updateDisplaySize = function () {
 
     // set the preview size based on the video type
     // -- AVATAR
-    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'));
-    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'));
-    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'));
+    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
+    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
     // -- DJI WTF
     $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF');
-    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF');
-    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF');
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
     // -- HD ZERO
     $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'));
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'));
