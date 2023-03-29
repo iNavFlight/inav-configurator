@@ -436,11 +436,11 @@ button {
 }
 
 .tab-osd .hd_bfhdcompat_43_left {
-	border-left: 2px solid red;
-	position: absolute;
-	/*left: 77.5px; // Calculated correct position */
+    border-left: 2px solid red;
+    position: absolute;
+    /*left: 77.5px; // Calculated correct position */
     left: 70px;
-	height: calc(100% - 27px);
+    height: calc(100% - 27px);
 }
 
 .tab-osd .hd_bfhdcompat_43_right {
