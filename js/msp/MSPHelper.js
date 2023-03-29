@@ -807,7 +807,7 @@ var mspHelper = (function (gui) {
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
-                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
+                        peripherals_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
                     };
 
                     offset += bytesPerPort;
@@ -1839,7 +1839,7 @@ var mspHelper = (function (gui) {
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.peripherals_baudrate));
                 }
                 break;
 
@@ -2700,15 +2700,15 @@ var mspHelper = (function (gui) {
 
                 bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                 if (bitIndex >= 0) {
-                    if(bitIndex < 2) {
-                        mask |= bit_set(mask, bitIndex + 2);
+                    if(bitIndex < 4) {
+                        mask |= bit_set(mask, bitIndex + 28);
                     } else {
-                        extra |= bit_set(exta, bitIndex - 2);
+                        extra |= bit_set(extra, bitIndex - 4);
                     }
                 }
             }
 
-            extra |= (0 << 4); // parameters
+            extra |= (0 << 2); // parameters
 
             buffer.push(specificByte(mask, 0));
             buffer.push(specificByte(mask, 1));

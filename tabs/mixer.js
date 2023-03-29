@@ -628,6 +628,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();

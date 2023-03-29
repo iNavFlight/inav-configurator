@@ -3,7 +3,10 @@
 This directory contains one directory per font. In each
 directory, each character is named `%d%d%d.png`, where
 the digits represent the decimal character number found
-in the filename without the extension.
+in the filename without the extension. All characters
+must be in the `default` font directory. If characters 
+missing from alternate font directories, the default 
+version of the character will be used.
 
 Don't alter the `.mcm` files directly, those should be
 only modified by altering the `.png` files found in its

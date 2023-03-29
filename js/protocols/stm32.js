@@ -115,7 +115,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                                 PortHandler.check_usb_devices(function(dfu_available) {
                                     if (dfu_available) {
                                         clearInterval(interval);
-                                        STM32DFU.connect(usbDevices.STM32DFU, hex, options);
+                                        STM32DFU.connect(usbDevices, hex, options);
                                         return;
                                     }
                                     // Check for the serial port
