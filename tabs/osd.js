@@ -2755,11 +2755,8 @@ OSD.GUI.updateGuidesView = function(on) {
     isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
     $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
     $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_bottom_bar').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_storage_box_top').toggleClass('hd_bfhdcompat_storagebox_t', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_storage_box_bottom').toggleClass('hd_bfhdcompat_storagebox_b', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_storage_box_left').toggleClass('hd_bfhdcompat_storagebox_l', (isBfHdCompat && on));
-    $('.hd_bfhdcompat_storage_box_right').toggleClass('hd_bfhdcompat_storagebox_r', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
 
     isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
     $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))

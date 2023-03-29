@@ -439,7 +439,7 @@ button {
 	border-left: 2px solid red;
 	position: absolute;
 	/*left: 77.5px; // Calculated correct position */
-    left: 30px;
+    left: 70px;
 	height: calc(100% - 27px);
 }
 
@@ -447,7 +447,7 @@ button {
 	border-right: 2px solid red;
 	position: absolute;
 	/* right: 77.5px; // Calculated correct position */
-    right: 36px;
+    right: 70px;
 	height: calc(100% - 27px);
 }
 
@@ -559,46 +559,47 @@ button {
 }
 
 .tab-osd .hd_bfhdcompat_bottom {
-    border-bottom: 2px solid purple;
+    border: 2px solid purple;
     position: absolute;
-    bottom: 33px;
-    left: 0px;
+    height: 70px;
+    bottom: 0px;
+    left: 450px;
     right: 0px;
 }
 
-.tab-osd .hd_bfhdcompat_storagebox_t {
-    border-top: 2px solid purple;
+.tab-osd .hd_bfhdcompat_storagebox {
+    border: 2px solid purple;
     position: absolute;
-    top: 56px;
-    height: 1px;
-    right: 34px;
-    width: 48px;
+    top: 115px;
+    height: 55px;
+    right: 0px;
+    width: 80px;
 }
 
 .tab-osd .hd_bfhdcompat_storagebox_b {
     border-bottom: 2px solid purple;
     position: absolute;
-    top: 88px;
+    top: 158px;
     height: 1px;
-    right: 34px;
-    width: 48px;
+    right: 10px;
+    width: 71px;
 }
 
 .tab-osd .hd_bfhdcompat_storagebox_l {
     border-left: 2px solid purple;
     position: absolute;
-    top: 56px;
+    top: 125px;
     height: 35px;
-    right: 80px;
+    right: 79px;
     width: 1px;
 }
 
 .tab-osd .hd_bfhdcompat_storagebox_r {
     border-right: 2px solid purple;
     position: absolute;
-    top: 56px;
+    top: 125px;
     height: 35px;
-    right: 32px;
+    right: 10px;
     width: 1px;
 }
 
