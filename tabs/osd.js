@@ -2752,17 +2752,14 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
 
-    ifBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
-    /*
-    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on))
-    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on))
-    $('.hd_bfhdcompat').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on))
-    $('.hd_bfhdcompat_storage_box_top').toggleClass('hd_bfhdcompat_storagebox_t', (isBfHdCompat && on))
-    $('.hd_bfhdcompat_storage_box_bottom').toggleClass('hd_bfhdcompat_storagebox_b', (isBfHdCompat && on))
-    $('.hd_bfhdcompat_storage_box_left').toggleClass('hd_bfhdcompat_storagebox_l', (isBfHdCompat && on))
-    $('.hd_bfhdcompat_storage_box_right').toggleClass('hd_bfhdcompat_storagebox_r', (isBfHdCompat && on))
-    */
-
+    isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
+    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_bottom_bar').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box_top').toggleClass('hd_bfhdcompat_storagebox_t', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box_bottom').toggleClass('hd_bfhdcompat_storagebox_b', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box_left').toggleClass('hd_bfhdcompat_storagebox_l', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box_right').toggleClass('hd_bfhdcompat_storagebox_r', (isBfHdCompat && on));
 
     isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
     $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
