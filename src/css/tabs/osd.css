@@ -444,11 +444,11 @@ button {
 }
 
 .tab-osd .hd_bfhdcompat_43_right {
-	border-right: 2px solid red;
-	position: absolute;
-	/* right: 77.5px; // Calculated correct position */
+    border-right: 2px solid red;
+    position: absolute;
+    /* right: 77.5px; // Calculated correct position */
     right: 70px;
-	height: calc(100% - 27px);
+    height: calc(100% - 27px);
 }
 
 .tab-osd .preview_bfhdcompat_side {
