@@ -565,6 +565,7 @@ button {
     bottom: 0px;
     left: 450px;
     right: 0px;
+    pointer-events: none;
 }
 
 .tab-osd .hd_bfhdcompat_storagebox {
@@ -574,6 +575,7 @@ button {
     height: 55px;
     right: 0px;
     width: 80px;
+    pointer-events: none;
 }
 
 .tab-osd .hd_avatar_bottom {
