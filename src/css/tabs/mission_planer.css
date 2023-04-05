@@ -522,3 +522,7 @@
 .tab-mission-control .valueLegend{
     float:right;
 }
+
+.tab-mission-control .userActionContainer {
+    display: inline-block;
+}

@@ -1,7 +1,7 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
