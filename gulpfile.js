@@ -639,7 +639,7 @@ function release_rpm(arch) {
             vendor: metadata.author,
             summary: metadata.description,
             license: 'GNU General Public License v3.0',
-            requires: ['libgconf-2-4', 'libatomic1'],
+            requires: ['GConf2', 'libatomic'],
             prefix: '/opt',
             files: [{
                 cwd: path.join(appsDir, metadata.name, arch),
