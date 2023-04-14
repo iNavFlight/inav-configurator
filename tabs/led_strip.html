@@ -46,29 +46,29 @@
         <div class="controls">
             <div class="wires-remaining">
                 <div></div>
-                Remaining
+                <span i18n="ledStripRemainingText"></span>
             </div>
-            <button class="funcClear">Clear selected</button>
-            <button class="funcClearAll">Clear ALL</button>
+            <button class="funcClear" i18n="ledStripClearSelectedButton"></button>
+            <button class="funcClearAll" i18n="ledStripClearAllButton"></button>
 
-            <div class="section">LED Functions</div>
-            
-            
+            <div class="section" i18n="ledStripFunctionSection"></div>
+
+
             <div class="select">
-                <span class="color_section">Function</span>
+                <span class="color_section" i18n="ledStripFunctionTitle">Function</span>
                 <select class="functionSelect">
-                    <option value="">None</option>
-                    <option value="function-c" class="">Color</option>
-                    <option value="function-f" class="">Modes &amp; Orientation</option>
-                    <option value="function-a" class="">Arm State</option>
-                    <option value="function-l" class="extra_functions20">Battery</option>
-                    <option value="function-s" class="extra_functions20">RSSI</option>
-                    <option value="function-g" class="extra_functions20">GPS</option>
-                    <option value="function-r" class="">Ring</option>
-                    <option value="function-h" class="channel_info">Channel</option>
+                    <option value="" i18n="ledStripFunctionNoneOption">None</option>
+                    <option value="function-c" class="" i18n="ledStripFunctionColorOption">Color</option>
+                    <option value="function-f" class="" i18n="ledStripFunctionModesOption">Modes &amp; Orientation</option>
+                    <option value="function-a" class="" i18n="ledStripFunctionArmOption">Arm State</option>
+                    <option value="function-l" class="extra_functions20" i18n="ledStripFunctionBatteryOption">Battery</option>
+                    <option value="function-s" class="extra_functions20" i18n="ledStripFunctionRSSIOption">RSSI</option>
+                    <option value="function-g" class="extra_functions20" i18n="ledStripFunctionGPSOption">GPS</option>
+                    <option value="function-r" class="" i18n="ledStripFunctionRingOption">Ring</option>
+                    <option value="function-h" class="channel_info" i18n="ledStripFunctionChannelOption">Channel</option>
                 </select>
             </div>
-            
+
 
             <div class="modifiers">
                 <span class="color_section">Color modifier</span>
@@ -81,7 +81,7 @@
                     <label> <span>Larson scanner</span></label>
                 </div>
             </div>
-            
+
             <div class="blinkers extra_functions20">
                 <span class="color_section">Blink</span>
                 <div class="checkbox blinkOverlay">
@@ -98,7 +98,7 @@
                     <label> <span>Enable strobe light effect</span></label>
                 </div>
             </div>
-                        
+
             <div class="overlays">
                 <span class="color_section">Overlay</span>
                 <div class="checkbox warningOverlay">
@@ -114,10 +114,10 @@
             <div class="channel_info">
                 <span class="color_section">Select Channel from color list</span>
             </div>
-            
+
             <div class="mode_colors">
                 <div class="section">Mode colors</div>
-                
+
                 <select class="modeSelect">
                     <option value="0">Orientation</option>
                     <option value="1">Headfree</option>
@@ -134,7 +134,7 @@
                 <button class="mode_color-0-4 dir-u">U</button>
                 <button class="mode_color-0-5 dir-d">D</button>
             </div>
-            
+
             <div class="section">LED Orientation and Color</div>
             <div class="directions">
                 <button class="dir-n">N</button>
@@ -144,7 +144,7 @@
                 <button class="dir-u">U</button>
                 <button class="dir-d">D</button>
             </div>
-            
+
             <div class="colors">
                 <button class="color-0" title="black">0</button>
                 <button class="color-1" title="white">1</button>
@@ -175,7 +175,7 @@
                 <button class="mode_color-6-6" title="orange">GPS: no lock</button>
                 <button class="mode_color-6-7" title="green">GPS: locked</button>
             </div>
-            
+
             <div class="section">LED Strip Wiring</div>
             <div class="wiringMode">
                 <button class="funcWire w100">Wire Ordering Mode</button>
@@ -186,11 +186,11 @@
             </div>
             <p>LEDs without wire ordering number will not be saved.</p>
         </div>
-        
+
         <div class="colorControls">
 
         </div>
-        
+
         <div class="clear-both"></div>
     </div>
     <div class="content_toolbar">
