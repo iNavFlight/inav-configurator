@@ -2,7 +2,6 @@
     "translation_version": {
         "message": "0"
     },
-
     "options_title": {
         "message": "Application Options"
     },
@@ -21,7 +20,6 @@
     "options_render": {
         "message": "Configurator rendering options"
     },
-
     "connect": {
         "message": "Connect"
     },
@@ -4553,19 +4551,26 @@
     "nmeaWarning": {
         "message": "NMEA protocol is deprecated and might be removed in the future. Please use UBLOX or UBLOX7 protocol instead."
     },
-
-
+    "ledStripColorSetupTitle": {
+        "message": "Color setup"
+    },
+    "ledStripH": {
+        "message": "H"
+    },
+    "ledStripS": {
+        "message": "S"
+    },
+    "ledStripV": {
+        "message": "V"
+    },
     "ledStripRemainingText": {
-        "message": "Remaining",
-        "description": "In the LED STRIP, text next the counter of leds remaining"
+        "message": "Remaining"
     },
     "ledStripClearSelectedButton": {
-        "message": "Clear selected",
-        "description": "In the LED STRIP, clear selected leds"
+        "message": "Clear selected"
     },
     "ledStripClearAllButton": {
-        "message": "Clear ALL",
-        "description": "In the LED STRIP, clear all leds"
+        "message": "Clear ALL"
     },
     "ledStripFunctionSection": {
         "message": "LED Functions"
@@ -4574,45 +4579,190 @@
         "message": "Function"
     },
     "ledStripFunctionNoneOption": {
-        "message": "None",
-        "description": "One of the modes of the Led Strip"
+        "message": "None"
     },
     "ledStripFunctionColorOption": {
-        "message": "Color",
-        "description": "One of the modes of the Led Strip"
+        "message": "Color"
     },
     "ledStripFunctionModesOption": {
-        "message": "Modes &amp; Orientation",
-        "description": "One of the modes of the Led Strip"
+        "message": "Modes &amp; Orientation"
     },
     "ledStripFunctionArmOption": {
-        "message": "Arm State",
-        "description": "One of the modes of the Led Strip"
+        "message": "Arm State"
     },
     "ledStripFunctionBatteryOption": {
-        "message": "Battery",
-        "description": "One of the modes of the Led Strip"
+        "message": "Battery"
     },
     "ledStripFunctionRSSIOption": {
-        "message": "RSSI",
-        "description": "One of the modes of the Led Strip"
+        "message": "RSSI"
     },
     "ledStripFunctionGPSOption": {
-        "message": "GPS",
-        "description": "One of the modes of the Led Strip"
+        "message": "GPS"
     },
     "ledStripFunctionRingOption": {
-        "message": "Ring",
-        "description": "One of the modes of the Led Strip"
+        "message": "Ring"
     },
     "ledStripFunctionChannelOption": {
-        "message": "Channel",
-        "description": "One of the modes of the Led Strip"
+        "message": "Channel"
+    },
+    "ledStripColorModifierTitle": {
+        "message": "Color modifier"
+    },
+    "ledStripThrottleText": {
+        "message": "Throttle"
+    },
+    "ledStripLarsonscannerText": {
+        "message": "Larson scanner"
+    },
+    "ledStripBlinkTitle": {
+        "message": "Blink"
+    },
+    "ledStripBlinkAlwaysOverlay": {
+        "message": "Blink always"
+    },
+    "ledStripBlinkLandingOverlay": {
+        "message": "Blink on landing"
+    },
+    "ledStripStrobeText": {
+        "message": "Strobe"
+    },
+    "ledStripEnableStrobeLightEffectText": {
+        "message": "Enable strobe light effect"
+    },
+    "ledStripOverlayTitle": {
+        "message": "Overlay"
+    },
+    "ledStripWarningsOverlay": {
+        "message": "Warnings"
+    },
+    "ledStripIndecatorOverlay": {
+        "message": "Indicator"
+    },
+    "colorBlack": {
+        "message": "black"
+    },
+    "colorWhite": {
+        "message": "white"
+    },
+    "colorRed": {
+        "message": "red"
+    },
+    "colorOrange": {
+        "message": "orange"
+    },
+    "colorYellow": {
+        "message": "yellow"
+    },
+    "colorLimeGreen": {
+        "message": "lime green"
+    },
+    "colorGreen": {
+        "message": "green"
+    },
+    "colorMintGreen": {
+        "message": "mint green"
+    },
+    "colorCyan": {
+        "message": "cyan"
+    },
+    "colorLightBlue": {
+        "message": "light blue"
+    },
+    "colorBlue": {
+        "message": "blue"
+    },
+    "colorDarkViolet": {
+        "message": "dark violet"
+    },
+    "colorMagenta": {
+        "message": "magenta"
+    },
+    "colorDeepPink": {
+        "message": "deep pink"
+    },
+    "ledStripSelectChannelFromColorList": {
+        "message": "Select Channel from color list"
+    },
+    "ledStripModeColorsTitle": {
+        "message": "Mode colors"
+    },
+    "ledStripModeColorsModeOrientation": {
+        "message": "Orientation"
+    },
+    "ledStripModeColorsModeHeadfree": {
+        "message": "Headfree"
+    },
+    "ledStripModeColorsModeHorizon": {
+        "message": "Horizon"
+    },
+    "ledStripModeColorsModeAngle": {
+        "message": "Angle"
+    },
+    "ledStripModeColorsModeMag": {
+        "message": "Mag"
+    },
+    "ledStripModeColorsModeBaro": {
+        "message": "Baro"
+    },
+
+    "ledStripDirN": {
+        "message": "N"
+    },
+    "ledStripDirE": {
+        "message": "E"
+    },
+    "ledStripDirS": {
+        "message": "S"
+    },
+    "ledStripDirW": {
+        "message": "W"
+    },
+    "ledStripDirU": {
+        "message": "U"
+    },
+    "ledStripDirD": {
+        "message": "D"
+    },
+    "ledStripModesOrientationTitle": {
+        "message": "LED Orientation and Color"
+    },
+    "ledStripModesSpecialColorsTitle": {
+        "message": "Special colors"
+    },
+    "ledStripModeColorsModeDisarmed": {
+        "message": "Disarmed"
+    },
+    "ledStripModeColorsModeArmed": {
+        "message": "Armed"
+    },
+    "ledStripModeColorsModeAnimation": {
+        "message": "Animation"
+    },
+    "ledStripModeColorsModeBlinkBg": {
+        "message": "Blink background"
+    },
+    "ledStripModeColorsModeGPSNoSats": {
+        "message": "GPS: no sats"
+    },
+    "ledStripModeColorsModeGPSNoLock": {
+        "message": "GPS: no lock"
+    },
+    "ledStripModeColorsModeGPSLocked": {
+        "message": "GPS: locked"
+    },
+    "ledStripWiring": {
+        "message": "LED Strip Wiring"
+    },
+    "ledStripWiringMode": {
+        "message": "Wire Ordering Mode"
+    },
+    "ledStripWiringClearControl": {
+        "message": "Clear selected"
+    },
+    "ledStripWiringClearAllControl": {
+        "message": "Clear ALL Wiring"
+    },
+    "ledStripWiringMessage": {
+        "message": "LEDs without wire ordering number will not be saved."
     }
-
-
-
-
-
-
 }
