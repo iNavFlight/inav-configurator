@@ -254,11 +254,6 @@ var SITLProcess = {
                 callback(error);
             this.isRunning = false;
         });
-        
-        this.process.on('exit', () => {
-            if (this.isRunning)
-                this.spawn(path, args, callback);
-        });
     },
 
     stop: function() {
