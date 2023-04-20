@@ -828,12 +828,12 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: '*' + FONT.symbol(SYM.THR) + '69'
+                    preview: ' ' + FONT.symbol(SYM.THR) + '69'
                 },
                 {
                     name: 'SCALED_THROTTLE_POSITION',
                     id: 33,
-                    preview: ' ' + FONT.symbol(SYM.THR) + '51'
+                    preview: FONT.symbol(SYM.SCALE) + FONT.symbol(SYM.THR) + '51'
                 },
                 {
                     name: 'CRAFT_NAME',
