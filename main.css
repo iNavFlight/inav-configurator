@@ -60,6 +60,10 @@ a.disabled {
     transition: none;
 }
 
+.inputRequiredWarning {
+    border: 3px solid #d40000 !important;
+}
+
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
