@@ -531,7 +531,7 @@ OSD.DjiElements =  {
     craftNameElements: [
         "MESSAGES",
         "THROTTLE_POSITION",
-        "THROTTLE_POSITION_AUTO_THR",
+        "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
         "EFFICIENCY_MAH",
         "TRIP_DIST"
@@ -835,12 +835,12 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                    preview: ' ' + FONT.symbol(SYM.THR) + '69'
                 },
                 {
-                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    name: 'SCALED_THROTTLE_POSITION',
                     id: 33,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                    preview: FONT.symbol(SYM.SCALE) + FONT.symbol(SYM.THR) + '51'
                 },
                 {
                     name: 'CRAFT_NAME',
