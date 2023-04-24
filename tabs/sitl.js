@@ -381,6 +381,10 @@ TABS.sitl.initialize = (callback) => {
     }
 
     function saveProfiles() {
+        if (currentProfile.isStdProfile) {
+            alert(chrome.i18n.getMessage('sitlStdProfileCantOverwritten'));
+            return;
+        }        
         var profilesToSave = [];
         profiles.forEach(profile => {
             if (!profile.isStdProfile)
