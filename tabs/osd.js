@@ -114,6 +114,7 @@ SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.EST_FRESNEL_ALT = 0x1C9;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -980,6 +981,21 @@ OSD.constants = {
                     id: 143,
                     min_version: '6.0.0',
                     preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'ESTIMATED_FRESNEL_ALTITUDE',
+                    id: 144,
+                    min_version: '7.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.symbol(SYM.EST_FRESNEL_ALT) + FONT.symbol(SYM.AH_DECORATION_UP) + ' 27' + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric & Metric + MPH
+                                return FONT.symbol(SYM.EST_FRESNEL_ALT) + FONT.symbol(SYM.AH_DECORATION_UP) + ' 27' + FONT.symbol(SYM.ALT_M);
+                        }
+                    }
                 },
                 {
                     name: 'MISSION INFO',

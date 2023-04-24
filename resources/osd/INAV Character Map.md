@@ -322,5 +322,6 @@
 | ![Pan centred](/resources/osd/digital/default/24x36/454.png)      | SYM_SERVO_PAN_IS_CENTRED   |                              | Pan servo is centred                  | 454        | 0x1C6         |
 | ![Pan Left](/resources/osd/digital/default/24x36/455.png)         | SYM_SERVO_PAN_IS_OFFSET_L  | SYM.PAN_SERVO_IS_OFFSET_L    | Pan servo is moved to the left        | 455        | 0x1C7         |
 | ![Pan Right](/resources/osd/digital/default/24x36/456.png)        | SYM_SERVO_PAN_IS_OFFSET_R  |                              | Pan servo is moved to the right       | 456        | 0x1C8         |
+| ![EFA](/resources/osd/digital/default/24x36/457.png)              | SYM_EST_FRESNEL_ALT        | SYM.EST_FRESNEL_ALT          | Estimated Fresnel Altitude            | 457        | 0x1C9         |
 
 _*_ Do not change the IDs of these characters
