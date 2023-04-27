@@ -1976,25 +1976,31 @@
         "message": "CLI output successfully saved to file"
     },
     "cliClearOutputHistoryBtn": {
-        "message": "Clear output history"
+        "message": "Clear Screen"
     },
     "cliCopyToClipboardBtn": {
-        "message": "Copy to clipboard"
+        "message": "Copy to Clipboard"
     },
     "cliExitBtn": {
-        "message": "EXIT"
+        "message": "Exit"
     },
     "cliSaveSettingsBtn": {
-        "message": "SAVE SETTINGS"
+        "message": "Save Settings"
     },
     "cliMscBtn": {
         "message": "MSC"
+    },
+    "cliDiffAllBtn": {
+        "message": "Diff All"
+    },
+    "cliCommandsHelp": {
+        "message": "Type or paste commands in the box to the left. You can use the up and down arrow keys to recall previously typed commands. Type 'help' or click on this icon for more info."
     },
     "cliCopySuccessful": {
         "message": "Copied!"
     },
     "cliLoadFromFileBtn": {
-        "message": "Load from file"
+        "message": "Load from File"
     },
     "cliConfirmSnippetDialogTitle": {
         "message": "Review loaded commands"
