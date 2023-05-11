@@ -49,15 +49,15 @@ var Ser2TCP = {
     },
 
     start: function(comPort, serialPortOptions, ipAddress, tcpPort, callback) {
-        
+
         if (this.isRunning)
             this.stop();
-        
+
         var path;
         if (GUI.operating_system == 'Windows') {
             path = './resources/sitl/windows/Ser2TCP.exe'
         } else if (GUI.operating_system == 'Linux') {
-            path = './resources/sitl/linux/ser2TCP'
+            path = './resources/sitl/linux/Ser2TCP'
             chmod(path, 0o755, (err) => {
                 if (err)
                     console.log(err);
@@ -69,7 +69,7 @@ var Ser2TCP = {
         var protocoll = serialRXProtocolls.find(proto => {
             return proto.name == serialPortOptions.protocollName;
         });
-        
+
         var args = [];
         if (protocoll && protocoll.name != "manual") {
             args.push(`--comport=${comPort}`)
@@ -85,15 +85,15 @@ var Ser2TCP = {
             args.push(`--parity=${serialPortOptions.parity}`)
             args.push(`--ip=${ipAddress}`);
             args.push(`--tcpport=${tcpPort}`);
-        } 
+        }
 
         var opts = undefined;
-        if (GUI.operating_system == 'Linux') 
+        if (GUI.operating_system == 'Linux')
             opts = { useShell: true };
-        
+
         this.process = spawn(path, args, opts);
         this.isRunning = true;
-                
+
         this.process.stdout.on('data', (data) => {
             if (callback)
                 callback(data);
@@ -109,7 +109,7 @@ var Ser2TCP = {
                 callback(error);
             this.isRunning = false;
         });
-        
+
         this.process.on('exit', () => {
             if (this.isRunning)
                this.spawn(path, args, callback);
@@ -119,27 +119,32 @@ var Ser2TCP = {
     stop: function() {
         if (this.isRunning) {
             this.isRunning = false;
-            this.process.kill(); 
-        }  
+            this.process.kill();
+        }
     },
 
     getDevices: function(callback) {
         chrome.serial.getDevices((devices_array) => {
             var devices = [];
             devices_array.forEach((device) => {
-                
-                if (GUI.operating_system == 'Windows') { 
+
+                if (GUI.operating_system == 'Windows') {
                     var m = device.path.match(/COM\d?\d/g)
                         if (m)
                           devices.push(m[0]);
-                } else               
-                    devices.push(device.displayName);
+                } else {
+                    if (device.displayName != null) {
+			var m = device.path.match(/\/dev\/.*/)
+                        if (m)
+                          devices.push(m[0]);
+                    }
+		}
             });
             callback(devices);
         });
     },
 
-    pollSerialPorts: function(callback) {       
+    pollSerialPorts: function(callback) {
         this.getDevices(devices => {
             if (!this.arraysEqual(this.portsList, devices)) {
                this.portsList = devices;
@@ -149,7 +154,7 @@ var Ser2TCP = {
 
         });
         if (!this.stopPolling) {
-            setTimeout(() => { this.pollSerialPorts(callback) }, 250);        
+            setTimeout(() => { this.pollSerialPorts(callback) }, 250);
         } else {
             this.stopPolling = false;
         }
@@ -168,7 +173,7 @@ var Ser2TCP = {
         if (a === b) return true;
         if (a == null || b == null) return false;
         if (a.length !== b.length) return false;
-      
+
         for (var i = 0; i < a.length; ++i) {
           if (a[i] !== b[i]) return false;
         }
@@ -177,7 +182,7 @@ var Ser2TCP = {
 }
 
 var SITLProcess = {
-    
+
     spawn : null,
     isRunning: false,
     process: null,
@@ -194,7 +199,7 @@ var SITLProcess = {
 
         if (this.isRunning)
             this.stop();
-        
+
         var sitlExePath, eepromPath;
         if (GUI.operating_system == 'Windows') {
             sitlExePath = './resources/sitl/windows/inav_SITL.exe'
@@ -209,36 +214,36 @@ var SITLProcess = {
         } else {
             return;
         }
-        
+
         var args = [];
         args.push(`--path=${eepromPath}`);
 
         if (sim) {
-            args.push(`--sim=${sim}`);      
-            if (useIMU) 
+            args.push(`--sim=${sim}`);
+            if (useIMU)
                 args.push("--useimu")
-            
-            if (simIp) 
+
+            if (simIp)
                 args.push(`--simip=${simIp}`);
-            
-            if (simPort) 
+
+            if (simPort)
                 args.push(`--simport=${simPort}`);
-            
+
             if (channelMap)
                 args.push(`--chanmap=${channelMap}`)
-        }         
-        this.spawn(sitlExePath, args, callback);       
+        }
+        this.spawn(sitlExePath, args, callback);
     },
 
     spawn: function(path, args, callback) {
-         
+
         var opts = undefined;
-        if (GUI.operating_system == 'Linux') 
+        if (GUI.operating_system == 'Linux')
             opts = { useShell: true };
-        
+
         this.process = spawn(path, args, opts);
         this.isRunning = true;
-                
+
         this.process.stdout.on('data', (data) => {
             if (callback)
                 callback(data);
@@ -259,7 +264,7 @@ var SITLProcess = {
     stop: function() {
         if (this.isRunning) {
             this.isRunning = false;
-            this.process.kill(); 
-        }      
+            this.process.kill();
+        }
     }
 };
