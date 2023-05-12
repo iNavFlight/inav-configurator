@@ -137,7 +137,9 @@
     "tabAuxiliary": {
         "message": "Modes"
     },
-
+    "auxiliaryAcroEnabled": {
+        "message": "ACRO"
+    },
     "serialPortOpened": {
         "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
@@ -360,7 +362,9 @@
     "defaultWelcomeIntro": {
         "message": "Welcome to <strong>INAV - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
     },
-
+    "defaultWelcomeHead": {
+        "message": "Hardware"
+    },
     "defaultWelcomeText": {
         "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
@@ -695,6 +699,12 @@
     },
     "featureBLACKBOXTip": {
         "message": "Configure via the BlackBox tab after enabling."
+    },
+    "onboardLoggingBlackbox": {
+        "message": "Blackbox logging device"
+    },
+    "onboardLoggingBlackboxRate": {
+        "message": "Portion of flight loop iterations to log (logging rate)"
     },
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
@@ -1911,6 +1921,20 @@
     "magnetometerElementToShow": {
         "message": "Element to show"
     },
+
+    "axisTableTitleAxis": {
+        "message": "Axis"
+    },
+    "axisTableTitleSlider": {
+        "message": "Slider"
+    },
+    "axisTableTitleValue": {
+        "message": "Value [degree]"
+    },
+
+
+
+
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },
@@ -2279,7 +2303,6 @@
     "ledStripEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
-
     "controlAxisRoll": {
         "message": "Roll [A]"
     },
@@ -2625,6 +2648,46 @@
     "AccBtn": {
         "message": "Calibrate Accelerometer"
     },
+
+    "stepTitle1": {
+        "message": "Step 1"
+    },
+    "stepTitle2": {
+        "message": "Step 2"
+    },
+    "stepTitle3": {
+        "message": "Step 3"
+    },
+    "stepTitle4": {
+        "message": "Step 4"
+    },
+    "stepTitle5": {
+        "message": "Step 5"
+    },
+    "stepTitle6": {
+        "message": "Step 6"
+    },
+    "MagXText": {
+        "message": "Zero X"
+    },
+    "MagYText": {
+        "message": "Zero Y"
+    },
+    "MagZText": {
+        "message": "Zero Z"
+    },
+    "MagGainXText": {
+        "message": "Gain X"
+    },
+    "MagGainYText": {
+        "message": "Gain Y"
+    },
+    "MagGainZText": {
+        "message": "Gain Z"
+    },
+    "OpflowScaleText": {
+        "message": "Scale"
+    },
     "AccResetBtn": {
         "message": "Reset Accelerometer Calibration"
     },
@@ -2679,6 +2742,16 @@
     "tabAdvancedTuningTitle": {
         "message": "Advanced Tuning"
     },
+    "tabAdvancedTuningAirplaneTuningTitle": {
+        "message": ": Fixed Wing"
+    },
+    "tabAdvancedTuningMultirotorTuningTitle": {
+        "message": ": Multirotors"
+    },
+
+
+
+
     "tabAdvancedTuningGenericTitle": {
         "message": "Generic settings"
     },
@@ -2907,7 +2980,7 @@
     "rthTwoStageAltHelp": {
         "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
     },
-    "rthUseLinearDescent" : {
+    "rthUseLinearDescent": {
         "message": "Use Linear Descent"
     },
     "rthUseLinearDescentHelp": {
@@ -4782,5 +4855,106 @@
     },
     "ledStripWiringMessage": {
         "message": "LEDs without wire ordering number will not be saved."
+    },
+
+
+    "mainLogoText": {
+        "message": "CONFIGURATOR"
+    },
+    "mainLogoTextFirmware": {
+        "message": "FC FIRMWARE"
+    },
+    "mainPortOverrideLabel": {
+        "message": "Port: "
+    },
+    "mainManual": {
+        "message": "Manual"
+    },
+    "sensorDataFlashNotFound": {
+        "message": "No dataflash <br>chip found"
+    },
+    "sensorDataFlashFreeSpace": {
+        "message": "Dataflash: free space"
+    },
+    "sensorProfile1": {
+        "message": "Profile 1"
+    },
+    "sensorProfile2": {
+        "message": "Profile 2"
+    },
+    "sensorProfile3": {
+        "message": "Profile 3"
+    },
+    "sensorBatteryProfile1": {
+        "message": "Battery profile 1"
+    },
+    "sensorBatteryProfile2": {
+        "message": "Battery profile 2"
+    },
+    "sensorBatteryProfile3": {
+        "message": "Battery profile 3"
+    },
+    "sensorStatusGyro": {
+        "message": "Gyroscope"
+    },
+    "sensorStatusGyroShort": {
+        "message": "Gyro",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusAccel": {
+        "message": "Accelerometer"
+    },
+    "sensorStatusAccelShort": {
+        "message": "Accel",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusMag": {
+        "message": "Magnetometer"
+    },
+    "sensorStatusMagShort": {
+        "message": "Mag",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusBaro": {
+        "message": "Barometer"
+    },
+    "sensorStatusBaroShort": {
+        "message": "Baro",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusGPS": {
+        "message": "GPS"
+    },
+    "sensorStatusGPSShort": {
+        "message": "GPS",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorOpticalFlow": {
+        "message": "Optical flow"
+    },
+    "sensorOpticalFlowShort": {
+        "message": "Flow"
+    },
+    "sensorStatusSonar": {
+        "message": "Sonar / Range finder"
+    },
+    "sensorStatusSonarShort": {
+        "message": "Sonar",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorAirspeed": {
+        "message": "Airspeed"
+    },
+    "sensorAirspeedShort": {
+        "message": "Speed"
+    },
+    "sensorBatteryVoltage": {
+        "message": "Battery voltage"
+    },
+    "mainShowLog": {
+        "message": "Show Log"
+    },
+    "waitingForData": {
+        "message": "Waiting for data ..."
     }
 }

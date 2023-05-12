@@ -1,6 +1,6 @@
 <div class="tab-configuration tab-advanced-tuning toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title"><span data-i18n="tabAdvancedTuningTitle">Advanced Tuning</span><span class="airplaneTuningTitle">: Fixed Wing</span><span class="multirotorTuningTitle">: Multirotors</span></div>
+        <div class="tab_title"><span data-i18n="tabAdvancedTuningTitle"></span><span class="airplaneTuningTitle" data-i18n="tabAdvancedTuningAirplaneTuningTitle"></span><span class="multirotorTuningTitle" data-i18n="tabAdvancedTuningMultirotorTuningTitle"></span></div>
 
         <!-- Airplane Advanced Tuning-->
         <div class="airplaneTuning">
@@ -96,7 +96,8 @@
                     </div>
                 </div>
 
-            </div> <!-- left wrapper -->
+            </div>
+            <!-- left wrapper -->
 
             <div class="rightWrapper">
                 <div class="config-section gui_box grey">
@@ -120,7 +121,7 @@
                         </div>
 
                         <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" id="cruiseManualThrottle" data-setting="nav_fw_allow_manual_thr_increase"  data-live="true" />
+                            <input type="checkbox" class="toggle update_preview" id="cruiseManualThrottle" data-setting="nav_fw_allow_manual_thr_increase" data-live="true" />
                             <label for="cruiseManualThrottle"><span data-i18n="cruiseManualThrottleLabel"></span></label>
                             <div for="cruiseManualThrottle" class="helpicon cf_tip" data-i18n_title="cruiseManualThrottleHelp"></div>
                         </div>
@@ -191,7 +192,7 @@
                         </div>
 
                         <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" id="soarMotorStop" data-setting="nav_fw_soaring_motor_stop"  data-live="true" />
+                            <input type="checkbox" class="toggle update_preview" id="soarMotorStop" data-setting="nav_fw_soaring_motor_stop" data-live="true" />
                             <label for="soarMotorStop"><span data-i18n="soarMotorStop"></span></label>
                             <div for="soarMotorStop" class="helpicon cf_tip" data-i18n_title="soarMotorStopHelp"></div>
                         </div>
@@ -204,10 +205,12 @@
 
                     </div>
                 </div>
-            </div> <!-- right wrapper -->
+            </div>
+            <!-- right wrapper -->
 
             <div class="clear-both"></div>
-        </div> <!-- Airplane Advanced Tuning -->
+        </div>
+        <!-- Airplane Advanced Tuning -->
 
         <!-- Multirotor Advanced tuning -->
         <div class="multirotorTuning">
@@ -255,7 +258,8 @@
                         </div>
                     </div>
                 </div>
-            </div> <!-- left wrapper -->
+            </div>
+            <!-- left wrapper -->
 
             <div class="rightWrapper">
                 <div class="config-section gui_box grey">
@@ -295,7 +299,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="brakingBoostSpeedThreshold" type="number" data-unit="cms"data-setting="nav_mc_braking_boost_speed_threshold" data-setting-multiplier="1" step="1" min="100" max="1000" />
+                            <input id="brakingBoostSpeedThreshold" type="number" data-unit="cms" data-setting="nav_mc_braking_boost_speed_threshold" data-setting-multiplier="1" step="1" min="100" max="1000" />
                             <label for="brakingBoostSpeedThreshold"><span data-i18n="brakingBoostSpeedThreshold"></span></label>
                             <div for="brakingBoostSpeedThreshold" class="helpicon cf_tip" data-i18n_title="brakingBoostSpeedThresholdTip"></div>
                         </div>
@@ -314,10 +318,12 @@
 
                     </div>
                 </div>
-            </div> <!-- right wrapper -->
+            </div>
+            <!-- right wrapper -->
 
             <div class="clear-both"></div>
-        </div> <!-- Multirotor Advanced Tuning -->
+        </div>
+        <!-- Multirotor Advanced Tuning -->
 
         <!-- Common tuning -->
         <div class="tab_subtitle" data-i18n="tabAdvancedTuningGenericTitle">Advanced Tuning: Generic settings</div>
@@ -341,7 +347,7 @@
                             <div for="rthAltitude" class="helpicon cf_tip" data-i18n_title="rthAltitudeHelp"></div>
                         </div>
 
-                         <div class="number">
+                        <div class="number">
                             <input type="number" id="rthHomeAltitude" data-unit="cm" data-setting="nav_rth_home_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
                             <label for="rthHomeAltitude"><span data-i18n="rthHomeAltitudeLabel"></span></label>
                             <div for="rthHomeAltitude" class="helpicon cf_tip" data-i18n_title="rthHomeAltitudeHelp"></div>
@@ -439,17 +445,18 @@
                             <label for="fsMissionDelay"><span data-i18n="fsMissionDelay"></span></label>
                             <div for="fsMissionDelay" class="helpicon cf_tip" data-i18n_title="fsMissionDelayHelp"></div>
                         </div>
-<!-- 
+                        <!-- 
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="drNavigation" data-setting="inav_allow_dead_reckoning" data-live="true" />
                             <label for="drNavigation"><span data-i18n="drNavigation"></span></label>
                             <div for="drNavigation" class="helpicon cf_tip" data-i18n_title="drNavigationHelp"></div>
                         </div>
--->                    
+-->
                     </div>
                 </div>
 
-            </div> <!-- Left wrapper -->
+            </div>
+            <!-- Left wrapper -->
 
             <div class="rightWrapper">
 
@@ -469,13 +476,13 @@
                             <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
                             <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
                         </div>
-                        
+
                         <div class="number">
                             <input type="number" id="navMaxAltitude" data-unit="cm" data-setting="nav_max_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
                             <label for="navMaxAltitude"><span data-i18n="navMaxAltitude"></span></label>
                             <div for="navMaxAltitude" class="helpicon cf_tip" data-i18n_title="navMaxAltitudeHelp"></div>
                         </div>
-                        
+
                         <div class="select">
                             <select id="navMotorStop" data-setting="nav_overrides_motor_stop"></select>
                             <label for="navMotorStop"><span data-i18n="navMotorStop"></span></label>
@@ -514,7 +521,7 @@
                             <label for="wpEnforceAlt"><span data-i18n="wpEnforceAlt"></span></label>
                             <div for="wpEnforceAlt" class="helpicon cf_tip" data-i18n_title="wpEnforceAltHelp"></div>
                         </div>
-                        
+
                         <div class="number">
                             <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
                             <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
@@ -526,7 +533,7 @@
                             <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
                             <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
                         </div>
-                        
+
                         <div class="select">
                             <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
                             <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
@@ -573,9 +580,11 @@
                     </div>
                 </div>
 
-            </div> <!-- Right wrapper -->
+            </div>
+            <!-- Right wrapper -->
 
-        </div> <!-- Common tuning -->
+        </div>
+        <!-- Common tuning -->
 
         <div class="clear-both"></div>
 
