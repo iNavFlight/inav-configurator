@@ -2076,9 +2076,18 @@
     "blackboxButtonSave": {
         "message": "Save and reboot"
     },
-
+    "serialLogging": {
+        "message": "Outboard serial logging device"
+    },
     "serialLoggingSupportedNote": {
         "message": "You can log to an external logging device (such as an OpenLog or compatible clone) by using a serial port. Configure the port on the Ports tab."
+    },
+
+    "onboardLoggingFlashLogger": {
+        "message": "Onboard dataflash chip"
+    },
+    "OnboardSDCard": {
+        "message": "Onboard SD card"
     },
     "sdcardNote": {
         "message": "Flight logs can be recorded to your flight controller's onboard SD card slot."
@@ -2104,6 +2113,9 @@
     },
     "dataflashConfirmEraseNote": {
         "message": "This will erase any Blackbox logs or other data contained in the dataflash which will take about 20 seconds, are you sure?"
+    },
+    "dataflashEraseing": {
+        "message": "Erase in progress, please wait..."
     },
     "dataflashSavingTitle": {
         "message": "Saving dataflash to file"
@@ -2314,6 +2326,9 @@
     },
     "controlAxisThrottle": {
         "message": "Throttle [T]"
+    },
+    "controlAxisMotor": {
+        "message": "Motor"
     },
     "radioChannelShort": {
         "message": "CH "
@@ -3967,8 +3982,23 @@
     "uploadedCharacters": {
         "message": "Uploaded $1 characters"
     },
+    "portsIdentifier": {
+        "message": "Identifier"
+    },
+    "portsConfiguration": {
+        "message": "Data"
+    },
+    "portsTelemetryOut": {
+        "message": "Telemetry"
+    },
+    "portsSerialRx": {
+        "message": "RX"
+    },
     "portColumnSensors": {
         "message": "Sensors"
+    },
+    "portsPeripherals": {
+        "message": "Peripherals"
     },
     "appUpdateNotificationHeader": {
         "message": "New Configurator version available."
@@ -4023,6 +4053,108 @@
     },
     "missionTotalInformationHead": {
         "message": "Total information"
+    },
+    "missionTotalInfoFilenameLoaded": {
+        "message": "Filename loaded:"
+    },
+    "missionTotalInfoDistance": {
+        "message": "Distance (m):"
+    },
+    "missionTotalInfoAvailablePoints": {
+        "message": "Available Points"
+    },
+    "missionTotalInfoMissionValid": {
+        "message": "Mission valid"
+    },
+    "missionDefaultPointAlt": {
+        "message": "Alt (cm): "
+    },
+    "missionDefaultPointSpeed": {
+        "message": "Speed (cm/s): "
+    },
+    "missionDefaultSafeRangeSH": {
+        "message": "Radius (m): "
+    },
+    "missionMultiMissionsInfo": {
+        "message": "Missions Info:"
+    },
+    "missionMultiActiveMission": {
+        "message": "Active Mission:"
+    },
+    "missionMultiMissionNo": {
+        "message": "Mission No."
+    },
+    "missionMultiUpdateAll": {
+        "message": "Update All"
+    },
+    "missionMultiAddNewMission": {
+        "message": "Add New Mission"
+    },
+    "missionLevelEarthDEMModel": {
+        "message": "Use Sea Level Earth DEM Model: "
+    },
+    "SafehomeLegend": {
+        "message": "Legend : "
+    },
+    "SafehomeMaxDistance": {
+        "message": "Max distance (m):"
+    },
+    "SafehomeSafeRadius": {
+        "message": "Safe Radius (m):"
+    },
+    "missionTitleHide": {
+        "message": "Hide"
+    },
+    "missionTitleCancel": {
+        "message": "Cancel"
+    },
+    "missionTitleSave": {
+        "message": "Save"
+    },
+    "missionTitlRemove": {
+        "message": "Remove"
+    },
+    "missionTitleLoadMissionFile": {
+        "message": "Load Mission File"
+    },
+    "missionTitleSaveMissionFile": {
+        "message": "Save Mission File"
+    },
+    "missionTitleLoadMissionFromFC": {
+        "message": "Load mission from FC"
+    },
+    "missionTitleSaveMissionToFC": {
+        "message": "Save mission to FC"
+    },
+    "missionTitleLoadEepromMission": {
+        "message": "Load Eeprom mission"
+    },
+    "missionTitleSaveEepromMission": {
+        "message": "Save Eeprom mission"
+    },
+    "missionTitleRemoveAll": {
+        "message": "Remove all"
+    },
+    "missionTitleSetActive": {
+        "message": "Set Active"
+    },
+    "missionTitleUpdateAll": {
+        "message": "Update All"
+    },
+    "missionTitleAdd": {
+        "message": "Add"
+    },
+    "missionTitleMoveToCenterView": {
+        "message": "move to center view"
+    },
+    "missionTitleSaveEepromSafehome": {
+        "message": "Save Eeprom Safehome"
+    },
+    "missionTitleLoadEepromSafehome": {
+        "message": "Load Eeprom Safehome"
+    },
+    "missionTitlEditMission": {
+        "message": "Edit Mission"
     },
     "missionRTHsettingsTitle": {
         "message": "RTH settings"
@@ -4954,7 +5086,212 @@
     "mainShowLog": {
         "message": "Show Log"
     },
+    "mainHideLog": {
+        "message": "Hide Log"
+    },
     "waitingForData": {
         "message": "Waiting for data ..."
+    },
+    "outputStatsTableAcc": {
+        "message": "Acc. noise RMS"
+    },
+    "outputStatsTableCurrent": {
+        "message": "Current [A]"
+    },
+    "outputStatsTableVoltage": {
+        "message": "Voltage [V]"
+    },
+    "LogicConditions": {
+        "message": "Logic Conditions"
+    },
+    "PIDControllers": {
+        "message": "PID Controllers"
+    },
+    "sensorsGyroSelect": {
+        "message": "Gyroscope"
+    },
+    "sensorsAccelSelect": {
+        "message": "Accelerometer"
+    },
+    "sensorsMagSelect": {
+        "message": "Magnetometer"
+    },
+    "sensorsAltitudeSelect": {
+        "message": "Barometer"
+    },
+    "sensorsSonarSelect": {
+        "message": "Sonar"
+    },
+    "sensorsAirSpeedSelect": {
+        "message": "Air speed"
+    },
+    "sensorsTemperaturesSelect": {
+        "message": "Temperatures"
+    },
+
+    "sensorsDebugSelect": {
+        "message": "Debug"
+    },
+    "sensorsDebugTrace": {
+        "message": "Open Debug Trace"
+    },
+    "sensorsGyroscope": {
+        "message": "Gyroscope - deg/s"
+    },
+    "sensorsAccelerometer": {
+        "message": "Accelerometer - g"
+    },
+    "sensorsMagnetometer": {
+        "message": "Magnetometer - Ga"
+    },
+    "sensorsBarometer": {
+        "message": "Barometer - meters"
+    },
+    "sensorsSonar": {
+        "message": "Sonar - cm"
+    },
+    "sensorsAirspeed": {
+        "message": "Air speed - cm/s"
+    },
+    "sensorsTemperature0": {
+        "message": "Temperature 0 - °C"
+    },
+    "sensorsTemperature1": {
+        "message": "Temperature 1 - °C"
+    },
+    "sensorsTemperature2": {
+        "message": "Temperature 2 - °C"
+    },
+    "sensorsTemperature3": {
+        "message": "Temperature 3 - °C"
+    },
+    "sensorsTemperature4": {
+        "message": "Temperature 4 - °C"
+    },
+    "sensorsTemperature5": {
+        "message": "Temperature 5 - °C"
+    },
+    "sensorsTemperature6": {
+        "message": "Temperature 6 - °C"
+    },
+    "sensorsTemperature7": {
+        "message": "Temperature 7 - °C"
+    },
+    "sensorsTemperatureValue": {
+        "message": "value:"
+    },
+    "getRunningOS": {
+        "message": "Running - OS: <strong>"
+    },
+    "getConfiguratorVersion": {
+        "message": "Configurator: <strong>"
+    },
+    "loadedReleaseInfo": {
+        "message": "Loaded release information from GitHub."
+    },
+    "newVersionAvailable": {
+        "message": "New version available!"
+    },
+    "ReceiveTime": {
+        "message": "Receive time: "
+    },
+    "SendTime": {
+        "message": "Send time: "
+    },
+    "ErrorWritingFile": {
+        "message": "<span style=\"color: red\">Error writing file</span>"
+    },
+    "FileSaved": {
+        "message": "File saved"
+    },
+    "selectedTarget": {
+        "message": "selected target = "
+    },
+    "toggledRCs": {
+        "message": "toggled RCs"
+    },
+    "noFirmwareSelectedToLoad": {
+        "message": "<b>No firmware selected to load</b>"
+    },
+    "selectValidSerialPort": {
+        "message": "<span style=\"color: red\">Please select valid serial port</span>'"
+    },
+    "writePermissionsForFile": {
+        "message": "You don\\'t have <span style=\"color: red\">write permissions</span> for this file"
+    },
+    "automaticTargetSelect": {
+        "message": "Attempting automatic target selection"
+    },
+    "notAWAYPOINT": {
+        "message": "Previous selection was not a WAYPOINT!"
+    },
+    "startGettingSafehomePoints": {
+        "message": "Start of getting Safehome points"
+    },
+    "endGettingSafehomePoints": {
+        "message": "End of getting Safehome points"
+    },
+    "startSendingSafehomePoints": {
+        "message": "Start of sending Safehome points"
+    },
+    "endSendingSafehomePoints": {
+        "message": "End of sending Safehome points"
+    },
+    "startGetPoint": {
+        "message": "Start get point"
+    },
+    "startSendPoint": {
+        "message": "Start send point"
+    },
+    "errorReadingFileXml2jsNotFound": {
+        "message": "<span style=\"color: red\">Error reading file (xml2js not found)</span>'"
+    },
+    "errorReadingFile": {
+        "message": "<span style=\"color: red\">Error reading file</span>"
+    },
+    "errorParsingFile": {
+        "message": "<span style=\"color: red\">Error parsing file</span>"
+    },
+    "loadedSuccessfully": {
+        "message": " has been loaded successfully !"
+    },
+    "errorWritingFileXml2jsNotFound": {
+        "message": "<span style=\"color: red\">Error writing file (xml2js not found)</span>"
+    },
+    "savedSuccessfully": {
+        "message": " has been saved successfully !"
+    },
+    "endGetPoint": {
+        "message": "End get point"
+    },
+    "endSendPoint": {
+        "message": "End send point"
+    },
+    "osdSettingsSaved": {
+        "message": "OSD settings saved"
+    },
+    "failedToOpenSerialPort": {
+        "message": "<span style=\"color: red\">Failed</span> to open serial port"
+    },
+    "failedToFlash": {
+        "message": "<span style=\"color: red\">Failed</span> to flash"
+    },
+    "targetPrefetchsuccessful": {
+        "message": "Target prefetch successful: "
+    },
+    "targetPrefetchFail": {
+        "message": "Cannot prefetch target: "
+    },
+    "targetPrefetchFailDFU": {
+        "message": "Cannot prefetch target: Flight Controller in DFU"
+    },
+    "targetPrefetchFailOld": {
+        "message": "Cannot prefetch target: INAV Firmware too old"
+    },
+    "targetPrefetchFailNonINAV": {
+        "message": "Cannot prefetch target: Non-INAV Firmware"
+    },
+    "targetPrefetchFailNoPort": {
+        "message": "Cannot prefetch target: No port"
     }
 }
