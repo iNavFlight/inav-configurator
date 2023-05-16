@@ -1797,7 +1797,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                 } catch (e) {
                     console.log(e);
-                    GUI.log("Previous selection was not a WAYPOINT!");
+                    GUI.log(chrome.i18n.getMessage('notAWAYPOINT'));
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
@@ -2259,25 +2259,25 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromSafehomeButton').on('click', function () {
             $(this).addClass('disabled');
-            GUI.log('Start of getting Safehome points');
+            GUI.log(chrome.i18n.getMessage('startGettingSafehomePoints'));
             mspHelper.loadSafehomes();
             setTimeout(function(){
                 renderSafehomesTable();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
-                GUI.log('End of getting Safehome points');
+                GUI.log(chrome.i18n.getMessage('endGettingSafehomePoints'));
                 $('#loadEepromSafehomeButton').removeClass('disabled');
             }, 500);
 
         });
 
-        $('#saveEepromSafehomeButton').on('click', function () {
+        $('#saveEepromSafehomeButton').on('click', function() {
             $(this).addClass('disabled');
-            GUI.log('Start of sending Safehome points');
+            GUI.log(chrome.i18n.getMessage('startSendingSafehomePoints'));
             mspHelper.saveSafehomes();
             setTimeout(function(){
                 mspHelper.saveToEeprom();
-                GUI.log('End of sending Safehome points');
+                GUI.log(chrome.i18n.getMessage('endSendingSafehomePoints'));
                 $('#saveEepromSafehomeButton').removeClass('disabled');
             }, 500);
         });
@@ -2431,7 +2431,7 @@ TABS.mission_control.initialize = function (callback) {
             if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log('Start get point');
+            GUI.log(chrome.i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(false);
         });
 
@@ -2441,7 +2441,7 @@ TABS.mission_control.initialize = function (callback) {
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log('Start send point');
+            GUI.log(chrome.i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(false);
         });
 
@@ -2450,7 +2450,7 @@ TABS.mission_control.initialize = function (callback) {
             if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log('Start get point');
+            GUI.log(chrome.i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(true);
         });
 
@@ -2460,7 +2460,7 @@ TABS.mission_control.initialize = function (callback) {
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log('Start send point');
+            GUI.log(chrome.i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
         });
 
@@ -2494,17 +2494,17 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     function loadMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log('<span style="color: red">Error reading file (xml2js not found)</span>');
+        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorReadingFileXml2jsNotFound'));
 
         fs.readFile(filename, (err, data) => {
             if (err) {
-                GUI.log('<span style="color: red">Error reading file</span>');
+                GUI.log(chrome.i18n.getMessage('errorReadingFile'));
                 return console.error(err);
             }
 
             window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
-                    GUI.log('<span style="color: red">Error parsing file</span>');
+                    GUI.log(chrome.i18n.getMessage('errorParsingFile'));
                     return console.error(err);
                 }
 
@@ -2636,7 +2636,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
-                GUI.log(sFilename+' has been loaded successfully !');
+                GUI.log(sFilename + chrome.i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
         });
@@ -2644,7 +2644,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function saveMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log('<span style="color: red">Error writing file (xml2js not found)</span>');
+        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorWritingFileXml2jsNotFound'));
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
@@ -2693,11 +2693,11 @@ TABS.mission_control.initialize = function (callback) {
         xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {
             if (err) {
-                GUI.log('<span style="color: red">Error writing file</span>');
+                GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
             let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename+' has been saved successfully !');
+            GUI.log(sFilename + chrome.i18n.getMessage('savedSuccessfully'));
             updateFilename(sFilename);
         });
     }
@@ -2715,7 +2715,7 @@ TABS.mission_control.initialize = function (callback) {
 
         function getWaypointData() {
             mspHelper.loadWaypoints(function() {
-                GUI.log('End get point');
+                GUI.log(chrome.i18n.getMessage('endGetPoint'));
                 if (loadEeprom) {
                     GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
                     $('#loadEepromMissionButton').removeClass('disabled');
@@ -2757,7 +2757,7 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANNER.copy(mission);
         MISSION_PLANNER.update(false, true, true);
         mspHelper.saveWaypoints(function() {
-            GUI.log('End send point');
+            GUI.log(chrome.i18n.getMessage('endSendPoint'));
             if (saveEeprom) {
                 $('#saveEepromMissionButton').removeClass('disabled');
                 GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));

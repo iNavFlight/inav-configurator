@@ -3003,7 +3003,7 @@ var mspHelper = (function (gui) {
             if (waypointId < MISSION_PLANNER.getCountBusyPoints()) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, loadWaypoint);
             } else {
-                GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
+                GUI.log(chrome.i18n.getMessage('ReceiveTime') + (new Date().getTime() - startTime) + 'ms');
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
@@ -3025,7 +3025,7 @@ var mspHelper = (function (gui) {
         };
 
         function endMission() {
-            GUI.log('Send time: ' + (new Date().getTime() - startTime) + 'ms');
+            GUI.log(chrome.i18n.getMessage('SendTime') + (new Date().getTime() - startTime) + 'ms');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };
