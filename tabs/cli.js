@@ -172,10 +172,10 @@ TABS.cli.initialize = function (callback) {
 
                 fs.writeFile(result, self.outputHistory, (err) => {
                     if (err) {
-                        GUI.log('<span style="color: red">Error writing file</span>');
+                        GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
                     }
-                    GUI.log('File saved');
+                    GUI.log(chrome.i18n.getMessage('FileSaved'));
                 });
 
             });
@@ -250,7 +250,7 @@ TABS.cli.initialize = function (callback) {
 
                 fs.readFile(result, (err, data) => {
                     if (err) {
-                        GUI.log('<span style="color: red">Error reading file</span>');
+                        GUI.log(chrome.i18n.getMessage('ErrorReadingFile'));
                         return console.error(err);
                     }
 

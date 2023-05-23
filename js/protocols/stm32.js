@@ -81,7 +81,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
                 self.initialize();
             } else {
-                GUI.log('<span style="color: red">Failed</span> to open serial port');
+                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
             }
         });
     } else {
@@ -108,7 +108,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                                     retries++;
                                     if (retries > maxRetries) {
                                         clearInterval(interval);
-                                        GUI.log('<span style="color: red">Failed</span> to flash ' + port);
+                                            GUI.log(chrome.i18n.getMessage('failedToFlash') + port);
                                     }
                                 }
                                 // Check for DFU devices
@@ -145,7 +145,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                     });
                 });
             } else {
-                GUI.log('<span style="color: red">Failed</span> to open serial port');
+                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
             }
         });
     }
