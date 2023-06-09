@@ -336,6 +336,8 @@ STM32DFU_protocol.prototype.getChipInfo = function (_interface, callback) {
             // H750 SPRacing H7 EXST: "@External Flash /0x90000000/998*128Kg,1*128Kg,4*128Kg,21*128Ka"
             // H750 SPRacing H7 EXST: "@External Flash /0x90000000/1001*128Kg,3*128Kg,20*128Ka" - Early BL firmware with incorrect string, treat as above.
 
+            // AT32F435: "@Internal Flash   /0x08000000/512*002Kg,@Option byte   /0x1FFFC000/01*512 g"
+
             // H750 Partitions: Flash, Config, Firmware, 1x BB Management block + x BB Replacement blocks)
             if (str == "@External Flash /0x90000000/1001*128Kg,3*128Kg,20*128Ka") {
                 str = "@External Flash /0x90000000/998*128Kg,1*128Kg,4*128Kg,21*128Ka";
@@ -617,6 +619,11 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
             });
             break;
         case 1:
+            // workaroud for AT32
+            if (typeof self.chipInfo.option_bytes === "undefined" && typeof self.chipInfo.option_byte !== "undefined") {
+                self.chipInfo.option_bytes = self.chipInfo.option_byte;
+            }
+
             if (typeof self.chipInfo.option_bytes === "undefined") {
                 console.log('Failed to detect option bytes');
                 self.cleanup();

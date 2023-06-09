@@ -889,6 +889,18 @@ li.active .ic_flasher {
     background-image: url("../images/icons/cf_icon_flasher_white.svg");
 }
 
+.ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_grey.svg");
+}
+
+.ic_sitl:hover {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
+}
+
+li.active .ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
+}
+
 .ic_calibration {
     background-image: url(../images/icons/cf_icon_cal_grey.svg);
 }

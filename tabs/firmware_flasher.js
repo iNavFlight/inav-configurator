@@ -405,7 +405,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 GUI.log(chrome.i18n.getMessage('selectValidSerialPort'));
                             }
                         } else {
-                            STM32DFU.connect(usbDevices.STM32DFU, parsed_hex, options);
+                            STM32DFU.connect(usbDevices, parsed_hex, options);
                         }
                     } else {
                         $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
