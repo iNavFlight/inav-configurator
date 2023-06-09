@@ -223,6 +223,9 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
+                    case 'sitl':
+                        TABS.sitl.initialize(content_ready);
+                        break;
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
@@ -411,6 +414,9 @@ $(document).ready(function () {
                         'proxylayer': $(this).val()
                     });
                     globalSettings.proxyLayer = $(this).val();
+                });
+                $('#demoModeReset').on('click', () => {
+                    SITLProcess.deleteEepromFile('demo.bin');
                 });
                 function close_and_cleanup(e) {
                     if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {

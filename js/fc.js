@@ -596,7 +596,8 @@ var FC = {
             'NMEA',
             'UBLOX',
             'UBLOX7',
-            'MSP'
+            'MSP',
+            'FAKE'
         ];
     },
     getGpsBaudRates: function () {
