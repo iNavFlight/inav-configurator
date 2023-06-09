@@ -41,65 +41,59 @@
 
                 <table class="axis-table">
                     <thead>
-                    <tr>
-                        <td style="width: 5%; padding-bottom: 10px;">
-                            <p class="table-title">
-                                Axis
-                            </p>
-                        </td>
-                        <td style="width: 90%; padding-bottom: 10px;">
-                            <p class="table-title">
-                                Slider
-                            </p>
-                        </td>
-                        <td style="width: 5%; padding-bottom: 10px;">
-                            <a class="table-title">
-                                Value [degree]
-                            </a>
+                        <tr>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <p class="table-title">
+                                    <span data-i18n="axisTableTitleAxis"></span>
+                                </p>
+                            </td>
+                            <td style="width: 90%; padding-bottom: 10px;">
+                                <p class="table-title">
+                                    <span data-i18n="axisTableTitleSlider"></span>
+                                </p>
+                            </td>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <a class="table-title">
+                                    <span data-i18n="axisTableTitleValue"></span>
+                                </a>
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td class="info">
-                            <p class="title" data-i18n="configurationSensorAlignmentMagPitch"></p>
-                        </td>
-                        <td>
-                            <div id="roll_slider" class="slider"></div>
-                        </td>
-                        <td>
-                            <input type="number" id="alignRoll" class="tab-magnetometer" data-setting="tz_offset"
-                                   data-setting-multiplier="1"
-                                   step="1" min="-180" max="180"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="info">
-                            <p class="title" data-i18n="configurationSensorAlignmentMagRoll"></p>
-                        </td>
-                        <td>
-                            <div id="pitch_slider" class="slider"></div>
-                        </td>
-                        <td>
-                            <input type="number" id="alignPitch" class="tab-magnetometer" data-setting="tz_offset"
-                                   data-setting-multiplier="1"
-                                   step="1" min="-180" max="180"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="info">
-                            <p class="title" data-i18n="configurationSensorAlignmentMagYaw"></p>
-                        </td>
-                        <td>
-                            <div id="yaw_slider" class="slider"></div>
-                        </td>
-                        <td>
-                            <input type="number" id="alignYaw" class="tab-magnetometer" data-setting="tz_offset"
-                                   data-setting-multiplier="1"
-                                   step="1" min="-180" max="360"/>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagPitch"></p>
+                            </td>
+                            <td>
+                                <div id="roll_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagRoll"></p>
+                            </td>
+                            <td>
+                                <div id="pitch_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagYaw"></p>
+                            </td>
+                            <td>
+                                <div id="yaw_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="alignYaw" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -115,15 +109,15 @@
 <div id="tab-auxiliary-templates">
     <table class="modes">
         <tbody>
-        <tr class="mode">
-            <td class="info">
-                <p class="name"></p>
-                <div class="buttons">
-                    <a class="addRange" href="#" i18n="auxiliaryAddRange"></a>
-                </div>
-            </td>
-            <td class="ranges"></td>
-        </tr>
+            <tr class="mode">
+                <td class="info">
+                    <p class="name"></p>
+                    <div class="buttons">
+                        <a class="addRange" href="#" i18n="auxiliaryAddRange"></a>
+                    </div>
+                </td>
+                <td class="ranges"></td>
+            </tr>
         </tbody>
     </table>
     <div class="range">
@@ -150,7 +144,9 @@
     <table>
         <tr class="modeSection">
             <td colspan="2">
-                <div class="modeSectionArea"><p class="modeSectionName"></p></div>
+                <div class="modeSectionArea">
+                    <p class="modeSectionName"></p>
+                </div>
             </td>
         </tr>
     </table>

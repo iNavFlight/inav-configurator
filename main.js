@@ -85,9 +85,9 @@ $(document).ready(function () {
     }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
-    GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
+    GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
-        'Configurator: <strong>' + chrome.runtime.getManifest().version + '</strong>');
+        chrome.i18n.getMessage('getConfiguratorVersion') + chrome.runtime.getManifest().version + '</strong>');
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
@@ -540,7 +540,7 @@ $(document).ready(function () {
 
         state = true;
     }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
+        $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
     });

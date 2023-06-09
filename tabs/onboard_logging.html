@@ -3,7 +3,7 @@
     <div class="content_wrapper">
         <div class="tab_title" data-i18n="tabOnboardLogging"></div>
         <div class="require-blackbox-unsupported">
-            
+
             <div class="gui_box grey require-blackbox-config-supported">
                 <div class="gui_box_titlebar">
                     <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
@@ -31,22 +31,22 @@
                         <div class="spacer_box_title" data-i18n="blackboxConfiguration"></div>
                     </div>
                     <div class="spacer_box">
-                    <div class="checkbox">
+                        <div class="checkbox">
                             <input checked type="checkbox" data-bit="19" class="feature toggle" name="BLACKBOX" title="BLACKBOX" id="feature-19-2">
                             <label for="feature-19-2">
                                 <span data-i18n="featureBLACKBOX"></span>
                             </label>
                         </div>
-                    <div class="select line blackboxDevice">
-                        <select name="blackbox_device">
+                        <div class="select line blackboxDevice">
+                            <select name="blackbox_device">
                         </select>
-                        <span>Blackbox logging device</span>
-                    </div>
-                    <div class="select line blackboxRate">
-                        <select name="blackbox_rate">
+                            <span i18n="onboardLoggingBlackbox"></span>
+                        </div>
+                        <div class="select line blackboxRate">
+                            <select name="blackbox_rate">
                         </select>
-                        <span>Portion of flight loop iterations to log (logging rate)</span>
-                    </div>
+                            <span i18n="onboardLoggingBlackboxRate"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -56,45 +56,43 @@
                         <div class="spacer_box_title" data-i18n="blackboxFields"></div>
                     </div>
                     <div id="blackBoxFlagsDiv" class="spacer_box config-section">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="gui_box grey">
-            <div class="gui_box_titlebar" align="left">
-                <div class="spacer_box_title">
-                    Outboard serial logging device
+            <div class="gui_box grey">
+                <div class="gui_box_titlebar" align="left">
+                    <div class="spacer_box_title" data-i18n="serialLogging">
+                    </div>
+                </div>
+                <div class="spacer_box">
+                    <p data-i18n="serialLoggingSupportedNote"></p>
                 </div>
             </div>
-            <div class="spacer_box">
-                <p data-i18n="serialLoggingSupportedNote"></p>
-            </div>
-        </div>
-            
-        <div class="gui_box grey require-dataflash-supported">
+
+            <div class="gui_box grey require-dataflash-supported">
                 <div class="gui_box_titlebar" align="left">
-                    <div class="spacer_box_title">
-                        Onboard dataflash chip
+                    <div class="spacer_box_title" data-i18n="onboardLoggingFlashLogger">
                     </div>
                 </div>
                 <div class="spacer_box">
                     <div class="require-dataflash-supported">
                         <p data-i18n="dataflashNote"></p>
-                        
+
                         <dialog class="dataflash-confirm-erase">
                             <h3 data-i18n="dataflashConfirmEraseTitle"></h3>
                             <div class="dataflash-confirm-erase-note" data-i18n="dataflashConfirmEraseNote"></div>
                             <div class="dataflash-erase-progress">
                                 <div class="data-loading">
-                                    <p>Erase in progress, please wait...</p>
+                                    <p data-i18n="dataflashEraseing"></p>
                                 </div>
                             </div>
                             <div class="buttons">
                                 <a href="#" class="erase-flash-confirm regular-button" data-i18n="dataflashButtonEraseConfirm"></a>
-                                <a href="#" class="erase-flash-cancel regular-button" data-i18n="dataflashButtonEraseCancel"></a> 
+                                <a href="#" class="erase-flash-cancel regular-button" data-i18n="dataflashButtonEraseCancel"></a>
                             </div>
                         </dialog>
-                        
+
                         <dialog class="dataflash-saving">
                             <h3 data-i18n="dataflashSavingTitle"></h3>
                             <div class="dataflash-saving-before">
@@ -111,7 +109,7 @@
                                 </div>
                             </div>
                         </dialog>
-                        
+
                         <ul class="dataflash-contents">
                             <li class="dataflash-used">
                                 <div class="legend"></div>
@@ -120,32 +118,31 @@
                                 <div class="legend"></div>
                             </li>
                         </ul>
-                        
+
                         <div>
                             <a class="regular-button erase-flash" href="#" data-i18n="dataflashButtonErase"></a>
                             <a class="regular-button save-flash" href="#" data-i18n="dataflashButtonSaveFile"></a>
                         </div>
                     </div>
-                    
+
                     <p class="require-dataflash-not-present" data-i18n="dataflashNotPresentNote"></p>
                     <p class="require-dataflash-unsupported" data-i18n="dataflashFirmwareUpgradeRequired"></p>
                 </div>
-        </div>
-        <div class="require-sdcard-supported">
-            <div class="gui_box grey">
-                <div class="gui_box_titlebar" align="left">
-                    <div class="spacer_box_title">
-                        Onboard SD card
+            </div>
+            <div class="require-sdcard-supported">
+                <div class="gui_box grey">
+                    <div class="gui_box_titlebar" align="left">
+                        <div class="spacer_box_title" data-i18n="OnboardSDCard">
+                        </div>
                     </div>
-                </div>
-                <div class="spacer_box">
+                    <div class="spacer_box">
                         <div class="sdcard">
                             <div class="sdcard-icon"></div>
                             <div class="sdcard-status"></div>
                         </div>
-                    
+
                         <p data-i18n="sdcardNote"></p>
-                        
+
                         <div class="require-sdcard-ready">
                             <ul class="sdcard-contents">
                                 <li class="sdcard-other">
