@@ -1146,9 +1146,6 @@
     "configurationGPSUseBeidou": {
         "message": "Gps use Beidou Satellites (CN)"
     },
-    "configurationGPSUseGzss": {
-        "message": "Gps use GZSS Satellites (JP)"
-    },
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
     },
