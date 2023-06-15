@@ -41,12 +41,40 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 ### Linux
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for Linux platform (linux32 and linux64 are present)
-1. Extract tar.gz archive
-1. Make the following files executable:
-   * inav-configurator `chmod +x inav-configurator`
-   * (5.0.0+) chrome_crashpad_handler `chmod +x chrome_crashpad_handler`
-1. Run INAV Configurator app from unpacked folder
+2. Download Configurator for Linux platform (linux32 and linux64 are present)
+   *  **.rpm** is the Fedora installation file. Just download and run to install INAV Configurator
+   *  **.deb** is the Debian/Ubuntu installation file. Just download and run to install INAV Configurator
+   *  **.tar.gz** is a universal archive. Download and continue with these instructions to install
+3. Change to the directory containing the downloaded **tar.gz** file
+4. download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
+5. Extract **tar.gz** archive 
+```
+tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
+```
+   **NN** is the bits of your OS. **x.y.z** is the INAV Configurator version number.
+
+6. If this is the first time installing INAV Configurator, create a home for it's files
+```
+sudo mkdir /opt/inav
+sudo chown $USER /opt/inav
+```
+7. Move the temporary files in to their home 
+```
+mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
+```
+8. Update the application icon.
+```
+sudo mkdir /opt/inav/inav-configurator/icon
+sudo cp /opt/inav/inav-configurator/images/inav_icon_128.png /opt/inav/inav-configurator/icon
+```
+9. As a one off, move the desktop file into the applications directory 
+```
+sudo mv inav-configurator.desktop /usr/share/applications/
+```
+10. Make the following files executable:
+   * inav-configurator `chmod +x /opt/inav/inav-configurator/inav-configurator`
+   * (5.0.0+) chrome_crashpad_handler `chmod +x /opt/inav/inav-configurator/chrome_crashpad_handler`
+11. Run INAV Configurator app from unpacked folder
 
 On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:
 
