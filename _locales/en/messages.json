@@ -1144,7 +1144,7 @@
         "message": "Gps use Galileo Satellites (EU)"
     },
     "configurationGPSUseBeidou": {
-        "message": "Gps use Beidou Satellites (CN)"
+        "message": "Gps use BeiDou Satellites (CN)"
     },
     "configurationGPSUseGlonass": {
         "message": "Gps use Glonass Satellites (RU)"
