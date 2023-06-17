@@ -1141,7 +1141,13 @@
         "message": "Protocol"
     },
     "configurationGPSUseGalileo": {
-        "message": "Gps use Galileo Satellites"
+        "message": "Gps use Galileo Satellites (EU)"
+    },
+    "configurationGPSUseBeidou": {
+        "message": "Gps use BeiDou Satellites (CN)"
+    },
+    "configurationGPSUseGlonass": {
+        "message": "Gps use Glonass Satellites (RU)"
     },
     "tzOffset": {
         "message": "Timezone Offset"

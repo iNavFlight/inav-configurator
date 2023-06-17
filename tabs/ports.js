@@ -132,7 +132,8 @@ TABS.ports.initialize = function (callback) {
         '19200',
         '38400',
         '57600',
-        '115200'
+        '115200',
+        '230400'
     ];
 
     var telemetryBaudRates_post1_6_3 = [
