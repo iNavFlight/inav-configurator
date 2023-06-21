@@ -7,7 +7,6 @@ var minimist = require('minimist');
 
 var archiver = require('archiver');
 var del = require('del');
-//var NwBuilder = require('nw-builder');
 var semver = require('semver');
 
 var gulp = require('gulp');
