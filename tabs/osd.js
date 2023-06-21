@@ -423,9 +423,11 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
-function osdmAhdrawnPreview() {
-    let precision = Settings.getInputValue('osd_mah_used_precision');
-    let preview = "1215075".substring(0, precision);
+function osdmAhPrecisionPreview() {
+    let precision = Settings.getInputValue('osd_mah_precision');
+    let rnd = (Math.floor(10000000000000 + Math.random() * 90000000000000)).toString();
+    rnd = rnd.replace('0', '');
+    let preview = rnd.substring(0, precision);
 
     return preview + FONT.symbol(SYM.MAH);
 }
@@ -1306,14 +1308,14 @@ OSD.constants = {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        return osdmAhdrawnPreview();
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
                     name: 'WH_DRAWN',
                     id: 36,
                     preview: function() {
-                        return FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {

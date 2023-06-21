@@ -3371,8 +3371,8 @@
     "osd_main_voltage_decimals": {
         "message": "Voltage Decimals"
     },
-    "osd_mah_used_precision": {
-        "message": "mAh Used Precision"
+    "osd_mah_precision": {
+        "message": "mAh Precision"
     },
     "osd_coordinate_digits": {
         "message": "Coordinate Digits"
