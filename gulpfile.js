@@ -7,7 +7,6 @@ var minimist = require('minimist');
 
 var archiver = require('archiver');
 var del = require('del');
-var NwBuilder = require('nw-builder');
 var semver = require('semver');
 
 var gulp = require('gulp');
@@ -264,6 +263,7 @@ gulp.task('dist',  gulp.series('clean', 'dist-build'));
 
 // Create app directories in ./apps
 gulp.task('apps', gulp.series('dist', function(done) {
+    var NwBuilder = require('nw-builder');
     var builder = new NwBuilder({
         files: './dist/**/*',
         buildDir: appsDir,
