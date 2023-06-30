@@ -92,8 +92,7 @@ var FC = {
             gpsHwStatus: 0,
             rangeHwStatus: 0,
             speedHwStatus: 0,
-            flowHwStatus: 0,
-            imu2HwStatus: 0
+            flowHwStatus: 0
         };
 
         SENSOR_CONFIG = {
@@ -597,7 +596,8 @@ var FC = {
             'NMEA',
             'UBLOX',
             'UBLOX7',
-            'MSP'
+            'MSP',
+            'FAKE'
         ];
     },
     getGpsBaudRates: function () {
@@ -764,6 +764,24 @@ var FC = {
 
         return retVal;
     },
+    getAccelerometerCalibrated: function () {
+        var calibrated = true;
+        var flagNames = FC.getArmingFlags();
+
+        if (CALIBRATION_DATA.accGain.X === 4096 && CALIBRATION_DATA.accGain.Y === 4096 && CALIBRATION_DATA.accGain.Z === 4096 && 
+            CALIBRATION_DATA.accZero.X === 0 && CALIBRATION_DATA.accZero.Y === 0 && CALIBRATION_DATA.accZero.Z === 0
+           ) {
+            calibrated = false;
+        }
+
+        if ((calibrated) && flagNames.hasOwnProperty(13)) {
+            if (bit_check(CONFIG.armingFlags, 13)) {
+                calibrated = false;
+            }
+        }
+
+        return calibrated;
+    },
     getUserControlMode: function () {
         return [
             "Attitude",
@@ -889,19 +907,19 @@ var FC = {
                 output: "boolean"
             },
             1: {
-                name: "Equal",
+                name: "Equal (A = B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
-                name: "Greater Than",
+                name: "Greater Than (A > B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
-                name: "Lower Than",
+                name: "Lower Than (A < B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
@@ -1159,6 +1177,36 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            48: {
+                name: "Delay",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            49: {
+                name: "Timer",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            50: {
+                name: "Delta (|A| >= B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            51: {
+                name: "Approx Equals (A ~ B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1205,24 +1253,21 @@ var FC = {
                     20: "Is Controlling Position",
                     21: "Is Emergency Landing",
                     22: "Is RTH",
-                    23: "Is WP",
-                    24: "Is Landing",
-                    25: "Is Failsafe",
-                    26: "Stabilized Roll",
-                    27: "Stabilized Pitch",
-                    28: "Stabilized Yaw",
-                    29: "Current Waypoint Index",
-                    30: "Current Waypoint Action",
-                    31: "3D home distance [m]",
-                    32: "CRSF LQ",
-                    33: "CRSF SNR",
-                    34: "GPS Valid Fix",
-                    35: "Loiter Radius [cm]",
-                    36: "Active Profile",
-                    37: "Battery cells",
-                    38: "AGL status [0/1]",
-                    39: "AGL [cm]",
-                    40: "Rangefinder [cm]",
+                    23: "Is Landing",
+                    24: "Is Failsafe",
+                    25: "Stabilized Roll",
+                    26: "Stabilized Pitch",
+                    27: "Stabilized Yaw",
+                    28: "3D home distance [m]",
+                    29: "CRSF LQ",
+                    30: "CRSF SNR",
+                    31: "GPS Valid Fix",
+                    32: "Loiter Radius [cm]",
+                    33: "Active Profile",
+                    34: "Battery cells",
+                    35: "AGL status [0/1]",
+                    36: "AGL [cm]",
+                    37: "Rangefinder [cm]",
                 }
             },
             3: {
@@ -1240,7 +1285,12 @@ var FC = {
                     7: "Horizon",
                     8: "Air",
                     9: "USER 1",
-                    10: "USER 2"
+                    10: "USER 2",
+                    11: "Course Hold",
+                    12: "USER 3",
+                    13: "USER 4",
+                    14: "Acro",
+                    15: "Waypoint Mission",
                 }
             },
             4: {
@@ -1260,7 +1310,28 @@ var FC = {
                 type: "range",
                 range: [0, 3],
                 default: 0
-            }
+            },
+            7: {
+                name: "Waypoints",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "Is WP",
+                    1: "Current Waypoint Index",
+                    2: "Current Waypoint Action",
+                    3: "Next Waypoint Action",
+                    4: "Distance to next Waypoint [m]",
+                    5: "Distance from last Waypoint [m]",
+                    6: "Current WP has User Action 1",
+                    7: "Current WP has User Action 2",
+                    8: "Current WP has User Action 3",
+                    9: "Current WP has User Action 4",
+                    10: "Next WP has User Action 1",
+                    11: "Next WP has User Action 2",
+                    12: "Next WP has User Action 3",
+                    13: "Next WP has User Action 4",
+                }
+            },
         }
     },
     getBatteryProfileParameters: function () {
@@ -1279,7 +1350,6 @@ var FC = {
             'throttle_idle',
             'turtle_mode_power_factor',
             'failsafe_throttle',
-            'fw_min_throttle_down_pitch',
             'nav_mc_hover_thr',
             'nav_fw_cruise_thr',
             'nav_fw_min_thr',
@@ -1340,7 +1410,6 @@ var FC = {
             'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
-            'fw_loiter_direction',
             'fw_reference_airspeed',
             'fw_turn_assist_yaw_gain',
             'fw_turn_assist_pitch_gain',

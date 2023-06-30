@@ -42,11 +42,11 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL"];
         modeSections["Navigation Modes"] = ["NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV"];
         modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE", "TURN ASSIST"];
-        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
+        modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL TRIM", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
         modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
-        modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2"];
+        modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
 
     function sort_modes_for_display() {
         // Sort the modes
@@ -137,8 +137,15 @@ TABS.auxiliary.initialize = function (callback) {
         var channelList = $(rangeTemplate).find('.channel');
         var channelOptionTemplate = $(channelList).find('option');
         channelOptionTemplate.remove();
+
+        //add value to autodetect channel
+        let channelOption = channelOptionTemplate.clone();
+        channelOption.text(chrome.i18n.getMessage('auxiliaryAutoChannelSelect'));
+        channelOption.val(-1);
+        channelList.append(channelOption);
+
         for (var channelIndex = 0; channelIndex < auxChannelCount; channelIndex++) {
-            var channelOption = channelOptionTemplate.clone();
+            channelOption = channelOptionTemplate.clone();
             channelOption.text('CH ' + (channelIndex + 5));
             channelOption.val(channelIndex);
             channelList.append(channelOption);
@@ -444,9 +451,49 @@ TABS.auxiliary.initialize = function (callback) {
                 }
             }
 
+           auto_select_channel(RC.channels, RC.active_channels, MISC.rssi_channel);
+
             $(".modeSection").each(function() {
                 $(this).toggle(!hideUnused);
             });
+        }
+
+        /**
+         * Autodetect channel based on maximum deference with previous value
+         * minimum value to autodetect is 100
+         */
+        function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
+            const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
+            if (auto_option.length === 0) {
+                prevChannelsValues = null;
+                return;
+            }
+
+            const fillPrevChannelsValues = function () {
+                prevChannelsValues = RC_channels.slice(0); //clone array
+            };
+
+            if (!prevChannelsValues || RC_channels.length === 0) return fillPrevChannelsValues();
+
+            let diff_array = RC_channels.map(function(currentValue, index) {
+                return Math.abs(prevChannelsValues[index] - currentValue);
+            });
+
+            diff_array = diff_array.slice(0, activeChannels);
+
+            const largest = diff_array.reduce(function(x,y){
+                return (x > y) ? x : y;
+            }, 0);
+
+            //minimum change to autoselect is 100
+            if (largest < 100) return fillPrevChannelsValues();
+
+            const indexOfMaxValue = diff_array.indexOf(largest);
+            if (indexOfMaxValue >= 4 && indexOfMaxValue != RSSI_channel - 1){ //set channel
+                auto_option.parent().val(indexOfMaxValue - 4);
+            }
+
+            return fillPrevChannelsValues();
         }
 
         let hideUnusedModes = false;

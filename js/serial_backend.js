@@ -5,7 +5,8 @@ $(document).ready(function () {
 
     var $port = $('#port'),
         $baud = $('#baud'),
-        $portOverride = $('#port-override');
+        $portOverride = $('#port-override'),
+        isDemoRunning = false;
 
     /*
      * Handle "Wireless" mode with strict queueing of messages
@@ -89,14 +90,14 @@ $(document).ready(function () {
             $('#port-override-label').text("Port");
         }
 
-        if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
+        if (selected_port.data().isDFU || selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
             $baud.hide();
         }
         else {
             $baud.show();
         }        
 
-        if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp) {
+        if (selected_port.data().isBle || selected_port.data().isTcp || selected_port.data().isUdp || selected_port.data().isSitl) {
             $('.tab_firmware_flasher').hide();
         } else {
             $('.tab_firmware_flasher').show();
@@ -104,7 +105,7 @@ $(document).ready(function () {
         var type = ConnectionType.Serial;
         if (selected_port.data().isBle) {
             type = ConnectionType.BLE;
-        } else if (selected_port.data().isTcp) {
+        } else if (selected_port.data().isTcp || selected_port.data().isSitl) {
             type = ConnectionType.TCP;
         } else if (selected_port.data().isUdp) {
             type = ConnectionType.UDP;
@@ -150,10 +151,24 @@ $(document).ready(function () {
 
                     if (selected_port == 'tcp' || selected_port == 'udp') {
                         CONFIGURATOR.connection.connect($portOverride.val(), {}, onOpen);
+                    } else if (selected_port == 'sitl') {
+                        CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, onOpen);
+                    } else if (selected_port == 'sitl-demo') {
+                        if (SITLProcess.isRunning) {
+                            SITLProcess.stop();
+                        }
+                        SITLProcess.start("demo.bin");
+                        this.isDemoRunning = true;
+                        CONFIGURATOR.connection.connect("127.0.0.1:5760", {}, onOpen);
                     } else {
                         CONFIGURATOR.connection.connect(selected_port, {bitrate: selected_baud}, onOpen);
                     }
                 } else {
+                     if (this.isDemoRunning) {
+                        SITLProcess.stop();
+                        this.isDemoRunning = false;
+                     }
+                    
                     var wasConnected = CONFIGURATOR.connectionValid;
 
                     helper.timeout.killAll();
@@ -464,7 +479,6 @@ function sensor_status_ex(hw_status)
     sensor_status_update_icon('.sonar',     '.sonaricon',       hw_status.rangeHwStatus);
     sensor_status_update_icon('.airspeed',  '.airspeedicon',    hw_status.speedHwStatus);
     sensor_status_update_icon('.opflow',    '.opflowicon',      hw_status.flowHwStatus);
-    sensor_status_update_icon('.imu2',      '.imu2icon',        hw_status.imu2HwStatus);
 }
 
 function sensor_status_update_icon(sensId, sensIconId, status)
@@ -499,8 +513,7 @@ function sensor_status_hash(hw_status)
            hw_status.gpsHwStatus +
            hw_status.rangeHwStatus +
            hw_status.speedHwStatus +
-           hw_status.flowHwStatus +
-           hw_status.imu2HwStatus;
+           hw_status.flowHwStatus;
 }
 
 /**
@@ -523,7 +536,6 @@ function sensor_status(sensors_detected) {
     SENSOR_STATUS.rangeHwStatus     = have_sensor(sensors_detected, 'sonar') ? 1 : 0;
     SENSOR_STATUS.speedHwStatus     = have_sensor(sensors_detected, 'airspeed') ? 1 : 0;
     SENSOR_STATUS.flowHwStatus      = have_sensor(sensors_detected, 'opflow') ? 1 : 0;
-    SENSOR_STATUS.imu2HwStatus      = have_sensor(sensors_detected, 'imu2') ? 1 : 0;
     sensor_status_ex(SENSOR_STATUS);
 }
 

@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "minimum_chrome_version": "38",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "author": "Several",
     "name": "INAV - Configurator",
     "short_name": "INAV",
@@ -47,7 +47,8 @@
         "notifications",
         "alwaysOnTopWindows",
         {"usbDevices": [
-            {"vendorId": 1155, "productId": 57105}
+            {"vendorId": 1155, "productId": 57105},
+            {"vendorId": 11836, "productId": 57105}
         ]}
     ],
 

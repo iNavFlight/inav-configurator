@@ -1,6 +1,6 @@
 <div class="tab-configuration tab-advanced-tuning toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title"><span data-i18n="tabAdvancedTuningTitle">Advanced Tuning</span><span class="airplaneTuningTitle">: Fixed Wing</span><span class="multirotorTuningTitle">: Multirotors</span></div>
+        <div class="tab_title"><span data-i18n="tabAdvancedTuningTitle"></span><span class="airplaneTuningTitle" data-i18n="tabAdvancedTuningAirplaneTuningTitle"></span><span class="multirotorTuningTitle" data-i18n="tabAdvancedTuningMultirotorTuningTitle"></span></div>
 
         <!-- Airplane Advanced Tuning-->
         <div class="airplaneTuning">
@@ -96,7 +96,8 @@
                     </div>
                 </div>
 
-            </div> <!-- left wrapper -->
+            </div>
+            <!-- left wrapper -->
 
             <div class="rightWrapper">
                 <div class="config-section gui_box grey">
@@ -104,24 +105,6 @@
                         <div class="spacer_box_title" data-i18n="fixedWingNavigationConfiguration"></div>
                     </div>
                     <div class="spacer_box">
-
-                        <div class="number">
-                            <input id="cruiseThrottle" type="number" data-unit="us" data-setting="nav_fw_cruise_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                            <label for="cruiseThrottle"><span data-i18n="cruiseThrottle"></span></label>
-                        </div>
-
-                        <div class="number">
-                            <input id="pitchToThrottle" type="number" data-unit="us" data-setting="nav_fw_pitch2thr" data-setting-multiplier="1" step="1" min="0" max="100" />
-                            <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
-                            <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
-                        </div>
-
-                        <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" id="cruiseManualThrottle" data-setting="nav_fw_allow_manual_thr_increase"  data-live="true" />
-                            <label for="cruiseManualThrottle"><span data-i18n="cruiseManualThrottleLabel"></span></label>
-                            <div for="cruiseManualThrottle" class="helpicon cf_tip" data-i18n_title="cruiseManualThrottleHelp"></div>
-                        </div>
-
                         <div class="number">
                             <input id="minThrottle" type="number" data-unit="us" data-setting="nav_fw_min_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="minThrottle"><span data-i18n="minThrottle"></span></label>
@@ -130,6 +113,29 @@
                         <div class="number">
                             <input id="maxThrottle" type="number" data-unit="us" data-setting="nav_fw_max_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="maxThrottle"><span data-i18n="maxThrottle"></span></label>
+                        </div>
+
+                        <div class="number">
+                            <input id="cruiseThrottle" type="number" data-unit="us" data-setting="nav_fw_cruise_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <label for="cruiseThrottle"><span data-i18n="cruiseThrottle"></span></label>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="cruiseManualThrottle" data-setting="nav_fw_allow_manual_thr_increase" data-live="true" />
+                            <label for="cruiseManualThrottle"><span data-i18n="cruiseManualThrottleLabel"></span></label>
+                            <div for="cruiseManualThrottle" class="helpicon cf_tip" data-i18n_title="cruiseManualThrottleHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input id="minThrottleDownPitch" type="number" data-unit="decideg" data-setting="fw_min_throttle_down_pitch" data-setting-multiplier="1" step="1" min="0" max="450" />
+                            <label for="minThrottleDownPitch"><span data-i18n="minThrottleDownPitch"></span></label>
+                            <div for="minThrottleDownPitch" class="helpicon cf_tip" data-i18n_title="minThrottleDownPitchHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input id="pitchToThrottle" type="number" data-unit="us" data-setting="nav_fw_pitch2thr" data-setting-multiplier="1" step="1" min="0" max="100" />
+                            <label for="pitchToThrottle"><span data-i18n="pitchToThrottle"></span></label>
+                            <div for="pitchToThrottle" class="helpicon cf_tip" data-i18n_title="pitchToThrottleHelp"></div>
                         </div>
 
                         <div class="number">
@@ -142,12 +148,6 @@
                             <input id="pitchToThrottleThreshold" type="number" data-unit="decideg" data-setting="nav_fw_pitch2thr_threshold" data-setting-multiplier="1" step="1" min="0" max="900" />
                             <label for="pitchToThrottleThreshold"><span data-i18n="pitchToThrottleThreshold"></span></label>
                             <div for="pitchToThrottleThreshold" class="helpicon cf_tip" data-i18n_title="pitchToThrottleThresholdHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
-                            <label for="cruiseYawRate"><span data-i18n="cruiseYawRateLabel"></span></label>
-                            <div for="cruiseYawRate" class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
                         </div>
 
                         <div class="number">
@@ -169,6 +169,12 @@
                         </div>
 
                         <div class="number">
+                            <input type="number" id="cruiseYawRate" data-setting="nav_fw_cruise_yaw_rate" data-setting-multiplier="1" step="1" min="0" max="60" />
+                            <label for="cruiseYawRate"><span data-i18n="cruiseYawRateLabel"></span></label>
+                            <div for="cruiseYawRate" class="helpicon cf_tip" data-i18n_title="cruiseYawRateHelp"></div>
+                        </div>
+
+                        <div class="number">
                             <input id="loiterRadius" type="number" data-unit="cm" data-setting="nav_fw_loiter_radius" data-setting-multiplier="1" step="1" min="0" max="30000" />
                             <label for="loiterRadius"><span data-i18n="loiterRadius"></span></label>
                         </div>
@@ -185,13 +191,26 @@
                             <div for="controlSmoothness" class="helpicon cf_tip" data-i18n_title="controlSmoothnessHelp"></div>
                         </div>
 
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="soarMotorStop" data-setting="nav_fw_soaring_motor_stop" data-live="true" />
+                            <label for="soarMotorStop"><span data-i18n="soarMotorStop"></span></label>
+                            <div for="soarMotorStop" class="helpicon cf_tip" data-i18n_title="soarMotorStopHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="soarPitchDeadband" data-unit="deg" data-setting="nav_fw_soaring_pitch_deadband" data-setting-multiplier="1" step="1" min="0" max="15" />
+                            <label for="soarPitchDeadband"><span data-i18n="soarPitchDeadband"></span></label>
+                            <div for="soarPitchDeadband" class="helpicon cf_tip" data-i18n_title="soarPitchDeadbandHelp"></div>
+                        </div>
+
                     </div>
                 </div>
-
-            </div> <!-- right wrapper -->
+            </div>
+            <!-- right wrapper -->
 
             <div class="clear-both"></div>
-        </div> <!-- Airplane Advanced Tuning -->
+        </div>
+        <!-- Airplane Advanced Tuning -->
 
         <!-- Multirotor Advanced tuning -->
         <div class="multirotorTuning">
@@ -239,7 +258,8 @@
                         </div>
                     </div>
                 </div>
-            </div> <!-- left wrapper -->
+            </div>
+            <!-- left wrapper -->
 
             <div class="rightWrapper">
                 <div class="config-section gui_box grey">
@@ -279,7 +299,7 @@
                         </div>
 
                         <div class="number">
-                            <input id="brakingBoostSpeedThreshold" type="number" data-unit="cms"data-setting="nav_mc_braking_boost_speed_threshold" data-setting-multiplier="1" step="1" min="100" max="1000" />
+                            <input id="brakingBoostSpeedThreshold" type="number" data-unit="cms" data-setting="nav_mc_braking_boost_speed_threshold" data-setting-multiplier="1" step="1" min="100" max="1000" />
                             <label for="brakingBoostSpeedThreshold"><span data-i18n="brakingBoostSpeedThreshold"></span></label>
                             <div for="brakingBoostSpeedThreshold" class="helpicon cf_tip" data-i18n_title="brakingBoostSpeedThresholdTip"></div>
                         </div>
@@ -298,10 +318,12 @@
 
                     </div>
                 </div>
-            </div> <!-- right wrapper -->
+            </div>
+            <!-- right wrapper -->
 
             <div class="clear-both"></div>
-        </div> <!-- Multirotor Advanced Tuning -->
+        </div>
+        <!-- Multirotor Advanced Tuning -->
 
         <!-- Common tuning -->
         <div class="tab_subtitle" data-i18n="tabAdvancedTuningGenericTitle">Advanced Tuning: Generic settings</div>
@@ -325,7 +347,7 @@
                             <div for="rthAltitude" class="helpicon cf_tip" data-i18n_title="rthAltitudeHelp"></div>
                         </div>
 
-                         <div class="number">
+                        <div class="number">
                             <input type="number" id="rthHomeAltitude" data-unit="cm" data-setting="nav_rth_home_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
                             <label for="rthHomeAltitude"><span data-i18n="rthHomeAltitudeLabel"></span></label>
                             <div for="rthHomeAltitude" class="helpicon cf_tip" data-i18n_title="rthHomeAltitudeHelp"></div>
@@ -337,6 +359,30 @@
                             <div for="rth-climb-first" class="helpicon cf_tip" data-i18n_title="rthClimbFirstHelp"></div>
                         </div>
 
+                        <div class="select">
+                            <select id="rthTwoStage" data-setting="nav_rth_climb_first_stage_mode"></select>
+                            <label for="rthTwoStage"><span data-i18n="rthTwoStage"></span></label>
+                            <div for="rthTwoStage" class="helpicon cf_tip" data-i18n_title="rthTwoStageHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTwoStageAlt" data-unit="cm" data-setting="nav_rth_climb_first_stage_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="rthTwoStageAlt"><span data-i18n="rthTwoStageAlt"></span></label>
+                            <div for="rthTwoStageAlt" class="helpicon cf_tip" data-i18n_title="rthTwoStageAltHelp"></div>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="rthUseLinearDescent" data-setting="nav_rth_use_linear_descent" data-live="true" />
+                            <label for="rthUseLinearDescent"><span data-i18n="rthUseLinearDescent"></span></label>
+                            <div for="rthUseLinearDescent" class="helpicon cf_tip" data-i18n_title="rthUseLinearDescentHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthLinearDescentStart" data-unit="m" data-setting="nav_rth_linear_descent_start_distance" data-setting-multiplier="1" step="1" min="0" max="10000" />
+                            <label for="rthLinearDescentStart"><span data-i18n="rthLinearDescentStart"></span></label>
+                            <div for="rthLinearDescentStart" class="helpicon cf_tip" data-i18n_title="rthLinearDescentStartHelp"></div>
+                        </div>
+
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="rthClimbIgnoreEmergency" data-setting="nav_rth_climb_ignore_emerg" data-live="true" />
                             <label for="rthClimbIgnoreEmergency"><span data-i18n="rthClimbIgnoreEmergency"></span></label>
@@ -346,6 +392,30 @@
                             <input type="checkbox" class="toggle update_preview" id="rthAltControlOverride" data-setting="nav_rth_alt_control_override" data-live="true" />
                             <label for="rthAltControlOverride"><span data-i18n="rthAltControlOverride"></span></label>
                             <div for="rthAltControlOverride" class="helpicon cf_tip" data-i18n_title="rthAltControlOverrideHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="rthTrackBack" data-setting="nav_rth_trackback_mode"></select>
+                            <label for="rthTrackBack"><span data-i18n="rthTrackBack"></span></label>
+                            <div for="rthTrackBack" class="helpicon cf_tip" data-i18n_title="rthTrackBackHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTrackBackDistance" data-unit="m" data-setting="nav_rth_trackback_distance" data-setting-multiplier="1" step="1" min="50" max="2000" />
+                            <label for="rthTrackBackDistance"><span data-i18n="rthTrackBackDistance"></span></label>
+                            <div for="rthTrackBackDistance" class="helpicon cf_tip" data-i18n_title="rthTrackBackDistanceHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="rthSafeHome" data-setting="safehome_usage_mode"></select>
+                            <label for="rthSafeHome"><span data-i18n="rthSafeHome"></span></label>
+                            <div for="rthSafeHome" class="helpicon cf_tip" data-i18n_title="rthSafeHomeHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="rthTrackBackDistance" data-unit="cm" data-setting="safehome_max_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="rthSafeHomeDistance"><span data-i18n="rthSafeHomeDistance"></span></label>
+                            <div for="rthSafeHomeDistance" class="helpicon cf_tip" data-i18n_title="rthSafeHomeDistanceHelp"></div>
                         </div>
 
                         <div class="checkbox notFixedWingTuning">
@@ -370,10 +440,23 @@
                             <div for="rthAbortThreshold" class="helpicon cf_tip" data-i18n_title="rthAbortThresholdHelp"></div>
                         </div>
 
+                        <div class="number">
+                            <input id="fsMissionDelay" type="number" data-unit="sec" data-setting="failsafe_mission_delay" data-setting-multiplier="1" step="1" min="-1" max="600" />
+                            <label for="fsMissionDelay"><span data-i18n="fsMissionDelay"></span></label>
+                            <div for="fsMissionDelay" class="helpicon cf_tip" data-i18n_title="fsMissionDelayHelp"></div>
+                        </div>
+                        <!-- 
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="drNavigation" data-setting="inav_allow_dead_reckoning" data-live="true" />
+                            <label for="drNavigation"><span data-i18n="drNavigation"></span></label>
+                            <div for="drNavigation" class="helpicon cf_tip" data-i18n_title="drNavigationHelp"></div>
+                        </div>
+-->
                     </div>
                 </div>
 
-            </div> <!-- Left wrapper -->
+            </div>
+            <!-- Left wrapper -->
 
             <div class="rightWrapper">
 
@@ -393,6 +476,19 @@
                             <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
                             <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
                         </div>
+
+                        <div class="number">
+                            <input type="number" id="navMaxAltitude" data-unit="cm" data-setting="nav_max_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <label for="navMaxAltitude"><span data-i18n="navMaxAltitude"></span></label>
+                            <div for="navMaxAltitude" class="helpicon cf_tip" data-i18n_title="navMaxAltitudeHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="navMotorStop" data-setting="nav_overrides_motor_stop"></select>
+                            <label for="navMotorStop"><span data-i18n="navMotorStop"></span></label>
+                            <div for="navMotorStop" class="helpicon cf_tip" data-i18n_title="navMotorStopHelp"></div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -409,9 +505,45 @@
                         </div>
 
                         <div class="number">
-                            <input type="number" id="waypointSafeDistance" data-unit="cm" data-setting="nav_wp_safe_distance" data-setting-multiplier="1" step="1" min="0" max="65000" />
+                            <input type="number" id="waypointSafeDistance" data-unit="m" data-setting="nav_wp_max_safe_distance" data-setting-multiplier="1" step="1" min="0" max="1500" />
                             <label for="waypointSafeDistance"><span data-i18n="waypointSafeDistance"></span></label>
                             <div for="waypointSafeDistance" class="helpicon cf_tip" data-i18n_title="waypointSafeDistanceHelp"></div>
+                        </div>
+
+                        <div class="checkbox">
+                            <input type="checkbox" class="toggle update_preview" id="wpLoadBoot" data-setting="nav_wp_load_on_boot" data-live="true" />
+                            <label for="wpLoadBoot"><span data-i18n="wpLoadBoot"></span></label>
+                            <div for="wpLoadBoot" class="helpicon cf_tip" data-i18n_title="wpLoadBootHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpEnforceAlt" data-unit="cm" data-setting="nav_wp_enforce_altitude" data-setting-multiplier="1" step="1" min="0" max="2000" />
+                            <label for="wpEnforceAlt"><span data-i18n="wpEnforceAlt"></span></label>
+                            <div for="wpEnforceAlt" class="helpicon cf_tip" data-i18n_title="wpEnforceAltHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpTrackingAccuracy" data-setting="nav_fw_wp_tracking_accuracy" data-setting-multiplier="1" step="1" min="0" max="10" />
+                            <label for="wpTrackingAccuracy"><span data-i18n="wpTrackingAccuracy"></span></label>
+                            <div for="wpTrackingAccuracy" class="helpicon cf_tip" data-i18n_title="wpTrackingAccuracyHelp"></div>
+                        </div>
+
+                        <div class="number">
+                            <input type="number" id="wpTrackingAngle" data-unit="deg" data-setting="nav_fw_wp_tracking_max_angle" data-setting-multiplier="1" step="1" min="30" max="80" />
+                            <label for="wpTrackingAngle"><span data-i18n="wpTrackingAngle"></span></label>
+                            <div for="wpTrackingAngle" class="helpicon cf_tip" data-i18n_title="wpTrackingAngleHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="wpTurnSmoothing" data-setting="nav_fw_wp_turn_smoothing"></select>
+                            <label for="wpTurnSmoothing"><span data-i18n="wpTurnSmoothing"></span></label>
+                            <div for="wpTurnSmoothing" class="helpicon cf_tip" data-i18n_title="wpTurnSmoothingHelp"></div>
+                        </div>
+
+                        <div class="select">
+                            <select id="wpRestartMission" data-setting="nav_wp_mission_restart"></select>
+                            <label for="wpRestartMission"><span data-i18n="wpRestartMission"></span></label>
+                            <div for="wpRestartMission" class="helpicon cf_tip" data-i18n_title="wpRestartMissionHelp"></div>
                         </div>
 
                     </div>
@@ -448,9 +580,11 @@
                     </div>
                 </div>
 
-            </div> <!-- Right wrapper -->
+            </div>
+            <!-- Right wrapper -->
 
-        </div> <!-- Common tuning -->
+        </div>
+        <!-- Common tuning -->
 
         <div class="clear-both"></div>
 

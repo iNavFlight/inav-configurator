@@ -76,9 +76,15 @@ TABS.gps.initialize = function (callback) {
 
         gps_protocol_e.change(function () {
             MISC.gps_type = parseInt($(this).val());
+            if (MISC.gps_type == 0) {
+                $('#nmeaWarning').show();
+            } else {
+                $('#nmeaWarning').hide();
+            }
         });
 
         gps_protocol_e.val(MISC.gps_type);
+        gps_protocol_e.change();
 
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (i = 0; i < gpsSbas.length; i++) {

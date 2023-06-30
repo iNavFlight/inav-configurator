@@ -43,8 +43,7 @@ var mspHelper = (function (gui) {
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
         'SMARTPORT_MASTER': 23,
-        'IMU2': 24,
-        'HDZERO_VTX': 25,
+        'MSP_DISPLAYPORT': 25,
     };
 
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
@@ -104,7 +103,6 @@ var mspHelper = (function (gui) {
                 SENSOR_STATUS.rangeHwStatus = data.getUint8(6);
                 SENSOR_STATUS.speedHwStatus = data.getUint8(7);
                 SENSOR_STATUS.flowHwStatus = data.getUint8(8);
-                SENSOR_STATUS.imu2HwStatus = data.getUint8(9);
                 sensor_status_ex(SENSOR_STATUS);
                 break;
 
@@ -477,9 +475,9 @@ var mspHelper = (function (gui) {
                             data.getInt8(i + 13)
                         ));
                     }
-                }   
+                }
                 break;
-            
+
             case MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE:
                 LOGIC_CONDITIONS.put(new LogicCondition(
                     data.getInt8(0),
@@ -777,6 +775,18 @@ var mspHelper = (function (gui) {
                 CONFIG.boardIdentifier = identifier;
                 CONFIG.boardVersion = data.getUint16(offset, 1);
                 offset += 2;
+                if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {
+                    CONFIG.osdUsed = data.getUint8(offset++);
+                    CONFIG.commCompatability = data.getUint8(offset++);
+                    let targetNameLen = data.getUint8(offset++);
+                    let targetName = "";
+                    targetNameLen += offset;
+                    for (offset = offset; offset < targetNameLen; offset++) {
+                        targetName += String.fromCharCode(data.getUint8(offset));
+                    }
+                    CONFIG.target = targetName;
+                }
+
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
@@ -797,7 +807,7 @@ var mspHelper = (function (gui) {
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
-                        blackbox_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
+                        peripherals_baudrate: BAUD_RATES[data.getUint8(offset + 8)]
                     };
 
                     offset += bytesPerPort;
@@ -1018,8 +1028,65 @@ var mspHelper = (function (gui) {
                     }
                 }
                 break;
+            case MSPCodes.MSP2_INAV_LED_STRIP_CONFIG_EX:
+                //noinspection JSUndeclaredVariable
+                LED_STRIP = [];
+
+                var ledCount = data.byteLength / 5;
+                var directionMask,
+                    directions,
+                    directionLetterIndex,
+                    functions,
+                    led;
+
+                for (i = 0; offset < data.byteLength && i < ledCount; i++) {
+                    var mask = data.getUint32(offset, 1);
+                    offset += 4;
+                    var extra = data.getUint8(offset, 1);
+                    offset++;
+
+                    var functionId = (mask >> 8) & 0xFF;
+
+                    functions = [];
+                    for (var baseFunctionLetterIndex = 0; baseFunctionLetterIndex < MSP.ledBaseFunctionLetters.length; baseFunctionLetterIndex++) {
+                        if (functionId == baseFunctionLetterIndex) {
+                            functions.push(MSP.ledBaseFunctionLetters[baseFunctionLetterIndex]);
+                            break;
+                        }
+                    }
+
+                    var overlayMask = (mask >> 16) & 0xFF;
+                    for (var overlayLetterIndex = 0; overlayLetterIndex < MSP.ledOverlayLetters.length; overlayLetterIndex++) {
+                        if (bit_check(overlayMask, overlayLetterIndex)) {
+                            functions.push(MSP.ledOverlayLetters[overlayLetterIndex]);
+                        }
+                    }
+
+                    directionMask = (mask >> 28) & 0xF | ((extra & 0x3) << 4);
+
+                    directions = [];
+                    for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
+                        if (bit_check(directionMask, directionLetterIndex)) {
+                            directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
+                        }
+                    }
+                    led = {
+                        y: (mask) & 0xF,
+                        x: (mask >> 4) & 0xF,
+                        functions: functions,
+                        color: (mask >> 24) & 0xF,
+                        directions: directions,
+                        parameters: (extra >> 2) & 0x3F
+                    };
+
+                    LED_STRIP.push(led);
+                }
+                break;
             case MSPCodes.MSP_SET_LED_STRIP_CONFIG:
                 console.log('Led strip config saved');
+                break;
+            case MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX:
+                console.log('Led strip extended config saved');
                 break;
             case MSPCodes.MSP_LED_COLORS:
 
@@ -1772,7 +1839,7 @@ var mspHelper = (function (gui) {
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.sensors_baudrate));
                     buffer.push(BAUD_RATES.indexOf(serialPort.telemetry_baudrate));
-                    buffer.push(BAUD_RATES.indexOf(serialPort.blackbox_baudrate));
+                    buffer.push(BAUD_RATES.indexOf(serialPort.peripherals_baudrate));
                 }
                 break;
 
@@ -2270,8 +2337,8 @@ var mspHelper = (function (gui) {
         }
     };
 
-    self.loadLogicConditions = function (callback) {   
-        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {        
+    self.loadLogicConditions = function (callback) {
+        if (semver.gte(CONFIG.flightControllerVersion, "5.0.0")) {
             LOGIC_CONDITIONS.flush();
             let idx = 0;
             MSP.send_message(MSPCodes.MSP2_INAV_LOGIC_CONDITIONS_SINGLE, [idx], false, nextLogicCondition);
@@ -2599,11 +2666,12 @@ var mspHelper = (function (gui) {
             buffer.push(ledIndex);
 
             var mask = 0;
+            var extra = 0;
             /*
                 ledDirectionLetters:        ['n', 'e', 's', 'w', 'u', 'd'],      // in LSB bit order
                 ledFunctionLetters:         ['i', 'w', 'f', 'a', 't', 'r', 'c', 'g', 's', 'b', 'l'], // in LSB bit order
                 ledBaseFunctionLetters:     ['c', 'f', 'a', 'l', 's', 'g', 'r', 'h'], // in LSB bit
-                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w'], // in LSB bit
+                ledOverlayLetters:          ['t', 'o', 'b', 'n', 'i', 'w', 'e'], // in LSB bit
 
                 */
             mask |= (led.y << 0);
@@ -2621,29 +2689,32 @@ var mspHelper = (function (gui) {
 
                 bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 12);
+                    mask |= bit_set(mask, bitIndex + 16);
                 }
 
             }
 
-            mask |= (led.color << 18);
+            mask |= (led.color << 24);
 
             for (directionLetterIndex = 0; directionLetterIndex < led.directions.length; directionLetterIndex++) {
 
                 bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 22);
+                    if(bitIndex < 4) {
+                        mask |= bit_set(mask, bitIndex + 28);
+                    } else {
+                        extra |= bit_set(extra, bitIndex - 4);
+                    }
                 }
-
             }
 
-            mask |= (0 << 28); // parameters
-
+            extra |= (0 << 2); // parameters
 
             buffer.push(specificByte(mask, 0));
             buffer.push(specificByte(mask, 1));
             buffer.push(specificByte(mask, 2));
             buffer.push(specificByte(mask, 3));
+            buffer.push(specificByte(extra, 0));
 
             // prepare for next iteration
             ledIndex++;
@@ -2651,7 +2722,7 @@ var mspHelper = (function (gui) {
                 nextFunction = onCompleteCallback;
             }
 
-            MSP.send_message(MSPCodes.MSP_SET_LED_STRIP_CONFIG, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_LED_STRIP_CONFIG_EX, buffer, false, nextFunction);
         }
     };
 
@@ -2932,7 +3003,7 @@ var mspHelper = (function (gui) {
             if (waypointId < MISSION_PLANNER.getCountBusyPoints()) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, loadWaypoint);
             } else {
-                GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
+                GUI.log(chrome.i18n.getMessage('ReceiveTime') + (new Date().getTime() - startTime) + 'ms');
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
@@ -2954,7 +3025,7 @@ var mspHelper = (function (gui) {
         };
 
         function endMission() {
-            GUI.log('Send time: ' + (new Date().getTime() - startTime) + 'ms');
+            GUI.log(chrome.i18n.getMessage('SendTime') + (new Date().getTime() - startTime) + 'ms');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };
@@ -3189,6 +3260,15 @@ var mspHelper = (function (gui) {
     self.loadMotors = function (callback) {
         MSP.send_message(MSPCodes.MSP_MOTOR, false, false, callback);
     };
+
+    self.getTarget = function(callback) {
+        MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function(resp){
+            var target = resp.data.readString();
+            if (callback) {
+                callback(target);
+            }
+        });
+    }
 
     self.getCraftName = function (callback) {
         MSP.send_message(MSPCodes.MSP_NAME, false, false, function (resp) {

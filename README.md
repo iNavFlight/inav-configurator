@@ -95,7 +95,7 @@ To be able to open Inspector, you will need SDK flavours of NW.js
 
 ## Different map providers
 
-INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps, and MapProxy map providers.
+INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps (Aerial View), and MapProxy map providers.
 INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configuerator by himself.
 
 ### How to choose Map provider
@@ -125,6 +125,10 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 	1. Enter MapProxy service URL, eg: http://192.168.145.20/inavmapproxy/service?
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
 1. Once completed, you can zoom in on area you will be flying in while connected to the internet in either GPS or Mission Control tab to save the cache for offline use
+
+## Font Customisation
+
+INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analogue and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analogue** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts, and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analogue](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
 
 ## Notes
 
