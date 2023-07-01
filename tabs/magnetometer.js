@@ -1,5 +1,5 @@
 'use strict';
-/*global chrome,GUI,TABS,nwdialog,$*/
+/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,$*/
 
 TABS.magnetometer = {};
 
@@ -28,6 +28,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadMixerConfig,
+        mspHelper.loadBoardAlignment,
         mspHelper.loadSensorAlignment,
         // Pitch and roll must be inverted
         function (callback) {
@@ -219,6 +220,7 @@ TABS.magnetometer.initialize = function (callback) {
         elementToShow.change(function () {
             const value = parseInt($(this).val());
             self.showMagnetometer = (value == 0);
+            self.render3D();
         });
 
         function clamp(input, min, max) {
@@ -390,8 +392,17 @@ TABS.magnetometer.initialize3D = function () {
 
         gps.visible = self.showMagnetometer;
         xyz.visible = !self.showMagnetometer;
-        gps.rotation.set(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
-        xyz.rotation.set(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
+
+        var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
+
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -BOARD_ALIGNMENT.pitch / 10.0 ), THREE.Math.degToRad( -BOARD_ALIGNMENT.yaw / 10.0 ), THREE.Math.degToRad( -BOARD_ALIGNMENT.roll / 10.0 ), 'YXZ');
+        var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
+ 
+        matrix.multiply(matrix1);
+
+        gps.rotation.setFromRotationMatrix(matrix);
+        xyz.rotation.setFromRotationMatrix(matrix);
 
         // draw
         if (camera != null)

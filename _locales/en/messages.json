@@ -2038,7 +2038,7 @@
         "message": "Magnetometer Alignment"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> Magnetometer alignment is relative to board. Make sure to align board first."
     },
     "magnetometerOrientationPreset": {
         "message": "Orientation presets"
