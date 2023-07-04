@@ -41,12 +41,42 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 ### Linux
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for Linux platform (linux32 and linux64 are present)
-1. Extract tar.gz archive
-1. Make the following files executable:
-   * inav-configurator `chmod +x inav-configurator`
-   * (5.0.0+) chrome_crashpad_handler `chmod +x chrome_crashpad_handler`
-1. Run INAV Configurator app from unpacked folder
+2. Download Configurator for Linux platform (linux32 and linux64 are present)
+   *  **.rpm** is the Fedora installation file. Just download and install using `sudo dnf localinstall /path/to/INAV-Configurator_linux64-x.y.z-x86_64.rpm` or open it with a package manager (e.g. via Files)
+   *  **.deb** is the Debian/Ubuntu installation file. Just download and install using `sudo apt install /path/to/INAV-Configurator_linux64_x.y.z.deb` or open it with a package manager (e.g. via the File Manager)
+   *  **.tar.gz** is a universal archive. Download and continue with these instructions to install
+3. Change to the directory containing the downloaded **tar.gz** file
+4. download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
+5. Extract **tar.gz** archive 
+```
+tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
+```
+   **NN** is the bits of your OS. **x.y.z** is the INAV Configurator version number.
+
+6. If this is the first time installing INAV Configurator, create a home for its files
+```
+sudo mkdir /opt/inav
+sudo chown $USER /opt/inav
+```
+7. Move the temporary files in to their home 
+```
+mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
+```
+8. Update the application icon.
+```
+sudo mkdir /opt/inav/inav-configurator/icon
+sudo cp /opt/inav/inav-configurator/images/inav_icon_128.png /opt/inav/inav-configurator/icon
+```
+9. As a one off, move the desktop file into the applications directory 
+```
+sudo mv inav-configurator.desktop /usr/share/applications/
+```
+10. Make the following files executable:
+   * inav-configurator `chmod +x /opt/inav/inav-configurator/inav-configurator`
+   * (5.0.0+) chrome_crashpad_handler `chmod +x /opt/inav/inav-configurator/chrome_crashpad_handler`
+11. Run INAV Configurator app from unpacked folder `/opt/inav/inav-configurator/inav-configurator`
+
+#### Notes
 
 On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:
 
@@ -54,15 +84,17 @@ On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `lib
 * Debian / Ubuntu: `sudo apt install libatomic1`
 * Fedora: `sudo dnf install libatomic`
 
+1. Dont forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
+2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
+
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
 1. Download Configurator for Mac platform
 1. Extract ZIP archive
 1. Run INAV Configurator
-1. Configurator is not signed, so you have to allow Mac to run untrusted application. There might be a monit for it during first run
 
-## Building and running INAV Configurator locally (for development or Linux users)
+## Building and running INAV Configurator locally (for development)
 
 For local development, **node.js** build system is used.
 
@@ -135,11 +167,6 @@ INAV provides the font images so that custom fonts can be created for your perso
 ### WebGL
 
 Make sure Settings -> System -> "User hardware acceleration when available" is checked to achieve the best performance
-
-### Linux users
-
-1. Dont forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
-2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
 
 ## Issue trackers
 
