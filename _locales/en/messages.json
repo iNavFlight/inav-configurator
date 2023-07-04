@@ -2038,7 +2038,7 @@
         "message": "Magnetometer Alignment"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> Magnetometer alignment is relative to board. Make sure to align board first."
+        "message": "Adjust the magnetometer orientation to match physical orientation on the aircraft.<br/>If magnetometer is not BN-880, adjust according to \"compass direction\" arrow or axis markings on your magnetometer model.<br/><strong>Note:</strong> Magnetometer alignment is relative to board. Make sure to align board first."
     },
     "magnetometerOrientationPreset": {
         "message": "Orientation presets"
