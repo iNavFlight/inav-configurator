@@ -602,6 +602,7 @@ var FC = {
     },
     getGpsBaudRates: function () {
         return [
+            '230400',
             '115200',
             '57600',
             '38400',
