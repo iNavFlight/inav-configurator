@@ -2038,16 +2038,16 @@
         "message": "Magnetometer Alignment"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer orientation to match physical orientation on the aircraft.<br/>If magnetometer is not BN-880, adjust according to \"compass direction\" arrow or axis markings on your magnetometer model.<br/><strong>Note:</strong> Magnetometer alignment is relative to FC. Make sure to align FC first (board_align_yaw, board_align_pitch, board_align_roll)."
+        "message": "Adjust the magnetometer orientation to match physical orientation on the aircraft.<br/>If magnetometer is not BN-880, adjust according to \"compass direction\" arrow or axis markings on your magnetometer model.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (board_align_yaw, board_align_pitch, board_align_roll).<br/>If preset is not used (some of the align_mag_roll, align_mag_pitch or align_mag_yaw are non-zero), magnetometer orientation does not depend on FC orientation."
     },
     "magnetometerOrientationPreset": {
-        "message": "Orientation presets"
+        "message": "Orientation preset (align_mag). Relative to FC orientation"
     },
     "magnetometerInfo": {
         "message": "Select a preset or create a custom configuration moving the sliders"
     },
     "magnetometerElementToShow": {
-        "message": "Element to show"
+        "message": "Element to show: Magnetometer model or axes"
     },
 
     "axisTableTitleAxis": {
