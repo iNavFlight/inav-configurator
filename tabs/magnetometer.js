@@ -50,7 +50,7 @@ TABS.magnetometer.initialize = function (callback) {
         },
         function (callback) {
             mspHelper.getSetting("align_mag_pitch").then(function (data) {
-                self.alignmentConfig.pitch = (parseInt(data.value, 10) / 10) - 180;
+                self.alignmentConfig.pitch = parseInt(data.value, 10) / 10;
             }).then(callback)
         },
         function (callback) {
@@ -65,7 +65,7 @@ TABS.magnetometer.initialize = function (callback) {
     loadChainer.execute();
 
     function areAnglesZero() {
-        return self.alignmentConfig.pitch === -180 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0
+        return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0
     }
 
     function isBoardAlignmentZero() {
@@ -104,7 +104,7 @@ TABS.magnetometer.initialize = function (callback) {
             if (self.isSavePreset)
                 mspHelper.setSetting("align_mag_pitch", 0, callback);
             else
-                mspHelper.setSetting("align_mag_pitch", (180 + self.alignmentConfig.pitch) * 10, callback);
+                mspHelper.setSetting("align_mag_pitch", self.alignmentConfig.pitch * 10, callback);
 
         },
         function (callback) {
@@ -151,7 +151,8 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function toUpperRange(input, max) {
-        while (input + 360 <= max) input +=360;
+        while (input > max) input -= 360;
+        while (input + 360 <= max) input += 360;
         return input;
     }
 
@@ -163,23 +164,23 @@ TABS.magnetometer.initialize = function (callback) {
         //pitch, roll, yaw
         switch (selectedPreset) {
             case 1: //CW0_DEG = 1
-                return [180, 0, 0];
-            case 2: //CW90_DEG = 2
-                return [180, 0, 90];
-            case 3: //CW180_DEG = 3
-                return [180, 0, 180];
-            case 4: //CW270_DEG = 4
-                return [180, 0, 270];
-            case 5: //CW0_DEG_FLIP = 5
                 return [0, 0, 0];
-            case 6: //CW90_DEG_FLIP = 5
+            case 2: //CW90_DEG = 2
                 return [0, 0, 90];
-            case 7: //CW180_DEG_FLIP = 5
+            case 3: //CW180_DEG = 3
                 return [0, 0, 180];
+            case 4: //CW270_DEG = 4
+                return [0, 0, 270];
+            case 5: //CW0_DEG_FLIP = 5
+                return [180, 0, 0];
+            case 6: //CW90_DEG_FLIP = 5
+                return [180, 0, 90];
+            case 7: //CW180_DEG_FLIP = 5
+                return [180, 0, 180];
             case 0: //ALIGN_DEFAULT = 0
             case 8: //CW270_DEG_FLIP = 5
             default://If not recognized, returns defualt
-                return [0, 0, 270];
+                return [180, 0, 270];
         }
     }
 
@@ -193,8 +194,8 @@ TABS.magnetometer.initialize = function (callback) {
         //degree[0] - pitch
         //degree[1] - roll
         //degree[2] - yaw
-        //-pitch, -180 - yaw, roll
-        var magRotation = new THREE.Euler(-THREE.Math.degToRad(degree[0]), THREE.Math.degToRad(-180 - degree[2]), THREE.Math.degToRad(degree[1]), 'YXZ'); 
+        //-(pitch-180), -180 - yaw, roll
+        var magRotation = new THREE.Euler(-THREE.Math.degToRad(degree[0]-180), THREE.Math.degToRad(-180 - degree[2]), THREE.Math.degToRad(degree[1]), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
         var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
@@ -205,7 +206,7 @@ TABS.magnetometer.initialize = function (callback) {
         var euler = new THREE.Euler();
         euler.setFromRotationMatrix(matrix, 'YXZ');
 
-        var pitch = toUpperRange( Math.round( THREE.Math.radToDeg(-euler.x)), 180 );
+        var pitch = toUpperRange( Math.round( THREE.Math.radToDeg(-euler.x)) + 180, 180 );
         var yaw = toUpperRange( Math.round( -180 - THREE.Math.radToDeg(euler.y)), 359 );
         var roll = toUpperRange( Math.round( THREE.Math.radToDeg(euler.z)), 180 );
 
@@ -577,7 +578,7 @@ TABS.magnetometer.initialize3D = function () {
         xyz.visible = !self.showMagnetometer;
         fc.visible = true;
 
-        var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch-180), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
         var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
