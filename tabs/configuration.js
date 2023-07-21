@@ -256,7 +256,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $('a.save').click(function () {
             //UPDATE: moved to GPS tab and hidden
-            MISC.mag_declination = parseFloat($('#mag_declination').val());
+            //MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
 
