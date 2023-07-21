@@ -20,6 +20,72 @@
         </div>
         <div class="config-section gui_box grey">
             <div class="spacer_box">
+                <div id="board-alignment-info" class="info-box">
+                    <span data-i18n="boardInfo"></span>
+                </div>
+
+                <table class="axis-table">
+                    <thead>
+                        <tr>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <p class="table-title">
+                                    <span data-i18n="axisTableTitleAxis"></span>
+                                </p>
+                            </td>
+                            <td style="width: 90%; padding-bottom: 10px;">
+                                <p class="table-title">
+                                    <span data-i18n="axisTableTitleSlider"></span>
+                                </p>
+                            </td>
+                            <td style="width: 5%; padding-bottom: 10px;">
+                                <a class="table-title">
+                                    <span data-i18n="axisTableTitleValue"></span>
+                                </a>
+
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagPitch"></p>
+                            </td>
+                            <td>
+                                <div id="board_roll_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagRoll"></p>
+                            </td>
+                            <td>
+                                <div id="board_pitch_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="info">
+                                <p class="title" data-i18n="configurationSensorAlignmentMagYaw"></p>
+                            </td>
+                            <td>
+                                <div id="board_yaw_slider" class="slider"></div>
+                            </td>
+                            <td>
+                                <input type="number" id="boardAlignYaw" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="config-section gui_box grey">
+            <div class="spacer_box">
                 <div id="alignment-info" class="info-box">
                     <span data-i18n="magnetometerInfo"></span>
                 </div>
@@ -69,7 +135,7 @@
                                 <div id="roll_slider" class="slider"></div>
                             </td>
                             <td>
-                                <input type="number" id="alignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                                <input type="number" id="alignRoll" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
                             </td>
                         </tr>
                         <tr>
@@ -80,7 +146,7 @@
                                 <div id="pitch_slider" class="slider"></div>
                             </td>
                             <td>
-                                <input type="number" id="alignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="180" />
+                                <input type="number" id="alignPitch" class="tab-magnetometer" data-setting="tz_offset" data-setting-multiplier="1" step="1" min="-180" max="360" />
                             </td>
                         </tr>
                         <tr>
