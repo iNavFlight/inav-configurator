@@ -3419,6 +3419,9 @@
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
     },
+    "osd_hud_radar_disp": {
+        "message": "Maximum number of radar elements on screen. 0 to disable."
+    },
     "osd_alarms": {
         "message": "Alarms"
     },
