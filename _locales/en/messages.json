@@ -3419,8 +3419,23 @@
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
     },
+    "osd_hud_settings": {
+        "message": "Heads up Display settings"
+    },
+    "osd_hud_settings_HELP": {
+        "message": "This section allows tweaking the behavior of HUD elements."
+    },
     "osd_hud_radar_disp": {
-        "message": "Maximum number of radar elements on screen. 0 to disable."
+        "message": "Maximum number of radar elements on screen."
+    },
+    "osd_hud_radar_disp_help": {
+        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+    },
+    "osd_hud_wp_disp": {
+        "message": "Maximum number of waypoint elements on screen."
+    },
+    "osd_hud_wp_disp_help": {
+        "message": "Number of Wayponts to show on screen. 0 disables this feature."
     },
     "osd_alarms": {
         "message": "Alarms"
