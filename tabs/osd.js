@@ -1681,7 +1681,12 @@ OSD.constants = {
                     name: 'MAP_REFERENCE',
                     id: 99,
                     preview: FONT.symbol(SYM.DIRECTION) + '\nN',
-                },
+                }
+            ],
+        },
+        {
+            name: 'osdGroupHud',
+            items: [
                 {
                     name: 'HOMING',
                     id: 144,
@@ -1702,7 +1707,7 @@ OSD.constants = {
                     id: 147,
                     positionable: false
                 }
-            ],
+            ]
         },
         {
             name: 'osdGroupVTX',

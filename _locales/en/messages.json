@@ -3593,6 +3593,9 @@
     "osdGroupMapsAndRadars": {
         "message": "Maps and Radars"
     },
+    "osdGroupHud": {
+        "message": "Heads up display"
+    },
     "osdGroupMapsAndRadars_HELP": {
         "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
     },
