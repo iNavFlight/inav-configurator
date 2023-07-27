@@ -3594,7 +3594,15 @@
         "message": "Maps and Radars"
     },
     "osdGroupHud": {
-        "message": "Heads up display"
+        "message": "Heads up Display"
+    },
+    "osdGroupHud_HELP":
+    {
+        "message": "HUD elements are positioned around the center of the screen and move as their position in relation to the aircraft changes."
+    },
+    "osdElement_INAV_RADAR":
+    {
+        "message": "INAV Radar/FormationFlight"
     },
     "osdGroupMapsAndRadars_HELP": {
         "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
