@@ -3426,10 +3426,10 @@
         "message": "This section allows tweaking the behavior of HUD elements."
     },
     "osd_hud_radar_disp": {
-        "message": "Maximum number of radar elements on screen."
+        "message": "Maximum count of nearby aircrafts to display in the HUD. The nearby aircrafts will appear as markers A, B, C, etc"
     },
     "osd_hud_radar_disp_help": {
-        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+        "message": "This is used for INAV Radar/FormationFlight."
     },
 
     "osd_hud_radar_range_min": {
@@ -3451,7 +3451,7 @@
         "message": "Maximum number of waypoint elements on screen."
     },
     "osd_hud_wp_disp_help": {
-        "message": "Number of Wayponts to show on screen. 0 disables this feature."
+        "message": "How many navigation waypoints are displayed in the HUD. As sample, if set to 2, and you just passed the 3rd waypoint of the mission, you'll see markers for the 4th waypoint (marked 1) and the 5th waypoint (marked 2)"
     },
     "osd_camera_fov_h": {
         "message": "Camera Horizontal FOV"
