@@ -1207,6 +1207,12 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },        
         }
     },
     getOperandTypes: function () {
