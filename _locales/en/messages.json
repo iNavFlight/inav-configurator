@@ -3431,12 +3431,42 @@
     "osd_hud_radar_disp_help": {
         "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
     },
+
+    "osd_hud_radar_range_min": {
+        "message": "Minimum radar range"
+    },
+    "osd_hud_radar_range_min_help": {
+        "message": "Radar aircrafts closer than this will not be displayed in the HUD."
+    },
+
+    "osd_hud_radar_range_max": {
+        "message": "Maximum radar range"
+    },
+    "osd_hud_radar_range_max_help": {
+        "message": "Radar aircrafts further away than this will not be displayed in the HUD."
+    },
+
+
     "osd_hud_wp_disp": {
         "message": "Maximum number of waypoint elements on screen."
     },
     "osd_hud_wp_disp_help": {
         "message": "Number of Wayponts to show on screen. 0 disables this feature."
     },
+    "osd_camera_fov_h": {
+        "message": "Camera Horizontal FOV"
+    },
+    "osd_camera_fov_h_help": {
+        "message": "Camera Horizontal Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+    "osd_camera_fov_v": {
+        "message": "Camera Vertical FOV"
+    },
+    "osd_camera_fov_v_help": {
+        "message": "Camera Vertical Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+
+
     "osd_alarms": {
         "message": "Alarms"
     },
