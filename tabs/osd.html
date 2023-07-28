@@ -114,11 +114,6 @@
                                 <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
                                 <span data-i18n="osd_crosshairs_style"></span>
                             </label>
-                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
-                            <label>
-                                <select class="update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
-                                <span data-i18n="osd_horizon_offset"></span>
-                            </label>
                             <label>
                                 <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select>
                                 <span data-i18n="osd_left_sidebar_scroll"></span>
@@ -346,6 +341,56 @@
                         </div>
                     </div>
                 </div>
+                <div class="gui_box grey hud-settings-container"> 
+                    <div class="gui_box_titlebar">
+                        <div for="osd_hud_settings" class="helpicon cf_tip" data-i18n_title="osd_hud_settings_HELP"></div>
+                        <div class="spacer_box_title" data-i18n="osd_hud_settings"></div>
+                    </div>
+                    <div class="spacer_box settings">
+                        <div id="osd_hud_settings">
+                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
+                            <label>
+                                <select class="update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
+                                <span data-i18n="osd_horizon_offset"></span>
+                            </label>
+                            <div for="osd_hud_wp_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_wp_disp_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_wp_disp"></span>
+                            </label>
+                            <div for="osd_hud_radar_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_disp_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_disp"></span>
+                            </label>
+
+                            <div for="osd_hud_radar_range_min" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_min_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_range_min"></span>
+                            </label>
+                            <div for="osd_hud_radar_range_max" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_max_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_range_max"></span>
+                            </label>
+
+                            <div for="osd_camera_fov_h" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_h_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_camera_fov_h"></span>
+                            </label>
+                            <div for="osd_camera_fov_v" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_v_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_camera_fov_v"></span>
+                            </label>
+
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
                 <div class="font-picker" style="margin-bottom: 10px;">
