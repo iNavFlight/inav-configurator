@@ -3453,6 +3453,12 @@
     "osd_hud_wp_disp_help": {
         "message": "Number of Wayponts to show on screen. 0 disables this feature."
     },
+    "osd_camera_uptilt": {
+        "message": "Camera uptilt"
+    },
+    "osd_camera_uptilt_help": {
+        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+    },
     "osd_camera_fov_h": {
         "message": "Camera Horizontal FOV"
     },
