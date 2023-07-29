@@ -1,5 +1,5 @@
 'use strict';
-/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,$*/
+/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,helper,$*/
 
 TABS.magnetometer = {};
 
@@ -314,6 +314,10 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.pitch_slider = $('#pitch_slider');
         self.pageElements.yaw_slider = $('#yaw_slider');
 
+        self.roll_e = $('dd.roll'),
+        self.pitch_e = $('dd.pitch'),
+        self.heading_e = $('dd.heading');
+
         for (i = 0; i < alignments.length; i++) {
             self.pageElements.orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
@@ -507,6 +511,21 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.yaw_slider.on('slide', (e) => {
             disableSavePreset();
         });
+
+        function get_fast_data() {
+            if (helper.mspQueue.shouldDrop()) {
+                return;
+            }
+
+            MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
+	            self.roll_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
+	            self.pitch_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
+                self.heading_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
+                self.render3D();
+            });
+        }
+
+        helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
         GUI.content_ready(callback);
     }
