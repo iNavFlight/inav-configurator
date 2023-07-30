@@ -1315,7 +1315,7 @@ OSD.constants = {
                     name: 'WH_DRAWN',
                     id: 36,
                     preview: function() {
-                        return osdmAhPrecisionPreview();
+                        return FONT.embed_dot('1.25') + FONT.symbol(SYM.WH);
                     }
                 },
                 {
@@ -1329,7 +1329,7 @@ OSD.constants = {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
                     preview: function() {
-                        return '1276' + FONT.symbol(SYM.MAH); // 4 chars
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
