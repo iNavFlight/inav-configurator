@@ -775,18 +775,23 @@ var mspHelper = (function (gui) {
                 CONFIG.boardIdentifier = identifier;
                 CONFIG.boardVersion = data.getUint16(offset, 1);
                 offset += 2;
+                // woga65: Get full target name/identifier in any case. 
+                //         Also, determine whether target is variable pitch.
                 if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {
                     CONFIG.osdUsed = data.getUint8(offset++);
                     CONFIG.commCompatability = data.getUint8(offset++);
-                    let targetNameLen = data.getUint8(offset++);
-                    let targetName = "";
-                    targetNameLen += offset;
-                    for (offset = offset; offset < targetNameLen; offset++) {
-                        targetName += String.fromCharCode(data.getUint8(offset));
-                    }
-                    CONFIG.target = targetName;
+                    offset++;
+                } else {
+                    offset += 3;
+                }                
+                TARGET.fullIdentifier = "";
+                for (let i = offset; i < data.byteLength; i++) {
+                    TARGET.fullIdentifier += String.fromCharCode(data.getUint8(i));
                 }
-
+                TARGET.isVariablePitch = TARGET.fullIdentifier.includes('_VP');
+                if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {   //keep INAV's contributor's (MrD-RC) original
+                    CONFIG.target = TARGET.fullIdentifier;                  //state of variables in case it's needed
+                }
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:

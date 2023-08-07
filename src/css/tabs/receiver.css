@@ -43,7 +43,8 @@
 }
 
 .tab-receiver .bars .meter {
-    width: calc(97% - 60px);
+    width: calc(97% - 70px);
+    padding-left: 10px;
 }
 
 .tab-receiver .bars .meter-bar {

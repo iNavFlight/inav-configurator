@@ -79,8 +79,12 @@ TABS.outputs.initialize = function (callback) {
         finalize();
     }
 
+    //woga65: if craft is variable pitch, output raw output values rather than percentages
     function getMotorOutputValue(value) {
 
+        if (TARGET.isVariablePitch) {
+            return value;
+        } 
         if (!self.feature3DEnabled) {
             let valueNormalized = value - MISC.mincommand;
             let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;

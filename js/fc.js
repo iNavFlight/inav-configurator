@@ -1,6 +1,11 @@
 'use strict';
 
 // define all the global variables that are uses to hold FC state
+const TARGET = {  // woga65: info about the target variant
+    fullIdentifier: "",
+    isVariablePitch: false,
+}
+
 var CONFIG,
     LED_STRIP,
     LED_COLORS,
@@ -818,7 +823,9 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        return ['A', 'E', 'R', 'T', '1', '2', '3', '4'];    //woga65: rc-channel remapping
+        return TARGET.isVariablePitch                       //woga65: rc-channel remapping
+            ? ['A', 'E', 'R', 'T', '1', '2', 'C', 'G']      //if variable pitch, map collective + gyro gain
+            : ['A', 'E', 'R', 'T', '1', '2', '3', '4'];     //else map AUX3 + AUX4
     },
     isRcMapValid: function (val) {
         var strBuffer = val.split(''),
@@ -852,8 +859,8 @@ var FC = {
             'RC Throttle',          // 7
             'RC Channel 5',         // 8
             'RC Channel 6',         // 9
-            'RC Channel 7',         // 10
-            'RC Channel 8',         // 11
+            TARGET.isVariablePitch ? 'RC Collective Pitch' : 'RC Channel 7',    // 10   // woga65: channel naming for either
+            TARGET.isVariablePitch ? 'RC Gyro Gain' : 'RC Channel 8',           // 11   // variable pitch or regular aircraft
             'Gimbal Pitch',         // 12
             'Gimbal Roll',          // 13
             'Flaperon Mode',        // 14
