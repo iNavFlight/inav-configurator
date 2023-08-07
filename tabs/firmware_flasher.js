@@ -170,8 +170,9 @@ TABS.firmware_flasher.initialize = function (callback) {
             TABS.firmware_flasher.releases = releases;
             return;
         };
-
-        $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
+        // woga65: load firmware (pre)releases from variable pitch repository
+        //$.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
+        $.get('https://api.github.com/repos/Woga65/inav/releases?per_page=10', function (releasesData){
             TABS.firmware_flasher.releasesData = releasesData;
             buildBoardOptions();
 
