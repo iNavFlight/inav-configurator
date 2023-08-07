@@ -818,7 +818,7 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        return ['A', 'E', 'R', 'T'];
+        return ['A', 'E', 'R', 'T', '1', '2', '3', '4'];    //woga65: rc-channel remapping
     },
     isRcMapValid: function (val) {
         var strBuffer = val.split(''),
