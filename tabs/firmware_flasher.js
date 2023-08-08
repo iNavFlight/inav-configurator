@@ -293,8 +293,9 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('a.flash_firmware').removeClass('disabled');
 
-                        if (summary.commit) {
-                            $.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
+                        if (summary.commit) {   //woga65:
+                            //$.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
+                            $.get('https://api.github.com/repos/Woga65/inav/commits/' + summary.commit, function (data) {                                
                                 var data = data,
                                     d = new Date(data.commit.author.date),
                                     offset = d.getTimezoneOffset() / 60,
@@ -306,8 +307,10 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                                 $('div.git_info .committer').text(data.commit.author.name);
                                 $('div.git_info .date').text(date);
-                                $('div.git_info .hash').text(data.sha.slice(0, 7)).prop('href', 'https://api.github.com/repos/iNavFlight/inav/commit/' + data.sha);
-
+                                //$('div.git_info .hash').text(data.sha.slice(0, 7)).prop('href', 'https://api.github.com/repos/iNavFlight/inav/commit/' + data.sha);
+                                $('div.git_info .hash')     //woga65:
+                                    .text(data.sha.slice(0, 7))
+                                    .prop('href', 'https://api.github.com/repos/Woga65/inav/commit/' + data.sha);
                                 $('div.git_info .message').text(data.commit.message);
 
                                 $('div.git_info').slideDown();
