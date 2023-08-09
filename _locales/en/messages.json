@@ -2032,10 +2032,10 @@
         "message": "Orientation preset (align_mag). Relative to FC orientation"
     },
     "boardInfo": {
-        "message": "1. Select Flight Controller alignment (align_board_roll, align_board_pitch, align_board_yaw)"
+        "message": "1. Select Flight Controller alignment<br>(align_board_roll, align_board_pitch, align_board_yaw)"
     },
     "magnetometerInfo": {
-        "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders (align_mag_roll, align_mag_pitch, align_mag_yaw)"
+        "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
     },
     "magnetometerElementToShow": {
         "message": "Element to show: Magnetometer model or axes"
