@@ -612,6 +612,209 @@ helper.defaultsDialog = (function () {
         ]
     },
     {
+        "title": 'HeliQuad - Variable Pitch Quadcopter',
+        "id": 7,
+        "notRecommended": false,
+        "reboot": true,
+        "mixerToApply": 35,
+        "settings": [
+            {
+                key: "model_preview_type",
+                value: 35
+            },
+            /*
+            System
+            */
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "looptime",
+                value: 500
+            },
+            {
+                key: "motor_pwm_protocol",
+                value: "DSHOT300"
+            },
+            {
+                key: "servo_pwm_rate",
+                value: 330
+            },
+            {
+                key: "throttle_idle",
+                value: 0
+            },
+            {
+                key: "motor_poles",
+                value: 24
+            },
+            /*
+            Filtering
+            */
+            {
+                key: "gyro_main_lpf_hz",
+                value: 110
+            },
+            {
+                key: "gyro_main_lpf_type",
+                value: "PT1"
+            },
+            {
+                key: "dterm_lpf_hz",
+                value: 110
+            },
+            {
+                key: "dterm_lpf_type",
+                value: "PT3"
+            },
+            {
+                key: "dterm_lpf2_hz",
+                value: 0
+            },
+            {
+                key: "dterm_lpf2_type",
+                value: "PT1"
+            },
+            {
+                key: "dynamic_gyro_notch_enabled",
+                value: "ON"
+            },
+            {
+                key: "dynamic_gyro_notch_q",
+                value: 250
+            },
+            {
+                key: "dynamic_gyro_notch_min_hz",
+                value: 120
+            },
+            {
+                key: "setpoint_kalman_enabled",
+                value: "ON"
+            },
+            {
+                key: "setpoint_kalman_q",
+                value: 200
+            },
+            {
+                key: "smith_predictor_delay",   // Enable Smith Predictor 
+                value: 1.5
+            },   
+            /*
+            Mechanics
+            */
+            {
+                key: "airmode_type",
+                value: "STICK_CENTER"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
+                key: "mc_iterm_relax",
+                value: "RP"
+            },
+            {
+                key: "d_boost_min",
+                value: 0.8
+            },
+            {
+                key: "d_boost_max",
+                value: 1.2
+            },
+            {
+                key: "antigravity_gain",
+                value: 2
+            },
+            {
+                key: "antigravity_accelerator",
+                value: 5
+            },
+            /*
+            Rates
+            */
+            {
+                key: "rc_yaw_expo",
+                value: 75
+            },
+            {
+                key: "rc_expo",
+                value: 75
+            },
+            {
+                key: "roll_rate",
+                value: 70
+            },
+            {
+                key: "pitch_rate",
+                value: 70
+            },
+            {
+                key: "yaw_rate",
+                value: 60
+            },
+            /*
+            PIDs
+            */
+            {
+                key: "mc_p_pitch",
+                value: 41
+            },
+            {
+                key: "mc_i_pitch",
+                value: 20
+            },
+            {
+                key: "mc_d_pitch",
+                value: 1
+            },
+            {
+                key: "mc_p_roll",
+                value: 41
+            },
+            {
+                key: "mc_i_roll",
+                value: 20
+            },
+            {
+                key: "mc_d_roll",
+                value: 1
+            },
+            {
+                key: "mc_p_yaw",
+                value: 35
+            },
+            {
+                key: "mc_i_yaw",
+                value: 80
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 20
+            },
+            {
+                key: "tpa_breakpoint",
+                value: 2000
+            },
+            {
+                key: "platform_type",
+                value: "HELICOPTER"
+            },
+            {
+                key: "applied_defaults",
+                value: 7
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
+            }
+        ]
+    },    
+    {
         "title": 'Airplane with a Tail',
         "notRecommended": false,
         "id": 3,
