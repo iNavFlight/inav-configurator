@@ -633,7 +633,7 @@ const mixerList = [
     {
         id: 36,
         name: 'Chinook style Bicopter 120deg',
-        model: 'custom',
+        model: 'chinook',
         image: 'heli_bicopter',
         enabled: true,
         legacy: true,
