@@ -788,7 +788,7 @@ var mspHelper = (function (gui) {
                 for (let i = offset; i < data.byteLength; i++) {
                     TARGET.fullIdentifier += String.fromCharCode(data.getUint8(i));
                 }
-                TARGET.isVariablePitch = TARGET.fullIdentifier.includes('_VP');
+                TARGET.isVariablePitch = TARGET.fullIdentifier.includes('_VP') || TARGET.fullIdentifier === 'SITL';
                 if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {   //keep INAV's contributor's (MrD-RC) original
                     CONFIG.target = TARGET.fullIdentifier;                  //state of variables in case it's needed
                 }

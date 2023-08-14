@@ -614,6 +614,7 @@ helper.defaultsDialog = (function () {
     {
         "title": 'HeliQuad - Variable Pitch Quadcopter',
         "id": 7,
+        "collectivePitch": true,
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 35,
@@ -1517,6 +1518,8 @@ helper.defaultsDialog = (function () {
         if (promise.value > 0) {
             return; //Defaults were applied, we can just ignore
         }
+
+        data = TARGET.isVariablePitch ? data : data.filter(d => !(d.collectivePitch || false));
 
         privateScope.render();
         $container.show();

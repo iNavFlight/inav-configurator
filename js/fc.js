@@ -81,6 +81,9 @@ var FC = {
     isMultirotor: function () {
         return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
     },
+    isHelicopter: function () {
+        return (MIXER_CONFIG.platformType == PLATFORM_HELICOPTER);
+    },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF
     },

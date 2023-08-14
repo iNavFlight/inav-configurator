@@ -26,6 +26,12 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.multirotorTuning').show();
             $('.multirotorTuningTitle').show();
             $('.notFixedWingTuning').show();
+        } else if (FC.isHelicopter()) {
+            $('.airplaneTuning').hide();
+            $('.airplaneTuningTitle').hide();
+            $('.multirotorTuning').show();
+            $('.multirotorTuningTitle').show();
+            $('.notFixedWingTuning').show();            
         } else {
             $('.airplaneTuning').show();
             $('.airplaneTuningTitle').hide();

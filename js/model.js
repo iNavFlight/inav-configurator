@@ -754,7 +754,8 @@ const platformList = [
         id: 2,
         name: "Helicopter",
         enabled: true,          //woga65: enable platform HELICOPTER
-        flapsPossible: false
+        flapsPossible: false,
+        collectivePitch: true
     },
     {
         id: 3,
