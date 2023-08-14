@@ -2899,6 +2899,9 @@
     },
     "tabAdvancedTuningMultirotorTuningTitle": {
         "message": ": Multirotors"
+    },    
+    "tabAdvancedTuningHelicopterTuningTitle": {
+        "message": ": Helicopters"
     },
     "tabAdvancedTuningGenericTitle": {
         "message": "Generic settings"
@@ -2945,6 +2948,9 @@
     "multiRotorNavigationConfiguration": {
         "message": "Multirotor Navigation Settings"
     },
+    "helicopterNavigationConfiguration": {
+        "message": "Helicopter Navigation Settings"
+    },
     "userControlMode": {
         "message": "User Control Mode"
     },
@@ -2972,14 +2978,29 @@
     "posholdMaxBankAngle": {
         "message": "Multirotor max. banking angle"
     },
+    "posholdMaxBankAngleHeli": {
+        "message": "Helicopter max. banking angle"
+    },
     "posholdMaxBankAngleHelp": {
-        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab. CLI setting for multirotor and helicopter: nav_mc_bank_angle"
     },
     "posholdHoverThrottle": {
         "message": "Hover throttle"
     },
+    "posholdHoverThrottleHelp": {
+        "message": "Throttle at which the multirotor hovers. Used as a starting point for altitude hold. CLI: nav_mc_hover_thr"
+    },
     "posholdHoverMidThrottle": {
         "message": "Use mid. throttle for ALTHOLD"
+    },
+    "posholdHoverCollective": {
+        "message": "Hover collective pitch"
+    },
+    "posholdHoverCollectiveHelp": {
+        "message": "Collective pitch at which the helicopter hovers. Used as a starting point for altitude hold. Note that this setting is shared with the corresponding multirotor setting. CLI: nav_mc_hover_thr"
+    },
+    "posholdHoverMidCollective": {
+        "message": "Use mid. collective pitch for ALTHOLD"
     },
     "mcWpSlowdown": {
         "message": "Slow down when approaching waypoint"
@@ -4570,6 +4591,9 @@
     },
     "multirotorBrakingConfiguration": {
         "message": "Multirotor braking mode configuration"
+    },
+    "helicopterBrakingConfiguration": {
+        "message": "Helicopter braking mode configuration"
     },
     "mapProvider": {
         "message": "Map Provider"
