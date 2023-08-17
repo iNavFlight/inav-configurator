@@ -85,6 +85,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     function renderOutputMapping() {
         let outputMap = OUTPUT_MAPPING.getOutputTable(
             MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
+            MIXER_CONFIG.platformType == PLATFORM_HELICOPTER,
             MOTOR_RULES.getNumberOfConfiguredMotors(),
             SERVO_RULES.getUsedServoIndexes()
         );

@@ -300,6 +300,8 @@ TABS.outputs.initialize = function (callback) {
 
             if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
                 output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+            } else if (MIXER_CONFIG.platformType == PLATFORM_HELICOPTER) {
+                output = OUTPUT_MAPPING.getHeliServoOutput(usedServoIndex);
             } else {
                 output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
             }
