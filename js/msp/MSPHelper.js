@@ -1486,8 +1486,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
-                for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.put(data.getUint8(i));
+                for (i = 0; i < data.byteLength; i+= 4)
+                    OUTPUT_MAPPING.put(data.getUint32(i, true));    // woga65: OUTPUT_MAPPING.put(data.getUint8(i));
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
