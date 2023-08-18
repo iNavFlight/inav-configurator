@@ -643,7 +643,7 @@ const mixerList = [
             new MotorMixRule(1.0, 0, 0, 0),          // MOTOR OUT 2
         ],
         servoMixer: [
-            new ServoMixRule(0, INPUT_STABILIZED_ROLL, 100, 0),    //REAR_L
+            new ServoMixRule(0, INPUT_STABILIZED_ROLL, 100, 0),     //REAR_L
             new ServoMixRule(0, INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(0, INPUT_STABILIZED_YAW, -100, 0),
             new ServoMixRule(0, INPUT_RC_COLLECTIVE, 100, 0),
@@ -651,17 +651,17 @@ const mixerList = [
             new ServoMixRule(1, INPUT_STABILIZED_PITCH, 100, 0),
             new ServoMixRule(1, INPUT_STABILIZED_YAW, 100, 0),
             new ServoMixRule(1, INPUT_RC_COLLECTIVE, 100, 0),
-            new ServoMixRule(2, INPUT_STABILIZED_PITCH, 100, 0),     //REAR_PITCH
+            new ServoMixRule(2, INPUT_STABILIZED_PITCH, 100, 0),    //REAR_PITCH
             new ServoMixRule(2, INPUT_RC_COLLECTIVE, 100, 0),
             new ServoMixRule(3, INPUT_STABILIZED_ROLL, 100, 0),     //FRONT_L
             new ServoMixRule(3, INPUT_STABILIZED_PITCH, -100, 0),
             new ServoMixRule(3, INPUT_STABILIZED_YAW, 100, 0),
             new ServoMixRule(3, INPUT_RC_COLLECTIVE, 100, 0),
-            new ServoMixRule(4, INPUT_STABILIZED_ROLL, -100, 0),     //FRONT_R
+            new ServoMixRule(4, INPUT_STABILIZED_ROLL, -100, 0),    //FRONT_R
             new ServoMixRule(4, INPUT_STABILIZED_PITCH, -100, 0),
             new ServoMixRule(4, INPUT_STABILIZED_YAW, -100, 0),
             new ServoMixRule(4, INPUT_RC_COLLECTIVE, 100, 0),
-            new ServoMixRule(5, INPUT_STABILIZED_PITCH, -100, 0),     //FRONT_PITCH
+            new ServoMixRule(5, INPUT_STABILIZED_PITCH, -100, 0),   //FRONT_PITCH
             new ServoMixRule(5, INPUT_RC_COLLECTIVE, 100, 0),
         ]
     }, // 36

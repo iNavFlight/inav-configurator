@@ -784,11 +784,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "mc_p_yaw",
-                value: 35
+                value: 80
             },
             {
                 key: "mc_i_yaw",
-                value: 80
+                value: 35
             },
             /*
              * TPA
