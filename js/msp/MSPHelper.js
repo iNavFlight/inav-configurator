@@ -1486,8 +1486,13 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
+                for (i = 0; i < data.byteLength; i++)
+                    OUTPUT_MAPPING.put(data.getUint8(i));           // woga65: kept for backwards compatibility
+                break;
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_FULL:
+                OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; i+= 4)
-                    OUTPUT_MAPPING.put(data.getUint32(i, true));    // woga65: OUTPUT_MAPPING.put(data.getUint8(i));
+                    OUTPUT_MAPPING.put(data.getUint32(i, true));    // woga65: get full 32 bits timer usage flags
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
@@ -2822,7 +2827,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadOutputMapping = function (callback) {
-        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_FULL, false, false, callback); //woga65: full 32 bits
     };
 
     self.loadBatteryConfig = function (callback) {
