@@ -1,6 +1,6 @@
 'use strict';
 
-// define all the global variables that are uses to hold FC state
+// define all the global variables that are used to hold FC state
 const TARGET = {  // woga65: info about the target variant
     fullIdentifier: "",
     isVariablePitch: false,
@@ -826,9 +826,12 @@ var FC = {
         }
     },
     getRcMapLetters: function () {
-        return TARGET.isVariablePitch                       //woga65: rc-channel remapping
-            ? ['A', 'E', 'R', 'T', '1', '2', 'C', 'G']      //if variable pitch, map collective + gyro gain
-            : ['A', 'E', 'R', 'T', '1', '2', '3', '4'];     //else map AUX3 + AUX4
+        if (RC_MAP.length === 8 || TARGET.isVariablePitch) {
+            return MIXER_CONFIG.platformType === PLATFORM_HELICOPTER    // woga65: rc-channel remapping
+                ? ['A', 'E', 'R', 'T', '1', '2', 'C', 'G']              // if variable pitch, map collective + gyro gain
+                : ['A', 'E', 'R', 'T', '1', '2', '3', '4'];             // else map AUX3 + AUX4
+        }
+        return ['A', 'E', 'R', 'T'];                                    // FC firmware restricted to 4-channel mapping
     },
     isRcMapValid: function (val) {
         var strBuffer = val.split(''),

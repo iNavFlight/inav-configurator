@@ -79,12 +79,24 @@ TABS.receiver.initialize = function (callback) {
         // woga65: if craft is variable pitch, default to 
         // collective and gyro gain rather than AUX channels
         const rcMapElement = document.getElementById('rcmap_element');
-        if (TARGET.isVariablePitch) {
-            rcMapElement.innerHTML = `
-                    <option value="AECR12TG">Default</option>
+        if (
+            RC_MAP.length === 8 ||
+            TARGET.isVariablePitch  // woga65: RC_MAP.length might be 4 if target is SITL, so make sure, heli mode is viable in simulator
+        ) {
+            rcMapElement.innerHTML = MIXER_CONFIG.platformType == PLATFORM_HELICOPTER
+                ? ` <option value="AECR12TG">Default</option>
                     <option value="CAER12TG">Collective Pitch / Spektrum</option>
-                    <option value="AECR12TG">Collective Pitch / Futaba</option>`.trim();
+                    <option value="AECR12TG">Collective Pitch / Futaba</option>`.trim()
+                : ` <option value="AETR1234">Default</option>
+                    <option value="TAER1234">JR / Spektrum / Graupner</option>
+                    <option value="AETR1234">Futaba / Hitec</option>`.trim();                    
+        } else {
+            rcMapElement.innerHTML = `
+                <option value="AETR">Default</option>
+                <option value="TAER">JR / Spektrum / Graupner</option>
+                <option value="AETR">Futaba / Hitec</option>`.trim();
         }
+
 
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
