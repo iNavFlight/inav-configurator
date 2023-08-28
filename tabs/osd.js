@@ -1560,11 +1560,11 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('0000169') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00016.9') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('0000147') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00014.7') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('0000272') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00027.2') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
