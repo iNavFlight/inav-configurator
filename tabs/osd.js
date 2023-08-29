@@ -1001,7 +1001,7 @@ OSD.constants = {
                 },
                 {
                     name: 'MULTI FUNCTION STATUS',
-                    id: 142,
+                    id: 144,
                     min_version: '6.0.0',
                     preview: '0 WARNINGS'
                 }
@@ -2163,7 +2163,7 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    
+
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -3111,7 +3111,7 @@ TABS.osd.initialize = function (callback) {
         chrome.storage.local.get('showOSDGuides', function (result) {
             if (typeof result.showOSDGuides !== 'undefined') {
                 isGuidesChecked = result.showOSDGuides;
-            }     
+            }
         });
 
         // Setup switch indicators
@@ -3363,7 +3363,7 @@ function refreshOSDSwitchIndicators() {
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
-    
+
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
@@ -3415,7 +3415,7 @@ function updatePanServoPreview() {
     let servoRules = SERVO_RULES;
     $('#panServoOutput option').each(function() {
         let servoIndex = $(this).val();
-        
+
         if (servoIndex === "0") {
             $(this).text("OFF");
         } else {
