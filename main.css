@@ -60,6 +60,10 @@ a.disabled {
     transition: none;
 }
 
+.inputRequiredWarning {
+    border: 3px solid #d40000 !important;
+}
+
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
@@ -883,6 +887,18 @@ li.active .ic_help {
 
 li.active .ic_flasher {
     background-image: url("../images/icons/cf_icon_flasher_white.svg");
+}
+
+.ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_grey.svg");
+}
+
+.ic_sitl:hover {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
+}
+
+li.active .ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
 }
 
 .ic_calibration {

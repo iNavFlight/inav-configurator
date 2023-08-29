@@ -348,6 +348,15 @@
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
+                            <th data-i18n="pidTuning_gyro_use_dyn_lpf" style="height: 24px;"></th>
+                            <td>
+                                <div class="pidTuning_select">
+                                    <input id="gyro_use_dyn_lpf" type="checkbox" class="toggle update_preview" data-setting="gyro_use_dyn_lpf"/>
+                                    <div for="gyro_use_dyn_lpf" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_use_dyn_lpf_help"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="for_static_gyro_lpf">
                             <th data-i18n="pidTuning_gyro_main_lpf_hz"></th>
                             <td>
                                 <div class="pidTuning_number">
@@ -356,6 +365,43 @@
                                 </div>
                             </td>
                         </tr>
+                        <tr class="for_dynamic_gyro_lpf">
+                            <th data-i18n="pidTuning_gyro_dyn_lpf_min_hz"></th>
+                            <td>
+                                <div class="pidTuning_number">
+                                    <input id="gyro_dyn_lpf_min_hz" data-setting="gyro_dyn_lpf_min_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="150" />
+                                    <div for="gyro_dyn_lpf_min_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_min_hz_help"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="for_dynamic_gyro_lpf">
+                            <th data-i18n="pidTuning_gyro_dyn_lpf_max_hz"></th>
+                            <td>
+                                <div class="pidTuning_number">
+                                    <input id="gyro_dyn_lpf_max_hz" data-setting="gyro_dyn_lpf_max_hz" type="number" data-presentation="range" class="rate-tpa_input" data-normal-max="500" />
+                                    <div for="gyro_dyn_lpf_max_hz" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_man_hz_help"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="for_dynamic_gyro_lpf">
+                            <th data-i18n="pidTuning_gyro_dyn_lpf_curve_expo"></th>
+                            <td>
+                                <div class="pidTuning_number">
+                                    <input id="gyro_dyn_lpf_curve_expo" data-setting="gyro_dyn_lpf_curve_expo" type="number" data-presentation="range" class="rate-tpa_input" />
+                                    <!-- <div for="gyro_dyn_lpf_curve_expo" class="helpicon cf_tip" data-i18n_title="pidTuning_gyro_dyn_lpf_curve_expo_help"></div> -->
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" data-i18n="pidTuning_advancedFilters" style="margin-top: 1em;"></div>
+            <div class="clear-both"></div>
+            <div class="cf_column">
+                <table class="settings-table settings-table--filtering">
+                    <tbody>
                         <tr>
                             <th data-i18n="pidTuning_MatrixFilterType"></th>
                             <td>

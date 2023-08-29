@@ -1,5 +1,5 @@
 'use strict';
-/*global chrome,GUI,TABS,nwdialog,$*/
+/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,$*/
 
 TABS.magnetometer = {};
 
@@ -28,6 +28,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadMixerConfig,
+        mspHelper.loadBoardAlignment,
         mspHelper.loadSensorAlignment,
         // Pitch and roll must be inverted
         function (callback) {
@@ -219,6 +220,7 @@ TABS.magnetometer.initialize = function (callback) {
         elementToShow.change(function () {
             const value = parseInt($(this).val());
             self.showMagnetometer = (value == 0);
+            self.render3D();
         });
 
         function clamp(input, min, max) {
@@ -341,6 +343,7 @@ TABS.magnetometer.initialize3D = function () {
         scene,
         gps,
         xyz,
+        fc,
         useWebGlRenderer = false;
 
     canvas = $('.model-and-info #canvas');
@@ -385,13 +388,24 @@ TABS.magnetometer.initialize3D = function () {
 
     this.render3D = function () {
 
-        if (!gps || !xyz)
+        if (!gps || !xyz || !fc)
             return;
 
         gps.visible = self.showMagnetometer;
         xyz.visible = !self.showMagnetometer;
-        gps.rotation.set(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
-        xyz.rotation.set(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ');
+        fc.visible = true;
+
+        var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
+        var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
+
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -BOARD_ALIGNMENT.pitch / 10.0 ), THREE.Math.degToRad( -BOARD_ALIGNMENT.yaw / 10.0 ), THREE.Math.degToRad( -BOARD_ALIGNMENT.roll / 10.0 ), 'YXZ');
+        var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
+ 
+        matrix.multiply(matrix1);
+
+        gps.rotation.setFromRotationMatrix(matrix);
+        xyz.rotation.setFromRotationMatrix(matrix);
+        fc.rotation.setFromRotationMatrix(matrix1);
 
         // draw
         if (camera != null)
@@ -429,7 +443,7 @@ TABS.magnetometer.initialize3D = function () {
             case "twin_plane":
             case "vtail_plane":
             case "vtail_single_servo_plane":
-                return [0, 1.4, 0];
+                return [0, 1.6, 0];
             case "fallback":
             default:
                 return [0, 2.5, 0];
@@ -479,7 +493,7 @@ TABS.magnetometer.initialize3D = function () {
             gps = obj.scene;
             const scaleFactor = 0.04;
             gps.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            gps.position.set(gpsOffset[0], gpsOffset[1], gpsOffset[2]);
+            gps.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
             gps.traverse(child => {
                 if (child.material) child.material.metalness = 0;
             });
@@ -493,11 +507,23 @@ TABS.magnetometer.initialize3D = function () {
             xyz = obj.scene;
             const scaleFactor = 0.04;
             xyz.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            xyz.position.set(gpsOffset[0], gpsOffset[1], gpsOffset[2]);
+            xyz.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
             xyz.rotation.y = 3 * Math.PI / 2;
             model.add(xyz);
             this.render3D();
         });
+
+        //Load the FC model
+        loader.load('./resources/models/fc.gltf', (obj) => {
+            fc = obj.scene;
+            const scaleFactor = 0.04;
+            fc.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            fc.position.set(gpsOffset[0], gpsOffset[1] - 0.5, gpsOffset[2]);
+            fc.rotation.y = 3 * Math.PI / 2;
+            model.add(fc);
+            this.render3D();
+        });
+
     });
     this.render3D();
     this.resize3D();

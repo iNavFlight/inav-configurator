@@ -24,12 +24,16 @@ let globalSettings = {
     // Used to depict how the units are displayed within the UI
     unitType: null,
     // Used to convert units within the UI
-    osdUnits: null,    
+    osdUnits: null,
+    // Map  
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
+    // Show colours for profiles
     showProfileParameters: null,
+    // tree target for documents
+    docsTreeLocation: 'master',
 };
 
 $(document).ready(function () {
@@ -81,9 +85,9 @@ $(document).ready(function () {
     }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
-    GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
+    GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
-        'Configurator: <strong>' + chrome.runtime.getManifest().version + '</strong>');
+        chrome.i18n.getMessage('getConfiguratorVersion') + chrome.runtime.getManifest().version + '</strong>');
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
@@ -218,6 +222,9 @@ $(document).ready(function () {
                         break;
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
+                        break;
+                    case 'sitl':
+                        TABS.sitl.initialize(content_ready);
                         break;
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
@@ -408,6 +415,9 @@ $(document).ready(function () {
                     });
                     globalSettings.proxyLayer = $(this).val();
                 });
+                $('#demoModeReset').on('click', () => {
+                    SITLProcess.deleteEepromFile('demo.bin');
+                });
                 function close_and_cleanup(e) {
                     if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
                         $(document).unbind('click keyup', close_and_cleanup);
@@ -530,7 +540,7 @@ $(document).ready(function () {
 
         state = true;
     }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
+        $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
     });
@@ -673,7 +683,21 @@ function updateActivatedTab() {
 function updateFirmwareVersion() {
     if (CONFIGURATOR.connectionValid) {
         $('#logo .firmware_version').text(CONFIG.flightControllerVersion + " [" + CONFIG.target + "]");
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/' + CONFIG.flightControllerVersion + '/docs/';
+
+        // If this is a master branch firmware, this will find a 404 as there is no tag tree. So default to master for docs.
+        $.ajax({
+            url : globalSettings.docsTreeLocation + 'Settings.md',
+            method: "HEAD",
+            statusCode: {
+                404: function() {
+                    globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
+                }
+            }
+        });
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
+        
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
 }
