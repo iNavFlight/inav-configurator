@@ -112,6 +112,7 @@ SYM.GLIDE_RANGE = 0xD4;
 SYM.FLIGHT_MINS_REMAINING = 0xDA;
 SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 
@@ -997,6 +998,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 144,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
@@ -2156,7 +2163,7 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    
+
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -3104,7 +3111,7 @@ TABS.osd.initialize = function (callback) {
         chrome.storage.local.get('showOSDGuides', function (result) {
             if (typeof result.showOSDGuides !== 'undefined') {
                 isGuidesChecked = result.showOSDGuides;
-            }     
+            }
         });
 
         // Setup switch indicators
@@ -3356,7 +3363,7 @@ function refreshOSDSwitchIndicators() {
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
-    
+
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
@@ -3408,7 +3415,7 @@ function updatePanServoPreview() {
     let servoRules = SERVO_RULES;
     $('#panServoOutput option').each(function() {
         let servoIndex = $(this).val();
-        
+
         if (servoIndex === "0") {
             $(this).text("OFF");
         } else {

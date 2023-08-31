@@ -113,7 +113,7 @@
 |                                                                    | SYM_MAH_KM_1               | SYM.MAH_KM_1                 | mAh per Kilometre, right side         | 108        | 0x6C         |
 | ![Watt hours](/resources/osd/digital/default/24x36/109.png)        | SYM_WH                     | SYM.WH                       | Watthours symbol                      | 109        | 0x6D         |
 | ![Wh per Km](/resources/osd/digital/default/24x36/110.png)         | SYM_WH_KM                  | SYM.WH_KM                    | Watthours per Kilometre               | 110        | 0x6E         |
-| ![Wh per Mile](/resources/osd/digital/default/24x36/111.png)       | SYM_WH_MI                  | SYM.WH_MI                    | Watthours per Mile                    | 111        | 0x6F         | 
+| ![Wh per Mile](/resources/osd/digital/default/24x36/111.png)       | SYM_WH_MI                  | SYM.WH_MI                    | Watthours per Mile                    | 111        | 0x6F         |
 | ![Wh per NM](/resources/osd/digital/default/24x36/112.png)         | SYM_WH_NM                  | SYM.WH_NM                    | Watthours per Nautical Mile           | 112        | 0x70         |
 | ![Watts](/resources/osd/digital/default/24x36/113.png)             | SYM_WATT                   | SYM.WATT                     | Watts symbol                          | 113        | 0x71         |
 | ![milliWatts](/resources/osd/digital/default/24x36/114.png)        | SYM_MW                     | SYM.MW                       | Milliwatts symbol                     | 114        | 0x72         |
@@ -224,6 +224,7 @@
 | ![Flight mins rem](/resources/osd/digital/default/24x36/218.png)   | SYM_FLIGHT_MINS_REMAINING  | SYM.FLIGHT_MINS_REMAINING    | Flight time (mins) remaining          | 218        | 0xDA         |
 | ![Flight hours rem](/resources/osd/digital/default/24x36/219.png)  | SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB         |
 | ![Ground course](/resources/osd/digital/default/24x36/220.png)     | SYM_GROUND_COURSE          | SYM.GROUND_COURSE            | Ground course                         | 220        | 0xDC         |
+| ![Alert](/resources/osd/digital/default/24x36/221.png)             | SYM_ALERT                  | SYM.ALERT                    | General Alert                         | 221        | 0xDD         |
 | ![Terrain follow](/resources/osd/digital/default/24x36/251.png)    | SYM_TERRAIN_FOLLOWING      | SYM.TERRAIN_FOLLOWING        | Terrain following                     | 251        | 0xFB         |
 | ![Cross track err](/resources/osd/digital/default/24x36/252.png)   | SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error                     | 252        | 0xFC         |
 | ![ADSB](/resources/osd/digital/default/24x36/253.png)              | SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD         |
