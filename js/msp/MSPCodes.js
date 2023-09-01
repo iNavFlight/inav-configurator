@@ -234,6 +234,8 @@ var MSPCodes = {
     
     MSP2_INAV_LOGIC_CONDITIONS_SINGLE:  0x203B,
 
+    MSP2_INAV_ESC_RPM:                  0x2040,     //woga65:
+
     MSP2_INAV_LED_STRIP_CONFIG_EX:      0x2048,
     MSP2_INAV_SET_LED_STRIP_CONFIG_EX:  0x2049
 };

@@ -69,7 +69,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    ESC_RPMS;       // woga65:
 
 var FC = {
     restartRequired: false,
@@ -546,6 +547,8 @@ var FC = {
         OUTPUT_MAPPING = new OutputMappingCollection();
 
         SETTINGS = {};
+
+        ESC_RPMS = [];      // woga65:
 
         SAFEHOMES = new SafehomeCollection();
     },

@@ -1376,6 +1376,12 @@ var mspHelper = (function (gui) {
                 FW_CONFIG.loiterRadius = data.getUint16(10, true);
                 break;
 
+            case MSPCodes.MSP2_INAV_ESC_RPM:
+                ESC_RPMS = [];
+                for (i = 0; i < data.byteLength; i+= 4)
+                    ESC_RPMS.push(data.getUint32(i, true));    // woga65: get RPMs for each motor
+                break;
+
             case MSPCodes.MSP_SET_FW_CONFIG:
                 console.log('FW_CONFIG saved');
                 break;
