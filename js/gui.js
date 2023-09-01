@@ -383,5 +383,14 @@ GUI_control.prototype.renderLogicConditionSelect = function ($container, logicCo
     $select.val(current).change(onChange);
 }
 
+GUI_control.prototype.selectAdvancedTuningHelicopter = function () {
+    $('#max-bank-angle-label').attr('data-i18n', 'posholdMaxBankAngleHeli');
+    $('#hover-throttle-label').attr('data-i18n', 'posholdHoverCollective');
+    $('#use-mid-throttle-label').attr('data-i18n','posholdHoverMidCollective');
+    $('#hover-throttle-help').attr('data-i18n_title', 'posholdHoverCollectiveHelp');
+    $('#multirotor-navigation-config').attr('data-i18n', 'helicopterNavigationConfiguration');
+    $('#multirotor-braking-config').attr('data-i18n', 'helicopterBrakingConfiguration');
+}
+
 // initialize object into GUI variable
 var GUI = new GUI_control();

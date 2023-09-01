@@ -1,6 +1,11 @@
 <div class="tab-configuration tab-advanced-tuning toolbar_fixed_bottom">
     <div class="content_wrapper">
-        <div class="tab_title"><span data-i18n="tabAdvancedTuningTitle"></span><span class="airplaneTuningTitle" data-i18n="tabAdvancedTuningAirplaneTuningTitle"></span><span class="multirotorTuningTitle" data-i18n="tabAdvancedTuningMultirotorTuningTitle"></span></div>
+        <div class="tab_title">
+            <span data-i18n="tabAdvancedTuningTitle"></span>
+            <span class="airplaneTuningTitle" data-i18n="tabAdvancedTuningAirplaneTuningTitle"></span>
+            <span class="multirotorTuningTitle" data-i18n="tabAdvancedTuningMultirotorTuningTitle"></span>
+            <span class="helicopterTuningTitle" data-i18n="tabAdvancedTuningHelicopterTuningTitle"></span>
+        </div>
 
         <!-- Airplane Advanced Tuning-->
         <div class="airplaneTuning">
@@ -217,7 +222,7 @@
             <div class="leftWrapper">
                 <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="multiRotorNavigationConfiguration"></div>
+                        <div class="spacer_box_title" id="multirotor-navigation-config" data-i18n="multiRotorNavigationConfiguration"></div>
                     </div>
                     <div class="spacer_box">
                         <div class="select">
@@ -240,16 +245,17 @@
                         </div>
                         <div class="number">
                             <input id="max-bank-angle" type="number" data-unit="deg" data-setting="nav_mc_bank_angle" data-setting-multiplier="1" step="1" min="15" max="45" />
-                            <label for="max-bank-angle"><span data-i18n="posholdMaxBankAngle"></span></label>
+                            <label for="max-bank-angle"><span id="max-bank-angle-label" data-i18n="posholdMaxBankAngle"></span></label>
                             <div for="max-bank-angle" class="helpicon cf_tip" data-i18n_title="posholdMaxBankAngleHelp"></div>
                         </div>
                         <div class="checkbox">
                             <input type="checkbox" class="toggle update_preview" id="use-mid-throttle" data-setting="nav_use_midthr_for_althold" data-live="true" />
-                            <label for="use-mid-throttle"><span data-i18n="posholdHoverMidThrottle"></span></label>
+                            <label for="use-mid-throttle"><span id="use-mid-throttle-label" data-i18n="posholdHoverMidThrottle"></span></label>
                         </div>
                         <div class="number">
                             <input id="hover-throttle" type="number" data-unit="us" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
-                            <label for="hover-throttle"><span data-i18n="posholdHoverThrottle"></span></label>
+                            <label for="hover-throttle"><span id="hover-throttle-label" data-i18n="posholdHoverThrottle"></span></label>
+                            <div for="hover-throttle" id="hover-throttle-help" class="helpicon cf_tip" data-i18n_title="posholdHoverThrottleHelp"></div>
                         </div>
                         <div class="checkbox">
                             <input id="wp-slowdown" type="checkbox" class="toggle update_preview" data-setting="nav_mc_wp_slowdown" data-live="true" />
@@ -264,7 +270,7 @@
             <div class="rightWrapper">
                 <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title" data-i18n="multirotorBrakingConfiguration"></div>
+                        <div class="spacer_box_title" id="multirotor-braking-config" data-i18n="multirotorBrakingConfiguration"></div>
                     </div>
                     <div class="spacer_box">
 

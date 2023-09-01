@@ -775,18 +775,23 @@ var mspHelper = (function (gui) {
                 CONFIG.boardIdentifier = identifier;
                 CONFIG.boardVersion = data.getUint16(offset, 1);
                 offset += 2;
+                // woga65: Get full target name/identifier in any case. 
+                //         Also, determine whether target is variable pitch.
                 if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {
                     CONFIG.osdUsed = data.getUint8(offset++);
                     CONFIG.commCompatability = data.getUint8(offset++);
-                    let targetNameLen = data.getUint8(offset++);
-                    let targetName = "";
-                    targetNameLen += offset;
-                    for (offset = offset; offset < targetNameLen; offset++) {
-                        targetName += String.fromCharCode(data.getUint8(offset));
-                    }
-                    CONFIG.target = targetName;
+                    offset++;
+                } else {
+                    offset += 3;
+                }                
+                TARGET.fullIdentifier = "";
+                for (let i = offset; i < data.byteLength; i++) {
+                    TARGET.fullIdentifier += String.fromCharCode(data.getUint8(i));
                 }
-
+                TARGET.isVariablePitch = TARGET.fullIdentifier.includes('_VP') || TARGET.fullIdentifier === 'SITL';
+                if (semver.gt(CONFIG.flightControllerVersion, "4.1.0")) {   //keep INAV's contributor's (MrD-RC) original
+                    CONFIG.target = TARGET.fullIdentifier;                  //state of variables in case it's needed
+                }
                 break;
 
             case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
@@ -1371,6 +1376,12 @@ var mspHelper = (function (gui) {
                 FW_CONFIG.loiterRadius = data.getUint16(10, true);
                 break;
 
+            case MSPCodes.MSP2_INAV_ESC_RPM:
+                ESC_RPMS = [];
+                for (i = 0; i < data.byteLength; i+= 4)
+                    ESC_RPMS.push(data.getUint32(i, true));    // woga65: get RPMs for each motor
+                break;
+
             case MSPCodes.MSP_SET_FW_CONFIG:
                 console.log('FW_CONFIG saved');
                 break;
@@ -1481,8 +1492,13 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
-                for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.put(data.getUint8(i));
+                for (i = 0; i < data.byteLength; i++)
+                    OUTPUT_MAPPING.put(data.getUint8(i));           // woga65: kept for backwards compatibility
+                break;
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_FULL:
+                OUTPUT_MAPPING.flush();
+                for (i = 0; i < data.byteLength; i+= 4)
+                    OUTPUT_MAPPING.put(data.getUint32(i, true));    // woga65: get full 32 bits timer usage flags
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
@@ -2817,7 +2833,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadOutputMapping = function (callback) {
-        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_FULL, false, false, callback); //woga65: full 32 bits
     };
 
     self.loadBatteryConfig = function (callback) {

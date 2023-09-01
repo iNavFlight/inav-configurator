@@ -19,19 +19,30 @@ TABS.advanced_tuning.initialize = function (callback) {
             $('.airplaneTuningTitle').show();
             $('.multirotorTuning').hide();
             $('.multirotorTuningTitle').hide();
+            $('.helicopterTuningTitle').hide();
             $('.notFixedWingTuning').hide();
         } else if (FC.isMultirotor()) {
             $('.airplaneTuning').hide();
             $('.airplaneTuningTitle').hide();
+            $('.helicopterTuningTitle').hide();
             $('.multirotorTuning').show();
             $('.multirotorTuningTitle').show();
             $('.notFixedWingTuning').show();
+        } else if (FC.isHelicopter()) {
+            $('.multirotorTuning').show();
+            $('.helicopterTuningTitle').show();
+            $('.notFixedWingTuning').show();
+            $('.airplaneTuning').hide();
+            $('.airplaneTuningTitle').hide();
+            $('.multirotorTuningTitle').hide();
+            GUI.selectAdvancedTuningHelicopter();
         } else {
             $('.airplaneTuning').show();
-            $('.airplaneTuningTitle').hide();
             $('.multirotorTuning').show();
-            $('.multirotorTuningTitle').hide();
             $('.notFixedWingTuning').show();
+            $('.airplaneTuningTitle').hide();
+            $('.multirotorTuningTitle').hide();
+            $('.helicopterTuningTitle').hide();
         }
 
         GUI.simpleBind();

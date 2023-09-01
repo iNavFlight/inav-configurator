@@ -14,7 +14,15 @@ TABS.auxiliary.initialize = function (callback) {
     }
 
     function get_box_ids() {
-        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
+        if (RC_MAP.length == 0) {   // woga65: if empty, get rc-mapping from the FC
+            MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_map);
+        } else {
+            MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
+        }
+    }
+
+    function get_rc_map() {
+        MSP.send_message(MSPCodes.MSP_RX_MAP, false, false, get_rc_data);
     }
 
     function get_rc_data() {
@@ -46,7 +54,8 @@ TABS.auxiliary.initialize = function (callback) {
         modeSections["Multi-rotor"] = ["FPV ANGLE MIX", "TURTLE", "MC BRAKING", "HEADFREE", "HEADADJ"];
         modeSections["OSD Modes"] = ["OSD OFF", "OSD ALT 1", "OSD ALT 2", "OSD ALT 3"];
         modeSections["FPV Camera Modes"] = ["CAMSTAB", "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3"];
-        modeSections["Misc Modes"] = ["BEEPER", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
+        modeSections["Misc Modes"] = ["BEEPER", "BEEPER MUTE", "LEDS OFF", "LIGHTS", "HOME RESET", "WP PLANNER", "MISSION CHANGE", "BLACKBOX", "FAILSAFE", "KILLSWITCH", "TELEMETRY", "MSP RC OVERRIDE", "USER1", "USER2", "USER3", "USER4"];
+        modeSections["Helicopter"] = ["HS NORMAL", "HS IDLE-UP 1", "HS IDLE-UP 2"]; // woga65: helicopter specific modes
 
     function sort_modes_for_display() {
         // Sort the modes
@@ -386,7 +395,9 @@ TABS.auxiliary.initialize = function (callback) {
             var auxChannelCount = RC.active_channels - 4;
 
             for (var i = 0; i < (auxChannelCount); i++) {
-                update_marker(i, RC.channels[i + 4]);
+                (MIXER_CONFIG.platformType == PLATFORM_HELICOPTER && i == FC.getRcMapLetters().indexOf('C') - 4)
+                    ? update_marker(i, RC.channels[3])          // woga65: if helicopter, use throttle instead of AUX3
+                    : update_marker(i, RC.channels[i + 4]);     // for mode switching, else use AUX3 channel
             }
 
             for (var i = 0; i < AUX_CONFIG.length; i++) {
