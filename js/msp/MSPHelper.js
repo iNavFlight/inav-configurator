@@ -1295,6 +1295,10 @@ var mspHelper = (function (gui) {
                 NAV_POSHOLD.maxBankAngle = data.getUint8(9);
                 NAV_POSHOLD.useThrottleMidForAlthold = data.getUint8(10);
                 NAV_POSHOLD.hoverThrottle = data.getUint16(11, true);
+                //if (TARGET.isVariablePitch) {     //woga65: @todo get helicopter hover values per headspeed
+                //    NAV_POSHOLD.hoverCollectiveIdelUp1 = data.getUint16(13, true);
+                //    NAV_POSHOLD.hoverCollectiveIdelUp2 = data.getUint16(15, true);
+                //}
                 break;
 
             case MSPCodes.MSP_SET_NAV_POSHOLD:
@@ -1942,6 +1946,12 @@ var mspHelper = (function (gui) {
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
                 buffer.push(highByte(NAV_POSHOLD.hoverThrottle));
+                //if (TARGET.isVariablePitch) {     //woga65: @todo set helicopter hover values per headspeed
+                //    buffer.push(lowByte(NAV_POSHOLD.hoverCollectiveIdelUp1));
+                //    buffer.push(highByte(NAV_POSHOLD.hoverCollectiveIdelUp1));
+                //    buffer.push(lowByte(NAV_POSHOLD.hoverCollectiveIdelUp2));
+                //    buffer.push(highByte(NAV_POSHOLD.hoverCollectiveIdelUp2));
+                //}
                 break;
 
             case MSPCodes.MSP_SET_CALIBRATION_DATA:
