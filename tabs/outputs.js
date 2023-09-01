@@ -79,7 +79,7 @@ TABS.outputs.initialize = function (callback) {
         finalize();
     }
 
-    //woga65: if craft is variable pitch, output raw output values rather than percentages
+    //woga65: if craft is variable pitch, output raw output values rather than percentages (for testing)
     function getMotorOutputValue(value) {
 
         if (TARGET.isVariablePitch) {

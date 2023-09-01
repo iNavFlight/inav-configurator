@@ -831,8 +831,8 @@ var FC = {
     getRcMapLetters: function () {
         if (RC_MAP.length === 8 || TARGET.isVariablePitch) {
             return MIXER_CONFIG.platformType === PLATFORM_HELICOPTER    // woga65: rc-channel remapping
-                ? ['A', 'E', 'R', 'T', '1', '2', 'C', 'G']              // if variable pitch, map collective + gyro gain
-                : ['A', 'E', 'R', 'T', '1', '2', '3', '4'];             // else map AUX3 + AUX4
+                ? ['A', 'E', 'R', 'T', '5', '6', 'C', 'G']              // if variable pitch, map collective + gyro gain
+                : ['A', 'E', 'R', 'T', '5', '6', '7', '8'];             // else map AUX3/CH7 + AUX4/CH8
         }
         return ['A', 'E', 'R', 'T'];                                    // FC firmware restricted to 4-channel mapping
     },

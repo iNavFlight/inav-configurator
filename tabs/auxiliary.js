@@ -396,7 +396,7 @@ TABS.auxiliary.initialize = function (callback) {
 
             for (var i = 0; i < (auxChannelCount); i++) {
                 (MIXER_CONFIG.platformType == PLATFORM_HELICOPTER && i == FC.getRcMapLetters().indexOf('C') - 4)
-                    ? update_marker(i, RC.channels[3])          // woga65: if helicopter, use throttle instead of AUX3
+                    ? update_marker(i, RC.channels[3])          // woga65: if helicopter, use throttle instead of AUX3 / CH7
                     : update_marker(i, RC.channels[i + 4]);     // for mode switching, else use AUX3 channel
             }
 

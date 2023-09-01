@@ -170,7 +170,7 @@ TABS.firmware_flasher.initialize = function (callback) {
             TABS.firmware_flasher.releases = releases;
             return;
         };
-        // woga65: load firmware (pre)releases from variable pitch repository
+        // woga65: load firmware (pre)releases from variable pitch repository (for testing)
         //$.get('https://api.github.com/repos/Woga65/inav/releases?per_page=10', function (releasesData){
         $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
             TABS.firmware_flasher.releasesData = releasesData;
@@ -293,7 +293,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                         $('a.flash_firmware').removeClass('disabled');
 
-                        if (summary.commit) {   //woga65:
+                        if (summary.commit) {   //woga65: (for testing)
                             //$.get('https://api.github.com/repos/Woga65/inav/commits/' + summary.commit, function (data) {                                
                             $.get('https://api.github.com/repos/iNavFlight/inav/commits/' + summary.commit, function (data) {
                                 var data = data,
@@ -307,7 +307,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                                 $('div.git_info .committer').text(data.commit.author.name);
                                 $('div.git_info .date').text(date);
-                                //$('div.git_info .hash')     //woga65:
+                                //$('div.git_info .hash')     //woga65: (for testing)
                                 //    .text(data.sha.slice(0, 7))
                                 //    .prop('href', 'https://api.github.com/repos/Woga65/inav/commit/' + data.sha);
                                 $('div.git_info .hash')
