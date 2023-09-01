@@ -130,6 +130,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
+                                case STABILIZED_PITCH_POSITIVE:
+                                case STABILIZED_PITCH_NEGATIVE:
                                 case INPUT_RC_PITCH:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaces.elevatorSet);
                                     if (outputArea != null) {
@@ -152,6 +154,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_ROLL:
+                                case STABILIZED_ROLL_POSITIVE:
+                                case STABILIZED_ROLL_NEGATIVE:
                                 case INPUT_RC_ROLL:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaces.aileronSet);
                                     if (outputArea != null) {
@@ -174,6 +178,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_YAW:
+                                case STABILIZED_YAW_POSITIVE:
+                                case STABILIZED_YAW_NEGATIVE:
                                 case INPUT_RC_YAW:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaces.rudderSet);
                                     if (outputArea != null) {
@@ -295,6 +301,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     function () {
                         servoRule.setConditionId($(this).val());
                     },
+                    true,
                     true
                 );
 
@@ -525,17 +532,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             motorWizardModal.close();
         });
 
-        const drawImage = function () {
-            const isReversed = $("#motor_direction_inverted").is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+        const updateMotorDirection = function () {
+            let motorDirectionCheckbox = $("#motor_direction_inverted");
+            const isReversed = motorDirectionCheckbox.is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
 
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                if (isReversed) {
+                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_isInverted"));
+                } else {
+                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_inverted"));
+                }
+            }
+
             renderServoOutputImage();
         };
 
-        $("#motor_direction_inverted").change(drawImage);
+        $("#motor_direction_inverted").change(updateMotorDirection);
 
         $platformSelect.find("*").remove();
 
@@ -587,7 +603,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             updateRefreshButtonStatus();
 
-            drawImage();
+            updateMotorDirection();
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {
@@ -612,6 +628,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();

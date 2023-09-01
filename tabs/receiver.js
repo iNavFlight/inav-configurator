@@ -79,6 +79,21 @@ TABS.receiver.initialize = function (callback) {
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
 
+        // Order Serial Rx providers
+        let serialRxProviders = $('#serialrx_provider option');
+        let selectedRxProvider = $('#serialrx_provider').val();
+        serialRxProviders.sort(function(a,b) {
+            if (a.text > b.text) {
+                return 1;
+            } else if (a.text < b.text) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        $("#serialrx_provider").empty().append(serialRxProviders);
+        $('#serialrx_provider').val(selectedRxProvider);
+
         $receiverMode.change(function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
@@ -177,11 +192,6 @@ TABS.receiver.initialize = function (callback) {
 
         // set current value
         $rcMap.val(str);
-
-        /*
-         * Send tracking event so we can know if users are using different mappings than EATR
-         */
-        googleAnalytics.sendEvent('Setting', 'RcMappingRead', str);
 
         // validation / filter
         var last_valid = str;
@@ -296,6 +306,8 @@ TABS.receiver.initialize = function (callback) {
             for (var i = 0; i < RC_MAP.length; i++) {
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
+
+            googleAnalytics.sendEvent('Setting', 'RcProtocol', $('#receiver_type option:selected').text() + ":" + $('#serialrx_provider option:selected').text());
 
             // catch rssi aux
             MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());

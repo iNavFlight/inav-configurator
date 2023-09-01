@@ -29,12 +29,17 @@ SYM.MAH_KM_0 = 0x6B;
 SYM.MAH_KM_1 = 0x6C;
 SYM.MAH_MI_0 = 0x93;
 SYM.MAH_MI_1 = 0x94;
+SYM.AH_V_FT_0 = 0xD6;
+SYM.AH_V_FT_1 = 0xD7;
+SYM.AH_V_M_0 = 0xD8;
+SYM.AH_V_M_1 = 0xD9;
 SYM.WH_KM = 0x6E;
 SYM.WH_MI = 0x6F;
 SYM.GPS_SAT1 = 0x08;
 SYM.GPS_SAT2 = 0x09;
 SYM.GPS_HDP1 = 0x0E;
 SYM.GPS_HDP2 = 0x0F;
+SYM.KM = 0x83;
 SYM.KMH = 0x90;
 SYM.KMH_3D = 0x88;
 SYM.MPH = 0x91;
@@ -102,6 +107,14 @@ SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
+SYM.GLIDE_MINS = 0xD5;
+SYM.GLIDE_RANGE = 0xD4;
+SYM.FLIGHT_MINS_REMAINING = 0xDA;
+SYM.FLIGHT_DIST_REMAINING = 0x167;
+SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
+SYM.CROSS_TRACK_ERROR = 0xFC;
+SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -111,8 +124,16 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
+var useESCTelemetry = false;
+var useBaro         = false;
+var useCRSFRx       = false;
+var usePitot        = false;
+
+var video_type = null;
+var isGuidesChecked = false;
 var FONT = FONT || {};
 
+var FONT = FONT || {};
 FONT.initData = function () {
     if (FONT.data) {
         return;
@@ -162,7 +183,7 @@ FONT.parseMCMFontFile = function (data) {
 
     // make sure the font file is valid
     if (data.shift().trim() != 'MAX7456') {
-        var msg = 'that font file doesnt have the MAX7456 header, giving up';
+        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
         Promise.reject(msg);
     }
@@ -460,7 +481,8 @@ OSD.initData = function () {
         items: [],
         groups: {},
         preview: [],
-        isDjiHdFpv: false
+        isDjiHdFpv: false,
+        isMspDisplay: false
     };
 };
 
@@ -493,6 +515,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -509,7 +532,7 @@ OSD.DjiElements =  {
     craftNameElements: [
         "MESSAGES",
         "THROTTLE_POSITION",
-        "THROTTLE_POSITION_AUTO_THR",
+        "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
         "EFFICIENCY_MAH",
         "TRIP_DIST"
@@ -522,22 +545,38 @@ OSD.constants = {
         'AUTO',
         'PAL',
         'NTSC',
-        'HD'
+        'HDZERO',
+        'DJIWTF',
+        'AVATAR',
+        'BF43COMPAT',
+        'BFHDCOMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
-        HD: 18
+        HDZERO: 18,
+        DJIWTF: 22,
+        AVATAR: 20,
+        BF43COMPAT: 16,
+        BFHDCOMPAT: 20
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
-        HD: 50
+        HDZERO: 50,
+        DJIWTF: 60,
+        AVATAR: 53,
+        BF43COMPAT: 30,
+        BFHDCOMPAT: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
-        HD: 900
+        HDZERO: 900,
+        DJIWTF: 1320,
+        AVATAR: 1060,
+        BF43COMPAT: 480,
+        BFHDCOMPAT: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -781,7 +820,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_TIME',
                     id: 48,
-                    preview: FONT.symbol(SYM.FLY_M) + '10:35'
+                    preview: FONT.symbol(SYM.FLIGHT_MINS_REMAINING) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
@@ -790,28 +829,34 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+
+                    preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
-                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    name: 'SCALED_THROTTLE_POSITION',
                     id: 33,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                    preview: FONT.symbol(SYM.SCALE) + FONT.symbol(SYM.THR) + ' 51'
                 },
                 {
                     name: 'CRAFT_NAME',
                     id: 8,
                     preview: '[CRAFT_NAME]'
+                },
+                {
+                    name: 'PILOT_NAME',
+                    id: 142,
+                    preview: '[PILOT_NAME]'
                 },
                 {
                     name: 'FLYMODE',
@@ -845,7 +890,7 @@ OSD.constants = {
                     name: 'AIR_SPEED',
                     id: 27,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return usePitot;
                     },
                     preview: function(osd_data) {
                         var speed;
@@ -870,7 +915,7 @@ OSD.constants = {
                     name: 'AIR_MAX_SPEED',
                     id: 127,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return usePitot;
                     },
                     preview: function(osd_data) {
                         // 3 chars
@@ -900,6 +945,9 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
+                    enabled: function() {
+                        return useESCTelemetry;
+                    },
                     preview: function(){
                         let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
                         return FONT.symbol(SYM.RPM) + rpmPreview;
@@ -912,6 +960,34 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
                 },
                 {
+                    name: 'GLIDE_TIME',
+                    id: 136,
+                    min_version: '5.0.0',
+                    preview: FONT.symbol(SYM.GLIDE_MINS) + '02:34',
+                },
+                {
+                    name: 'GLIDE_RANGE',
+                    id: 137,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 12') + FONT.symbol(SYM.MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 11') + FONT.symbol(SYM.NM);
+                            default: // Metric & Metric + MPH
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 21') + FONT.symbol(SYM.KM);
+                        }
+                    }
+                },
+                {
+                    name: 'PAN_SERVO_CENTRED',
+                    id: 143,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
+                },
+                {
                     name: 'MISSION INFO',
                     id: 129,
                     min_version: '4.0.0',
@@ -922,6 +998,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 144,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
@@ -943,6 +1025,9 @@ OSD.constants = {
                 {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
+                    enabled: function() {
+                        return useBaro;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -956,6 +1041,9 @@ OSD.constants = {
                     name: 'ESC_TEMPERATURE',
                     id: 107,
                     min_version: '2.5.0',
+                    enabled: function() {
+                        return useESCTelemetry;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -1278,7 +1366,22 @@ OSD.constants = {
                                 return FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM);
                         }
                     }
-                }
+                },
+                {
+                    name: 'CLIMB_EFFICIENCY',
+                    id: 138,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.embed_dot('0.76') + FONT.symbol(SYM.AH_V_FT_0) + FONT.symbol(SYM.AH_V_FT_1);
+                            default: // Metric & Metric + MPH
+                                return FONT.embed_dot('1.23') + FONT.symbol(SYM.AH_V_M_0) + FONT.symbol(SYM.AH_V_M_1);
+                        }
+                    }
+                },
             ]
         },
         {
@@ -1519,6 +1622,28 @@ OSD.constants = {
                     id: 52,
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
                 },
+                {
+                    name: 'GROUND COURSE',
+                    id: 140,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'CROSS TRACK ERROR',
+                    id: 141,
+                    min_version: '6.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
             ]
         },
         {
@@ -1586,6 +1711,9 @@ OSD.constants = {
         },
         {
             name: 'osdGroupCRSF',
+            enabled: function() {
+                return useCRSFRx;
+            },
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',
@@ -1836,6 +1964,11 @@ OSD.constants = {
                     id: 135,
                     preview: 'LEVEL  ' + FONT.embed_dot('5.4')
                 },
+                {
+                    name: 'MISSION_INDEX',
+                    id: 139,
+                    preview: 'WP NO 7'
+                },
             ]
         },
         {
@@ -1934,6 +2067,9 @@ OSD.reload = function(callback) {
             if(port.functions.includes('DJI_FPV')) {
                 OSD.data.isDjiHdFpv = true;
             }
+            if(port.functions.includes('MSP_DISPLAYPORT')) {
+                OSD.data.isMspDisplay = true;
+            }
         });
     });
 
@@ -1971,7 +2107,7 @@ OSD.updateSelectedLayout = function(new_layout) {
 };
 
 OSD.updateDisplaySize = function () {
-    var video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
+    video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
@@ -1989,7 +2125,6 @@ OSD.updateDisplaySize = function () {
 
     // set the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
-    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
     // set the new display size
     OSD.data.display_size = {
@@ -2006,17 +2141,30 @@ OSD.updateDisplaySize = function () {
             var item = OSD.msp.helpers.unpack.position(origPos[jj]);
             // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
             if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-                items[jj] = item; 
+                items[jj] = item;
             }
         }
     }
 
     // set the preview size based on the video type
-    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
-    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
-    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
+    // -- AVATAR
+    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
+    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    // -- DJI WTF
+    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    // -- HD ZERO
+    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
+    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    // -- BFHDCOMPAT
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2299,22 +2447,57 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
+const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
+const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
+
 OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
-    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
 
-        $videoTypes.append(
-            $('<label/>')
-            .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                .prop('checked', i === OSD.data.preferences.video_system)
-                .data('type', i)
-            )
-        );
+    if (!OSD.data.isDjiHdFpv) {
+        $('#dji_settings').hide();
     }
 
-    $videoTypes.find(':radio').click(function () {
-        OSD.data.preferences.video_system = $(this).data('type');
+    if (OSD.data.isMspDisplay) {
+        if (mspVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('HDZERO');
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    } else {
+        if (analogVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('AUTO')
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    }
+
+    if (OSD.data.isMspDisplay) {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (mspVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                );
+            }
+        }
+    } else {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (analogVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                );
+            }
+        }
+    }
+
+    $videoTypes.change(function () {
+        OSD.data.preferences.video_system = $(this).find(':selected').data('type');
         OSD.updateDisplaySize();
         OSD.GUI.saveConfig();
     });
@@ -2391,7 +2574,7 @@ OSD.GUI.updateFields = function() {
             $('<div class="helpicon cf_tip"></div>')
                 .css('margin-top', '1px')
                 .attr('title', groupHelp)
-                .appendTo(groupTitleContainer)
+                .appendTo(groupTitleContainer.parent())
                 .jBox('Tooltip', {
                     delayOpen: 100,
                     delayClose: 100,
@@ -2450,6 +2633,7 @@ OSD.GUI.updateFields = function() {
                             // Ensure the element is inside the viewport, at least partially.
                             // In that case move it to the very first row/col, otherwise there's
                             // no way to reposition items that are outside the viewport.
+                            OSD.msp.helpers.calculate.coords(itemData);
                             if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
                                 itemData.x = itemData.y = itemData.position = 0;
                             }
@@ -2484,23 +2668,37 @@ OSD.GUI.updateFields = function() {
         }
     }
 
+    if ($('#videoGuidesToggle').length == false) {
+        $('#videoGuides').prepend(
+            $('<input id="videoGuidesToggle" type="checkbox" class="toggle" />')
+            .attr('checked', isGuidesChecked)
+            .on('change', function () {
+                OSD.GUI.updateGuidesView(this.checked);
+                chrome.storage.local.set({'showOSDGuides': this.checked});
+                OSD.GUI.updatePreviews();
+            })
+        );
+    }
+
     if ($('#djiUnsupportedElementsToggle').length == false) {
         $('#djiUnsupportedElements').prepend(
             $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
-            .attr('checked', OSD.data.isDjiHdFpv)
+            .attr('checked', OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay)
             .on('change', function () {
                 OSD.GUI.updateDjiView(this.checked);
                 OSD.GUI.updatePreviews();
             })
         );
     }
+
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-     // Update the OSD preview
-     refreshOSDSwitchIndicators();
-     updateCraftName();
+    // Update the OSD preview
+    refreshOSDSwitchIndicators();
+    updatePilotAndCraftNames();
+    updatePanServoPreview();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2520,8 +2718,6 @@ OSD.GUI.removeBottomLines = function(){
     });
 };
 
-
-
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
         var name = $(element).find('input').attr('name');
@@ -2540,6 +2736,38 @@ OSD.GUI.updateDjiMessageElements = function(on) {
         }
     });
     OSD.GUI.removeBottomLines();
+};
+
+OSD.GUI.updateGuidesView = function(on) {
+    isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
+    $('.hd_43_margin_left').toggleClass('hdzero_43_left', (isHdZero && on))
+    $('.hd_43_margin_right').toggleClass('hdzero_43_right', (isHdZero && on))
+    $('.hd_3016_box_top').toggleClass('hd_3016_top', (isHdZero && on))
+    $('.hd_3016_box_bottom').toggleClass('hd_3016_bottom', (isHdZero && on))
+    $('.hd_3016_box_left').toggleClass('hd_3016_left', (isHdZero && on))
+    $('.hd_3016_box_right').toggleClass('hd_3016_right', (isHdZero && on))
+
+    isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
+    $('.hd_43_margin_left').toggleClass('dji_hd_43_left', (isDJIWTF && on))
+    $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
+
+    isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
+    $('.hd_43_margin_left').toggleClass('hd_avatar_43_left', (isAvatar && on))
+    $('.hd_43_margin_right').toggleClass('hd_avatar_43_right', (isAvatar && on))
+    $('.hd_avatar_bottom_bar').toggleClass('hd_avatar_bottom', (isAvatar && on))
+    $('.hd_avatar_storage_box_top').toggleClass('hd_avatar_storagebox_t', (isAvatar && on))
+    $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
+    $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
+    $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
+
+    isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
+    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
+
+    isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
+    $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
 };
 
 OSD.GUI.updateDjiView = function(on) {
@@ -2571,6 +2799,8 @@ OSD.GUI.updateDjiView = function(on) {
                 $(element).hide();
             }
         });
+
+        $('.switch-indicator-container').hide();
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
             $('#osdGroup' + groupName).show();
@@ -2583,8 +2813,17 @@ OSD.GUI.updateDjiView = function(on) {
         $('.settings-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
+
+        $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
+};
+
+OSD.GUI.updateAlarms = function() {
+    $(".osd_use_airspeed_alarm").toggle(usePitot);
+    $(".osd_use_baro_temp_alarm").toggle(useBaro);
+    $(".osd_use_esc_telemetry").toggle(useESCTelemetry);
+    $(".osd_use_crsf").toggle(useCRSFRx);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -2671,13 +2910,15 @@ OSD.GUI.updatePreviews = function() {
 
     var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
     if (OSD.data.display_size.y % 2 == 0) {
-        centerPosition += OSD.data.display_size.x / 2;
+        centerPosition += Math.floor(OSD.data.display_size.x / 2);
     }
+
+    let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
         for (i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
 
@@ -2686,21 +2927,21 @@ OSD.GUI.updatePreviews = function() {
         crsHNumber = Settings.getInputValue('osd_crosshairs_style');
        if (crsHNumber == 1) {
             // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 2, SYM.AH_AIRCRAFT4);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
         } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
             // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
         }
     }
 
@@ -2709,12 +2950,12 @@ OSD.GUI.updatePreviews = function() {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
         for (i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
         // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth - 1, SYM.AH_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
     OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
@@ -2787,12 +3028,15 @@ OSD.GUI.updateAll = function() {
         layouts.on('change', function() {
             OSD.updateSelectedLayout(parseInt(layouts.val()));
             OSD.GUI.updateFields();
+            OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
+            OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
             OSD.GUI.updatePreviews();
         });
     } else {
         layouts.hide();
         layouts.off('change');
     }
+
     $('.osd_search').on('input', function() {
         OSD.GUI.updateFields();
     });
@@ -2801,7 +3045,9 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
-    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv);
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
+    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay);
+    OSD.GUI.updateAlarms();
 };
 
 OSD.GUI.update = function() {
@@ -2824,6 +3070,8 @@ OSD.GUI.saveConfig = function() {
 
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
+
+    mspHelper.loadServoMixRules();
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
@@ -2850,7 +3098,7 @@ TABS.osd.initialize = function (callback) {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log('OSD settings saved');
+                GUI.log(chrome.i18n.getMessage('osdSettingsSaved'));
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
@@ -2859,6 +3107,12 @@ TABS.osd.initialize = function (callback) {
             });
         });
 
+        // Initialise guides checkbox
+        chrome.storage.local.get('showOSDGuides', function (result) {
+            if (typeof result.showOSDGuides !== 'undefined') {
+                isGuidesChecked = result.showOSDGuides;
+            }
+        });
 
         // Setup switch indicators
         $(".osdSwitchInd_channel option").each(function() {
@@ -2885,6 +3139,17 @@ TABS.osd.initialize = function (callback) {
             refreshOSDSwitchIndicators();
         });
 
+        // Functions for when pan servo settings change
+        $('#osdPanServoIndicatorShowDegrees').on('change', function() {
+            // Update the OSD preview
+            updatePanServoPreview();
+        });
+
+        $('#panServoOutput').on('change', function() {
+            // Update the OSD preview
+            updatePanServoPreview();
+        });
+
         // Function for when text for craft name changes
         $('#craft_name').on('keyup', function() {
             // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
@@ -2897,7 +3162,21 @@ TABS.osd.initialize = function (callback) {
             }
 
             // Update the OSD preview
-            updateCraftName();
+            updatePilotAndCraftNames();
+        });
+
+        $('#pilot_name').on('keyup', function() {
+            // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+            let testText = $(this).val();
+            if (testExp.test(testText.slice(-1))) {
+                $(this).val(testText.toUpperCase());
+            } else {
+                $(this).val(testText.slice(0, -1));
+            }
+
+            // Update the OSD preview
+            updatePilotAndCraftNames();
         });
 
         // font preview window
@@ -2913,7 +3192,7 @@ TABS.osd.initialize = function (callback) {
             }
             $fontPicker.removeClass('active');
             $(this).addClass('active');
-            $.get('/resources/osd/' + $(this).data('font-file') + '.mcm', function (data) {
+            $.get('/resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
                 FONT.preview($preview);
                 OSD.GUI.update();
@@ -3007,7 +3286,7 @@ TABS.osd.initialize = function (callback) {
                             });
                         } else {
                             console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log('You don\'t have <span style="color: red">write permissions</span> for this file');
+                            GUI.log(chrome.i18n.getMessage('writePermissionsForFile'));
                         }
                     });
                 });
@@ -3031,9 +3310,28 @@ TABS.osd.initialize = function (callback) {
             OSD.GUI.updateDjiMessageElements(this.checked);
         });
 
+        // Update RX data for Crossfire detection
+        mspHelper.loadRxConfig(function() {
+            useCRSFRx = (RX_CONFIG.serialrx_provider == 6);
+        });
+
+        // Get status of ESC Telemetry
+        useESCTelemetry = false;
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
+            for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
+                var serialPort = SERIAL_CONFIG.ports[portIndex];
+                if (serialPort.functions.indexOf("ESC") >= 0) {
+                    useESCTelemetry = true;
+                    break;
+                }
+            }
+        });
+
         // Update SENSOR_CONFIG, used to detect
         // OSD_AIR_SPEED
         mspHelper.loadSensorConfig(function () {
+            useBaro  = (SENSOR_CONFIG.barometer != 0);
+            usePitot = (SENSOR_CONFIG.pitot != 0);
             GUI.content_ready(callback);
         });
     }));
@@ -3060,26 +3358,92 @@ function refreshOSDSwitchIndicators() {
     }
 
     OSD.GUI.updatePreviews();
-}
+};
 
-function updateCraftName() {
+function updatePilotAndCraftNames() {
+    let foundPilotName = ($('#pilot_name').val() == undefined);
+    let foundCraftName = ($('#craft_name').val() == undefined);
+
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupGeneral";
+    })[0];
+
+    if (($('#craft_name').val() != undefined) || ($('#pilot_name').val() != undefined)) {
+        for (let si = 0; si < generalGroup.items.length; si++) {
+            if (generalGroup.items[si].name == "CRAFT_NAME") {
+                let nameText = $('#craft_name').val();
+
+                if (nameText == "") {
+                    generalGroup.items[si].preview = "CRAFT_NAME";
+                } else {
+                    generalGroup.items[si].preview = nameText;
+                }
+                foundCraftName = true;
+            }
+
+            if (generalGroup.items[si].name == "PILOT_NAME") {
+                let nameText = $('#pilot_name').val();
+
+                if (nameText == "") {
+                    generalGroup.items[si].preview = "PILOT_NAME";
+                } else {
+                    generalGroup.items[si].preview = nameText;
+                }
+                foundPilotName = true;
+            }
+
+            if (foundCraftName && foundPilotName) {
+                break;
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+};
+
+function updatePanServoPreview() {
+    // Show or hide the settings, based on of the feature is active.
+    if ($('#panServoOutput').val() === "0") {
+        $('#osd_pan_settings').hide();
+        $('#panServoOutput').parent().addClass('no-bottom');
+    } else {
+        $('#osd_pan_settings').show();
+        $('#panServoOutput').parent().removeClass('no-bottom');
+    }
+
+    // Update the panServoOutput select to be visibly easier to use
+    let servoRules = SERVO_RULES;
+    $('#panServoOutput option').each(function() {
+        let servoIndex = $(this).val();
+
+        if (servoIndex === "0") {
+            $(this).text("OFF");
+        } else {
+            let servo = servoRules.getServoMixRuleFromTarget(servoIndex);
+            if (servo == null) {
+                $(this).remove();
+            } else {
+                let servoInputIndex = parseInt(servo.getInput());
+                $(this).text("Servo " + servoIndex + ": " + FC.getServoMixInputName(servoInputIndex));
+            }
+        }
+    });
+
+    // Update the OSD preview based on settings
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
       })[0];
 
+    for (let si = 0; si < generalGroup.items.length; si++) {
+        if (generalGroup.items[si].name == "PAN_SERVO_CENTRED") {
+            let craftNameText = $('#craft_name').val();
 
-    if ($('#craft_name').val() != undefined) {
-        for (let si = 0; si < generalGroup.items.length; si++) {
-            if (generalGroup.items[si].name == "CRAFT_NAME") {
-                let craftNameText = $('#craft_name').val();
-                
-                if (craftNameText == "") {
-                    generalGroup.items[si].preview = "CRAFT_NAME";
-                } else {
-                    generalGroup.items[si].preview = craftNameText;
-                }
-                break;
+            if ($('#osdPanServoIndicatorShowDegrees').prop('checked')) {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES);
+            } else {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L);
             }
+            break;
         }
     }
 

@@ -11,20 +11,20 @@
         <div class="gui_box">
             <div class="info">
                 <div class="checkboxes">
-                    <label><input type="checkbox" name="gyro_on" class="first" />Gyroscope</label> <label><input
-                        type="checkbox" name="accel_on" />Accelerometer</label> <label><input type="checkbox"
-                        name="mag_on" />Magnetometer</label> <label><input type="checkbox" name="baro_on" />Barometer</label> <label><input
-                        type="checkbox" name="sonar_on" />Sonar</label> <label><input type="checkbox" name="airspeed_on" />Air speed</label> <label><input
-                        type="checkbox" name="temperature_on" />Temperatures</label><label><input type="checkbox" name="debug_on" />Debug</label>
+                    <label><input type="checkbox" name="gyro_on" class="first" /><span i18n="sensorsGyroSelect"></label> <label><input
+                        type="checkbox" name="accel_on" /><span i18n="sensorsAccelSelect"></span></label> <label><input type="checkbox"
+                        name="mag_on" /><span i18n="sensorsMagSelect"></span></label> <label><input type="checkbox" name="baro_on" /><span i18n="sensorsAltitudeSelect"></span></label> <label><input
+                        type="checkbox" name="sonar_on" /><span i18n="sensorsSonarSelect"></span></label> <label><input type="checkbox" name="airspeed_on" /><span i18n="sensorsAirSpeedSelect"></span></label> <label><input
+                        type="checkbox" name="temperature_on" /><span i18n="sensorsTemperaturesSelect"></span></label><label><input type="checkbox" name="debug_on" /><span i18n="sensorsDebugSelect"></span></label>
 
-                    <a class="debug-trace" href="javascript:void(0);">Open Debug Trace</a>
+                    <a class="debug-trace" href="javascript:void(0);"><span i18n="sensorsDebugTrace"></span></a>
                 </div>
             </div>
         </div>
         <div class="wrapper gyro">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Gyroscope - deg/s</div>
+                    <div class="title" i18n="sensorsGyroscope"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -70,7 +70,7 @@
         <div class="wrapper accel">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Accelerometer - g</div>
+                    <div class="title" i18n="sensorsAccelerometer"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -116,7 +116,7 @@
         <div class="wrapper mag">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Magnetometer - Ga</div>
+                    <div class="title" i18n="sensorsMagnetometer"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -160,7 +160,7 @@
         <div class="wrapper altitude">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Barometer - meters</div>
+                    <div class="title" i18n="sensorsBarometer"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -196,7 +196,7 @@
         <div class="wrapper sonar">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Sonar - cm</div>
+                    <div class="title" i18n="sensorsSonar"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -229,7 +229,7 @@
         <div class="wrapper airspeed">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Air speed - cm/s</div>
+                    <div class="title" i18n="sensorsAirspeed"></div>
                     <dl>
                         <dt i18n="sensorsRefresh"></dt>
                         <dd class="rate">
@@ -263,9 +263,9 @@
         <div class="wrapper temperature">
             <div class="gui_box grey">
                 <div class="plot_control">
-                    <div class="title">Temperature 0 - °C</div>
+                    <div class="title" i18n="sensorsTemperature0"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -278,9 +278,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 1 - °C</div>
+                    <div class="title" i18n="sensorsTemperature1"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -293,9 +293,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 2 - °C</div>
+                    <div class="title" i18n="sensorsTemperature2"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -308,9 +308,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 3 - °C</div>
+                    <div class="title" i18n="sensorsTemperature3"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -323,9 +323,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 4 - °C</div>
+                    <div class="title" i18n="sensorsTemperature4"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -338,9 +338,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 5 - °C</div>
+                    <div class="title" i18n="sensorsTemperature5"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -353,9 +353,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 6 - °C</div>
+                    <div class="title" i18n="sensorsTemperature6"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>
@@ -368,9 +368,9 @@
                 </svg>
                 <div class="clear-both"></div>
                 <div class="plot_control">
-                    <div class="title">Temperature 7 - °C</div>
+                    <div class="title" i18n="sensorsTemperature7"></div>
                     <dl>
-                        <dt>value:</dt>
+                        <dt i18n="sensorsTemperatureValue"></dt>
                         <dd class="x">0</dd>
                     </dl>
                 </div>

@@ -60,6 +60,10 @@ a.disabled {
     transition: none;
 }
 
+.inputRequiredWarning {
+    border: 3px solid #d40000 !important;
+}
+
 .cf_doc_version_bt a {
     padding: 1px 9px 1px 9px;
     margin-top: -45px;
@@ -319,27 +323,6 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .accicon.error {
     background-image: url("../images/icons/sensor_acc_error.png");
-    color: #d40000;
-}
-
-.imu2icon {
-    background: url("../images/icons/sensor_imu2_off.png") no-repeat -5px 2px;
-    background-size: 40px;
-    height: 30px;
-    margin-top: 3px;
-    width: 100%;
-    padding-top: 40px;
-    color: #4f4f4f;
-    text-align: center;
-}
-
-.imu2icon.active {
-    background-image: url("../images/icons/sensor_imu2_on.png");
-    color: #818181;
-}
-
-.imu2icon.error {
-    background-image: url("../images/icons/sensor_imu2_error.png");
     color: #d40000;
 }
 
@@ -904,6 +887,18 @@ li.active .ic_help {
 
 li.active .ic_flasher {
     background-image: url("../images/icons/cf_icon_flasher_white.svg");
+}
+
+.ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_grey.svg");
+}
+
+.ic_sitl:hover {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
+}
+
+li.active .ic_sitl {
+    background-image: url("../images/icons/cf_icon_sitl_white.svg");
 }
 
 .ic_calibration {
@@ -2008,6 +2003,10 @@ select {
     border: 1px solid silver;
     border-radius: 3px;
     padding: 1px;
+}
+
+.lc_disabled {
+    color: #aaa;
 }
 
 .ic_osd {
