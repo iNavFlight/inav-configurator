@@ -180,6 +180,7 @@ var MSPCodes = {
     MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
     MSPV2_INAV_AIR_SPEED:               0x2009,
     MSPV2_INAV_OUTPUT_MAPPING:          0x200A,
+    MSPV2_INAV_OUTPUT_MAPPING_FULL:     0x200D,     // woga65:
 
     MSP2_INAV_MIXER:                    0x2010,
     MSP2_INAV_SET_MIXER:                0x2011,
@@ -232,6 +233,8 @@ var MSPCodes = {
     MSP2_INAV_SET_SAFEHOME:             0x2039,
     
     MSP2_INAV_LOGIC_CONDITIONS_SINGLE:  0x203B,
+
+    MSP2_INAV_ESC_RPM:                  0x2040,     //woga65:
 
     MSP2_INAV_LED_STRIP_CONFIG_EX:      0x2048,
     MSP2_INAV_SET_LED_STRIP_CONFIG_EX:  0x2049

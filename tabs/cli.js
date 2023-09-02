@@ -104,6 +104,10 @@ function sendLinesWithDelay(outputArray) {
                 if (isLastCommand && TABS.cli.cliBuffer) {
                     line = getCliCommand(line, TABS.cli.cliBuffer);
                 }
+                // woga65: translate generic channel letters if target firmware expects collective pitch letters
+                if (line.toLowerCase().trim().startsWith('map') && TARGET.isVariablePitch) {
+                    line = line.replace(/[7-8]/g, ch => 'GC'.charAt(parseInt(ch) - 3));
+                }
                 TABS.cli.sendLine(line, () => {
                     resolve(processingDelay);
                 });

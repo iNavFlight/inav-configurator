@@ -170,7 +170,6 @@ TABS.firmware_flasher.initialize = function (callback) {
             TABS.firmware_flasher.releases = releases;
             return;
         };
-
         $.get('https://api.github.com/repos/iNavFlight/inav/releases?per_page=10', function (releasesData){
             TABS.firmware_flasher.releasesData = releasesData;
             buildBoardOptions();
@@ -305,8 +304,9 @@ TABS.firmware_flasher.initialize = function (callback) {
 
                                 $('div.git_info .committer').text(data.commit.author.name);
                                 $('div.git_info .date').text(date);
-                                $('div.git_info .hash').text(data.sha.slice(0, 7)).prop('href', 'https://api.github.com/repos/iNavFlight/inav/commit/' + data.sha);
-
+                                $('div.git_info .hash')
+                                    .text(data.sha.slice(0, 7))
+                                    .prop('href', 'https://api.github.com/repos/iNavFlight/inav/commit/' + data.sha);
                                 $('div.git_info .message').text(data.commit.message);
 
                                 $('div.git_info').slideDown();

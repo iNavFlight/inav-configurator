@@ -20,11 +20,11 @@
                 </div>
                 <div class="hybrid_element">
                     <input type="text" name="rcmap" spellcheck="false" /> 
-                    <select class="hybrid_helper"
-                        name="rcmap_helper">
-                        <option value="AETR">Default</option>
-                        <option value="AETR">Futaba / Hitec</option>
-                        <option value="TAER">JR / Spektrum / Graupner</option>
+                    <select class="hybrid_helper" name="rcmap_helper" id="rcmap_element">
+                        <!-- woga65: also map the AUX channels (will be overridden if the firmware sends only 4 channel's mapping) -->
+                        <option value="AETR5678">Default</option>
+                        <option value="AETR5678">Futaba / Hitec</option>
+                        <option value="TAER5678">JR / Spektrum / Graupner</option>
                     </select>
                 </div>
             </div>

@@ -79,8 +79,12 @@ TABS.outputs.initialize = function (callback) {
         finalize();
     }
 
+    //woga65: if craft is variable pitch, output raw output values rather than percentages (for testing)
     function getMotorOutputValue(value) {
 
+        if (TARGET.isVariablePitch) {
+            return value;
+        } 
         if (!self.feature3DEnabled) {
             let valueNormalized = value - MISC.mincommand;
             let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;
@@ -296,6 +300,8 @@ TABS.outputs.initialize = function (callback) {
 
             if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
                 output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+            } else if (MIXER_CONFIG.platformType == PLATFORM_HELICOPTER) {
+                output = OUTPUT_MAPPING.getHeliServoOutput(usedServoIndex);
             } else {
                 output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
             }
@@ -488,10 +494,10 @@ TABS.outputs.initialize = function (callback) {
                 <div class="m-block motor-' + i + '">\
                     <div class="meter-bar">\
                         <div class="label"></div>\
+                        <div class="rpm-label"></div>\
                         <div class="indicator">\
-                            <div class="label">\
-                                <div class="label"></div>\
-                            </div>\
+                            <div class="label"></div>\
+                            <div class="rpm-label"></div>\
                         </div>\
                     </div>\
                 </div>\
@@ -665,11 +671,20 @@ TABS.outputs.initialize = function (callback) {
 
         function getPeriodicServoOutput() {
             if (helper.mspQueue.shouldDrop()) {
+                getPeriodicMotorRpm();
+                return;
+            }
+
+            MSP.send_message(MSPCodes.MSP_SERVO, false, false, getPeriodicMotorRpm);
+        }
+
+        function getPeriodicMotorRpm() {            // woga65: get RPMs for each motor
+            if (helper.mspQueue.shouldDrop()) {     // || !SERIAL_CONFIG.ports.filter(p => p.functions.includes('ESC')).length) {
                 update_ui();
                 return;
             }
 
-            MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
+            MSP.send_message(MSPCodes.MSP2_INAV_ESC_RPM, false, false, update_ui);
         }
 
         var full_block_scale = MISC.maxthrottle - MISC.mincommand;
@@ -678,6 +693,7 @@ TABS.outputs.initialize = function (callback) {
             var previousArmState = self.armed,
                 block_height = $('div.m-block:first').height(),
                 data,
+                rpm,
                 margin_top,
                 height,
                 color,
@@ -688,7 +704,9 @@ TABS.outputs.initialize = function (callback) {
                 margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
                 height = (data * (block_height / full_block_scale)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
+                rpm = i < ESC_RPMS.length ? ESC_RPMS[i] : '';     // woga65: get motor RPM
 
+                $('.motor-' + i + ' .rpm-label', motors_wrapper).text(rpm);
                 $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
             }

@@ -14,25 +14,17 @@ TABS.advanced_tuning.initialize = function (callback) {
     function loadHtml() {
         GUI.load("./tabs/advanced_tuning.html", Settings.processHtml(function () {
 
-        if (FC.isAirplane()) {
-            $('.airplaneTuning').show();
-            $('.airplaneTuningTitle').show();
-            $('.multirotorTuning').hide();
-            $('.multirotorTuningTitle').hide();
-            $('.notFixedWingTuning').hide();
-        } else if (FC.isMultirotor()) {
-            $('.airplaneTuning').hide();
-            $('.airplaneTuningTitle').hide();
-            $('.multirotorTuning').show();
-            $('.multirotorTuningTitle').show();
-            $('.notFixedWingTuning').show();
-        } else {
-            $('.airplaneTuning').show();
-            $('.airplaneTuningTitle').hide();
-            $('.multirotorTuning').show();
-            $('.multirotorTuningTitle').hide();
-            $('.notFixedWingTuning').show();
-        }
+            if (FC.isAirplane()) {
+                GUI.selectAdvancedTuningAirplane();
+            } 
+            else if (FC.isMultirotor()) {
+                GUI.selectAdvancedTuningMultirotor();
+            }
+            else if (FC.isHelicopter()) {
+                GUI.selectAdvancedTuningHelicopter();
+            } else {
+                GUI.selectAdvancedTuningGenericPlatform();
+            }
 
         GUI.simpleBind();
 

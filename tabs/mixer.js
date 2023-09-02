@@ -85,6 +85,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     function renderOutputMapping() {
         let outputMap = OUTPUT_MAPPING.getOutputTable(
             MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
+            MIXER_CONFIG.platformType == PLATFORM_HELICOPTER,
             MOTOR_RULES.getNumberOfConfiguredMotors(),
             SERVO_RULES.getUsedServoIndexes()
         );
@@ -464,6 +465,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
+        platforms = (TARGET.isVariablePitch)    //woga65: exclude collective pitch platforms?
+            ? platforms
+            : platforms.filter(p => !(p.collectivePitch || false)); 
+
         motorWizardModal = new jBox('Modal', {
             width: 480,
             height: 410,
@@ -736,8 +741,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 };
 
 TABS.mixer.cleanup = function (callback) {
-    delete modal;
-    delete motorWizardModal;
+    delete this.modal;              //woga65: throws an error in strict mode without the prefix 'this'
+    delete this.motorWizardModal;   //woga65: see above
     $('.jBox-wrapper').remove();
     if (callback) callback();
 };

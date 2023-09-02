@@ -76,6 +76,28 @@ TABS.receiver.initialize = function (callback) {
         // translate to user-selected language
         localize();
 
+        // woga65: if craft is variable pitch, default to 
+        // collective and gyro gain rather than AUX channels
+        const rcMapElement = document.getElementById('rcmap_element');
+        if (
+            RC_MAP.length === 8 ||
+            TARGET.isVariablePitch  // woga65: RC_MAP.length might be 4 if target is SITL, so make sure, heli mode is viable in simulator
+        ) {
+            rcMapElement.innerHTML = MIXER_CONFIG.platformType == PLATFORM_HELICOPTER
+                ? ` <option value="AECR56TG">Default</option>
+                    <option value="CAER56TG">Collective Pitch / Spektrum</option>
+                    <option value="AECR56TG">Collective Pitch / Futaba</option>`.trim()
+                : ` <option value="AETR5678">Default</option>
+                    <option value="TAER5678">JR / Spektrum / Graupner</option>
+                    <option value="AETR5678">Futaba / Hitec</option>`.trim();                    
+        } else {
+            rcMapElement.innerHTML = `
+                <option value="AETR">Default</option>
+                <option value="TAER">JR / Spektrum / Graupner</option>
+                <option value="AETR">Futaba / Hitec</option>`.trim();
+        }
+
+
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
 
@@ -120,21 +142,24 @@ TABS.receiver.initialize = function (callback) {
         $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
 
         // generate bars
+        // woga65: including AUX- and/or variable pitch specific channel names
         var bar_names = [
                 chrome.i18n.getMessage('controlAxisRoll'),
                 chrome.i18n.getMessage('controlAxisPitch'),
                 chrome.i18n.getMessage('controlAxisYaw'),
-                chrome.i18n.getMessage('controlAxisThrottle')
+                chrome.i18n.getMessage('controlAxisThrottle'),
+                'CH5 [5]',
+                'CH6 [6]',
+                TARGET.isVariablePitch ? chrome.i18n.getMessage('controlAxisCollective') : 'CH7 [7]',
+                TARGET.isVariablePitch ? chrome.i18n.getMessage('controlGyroGain') : 'CH8 [8]',
             ],
             bar_container = $('.tab-receiver .bars');
 
         for (var i = 0; i < RC.active_channels; i++) {
             var name;
-            if (i < bar_names.length) {
-                name = bar_names[i];
-            } else {
-                name = chrome.i18n.getMessage("radioChannelShort") + (i + 1);
-            }
+            name = (i < bar_names.length && bar_names[i])   //woga65:
+                ? bar_names[i]
+                : chrome.i18n.getMessage("radioChannelShort") + (i + 1);
 
             bar_container.append('\
                 <ul>\
@@ -304,8 +329,8 @@ TABS.receiver.initialize = function (callback) {
             googleAnalytics.sendEvent('Setting', 'RcMappingSave', rcMapValue);
 
             for (var i = 0; i < RC_MAP.length; i++) {
-                RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
-            }
+                RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);     // woga65: nothing to change here since variable pitch
+            }                                                               // firmware accepts collective pitch specific letters 
 
             googleAnalytics.sendEvent('Setting', 'RcProtocol', $('#receiver_type option:selected').text() + ":" + $('#serialrx_provider option:selected').text());
 

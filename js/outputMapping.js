@@ -5,6 +5,7 @@ let OutputMappingCollection = function () {
     let self = {},
         data = [];
 
+    /** @todo Evaluate if 32 bit instead of 8 bit sent from the FC might cause compatibility issues */
     const TIM_USE_ANY = 0;
     const TIM_USE_PPM = 0;
     const TIM_USE_PWM = 1;
@@ -13,13 +14,15 @@ let OutputMappingCollection = function () {
     const TIM_USE_MC_CHNFW = 4;     // Deprecated and not used after removal of CHANNEL_FORWARDING feature
     const TIM_USE_FW_MOTOR = 5;
     const TIM_USE_FW_SERVO = 6;
+    const TIM_USE_HC_MOTOR = 7;     // woga65: Helicopter motor output
+    const TIM_USE_HC_SERVO = 8;     // woga65: Helicopter servo output
     const TIM_USE_LED = 24;
     const TIM_USE_BEEPER = 25;
 
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
 
-    function getTimerMap(isMR, motors, servos) {
+    function getTimerMap(isMR, isHeli, motors, servos) {
         let timerMap = [],
             motorsToGo = motors,
             servosToGo = servos;
@@ -35,7 +38,17 @@ let OutputMappingCollection = function () {
                     motorsToGo--;
                     timerMap[i] = OUTPUT_TYPE_MOTOR;
                 }
-            } else {
+            } 
+            else if (isHeli) {
+                if (servosToGo > 0 && bit_check(data[i], TIM_USE_HC_SERVO)) {
+                    servosToGo--;
+                    timerMap[i] = OUTPUT_TYPE_SERVO;
+                } else if (motorsToGo > 0 && bit_check(data[i], TIM_USE_HC_MOTOR)) {
+                    motorsToGo--;
+                    timerMap[i] = OUTPUT_TYPE_MOTOR;
+                }
+            }
+            else {
                 if (servosToGo > 0 && bit_check(data[i], TIM_USE_FW_SERVO)) {
                     servosToGo--;
                     timerMap[i] = OUTPUT_TYPE_SERVO;
@@ -50,10 +63,10 @@ let OutputMappingCollection = function () {
         return timerMap;
     };
 
-    self.getOutputTable = function (isMR, motors, servos) {
+    self.getOutputTable = function (isMR, isHeli, motors, servos) {
         let currentMotorIndex = 1,
             currentServoIndex = 0,
-            timerMap = getTimerMap(isMR, motors, servos.length),
+            timerMap = getTimerMap(isMR, isHeli, motors, servos.length),
             outputMap = [],
             offset = getFirstOutputOffset();
 
@@ -92,7 +105,9 @@ let OutputMappingCollection = function () {
                 bit_check(data[i], TIM_USE_MC_MOTOR) ||
                 bit_check(data[i], TIM_USE_MC_SERVO) ||
                 bit_check(data[i], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i], TIM_USE_FW_SERVO)
+                bit_check(data[i], TIM_USE_FW_SERVO) ||
+                bit_check(data[i], TIM_USE_HC_MOTOR) ||
+                bit_check(data[i], TIM_USE_HC_SERVO)
             ) {
                 retVal++;
             };
@@ -107,7 +122,9 @@ let OutputMappingCollection = function () {
                 bit_check(data[i], TIM_USE_MC_MOTOR) ||
                 bit_check(data[i], TIM_USE_MC_SERVO) ||
                 bit_check(data[i], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i], TIM_USE_FW_SERVO)
+                bit_check(data[i], TIM_USE_FW_SERVO) ||
+                bit_check(data[i], TIM_USE_HC_MOTOR) ||
+                bit_check(data[i], TIM_USE_HC_SERVO)
             ) {
                 return i;
             }
@@ -140,6 +157,10 @@ let OutputMappingCollection = function () {
 
     self.getMrServoOutput = function (index) {
         return getOutput(index, TIM_USE_MC_SERVO);
+    };
+
+    self.getHeliServoOutput = function (index) {
+        return getOutput(index, TIM_USE_HC_SERVO);
     };
 
     return self;
