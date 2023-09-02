@@ -2994,10 +2994,10 @@
         "message": "Use mid. throttle for ALTHOLD"
     },
     "posholdHoverCollective": {
-        "message": "Hover collective pitch"
+        "message": "Hover collective pitch for normal headspeed"
     },
     "posholdHoverCollectiveHelp": {
-        "message": "Collective pitch at which the helicopter hovers. Used as a starting point for altitude hold. Note that this setting is shared with the corresponding multirotor setting. CLI: nav_mc_hover_thr"
+        "message": "Collective pitch at which the helicopter hovers with the headspeed set to normal. Used as a starting point for altitude hold. For the IDLE_UP settings use the CLI: nav_hc_hover_collective_normal | nav_hc_hover_collective_idleup_1 | nav_hc_hover_collective_idleup_2"
     },
     "posholdHoverMidCollective": {
         "message": "Use mid. collective pitch for ALTHOLD"

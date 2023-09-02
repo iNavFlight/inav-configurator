@@ -252,10 +252,15 @@
                             <input type="checkbox" class="toggle update_preview" id="use-mid-throttle" data-setting="nav_use_midthr_for_althold" data-live="true" />
                             <label for="use-mid-throttle"><span id="use-mid-throttle-label" data-i18n="posholdHoverMidThrottle"></span></label>
                         </div>
-                        <div class="number">
+                        <div class="number non-collective">
                             <input id="hover-throttle" type="number" data-unit="us" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="hover-throttle"><span id="hover-throttle-label" data-i18n="posholdHoverThrottle"></span></label>
                             <div for="hover-throttle" id="hover-throttle-help" class="helpicon cf_tip" data-i18n_title="posholdHoverThrottleHelp"></div>
+                        </div>
+                        <div class="number collective">
+                            <input id="hover-collective" type="number" data-unit="us" data-setting="nav_hc_hover_collective_normal" data-setting-multiplier="1" step="1" min="1000" max="2000" />
+                            <label for="hover-collective"><span id="hover-collective-label" data-i18n="posholdHoverCollective"></span></label>
+                            <div for="hover-collective" id="hover-collective-help" class="helpicon cf_tip" data-i18n_title="posholdHoverCollectiveHelp"></div>
                         </div>
                         <div class="checkbox">
                             <input id="wp-slowdown" type="checkbox" class="toggle update_preview" data-setting="nav_mc_wp_slowdown" data-live="true" />

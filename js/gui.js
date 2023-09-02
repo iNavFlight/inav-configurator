@@ -385,11 +385,40 @@ GUI_control.prototype.renderLogicConditionSelect = function ($container, logicCo
 
 GUI_control.prototype.selectAdvancedTuningHelicopter = function () {
     $('#max-bank-angle-label').attr('data-i18n', 'posholdMaxBankAngleHeli');
-    $('#hover-throttle-label').attr('data-i18n', 'posholdHoverCollective');
     $('#use-mid-throttle-label').attr('data-i18n','posholdHoverMidCollective');
-    $('#hover-throttle-help').attr('data-i18n_title', 'posholdHoverCollectiveHelp');
     $('#multirotor-navigation-config').attr('data-i18n', 'helicopterNavigationConfiguration');
     $('#multirotor-braking-config').attr('data-i18n', 'helicopterBrakingConfiguration');
+}
+
+GUI_control.prototype.selectAdvancedTuningMultirotor = function () {
+    $('.airplaneTuning').hide();
+    $('.airplaneTuningTitle').hide();
+    $('.helicopterTuningTitle').hide();
+    $('.multirotorTuning').show();
+    $('.multirotorTuningTitle').show();
+    $('.notFixedWingTuning').show();
+    $('.non-collective').show();
+    $('.collective').hide();
+}
+
+GUI_control.prototype.selectAdvancedTuningAirplane = function () {
+    $('.airplaneTuning').show();
+    $('.airplaneTuningTitle').show();
+    $('.multirotorTuning').hide();
+    $('.multirotorTuningTitle').hide();
+    $('.helicopterTuningTitle').hide();
+    $('.notFixedWingTuning').hide();
+}
+
+GUI_control.prototype.selectAdvancedTuningGenericPlatform = function () {
+    $('.airplaneTuning').show();
+    $('.multirotorTuning').show();
+    $('.notFixedWingTuning').show();
+    $('.airplaneTuningTitle').hide();
+    $('.multirotorTuningTitle').hide();
+    $('.helicopterTuningTitle').hide();
+    $('.non-collective').show();
+    $('.collective').hide();
 }
 
 // initialize object into GUI variable
