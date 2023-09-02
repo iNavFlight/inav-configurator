@@ -180,6 +180,9 @@ var MSPCodes = {
     MSPV2_INAV_SET_RATE_PROFILE:        0x2008,
     MSPV2_INAV_AIR_SPEED:               0x2009,
     MSPV2_INAV_OUTPUT_MAPPING:          0x200A,
+    MSP2_INAV_MC_BRAKING:               0x200B,
+    MSP2_INAV_SET_MC_BRAKING:           0x200C,
+    MSPV2_INAV_OUTPUT_MAPPING_EXT:      0x200D,
 
     MSP2_INAV_MIXER:                    0x2010,
     MSP2_INAV_SET_MIXER:                0x2011,
@@ -190,9 +193,6 @@ var MSPCodes = {
     MSP2_INAV_OSD_SET_ALARMS:           0x2015,
     MSP2_INAV_OSD_PREFERENCES:          0x2016,
     MSP2_INAV_OSD_SET_PREFERENCES:      0x2017,
-
-    MSP2_INAV_MC_BRAKING:               0x200B,
-    MSP2_INAV_SET_MC_BRAKING:           0x200C,
 
     MSP2_INAV_SELECT_BATTERY_PROFILE:   0x2018,
 
@@ -216,6 +216,7 @@ var MSPCodes = {
     MSP2_INAV_PROGRAMMING_PID:          0x2028,
     MSP2_INAV_SET_PROGRAMMING_PID:      0x2029,
     MSP2_INAV_PROGRAMMING_PID_STATUS:   0x202A,
+
 
     MSP2_PID:                           0x2030,
     MSP2_SET_PID:                       0x2031,

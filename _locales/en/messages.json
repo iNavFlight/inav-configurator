@@ -4491,7 +4491,7 @@
         "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
-        "message": "Output"
+        "message": "Output (timer)"
     },
     "mappingTableFunction": {
         "message": "Function"

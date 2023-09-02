@@ -31,20 +31,19 @@ let OutputMappingCollection = function () {
                 if (servosToGo > 0 && bit_check(data[i], TIM_USE_MC_SERVO)) {
                     servosToGo--;
                     timerMap[i] = OUTPUT_TYPE_SERVO;
-                } else if (motorsToGo > 0 && bit_check(data[i], TIM_USE_MC_MOTOR)) {
+                } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR)) {
                     motorsToGo--;
                     timerMap[i] = OUTPUT_TYPE_MOTOR;
                 }
             } else {
-                if (servosToGo > 0 && bit_check(data[i], TIM_USE_FW_SERVO)) {
+                if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)) {
                     servosToGo--;
                     timerMap[i] = OUTPUT_TYPE_SERVO;
-                } else if (motorsToGo > 0 && bit_check(data[i], TIM_USE_FW_MOTOR)) {
+                } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR)) {
                     motorsToGo--;
                     timerMap[i] = OUTPUT_TYPE_MOTOR;
                 }
             }
-
         }
 
         return timerMap;
@@ -89,10 +88,10 @@ let OutputMappingCollection = function () {
 
         for (let i = 0; i < data.length; i++) {
             if (
-                bit_check(data[i], TIM_USE_MC_MOTOR) ||
-                bit_check(data[i], TIM_USE_MC_SERVO) ||
-                bit_check(data[i], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i], TIM_USE_FW_SERVO)
+                bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)
             ) {
                 retVal++;
             };
@@ -104,15 +103,19 @@ let OutputMappingCollection = function () {
     function getFirstOutputOffset() {
         for (let i = 0; i < data.length; i++) {
             if (
-                bit_check(data[i], TIM_USE_MC_MOTOR) ||
-                bit_check(data[i], TIM_USE_MC_SERVO) ||
-                bit_check(data[i], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i], TIM_USE_FW_SERVO)
+                bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)
             ) {
                 return i;
             }
         }
         return 0;
+    }
+
+    function getTimerId(outputIndex) {
+        return data[outputIndex]['timerId'];
     }
 
     function getOutput(servoIndex, bit) {
@@ -122,7 +125,7 @@ let OutputMappingCollection = function () {
         let lastFound = 0;
 
         for (let i = offset; i < data.length; i++) {
-            if (bit_check(data[i], bit)) {
+            if (bit_check(data[i]['usageFlags'], bit)) {
                 if (lastFound == servoIndex) {
                     return i - offset + 1;
                 } else {
@@ -132,6 +135,10 @@ let OutputMappingCollection = function () {
         }
 
         return null;
+    }
+
+    self.getTimerId = function(outputIndex) {
+        return getTimerId(outputIndex)
     }
 
     self.getFwServoOutput = function (servoIndex) {

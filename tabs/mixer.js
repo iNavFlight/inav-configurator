@@ -27,7 +27,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
-        mspHelper.loadOutputMapping,
+        mspHelper.loadOutputMappingExt,
         mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
@@ -74,7 +74,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
 
         for (let i = 1; i <= outputCount; i++) {
-            $outputRow.append('<td>S' + i + '</td>');
+            $outputRow.append('<td>S' + i + ' (T' + (OUTPUT_MAPPING.getTimerId(i -1)) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
