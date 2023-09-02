@@ -5474,5 +5474,8 @@
     },
     "targetPrefetchFailNoPort": {
         "message": "Cannot prefetch target: No port"
+    },
+    "timerOutputs": {
+        "message": "Timer outputs"
     }
 }

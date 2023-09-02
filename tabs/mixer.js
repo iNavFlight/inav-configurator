@@ -82,6 +82,38 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     }
 
+    function renderTimerOverride() {
+        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+            $container = $('#timerOutputsList'), timers = {};
+
+
+        for(let i = 0; i < outputCount; ++i) {
+            let timer = OUTPUT_MAPPING.getTimerId(i);
+
+            timers[timer] = true;
+            console.log("timer: " + i + " " + timer);
+        }
+
+        let usedTimers = Object.keys(timers).sort((a,b) => a-b);
+
+        for (t of usedTimers) {
+            console.log("timer settings: " + t);
+            $container.append(
+                        '<div class="select">' +
+                            '<select id="timer-output-' + t + '">' +
+                                '<option>AUTO</option>'+
+                                '<option>MOTORS</option>'+
+                                '<option>SERVOS</option>'+
+                            '</select>' +
+                            '<label for="timer-output-' + t + '">' +
+                                '<span> T' + t + '</span>' +
+                            '</label>' +
+                        '</div>'
+            );
+        }
+
+    }
+
     function renderOutputMapping() {
         let outputMap = OUTPUT_MAPPING.getOutputTable(
             MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
@@ -704,6 +736,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
+        renderTimerOverride();
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
