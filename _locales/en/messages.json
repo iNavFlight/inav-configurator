@@ -3371,6 +3371,15 @@
     "osd_pilot_name": {
         "message": "Pilot's Name"
     },
+    "osdElement_PILOT_LOGO_HELP": {
+        "message": "Shows your small pilot logo in the OSD, where you position it. This requires a custom font with your pilot logo."
+    },
+    "osd_use_pilot_logo": {
+        "message": "Use pilot logo"
+    },
+    "osd_use_large_pilot_logo_help": {
+        "message": "Use your large pilot logo with/instead of the INAV logo. This requires a custom font with your pilot logo. This is seen on the arming screen."
+    },
     "osd_units": {
         "message": "Units"
     },

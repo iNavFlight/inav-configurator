@@ -114,6 +114,9 @@ SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.PILOT_LOGO_SML_L = 0x1D5;
+SYM.PILOT_LOGO_SML_C = 0x1D6;
+SYM.PILOT_LOGO_SML_R = 0x1D7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -839,7 +842,6 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-
                     preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
@@ -856,6 +858,11 @@ OSD.constants = {
                     name: 'PILOT_NAME',
                     id: 142,
                     preview: '[PILOT_NAME]'
+                },
+                {
+                    name: 'PILOT_LOGO',
+                    id: 144,
+                    preview: FONT.symbol(SYM.PILOT_LOGO_SML_L) + FONT.symbol(SYM.PILOT_LOGO_SML_C) + FONT.symbol(SYM.PILOT_LOGO_SML_R)
                 },
                 {
                     name: 'FLYMODE',
