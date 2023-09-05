@@ -28,6 +28,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
         mspHelper.loadOutputMappingExt,
+        mspHelper.loadTimerOutputModes,
         mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
@@ -37,6 +38,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.saveMixerConfig,
         mspHelper.sendServoMixer,
         mspHelper.sendMotorMixer,
+        mspHelper.sendTimerOutputModes,
         saveSettings,
         mspHelper.saveToEeprom
     ]);
@@ -87,29 +89,25 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $container = $('#timerOutputsList'), timers = {};
 
 
-        for(let i = 0; i < outputCount; ++i) {
-            let timer = OUTPUT_MAPPING.getTimerId(i);
-
-            timers[timer] = true;
-            console.log("timer: " + i + " " + timer);
-        }
-
-        let usedTimers = Object.keys(timers).sort((a,b) => a-b);
+        let usedTimers = OUTPUT_MAPPING.getTimerOverrideIds();
 
         for (t of usedTimers) {
+            var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
             console.log("timer settings: " + t);
+            /*
             $container.append(
                         '<div class="select">' +
                             '<select id="timer-output-' + t + '">' +
-                                '<option>AUTO</option>'+
-                                '<option>MOTORS</option>'+
-                                '<option>SERVOS</option>'+
+                                '<option value=' + TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
+                                '<option value=' + TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
+                                '<option value=' + TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
                                 '<span> T' + t + '</span>' +
                             '</label>' +
                         '</div>'
             );
+            */
         }
 
     }
@@ -469,6 +467,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         SERVO_RULES.inflate();
         MOTOR_RULES.cleanup();
         MOTOR_RULES.inflate();
+
+        for (timerId OUTPUT_MAPPING.getTimerOverrideIds()) {
+
+        }
+
         saveChainer.execute();
     }
 

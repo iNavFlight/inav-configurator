@@ -1499,8 +1499,17 @@ var mspHelper = (function (gui) {
                         });
                 }
                 break;
-
-
+            
+            case MSPCodes.MSPV2_INAV_TIMER_OUTPUT_MODE:
+                if(data.byteLength > 2) {
+                    OUTPUT_MAPPING.flushTimerOverrides();
+                }
+                for (i = 0; i < data.byteLength; i += 2) {
+                    timerId = data.getUint8(i);
+                    outputMode = data.getUint8(i + 1);
+                    OUTPUT_MAPPING.setTimerOverride(timerId, outputMode);
+                }
+                break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
                 try {
@@ -2840,6 +2849,44 @@ var mspHelper = (function (gui) {
     self.loadOutputMappingExt = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT, false, false, callback);
     };
+
+    self.loadTimerOutputModes = function(callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.sendTimerOutputModes = function(callback) {
+        var nextFunction = send_next_output_mode;
+
+        var idIndex = 0;
+
+        var overrideIds = OUTPUT_MAPPING.getTimerOverrideIds();
+
+        if (MODE_RANGES.length == 0) {
+            onCompleteCallback();
+        } else {
+            send_next_output_mode();
+        }
+
+        function send_next_output_mode() {
+
+            var timerId = overrideIds[idIndex];
+
+            var ouputMode = OUTPUT_MAPPING.getTimerOverride(timerId);
+
+            var buffer = [];
+            buffer.push(timerId);
+            buffer.push(outputMode);
+
+            // prepare for next iteration
+            idIndex++;
+            if (idIndex == overrideIds.length) {
+                nextFunction = onCompleteCallback;
+
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
+        }
+
+    }
 
     self.loadBatteryConfig = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);

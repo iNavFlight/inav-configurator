@@ -3,7 +3,8 @@
 
 let OutputMappingCollection = function () {
     let self = {},
-        data = [];
+        data = [],
+        timerOverrides = {};
 
     const TIM_USE_ANY = 0;
     const TIM_USE_PPM = 0;
@@ -18,6 +19,26 @@ let OutputMappingCollection = function () {
 
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
+
+    const TIMER_OUTPUT_MODE_AUTO = 0;
+    const TIMER_OUTPUT_MODE_MOTORS = 1;
+    const TIMER_OUTPUT_MODE_SERVOS = 2;
+
+    self.flushTimerOverrides = function() {
+        timerOverrides = {};
+    }
+
+    self.setTimerOverride = function (timer, outputMode) {
+        timerOverrides[timer] = outputMode;
+    }
+
+    self.getTimerOverride = function (timer) {
+        timerOverrides[timer] = outputMode;
+    }
+
+    self.getTimerOverrideIds = function (timer) {
+        return Object.keys(timerOverrides).sort((a, b) => a - b);
+    }
 
     function getTimerMap(isMR, motors, servos) {
         let timerMap = [],
