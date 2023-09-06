@@ -1486,7 +1486,6 @@ var mspHelper = (function (gui) {
                         'timerId': i,
                         'usageFlags': data.getUint8(i)});
                 break;
-
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; i += 2) {
@@ -1500,7 +1499,7 @@ var mspHelper = (function (gui) {
                 }
                 break;
             
-            case MSPCodes.MSPV2_INAV_TIMER_OUTPUT_MODE:
+            case MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE:
                 if(data.byteLength > 2) {
                     OUTPUT_MAPPING.flushTimerOverrides();
                 }
@@ -2851,17 +2850,16 @@ var mspHelper = (function (gui) {
     };
 
     self.loadTimerOutputModes = function(callback) {
-        MSP.send_message(MSPCodes.MSPV2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+        MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
     self.sendTimerOutputModes = function(callback) {
         var nextFunction = send_next_output_mode;
-
         var idIndex = 0;
 
-        var overrideIds = OUTPUT_MAPPING.getTimerOverrideIds();
+        var overrideIds = OUTPUT_MAPPING.getUsedTimerIds();
 
-        if (MODE_RANGES.length == 0) {
+        if (overrideIds.length == 0) {
             onCompleteCallback();
         } else {
             send_next_output_mode();
@@ -2871,7 +2869,7 @@ var mspHelper = (function (gui) {
 
             var timerId = overrideIds[idIndex];
 
-            var ouputMode = OUTPUT_MAPPING.getTimerOverride(timerId);
+            var outputMode = OUTPUT_MAPPING.getTimerOverride(timerId);
 
             var buffer = [];
             buffer.push(timerId);
@@ -2880,7 +2878,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = onCompleteCallback;
+                nextFunction = callback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
