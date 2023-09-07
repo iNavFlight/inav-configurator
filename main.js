@@ -283,6 +283,9 @@ $(document).ready(function () {
                     case 'osd':
                         TABS.osd.initialize(content_ready);
                         break;
+                    case 'osd_settings':
+                        TABS.osd_settings.initialize(content_ready);
+                        break;
                     case 'sensors':
                         TABS.sensors.initialize(content_ready);
                         break;
