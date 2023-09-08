@@ -27,7 +27,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
-        mspHelper.loadOutputMapping,
+        mspHelper.loadOutputMappingExt,
+        mspHelper.loadTimerOutputModes,
         mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
@@ -37,6 +38,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.saveMixerConfig,
         mspHelper.sendServoMixer,
         mspHelper.sendMotorMixer,
+        mspHelper.sendTimerOutputModes,
         saveSettings,
         mspHelper.saveToEeprom
     ]);
@@ -74,11 +76,49 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
 
         for (let i = 1; i <= outputCount; i++) {
-            $outputRow.append('<td>S' + i + '</td>');
+            $outputRow.append('<td>S' + i + ' (T' + (OUTPUT_MAPPING.getTimerId(i -1)) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
+
+    }
+
+    function updateTimerOverride() {
+        let timers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for(let i =0; i < timers.length;++i) {
+            let timerId = timers[i];
+            $select = $('#timer-output-' + timerId);
+            if(!$select) {
+                continue;
+            }
+            OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
+        }
+    }
+
+    function renderTimerOverride() {
+        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+            $container = $('#timerOutputsList'), timers = {};
+
+
+        let usedTimers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for (t of usedTimers) {
+            var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
+            $container.append(
+                        '<div class="select">' +
+                            '<select id="timer-output-' + t + '">' +
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
+                            '</select>' +
+                            '<label for="timer-output-' + t + '">' +
+                                '<span> T' + t + '</span>' +
+                            '</label>' +
+                        '</div>'
+            );
+        }
 
     }
 
@@ -437,6 +477,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         SERVO_RULES.inflate();
         MOTOR_RULES.cleanup();
         MOTOR_RULES.inflate();
+
+        updateTimerOverride();
+
         saveChainer.execute();
     }
 
@@ -704,6 +747,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
+        renderTimerOverride();
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 

@@ -1482,7 +1482,32 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.put(data.getUint8(i));
+                    OUTPUT_MAPPING.put({
+                        'timerId': i,
+                        'usageFlags': data.getUint8(i)});
+                break;
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT:
+                OUTPUT_MAPPING.flush();
+                for (i = 0; i < data.byteLength; i += 2) {
+                    timerId = data.getUint8(i);
+                    usageFlags = data.getUint8(i + 1);
+                    OUTPUT_MAPPING.put(
+                        {
+                            'timerId': timerId,
+                            'usageFlags': usageFlags
+                        });
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE:
+                if(data.byteLength > 2) {
+                    OUTPUT_MAPPING.flushTimerOverrides();
+                }
+                for (i = 0; i < data.byteLength; i += 2) {
+                    timerId = data.getUint8(i);
+                    outputMode = data.getUint8(i + 1);
+                    OUTPUT_MAPPING.setTimerOverride(timerId, outputMode);
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
@@ -2819,6 +2844,47 @@ var mspHelper = (function (gui) {
     self.loadOutputMapping = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
+
+    self.loadOutputMappingExt = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT, false, false, callback);
+    };
+
+    self.loadTimerOutputModes = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.sendTimerOutputModes = function(callback) {
+        var nextFunction = send_next_output_mode;
+        var idIndex = 0;
+
+        var overrideIds = OUTPUT_MAPPING.getUsedTimerIds();
+
+        if (overrideIds.length == 0) {
+            onCompleteCallback();
+        } else {
+            send_next_output_mode();
+        }
+
+        function send_next_output_mode() {
+
+            var timerId = overrideIds[idIndex];
+
+            var outputMode = OUTPUT_MAPPING.getTimerOverride(timerId);
+
+            var buffer = [];
+            buffer.push(timerId);
+            buffer.push(outputMode);
+
+            // prepare for next iteration
+            idIndex++;
+            if (idIndex == overrideIds.length) {
+                nextFunction = callback;
+
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
+        }
+
+    }
 
     self.loadBatteryConfig = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
