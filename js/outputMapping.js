@@ -57,7 +57,7 @@ let OutputMappingCollection = function () {
             timerMap[i] = null;
 
             if (isMR) {
-                if (servosToGo > 0 && bit_check(data[i], TIM_USE_MC_SERVO)) {
+                if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO)) {
                     servosToGo--;
                     timerMap[i] = OUTPUT_TYPE_SERVO;
                 } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR)) {
