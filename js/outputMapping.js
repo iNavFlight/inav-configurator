@@ -9,11 +9,11 @@ let OutputMappingCollection = function () {
     const TIM_USE_ANY = 0;
     const TIM_USE_PPM = 0;
     const TIM_USE_PWM = 1;
-    const TIM_USE_MC_MOTOR = 2;     // Multicopter motor output
-    const TIM_USE_MC_SERVO = 3;     // Multicopter servo output (i.e. TRI)
-    const TIM_USE_MC_CHNFW = 4;     // Deprecated and not used after removal of CHANNEL_FORWARDING feature
-    const TIM_USE_FW_MOTOR = 5;
-    const TIM_USE_FW_SERVO = 6;
+    const TIM_USE_MOTOR = 2;     // Motor output
+    const TIM_USE_SERVO = 3;     // Servo output (i.e. TRI)
+    //const TIM_USE_MC_CHNFW = 4;     // Deprecated and not used after removal of CHANNEL_FORWARDING feature
+    //const TIM_USE_FW_MOTOR = 5;
+    //const TIM_USE_FW_SERVO = 6;
     const TIM_USE_LED = 24;
     const TIM_USE_BEEPER = 25;
 
@@ -56,22 +56,12 @@ let OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
 
-            if (isMR) {
-                if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO)) {
-                    servosToGo--;
-                    timerMap[i] = OUTPUT_TYPE_SERVO;
-                } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR)) {
-                    motorsToGo--;
-                    timerMap[i] = OUTPUT_TYPE_MOTOR;
-                }
-            } else {
-                if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)) {
-                    servosToGo--;
-                    timerMap[i] = OUTPUT_TYPE_SERVO;
-                } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR)) {
-                    motorsToGo--;
-                    timerMap[i] = OUTPUT_TYPE_MOTOR;
-                }
+            if (servosToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+                servosToGo--;
+                timerMap[i] = OUTPUT_TYPE_SERVO;
+            } else if (motorsToGo > 0 && bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
+                motorsToGo--;
+                timerMap[i] = OUTPUT_TYPE_MOTOR;
             }
         }
 
@@ -98,7 +88,6 @@ let OutputMappingCollection = function () {
                 outputMap[i] = "Servo " + servos[currentServoIndex];
                 currentServoIndex++;
             }
-
         }
 
         return outputMap;
@@ -117,10 +106,8 @@ let OutputMappingCollection = function () {
 
         for (let i = 0; i < data.length; i++) {
             if (
-                bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)
+                bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
             ) {
                 retVal++;
             };
@@ -132,10 +119,8 @@ let OutputMappingCollection = function () {
     function getFirstOutputOffset() {
         for (let i = 0; i < data.length; i++) {
             if (
-                bit_check(data[i]['usageFlags'], TIM_USE_MC_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_MC_SERVO) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_FW_MOTOR) ||
-                bit_check(data[i]['usageFlags'], TIM_USE_FW_SERVO)
+                bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
+                bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
             ) {
                 return i;
             }
@@ -171,11 +156,11 @@ let OutputMappingCollection = function () {
     }
 
     self.getFwServoOutput = function (servoIndex) {
-        return getOutput(servoIndex, TIM_USE_FW_SERVO);
+        return getOutput(servoIndex, TIM_USE_SERVO);
     };
 
     self.getMrServoOutput = function (index) {
-        return getOutput(index, TIM_USE_MC_SERVO);
+        return getOutput(index, TIM_USE_SERVO);
     };
 
     return self;
