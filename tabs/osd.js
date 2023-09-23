@@ -861,7 +861,7 @@ OSD.constants = {
                 },
                 {
                     name: 'PILOT_LOGO',
-                    id: 144,
+                    id: 145,
                     preview: FONT.symbol(SYM.PILOT_LOGO_SML_L) + FONT.symbol(SYM.PILOT_LOGO_SML_C) + FONT.symbol(SYM.PILOT_LOGO_SML_R)
                 },
                 {
