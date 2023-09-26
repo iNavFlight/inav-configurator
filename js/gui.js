@@ -37,7 +37,6 @@ var GUI_control = function () {
         'calibration',
         'setup',
         'osd',
-        'osd_settings',
         'profiles',
         'advanced_tuning',
         'mission_control',

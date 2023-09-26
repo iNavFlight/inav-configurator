@@ -2689,9 +2689,6 @@
     "tabOSD": {
         "message": "OSD Layout"
     },
-    "tabOSD_settings": {
-        "message": "OSD Settings"
-    },
     "configurationSensors": {
         "message": "Sensors & buses"
     },
