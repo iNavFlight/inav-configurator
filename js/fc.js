@@ -1270,6 +1270,7 @@ var FC = {
                     36: "AGL [cm]",
                     37: "Rangefinder [cm]",
                     38: "Active MixerProfile",
+                    39: "MixerTransition Active",
                 }
             },
             3: {
