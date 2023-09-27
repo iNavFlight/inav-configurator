@@ -5,7 +5,6 @@ let OutputMappingCollection = function () {
     let self = {},
         data = [];
 
-    /** @todo Evaluate if 32 bit instead of 8 bit sent from the FC might cause compatibility issues */
     const TIM_USE_ANY = 0;
     const TIM_USE_PPM = 0;
     const TIM_USE_PWM = 1;
@@ -14,8 +13,8 @@ let OutputMappingCollection = function () {
     const TIM_USE_MC_CHNFW = 4;     // Deprecated and not used after removal of CHANNEL_FORWARDING feature
     const TIM_USE_FW_MOTOR = 5;
     const TIM_USE_FW_SERVO = 6;
-    const TIM_USE_HC_MOTOR = 7;     // woga65: Helicopter motor output
-    const TIM_USE_HC_SERVO = 8;     // woga65: Helicopter servo output
+    const TIM_USE_HC_MOTOR = 5;     // woga65: Helicopter motor output (was 7, now same as FW_MOTOR)
+    const TIM_USE_HC_SERVO = 6;     // woga65: Helicopter servo output (was 8, now same as FW_SERVO)
     const TIM_USE_LED = 24;
     const TIM_USE_BEEPER = 25;
 

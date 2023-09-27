@@ -831,8 +831,8 @@ var FC = {
     getRcMapLetters: function () {
         if (RC_MAP.length === 8 || TARGET.isVariablePitch) {
             return MIXER_CONFIG.platformType === PLATFORM_HELICOPTER    // woga65: rc-channel remapping
-                ? ['A', 'E', 'R', 'T', '5', '6', 'C', 'G']              // if variable pitch, map collective + gyro gain
-                : ['A', 'E', 'R', 'T', '5', '6', '7', '8'];             // else map AUX3/CH7 + AUX4/CH8
+                ? ['A', 'E', 'R', 'T', '5', 'C', 'G', '8']              // if variable pitch, map collective + gyro gain
+                : ['A', 'E', 'R', 'T', '5', '6', '7', '8'];             // else map AUX2/CH6 + AUX3/CH7
         }
         return ['A', 'E', 'R', 'T'];                                    // FC firmware restricted to 4-channel mapping
     },
@@ -867,9 +867,9 @@ var FC = {
             'RC Yaw',               // 6
             'RC Throttle',          // 7
             'RC Channel 5',         // 8
-            'RC Channel 6',         // 9
-            TARGET.isVariablePitch ? 'RC Collective Pitch' : 'RC Channel 7',    // 10   // woga65: channel naming for either
-            TARGET.isVariablePitch ? 'RC Gyro Gain' : 'RC Channel 8',           // 11   // variable pitch or regular aircraft
+            TARGET.isVariablePitch ? 'RC Collective Pitch' : 'RC Channel 6',    // 9    // woga65: channel naming for either
+            TARGET.isVariablePitch ? 'RC Gyro Gain' : 'RC Channel 7',           // 10   // variable pitch or regular aircraft
+            'RC Channel 8',         // 11
             'Gimbal Pitch',         // 12
             'Gimbal Roll',          // 13
             'Flaperon Mode',        // 14
