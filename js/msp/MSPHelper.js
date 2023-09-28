@@ -1453,7 +1453,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_MIXER:
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
-                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
+                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint8(1, true);
+                MIXER_CONFIG.motorStopOnLow = data.getUint8(1, true);
                 MIXER_CONFIG.platformType = data.getInt8(3);
                 MIXER_CONFIG.hasFlaps = data.getInt8(4);
                 MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
@@ -2154,8 +2155,8 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_SET_MIXER:
                 buffer.push(MIXER_CONFIG.yawMotorDirection);
-                buffer.push(lowByte(MIXER_CONFIG.yawJumpPreventionLimit));
-                buffer.push(highByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(MIXER_CONFIG.yawJumpPreventionLimit);
+                buffer.push(MIXER_CONFIG.motorStopOnLow);
                 buffer.push(MIXER_CONFIG.platformType);
                 buffer.push(MIXER_CONFIG.hasFlaps);
                 buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));

@@ -392,7 +392,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         const $fixedValueCalcInput = row.find(".mix-rule-fixed-value");
         if (FC.getServoMixInputNames()[$mixRuleInput.val()] === 'MAX') {
             $fixedValueCalcInput.show();
-            row.find(".mix-rule-speed").prop('disabled', true);
         } else {
             $fixedValueCalcInput.hide();
             row.find(".mix-rule-speed").prop('disabled', false);
