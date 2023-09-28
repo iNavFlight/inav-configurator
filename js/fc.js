@@ -616,6 +616,7 @@ var FC = {
             'North American WAAS',
             'Japanese MSAS',
             'Indian GAGAN',
+            'SouthPAN (AU/NZ)',
             'Disabled'
         ];
     },
