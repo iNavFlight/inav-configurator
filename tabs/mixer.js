@@ -74,9 +74,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
-
+        
         for (let i = 1; i <= outputCount; i++) {
-            $outputRow.append('<td>S' + i + ' (T' + (OUTPUT_MAPPING.getTimerId(i -1)) + ')</td>');
+
+            let timerId = OUTPUT_MAPPING.getTimerId(i - 1);
+            let color = OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (T' + (timerId) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
@@ -107,7 +111,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         for (t of usedTimers) {
             var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
             $container.append(
-                        '<div class="select">' +
+                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + OUTPUT_MAPPING.getTimerColor(t) + '">' +
                             '<select id="timer-output-' + t + '">' +
                                 '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
                                 '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
