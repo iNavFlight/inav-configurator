@@ -76,11 +76,6 @@ TABS.gps.initialize = function (callback) {
 
         gps_protocol_e.change(function () {
             MISC.gps_type = parseInt($(this).val());
-            if (MISC.gps_type == 0) {
-                $('#nmeaWarning').show();
-            } else {
-                $('#nmeaWarning').hide();
-            }
         });
 
         gps_protocol_e.val(MISC.gps_type);

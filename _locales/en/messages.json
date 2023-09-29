@@ -4934,9 +4934,6 @@
     "pidTuning_MatrixFilterTypeHelp": {
         "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
     },
-    "nmeaWarning": {
-        "message": "NMEA protocol is deprecated and might be removed in the future. Please use UBLOX or UBLOX7 protocol instead."
-    },
     "softSerialWarning": {
         "message": "It is not advisable to use softserial for flight critical devices like GPS or receiver, or high traffic devices like MSP DisplayPort."
     },

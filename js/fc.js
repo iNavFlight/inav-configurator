@@ -593,7 +593,6 @@ var FC = {
     },
     getGpsProtocols: function () {
         return [
-            'NMEA',
             'UBLOX',
             'UBLOX7',
             'MSP',
