@@ -20,6 +20,16 @@ let OutputMappingCollection = function () {
     const OUTPUT_TYPE_MOTOR = 0;
     const OUTPUT_TYPE_SERVO = 1;
 
+    const outputColor = [
+        "#8ecae6",
+        "#2a9d8f",
+        "#e9c46a",
+        "#f4a261",
+        "#e76f51",
+        "#ef476f",
+        "#ffc300"
+    ];
+
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
@@ -34,6 +44,18 @@ let OutputMappingCollection = function () {
 
     self.getTimerOverride = function (timer) {
         return timerOverrides[timer];
+    }
+
+    self.getTimerColor = function (timer) {
+        let timerIndex = OUTPUT_MAPPING.getUsedTimerIds().indexOf(String(timer));
+     
+        return outputColor[timerIndex % outputColor.length];
+    }
+
+    self.getOutputTimerColor = function (output) {
+        let timerId = OUTPUT_MAPPING.getTimerId(output);
+
+        return self.getTimerColor(timerId);
     }
 
     self.getUsedTimerIds = function (timer) {
