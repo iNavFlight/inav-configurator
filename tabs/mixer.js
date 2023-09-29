@@ -80,7 +80,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             let timerId = OUTPUT_MAPPING.getTimerId(i - 1);
             let color = OUTPUT_MAPPING.getOutputTimerColor(i - 1);
 
-            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (T' + (timerId) + ')</td>');
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (TIM' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
@@ -118,7 +118,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                 '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
-                                '<span> T' + t + '</span>' +
+                                '<span> TIM' + (parseInt(t) + 1) + '</span>' +
                             '</label>' +
                         '</div>'
             );
