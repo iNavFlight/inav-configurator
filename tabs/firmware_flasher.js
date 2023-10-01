@@ -52,9 +52,9 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         $('input.show_development_releases').click(function() {
             let selectedTarget = String($('select[name="board"]').val());
-            GUI.log("selected target = " + selectedTarget);
+            GUI.log(chrome.i18n.getMessage('selectedTarget') + selectedTarget);
             buildBoardOptions();
-            GUI.log("toggled RCs");
+            GUI.log(chrome.i18n.getMessage('toggledRCs'));
             if (selectedTarget === "0") {
                 TABS.firmware_flasher.getTarget();
             } else {
@@ -274,7 +274,7 @@ TABS.firmware_flasher.initialize = function (callback) {
         $('a.load_remote_file').click(function (evt) {
 
             if ($('select[name="firmware_version"]').val() == "0") {
-                GUI.log("<b>No firmware selected to load</b>");
+                GUI.log(chrome.i18n.getMessage('noFirmwareSelectedToLoad'));
                 return;
             }
 
@@ -402,10 +402,10 @@ TABS.firmware_flasher.initialize = function (callback) {
                                 STM32.connect(port, baud, parsed_hex, options);
                             } else {
                                 console.log('Please select valid serial port');
-                                GUI.log('<span style="color: red">Please select valid serial port</span>');
+                                GUI.log(chrome.i18n.getMessage('selectValidSerialPort'));
                             }
                         } else {
-                            STM32DFU.connect(usbDevices.STM32DFU, parsed_hex, options);
+                            STM32DFU.connect(usbDevices, parsed_hex, options);
                         }
                     } else {
                         $('span.progressLabel').text(chrome.i18n.getMessage('firmwareFlasherFirmwareNotLoaded'));
@@ -452,7 +452,7 @@ TABS.firmware_flasher.initialize = function (callback) {
                             });
                         } else {
                             console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log('You don\'t have <span style="color: red">write permissions</span> for this file');
+                            GUI.log(chrome.i18n.getMessage('writePermissionsForFile'));
                         }
                     });
                 });
@@ -635,14 +635,14 @@ TABS.firmware_flasher.cleanup = function (callback) {
 };
 
 TABS.firmware_flasher.getTarget = function() {
-    GUI.log("Attempting automatic target selection");
+    GUI.log(chrome.i18n.getMessage('automaticTargetSelect'));
     
     var selected_baud = parseInt($('#baud').val());
     var selected_port = $('#port').find('option:selected').data().isManual ? $('#port-override').val() : String($('#port').val());
     
     if (selected_port !== 'DFU') {
         if (selected_port == '0') {
-            GUI.log("Cannot prefetch target: No port");
+            GUI.log(chrome.i18n.getMessage('targetPrefetchFailNoPort'));
         } else {
             console.log('Connecting to: ' + selected_port);
             GUI.connecting_to = selected_port;
@@ -654,7 +654,7 @@ TABS.firmware_flasher.getTarget = function() {
             }
         }
     } else {
-        GUI.log("Cannot prefetch target: Flight Controller in DFU");
+        GUI.log(chrome.i18n.getMessage('targetPrefetchFailDFU'));
     }
 };
 
@@ -686,7 +686,7 @@ TABS.firmware_flasher.onOpen = function(openInfo) {
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
             if (!CONFIGURATOR.connectionValid) {
-                GUI.log("Cannot prefetch target: " + chrome.i18n.getMessage('noConfigurationReceived'));
+                GUI.log(chrome.i18n.getMessage('targetPrefetchFail') + chrome.i18n.getMessage('noConfigurationReceived'));
 
                 TABS.firmware_flasher.closeTempConnection();
             }
@@ -709,7 +709,7 @@ TABS.firmware_flasher.onOpen = function(openInfo) {
                 if (CONFIG.flightControllerIdentifier == 'INAV') {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
                         if (semver.lt(CONFIG.flightControllerVersion, "5.0.0")) {
-                            GUI.log("Cannot prefetch target: INAV Firmware too old");
+                            GUI.log(chrome.i18n.getMessage('targetPrefetchFailOld'));
                             TABS.firmware_flasher.closeTempConnection();
                         } else {
                             mspHelper.getCraftName(function(name) {
@@ -721,13 +721,13 @@ TABS.firmware_flasher.onOpen = function(openInfo) {
                         }
                     });
                 } else {
-                    GUI.log("Cannot prefetch target: Non-INAV Firmware");
+                    GUI.log(chrome.i18n.getMessage('targetPrefetchFailNonINAV'));
                     TABS.firmware_flasher.closeTempConnection();
                 }
             });
         });
     } else {
-        GUI.log("Cannot prefetch target: " + chrome.i18n.getMessage('serialPortOpenFail'));
+        GUI.log(chrome.i18n.getMessage('targetPrefetchFail') + chrome.i18n.getMessage('serialPortOpenFail'));
         return;
     }
 };
@@ -736,7 +736,7 @@ TABS.firmware_flasher.onValidFirmware = function() {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
             $('select[name="board"] option[value=' + CONFIG.target + ']').attr("selected", "selected");
-            GUI.log("Target prefetch successful: " + CONFIG.target);
+            GUI.log(chrome.i18n.getMessage('targetPrefetchsuccessful') + CONFIG.target);
 
             TABS.firmware_flasher.closeTempConnection();
             $('select[name="board"]').change();

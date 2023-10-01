@@ -112,6 +112,7 @@ SYM.GLIDE_RANGE = 0xD4;
 SYM.FLIGHT_MINS_REMAINING = 0xDA;
 SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 SYM.ODOMETER = 0X168;
@@ -183,7 +184,7 @@ FONT.parseMCMFontFile = function (data) {
 
     // make sure the font file is valid
     if (data.shift().trim() != 'MAX7456') {
-        var msg = 'that font file doesnt have the MAX7456 header, giving up';
+        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
         Promise.reject(msg);
     }
@@ -532,7 +533,7 @@ OSD.DjiElements =  {
     craftNameElements: [
         "MESSAGES",
         "THROTTLE_POSITION",
-        "THROTTLE_POSITION_AUTO_THR",
+        "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
         "EFFICIENCY_MAH",
         "TRIP_DIST"
@@ -548,7 +549,8 @@ OSD.constants = {
         'HDZERO',
         'DJIWTF',
         'AVATAR',
-        'BF43COMPAT'
+        'BF43COMPAT',
+        'BFHDCOMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
@@ -557,6 +559,7 @@ OSD.constants = {
         DJIWTF: 22,
         AVATAR: 20,
         BF43COMPAT: 16,
+        BFHDCOMPAT: 20
     },
     VIDEO_COLS: {
         PAL: 30,
@@ -564,7 +567,8 @@ OSD.constants = {
         HDZERO: 50,
         DJIWTF: 60,
         AVATAR: 53,
-        BF43COMPAT: 30
+        BF43COMPAT: 30,
+        BFHDCOMPAT: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
@@ -572,7 +576,8 @@ OSD.constants = {
         HDZERO: 900,
         DJIWTF: 1320,
         AVATAR: 1060,
-        BF43COMPAT: 480
+        BF43COMPAT: 480,
+        BFHDCOMPAT: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -836,12 +841,13 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+
+                    preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
-                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    name: 'SCALED_THROTTLE_POSITION',
                     id: 33,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                    preview: FONT.symbol(SYM.SCALE) + FONT.symbol(SYM.THR) + ' 51'
                 },
                 {
                     name: 'CRAFT_NAME',
@@ -993,6 +999,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 144,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
@@ -2164,7 +2176,11 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
     $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
     $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
-    
+    // -- BFHDCOMPAT
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -2448,7 +2464,7 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
-const mspVideoSystem = [1,3,4,5,6];   // indexes of PAL, HDZERO, DJIWTF,AVATAR, & BF43COMPAT
+const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
 const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
 
 OSD.GUI.updateVideoMode = function() {
@@ -2760,6 +2776,12 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
+
+    isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
+    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
 
     isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
     $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
@@ -3093,7 +3115,7 @@ TABS.osd.initialize = function (callback) {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log('OSD settings saved');
+                GUI.log(chrome.i18n.getMessage('osdSettingsSaved'));
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
@@ -3106,7 +3128,7 @@ TABS.osd.initialize = function (callback) {
         chrome.storage.local.get('showOSDGuides', function (result) {
             if (typeof result.showOSDGuides !== 'undefined') {
                 isGuidesChecked = result.showOSDGuides;
-            }     
+            }
         });
 
         // Setup switch indicators
@@ -3281,7 +3303,7 @@ TABS.osd.initialize = function (callback) {
                             });
                         } else {
                             console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log('You don\'t have <span style="color: red">write permissions</span> for this file');
+                            GUI.log(chrome.i18n.getMessage('writePermissionsForFile'));
                         }
                     });
                 });
@@ -3358,7 +3380,7 @@ function refreshOSDSwitchIndicators() {
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
-    
+
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
@@ -3410,7 +3432,7 @@ function updatePanServoPreview() {
     let servoRules = SERVO_RULES;
     $('#panServoOutput option').each(function() {
         let servoIndex = $(this).val();
-        
+
         if (servoIndex === "0") {
             $(this).text("OFF");
         } else {

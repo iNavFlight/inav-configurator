@@ -23,11 +23,11 @@
         <div class="headerbar">
             <div id="logo">
                 <div class="logo_text">
-                    CONFIGURATOR
+                    <span i18n="mainLogoText"></span>
                     <div class="version"></div>
                 </div>
                 <div class="logo_text_firmware">
-                    FC FIRMWARE
+                    <span i18n="mainLogoTextFirmware"></span>
                     <div class="firmware_version"></div>
                 </div>
             </div>
@@ -43,13 +43,13 @@
                 <div id="portsinput">
                     <div class="portsinput__row">
                         <div id="port-override-option" class="portsinput__top-element portsinput__top-element--port-override">
-                            <label id="port-override-label" for="port-override">Port: </label>
+                            <label id="port-override-label" for="port-override" i18n="mainPortOverrideLabel"></label>
                             <input id="port-override" type="text" value="/dev/rfcomm0" />
                         </div>
                         <div class="dropdown dropdown-dark portsinput__top-element">
                             <!--suppress HtmlFormInputWithoutLabel -->
                             <select class="dropdown-select" id="port" title="Port">
-                            <option value="manual">Manual</option>
+                            <option value="manual" i18n="mainManual"></option>
                             <!-- port list gets generated here -->
                         </select>
                         </div>
@@ -81,10 +81,10 @@
             </div>
             <div class="header-wrapper">
                 <div id="dataflash_wrapper_global">
-                    <div class="noflash_global" align="center">No dataflash <br>chip found</div>
+                    <div class="noflash_global" align="center" i18n="sensorDataFlashNotFound"></div>
                     <ul class="dataflash-contents_global">
                         <li class="dataflash-free_global">
-                            <div class="legend">Dataflash: free space</div>
+                            <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
                         </li>
                     </ul>
                     <div id="profile_change">
@@ -92,9 +92,9 @@
                             <form name="profile-change" id="profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select class="dropdown-select" id="profilechange">
-                                <option value="0">Profile 1</option>
-                                <option value="1">Profile 2</option>
-                                <option value="2">Profile 3</option>
+                                <option value="0" i18n="sensorProfile1"></option>
+                                <option value="1" i18n="sensorProfile2"></option>
+                                <option value="2" i18n="sensorProfile3"></option>
                             </select>
                             </form>
                         </div>
@@ -104,9 +104,9 @@
                             <form name="battery-profile-change" id="battery-profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select class="dropdown-select" id="batteryprofilechange">
-                                <option value="0">Battery profile 1</option>
-                                <option value="1">Battery profile 2</option>
-                                <option value="2">Battery profile 3</option>
+                                <option value="0" i18n="sensorBatteryProfile1"></option>
+                                <option value="1" i18n="sensorBatteryProfile2"></option>
+                                <option value="2" i18n="sensorBatteryProfile3"></option>
                             </select>
                             </form>
                         </div>
@@ -114,29 +114,30 @@
                 </div>
                 <div id="sensor-status" class="sensor_state mode-connected">
                     <ul>
-                        <li class="gyro" title="Gyroscope">
-                            <div class="gyroicon">Gyro</div>
+                        <li class="gyro" i18n_title="sensorStatusGyro">
+                            <div class="gyroicon" i18n="sensorStatusGyroShort"></div>
                         </li>
-                        <li class="accel" title="Accelerometer">
-                            <div class="accicon">Accel</div>
+                        <li class="accel" i18n_title="sensorStatusAccel">
+                            <div class="accicon" i18n="sensorStatusAccelShort"></div>
                         </li>
-                        <li class="mag" title="Magnetometer">
-                            <div class="magicon">Mag</div>
+                        <li class="mag" i18n_title="sensorStatusMag">
+                            <div class="magicon" i18n="sensorStatusMagShort"></div>
                         </li>
-                        <li class="baro" title="Barometer">
-                            <div class="baroicon">Baro</div>
+                        <li class="baro" i18n_title="sensorStatusBaro">
+                            <div class="baroicon" i18n="sensorStatusBaroShort"></div>
                         </li>
-                        <li class="gps" title="GPS">
-                            <div class="gpsicon">GPS</div>
+                        <li class="gps" i18n_title="sensorStatusGPS">
+                            <div class="gpsicon" i18n="sensorStatusGPSShort"></div>
                         </li>
-                        <li class="opflow" title="Optical flow">
-                            <div class="opflowicon">Flow</div>
+
+                        <li class="opflow" i18n_title="sensorOpticalFlow">
+                            <div class="opflowicon" i18n="sensorOpticalFlowShort"></div>
                         </li>
-                        <li class="sonar" title="Sonar / Range finder">
-                            <div class="sonaricon">Sonar</div>
+                        <li class="sonar" i18n_title="sensorStatusSonar">
+                            <div class="sonaricon" i18n="sensorStatusSonarShort"></div>
                         </li>
-                        <li class="airspeed" title="Airspeed">
-                            <div class="airspeedicon">Speed</div>
+                        <li class="airspeed" i18n_title="sensorAirspeed">
+                            <div class="airspeedicon" i18n="sensorAirspeedShort"></div>
                         </li>
                     </ul>
                 </div>
@@ -146,7 +147,7 @@
                             <div class="battery-status"></div>
                         </div>
                     </div>
-                    <div class="battery-legend">Battery voltage</div>
+                    <div class="battery-legend" i18n="sensorBatteryVoltage"></div>
                     <div class="bottomStatusIcons">
                         <div class="armedicon cf_tip" data-i18n_title="mainHelpArmed"></div>
                         <div class="failsafeicon cf_tip" data-i18n_title="mainHelpFailsafe"></div>
@@ -158,7 +159,7 @@
         <div class="clear-both"></div>
         <div id="log">
             <div class="logswitch">
-                <a href="#" id="showlog">Show Log</a>
+                <a href="#" id="showlog" i18n="mainShowLog"></a>
             </div>
             <div id="scrollicon"></div>
             <div class="wrapper"></div>
@@ -177,6 +178,9 @@
                     </li>
                     <li class="tab_firmware_flasher">
                         <a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a>
+                    </li>
+                    <li class="tab_sitl">
+                        <a href="#" data-i18n="tabSitl" class="tabicon ic_sitl" title="SITL"></a>
                     </li>
                 </ul>
                 <ul class="mode-connected">
@@ -282,13 +286,16 @@
             <div>
                 <span id="drop-rate"> </span>
             </div>
+            <div>
+                <span data-i18n="statusbar_arming_flags"></span> <span class="arming-flags">-</span>
+            </div>
             <div class="version">
                 <!-- configuration version generated here -->
             </div>
         </div>
         <div id="cache">
             <div class="data-loading">
-                <p>Waiting for data ...</p>
+                <p i18n="waitingForData"></p>
             </div>
         </div>
     </div>

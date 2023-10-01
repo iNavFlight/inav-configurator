@@ -12,12 +12,12 @@
             <table class="ports spacebottom">
                 <thead>
                     <tr>
-                        <td>Identifier</td>
-                        <td>Data</td>
-                        <td>Telemetry</td>
-                        <td>RX</td>
+                        <td i18n="portsIdentifier"></td>
+                        <td i18n="portsConfiguration"></td>
+                        <td i18n="portsTelemetryOut"></td>
+                        <td i18n="portsSerialRx"></td>
                         <td data-i18n="portColumnSensors"></td>
-                        <td class='peripherls-column'>Peripherals</td>
+                        <td class='peripherls-column' i18n="portsPeripherals"></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +44,7 @@
         <tbody>
             <tr class="portConfiguration">
                 <td class="identifierCell">
-                    <p class="identifier"></p>
+                    <p><div class="identifier"/> <div class="softSerialWarning"><img src="../images/icons/cf_icon_armed_active.svg" height="16" width="16" data-i18n_title="softSerialWarning"/></div></p>
                 </td>
                 <td class="functionsCell-data"><select class="msp_baudrate">
                         <!-- list generated here -->

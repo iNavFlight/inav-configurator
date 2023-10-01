@@ -11,7 +11,12 @@
                 <div class="wrapper"></div>
             </div>
         </div>
-        <textarea name="commands" i18n_placeholder="cliInputPlaceholder" rows="1" cols="0"></textarea>
+        <div style="display:flex;align-items:center;">
+            <textarea name="commands" i18n_placeholder="cliInputPlaceholder" rows="1" cols="0"></textarea>
+            <a class="helpiconLink" style="margin-left:5px;margin-right:5px;" href="https://github.com/iNavFlight/inav/blob/master/docs/Cli.md" target="_blank">
+                <div class="helpicon cf_tip" style="float:none;" data-i18n_title="cliCommandsHelp"></div>
+            </a>            
+        </div>
     </div>
     <div class="content_toolbar">
         <div class="btn save_btn" style="float: left; padding-left: 15px">
@@ -23,8 +28,9 @@
             <a class="cliDocsBtn" href="#" i18n="cliDocsBtn" target="_blank"></a>
             <a class="save" href="#" i18n="cliSaveToFileBtn"></a>
             <a class="load" href="#" i18n="cliLoadFromFileBtn"></a>
-            <a class="clear" href="#" i18n="cliClearOutputHistoryBtn"></a>
-            <a class="copy" href="#" i18n="cliCopyToClipboardBtn"></a>
+            <a class="copy" href="#" i18n="cliCopyToClipboardBtn"></a>            
+            <a class="clear" href="#" i18n="cliClearOutputHistoryBtn"></a>     
+            <a class="diffall" href="#" i18n="cliDiffAllBtn"></a>  
         </div>
     </div>
 

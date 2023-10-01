@@ -132,7 +132,8 @@ TABS.ports.initialize = function (callback) {
         '19200',
         '38400',
         '57600',
-        '115200'
+        '115200',
+        '230400'
     ];
 
     var telemetryBaudRates_post1_6_3 = [
@@ -229,6 +230,11 @@ TABS.ports.initialize = function (callback) {
             port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
             port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+            if (serialPort.identifier >= 30) {
+                port_configuration_e.find('.softSerialWarning').css("display", "inline")
+            } else {
+                port_configuration_e.find('.softSerialWarning').css("display", "none")
+            }
 
             port_configuration_e.data('index', portIndex);
             port_configuration_e.data('port', serialPort);

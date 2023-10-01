@@ -1,28 +1,28 @@
 <div class="tab-mission-control">
     <div style="padding-top: 20px;padding-left: 20px; padding-right: 20px;position: relative;">
-        <div class="tab_title" data-i18n="tabMissionControl">Mission planner</div>
+        <div class="tab_title" data-i18n="tabMissionControl"></div>
     </div>
     <div class="content_wrapper">
         <div class="cf_column fourth" id="missionControls">
             <div class="spacer_right">
                 <div id="missionPlannerAction" class="gui_box grey">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionActionMenuHead">Action Menu</div>
+                        <div class="spacer_box_title" data-i18n="missionActionMenuHead"></div>
                         <div class="btnMenu btnMenuIcon show_btn"  id="showHideActionButton">
-                            <a class="ic_hide" href="#" title="Hide"></a>
+                            <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                         </div>
                     </div>
                     <div class="spacer" id="ActionContent">
 
                         <div class="btn save_btn">
-                            <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" title="Load Mission File"></a>
-                            <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" title="Save Mission File"></a>
+                            <a id="loadFileMissionButton" class="btnicon ic_loadFromFile" href="#" i18n_title="missionTitleLoadMissionFile"></a>
+                            <a id="saveFileMissionButton" class="btnicon ic_save2File" href="#" i18n_title="missionTitleSaveMissionFile"></a>
                         </div>
                         <div class="btn save_btn">
-                            <a id="loadMissionButton" class="btnicon ic_loadFromFC" href="#" title="Load mission from FC"</a>
-                            <a id="saveMissionButton" class="btnicon ic_save2FC" href="#" title="Save mission to FC"</a>
-                            <a id="loadEepromMissionButton" class="btnicon ic_loadFromEprom" href="#" title="Load Eeprom mission"></a>
-                            <a id="saveEepromMissionButton" class="btnicon ic_save2Eprom" href="#" title="Save Eeprom mission"></a>
+                            <a id="loadMissionButton" class="btnicon ic_loadFromFC" href="#" i18n_title="missionTitleLoadMissionFromFC" </a>
+                                <a id="saveMissionButton" class="btnicon ic_save2FC" href="#" i18n_title="missionTitleSaveMissionToFC" </a>
+                                    <a id="loadEepromMissionButton" class="btnicon ic_loadFromEprom" href="#" i18n_title="missionTitleLoadEepromMission"></a>
+                                    <a id="saveEepromMissionButton" class="btnicon ic_save2Eprom" href="#" i18n_title="missionTitleSaveEepromMission"></a>
                         </div>
                         <hr>
                         <!-- <div class="btn">
@@ -33,33 +33,33 @@
                         </div>
                         <hr> -->
                         <div id="removeAllPoints" class="btn btn-danger" style="padding-top: 1px; display: inline-block">
-                            <a class="btnicon ic_removeAll" href="#" title="Remove all"></a>
+                            <a class="btnicon ic_removeAll" href="#" i18n_title="missionTitleRemoveAll"></a>
                         </div>
                     </div>
                 </div>
 
                 <div id="missionPlannerTotalInfo" class="gui_box grey">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionTotalInformationHead">Total information</div>
+                        <div class="spacer_box_title" data-i18n="missionTotalInformationHead"></div>
                         <div class="btnMenu btnMenuIcon show_btn"  id="showHideInfoButton">
-                            <a class="ic_hide" href="#" title="Hide"></a>
+                            <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                         </div>
                     </div>
                     <div class="spacer"  id="InfoContent">
                         <div id="infoMissionFilename" style="padding-bottom: 2px;">
-                            <span>Filename loaded:</span>
+                            <span data-i18n="missionTotalInfoFilenameLoaded"></span>
                             <span id="missionFilename" style="color: #3394b5"></span>
                         </div>
                         <div id="infoMissionDistance" style="padding-bottom: 2px;">
-                            <span>Distance (m):</span>
+                            <span data-i18n="missionTotalInfoDistance"></span>
                             <span id="missionDistance"></span>
                         </div>
                         <div id="infoAvailablePoints" style="padding-bottom: 2px;">
-                            <span>Available Points</span>
+                            <span data-i18n="missionTotalInfoAvailablePoints"></span>
                             <span id="availablePoints">0/0</span>
                         </div>
                         <div id="infoMissionValid" style="padding-bottom: 2px;">
-                            <span>Mission valid</span>
+                            <span data-i18n="missionTotalInfoMissionValid"></span>
                             <div id="missionValid" style="display: inline-block"></div>
                         </div>
                     </div>
@@ -67,23 +67,23 @@
 
                 <div id="missionPlannerSettings" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultSettingsHead">Default settings</div>
+                        <div class="spacer_box_title" data-i18n="missionDefaultSettingsHead"></div>
                         <div class="btnMenu btnMenuIcon  save_btn">
-                                <a id="cancelSettings" class="ic_cancel" href="#" title="Cancel"></a>
-                                <a id="saveSettings" class="ic_save" href="#" title="Save"></a>
+                            <a id="cancelSettings" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
+                            <a id="saveSettings" class="ic_save" href="#" i18n_title="missionTitleSave"></a>
                         </div>
                     </div>
                     <div class="spacer">
                         <div class="point">
-                            <label class="point-label" for="MPdefaultPointAlt">Alt (cm): </label>
+                            <label class="point-label" for="MPdefaultPointAlt" data-i18n="missionDefaultPointAlt"></label>
                             <input id="MPdefaultPointAlt" type="text" value="0" required>
                         </div>
                         <div class="point">
-                            <label class="point-label" for="MPdefaultPointSpeed">Speed (cm/s): </label>
+                            <label class="point-label" for="MPdefaultPointSpeed" data-i18n="missionDefaultPointSpeed"></label>
                             <input id="MPdefaultPointSpeed" type="text" value="0" required>
                         </div>
                         <div class="point">
-                            <label class="point-label" for="MPdefaultSafeRangeSH">Radius (m): </label>
+                            <label class="point-label" for="MPdefaultSafeRangeSH" data-i18n="missionDefaultSafeRangeSH"></label>
                             <input id="MPdefaultSafeRangeSH" type="text" value="0" required>
                         </div>
                     </div>
@@ -91,38 +91,38 @@
 
                 <div id="missionPlannerMultiMission" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionMultiMissionHead">Multi Missions</div>
+                        <div class="spacer_box_title" data-i18n="missionMultiMissionHead"></div>
                         <div class="btnMenu btnMenuIcon save_btn">
                             <div id="showHideMultimissionButton">
-                                <a class="ic_hide" href="#" title="Hide"></a>
+                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                             </div>
-                            <a id="cancelMultimission" class="ic_cancel" href="#" title="Cancel"></a>
+                            <a id="cancelMultimission" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
                         </div>
                     </div>
                     <div class="spacer" id="multimissionContent">
                         <div class="btn btnTable btnTableIcon save_btn">
                             <div>
-                                <span>Missions Info:</span>
+                                <span data-i18n="missionMultiMissionsInfo"></span>
                                 <span id="multimissionInfo">None</span>
                             </div>
                             <div style="margin-top: 5px">
-                                <span>Active Mission:</span>
+                                <span data-i18n="missionMultiActiveMission"></span>
                                 <span id="activeNissionIndex">1</span>
-                                <a class="ic_save disabled" id="setActiveMissionButton" href="#" title="Set Active"></a>
+                                <a class="ic_save disabled" id="setActiveMissionButton" href="#" i18n_title="missionTitleSetActive"></a>
                             </div>
                             <hr>
                             <div style="display: inline-block">
-                                <label for="multimissionOptionList">Mission No.</label>
+                                <label for="multimissionOptionList" data-i18n="missionMultiMissionNo."></label>
                                 <select name="Number" id="multimissionOptionList" style="width: 50px">
                                     <option value="0">ALL</option>
                                 </select>
                                 <div style="float: right">
-                                    <span>Update All</span>
-                                    <a class="ic_save disabled" id="updateMultimissionButton" href="#" title="Update All"></a>
+                                    <span data-i18n="missionMultiUpdateAll"></span>
+                                    <a class="ic_save disabled" id="updateMultimissionButton" href="#" i18n_title="missionTitleUpdateAll"></a>
                                 </div>
                                 <div style="margin-bottom: 5px; margin-top: 5px">
-                                    <label for="addMultimissionButton">Add New Mission</label>
-                                    <a class="ic_add disabled" id="addMultimissionButton" href="#" title="Add"></a>
+                                    <label for="addMultimissionButton" data-i18n="missionMultiAddNewMission"></label>
+                                    <a class="ic_add disabled" id="addMultimissionButton" href="#" i18n_title="missionTitleAdd"></a>
                                 </div>
                             </div>
                         </div>
@@ -131,12 +131,12 @@
 
                 <div id="missionPlannerHome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionHomeHead">Take Off home</div>
+                        <div class="spacer_box_title" data-i18n="missionHomeHead"></div>
                         <div class="btnMenu btnMenuIcon  save_btn">
                             <div id="showHideHomeButton">
-                                <a class="ic_hide" href="#" title="Hide"></a>
+                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                             </div>
-                            <a id="cancelHome" class="ic_cancel" href="#" title="Cancel"></a>
+                            <a id="cancelHome" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
                         </div>
                     </div>
                     <div class="spacer" id="HomeContent">
@@ -152,8 +152,9 @@
                                 </thead>
                                 <tbody id="homeTableBody">
                                     <tr>
-                                        <td><div id="viewHomePoint" class="btnTable btnTableIcon">
-                                                <a class="ic_center" data-role="home-center" href="#"  title="move to center view"></a>
+                                        <td>
+                                            <div id="viewHomePoint" class="btnTable btnTableIcon">
+                                                <a class="ic_center" data-role="home-center" href="#" i18n_title="missionTitleMoveToCenterView"></a>
                                             </div>
                                         </td>
                                         <td><input type="number" class="home-lat" /></td>
@@ -165,21 +166,21 @@
                         </div>
                     </div>
                     <div class="point" id="elevationEarthModelclass" style="display: none">
-                        <label class="spacer_box_title i18n-replaced" for="elevationEarthModel">Use Sea Level Earth DEM Model: </label>
+                        <label class="spacer_box_title" for="elevationEarthModel" data-i18n="missionLevelEarthDEMModel"></label>
                         <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" required>
                     </div>
                 </div>
 
                 <div id="missionPlannerSafehome" class="gui_box grey" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionSafehomeHead">Safe Home manager</div>
+                        <div class="spacer_box_title" data-i18n="missionSafehomeHead"></div>
                         <div class="btnMenu btnMenuIcon  save_btn">
                             <div id="showHideSafehomeButton">
-                                <a class="ic_hide" href="#" title="Hide"></a>
+                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                             </div>
-                            <a id="cancelSafehome" class="ic_cancel" href="#" title="Cancel"></a>
-                            <a id="saveEepromSafehomeButton" class="ic_save2Eprom" href="#" title="Save Eeprom Safehome"></a>
-                            <a id="loadEepromSafehomeButton" class="ic_loadFromEprom" href="#" title="Load Eeprom Safehome"></a>
+                            <a id="cancelSafehome" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
+                            <a id="saveEepromSafehomeButton" class="ic_save2Eprom" href="#" i18n_title="missionTitleSaveEepromSafehome"></a>
+                            <a id="loadEepromSafehomeButton" class="ic_loadFromEprom" href="#" i18n_title="missionTitleLoadEepromSafehome"></a>
                         </div>
                     </div>
                     <div class="spacer" id="SafehomeContent">
@@ -199,15 +200,15 @@
                             </table>
                             <hr>
                             <div class="spacer"  id="safehomeLegend">
-                                <span><b>Legend : </b></span>
+                                <span><b data-i18n="SafehomeLegend"></b></span>
                                 <div class="legendItem">
                                     <span class="fill" style="border-bottom-color:#900C3F"></span>
-                                    <span class="textLegend">Max distance (m):</span>
+                                    <span class="textLegend" data-i18n="SafehomeMaxDistance"></span>
                                     <span id="safeHomeMaxDistance" class="valueLegend"></span>
                                 </div>
                                 <div class="legendItem">
                                     <span class="fill"></span>
-                                    <span class="textLegend">Safe Radius (m):</span>
+                                    <span class="textLegend" data-i18n="SafehomeSafeRadius"></span>
                                     <span id="SafeHomeSafeDistance" class="valueLegend"></span>
                                 </div>
                             </div>
@@ -217,16 +218,16 @@
 
                 <div class="gui_box grey" id="MPeditPoint" style="display: none">
                     <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="editPointHead" id="EditPointNumber">Edit point</div>
+                        <div class="spacer_box_title" data-i18n="editPointHead" id="EditPointNumber"></div>
                         <div class="btnMenu btnMenuIcon">
                             <div id="showHideWPeditButton"   class="save_btn">
-                                <a class="ic_hide" href="#" title="Hide"></a>
+                                <a class="ic_hide" href="#" i18n_title="missionTitleHide"></a>
                             </div>
                             <div id="removePoint" class="btn btnMenu-danger">
-                                <a id="removePointButton" class="ic_removeAll" href="#" title="Remove"></a>
+                                <a id="removePointButton" class="ic_removeAll" href="#" i18n_title="missionTitlRemove"></a>
                             </div>
                             <div id="editMission" class="save_btn" style="display: none">
-                                <a id="editMissionButton" class="ic_setup" href="#" title="Edit Mission"></a>
+                                <a id="editMissionButton" class="ic_setup" href="#" i18n_title="missionTitlEditMission"></a>
                             </div>
                         </div>
                     </div>
@@ -274,7 +275,7 @@
                             <label class="point-label" for="pointP1">Parameter 1: </label>
                             <input id="pointP1" type="text" value="0" required>
                         </div>
-						<div class="point" id="pointP2class" style="display: none">
+                        <div class="point" id="pointP2class" style="display: none">
                             <label class="point-label" for="pointP2">Parameter 2: </label>
                             <input id="pointP2" type="text" value="0" required>
                         </div>
@@ -286,26 +287,26 @@
                             <div class="userActionContainer">4 <input id="pointP3UserAction4" type="checkbox" value="0" class="togglemedium" checked required></div>
                         </div>
                         <div>
-                        <table class="waypointOptionsTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 30px">
-                                        <div id="addOptionsPoint" class="btn btnTable btnTableIcon btnTable-success">
-                                            <a id="addOptionsPointButton" class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
-                                        </div>
-                                    </th>
-                                    <th style="width: 50px" data-i18n="WaypointOptionId"></th>
-                                    <th style="width: 80px" data-i18n="WaypointOptionAction"></th>
-                                    <th style="width: 120px" data-i18n="WaypointOptionP1"></th>
-                                    <th style="width: 120px" data-i18n="WaypointOptionP2"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="waypointOptionsTableBody">
-                            </tbody>
-                        </table>
+                            <table class="waypointOptionsTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30px">
+                                            <div id="addOptionsPoint" class="btn btnTable btnTableIcon btnTable-success">
+                                                <a id="addOptionsPointButton" class="ic_add" data-role="waypointOptions-add" href="#" style="float: center" title="Add"></a>
+                                            </div>
+                                        </th>
+                                        <th style="width: 50px" data-i18n="WaypointOptionId"></th>
+                                        <th style="width: 80px" data-i18n="WaypointOptionAction"></th>
+                                        <th style="width: 120px" data-i18n="WaypointOptionP1"></th>
+                                        <th style="width: 120px" data-i18n="WaypointOptionP2"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="waypointOptionsTableBody">
+                                </tbody>
+                            </table>
                         </div>
 
-						<!-- <div class="point-radio" id="pointOptionclass" style="display: none">
+                        <!-- <div class="point-radio" id="pointOptionclass" style="display: none">
 							<div class="radio-line">
 								<input type="radio" id="Options_None" name="Options" value="None" checked>
 								<label class="radio-options" for="Options_None">None</label><br>
@@ -339,17 +340,17 @@
         <div class="cf_column threefourth_left" style="height: 100%;">
             <div id="missionMap"></div>
             <div id="missionPlannerElevation" class="gui_box grey" style="display: none">
-                    <div class="gui_box_titlebar">
-                        <div class="spacer_box_title i18n-replaced" data-i18n="missionDefaultElevationHead">Elevation Profile</div>
-                        <div class="btnMenu btnMenuIcon  save_btn">
-                                <a id="cancelPlot" class="ic_cancel" href="#" title="Cancel"></a>
-                        </div>
-                    </div>
-                    <div class="spacer">
-                        <div id="elevationDiv">
-                        </div>
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="missionDefaultElevationHead"></div>
+                    <div class="btnMenu btnMenuIcon  save_btn">
+                        <a id="cancelPlot" class="ic_cancel" href="#" i18n_title="missionTitleCancel"></a>
                     </div>
                 </div>
+                <div class="spacer">
+                    <div id="elevationDiv">
+                    </div>
+                </div>
+            </div>
             <div id="notLoadMap" data-i18n="useOnlyStandalone" style="display: none;"></div>
         </div>
     </div>

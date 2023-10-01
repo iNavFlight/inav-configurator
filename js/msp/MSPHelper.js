@@ -1453,7 +1453,8 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_MIXER:
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
-                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint16(1, true);
+                MIXER_CONFIG.yawJumpPreventionLimit = data.getUint8(1, true);
+                MIXER_CONFIG.motorStopOnLow = data.getUint8(1, true);
                 MIXER_CONFIG.platformType = data.getInt8(3);
                 MIXER_CONFIG.hasFlaps = data.getInt8(4);
                 MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
@@ -1482,7 +1483,32 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
-                    OUTPUT_MAPPING.put(data.getUint8(i));
+                    OUTPUT_MAPPING.put({
+                        'timerId': i,
+                        'usageFlags': data.getUint8(i)});
+                break;
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT:
+                OUTPUT_MAPPING.flush();
+                for (i = 0; i < data.byteLength; i += 2) {
+                    timerId = data.getUint8(i);
+                    usageFlags = data.getUint8(i + 1);
+                    OUTPUT_MAPPING.put(
+                        {
+                            'timerId': timerId,
+                            'usageFlags': usageFlags
+                        });
+                }
+                break;
+            
+            case MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE:
+                if(data.byteLength > 2) {
+                    OUTPUT_MAPPING.flushTimerOverrides();
+                }
+                for (i = 0; i < data.byteLength; i += 2) {
+                    timerId = data.getUint8(i);
+                    outputMode = data.getUint8(i + 1);
+                    OUTPUT_MAPPING.setTimerOverride(timerId, outputMode);
+                }
                 break;
 
             case MSPCodes.MSP2_INAV_MC_BRAKING:
@@ -2129,8 +2155,8 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_SET_MIXER:
                 buffer.push(MIXER_CONFIG.yawMotorDirection);
-                buffer.push(lowByte(MIXER_CONFIG.yawJumpPreventionLimit));
-                buffer.push(highByte(MIXER_CONFIG.yawJumpPreventionLimit));
+                buffer.push(MIXER_CONFIG.yawJumpPreventionLimit);
+                buffer.push(MIXER_CONFIG.motorStopOnLow);
                 buffer.push(MIXER_CONFIG.platformType);
                 buffer.push(MIXER_CONFIG.hasFlaps);
                 buffer.push(lowByte(MIXER_CONFIG.appliedMixerPreset));
@@ -2820,6 +2846,47 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 
+    self.loadOutputMappingExt = function (callback) {
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT, false, false, callback);
+    };
+
+    self.loadTimerOutputModes = function(callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
+    }
+
+    self.sendTimerOutputModes = function(callback) {
+        var nextFunction = send_next_output_mode;
+        var idIndex = 0;
+
+        var overrideIds = OUTPUT_MAPPING.getUsedTimerIds();
+
+        if (overrideIds.length == 0) {
+            onCompleteCallback();
+        } else {
+            send_next_output_mode();
+        }
+
+        function send_next_output_mode() {
+
+            var timerId = overrideIds[idIndex];
+
+            var outputMode = OUTPUT_MAPPING.getTimerOverride(timerId);
+
+            var buffer = [];
+            buffer.push(timerId);
+            buffer.push(outputMode);
+
+            // prepare for next iteration
+            idIndex++;
+            if (idIndex == overrideIds.length) {
+                nextFunction = callback;
+
+            }
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
+        }
+
+    }
+
     self.loadBatteryConfig = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
@@ -3003,7 +3070,7 @@ var mspHelper = (function (gui) {
             if (waypointId < MISSION_PLANNER.getCountBusyPoints()) {
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, loadWaypoint);
             } else {
-                GUI.log('Receive time: ' + (new Date().getTime() - startTime) + 'ms');
+                GUI.log(chrome.i18n.getMessage('ReceiveTime') + (new Date().getTime() - startTime) + 'ms');
                 MSP.send_message(MSPCodes.MSP_WP, [waypointId], false, callback);
             }
         };
@@ -3025,7 +3092,7 @@ var mspHelper = (function (gui) {
         };
 
         function endMission() {
-            GUI.log('Send time: ' + (new Date().getTime() - startTime) + 'ms');
+            GUI.log(chrome.i18n.getMessage('SendTime') + (new Date().getTime() - startTime) + 'ms');
             MSP.send_message(MSPCodes.MSP_WP_GETINFO, false, false, callback);
         }
     };

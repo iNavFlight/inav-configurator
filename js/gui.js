@@ -14,6 +14,7 @@ var GUI_control = function () {
         'landing',
         'firmware_flasher',
         'mission_control',
+        'sitl',
         'help'
     ];
     this.defaultAllowedTabsWhenConnected = [
@@ -202,9 +203,49 @@ GUI_control.prototype.content_ready = function (callback) {
 };
 
 GUI_control.prototype.updateStatusBar = function() {
+
+    var armingFlags = {
+        'ARMED':(1 << 2),
+        //'WAS_EVER_ARMED':(1 << 3),
+        'SIMULATOR_MODE':(1 << 4),
+        'ARMING_DISABLED_FAILSAFE_SYSTEM':(1 << 7),
+        'ARMING_DISABLED_NOT_LEVEL':(1 << 8),
+        'ARMING_DISABLED_SENSORS_CALIBRATING':(1 << 9),
+        'ARMING_DISABLED_SYSTEM_OVERLOADED':(1 << 10),
+        'ARMING_DISABLED_NAVIGATION_UNSAFE':(1 << 11),
+        'ARMING_DISABLED_COMPASS_NOT_CALIBRATED':(1 << 12),
+        'ARMING_DISABLED_ACCELEROMETER_NOT_CALIBRATED':(1 << 13),
+        'ARMING_DISABLED_ARM_SWITCH':(1 << 14),
+        'ARMING_DISABLED_HARDWARE_FAILURE':(1 << 15),
+        'ARMING_DISABLED_BOXFAILSAFE':(1 << 16),
+        'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
+        'ARMING_DISABLED_RC_LINK':(1 << 18),
+        'ARMING_DISABLED_THROTTLE':(1 << 19),
+        'ARMING_DISABLED_CLI':(1 << 20),
+        'ARMING_DISABLED_CMS_MENU':(1 << 21),
+        'ARMING_DISABLED_OSD_MENU':(1 << 22),
+        'ARMING_DISABLED_ROLLPITCH_NOT_CENTERED':(1 << 23),
+        'ARMING_DISABLED_SERVO_AUTOTRIM':(1 << 24),
+        'ARMING_DISABLED_OOM':(1 << 25),
+        'ARMING_DISABLED_INVALID_SETTING':(1 << 26),
+        'ARMING_DISABLED_PWM_OUTPUT_ERROR':(1 << 27),
+        'ARMING_DISABLED_NO_PREARM':(1 << 28),
+        'ARMING_DISABLED_DSHOT_BEEPER':(1 << 29),
+        'ARMING_DISABLED_LANDING_DETECTED':(1 << 30),
+    };
+
+    var activeArmFlags =  [];
+    for(var i=0;i<32;i++) {
+        var checkBit = (1 << i);
+        if(Object.values(armingFlags).includes(checkBit) && (checkBit & CONFIG.armingFlags)) {
+            activeArmFlags.push(Object.keys(armingFlags)[Object.values(armingFlags).indexOf(checkBit)]);
+        }
+    }
+
     $('span.i2c-error').text(CONFIG.i2cError);
     $('span.cycle-time').text(CONFIG.cycleTime);
     $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+    $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
 GUI_control.prototype.updateProfileChange = function() {
