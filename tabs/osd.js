@@ -1566,7 +1566,7 @@ OSD.constants = {
                 },
                 {
                     name: 'ODOMETER',
-                    id: 144,
+                    id: 145,
                     min_version: '6.1.0',
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
