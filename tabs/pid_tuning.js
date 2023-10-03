@@ -15,7 +15,8 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig,
-        mspHelper.loadFeatures
+        mspHelper.loadFeatures,
+        mspHelper.loadRateDynamics
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -270,7 +271,11 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveFilterConfig() {
-                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, saveSettings);
+                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, saveRateDynamics);
+            }
+
+            function saveRateDynamics() {
+                mspHelper.saveRateDynamics(saveSettings);
             }
 
             function saveSettings() {
