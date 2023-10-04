@@ -1353,6 +1353,24 @@
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
     },
+    "pidTuning_RateDynamics": {
+        "message": "Rate Dynamics"
+    },
+    "pidTuning_RateDynamics_Sensitivity": {
+        "message": "Sensitivity"
+    },
+    "pidTuning_RateDynamics_Correction": {
+        "message": "Correction"
+    },
+    "pidTuning_RateDynamics_Weight": {
+        "message": "Weight"
+    },
+    "pidTuning_RateDynamics_Center": {
+        "message": "Center"
+    },
+    "pidTuning_RateDynamics_End": {
+        "message": "End"
+    },
     "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
