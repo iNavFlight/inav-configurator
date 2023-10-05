@@ -339,6 +339,71 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RateDynamics"></div>
+            <div class="clear-both"></div>
+
+            <div class="pid-sliders-axis" data-axis="roll">
+                <h3 data-i18n="pidTuning_RateDynamics_Sensitivity"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_sensitivity" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_sensitivity" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
+            <div class="pid-sliders-axis" data-axis="pitch">
+                <h3 data-i18n="pidTuning_RateDynamics_Correction"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_correction" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_correction" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
+            <div class="pid-sliders-axis" data-axis="yaw">
+                <h3 data-i18n="pidTuning_RateDynamics_Weight"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_weight" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_weight" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
         </div>
 
         <div id="subtab-filters" class="subtab__content">
