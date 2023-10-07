@@ -115,6 +115,7 @@ SYM.GROUND_COURSE = 0xDC;
 SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.ODOMETER = 0X168;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -1560,6 +1561,22 @@ OSD.constants = {
                                 return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
                                 return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
+                {
+                    name: 'ODOMETER',
+                    id: 145,
+                    min_version: '6.1.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00016.9') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00014.7') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00027.2') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
