@@ -113,7 +113,7 @@
 |                                                                    | SYM_MAH_KM_1               | SYM.MAH_KM_1                 | mAh per Kilometre, right side         | 108        | 0x6C         |
 | ![Watt hours](/resources/osd/digital/default/24x36/109.png)        | SYM_WH                     | SYM.WH                       | Watthours symbol                      | 109        | 0x6D         |
 | ![Wh per Km](/resources/osd/digital/default/24x36/110.png)         | SYM_WH_KM                  | SYM.WH_KM                    | Watthours per Kilometre               | 110        | 0x6E         |
-| ![Wh per Mile](/resources/osd/digital/default/24x36/111.png)       | SYM_WH_MI                  | SYM.WH_MI                    | Watthours per Mile                    | 111        | 0x6F         | 
+| ![Wh per Mile](/resources/osd/digital/default/24x36/111.png)       | SYM_WH_MI                  | SYM.WH_MI                    | Watthours per Mile                    | 111        | 0x6F         |
 | ![Wh per NM](/resources/osd/digital/default/24x36/112.png)         | SYM_WH_NM                  | SYM.WH_NM                    | Watthours per Nautical Mile           | 112        | 0x70         |
 | ![Watts](/resources/osd/digital/default/24x36/113.png)             | SYM_WATT                   | SYM.WATT                     | Watts symbol                          | 113        | 0x71         |
 | ![milliWatts](/resources/osd/digital/default/24x36/114.png)        | SYM_MW                     | SYM.MW                       | Milliwatts symbol                     | 114        | 0x72         |
@@ -224,6 +224,7 @@
 | ![Flight mins rem](/resources/osd/digital/default/24x36/218.png)   | SYM_FLIGHT_MINS_REMAINING  | SYM.FLIGHT_MINS_REMAINING    | Flight time (mins) remaining          | 218        | 0xDA         |
 | ![Flight hours rem](/resources/osd/digital/default/24x36/219.png)  | SYM_FLIGHT_HOURS_REMAINING |                              | Flight time (hours) remaining         | 219        | 0xDB         |
 | ![Ground course](/resources/osd/digital/default/24x36/220.png)     | SYM_GROUND_COURSE          | SYM.GROUND_COURSE            | Ground course                         | 220        | 0xDC         |
+| ![Alert](/resources/osd/digital/default/24x36/221.png)             | SYM_ALERT                  | SYM.ALERT                    | General Alert                         | 221        | 0xDD         |
 | ![Terrain follow](/resources/osd/digital/default/24x36/251.png)    | SYM_TERRAIN_FOLLOWING      | SYM.TERRAIN_FOLLOWING        | Terrain following                     | 251        | 0xFB         |
 | ![Cross track err](/resources/osd/digital/default/24x36/252.png)   | SYM_CROSS_TRACK_ERROR      | SYM.CROSS_TRACK_ERROR        | Cross track error                     | 252        | 0xFC         |
 | ![ADSB](/resources/osd/digital/default/24x36/253.png)              | SYM_ADSB                   | SYM.ADSB                     | ADSB                                  | 253        | 0xFD         |
@@ -284,6 +285,7 @@
 | ![Home distance](/resources/osd/digital/default/24x36/357.png)    | SYM_HOME_DIST              |                              | Home distance icon                    | 357        | 0x165         |
 | ![Crosshair centre](/resources/osd/digital/default/24x36/358.png) | SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166         |
 | ![Flight dist rem](/resources/osd/digital/default/24x36/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
+| ![Odometer](/resources/osd/digital/default/24x36/360.png)         | SYM_ODOMETER               | SYM.ODOMETER                 | Odometer (total aircraft distance)    | 360        | 0x168         |
 | ![Crosshair 3](/resources/osd/digital/default/24x36/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
 | ![Crosshair 4](/resources/osd/digital/default/24x36/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
 | ![Crosshair 5](/resources/osd/digital/default/24x36/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |

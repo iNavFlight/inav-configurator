@@ -900,18 +900,6 @@
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
     },
-    "configurationBoardAlignment": {
-        "message": "Board and Sensor Alignment"
-    },
-    "configurationBoardAlignmentRoll": {
-        "message": "Roll Degrees"
-    },
-    "configurationBoardAlignmentPitch": {
-        "message": "Pitch Degrees"
-    },
-    "configurationBoardAlignmentYaw": {
-        "message": "Yaw Degrees"
-    },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
     },
@@ -1364,6 +1352,24 @@
     },
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
+    },
+    "pidTuning_RateDynamics": {
+        "message": "Rate Dynamics"
+    },
+    "pidTuning_RateDynamics_Sensitivity": {
+        "message": "Sensitivity"
+    },
+    "pidTuning_RateDynamics_Correction": {
+        "message": "Correction"
+    },
+    "pidTuning_RateDynamics_Weight": {
+        "message": "Weight"
+    },
+    "pidTuning_RateDynamics_Center": {
+        "message": "Center"
+    },
+    "pidTuning_RateDynamics_End": {
+        "message": "End"
     },
     "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
@@ -2035,19 +2041,22 @@
         "message": "Signal Strength"
     },
     "magnetometerHead": {
-        "message": "Magnetometer Alignment"
+        "message": "Alignment tool"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+        "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on Flight Controller</u>.<br/>2. Adjust magnetometer orientation to match physical orientation on the aircraft <u>according to \"compass direction\" arrow or axis markings on magnetometer</u>.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
     },
     "magnetometerOrientationPreset": {
-        "message": "Orientation presets"
+        "message": "Orientation preset (align_mag). Relative to FC orientation"
+    },
+    "boardInfo": {
+        "message": "1. Select Flight Controller alignment<br>(align_board_roll, align_board_pitch, align_board_yaw)"
     },
     "magnetometerInfo": {
-        "message": "Select a preset or create a custom configuration moving the sliders"
+        "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
     },
     "magnetometerElementToShow": {
-        "message": "Element to show"
+        "message": "Element to show: Magnetometer model or axes"
     },
 
     "axisTableTitleAxis": {
@@ -2060,9 +2069,6 @@
         "message": "Value [degree]"
     },
 
-
-
-
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },
@@ -2070,7 +2076,7 @@
         "message": "Mag Statistics"
     },
     "tabMAGNETOMETER": {
-        "message": "Magnetometer"
+        "message": "Alignment tool"
     },
     "motors": {
         "message": "Motors"
@@ -3419,6 +3425,60 @@
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
     },
+    "osd_hud_settings": {
+        "message": "Heads up Display settings"
+    },
+    "osd_hud_settings_HELP": {
+        "message": "This section allows tweaking the behavior of HUD elements."
+    },
+    "osd_hud_radar_disp": {
+        "message": "Maximum number of radar elements on screen."
+    },
+    "osd_hud_radar_disp_help": {
+        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+    },
+
+    "osd_hud_radar_range_min": {
+        "message": "Minimum radar range"
+    },
+    "osd_hud_radar_range_min_help": {
+        "message": "Radar aircrafts closer than this will not be displayed in the HUD."
+    },
+
+    "osd_hud_radar_range_max": {
+        "message": "Maximum radar range"
+    },
+    "osd_hud_radar_range_max_help": {
+        "message": "Radar aircrafts further away than this will not be displayed in the HUD."
+    },
+
+
+    "osd_hud_wp_disp": {
+        "message": "Maximum number of waypoint elements on screen."
+    },
+    "osd_hud_wp_disp_help": {
+        "message": "Number of Wayponts to show on screen. 0 disables this feature."
+    },
+    "osd_camera_uptilt": {
+        "message": "Camera uptilt"
+    },
+    "osd_camera_uptilt_help": {
+        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+    },
+    "osd_camera_fov_h": {
+        "message": "Camera Horizontal FOV"
+    },
+    "osd_camera_fov_h_help": {
+        "message": "Camera Horizontal Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+    "osd_camera_fov_v": {
+        "message": "Camera Vertical FOV"
+    },
+    "osd_camera_fov_v_help": {
+        "message": "Camera Vertical Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+
+
     "osd_alarms": {
         "message": "Alarms"
     },
@@ -4437,7 +4497,7 @@
         "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
-        "message": "Output"
+        "message": "Output (timer)"
     },
     "mappingTableFunction": {
         "message": "Function"
@@ -4772,9 +4832,6 @@
     "WaypointOptionP2": {
         "message": "P2"
     },
-    "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
-    },
     "pidId": {
         "message": "#"
     },
@@ -4894,9 +4951,6 @@
     },
     "pidTuning_MatrixFilterTypeHelp": {
         "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
-    },
-    "nmeaWarning": {
-        "message": "NMEA protocol is deprecated and might be removed in the future. Please use UBLOX or UBLOX7 protocol instead."
     },
     "softSerialWarning": {
         "message": "It is not advisable to use softserial for flight critical devices like GPS or receiver, or high traffic devices like MSP DisplayPort."
@@ -5420,5 +5474,8 @@
     },
     "targetPrefetchFailNoPort": {
         "message": "Cannot prefetch target: No port"
+    },
+    "timerOutputs": {
+        "message": "Timer outputs"
     }
 }

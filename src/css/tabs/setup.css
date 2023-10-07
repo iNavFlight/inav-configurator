@@ -40,6 +40,21 @@
     float: left;
 }
 
+.attitude_note1 {
+   position: absolute;
+   left: 130px;
+   top: 29px;
+   font-size: 10px;
+}
+
+.attitude_note2 {
+   position: absolute;
+   left: 130px;
+   top: 13px;
+   font-size: 10px;
+}
+
+
 #interactive_block a.reset {
     position: absolute;
     display: block;

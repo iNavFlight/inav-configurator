@@ -822,13 +822,11 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "motorstop_on_low",
+                value: "ON"
+            },
+        ],
     },
     {
         "title": 'Airplane without a Tail (Wing, Delta, etc)',
@@ -1041,13 +1039,11 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "motorstop_on_low",
+                value: "ON"
+            },
+        ],
     },
     {
         "title": 'Rovers & Boats',
