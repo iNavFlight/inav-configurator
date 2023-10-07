@@ -1454,7 +1454,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_MIXER:
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
                 MIXER_CONFIG.yawJumpPreventionLimit = data.getUint8(1, true);
-                MIXER_CONFIG.motorStopOnLow = data.getUint8(1, true);
+                MIXER_CONFIG.motorStopOnLow = data.getUint8(2, true);
                 MIXER_CONFIG.platformType = data.getInt8(3);
                 MIXER_CONFIG.hasFlaps = data.getInt8(4);
                 MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
@@ -1556,6 +1556,19 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 console.log('Safehome points saved');
+                break;
+
+            case MSPCodes.MSP2_INAV_RATE_DYNAMICS:
+                RATE_DYNAMICS.sensitivityCenter = data.getUint8(0);
+                RATE_DYNAMICS.sensitivityEnd = data.getUint8(1);
+                RATE_DYNAMICS.correctionCenter = data.getUint8(2);
+                RATE_DYNAMICS.correctionEnd = data.getUint8(3);
+                RATE_DYNAMICS.weightCenter = data.getUint8(4);
+                RATE_DYNAMICS.weightEnd = data.getUint8(5);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS:
+                console.log('Rate dynamics saved');
                 break;
 
             default:
@@ -2183,6 +2196,15 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(BRAKING_CONFIG.boostDisengageSpeed));
 
                 buffer.push(BRAKING_CONFIG.bankAngle);
+                break;
+
+            case MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS:
+                buffer.push(RATE_DYNAMICS.sensitivityCenter);
+                buffer.push(RATE_DYNAMICS.sensitivityEnd);
+                buffer.push(RATE_DYNAMICS.correctionCenter);
+                buffer.push(RATE_DYNAMICS.correctionEnd);
+                buffer.push(RATE_DYNAMICS.weightCenter);
+                buffer.push(RATE_DYNAMICS.weightEnd);
                 break;
 
             default:
@@ -3378,6 +3400,14 @@ var mspHelper = (function (gui) {
     self.saveBrakingConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_SET_MC_BRAKING, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_MC_BRAKING), false, callback);
     };
+
+    self.loadRateDynamics = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_RATE_DYNAMICS, false, false, callback);
+    }
+
+    self.saveRateDynamics = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS), false, callback);
+    }
 
     self.loadParameterGroups = function (callback) {
         MSP.send_message(MSPCodes.MSP2_COMMON_PG_LIST, false, false, function (resp) {

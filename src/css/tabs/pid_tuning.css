@@ -437,15 +437,15 @@
 }
 
 .pid-sliders-axis[data-axis="roll"] {
-    background-color: #afe4fe;
+    background-color: #8ecae6;
 }
 
 .pid-sliders-axis[data-axis="pitch"] {
-    background-color: #C4B5FF;
+    background-color: #00b4d8;
 }
 
 .pid-sliders-axis[data-axis="yaw"] {
-    background-color: #E6B6F0;
+    background-color: #e9c46a;
 }
 
 #pid-sliders {

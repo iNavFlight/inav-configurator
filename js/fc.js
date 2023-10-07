@@ -64,7 +64,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    RATE_DYNAMICS;
 
 var FC = {
     restartRequired: false,
@@ -541,6 +542,15 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        RATE_DYNAMICS = {
+            sensitivityCenter: null,
+            sensitivityEnd: null,
+            correctionCenter: null,
+            correctionEnd: null,
+            weightCenter: null, 
+            weightEnd: null
+        };
     },
     getOutputUsages: function() {
         return {
