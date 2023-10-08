@@ -436,18 +436,34 @@
     padding: 4px;
 }
 
-.pid-sliders-axis[data-axis="roll"] {
+.pid-sliders-axis[data-axis="roll"],
+.pid-sliders-axis[data-axis="0"] {
     background-color: #8ecae6;
 }
 
-.pid-sliders-axis[data-axis="pitch"] {
+.pid-sliders-axis[data-axis="pitch"],
+.pid-sliders-axis[data-axis="1"]
+ {
     background-color: #00b4d8;
 }
 
-.pid-sliders-axis[data-axis="yaw"] {
+.pid-sliders-axis[data-axis="yaw"],
+.pid-sliders-axis[data-axis="2"]
+{
     background-color: #e9c46a;
 }
 
+.pid-sliders-axis[data-axis="3"]
+{
+    background-color: #f4a261;
+}
+
 #pid-sliders {
+    margin-bottom: 1em;
+}
+
+.ez-tune-preview {
+    background-color: #f4a261;
+    margin-left: 1em;
     margin-bottom: 1em;
 }

@@ -13,7 +13,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneFilterHz" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_filter_hz" type="number"/>
+                        <input id="ez_tune_filter_hz" type="number" class="ez-element"/>
                     </div>
                 </div>
                 <div class="clear-both"></div>
@@ -25,7 +25,7 @@
                     
                     <span data-i18n="ezTuneAxisRatio" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_axis_ratio" type="number"/>
+                        <input id="ez_tune_axis_ratio" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -34,7 +34,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneResponse" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_response" type="number"/>
+                        <input id="ez_tune_response" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -43,7 +43,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneDamping" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_damping" type="number"/>
+                        <input id="ez_tune_damping" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -52,7 +52,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneStability" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_stability" type="number"/>
+                        <input id="ez_tune_stability" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -61,7 +61,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneAggressiveness" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_aggressiveness" type="number"/>
+                        <input id="ez_tune_aggressiveness" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -73,7 +73,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneRate" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_rate" type="number"/>
+                        <input id="ez_tune_rate" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -82,7 +82,7 @@
                 <div class="pid-slider-row">
                     <span data-i18n="ezTuneExpo" class="bold"></span>
                     <div class="number no-border">
-                        <input id="ez_tune_expo" type="number"/>
+                        <input id="ez_tune_expo" type="number" class="ez-element"/>
                     </div>
                     <div class="clear-both"></div>
                 </div>
@@ -90,7 +90,41 @@
 
             </div>
 
-            <div>Bla</div>
+            <div class="ez-tune-preview">
+
+                <table>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>P</th>
+                        <th>I</th>
+                        <th>D</th>
+                        <th>FF</th>
+                    </tr>
+                    <tr>
+                        <th>Roll</th>
+                        <td id="preview-roll-p"></td>
+                        <td id="preview-roll-i"></td>
+                        <td id="preview-roll-d"></td>
+                        <td id="preview-roll-ff"></td>
+                    </tr>
+                    <tr>
+                        <th>Pitch</th>
+                        <td id="preview-pitch-p"></td>
+                        <td id="preview-pitch-i"></td>
+                        <td id="preview-pitch-d"></td>
+                        <td id="preview-pitch-ff"></td>
+                    </tr>
+                    <tr>
+                        <th>Yaw</th>
+                        <td id="preview-yaw-p"></td>
+                        <td id="preview-yaw-i"></td>
+                        <td id="preview-yaw-d"></td>
+                        <td id="preview-yaw-ff"></td>
+                    </tr>
+                </table>
+
+
+            </div>
 
         </div>
 

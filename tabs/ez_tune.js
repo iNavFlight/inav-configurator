@@ -13,6 +13,9 @@ TABS.ez_tune.initialize = function (callback) {
         mspHelper.loadEzTune,
     ];
 
+    let EZ_TUNE_PID_RP_DEFAULT = [40, 75, 23, 100];
+    let EZ_TUNE_PID_YAW_DEFAULT = [45, 80, 0, 100];
+
     loadChain.push(mspHelper.loadRateProfileData);
 
     loadChainer.setChain(loadChain);
@@ -26,6 +29,37 @@ TABS.ez_tune.initialize = function (callback) {
 
     function load_html() {
         GUI.load("./tabs/ez_tune.html", Settings.processHtml(process_html));
+    }
+
+    function getYawPidScale(input) {
+        const normalized = (input - 100) * 0.01;
+    
+        return 1.0 + (normalized * 0.5); 
+    }
+
+    function updatePreview() {
+
+        let axisRatio = $('#ez_tune_axis_ratio').val() / 100;
+        let response = $('#ez_tune_response').val();
+        let damping = $('#ez_tune_damping').val();
+        let stability = $('#ez_tune_stability').val();
+        let aggressiveness = $('#ez_tune_aggressiveness').val();
+
+        $('#preview-roll-p').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[0] * response / 100));
+        $('#preview-roll-i').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[1] * stability / 100));
+        $('#preview-roll-d').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[2] * damping / 100));
+        $('#preview-roll-ff').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[3] * aggressiveness / 100));
+
+        $('#preview-pitch-p').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[0] * response / 100));
+        $('#preview-pitch-i').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[1] * stability / 100));
+        $('#preview-pitch-d').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[2] * damping / 100));
+        $('#preview-pitch-ff').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[3] * aggressiveness / 100));
+
+        $('#preview-yaw-p').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[0] * getYawPidScale(response)));
+        $('#preview-yaw-i').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[1] * getYawPidScale(stability)));
+        $('#preview-yaw-d').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[2] * getYawPidScale(damping)));
+        $('#preview-yaw-ff').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[3] * getYawPidScale(aggressiveness)));
+
     }
 
     function process_html() {
@@ -43,6 +77,12 @@ TABS.ez_tune.initialize = function (callback) {
 
         GUI.sliderize($('#ez_tune_rate'), EZ_TUNE.rate, 0, 200);
         GUI.sliderize($('#ez_tune_expo'), EZ_TUNE.expo, 0, 200);
+
+
+        $('.ez-element').on('updated', function () {
+            updatePreview();
+        });
+
 
         GUI.simpleBind();
 

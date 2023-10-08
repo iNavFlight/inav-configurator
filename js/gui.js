@@ -456,6 +456,7 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
         }
 
         $input.val(val);
+        $input.trigger('updated');
     });
 
     $input.on('change', function() {
@@ -474,6 +475,7 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
         }
 
         $range.val(newVal);
+        $input.trigger('updated');
     });
 
     $input.trigger('change');
