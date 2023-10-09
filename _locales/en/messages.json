@@ -3590,6 +3590,12 @@
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
         "message": "The axes g force elements will start blinking when greater than this value"
     },
+    "osdAlarmADSB_MAX_DISTANCE_WARNING": {
+        "message": "Distance in meters of ADSB aircraft that is displayed"
+    },
+    "osdAlarmADSB_MAX_DISTANCE_ALERT": {
+        "message": "Distance inside which ADSB data flashes for proximity warning"
+    },
     "osd_current_alarm": {
         "message": "Current (A)"
     },
@@ -3628,6 +3634,12 @@
     },
     "osd_rssi_dbm_alarm": {
         "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_adsb_distance_warning": {
+        "message": "ADSB distance warning"
+    },
+    "osd_adsb_distance_alert": {
+        "message": "ADSB distance alert"
     },
     "osd_rssi_dbm_alarm_HELP": {
         "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."

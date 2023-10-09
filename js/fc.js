@@ -29,6 +29,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    ADSB_VEHICLES,
     MISSION_PLANNER,
     ANALOG,
     ARMING_CONFIG,
@@ -249,6 +250,12 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0
+        };
+
+        ADSB_VEHICLES = {
+            vehiclesCount: 0,
+            callsignLength: 0,
+            vehicles: []
         };
 
         MISSION_PLANNER = new WaypointCollection();
