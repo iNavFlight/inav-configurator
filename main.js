@@ -122,10 +122,14 @@ $(document).ready(function () {
         //Get saved size and position
         chrome.storage.local.get('windowSize', function (result) {
             if (result.windowSize) {
-                win.height = result.windowSize.height;
-                win.width = result.windowSize.width;
-                win.x = result.windowSize.x;
-                win.y = result.windowSize.y;
+                if (result.windowSize.height <= window.screen.availHeight)
+                   win.height = result.windowSize.height;
+                if (result.windowSize.width <= window.screen.availWidth)
+                   win.width = result.windowSize.width;
+                if (result.windowSize.x >= window.screen.availLeft)
+                   win.x = result.windowSize.x;
+                if (result.windowSize.y >= window.screen.availTop)
+                    win.y = result.windowSize.y;
             }
         });
 
