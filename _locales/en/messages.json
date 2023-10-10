@@ -215,20 +215,20 @@
     "sitlStdProfileCantOverwritten": {
         "message": "SITL standard profile can't be overwritten. Please create a new one."
     },
-    "sitlSerialToTCP": {
-        "message": "Serial to TCP (UART)"
+    "serialReceiver": {
+        "message": "Serial receiver"
     },
     "sitlSerialProtocoll": {
-        "message": "Preset for RX Protocoll"
+        "message": "Serial port settings preset for RX Protocol of connected receiver"
     },
     "sitlSerialStopbits": {
         "message": "Stopbits"
     },
     "sitlSerialPort": {
-        "message": "Serial port"
+        "message": "Serial receiver/Proxy FC is connectected to host's serial port"
     },
-    "sitlSerialTCPPort": {
-        "message": "TCP port"
+    "sitlSerialUART": {
+        "message": "Serial receiver is configured on SITL's UART"
     },
     "sitlSerialParity": {
         "message": "Parity"
@@ -254,8 +254,8 @@
     "sitlPortHelp": {
         "message": "Port number of the interface of the simulator. Note: The RealFlight port is fixed and cannot be changed."
     },
-    "sitlSer2TcpHelp": {
-        "message": "Devices with a UART interface can be used with SITL via a serial to USB interface. Especially intended for serial receivers to use the full number of channels. "
+    "sitlSerialReceiverHelp": {
+        "message": "Use receiver (SBUS/CRSF/etc.) connected to host using USB-to-UART adapter or proxy Flight Controller."
     },
     "auxiliaryAcroEnabled": {
         "message": "ACRO"
