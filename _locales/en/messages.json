@@ -4397,6 +4397,9 @@
     "no_waypoints_to_save": {
         "message": "No waypoints to save !"
     },
+    "mixerThrottleWarning": {
+        "message": "Warning:value beyond normal operation range."
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },

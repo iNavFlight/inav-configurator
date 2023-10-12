@@ -5,6 +5,7 @@ let ServoMixerRuleCollection = function () {
 
     let self = {},
         data = [],
+        inactiveData = [],
         maxServoCount = 16;
 
     self.setServoCount = function (value) {
@@ -20,7 +21,11 @@ let ServoMixerRuleCollection = function () {
     }
 
     self.put = function (element) {
-        data.push(element);
+        if (data.length < self.getServoRulesCount()) {
+            data.push(element);
+        }else{
+            inactiveData.push(element); //store the data for mixer_profile 2
+        }
     };
 
     self.get = function () {
@@ -34,18 +39,24 @@ let ServoMixerRuleCollection = function () {
 
     self.flush = function () {
         data = [];
+        inactiveData = [];
     };
 
     self.cleanup = function () {
         var tmpData = [];
-
+        var tmpInactiveData = [];
         data.forEach(function (element) {
             if (element.isUsed()) {
                 tmpData.push(element);
             }
         });
-
+        inactiveData.forEach(function (element) {
+            if (element.isUsed()) {
+                tmpInactiveData.push(element);
+            }
+        });
         data = tmpData;
+        inactiveData = tmpInactiveData;
     };
 
     self.inflate = function () {
@@ -63,6 +74,15 @@ let ServoMixerRuleCollection = function () {
         for (let ruleIndex in data) {
             if (data.hasOwnProperty(ruleIndex)) {
                 let rule = data[ruleIndex];
+
+                if (rule.getTarget() == servoId && rule.isUsed()) {
+                    return true;
+                }
+            }
+        }
+        for (let ruleIndex in inactiveData) {
+            if (inactiveData.hasOwnProperty(ruleIndex)) {
+                let rule = inactiveData[ruleIndex];
 
                 if (rule.getTarget() == servoId && rule.isUsed()) {
                     return true;
@@ -103,6 +123,12 @@ let ServoMixerRuleCollection = function () {
         for (let ruleIndex in data) {
             if (data.hasOwnProperty(ruleIndex)) {
                 let rule = data[ruleIndex];
+                out.push(rule.getTarget());
+            }
+        }
+        for (let ruleIndex in inactiveData) {
+            if (inactiveData.hasOwnProperty(ruleIndex)) {
+                let rule = inactiveData[ruleIndex];
                 out.push(rule.getTarget());
             }
         }
