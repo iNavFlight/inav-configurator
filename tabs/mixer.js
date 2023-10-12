@@ -170,8 +170,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             motors.push(outputPad);
                         } else {
                             let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
+                            if (servo == null) {continue;}
                             let divID = "servoPreview" + omIndex[1];
-
+                            
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
                                 case STABILIZED_PITCH_POSITIVE:

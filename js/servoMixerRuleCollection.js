@@ -133,11 +133,10 @@ let ServoMixerRuleCollection = function () {
             }
         }
 
-        let unique = [...new Set(out)];
 
-        return unique.sort(function(a, b) {
-            return a-b;
-        });
+        let minIndex = Math.min(...out);
+        let maxIndex = Math.max(...out);
+        return Array.from({ length: maxIndex - minIndex + 1 }, (_, index) => minIndex + index);
     }
 
     self.getNextUnusedIndex = function() {
