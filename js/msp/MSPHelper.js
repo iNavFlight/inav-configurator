@@ -79,6 +79,8 @@ var mspHelper = (function (gui) {
                 profile_byte = data.getUint8(offset++)
                 CONFIG.profile = profile_byte & 0x0F;
                 CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
+                profile_byte = data.getUint8(offset++)
+                CONFIG.mixer_profile = profile_byte & 0x0F;
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
                 gui.updateStatusBar();

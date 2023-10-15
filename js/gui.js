@@ -260,6 +260,7 @@ GUI_control.prototype.updateStatusBar = function() {
 };
 
 GUI_control.prototype.updateProfileChange = function() {
+    $('#mixerprofilechange').val(CONFIG.mixer_profile);
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
 };

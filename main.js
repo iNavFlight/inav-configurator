@@ -545,6 +545,16 @@ $(document).ready(function () {
 
     });
 
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            updateActivatedTab();
+        });
+    });
+
     var profile_e = $('#profilechange');
 
     profile_e.change(function () {

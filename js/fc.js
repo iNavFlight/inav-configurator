@@ -118,6 +118,7 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
+            mixer_profile: 0,
             profile: 0,
             battery_profile: 0,
             uid: [0, 0, 0],
