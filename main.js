@@ -551,7 +551,10 @@ $(document).ready(function () {
         var mixerprofile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
             GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
-            updateActivatedTab();
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
         });
     });
 
