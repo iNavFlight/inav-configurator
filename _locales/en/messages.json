@@ -5534,5 +5534,20 @@
     },
     "ezTuneExpoTips": {
         "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+    },
+    "ezTunePidPreview": {
+        "message": "PID preview"
+    },
+    "ezTuneRatePreview": {
+        "message": "Rate preview"
+    },
+    "ezTuneRatePreviewAxis" : {
+        "message": "Axis"
+    },
+    "ezTuneRatePreviewRate" : {
+        "message": "Rate"
+    },
+    "ezTuneRatePreviewExpo" : {
+        "message": "Expo"
     }
 }

@@ -37,6 +37,12 @@ TABS.ez_tune.initialize = function (callback) {
         return 1.0 + (normalized * 0.5); 
     }
 
+    function scaleRange(x, srcMin, srcMax, destMin, destMax) {
+        let a = (destMax - destMin) * (x - srcMin);
+        let b = srcMax - srcMin;
+        return ((a / b) + destMin);
+    }
+
     function updatePreview() {
 
         let axisRatio = $('#ez_tune_axis_ratio').val() / 100;
@@ -44,6 +50,8 @@ TABS.ez_tune.initialize = function (callback) {
         let damping = $('#ez_tune_damping').val();
         let stability = $('#ez_tune_stability').val();
         let aggressiveness = $('#ez_tune_aggressiveness').val();
+        let rate = $('#ez_tune_rate').val();
+        let expo = $('#ez_tune_expo').val();
 
         $('#preview-roll-p').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[0] * response / 100));
         $('#preview-roll-i').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[1] * stability / 100));
@@ -59,6 +67,14 @@ TABS.ez_tune.initialize = function (callback) {
         $('#preview-yaw-i').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[1] * getYawPidScale(stability)));
         $('#preview-yaw-d').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[2] * getYawPidScale(damping)));
         $('#preview-yaw-ff').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[3] * getYawPidScale(aggressiveness)));
+
+        $('#preview-roll-rate').html(Math.floor(scaleRange(rate, 0, 200, 30, 90)) * 10 + " dps");
+        $('#preview-pitch-rate').html(Math.floor(scaleRange(rate, 0, 200, 30, 90)) * 10 + " dps");
+        $('#preview-yaw-rate').html((Math.floor(scaleRange(rate, 0, 200, 30, 90)) - 10) * 10 + " dps");
+
+        $('#preview-roll-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
+        $('#preview-pitch-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
+        $('#preview-yaw-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
 
     }
 
@@ -83,6 +99,7 @@ TABS.ez_tune.initialize = function (callback) {
             updatePreview();
         });
 
+        updatePreview();
 
         GUI.simpleBind();
 
