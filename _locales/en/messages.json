@@ -5555,5 +5555,8 @@
     },
     "ezTuneDisclaimer": {
         "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+    },
+    "ezTuneNote": {
+        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
     }
 }
