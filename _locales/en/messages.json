@@ -5549,5 +5549,8 @@
     },
     "ezTuneRatePreviewExpo" : {
         "message": "Expo"
+    },
+    "ezTuneEnabledTips": {
+        "message": ""
     }
 }

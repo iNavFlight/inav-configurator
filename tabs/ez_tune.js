@@ -7,9 +7,9 @@ TABS.ez_tune = {
 
 TABS.ez_tune.initialize = function (callback) {
 
-    var loadChainer = new MSPChainerClass();
+    let loadChainer = new MSPChainerClass();
 
-    var loadChain = [
+    let loadChain = [
         mspHelper.loadEzTune,
     ];
 
@@ -21,6 +21,29 @@ TABS.ez_tune.initialize = function (callback) {
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
     loadChainer.execute();
+
+    var saveChainer = new MSPChainerClass();
+
+    var saveChain = [
+        mspHelper.saveEzTune,
+        mspHelper.saveToEeprom
+    ];
+
+    saveChainer.setChain(saveChain);
+    saveChainer.setExitPoint(reboot);
+
+    function reboot() {
+        //noinspection JSUnresolvedVariable
+        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.tab_switch_cleanup(function () {
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
+        });
+    }
+
+    function reinitialize() {
+        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.handleReconnect($('.tab_ez_tune a'));
+    }
 
     if (GUI.active_tab != 'ez_tune') {
         GUI.active_tab = 'ez_tune';
@@ -84,6 +107,8 @@ TABS.ez_tune.initialize = function (callback) {
         helper.tabs.init($('.tab-ez_tune'));
         helper.features.updateUI($('.tab-ez_tune'), FEATURES);
 
+        $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled);
+
         GUI.sliderize($('#ez_tune_filter_hz'), EZ_TUNE.filterHz, 10, 300);
         GUI.sliderize($('#ez_tune_axis_ratio'), EZ_TUNE.axisRatio, 25, 175);
         GUI.sliderize($('#ez_tune_response'), EZ_TUNE.response, 0, 200);
@@ -104,6 +129,27 @@ TABS.ez_tune.initialize = function (callback) {
         GUI.simpleBind();
 
         GUI.content_ready(callback);
+
+        $('a.update').on('click', function () {
+
+            if ($("#ez_tune_enabled").is(":checked")) {
+                EZ_TUNE.enabled = 1;
+            } else {
+                EZ_TUNE.enabled = 0;
+            }
+
+            EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
+            EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
+            EZ_TUNE.response = $('#ez_tune_response').val();
+            EZ_TUNE.damping = $('#ez_tune_damping').val();
+            EZ_TUNE.stability = $('#ez_tune_stability').val();
+            EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
+            EZ_TUNE.rate = $('#ez_tune_rate').val();
+            EZ_TUNE.expo = $('#ez_tune_expo').val();
+
+            saveChainer.execute();
+        });
+
     }
     
 };

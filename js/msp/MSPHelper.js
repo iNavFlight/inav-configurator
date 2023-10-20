@@ -1584,7 +1584,7 @@ var mspHelper = (function (gui) {
                 break;
 
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
-                console.log('Rate dynamics saved');
+                console.log('EzTune settings saved');
                 break;
 
             default:
@@ -2235,6 +2235,9 @@ var mspHelper = (function (gui) {
                 buffer.push(EZ_TUNE.aggressiveness);
                 buffer.push(EZ_TUNE.rate);
                 buffer.push(EZ_TUNE.expo);
+                console.log(buffer);
+                break;
+
 
             default:
                 return false;
