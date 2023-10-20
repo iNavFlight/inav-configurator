@@ -5552,5 +5552,8 @@
     },
     "ezTuneEnabledTips": {
         "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+    },
+    "ezTuneDisclaimer": {
+        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
     }
 }
