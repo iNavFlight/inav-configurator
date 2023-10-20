@@ -1571,6 +1571,22 @@ var mspHelper = (function (gui) {
                 console.log('Rate dynamics saved');
                 break;
 
+            case MSPCodes.MSP2_INAV_EZ_TUNE:
+                EZ_TUNE.enabled = data.getUint8(0);
+                EZ_TUNE.filterHz = data.getUint16(1, true);
+                EZ_TUNE.axisRatio = data.getUint8(3);
+                EZ_TUNE.response = data.getUint8(4);
+                EZ_TUNE.damping = data.getUint8(5);
+                EZ_TUNE.stability = data.getUint8(6);
+                EZ_TUNE.aggressiveness = data.getUint8(7);
+                EZ_TUNE.rate = data.getUint8(8);
+                EZ_TUNE.expo = data.getUint8(9);
+                break;
+
+            case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
+                console.log('EzTune settings saved');
+                break;
+
             default:
                 console.log('Unknown code detected: ' + dataHandler.code);
         } else {
@@ -2206,6 +2222,22 @@ var mspHelper = (function (gui) {
                 buffer.push(RATE_DYNAMICS.weightCenter);
                 buffer.push(RATE_DYNAMICS.weightEnd);
                 break;
+
+            case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
+
+                buffer.push(EZ_TUNE.enabled);
+                buffer.push(lowByte(EZ_TUNE.filterHz));
+                buffer.push(highByte(EZ_TUNE.filterHz));
+                buffer.push(EZ_TUNE.axisRatio);
+                buffer.push(EZ_TUNE.response);
+                buffer.push(EZ_TUNE.damping);
+                buffer.push(EZ_TUNE.stability);
+                buffer.push(EZ_TUNE.aggressiveness);
+                buffer.push(EZ_TUNE.rate);
+                buffer.push(EZ_TUNE.expo);
+                console.log(buffer);
+                break;
+
 
             default:
                 return false;
@@ -3407,6 +3439,14 @@ var mspHelper = (function (gui) {
 
     self.saveRateDynamics = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS), false, callback);
+    }
+
+    self.loadEzTune = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_EZ_TUNE, false, false, callback);
+    }
+
+    self.saveEzTune = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_EZ_TUNE_SET, mspHelper.crunch(MSPCodes.MSP2_INAV_EZ_TUNE_SET), false, callback);
     }
 
     self.loadParameterGroups = function (callback) {

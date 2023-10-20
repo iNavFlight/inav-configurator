@@ -551,6 +551,18 @@ var FC = {
             weightCenter: null, 
             weightEnd: null
         };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
+        };
     },
     getOutputUsages: function() {
         return {

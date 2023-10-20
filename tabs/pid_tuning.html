@@ -1,7 +1,14 @@
 <!--suppress ALL -->
 <div id="content-watermark"></div>
 <div class="tab-pid_tuning toolbar_fixed_bottom">
-    <div class="content_wrapper">
+    <div id="note-wrapper" class="content_wrapper">
+        <div class="note spacebottom">
+            <div class="note_spacer">
+                <p i18n="ezTuneNote"></p>
+            </div>
+        </div>
+    </div>
+    <div id="tuning-wrapper" class="content_wrapper">
         <div class="tab_title subtab__header">
             <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDgains"></span>
             <span class="subtab__header_label" for="subtab-rates" data-i18n="pidTuning_RatesAndExpo"></span>
@@ -683,7 +690,7 @@
         </div>
     </div>
     <div class="clear-both"></div>
-    <div class="content_toolbar">
+    <div id="tuning-footer" class="content_toolbar">
         <div class="btn save_btn">
             <a class="update" href="#" data-i18n="pidTuning_ButtonSave"></a>
         </div>

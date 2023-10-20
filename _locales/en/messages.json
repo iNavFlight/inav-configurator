@@ -110,6 +110,9 @@
     "tabFailsafe": {
         "message": "Failsafe"
     },
+    "tabEzTune": {
+        "message": "Ez Tune"
+    },
     "tabGPS": {
         "message": "GPS"
     },
@@ -5492,5 +5495,77 @@
     },
     "timerOutputs": {
         "message": "Timer outputs"
+    },
+    "ezTuneFilterHz": {
+        "message": "Filter Hz"
+    },
+    "ezTuneAxisRatio": {
+        "message": "Axis ratio"
+    },
+    "ezTuneResponse": {
+        "message": "Response"
+    },
+    "ezTuneDamping": {
+        "message": "Damping"
+    },
+    "ezTuneStability": {
+        "message": "Stability"
+    },
+    "ezTuneAggressiveness": {
+        "message": "Aggressiveness"
+    },
+    "ezTuneRate": {
+        "message": "Rate"
+    },
+    "ezTuneExpo": {
+        "message": "Expo"
+    },
+    "ezTuneFilterHzTips": {
+        "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
+    },
+    "ezTuneAxisRatioTips": {
+        "message": "Describes the weight/moment of inertia distribution of your UAV. The longer the frame (more mass on the front-back axis) more Axis Ratio is requires. Perfect X frame is ratio 100. Most modern frames should fit somewhere between 110 and 130. Default 110 is a good starting point."
+    },
+    "ezTuneResponseTips": {
+        "message": "This setting defines how fast the UAV will react to stick movements and gyro signal. Higher values will result in faster reaction, but also in more overshoots and oscillations. If UAV feels sluggish or has a slow wobble, increase the Response. If it has hot motors, audibly osciallates, overshoots or feels too nervous, decrease the Response. Most modern quads should beefy motors will fly best with Response below 80. Should be tuned together with Damping. It is a P-term equivalent."
+    },
+    "ezTuneDampingTips": {
+        "message": "Describes the stengths of a force that opposes any rotation speed change. It dampens roll and pitch acceleration and causes smoother and more stable flight. Your task during tuning is to find out how much you can increase it before any negative symptoms appear: hot motors, audible osciallations, overshoot. Most modern quads should accept 'Damping' up to 150-180. It is a D-term equivalent."
+    },
+    "ezTuneStabilityTips": {
+        "message": "Defines long-term stabilization strength. Most modern quads should tolerate 'Stability' even up to 120-130. Usually does not have to be tuned at all. If UAV suffers from heavy propwash during vertical descent, lowering 'Stability' might help. It is a I-term equivalent"
+    },
+    "ezTuneAggressivenessTips": {
+        "message": "Defines how fast your UAV will react to fast stick movements. Higher 'Aggressiveness' results in snappier fast manouvers. It does not affect stabilization, only stick feeling. It is a FF-term equivalent."
+    },
+    "ezTuneRateTips": {
+        "message": "Defines how fast your UAV will rotate around roll, pitch and yaw axis. Higher 'Rate' results in faster rotation. Value of 0 is the equivalent of 300dps, 100 is the equivalent of 600dps, 200 is the equivalent of 900dps."
+    },
+    "ezTuneExpoTips": {
+        "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+    },
+    "ezTunePidPreview": {
+        "message": "PID preview"
+    },
+    "ezTuneRatePreview": {
+        "message": "Rate preview"
+    },
+    "ezTuneRatePreviewAxis" : {
+        "message": "Axis"
+    },
+    "ezTuneRatePreviewRate" : {
+        "message": "Rate"
+    },
+    "ezTuneRatePreviewExpo" : {
+        "message": "Expo"
+    },
+    "ezTuneEnabledTips": {
+        "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+    },
+    "ezTuneDisclaimer": {
+        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+    },
+    "ezTuneNote": {
+        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
     }
 }

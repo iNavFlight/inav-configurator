@@ -41,7 +41,8 @@ var GUI_control = function () {
         'advanced_tuning',
         'mission_control',
         'mixer',
-        'programming'
+        'programming',
+        'ez_tune'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -455,6 +456,7 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
         }
 
         $input.val(val);
+        $input.trigger('updated');
     });
 
     $input.on('change', function() {
@@ -473,6 +475,7 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
         }
 
         $range.val(newVal);
+        $input.trigger('updated');
     });
 
     $input.trigger('change');
