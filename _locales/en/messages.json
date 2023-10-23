@@ -4202,6 +4202,9 @@
     "portsPeripherals": {
         "message": "Peripherals"
     },
+    "serialpassthrough": {
+        "message": "Activate serialpassthrough"
+    },
     "appUpdateNotificationHeader": {
         "message": "New Configurator version available."
     },

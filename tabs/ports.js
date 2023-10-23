@@ -157,7 +157,18 @@ TABS.ports.initialize = function (callback) {
         '250000'
     ];
 
-    var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
+    var serialpassthroughBaudRates = [
+        '1200',
+        '2400',
+        '4800',
+        '9600',
+        '19200',
+        '38400',
+        '57600',
+        '115200'
+    ];
+
+    var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals', 'serialpassthrough'];
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
@@ -218,6 +229,8 @@ TABS.ports.initialize = function (callback) {
         var ports_e = $('.tab-ports .ports');
         var port_configuration_template_e = $('#tab-ports-templates .portConfiguration');
 
+        var showSerialpassthroughCol = false;
+
         for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
             var port_configuration_e = port_configuration_template_e.clone();
             var serialPort = SERIAL_CONFIG.ports[portIndex];
@@ -238,7 +251,6 @@ TABS.ports.initialize = function (callback) {
 
             port_configuration_e.data('index', portIndex);
             port_configuration_e.data('port', serialPort);
-
 
             for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
                 var column = columns[columnIndex];
@@ -286,7 +298,124 @@ TABS.ports.initialize = function (callback) {
                 }
             }
 
+            /////////////////////////////////////////////////////////////////
+            var serialpassthroughCell       = $(port_configuration_e).find('.functionsCell-serialpassthrough');
+
+            if(serialPort.identifier !== 20 && serialPort.functions.length > 0 && serialPort.functions.indexOf('RX_SERIAL')){
+                ///////////////
+                var defaultFunction = serialPort.functions[0];
+                var defaultFunctionGroup = null;
+                for (i = 0; i < portFunctionRules.length; i++) {
+                    if(portFunctionRules[i].name == defaultFunction){
+                        defaultFunctionGroup = portFunctionRules[i].groups[0];
+                    }
+                }
+
+                var baudRate = null;
+                switch (defaultFunctionGroup){
+                    case 'data': baudRate = serialPort.msp_baudrate; break;
+                    case 'telemetry': baudRate = serialPort.telemetry_baudrate; break;
+                    case 'sensors': baudRate = serialPort.sensors_baudrate; break;
+                    case 'peripherals': baudRate = serialPort.peripherals_baudrate; break;
+                }
+
+                var serialpassthroughButton = $('<button>').addClass('serialpassthroughButton').html('serialpassthrough').data('baudRate', baudRate).data('portIndex', serialPort.identifier).data('mode', 'rxtx');
+                serialpassthroughCell.append(serialpassthroughButton);
+
+                if(baudRate === null || baudRate === 'AUTO'){
+                    var serialpassthroughSelect = $('<select>').addClass('serialpassthroughSelect', 'msp_baudrate');
+                    for(var index = 0; index < serialpassthroughBaudRates.length; index++){
+                        serialpassthroughSelect.append('<option value="' + serialpassthroughBaudRates[index] + '">' + serialpassthroughBaudRates[index] + '</option>')
+                    }
+                    serialpassthroughSelect.val(serialpassthroughBaudRates[serialpassthroughBaudRates.length - 1])
+                    serialpassthroughButton.data('baudRateElement', serialpassthroughSelect);
+
+                    serialpassthroughCell.append(serialpassthroughSelect);
+                }
+
+                var serialpassthroughHelp = $('<div>').addClass('helpicon');
+                new jBox('Tooltip', {
+                    attach: serialpassthroughHelp,
+                    content: `Serialpassthrough<br />`
+                    + `----------------------------------------`
+                    + `UART: <strong>` + serialPort.identifier + `</strong><br />`
+                    + `Baud Rate: <strong>` + baudRate + `</strong><br />`
+                    + `Mode: <strong>RXTX</strong><br />`
+                    ,
+                });
+
+                showSerialpassthroughCol = true;
+                serialpassthroughCell.append(serialpassthroughHelp);
+            }
+
             ports_e.find('tbody').append(port_configuration_e);
+        }
+
+        if(showSerialpassthroughCol){
+            $('button.serialpassthroughButton').click(function() {
+                var currentButton = $(this);
+
+                var serialpassthroughData = {
+                    portIndex: null,
+                    mode: null,
+                    baudRate: null,
+                };
+
+                serialpassthroughData.portIndex = currentButton.data('portIndex');
+                serialpassthroughData.mode = currentButton.data('mode');
+                serialpassthroughData.baudRate = currentButton.data('baudRate');
+
+                if (serialpassthroughData.baudRate === 'AUTO') {
+                    serialpassthroughData.baudRate = currentButton.data('baudRateElement').val();
+                }
+
+                enter_to_cli(serialpassthroughData)
+                    .then(set_serial_passthrough)
+                    .then(close_configurator);
+            });
+        }else{
+            $('.serialpassthrough, .functionsCell-serialpassthrough').remove();
+        }
+
+
+        function enter_to_cli(serialpassthroughData){
+            return new Promise(function(resolve){
+                helper.mspQueue.flush();
+                MSP.callbacks_cleanup();
+
+                var bufferOut = new ArrayBuffer(1);
+                var bufView = new Uint8Array(bufferOut);
+
+                bufView[0] = 0x23;
+
+                CONFIGURATOR.connection.send(bufferOut, function(){
+                    resolve(serialpassthroughData);
+                });
+            });
+        }
+
+        function set_serial_passthrough(serialpassthroughData){
+            return new Promise(function(resolve){
+                helper.timeout.add('serialpassthrough_wait_for_CLI', function(){
+                    var line = '\nserialpassthrough ' + serialpassthroughData.portIndex + ' ' + serialpassthroughData.baudRate + ' ' + serialpassthroughData.mode  + '\n';
+                    var bufferOut = new ArrayBuffer(line.length);
+                    var bufView = new Uint8Array(bufferOut);
+
+                    for (var c_key = 0; c_key < line.length; c_key++) {
+                        bufView[c_key] = line.charCodeAt(c_key);
+                    }
+                    CONFIGURATOR.connection.send(bufferOut, resolve);
+                }, 1000);
+            });
+        }
+
+        function close_configurator(){
+            return new Promise(function(resolve){
+                helper.timeout.add('serialpassthrough_wait_for_close_configurator', function(){
+                    $('a.connect').click();
+                    resolve();
+                }, 500);
+            });
         }
     }
 
