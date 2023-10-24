@@ -324,5 +324,7 @@
 | ![Pan centred](/resources/osd/digital/default/24x36/454.png)      | SYM_SERVO_PAN_IS_CENTRED   |                              | Pan servo is centred                  | 454        | 0x1C6         |
 | ![Pan Left](/resources/osd/digital/default/24x36/455.png)         | SYM_SERVO_PAN_IS_OFFSET_L  | SYM.PAN_SERVO_IS_OFFSET_L    | Pan servo is moved to the left        | 455        | 0x1C7         |
 | ![Pan Right](/resources/osd/digital/default/24x36/456.png)        | SYM_SERVO_PAN_IS_OFFSET_R  |                              | Pan servo is moved to the right       | 456        | 0x1C8         |
+| ![Pilot Logo S](/resources/osd/digital/default/24x36/469_471.png) | SYM_PILOT_LOGO_SML_L       | SYM.PILOT_LOGO_SML_L         | Small Pilot logo                      | 469 - 471  | 0x1D5 - 0x1D7 |
+| ![Pilot Logo L](/resources/osd/digital/default/24x36/472_511.png) | SYM_PILOT_LOGO_LRG_START   |                              | Large Pilot logo                      | 472 - 511  | 0x1D5 - 0x1D7 |
 
 _*_ Do not change the IDs of these characters

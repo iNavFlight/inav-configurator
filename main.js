@@ -301,6 +301,9 @@ $(document).ready(function () {
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
+                        break;
 
                     default:
                         console.log('Tab not found:' + tab);
