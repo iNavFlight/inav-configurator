@@ -299,8 +299,10 @@ TABS.ports.initialize = function (callback) {
             }
 
             /////////////////////////////////////////////////////////////////
-            var serialpassthroughCell       = $(port_configuration_e).find('.functionsCell-serialpassthrough');
+            var serialpassthroughCell = $(port_configuration_e).find('.functionsCell-serialpassthrough');
 
+            //20 VCP
+            console.log(serialPort);
             if(serialPort.identifier !== 20 && serialPort.functions.length > 0 && serialPort.functions.indexOf('RX_SERIAL')){
                 ///////////////
                 var defaultFunction = serialPort.functions[0];
@@ -373,6 +375,13 @@ TABS.ports.initialize = function (callback) {
                     .then(set_serial_passthrough)
                     .then(close_configurator);
             });
+
+            $('.ports').find('.portConfiguration').first().append($('<td>').addClass('moreCell').attr('rowspan', SERIAL_CONFIG.ports.length).html(' >> ').click(function(){
+                $('.serialpassthrough, .functionsCell-serialpassthrough').show();
+                $(this).remove();
+            }));
+            $('.serialpassthrough, .functionsCell-serialpassthrough').hide();
+
         }else{
             $('.serialpassthrough, .functionsCell-serialpassthrough').remove();
         }

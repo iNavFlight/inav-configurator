@@ -96,3 +96,12 @@
         height: 22px;
     }
 }
+
+.moreCell {
+    text-align: left;
+    white-space: nowrap;
+    padding: 5px 7px;
+    background-color: #828885;
+    color: white;
+    width: 10px;
+}
