@@ -42,7 +42,9 @@
     "plotly": "^1.0.6",
     "temp": "^0.8.3",
     "three": "0.139.0",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "i18next": "^19.0.0",
+    "i18next-xhr-backend": "^3.2.2"
   },
   "devDependencies": {
     "@quanle94/innosetup": "^6.0.2",
