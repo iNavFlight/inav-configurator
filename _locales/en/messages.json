@@ -1584,6 +1584,9 @@
     "pidTuning_gyro_dyn_lpf_max_hz_help": {
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
     },
+    "loadedMixerProfile": {
+        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
+    },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
@@ -4409,6 +4412,9 @@
     "no_waypoints_to_save": {
         "message": "No waypoints to save !"
     },
+    "mixerThrottleWarning": {
+        "message": "Warning:value beyond normal operation range."
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
@@ -4892,6 +4898,12 @@
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
     },
+    "mixer_pid_profile_linking": {
+        "message": "PID Profile will use same index as Mixer Profile index"
+    },
+    "mixer_pid_profile_linking_hint": {
+        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want PID Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
+    },
     "blackboxFields": {
         "message": "Blackbox fields"
     },
@@ -5207,14 +5219,20 @@
     "sensorDataFlashFreeSpace": {
         "message": "Dataflash: free space"
     },
+    "mixerProfile1": {
+        "message": "Mixer profile 1"
+    },
+    "mixerProfile2": {
+        "message": "Mixer profile 2"
+    },
     "sensorProfile1": {
-        "message": "Profile 1"
+        "message": "PID profile 1"
     },
     "sensorProfile2": {
-        "message": "Profile 2"
+        "message": "PID profile 2"
     },
     "sensorProfile3": {
-        "message": "Profile 3"
+        "message": "PID profile 3"
     },
     "sensorBatteryProfile1": {
         "message": "Battery profile 1"

@@ -79,6 +79,8 @@ var mspHelper = (function (gui) {
                 profile_byte = data.getUint8(offset++)
                 CONFIG.profile = profile_byte & 0x0F;
                 CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
+                profile_byte = data.getUint8(offset++)
+                CONFIG.mixer_profile = profile_byte & 0x0F;
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
                 gui.updateStatusBar();
@@ -1454,7 +1456,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_MIXER:
                 MIXER_CONFIG.yawMotorDirection = data.getInt8(0);
                 MIXER_CONFIG.yawJumpPreventionLimit = data.getUint8(1, true);
-                MIXER_CONFIG.motorStopOnLow = data.getUint8(2, true);
+                MIXER_CONFIG.motorStopOnLow = data.getUint8(1, true);
                 MIXER_CONFIG.platformType = data.getInt8(3);
                 MIXER_CONFIG.hasFlaps = data.getInt8(4);
                 MIXER_CONFIG.appliedMixerPreset = data.getInt16(5, true);
