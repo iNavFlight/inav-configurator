@@ -27,7 +27,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
-        mspHelper.loadOutputMapping,
+        mspHelper.loadOutputMappingExt,
+        mspHelper.loadTimerOutputModes,
         mspHelper.loadLogicConditions
     ]);
     loadChainer.setExitPoint(loadHtml);
@@ -37,6 +38,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.saveMixerConfig,
         mspHelper.sendServoMixer,
         mspHelper.sendMotorMixer,
+        mspHelper.sendTimerOutputModes,
         saveSettings,
         mspHelper.saveToEeprom
     ]);
@@ -72,13 +74,55 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
-
+        
         for (let i = 1; i <= outputCount; i++) {
-            $outputRow.append('<td>S' + i + '</td>');
+
+            let timerId = OUTPUT_MAPPING.getTimerId(i - 1);
+            let color = OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (Timer ' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
+
+    }
+
+    function updateTimerOverride() {
+        let timers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for(let i =0; i < timers.length;++i) {
+            let timerId = timers[i];
+            $select = $('#timer-output-' + timerId);
+            if(!$select) {
+                continue;
+            }
+            OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
+        }
+    }
+
+    function renderTimerOverride() {
+        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+            $container = $('#timerOutputsList'), timers = {};
+
+
+        let usedTimers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for (t of usedTimers) {
+            var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
+            $container.append(
+                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + OUTPUT_MAPPING.getTimerColor(t) + '">' +
+                            '<select id="timer-output-' + t + '">' +
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
+                            '</select>' +
+                            '<label for="timer-output-' + t + '">' +
+                                '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
+                            '</label>' +
+                        '</div>'
+            );
+        }
 
     }
 
@@ -126,8 +170,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             motors.push(outputPad);
                         } else {
                             let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
+                            if (servo == null) {continue;}
                             let divID = "servoPreview" + omIndex[1];
-
+                            
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
                                 case STABILIZED_PITCH_POSITIVE:
@@ -352,7 +397,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         const $fixedValueCalcInput = row.find(".mix-rule-fixed-value");
         if (FC.getServoMixInputNames()[$mixRuleInput.val()] === 'MAX') {
             $fixedValueCalcInput.show();
-            row.find(".mix-rule-speed").prop('disabled', true);
         } else {
             $fixedValueCalcInput.hide();
             row.find(".mix-rule-speed").prop('disabled', false);
@@ -392,7 +436,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $motorMixTableBody.append('\
                     <tr>\
                     <td><span class="mix-rule-motor"></span></td>\
-                    <td><input type="number" class="mix-rule-throttle" step="0.001" min="0" max="1" /></td>\
+                    <td>\
+                        <input type="number" class="mix-rule-throttle" step="0.001" min="-2" max="2" />\
+                        <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>\
+                    </td>\
                     <td><input type="number" class="mix-rule-roll" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-pitch" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-yaw" step="0.001" min="-2" max="2" /></td>\
@@ -403,9 +450,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const $row = $motorMixTableBody.find('tr:last');
 
                 $row.find('.mix-rule-motor').html(index);
-                $row.find('.mix-rule-throttle').val(rule.getThrottle()).change(function () {
-                    rule.setThrottle($(this).val());
-                });
+                const $throttleInput = $row.find('.mix-rule-throttle').val(rule.getThrottle());
+                const $warningBox = $row.find('.throttle-warning-text');
+    
+                // Function to update throttle and show/hide warning box
+                function updateThrottle() {
+                    rule.setThrottle($throttleInput.val());
+                    // Change color if value exceeds 1
+                    if (parseFloat($throttleInput.val()) > 1 || parseFloat($throttleInput.val()) < 0) {
+                        $throttleInput.css('background-color', 'orange');
+                        // Show warning box
+                        $warningBox.show();
+                    } else {
+                        $throttleInput.css('background-color', ''); // Reset to default
+                        // Hide warning box
+                        $warningBox.hide();
+                    }
+                }
+                updateThrottle();
+                $throttleInput.change(updateThrottle);
+
                 $row.find('.mix-rule-roll').val(rule.getRoll()).change(function () {
                     rule.setRoll($(this).val());
                 });
@@ -437,6 +501,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         SERVO_RULES.inflate();
         MOTOR_RULES.cleanup();
         MOTOR_RULES.inflate();
+
+        updateTimerOverride();
+
         saveChainer.execute();
     }
 
@@ -704,6 +771,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
+        renderTimerOverride();
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 

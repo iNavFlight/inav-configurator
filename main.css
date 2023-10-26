@@ -1643,7 +1643,7 @@ dialog {
 /* fixing padding for all Tabs*/
 .tab-setup, .tab-landing, .tab-adjustments, .tab-auxiliary, .tab-cli, .tab-configuration, .tab-failsafe, .tab-onboard_logging,
 .tab-firmware_flasher, .tab-gps, .tab-magnetometer, .tab-help, .tab-led-strip, .tab-logging, .tab-modes, .tab-motors, .tab-pid_tuning,
-.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-osd, .tab-calibration {
+.tab-ports, .tab-receiver, .tab-sensors, .tab-servos, .tab-osd, .tab-calibration, .tab-ez_tune {
     height: 100%;
     position: relative;
 }
@@ -1685,7 +1685,7 @@ dialog {
     color: white;
     font-size: 10px;
     margin-top: 20px;
-    width: 269px;
+    width: 410px;
     float: right;
     margin-right: 10px;
     line-height: 12px;
@@ -1698,6 +1698,15 @@ dialog {
     display: none;
     text-shadow: 0 1px rgba(0, 0, 0, 1.0);
 
+}
+
+#mixer_profile_change {
+    color: white;
+    margin-top: 16px;
+    width: 130px;
+    float: left;
+    margin-right: 10px;
+    line-height: 12px;
 }
 
 #profile_change {
@@ -2274,4 +2283,12 @@ ol li {
 
 .controlProfileHighlightActive {
     background-color: #d5ebfe !important ;
+}
+
+.no-border {
+    border: none !important;
+}
+
+.bold {
+    font-weight: bold;
 }

@@ -20,14 +20,21 @@
                             <label for="motor_direction_inverted"><span data-i18n="motor_direction_inverted"></span></label>
                             <div class="helpicon cf_tip" data-i18n_title="motor_direction_inverted_hint"></div>
                         </div>
-                        <div class="select">
-                            <select id="output_mode" data-setting="output_mode"></select>
-                            <label for="output_mode">
-                                <span data-i18n="output_modeTitle"></span>
-                            </label>
+                        <div class="checkbox">
+                            <input id="mixer_pid_profile_linking" type="checkbox" class="toggle" data-setting="mixer_pid_profile_linking" />
+                            <label for="mixer_pid_profile_linking"><span data-i18n="mixer_pid_profile_linking"></span></label>
+                            <div class="helpicon cf_tip" data-i18n_title="mixer_pid_profile_linking_hint"></div>
                         </div>
                     </div>
                 </div>
+            
+                <div class="platform-type gui_box grey">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="timerOutputs"></div>
+                    </div>
+                    <div class="spacer_box" id="timerOutputsList" style="padding: 0; width: calc(100% - 12px)"></div>
+                </div>
+
             </div>
             <div class="rightWrapper">
                 <div class="platform-type gui_box grey">

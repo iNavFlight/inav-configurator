@@ -110,6 +110,9 @@
     "tabFailsafe": {
         "message": "Failsafe"
     },
+    "tabEzTune": {
+        "message": "Ez Tune"
+    },
     "tabGPS": {
         "message": "GPS"
     },
@@ -485,10 +488,16 @@
         "message": "Welcome to <strong>INAV - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
     },
     "defaultWelcomeHead": {
-        "message": "Hardware"
+        "message": "Firmware & drivers"
+    },
+    "defaultWelcomeHead2": {
+        "message": "INAV Friends"
+    },
+    "defaultWelcomeText2": {
+        "message": "INAV is supported by a great community of users, developers and companies. Here is a short list: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>. "
     },
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -899,18 +908,6 @@
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
-    },
-    "configurationBoardAlignment": {
-        "message": "Board and Sensor Alignment"
-    },
-    "configurationBoardAlignmentRoll": {
-        "message": "Roll Degrees"
-    },
-    "configurationBoardAlignmentPitch": {
-        "message": "Pitch Degrees"
-    },
-    "configurationBoardAlignmentYaw": {
-        "message": "Yaw Degrees"
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
@@ -1365,6 +1362,24 @@
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
     },
+    "pidTuning_RateDynamics": {
+        "message": "Rate Dynamics"
+    },
+    "pidTuning_RateDynamics_Sensitivity": {
+        "message": "Sensitivity"
+    },
+    "pidTuning_RateDynamics_Correction": {
+        "message": "Correction"
+    },
+    "pidTuning_RateDynamics_Weight": {
+        "message": "Weight"
+    },
+    "pidTuning_RateDynamics_Center": {
+        "message": "Center"
+    },
+    "pidTuning_RateDynamics_End": {
+        "message": "End"
+    },
     "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
@@ -1568,6 +1583,9 @@
     },
     "pidTuning_gyro_dyn_lpf_max_hz_help": {
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
+    },
+    "loadedMixerProfile": {
+        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
     },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
@@ -2035,19 +2053,22 @@
         "message": "Signal Strength"
     },
     "magnetometerHead": {
-        "message": "Magnetometer Alignment"
+        "message": "Alignment tool"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+        "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on Flight Controller</u>.<br/>2. Adjust magnetometer orientation to match physical orientation on the aircraft <u>according to \"compass direction\" arrow or axis markings on magnetometer</u>.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
     },
     "magnetometerOrientationPreset": {
-        "message": "Orientation presets"
+        "message": "Orientation preset (align_mag). Relative to FC orientation"
+    },
+    "boardInfo": {
+        "message": "1. Select Flight Controller alignment<br>(align_board_roll, align_board_pitch, align_board_yaw)"
     },
     "magnetometerInfo": {
-        "message": "Select a preset or create a custom configuration moving the sliders"
+        "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
     },
     "magnetometerElementToShow": {
-        "message": "Element to show"
+        "message": "Element to show: Magnetometer model or axes"
     },
 
     "axisTableTitleAxis": {
@@ -2060,9 +2081,6 @@
         "message": "Value [degree]"
     },
 
-
-
-
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },
@@ -2070,7 +2088,7 @@
         "message": "Mag Statistics"
     },
     "tabMAGNETOMETER": {
-        "message": "Magnetometer"
+        "message": "Alignment tool"
     },
     "motors": {
         "message": "Motors"
@@ -3371,14 +3389,23 @@
     "osd_pilot_name": {
         "message": "Pilot's Name"
     },
+    "osdElement_PILOT_LOGO_HELP": {
+        "message": "Shows your small pilot logo in the OSD, where you position it. This requires a custom font with your pilot logo."
+    },
+    "osd_use_pilot_logo": {
+        "message": "Use pilot logo"
+    },
+    "osd_use_large_pilot_logo_help": {
+        "message": "Use your large pilot logo with/instead of the INAV logo. This requires a custom font with your pilot logo. This is seen on the arming screen."
+    },
     "osd_units": {
         "message": "Units"
     },
     "osd_main_voltage_decimals": {
         "message": "Voltage Decimals"
     },
-    "osd_mah_used_precision": {
-        "message": "mAh Used Precision"
+    "osd_mah_precision": {
+        "message": "mAh Precision"
     },
     "osd_coordinate_digits": {
         "message": "Coordinate Digits"
@@ -3419,6 +3446,60 @@
     "osd_home_position_arm_screen": {
         "message": "Home Position on Arming Screen"
     },
+    "osd_hud_settings": {
+        "message": "Heads up Display settings"
+    },
+    "osd_hud_settings_HELP": {
+        "message": "This section allows tweaking the behavior of HUD elements."
+    },
+    "osd_hud_radar_disp": {
+        "message": "Maximum number of radar elements on screen."
+    },
+    "osd_hud_radar_disp_help": {
+        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+    },
+
+    "osd_hud_radar_range_min": {
+        "message": "Minimum radar range"
+    },
+    "osd_hud_radar_range_min_help": {
+        "message": "Radar aircrafts closer than this will not be displayed in the HUD."
+    },
+
+    "osd_hud_radar_range_max": {
+        "message": "Maximum radar range"
+    },
+    "osd_hud_radar_range_max_help": {
+        "message": "Radar aircrafts further away than this will not be displayed in the HUD."
+    },
+
+
+    "osd_hud_wp_disp": {
+        "message": "Maximum number of waypoint elements on screen."
+    },
+    "osd_hud_wp_disp_help": {
+        "message": "Number of Wayponts to show on screen. 0 disables this feature."
+    },
+    "osd_camera_uptilt": {
+        "message": "Camera uptilt"
+    },
+    "osd_camera_uptilt_help": {
+        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+    },
+    "osd_camera_fov_h": {
+        "message": "Camera Horizontal FOV"
+    },
+    "osd_camera_fov_h_help": {
+        "message": "Camera Horizontal Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+    "osd_camera_fov_v": {
+        "message": "Camera Vertical FOV"
+    },
+    "osd_camera_fov_v_help": {
+        "message": "Camera Vertical Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+
+
     "osd_alarms": {
         "message": "Alarms"
     },
@@ -4331,6 +4412,9 @@
     "no_waypoints_to_save": {
         "message": "No waypoints to save !"
     },
+    "mixerThrottleWarning": {
+        "message": "Warning:value beyond normal operation range."
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
@@ -4437,7 +4521,7 @@
         "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
-        "message": "Output"
+        "message": "Output (timer)"
     },
     "mappingTableFunction": {
         "message": "Function"
@@ -4772,9 +4856,6 @@
     "WaypointOptionP2": {
         "message": "P2"
     },
-    "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
-    },
     "pidId": {
         "message": "#"
     },
@@ -4816,6 +4897,12 @@
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+    },
+    "mixer_pid_profile_linking": {
+        "message": "PID Profile will use same index as Mixer Profile index"
+    },
+    "mixer_pid_profile_linking_hint": {
+        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want PID Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
     },
     "blackboxFields": {
         "message": "Blackbox fields"
@@ -4894,9 +4981,6 @@
     },
     "pidTuning_MatrixFilterTypeHelp": {
         "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
-    },
-    "nmeaWarning": {
-        "message": "NMEA protocol is deprecated and might be removed in the future. Please use UBLOX or UBLOX7 protocol instead."
     },
     "softSerialWarning": {
         "message": "It is not advisable to use softserial for flight critical devices like GPS or receiver, or high traffic devices like MSP DisplayPort."
@@ -5135,14 +5219,20 @@
     "sensorDataFlashFreeSpace": {
         "message": "Dataflash: free space"
     },
+    "mixerProfile1": {
+        "message": "Mixer profile 1"
+    },
+    "mixerProfile2": {
+        "message": "Mixer profile 2"
+    },
     "sensorProfile1": {
-        "message": "Profile 1"
+        "message": "PID profile 1"
     },
     "sensorProfile2": {
-        "message": "Profile 2"
+        "message": "PID profile 2"
     },
     "sensorProfile3": {
-        "message": "Profile 3"
+        "message": "PID profile 3"
     },
     "sensorBatteryProfile1": {
         "message": "Battery profile 1"
@@ -5420,5 +5510,80 @@
     },
     "targetPrefetchFailNoPort": {
         "message": "Cannot prefetch target: No port"
+    },
+    "timerOutputs": {
+        "message": "Timer outputs"
+    },
+    "ezTuneFilterHz": {
+        "message": "Filter Hz"
+    },
+    "ezTuneAxisRatio": {
+        "message": "Axis ratio"
+    },
+    "ezTuneResponse": {
+        "message": "Response"
+    },
+    "ezTuneDamping": {
+        "message": "Damping"
+    },
+    "ezTuneStability": {
+        "message": "Stability"
+    },
+    "ezTuneAggressiveness": {
+        "message": "Aggressiveness"
+    },
+    "ezTuneRate": {
+        "message": "Rate"
+    },
+    "ezTuneExpo": {
+        "message": "Expo"
+    },
+    "ezTuneFilterHzTips": {
+        "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
+    },
+    "ezTuneAxisRatioTips": {
+        "message": "Describes the weight/moment of inertia distribution of your UAV. The longer the frame (more mass on the front-back axis) more Axis Ratio is requires. Perfect X frame is ratio 100. Most modern frames should fit somewhere between 110 and 130. Default 110 is a good starting point."
+    },
+    "ezTuneResponseTips": {
+        "message": "This setting defines how fast the UAV will react to stick movements and gyro signal. Higher values will result in faster reaction, but also in more overshoots and oscillations. If UAV feels sluggish or has a slow wobble, increase the Response. If it has hot motors, audibly osciallates, overshoots or feels too nervous, decrease the Response. Most modern quads should beefy motors will fly best with Response below 80. Should be tuned together with Damping. It is a P-term equivalent."
+    },
+    "ezTuneDampingTips": {
+        "message": "Describes the stengths of a force that opposes any rotation speed change. It dampens roll and pitch acceleration and causes smoother and more stable flight. Your task during tuning is to find out how much you can increase it before any negative symptoms appear: hot motors, audible osciallations, overshoot. Most modern quads should accept 'Damping' up to 150-180. It is a D-term equivalent."
+    },
+    "ezTuneStabilityTips": {
+        "message": "Defines long-term stabilization strength. Most modern quads should tolerate 'Stability' even up to 120-130. Usually does not have to be tuned at all. If UAV suffers from heavy propwash during vertical descent, lowering 'Stability' might help. It is a I-term equivalent"
+    },
+    "ezTuneAggressivenessTips": {
+        "message": "Defines how fast your UAV will react to fast stick movements. Higher 'Aggressiveness' results in snappier fast manouvers. It does not affect stabilization, only stick feeling. It is a FF-term equivalent."
+    },
+    "ezTuneRateTips": {
+        "message": "Defines how fast your UAV will rotate around roll, pitch and yaw axis. Higher 'Rate' results in faster rotation. Value of 0 is the equivalent of 300dps, 100 is the equivalent of 600dps, 200 is the equivalent of 900dps."
+    },
+    "ezTuneExpoTips": {
+        "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+    },
+    "ezTunePidPreview": {
+        "message": "PID preview"
+    },
+    "ezTuneRatePreview": {
+        "message": "Rate preview"
+    },
+    "ezTuneRatePreviewAxis" : {
+        "message": "Axis"
+    },
+    "ezTuneRatePreviewRate" : {
+        "message": "Rate"
+    },
+    "ezTuneRatePreviewExpo" : {
+        "message": "Expo"
+    },
+    "ezTuneEnabledTips": {
+        "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+    },
+    "ezTuneDisclaimer": {
+        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+    },
+    "ezTuneNote": {
+        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
     }
 }

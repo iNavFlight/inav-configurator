@@ -15,7 +15,9 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig,
-        mspHelper.loadFeatures
+        mspHelper.loadFeatures,
+        mspHelper.loadRateDynamics,
+        mspHelper.loadEzTune
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -92,6 +94,15 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
         RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
         RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
+
+        // Rate Dynamics
+        RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
+        RATE_DYNAMICS.sensitivityEnd = parseInt($('#rate_dynamics_end_sensitivity').val());
+        RATE_DYNAMICS.correctionCenter = parseInt($('#rate_dynamics_center_correction').val());
+        RATE_DYNAMICS.correctionEnd = parseInt($('#rate_dynamics_end_correction').val());
+        RATE_DYNAMICS.weightCenter = parseInt($('#rate_dynamics_center_weight').val());
+        RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
+
     }
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
@@ -115,6 +126,15 @@ TABS.pid_tuning.initialize = function (callback) {
     }
     function process_html() {
         // translate to user-selected language
+
+        if (EZ_TUNE.enabled) {
+            $("#tuning-wrapper").remove();
+            $("#tuning-footer").remove();
+            $('#note-wrapper').show();
+        } else {
+            $("#note-wrapper").remove();
+        }
+
         localize();
 
         helper.tabs.init($('.tab-pid_tuning'));
@@ -232,6 +252,15 @@ TABS.pid_tuning.initialize = function (callback) {
             axis++;
         });
 
+        GUI.sliderize($('#rate_dynamics_center_sensitivity'), RATE_DYNAMICS.sensitivityCenter, 25, 175);
+        GUI.sliderize($('#rate_dynamics_end_sensitivity'), RATE_DYNAMICS.sensitivityEnd, 25, 175);
+
+        GUI.sliderize($('#rate_dynamics_center_correction'), RATE_DYNAMICS.correctionCenter, 10, 95);
+        GUI.sliderize($('#rate_dynamics_end_correction'), RATE_DYNAMICS.correctionEnd, 10, 95);
+
+        GUI.sliderize($('#rate_dynamics_center_weight'), RATE_DYNAMICS.weightCenter, 0, 95);
+        GUI.sliderize($('#rate_dynamics_end_weight'), RATE_DYNAMICS.weightEnd, 0, 95);
+
         if (!FC.isRpyFfComponentUsed()) {
             $('.rpy_ff').prop('disabled', 'disabled');
         }
@@ -270,7 +299,11 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveFilterConfig() {
-                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, saveSettings);
+                MSP.send_message(MSPCodes.MSP_SET_FILTER_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FILTER_CONFIG), false, saveRateDynamics);
+            }
+
+            function saveRateDynamics() {
+                mspHelper.saveRateDynamics(saveSettings);
             }
 
             function saveSettings() {

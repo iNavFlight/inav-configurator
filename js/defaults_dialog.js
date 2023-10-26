@@ -823,12 +823,6 @@ helper.defaultsDialog = (function () {
                 value: 25
             },
         ],
-        "features": [
-            {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
     },
     {
         "title": 'Airplane without a Tail (Wing, Delta, etc)',
@@ -1042,12 +1036,6 @@ helper.defaultsDialog = (function () {
                 value: 25
             },
         ],
-        "features": [
-            {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
     },
     {
         "title": 'Rovers & Boats',
@@ -1205,6 +1193,7 @@ helper.defaultsDialog = (function () {
                     
                     MIXER_CONFIG.platformType = currentMixerPreset.platform;
                     MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+                    MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
                     MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
                     SERVO_RULES.cleanup();

@@ -41,7 +41,8 @@ var GUI_control = function () {
         'advanced_tuning',
         'mission_control',
         'mixer',
-        'programming'
+        'programming',
+        'ez_tune'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -52,6 +53,17 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("Linux") != -1)   this.operating_system = "Linux";
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
+
+    this.colorTable = [
+        "#8ecae6",
+        "#2a9d8f",
+        "#e9c46a",
+        "#f4a261",
+        "#e76f51",
+        "#ef476f",
+        "#ffc300"
+    ];
+
 };
 
 // message = string
@@ -249,6 +261,7 @@ GUI_control.prototype.updateStatusBar = function() {
 };
 
 GUI_control.prototype.updateProfileChange = function() {
+    $('#mixerprofilechange').val(CONFIG.mixer_profile);
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
 };
@@ -382,6 +395,92 @@ GUI_control.prototype.renderLogicConditionSelect = function ($container, logicCo
 
     $select.val(current).change(onChange);
 }
+
+GUI_control.prototype.sliderize = function ($input, value, min, max) {
+    let scaledMax;
+    let scaledMin;
+    let scalingThreshold;
+
+    if ($input.data('normal-max')) {
+        scaledMax = max * 2;
+        scalingThreshold = Math.round(scaledMax * 0.8);
+        scaledMin = min *2;
+    } else {
+        scaledMax = max;
+        scaledMin = min;
+        scalingThreshold = scaledMax;
+    }
+
+    let $range = $('<input type="range" min="' + scaledMin + '" max="' + scaledMax + '" value="' + value + '"/>');
+    if ($input.data('step')) {
+        $range.attr('step', $input.data('step'));
+    }
+    $range.css({
+        'display': 'block',
+        'flex-grow': 100,
+        'margin-left': '1em',
+        'margin-right': '1em',
+    });
+    
+    $input.attr('min', min);
+    $input.attr('max', max);
+    $input.val(parseInt(value));
+    $input.css({
+        'width': 'auto',
+        'min-width': '75px',
+    });
+    
+    $input.parent().css({
+        'display': 'flex',
+        'width': '100%'
+    });
+    $range.insertAfter($input);
+
+    $input.parent().find('.helpicon').css({
+        'top': '5px',
+        'left': '-10px'
+    });
+
+    /*
+     * Update slider to input
+     */
+    $range.on('input', function() {
+        let val = $(this).val();
+        let normalMax = parseInt($input.data('normal-max'));
+
+        if (normalMax) {
+            if (val <= scalingThreshold) {
+                val = scaleRangeInt(val, scaledMin, scalingThreshold, min, normalMax);
+            } else {
+                val = scaleRangeInt(val, scalingThreshold + 1, scaledMax, normalMax + 1, max);
+            }
+        }
+
+        $input.val(val);
+        $input.trigger('updated');
+    });
+
+    $input.on('change', function() {
+
+        let val = $(this).val();
+        let newVal;
+        let normalMax = parseInt($input.data('normal-max'));
+        if (normalMax) {
+            if (val <= normalMax) {
+                newVal = scaleRangeInt(val, min, normalMax, scaledMin, scalingThreshold);
+            } else {
+                newVal = scaleRangeInt(val, normalMax + 1, max, scalingThreshold + 1, scaledMax);
+            }
+        } else {
+            newVal = val;
+        }
+
+        $range.val(newVal);
+        $input.trigger('updated');
+    });
+
+    $input.trigger('change');
+};
 
 // initialize object into GUI variable
 var GUI = new GUI_control();
