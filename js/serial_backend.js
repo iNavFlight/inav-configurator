@@ -414,7 +414,7 @@ function onConnect() {
     /*
      * Init PIDs bank with a length that depends on the version
      */
-    let pidCount = 11;
+    let pidCount = FC.getPidNames().length;
 
     for (let i = 0; i < pidCount; i++) {
         PIDs.push(new Array(4));

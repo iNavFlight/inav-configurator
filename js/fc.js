@@ -822,7 +822,8 @@ var FC = {
             'Level',
             'Heading Hold',
             'Velocity Z',
-            'Nav Heading'
+            'Nav Heading',
+            'Acceleration Z'
         ];
     },
     getRthAltControlMode: function () {
