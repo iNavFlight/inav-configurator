@@ -84,7 +84,7 @@ On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `lib
 * Debian / Ubuntu: `sudo apt install libatomic1`
 * Fedora: `sudo dnf install libatomic`
 
-1. Dont forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
+1. Don't forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
 2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
 
 ### Mac
@@ -128,7 +128,7 @@ To be able to open Inspector, you will need SDK flavours of NW.js
 ## Different map providers
 
 INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps (Aerial View), and MapProxy map providers.
-INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configuerator by himself.
+INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configurator by himself.
 
 ### How to choose Map provider
 
