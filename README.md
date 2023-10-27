@@ -1,10 +1,10 @@
 # INAV Configurator
 
-INAV Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
+INAV Configurator is a cross platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
 It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
 
-Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters and fixed-wing aircraft.
+Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters, and fixed-wing aircraft.
 
 # Support
 
@@ -28,7 +28,7 @@ Alternatively, on Windows with PowerShell you can use `post_install_cleanup.ps1`
 
 ## Installation
 
-Depending on target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
+Depending on the target operating system, _INAV Configurator_ is distributed as _standalone_ application or Chrome App.
 
 ### Windows
 
@@ -36,7 +36,7 @@ Depending on target operating system, _INAV Configurator_ is distributed as _sta
 1. Download Configurator for Windows platform (win32 or win64 is present)
 1. Extract ZIP archive
 1. Run INAV Configurator app from unpacked folder
-1. Configurator is not signed, so you have to allow Windows to run untrusted application. There might be a monit for it during first run
+1. Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
 
 ### Linux
 
@@ -58,7 +58,7 @@ tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
 sudo mkdir /opt/inav
 sudo chown $USER /opt/inav
 ```
-7. Move the temporary files in to their home 
+7. Move the temporary files into their home 
 ```
 mv /tmp/INAV\ Configurator /opt/inav/inav-configurator
 ```
@@ -84,7 +84,7 @@ On some Linux distros, you may be missing `libatomic`, a `NW.JS` (specially `lib
 * Debian / Ubuntu: `sudo apt install libatomic1`
 * Fedora: `sudo dnf install libatomic`
 
-1. Don't forget to add your user into dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
+1. Don't forget to add your user to dial-out group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
 2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
 
 ### Mac
@@ -113,22 +113,22 @@ in the configurator. If new files are added, they must be included in `gulpfile.
 - **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or a NW.js app)
 in the `./dist/` directory.
 - **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
-directory. Running this task on macOS or Linux requires Wine, since it's needed to set the icon
+directory. Running this task on macOS or Linux requires Wine since it's needed to set the icon
 for the Windows app. If you don't have Wine installed you can create a release by running the **release-only-linux** task.
-<br>`--installer` argument can be added to build installers for particular OS. NOTE: MacOS Installer can be built with MacOS only.
+<br>`--installer` argument can be added to build installers for a particular OS. NOTE: MacOS Installer can be built with MacOS only.
 
 To build a specific release, use the command `release --platform="win64"` for example.
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, you will need SDK flavours of NW.js
+To be able to open Inspector, you will need SDK flavors of NW.js
 
 `npm install nw@0.61.0 --nwjs_build_type=sdk`
 
 ## Different map providers
 
-INAV Configurator 2.1 allows to choose between OpenStreetMap, Bing Maps (Aerial View), and MapProxy map providers.
-INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps and configure INAV Configurator by himself.
+INAV Configurator 2.1 allows you to choose between OpenStreetMap, Bing Maps (Aerial View), and MapProxy map providers.
+INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: every user who wants to use Bing Maps has to create own account, agree to all _Terms and Conditions_ required by Bing Maps, and configure INAV Configurator by himself.
 
 ### How to choose Map provider
 
@@ -145,22 +145,22 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 1. Select the option to create a new key.
 1. Provide the following information to create a key:
     1. Application name: Required. The name of the application.
-    1. Application URL: The URL of the application. This is an optional field which is useful in helping you remember the purpose of that key in the future.
+    1. Application URL: The URL of the application. This is an optional field that is useful in helping you remember the purpose of that key in the future.
     1. Key type: Required. Select the key type that you want to create. You can find descriptions of key and application types here.
     1. Application type: Required. Select the application type that best represents the application that will use this key. You can find descriptions of key and application types [here](https://www.microsoft.com/maps/create-a-bing-maps-key.aspx).
-1. Click the **Create** button. The new key displays in the list of available keys. Use this key to authenticate your Bing Maps application as described in the documentation for the Bing Maps API you are using.
+1. Click the **Create** button. The new key is displayed in the list of available keys. Use this key to authenticate your Bing Maps application as described in the documentation for the Bing Maps API you are using.
 
-### How to setup a MapProxy server for offline caching and mission planning
-1. Follow process described in [MAPPROXY.md](MAPPROXY.md)
-1. Test your MapProxy server in web browser, eg: http://192.168.145.20/inavmapproxy/
+### How to set up a MapProxy server for offline caching and mission planning
+1. Follow the process described in [MAPPROXY.md](MAPPROXY.md)
+1. Test your MapProxy server in the web browser, eg: http://192.168.145.20/inavmapproxy/
 1. Once you have a working MapProxy server choose MapProxy as your map provider
 	1. Enter MapProxy service URL, eg: http://192.168.145.20/inavmapproxy/service?
 	1. Enter MapProxy service layer (inav_layer if configured from MAPPROXY.md)
-1. Once completed, you can zoom in on area you will be flying in while connected to the internet in either GPS or Mission Control tab to save the cache for offline use
+1. Once completed, you can zoom in on the area you will be flying in while connected to the internet in either GPS or Mission Control tab to save the cache for offline use
 
 ## Font Customisation
 
-INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analogue and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analogue** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts, and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analogue](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
+INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analog and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analog** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analog](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
 
 ## Notes
 
