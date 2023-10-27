@@ -1231,7 +1231,7 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
-            52: {
+            53: {
                 name: "Mag calibration",
                 operandType: "Set Flight Parameter",
                 hasOperand: [false, false],
