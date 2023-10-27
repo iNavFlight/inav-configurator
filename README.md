@@ -20,7 +20,7 @@ everything, hardware is not working or have any other _support_ problem, please 
 
 ## INAV Configurator start minimized, what should I do?
 
-You have to remove `C:\Users%Your_UserNname%\AppData\Local\inav-configurator` folder and all its content.
+You have to remove `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
 
 [https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
 
