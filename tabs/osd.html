@@ -43,6 +43,8 @@
                         <div class="hd_avatar_storage_box_left"></div>
                         <div class="hd_avatar_storage_box_right"></div>
                         <div class="hd_avatar_bottom_bar"></div>
+                        <div class="hd_bfhdcompat_storage_box"></div>
+                        <div class="hd_bfhdcompat_bottom_box"></div>
                         <div class="preview"></div>
                     </div>
                 </div>
@@ -72,6 +74,11 @@
                                 <input type="text" id="pilot_name" data-setting="pilot_name" data-live="true" />
                                 <span data-i18n="osd_pilot_name"></span>
                             </label>
+                            <div for="usePilotLogo" class="helpicon cf_tip osd_use_large_pilot_logo" data-i18n_title="osd_use_large_pilot_logo_help"></div>
+                            <label>
+                                <input type="checkbox" id="usePilotLogo" class="toggle update_preview" data-setting="osd_use_pilot_logo" data-live="true">
+                                <span data-i18n="osd_use_pilot_logo"></span>
+                            </label>
                             <label class="craft_name">
                                 <input type="text" id="craft_name" data-setting="name" data-live="true" />
                                 <span data-i18n="osd_craft_name"></span>
@@ -86,8 +93,8 @@
                                 <span data-i18n="osd_main_voltage_decimals"></span>
                             </label>
                             <label>
-                                <select class="update_preview" data-setting="osd_mah_used_precision" data-live="true"></select>
-                                <span data-i18n="osd_mah_used_precision"></span>
+                                <select class="update_preview" data-setting="osd_mah_precision" data-live="true"></select>
+                                <span data-i18n="osd_mah_precision"></span>
                             </label>
                             <label>
                                 <select class="update_preview" data-setting="osd_coordinate_digits" data-live="true"></select>
@@ -111,11 +118,6 @@
                             <label>
                                 <select class="update_preview" data-setting="osd_crosshairs_style" data-live="true"></select>
                                 <span data-i18n="osd_crosshairs_style"></span>
-                            </label>
-                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
-                            <label>
-                                <select class="update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
-                                <span data-i18n="osd_horizon_offset"></span>
                             </label>
                             <label>
                                 <select class="update_preview" data-setting="osd_left_sidebar_scroll" data-live="true"></select>
@@ -344,6 +346,59 @@
                         </div>
                     </div>
                 </div>
+                <div class="gui_box grey hud-settings-container"> 
+                    <div class="gui_box_titlebar">
+                        <div for="osd_hud_settings" class="helpicon cf_tip" data-i18n_title="osd_hud_settings_HELP"></div>
+                        <div class="spacer_box_title" data-i18n="osd_hud_settings"></div>
+                    </div>
+                    <div class="spacer_box settings">
+                        <div id="osd_hud_settings">
+                            <div for="osd_horizon_offset" class="helpicon cf_tip" data-i18n_title="osd_horizon_offset_help"></div>
+                            <label>
+                                <select class="update_preview" id="osd_horizon_offset" data-setting="osd_horizon_offset" data-setting-invert-select="true" data-live="true"></select>
+                                <span data-i18n="osd_horizon_offset"></span>
+                            </label>
+                            <div for="osd_hud_wp_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_wp_disp_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_wp_disp" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_wp_disp"></span>
+                            </label>
+                            <div for="osd_hud_radar_disp" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_disp_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_hud_radar_disp" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_disp"></span>
+                            </label>
+
+                            <div for="osd_hud_radar_range_min" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_min_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_min" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_range_min"></span>
+                            </label>
+                            <div for="osd_hud_radar_range_max" class="helpicon cf_tip" data-i18n_title="osd_hud_radar_range_max_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-unit="m" data-setting-multiplier="1" data-setting="osd_hud_radar_range_max" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_hud_radar_range_max"></span>
+                            </label>
+
+                            <div for="osd_camera_fov_h" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_h_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_h" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_camera_fov_h"></span>
+                            </label>
+                            <div for="osd_camera_fov_v" class="helpicon cf_tip" data-i18n_title="osd_camera_fov_v_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_fov_v" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_camera_fov_v"></span>
+                            </label>
+                            <div for="osd_camera_uptilt" class="helpicon cf_tip" data-i18n_title="osd_camera_uptilt_help"></div>
+                            <label>
+                                <input type="number" data-step="1" data-setting-multiplier="1" data-setting="osd_camera_uptilt" class="toggle update_preview" data-live="true">
+                                <span data-i18n="osd_camera_uptilt"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div id="fontmanagercontent" style="display:none; width:712px;">
                 <div class="font-picker" style="margin-bottom: 10px;">

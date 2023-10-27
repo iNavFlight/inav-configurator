@@ -85,9 +85,9 @@ $(document).ready(function () {
     }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
-    GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
+    GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
-        'Configurator: <strong>' + chrome.runtime.getManifest().version + '</strong>');
+        chrome.i18n.getMessage('getConfiguratorVersion') + chrome.runtime.getManifest().version + '</strong>');
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
@@ -223,6 +223,9 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
+                    case 'sitl':
+                        TABS.sitl.initialize(content_ready);
+                        break;
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
@@ -297,6 +300,9 @@ $(document).ready(function () {
                         break;
                     case 'cli':
                         TABS.cli.initialize(content_ready);
+                        break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
                         break;
 
                     default:
@@ -411,6 +417,9 @@ $(document).ready(function () {
                         'proxylayer': $(this).val()
                     });
                     globalSettings.proxyLayer = $(this).val();
+                });
+                $('#demoModeReset').on('click', () => {
+                    SITLProcess.deleteEepromFile('demo.bin');
                 });
                 function close_and_cleanup(e) {
                     if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
@@ -534,9 +543,22 @@ $(document).ready(function () {
 
         state = true;
     }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
+        $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
+    });
+
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
+        });
     });
 
     var profile_e = $('#profilechange');

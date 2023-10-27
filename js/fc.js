@@ -64,7 +64,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    RATE_DYNAMICS;
 
 var FC = {
     restartRequired: false,
@@ -117,6 +118,7 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
+            mixer_profile: 0,
             profile: 0,
             battery_profile: 0,
             uid: [0, 0, 0],
@@ -195,6 +197,7 @@ var FC = {
         MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,
+            motorStopOnLow: false,
             platformType: -1,
             hasFlaps: false,
             appliedMixerPreset: -1,
@@ -540,6 +543,27 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        RATE_DYNAMICS = {
+            sensitivityCenter: null,
+            sensitivityEnd: null,
+            correctionCenter: null,
+            correctionEnd: null,
+            weightCenter: null, 
+            weightEnd: null
+        };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
+        };
     },
     getOutputUsages: function() {
         return {
@@ -554,7 +578,6 @@ var FC = {
     getFeatures: function () {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
@@ -593,10 +616,10 @@ var FC = {
     },
     getGpsProtocols: function () {
         return [
-            'NMEA',
             'UBLOX',
             'UBLOX7',
-            'MSP'
+            'MSP',
+            'FAKE'
         ];
     },
     getGpsBaudRates: function () {
@@ -615,6 +638,7 @@ var FC = {
             'North American WAAS',
             'Japanese MSAS',
             'Indian GAGAN',
+            'SouthPAN (AU/NZ)',
             'Disabled'
         ];
     },
@@ -879,6 +903,7 @@ var FC = {
             'GVAR 5',               // 35
             'GVAR 6',               // 36
             'GVAR 7',               // 37
+            'Mixer Transition',     // 38
         ];
     },
     getServoMixInputName: function (input) {
@@ -1207,6 +1232,12 @@ var FC = {
                 output: "boolean"
             },
             52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },        
+            53: {
                 name: "Disable GPS Sensor Fix",
                 operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
@@ -1268,11 +1299,14 @@ var FC = {
                     30: "CRSF SNR",
                     31: "GPS Valid Fix",
                     32: "Loiter Radius [cm]",
-                    33: "Active Profile",
+                    33: "Active PIDProfile",
                     34: "Battery cells",
                     35: "AGL status [0/1]",
                     36: "AGL [cm]",
                     37: "Rangefinder [cm]",
+                    38: "Active MixerProfile",
+                    39: "MixerTransition Active",
+                    40: "Yaw [deg]"
                 }
             },
             3: {

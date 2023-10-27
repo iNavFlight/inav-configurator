@@ -5,7 +5,7 @@ var appUpdater = appUpdater || {};
 appUpdater.checkRelease = function (currVersion) {
     var modalStart;
     $.get('https://api.github.com/repos/iNavFlight/inav-configurator/releases', function (releaseData) {
-        GUI.log('Loaded release information from GitHub.');
+        GUI.log(chrome.i18n.getMessage('loadedReleaseInfo'));
         //Git return sorted list, 0 - last release
 
         let newVersion = releaseData[0].tag_name;
@@ -15,7 +15,7 @@ appUpdater.checkRelease = function (currVersion) {
             GUI.log(newVersion, chrome.runtime.getManifest().version);
             GUI.log(currVersion);
 
-            GUI.log('New version available!');
+            GUI.log(chrome.i18n.getMessage('newVersionAvailable'));
             modalStart = new jBox('Modal', {
                 width: 400,
                 height: 200,

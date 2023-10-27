@@ -1,0 +1,32 @@
+.ez-tune-preview {
+    background-color: #8ecae6;
+    margin-left: 1em;
+    margin-bottom: 1em;
+    min-width: 25%;
+    padding: 0.5em;
+}
+
+.ez-tune-preview h2 {
+    font-size: 1.3em;
+    margin-bottom: 1em;
+    margin-top: 0.5em;
+    color: #303030
+}
+
+.ez-tune-preview table {
+    width: 100%;
+}
+
+.ez-tune-preview table td,
+.ez-tune-preview table th {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.ez-tune-preview table th {
+    background-color: #3EA5D4;
+}
+
+.ez-tune-preview table td {
+    background-color: #A8D6EC;
+}

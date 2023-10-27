@@ -172,10 +172,10 @@ TABS.cli.initialize = function (callback) {
 
                 fs.writeFile(result, self.outputHistory, (err) => {
                     if (err) {
-                        GUI.log('<span style="color: red">Error writing file</span>');
+                        GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
                     }
-                    GUI.log('File saved');
+                    GUI.log(chrome.i18n.getMessage('FileSaved'));
                 });
 
             });
@@ -191,6 +191,12 @@ TABS.cli.initialize = function (callback) {
 
         $('.tab-cli .msc').click(function() {
             self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
+        });
+
+        $('.tab-cli .diffall').click(function() {
+            self.outputHistory = "";
+            $('.tab-cli .window .wrapper').empty();
+            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
         });
 
         $('.tab-cli .clear').click(function() {
@@ -244,7 +250,7 @@ TABS.cli.initialize = function (callback) {
 
                 fs.readFile(result, (err, data) => {
                     if (err) {
-                        GUI.log('<span style="color: red">Error reading file</span>');
+                        GUI.log(chrome.i18n.getMessage('ErrorReadingFile'));
                         return console.error(err);
                     }
 
@@ -278,7 +284,7 @@ TABS.cli.initialize = function (callback) {
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
 
-                if (out_string.trim().toLowerCase() == "cls") {
+                if (out_string.trim().toLowerCase() == "cls" || out_string.trim().toLowerCase() == "clear") {
                     self.outputHistory = "";
                     $('.tab-cli .window .wrapper').empty();
                 } else {
