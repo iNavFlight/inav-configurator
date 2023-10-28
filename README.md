@@ -84,7 +84,7 @@ On some Linux distros, you may be missing `libatomic`, an `NW.JS` (especially `l
 * Debian / Ubuntu: `sudo apt install libatomic1`
 * Fedora: `sudo dnf install libatomic`
 
-1. Don't forget to add your user to the dial-out group "sudo usermod -aG dial-out YOUR_USERNAME" for serial access
+1. Don't forget to add your user to the dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
 2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
 
 ### Mac
