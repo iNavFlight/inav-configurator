@@ -121,7 +121,7 @@ To build a specific release, use the command `release --platform="win64"` for ex
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, you will need SDK Flavours of NW.js
+To be able to open Inspector, you will need SDK flavours of NW.js
 
 `npm install nw@0.61.0 --nwjs_build_type=sdk`
 
