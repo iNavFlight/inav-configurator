@@ -1,6 +1,6 @@
 # INAV Configurator
 
-INAV Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
+INAV Configurator is a cross-platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
 It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
 
@@ -121,7 +121,7 @@ To build a specific release, use the command `release --platform="win64"` for ex
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, you will need SDK flavours of NW.js
+To be able to open Inspector, you will need SDK flavors of NW.js
 
 `npm install nw@0.61.0 --nwjs_build_type=sdk`
 
