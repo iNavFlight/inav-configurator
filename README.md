@@ -78,7 +78,7 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 
 #### Notes
 
-On some Linux distros, you may be missing `libatomic`, an `NW.JS` (especially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:
+On some Linux distros, you may be missing `libatomic`or `NW.JS` (especially `libnode.so`) dependency. If so, please install `libatomic` using your distro's package manager, e.g:
 
 * Arch Linux: `sudo pacman -S --needed libatomic_ops`
 * Debian / Ubuntu: `sudo apt install libatomic1`
