@@ -14,6 +14,9 @@
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
     },
+    "options_cliAutocomplete": {
+        "message": "Advanced CLI AutoComplete"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },

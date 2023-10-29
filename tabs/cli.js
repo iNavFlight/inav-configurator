@@ -151,12 +151,6 @@ TABS.cli.initialize = function (callback) {
         CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
-        //////////////////////////////////////////////
-        //////////////////////////////////////////////
-        // READ THIS FROM OPTIONS (APP SETTINGS) globalSettings.XXXXX
-        CliAutoComplete.setEnabled(true);
-        //////////////////////////////////////////////
-        //////////////////////////////////////////////
         CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
         $(CliAutoComplete).on('build:start', function() {
             textarea
@@ -170,11 +164,6 @@ TABS.cli.initialize = function (callback) {
                 .prop('disabled', false)
                 .focus();
         });
-
-
-
-
-
 
         $('.tab-cli .save').click(function() {
             var prefix = 'cli';

@@ -91,6 +91,7 @@
 }
 .cli-textcomplete-dropdown a {
     color: white;
+    cursor: pointer;
 }
 .cli-textcomplete-dropdown .active {
     background-color: #000000;

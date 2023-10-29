@@ -95,9 +95,8 @@ CliAutoComplete.builderStart = function() {
             settingsAcceptedValues: {},
             feature: [],
             beeper: ['ALL'],
-            mixers: [],
         };
-        this.builder.commandSequence = ['help', 'dump', 'get', 'mixer list'];
+        this.builder.commandSequence = ['help', 'dump', 'get'];
         this.builder.currentSetting = null;
         this.builder.sentinel = `# ${Math.random()}`;
         this.builder.state = 'init';
@@ -182,13 +181,6 @@ CliAutoComplete.builderParseLine = function(line) {
                             cache.settingsAcceptedValues[builder.currentSetting] = matchGetSettings[0];
                         }
                     }
-                }
-                break;
-
-            case 'parse-mixer list':
-                const matchMixer = line.match(/:(.+)/);
-                if (matchMixer) {
-                    cache.mixers = ['list'].concat(matchMixer[1].trim().split(/\s+/));
                 }
                 break;
         }
@@ -515,13 +507,6 @@ CliAutoComplete._initTextcomplete = function() {
             index: 4,
         }),
 
-        strategy({ // "mixer"
-            match: /^(\s*mixer\s+)(\w*)$/i,
-            search:  function(term, callback) {
-                sendOnEnter = true;
-                searcher(term, callback, cache.mixers, 1);
-            },
-        }),
     ]);
 
     $textarea.textcomplete('register', [
