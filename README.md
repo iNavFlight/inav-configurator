@@ -10,8 +10,8 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 INAV Configurator comes `as is`, without any warranty and support from authors. If you found a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
 
-The GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to setup
-everything, the hardware is not working or have any other _support_ problem, please consult:
+The GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to set up
+everything, the hardware is not working, or have any other _support_ problem, please consult:
 
 * [INAV Discord Server](https://discord.gg/peg2hhbYwN)
 * [INAV Official on Facebook](https://www.facebook.com/groups/INAVOfficial)
