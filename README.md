@@ -18,7 +18,7 @@ everything, the hardware is not working, or you have any other _support_ problem
 * [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [INAV Official on Telegram](https://t.me/INAVFlight)
 
-## INAV Configurator start minimized, what should I do?
+## INAV Configurator starts minimized, what should I do?
 
 You have to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
 
