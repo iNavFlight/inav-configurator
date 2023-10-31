@@ -138,7 +138,7 @@
 | ![Miles](/resources/osd/digital/default/24x36/132.png)             | SYM_MI                     | SYM.MI                       | Miles symbol                          | 132        | 0x84         |
 | ![Nautical Miles](/resources/osd/digital/default/24x36/133.png)    | SYM_NM                     | SYM.NM                       | Nautical Miles symbol                 | 133        | 0x85         |
 | ![Horiz Wind Speed](/resources/osd/digital/default/24x36/134.png)  | SYM_WIND_HORIZONTAL        | SYM.WIND_SPEED_HORIZONTAL    | Horizontal wind speed                 | 134        | 0x86         |
-| ![Vert Wind Speed](/resources/osd/digital/default/24x36/135.png)   | SYM_WIND_VERTICAL          | SYM.WIND_SPEED_VERITCAL      | Vertical wind speed                   | 135        | 0x87         |
+| ![Vert Wind Speed](/resources/osd/digital/default/24x36/135.png)   | SYM_WIND_VERTICAL          | SYM.WIND_SPEED_VERTICAL      | Vertical wind speed                   | 135        | 0x87         |
 | ![3D Speed Km/h](/resources/osd/digital/default/24x36/136.png)     | SYM_3D_KMH                 | SYM.KMH_3D                   | 3D speed in Kilometres per Hour       | 136        | 0x88         |
 | ![3D Speed MPH](/resources/osd/digital/default/24x36/137.png)      | SYM_3D_MPH                 | SYM.MPH_3D                   | 3D speed in Miles per Hour            | 137        | 0x89         |
 | ![3D Speed Knots](/resources/osd/digital/default/24x36/138.png)    | SYM_3D_KT                  | SYM.KT_3D                    | 3D speed in Knots                     | 138        | 0x8A         |
@@ -156,7 +156,7 @@
 | ![Temp Fahrenheit](/resources/osd/digital/default/24x36/150.png)   | SYM_TEMP_F                 | SYM.TEMP_F                   | Fahrenheit symbol                     | 150        | 0x96         |
 | ![Temp Celsius](/resources/osd/digital/default/24x36/151.png)      | SYM_TEMP_C                 | SYM.TEMP_C                   | Celsius symbol                        | 151        | 0x97         |
 | ![Home Point map](/resources/osd/digital/default/24x36/152.png)    | _reserved or old ?_        |                              | Home point map                        | 152        | 0x98         |
-| ![mAh](/resources/osd/digital/default/24x36/153.png)               | SYM_MAH                    | SYM.MAH                      | mAh sysmbol                           | 153        | 0x99         |
+| ![mAh](/resources/osd/digital/default/24x36/153.png)               | SYM_MAH                    | SYM.MAH                      | mAh symbol                           | 153        | 0x99         |
 | ![On Hours](/resources/osd/digital/default/24x36/154.png)          | SYM_ON_H                   |                              | On hours                              | 154        | 0x9A         |
 | ![Flying Hours](/resources/osd/digital/default/24x36/155.png)      | SYM_FLY_H                  |                              | Flying hours                          | 155        | 0x9B         |
 | ![Glide slope](/resources/osd/digital/default/24x36/156.png)       | SYM_GLIDESLOPE             | SYM.GLIDESLOPE               | Glide slope                           | 156        | 0x9C         |
