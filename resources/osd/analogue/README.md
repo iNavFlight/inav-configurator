@@ -10,7 +10,7 @@ version of the character will be used.
 
 Don't alter the `.mcm` files directly, those should be
 only modified by altering the `.png` files found in its
-correspondant font directory.
+correspondent font directory.
 
 Character map files (`.mcm`) are built from the `.png` files
 in each directory representing the font, using
