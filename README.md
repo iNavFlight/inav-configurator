@@ -1,16 +1,18 @@
 # INAV Configurator
 
-INAV Configurator is a cross-platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
+INAV Configurator is a cross-platform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system. 
 
-It runs as an app within Google Chrome and allows you to configure the INAV software running on any supported INAV target.
+It operates as a web application within Google Chrome, enabling users to configure the INAV software on supported INAV targets.
 
-Various types of aircraft are supported by the tool and by INAV, e.g. quadcopters, hexacopters, octocopters, and fixed-wing aircraft.
+INAV supports various types of aircraft, including quadcopters, hexacopters, octocopters, and fixed-wing aircraft.
+
+
 
 # Support
 
-INAV Configurator comes `as is`, without any warranty and support from the authors. If you find a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
+INAV Configurator comes `as is`, without any warranty and support from the authors. If you encounter a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
 
-The GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to set up
+The GitHub issue tracker is intended for bugs and other technical problems. If you do not know how to set up
 everything, the hardware is not working, or you have any other _support_ problem, please consult:
 
 * [INAV Discord Server](https://discord.gg/peg2hhbYwN)
@@ -20,11 +22,11 @@ everything, the hardware is not working, or you have any other _support_ problem
 
 ## INAV Configurator starts minimized, what should I do?
 
-You have to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
+To resolve this issue, you need to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
 
 [https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
 
-Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script that will do the cleaning. (thank you, James Cherrill)
+Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script to perform the cleanup . (thank you, James Cherrill)
 
 ## Installation
 
