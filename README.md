@@ -46,7 +46,7 @@ Depending on the target operating system, _INAV Configurator_ is distributed as 
    *  **.deb** is the Debian/Ubuntu installation file. Just download and install using `sudo apt install /path/to/INAV-Configurator_linux64_x.y.z.deb` or open it with a package manager (e.g. via the File Manager)
    *  **.tar.gz** is a universal archive. Download and continue with these instructions to install
 3. Change to the directory containing the downloaded **tar.gz** file
-4. download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
+4. Download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
 5. Extract **tar.gz** archive
 ```
 tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
