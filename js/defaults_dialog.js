@@ -178,6 +178,10 @@ helper.defaultsDialog = (function () {
                 key: "mc_i_yaw",
                 value: 80
             },
+            {
+                key: "pid_iterm_limit_percent",
+                value: 50
+            },
             /*
                 * TPA
                 */
@@ -391,6 +395,10 @@ helper.defaultsDialog = (function () {
                 key: "mc_i_yaw",
                 value: 80
             },
+            {
+                key: "pid_iterm_limit_percent",
+                value: 50
+            },
             /*
              * TPA
              */
@@ -585,6 +593,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "mc_i_yaw",
                 value: 80
+            },
+            {
+                key: "pid_iterm_limit_percent",
+                value: 50
             },
             /*
              * TPA
