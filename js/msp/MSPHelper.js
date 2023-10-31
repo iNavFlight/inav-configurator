@@ -79,10 +79,14 @@ var mspHelper = (function (gui) {
                 profile_byte = data.getUint8(offset++)
                 CONFIG.profile = profile_byte & 0x0F;
                 CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_byte = data.getUint8(offset++)
-                CONFIG.mixer_profile = profile_byte & 0x0F;
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
+                
+                //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
+                //read mixer profile as the last byte in the the message
+                profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
+                CONFIG.mixer_profile = profile_byte & 0x0F;
+
                 gui.updateStatusBar();
                 gui.updateProfileChange();
                 break;
