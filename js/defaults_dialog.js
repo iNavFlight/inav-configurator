@@ -822,10 +822,6 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-            {
-                key: "motorstop_on_low",
-                value: "ON"
-            },
         ],
     },
     {
@@ -1039,10 +1035,6 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-            {
-                key: "motorstop_on_low",
-                value: "ON"
-            },
         ],
     },
     {
@@ -1201,6 +1193,7 @@ helper.defaultsDialog = (function () {
                     
                     MIXER_CONFIG.platformType = currentMixerPreset.platform;
                     MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+                    MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
                     MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
                     SERVO_RULES.cleanup();

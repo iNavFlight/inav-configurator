@@ -301,6 +301,9 @@ $(document).ready(function () {
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
+                        break;
 
                     default:
                         console.log('Tab not found:' + tab);
@@ -543,6 +546,19 @@ $(document).ready(function () {
         $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
+    });
+
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
+        });
     });
 
     var profile_e = $('#profilechange');

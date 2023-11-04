@@ -118,6 +118,7 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
+            mixer_profile: 0,
             profile: 0,
             battery_profile: 0,
             uid: [0, 0, 0],
@@ -550,6 +551,18 @@ var FC = {
             correctionEnd: null,
             weightCenter: null, 
             weightEnd: null
+        };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
         };
     },
     getOutputUsages: function() {
@@ -1218,6 +1231,12 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },        
         }
     },
     getOperandTypes: function () {
