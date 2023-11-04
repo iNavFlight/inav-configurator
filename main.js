@@ -717,3 +717,28 @@ function updateFirmwareVersion() {
         globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
 }
+
+function updateEzTuneTabVisibility(loadMixerConfig) {
+    let useEzTune = true;
+    if (CONFIGURATOR.connectionValid) {
+        if (loadMixerConfig) {
+            mspHelper.loadMixerConfig(function() {
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    $('.tab_ez_tune').removeClass("is-hidden");
+                } else {
+                    $('.tab_ez_tune').addClass("is-hidden");
+                    useEzTune = false;
+                }
+            });
+        } else {
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('.tab_ez_tune').removeClass("is-hidden");
+            } else {
+                $('.tab_ez_tune').addClass("is-hidden");
+                useEzTune = false;
+            }
+        }
+    }
+
+    return useEzTune;
+}
