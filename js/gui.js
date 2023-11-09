@@ -264,6 +264,11 @@ GUI_control.prototype.updateProfileChange = function() {
     $('#mixerprofilechange').val(CONFIG.mixer_profile);
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
+    if (this.hasOwnProperty('last_mixer_profile') && this.last_mixer_profile !== CONFIG.mixer_profile) {
+        GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile]));
+        updateActivatedTab();
+    }
+    this.last_mixer_profile = CONFIG.mixer_profile;
 };
 
 GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {
