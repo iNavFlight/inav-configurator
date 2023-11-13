@@ -70,6 +70,49 @@
 
                 <div class="config-section gui_box grey">
                     <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="fixedWingLandingConfiguration"></div>
+                    </div>
+                    <div class="spacer_box">
+                        <div class="number">
+                            <input id="fwLandApproachLength" type="number" data-unit="cm" data-setting="nav_fw_land_approach_length" data-setting-multiplier="1" step="1" min="100" max="100000" />
+                            <label for="fwLandApproachLength"><span data-i18n="fwLandApproachLength"></span></label>
+                            <div for="fwLandApproachLength" class="helpicon cf_tip" data-i18n_title="fwLandApproachLengthHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandFinalApproachPitch2throttle" type="number" data-unit="percent" data-setting="nav_fw_land_final_approach_pitch2throttle_mod" data-setting-multiplier="1" step="1" min="100" max="400" />
+                            <label for="fwLandFinalApproachPitch2throttle"><span data-i18n="fwLandFinalApproachPitch2throttle"></span></label>
+                            <div for="fwLandFinalApproachPitch2throttle" class="helpicon cf_tip" data-i18n_title="fwLandFinalApproachPitch2throttleHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandGlideAlt" type="number" data-unit="cm" data-setting="nav_fw_land_glide_alt" data-setting-multiplier="1" step="1" min="100" max="5000" />
+                            <label for="fwLandGlideAlt"><span data-i18n="fwLandGlideAlt"></span></label>
+                            <div for="fwLandGlideAlt" class="helpicon cf_tip" data-i18n_title="fwLandGlideAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandFlareAlt" type="number" data-unit="cm" data-setting="nav_fw_land_flare_alt" data-setting-multiplier="1" step="1" min="0" max="10000" />
+                            <label for="fwLandFlareAlt"><span data-i18n="fwLandFlareAlt"></span></label>
+                            <div for="fwLandFlareAlt" class="helpicon cf_tip" data-i18n_title="fwLandFlareAltHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandGlidePitch" type="number" data-unit="deg" data-setting="nav_fw_land_glide_pitch" data-setting-multiplier="1" step="1" min="0" max="45" />
+                            <label for="fwLandGlidePitch"><span data-i18n="fwLandGlidePitch"></span></label>
+                            <div for="fwLandGlidePitch" class="helpicon cf_tip" data-i18n_title="fwLandGlidePitchHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandFlarePitch" type="number" data-unit="deg" data-setting="nav_fw_land_flare_pitch" data-setting-multiplier="1" step="1" min="0" max="45" />
+                            <label for="fwLandFlarePitch"><span data-i18n="fwLandFlarePitch"></span></label>
+                            <div for="fwLandFlarePitch" class="helpicon cf_tip" data-i18n_title="fwLandFlarePitchHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input id="fwLandMaxTailwind" type="number" data-unit="cms" data-setting="nav_fw_land_max_tailwind" data-setting-multiplier="1" step="1" min="0" max="3000" />
+                            <label for="fwLandMaxTailwind"><span data-i18n="fwLandMaxTailwind"></span></label>
+                            <div for="fwLandMaxTailwind" class="helpicon cf_tip" data-i18n_title="fwLandMaxTailwindHelp"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section gui_box grey">
+                    <div class="gui_box_titlebar">
                         <div class="spacer_box_title" data-i18n="powerConfiguration"></div>
                     </div>
                     <div class="spacer_box">

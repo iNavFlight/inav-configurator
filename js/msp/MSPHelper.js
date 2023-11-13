@@ -1567,12 +1567,27 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP2_INAV_SAFEHOME:
-                SAFEHOMES.put(new Safehome(
-                    data.getUint8(0),
+                let safehome = new Safehome(
                     data.getUint8(1),
                     data.getInt32(2, true),
-                    data.getInt32(6, true)
-                ));
+                    data.getInt32(6, true),
+                    data.getInt32(10, true),
+                    data.getInt32(14, true),
+                    data.getUint8(18, true),
+                    data.getInt16(19, true),
+                    data.getInt16(21, true),
+                    data.getUint8(23, true),
+                    data.getUint8(0, true),
+                );
+
+                if (safehome.getEnabled()) {
+                    (async () => {
+                        const elevation = await safehome.getElevationFromServer(globalSettings) * 100;
+                        safehome.setElevation(elevation);
+                        SAFEHOMES.put(safehome);
+                    })();
+                }
+
                 break;
             case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 console.log('Safehome points saved');

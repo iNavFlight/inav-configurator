@@ -1300,7 +1300,8 @@ var FC = {
                     37: "Rangefinder [cm]",
                     38: "Active MixerProfile",
                     39: "MixerTransition Active",
-                    40: "Yaw [deg]"
+                    40: "Yaw [deg]",
+                    38: "FW Land State"
                 }
             },
             3: {
