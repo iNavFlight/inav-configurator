@@ -3241,6 +3241,52 @@
     "fixedWingNavigationConfiguration": {
       "message": "Fixed Wing Navigation Settings"
     },
+    "fixedWingLandingConfiguration": {
+        "message": "Fixed Wing Landing Settings"
+    },
+    
+    "fwLandApproachLength" : {
+        "message": "Final approach length"
+    },
+    "fwLandApproachLengthHelp": {
+        "message": "Length of the final approach, also includes the glide and intercept phase. This is the length from the safe home point to the final turn point."
+    },
+    "fwLandFinalApproachPitch2throttle": {
+        "message": "Modifier for pitch to throttle ratio at final approach"
+    },
+    "fwLandFinalApproachPitch2throttleHelp": {
+        "message": "This value is multiplied by the \"pitch to throttle ratio\" value during the final approach. Allows the velocity to be reduced."
+    },
+    "fwLandGlideAlt" : {
+        "message": "Initial altitude of the glide phase"
+    },
+    "fwLandGlideAltHelp" : {
+        "message": "At this altitude (measured from the altitude of the landing point) the engine is switched off and the aircraft glides from here."
+    },
+    "fwLandFlareAlt" : {
+        "message": "Initial altitude of the flare phase"
+    },
+    "fwLandFlareAltHelp" : {
+        "message": "At this altitude (measured from the altitude of the landing point) the last phase of landing is executed."
+    },
+    "fwLandGlidePitch" : {
+        "message": "Pitch value for glide phase"
+    },
+    "fwLandGlidePitchHelp" : {
+        "message": "This pitch angle is held during the glide phase."
+    },
+    "fwLandFlarePitch" : {
+        "message": "Pitch value for flare phase"
+    },
+    "fwLandFlarePitchHelp" : {
+        "message": "This pitch angle is held during the flare phase."
+    },
+    "fwLandMaxTailwind": {
+        "message": "Max. tailwind"
+    },
+    "fwLandMaxTailwindHelp": {
+        "message": "This value is used when no headwind landing is possible and wind speeds below this value are ignored (inaccuracies in INAV wind measurement)."
+    },
     "osd_unsupported_msg1": {
         "message" : "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
     },
@@ -4071,6 +4117,12 @@
     },
     "missionSafehomeHead": {
         "message": "Safe Home manager"
+    },
+    "missionSafehomeAvailableSafehomes" : {
+        "message": "Available Safehomes:"
+    },
+    "missionSafehomeMaxSafehomesReached": {
+        "message": "Maximum number of safehomes reached."
     },
     "missionMultiMissionHead": {
         "message": "Multi Missions"

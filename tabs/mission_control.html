@@ -180,35 +180,34 @@
                             <a id="cancelSafehome" class="ic_cancel" href="#" title="Cancel"></a>
                             <a id="saveEepromSafehomeButton" class="ic_save2Eprom" href="#" title="Save Eeprom Safehome"></a>
                             <a id="loadEepromSafehomeButton" class="ic_loadFromEprom" href="#" title="Load Eeprom Safehome"></a>
+                            <a id="addSafehome" class="ic_add" href="#" title="Add Safehome"></a>
                         </div>
                     </div>
                     <div class="spacer" id="SafehomeContent">
                         <div>
-                            <table class="safehomesTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px" data-i18n="SafehomeSelected"></th>
-                                        <th style="width: 40px" data-i18n="SafehomeId"></th>
-                                        <th style="width: 60px" data-i18n="SafehomeEnabled"></th>
-                                        <th style="width: 140px" data-i18n="SafehomeLat"></th>
-                                        <th style="width: 140px" data-i18n="SafehomeLon"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="safehomesTableBody">
-                                </tbody>
-                            </table>
+                            <div style="padding-bottom: 2px;">
+                                <span class="i18n-replaced" data-i18n="missionSafehomeAvailableSafehomes">Available Safehomes:</span>
+                                <span id="availableSafehomes"></span>
+                            </div>
+                            <div id="SafehomeContentBox">
+                            </div>
                             <hr>
                             <div class="spacer"  id="safehomeLegend">
                                 <span><b>Legend : </b></span>
                                 <div class="legendItem">
-                                    <span class="fill" style="border-bottom-color:#900C3F"></span>
+                                    <span class="fill" style="border-bottom:5px dotted #900C3F;"></span>
                                     <span class="textLegend">Max distance (m):</span>
-                                    <span id="safeHomeMaxDistance" class="valueLegend"></span>
+                                    <span id="safeHomeMaxDistance"></span>
                                 </div>
                                 <div class="legendItem">
-                                    <span class="fill"></span>
+                                    <span class="fill" style="border-bottom:5px dotted #88CC3E;"></span>
                                     <span class="textLegend">Safe Radius (m):</span>
-                                    <span id="SafeHomeSafeDistance" class="valueLegend"></span>
+                                    <span id="SafeHomeSafeDistance"></span>
+                                </div>
+                                <div class="legendItem">
+                                    <span class="fill" style="border-bottom:5px solid #f78a05;"></span>
+                                    <span class="textLegend">FW Approach</span>
+                                    <span id="SafeHomeSafeDistance"></span>
                                 </div>
                             </div>
                         </div>

@@ -274,7 +274,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         version: get_nw_version(),
         zip: false
     });
-    builder.on('log', console.log);
+    //builder.on('log', console.log);
     builder.build(function (err) {
         if (err) {
             console.log("Error building NW apps:" + err);

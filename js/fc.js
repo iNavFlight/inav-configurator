@@ -1268,6 +1268,7 @@ var FC = {
                     35: "AGL status [0/1]",
                     36: "AGL [cm]",
                     37: "Rangefinder [cm]",
+                    38: "FW Land State"
                 }
             },
             3: {

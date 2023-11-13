@@ -79,6 +79,8 @@ TABS.mission_control.initialize = function (callback) {
     var textGeom;
     let isOffline = false;
     let rthUpdateInterval = 0;
+    let selectedSafehome = -1;    
+    let settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, fwApproachLength: 0};
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -90,7 +92,17 @@ TABS.mission_control.initialize = function (callback) {
         loadChainer.setChain([
             mspHelper.getMissionInfo,
             //mspHelper.loadWaypoints,
-            //mspHelper.loadSafehomes
+            mspHelper.loadSafehomes,
+            function (callback) {
+                mspHelper.getSetting("nav_fw_land_approach_length").then((data) =>  {
+                    settings.fwApproachLength = parseInt(data.value);
+                }).then(callback);
+            },
+            function (callback) {
+                mspHelper.getSetting("safehome_max_distance").then((data) => {
+                    settings.maxDistSH = parseInt(data.value) / 100;    
+                }).then(callback);
+            },
         ]);
         loadChainer.setExitPoint(loadHtml);
         loadChainer.execute();
@@ -117,8 +129,7 @@ TABS.mission_control.initialize = function (callback) {
             isOffline = true;
         }
 
-        $safehomesTable = $('.safehomesTable');
-        $safehomesTableBody = $('#safehomesTableBody');
+        $safehomeContentBox = $('#SafehomeContentBox');
         $waypointOptionsTable = $('.waypointOptionsTable');
         $waypointOptionsTableBody = $('#waypointOptionsTableBody');
 
@@ -126,6 +137,17 @@ TABS.mission_control.initialize = function (callback) {
             loadSettings();
             // let the dom load finish, avoiding the resizing of the map
             setTimeout(initMap, 200);
+            if (!isOffline) {
+                setTimeout(() => {
+                    if (SAFEHOMES.safehomeCount() >= 1) {
+                        selectedSafehome = 0;
+                    } else {
+                        selectedSafehome = -1;
+                    }
+                    renderSafehomesOnMap();
+                    updateSafehomeInfo();
+                }, 500);
+            }
         } else {
             $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
@@ -364,24 +386,8 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for default Settings
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var vMaxDistSH = 0;
-    var settings = {};
-    if (CONFIGURATOR.connectionValid) {
-        mspHelper.getSetting("safehome_max_distance").then(function (s) {
-            if (s) {
-                vMaxDistSH = Number(s.value)/100;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-            }
-            else {
-                vMaxDistSH = 0;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-            }
-        });
-    }
-    else {
-        vMaxDistSH = 0;
-        settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-    }
+    
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init Waypoints parameters
@@ -468,58 +474,253 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function renderSafehomesTable() {
-        /*
-         * Process safehome table UI
-         */
-        let safehomes = SAFEHOMES.get();
-        $safehomesTableBody.find("*").remove();
-        for (let safehomeIndex in safehomes) {
-            if (safehomes.hasOwnProperty(safehomeIndex)) {
-                const safehome = safehomes[safehomeIndex];
-
-                $safehomesTableBody.append('\
-                    <tr>\
-                    <td><div id="viewSafomePoint" class="btnTable btnTableIcon"> \
-                            <a class="ic_center" data-role="safehome-center" href="#"  title="move to center view"></a> \
-                        </div>\
-                    </td> \
-                    <td><span class="safehome-number"/></td>\
-                    <td class="safehome-enabled"><input type="checkbox" class="togglesmall safehome-enabled-value"/></td> \
-                    <td><input type="number" class="safehome-lat" /></td>\
-                    <td><input type="number" class="safehome-lon" /></td>\
-                    </tr>\
-                ');
-
-                const $row = $safehomesTableBody.find('tr:last');
-
-                $row.find(".safehome-number").text(safehome.getNumber()+1);
-
-                $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
-                    safehome.setEnabled((($(this).prop('checked')) ? 1 : 0));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find(".safehome-lon").val(safehome.getLonMap()).change(function () {
-                    safehome.setLon(Math.round(Number($(this).val()) * 10000000));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find(".safehome-lat").val(safehome.getLatMap()).change(function () {
-                    safehome.setLat(Math.round(Number($(this).val()) * 10000000));
-                    SAFEHOMES.updateSafehome(safehome);
-                    cleanSafehomeLayers();
-                    renderSafehomesOnMap();
-                });
-
-                $row.find("[data-role='safehome-center']").attr("data-index", safehomeIndex);
-            }
+               
+        $safehomeContentBox.find("*").remove();
+        
+        if (selectedSafehome < 0) {
+            return;
         }
+
+        if (!$("#missionPlannerSafehome").is(":visible")) {
+            $("#missionPlannerSafehome").fadeIn(300);
+            $('#safeHomeMaxDistance').text(settings.maxDistSH);
+            $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
+        }
+        
+        const safehome = SAFEHOMES.get()[selectedSafehome];
+                
+        $safehomeContentBox.append('\
+            <div class="gui_box grey missionPlannerSafehomeBox"> \
+                <div class="gui_box_titlebar"> \
+                    <div class="spacer_box_title">Edit Safehome </div> \
+                    <div class="btnMenu btnMenuIcon"> \
+                        <div class="btnMenu-danger"> \
+                            <a id="deleteSafehome" class="ic_removeAll" href="#" title="Delete"></a> \
+                        </div> \
+                    </div> \
+                </div> \
+                <div class="spacer" id="safehomeSingelContent"> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safeHomeLatitude">Latitude:</label> \
+                        <input type="number" id="safehomeLatitude"></input> \
+                    </div>  \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeLongitude">Longitude:</label> \
+                        <input type="number" id="safehomeLongitude"></input> \
+                    </div>  \
+                    <div class="point"> \
+                        <span style="font-weight: bold">Fixed Wing landing settings:</span> \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeSeaLEvelRef">Sea level ref:</label> \
+                        <input id="safehomeSeaLevelRef" type="checkbox" value="0" class="togglemedium" required> \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeApproachAlt">Approach Alt: (cm):</label> \
+                        <input type="number" id="safehomeApproachAlt"></input> \
+                        <span id="safehomeApproachAltM"></span> \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeLandAlt">Land Alt: (cm):</label> \
+                        <input type="number" id="safehomeLandAlt"></input> \
+                        <span id="safehomeLandAltM"></span> \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeElevation">Elevation: (m):</label> \
+                        <span id="safehomeElevation"></span> \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="geozoneApproachDirection">Approach direction:</label> \
+                        <select name="zoneAction" id="geozoneApproachDirection"> \
+                            <option value="0">Left</option> \
+                            <option value="1">Right</option> \
+                        </select> \
+                    </div>  \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeLandHeading1">Heading 1: (deg):</label> \
+                        <input type="number" id="safehomeLandHeading1"></input> \
+                        <input id="safehomeLandHeading1Excl" type="checkbox" value="0" class="togglemedium" required> Excl. \
+                    </div> \
+                    <div class="point"> \
+                        <label class="point-label-safehome" for="safehomeLandHeading2">Heading 2: (deg):</label> \
+                        <input type="number" id="safehomeLandHeading2"></input> \
+                        <input id="safehomeLandHeading2Excl" type="checkbox" value="0" class="togglemedium" required> Excl. \
+                    </div> \
+                </div> \
+            </div> \
+        ');
+
+        const $safehomeBox = $safehomeContentBox.find('.missionPlannerSafehomeBox:last-child');
+        $safehomeBox.find('.spacer_box_title').append(safehome.getNumber() + 1);
+
+        $safehomeBox.find('#deleteSafehome').on('click', () => {
+            SAFEHOMES.drop(safehome.getNumber());
+            selectedSafehome = SAFEHOMES.safehomeCount() - 1;
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+            renderSafehomesTable();
+            updateSafehomeInfo();
+        });
+
+        $safehomeBox.find('#safehomeLatitude').val(safehome.getLatMap()).on('change', event => {
+            safehome.setLat(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+
+        $safehomeBox.find('#safehomeLongitude').val(safehome.getLonMap()).on('change', event => {
+            safehome.setLon(Math.round(Number($(event.currentTarget).val()) * 1e7));
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $safehomeBox.find($('#safehomeSeaLevelRef')).prop('checked', safehome.getIsSeaLevelRef()).change(event => {
+            
+            let isChecked = $(event.currentTarget).prop('checked') ? 1 : 0;
+            safehome.setIsSeaLevelRef(isChecked);
+
+            (async () => {
+                const elevation = await safehome.getElevationFromServer(globalSettings) * 100;
+                safehome.setElevation(elevation);
+                
+                $('#safehomeElevation').text(elevation / 100);
+                $approachAlt = $safehomeBox.find('#safehomeApproachAlt');
+                $landAlt = $safehomeBox.find('#safehomeLandAlt');
+
+                if (isChecked) {
+                    safehome.setApproachAltAsl(safehome.getApproachAltAsl() + elevation)
+                    $approachAlt.val(safehome.getApproachAltAsl());
+                    safehome.setLandAltAsl(safehome.getLandAltAsl() + elevation)
+                    $landAlt.val(safehome.getLandAltAsl());
+                } else {
+                    safehome.setApproachAltAsl(safehome.getApproachAltAsl() - elevation)
+                    $approachAlt.val(safehome.getApproachAltAsl());
+                    safehome.setLandAltAsl(safehome.getLandAltAsl() - elevation)
+                    $landAlt.val(safehome.getLandAltAsl());
+                }
+
+                $('#safehomeLandAltM').text(safehome.getLandAltAsl() / 100 + " m");
+                $('#safehomeApproachAltM').text( safehome.getApproachAltAsl() / 100 + " m");
+
+            })();
+            
+        });
+
+        $safehomeBox.find('#safehomeApproachAlt').val(safehome.getApproachAltAsl()).on('change', event => {
+            
+            let altitude = Number($(event.currentTarget).val());
+            if (checkSafhomeAltitude(altitude, $safehomeBox.find('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                safehome.setApproachAltAsl(Number($(event.currentTarget).val()));
+                $('#safehomeApproachAltM').text( safehome.getApproachAltAsl() / 100 + " m");
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+                renderHomeTable();
+            }
+            $safehomeBox.find('#safehomeApproachAlt').val(safehome.getApproachAltAsl());
+            
+        });
+
+        $safehomeBox.find('#safehomeLandAlt').val(safehome.getLandAltAsl()).on('change', event => {
+            
+            let altitude = Number($(event.currentTarget).val());
+            if (checkSafhomeAltitude(altitude, $safehomeBox.find('#safehomeSeaLevelRef').prop('checked'), Number($('#safehomeElevation').text()))) {
+                safehome.setLandAltAsl(altitude);
+                $('#safehomeLandAltM').text(safehome.getLandAltAsl() / 100 + " m");
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+                renderHomeTable();
+            } else {
+                $safehomeBox.find('#safehomeLandAlt').val(safehome.getLandAltAsl());
+            }
+        });
+
+        $safehomeBox.find('#geozoneApproachDirection').val(safehome.getApproachDirection()).on('change', event => {
+            safehome.setApproachDirection($(event.currentTarget).val());
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $safehomeBox.find('#safehomeLandHeading1Excl').prop('checked', safehome.getLandHeading1() < 0).change(event => {
+            safehome.setLandHeading1(safehome.getLandHeading1() * -1);
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $safehomeBox.find('#safehomeLandHeading1').val(Math.abs(safehome.getLandHeading1())).on('change', event => {
+            let val = Number($(event.currentTarget).val());
+            if (val < -360 || val > 360) {
+                $safehomeBox.find('#safehomeLandHeading1').val(safehome.getLandHeading1());
+                return;
+            }
+            
+            safehome.setLandHeading1(val);
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $safehomeBox.find('#safehomeLandHeading2Excl').prop('checked', safehome.getLandHeading2() < 0).change(event => {
+            safehome.setLandHeading2(safehome.getLandHeading2() * -1);
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $safehomeBox.find('#safehomeLandHeading2').val(Math.abs(safehome.getLandHeading2())).on('change', event => {
+            let val = Number($(event.currentTarget).val());
+            if (val < -360 || val > 360) {
+                $safehomeBox.find('#safehomeLandHeading2').val(safehome.getLandHeading2());
+                return;
+            }
+
+            safehome.setLandHeading2(val);
+            cleanSafehomeLayers();
+            renderSafehomesOnMap();
+        });
+
+        $('#safehomeLandAltM').text(safehome.getLandAltAsl() / 100 + " m");
+        $('#safehomeApproachAltM').text(safehome.getApproachAltAsl() / 100 + " m");
+        
+        if (safehome.getElevation() != "NaN")
+            $('#safehomeElevation').text(safehome.getElevation() / 100 + " m");
+    
         GUI.switchery();
         localize();
+    }
+
+    function checkSafhomeAltitude(altitude, isSeaLevelRef, sealevel) {
+
+        if (isSeaLevelRef && altitude - sealevel < 0) {
+            alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
+            return false;
+        }
+        return true;
+
+    }
+
+    function updateSafehomeInfo(){
+        let freeSamehomes = SAFEHOMES.getMaxSafehomeCount() - SAFEHOMES.safehomeCount()
+        $('#availableSafehomes').text(freeSamehomes + '/' + SAFEHOMES.getMaxSafehomeCount());
+    }
+
+    function addSafehome(){
+        if (SAFEHOMES.safehomeCount() + 1 > SAFEHOMES.getMaxSafehomeCount()){
+            alert(chrome.i18n.getMessage('missionSafehomeMaxSafehomesReached'));
+            return;
+        }
+
+        let mapCenter = map.getView().getCenter();
+        let midLon = Math.round(ol.proj.toLonLat(mapCenter)[0] * 1e7);
+        let midLat = Math.round(ol.proj.toLonLat(mapCenter)[1] * 1e7);
+        var safehome = new Safehome(1, midLat, midLon);
+        safehome.setNumber(SAFEHOMES.safehomeCount());
+        SAFEHOMES.put(safehome);
+        selectedSafehome = SAFEHOMES.safehomeCount() - 1;
+        
+
+        cleanSafehomeLayers();
+        renderSafehomesOnMap();
+        renderSafehomesTable();
+        updateSafehomeInfo();
     }
 
 
@@ -527,8 +728,13 @@ TABS.mission_control.initialize = function (callback) {
         /*
          * Process safehome on Map
          */
-        SAFEHOMES.get().forEach(function (safehome) {
-            map.addLayer(addSafeHomeMarker(safehome));
+
+        SAFEHOMES.get().forEach(safehome => {
+            addSafehomeCircles(safehome);
+            addSafeHomeMarker(safehome);
+        });
+        SAFEHOMES.get().forEach(safehome => {
+            addFwApproach(safehome);
         });
     }
 
@@ -565,7 +771,105 @@ TABS.mission_control.initialize = function (callback) {
         });
     }
 
-    function addSafeHomeMarker(safehome) {
+    function paintApproachLine(pos1, pos2, color) 
+    {
+        var line = new ol.geom.LineString([pos1, pos2]);
+
+        var feature = new ol.Feature({
+            geometry: line
+        });
+        
+        var styles = [  new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: color,
+                    width: 3,
+                }),
+            })
+        ];
+
+        var geometry = feature.getGeometry();
+        geometry.forEachSegment(function (start, end) {
+            var dx = end[0] - start[0];
+            var dy = end[1] - start[1];
+            var rotation = Math.atan2(dy, dx);
+    
+            styles.push(new ol.style.Style({
+              geometry: new ol.geom.Point(distanceOnLine(start, end, -8)),
+              image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({color}),
+                points: 3,
+                radius: 8,
+                rotation: -rotation,
+                angle: Math.PI / 2 // rotate -90°
+              })
+            }));
+        });
+
+        feature.setStyle(styles);
+
+        var vectorSource = new ol.source.Vector({
+                features: [feature]
+        });
+        
+
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        });
+
+        
+
+        vectorLayer.kind = "approachline";
+        vectorLayer.selection = false;
+
+        safehomeMarkers.push(vectorLayer);
+        map.addLayer(vectorLayer);
+    }
+
+    function paintApproach(landCoord, approachLength, bearing, approachDirection) {
+        var coords = new Array(4);
+        coords[3] = landCoord;
+        coords[2] = calculate_new_cooridatnes(coords[3], bearing, approachLength);
+        let direction;
+        if (approachDirection == ApproachDirection.LEFT) {
+            direction = wrap_360(bearing + 90);
+        } else {
+            direction = wrap_360(bearing - 90);
+        }
+        coords[1] = calculate_new_cooridatnes(coords[2], direction, approachLength / 2);
+        coords[0] = calculate_new_cooridatnes(coords[3], direction, approachLength / 2);
+
+        for (let i = 0; i < 3; i++) {
+            let pos1 = ol.proj.fromLonLat([coords[i].lon, coords[i].lat]);
+            let pos2 = ol.proj.fromLonLat([coords[i + 1].lon, coords[i + 1].lat]);
+            paintApproachLine(pos1, pos2, '#f78a05');
+        }       
+
+    }
+
+    function addFwApproach(safehome)
+    {        
+        if (safehome.getLandHeading1() != 0) {
+            let bearing = wrap_360(Math.abs(safehome.getLandHeading1()) + 180);
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, bearing, safehome.getApproachDirection());
+        }
+
+        if (safehome.getLandHeading1() > 0) {     
+            let direction = safehome.getApproachDirection() == ApproachDirection.LEFT ? ApproachDirection.RIGHT : ApproachDirection.LEFT;
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, safehome.getLandHeading1(), direction);
+        }
+
+        if (safehome.getLandHeading2() != 0) {
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, Math.abs(safehome.getLandHeading2()), safehome.getApproachDirection());
+        }
+
+        if (safehome.getLandHeading2() > 0) {
+            let bearing = wrap_360(safehome.getLandHeading2() + 180);
+            let direction = safehome.getApproachDirection() == ApproachDirection.LEFT ? ApproachDirection.RIGHT : ApproachDirection.LEFT;
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, bearing, direction);
+        }
+    }
+
+    function addSafehomeCircles(safehome) {        
         /*
          * add safehome on Map
          */
@@ -620,8 +924,32 @@ TABS.mission_control.initialize = function (callback) {
         vectorLayer.selection = false;
 
         safehomeMarkers.push(vectorLayer);
+        map.addLayer(vectorLayer);        
+    }
 
-        return vectorLayer;
+    function addSafeHomeMarker(safehome) {
+
+        let coord = ol.proj.fromLonLat([safehome.getLonMap(), safehome.getLatMap()]);
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+            name: 'safehome'
+        });
+
+        var vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                        features: [iconFeature]
+                    }),
+            style : function(iconFeature) {
+                return [getSafehomeIcon(safehome)];
+            }
+        });
+
+        vectorLayer.kind = "safehome";
+        vectorLayer.number = safehome.getNumber();
+        vectorLayer.selection = true;
+
+        safehomeMarkers.push(vectorLayer);
+        map.addLayer(vectorLayer);
     }
 
     function getProjectedRadius(radius) {
@@ -1599,6 +1927,10 @@ TABS.mission_control.initialize = function (callback) {
          * @param {ol.MapBrowserEvent} evt Map browser event.
          */
         app.Drag.prototype.handleDragEvent = function (evt) {
+            if (tempMarker.kind == "safehomecircle") {
+                return;
+            }
+            
             var map = evt.map;
 
             var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -1606,7 +1938,7 @@ TABS.mission_control.initialize = function (callback) {
                     return feature;
                 });
 
-            var deltaX = evt.coordinate[0] - this.coordinate_[0];
+            var deltaX = evt.coordinate[0] - this.coordinate_[0]; 
             var deltaY = evt.coordinate[1] - this.coordinate_[1];
 
             var geometry = /** @type {ol.geom.SimpleGeometry} */
@@ -1615,7 +1947,7 @@ TABS.mission_control.initialize = function (callback) {
                 geometry.translate(deltaX, deltaY);
                 this.coordinate_[0] = evt.coordinate[0];
                 this.coordinate_[1] = evt.coordinate[1];
-            }
+            }            
 
             let coord = ol.proj.toLonLat(geometry.getCoordinates());
             if (tempMarker.kind == "waypoint") {
@@ -1630,12 +1962,17 @@ TABS.mission_control.initialize = function (callback) {
                 repaintLine4Waypoints(mission);
             }
             else if (tempMarker.kind == "safehome") {
-                let tempSH = SAFEHOMES.getSafehome(tempMarker.number);
-                tempSH.setLon(Math.round(coord[0] * 10000000));
-                tempSH.setLat(Math.round(coord[1] * 10000000));
-                SAFEHOMES.updateSafehome(tempSH);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+                let tmpSafehome = SAFEHOMES.get()[tempMarker.number];
+                tmpSafehome.setLon(Math.round(coord[0] * 1e7));
+                tmpSafehome.setLat(Math.round(coord[1] * 1e7));
+
+                $('#safeHomeLongitude').val(Math.round(coord[0] * 1e7));
+                $('#safeHomeLatitude').val(Math.round(coord[1] * 1e7));
+                selectedSafehome = tempMarker.number;
+                
+                cleanSafehomeLayers();
+                renderSafehomesOnMap();
+                renderSafehomesTable();
             }
             else if (tempMarker.kind == "home") {
                 HOME.setLon(Math.round(coord[0] * 10000000));
@@ -1690,6 +2027,21 @@ TABS.mission_control.initialize = function (callback) {
                     $('#elevationValueAtHome').text(elevationAtHome+' m');
                     HOME.setAlt(elevationAtHome);
                     plotElevation();
+                })()
+            }
+            else if (tempMarker.kind == "safehome") {
+                (async () => {
+                    let safehome = SAFEHOMES.get()[tempMarker.number];
+                    const elevation = await safehome.getElevationFromServer(globalSettings) * 100;
+                    $('#safehomeElevation').text(elevation / 100 + " m");        
+                    if (safehome.getIsSeaLevelRef()) {
+                        if ( safehome.getElevation() != 0) { 
+                            safehome.setApproachAltAsl(safehome.getApproachAltAsl() - safehome.getElevation() + elevation);
+                            safehome.setLandAltAsl(safehome.getLandAltAsl() - safehome.getElevation() + elevation);
+                        }
+                        safehome.setElevation(elevation);
+                        renderSafehomesTable();
+                    }                         
                 })()
             }
             this.coordinate_ = null;
@@ -1883,12 +2235,8 @@ TABS.mission_control.initialize = function (callback) {
                 }
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
-                selectedMarker = SAFEHOMES.getSafehome(tempMarker.number);
-                var geometry = selectedFeature.getGeometry();
-                var coord = ol.proj.toLonLat(geometry.getCoordinates());
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-enabled-value').val(selectedMarker.isUsed());
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lon').val(Math.round(coord[0] * 10000000) / 10000000);
-                $safehomesTableBody.find('tr:nth-child('+String(tempMarker.number+1)+') > td > .safehome-lat').val(Math.round(coord[1] * 10000000) / 10000000);
+                selectedSafehome = tempMarker.number;
+                renderSafehomesTable();
             }
             else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
                 selectedMarker = HOME;
@@ -1926,10 +2274,14 @@ TABS.mission_control.initialize = function (callback) {
         //////////////////////////////////////////////////////////////////////////
         $(map.getViewport()).on('mousemove', function (e) {
             var pixel = map.getEventPixel(e.originalEvent);
+            var name = "";
             var hit = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                if (feature) {
+                    name = feature.getProperties().name;
+                }
                 return true;
             });
-            if (hit) {
+            if (hit && name != "safehomeDist" && name != "safehomeSafe") {
                 map.getTarget().style.cursor = 'pointer';
             } else {
                 map.getTarget().style.cursor = '';
@@ -2242,6 +2594,7 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback for SAFEHOMES Table
         /////////////////////////////////////////////
+        /*
         $safehomesTableBody.on('click', "[data-role='safehome-center']", function (event) {
             let mapCenter = map.getView().getCenter();
             let tmpSH = SAFEHOMES.getSafehome($(event.currentTarget).attr("data-index"));
@@ -2251,6 +2604,11 @@ TABS.mission_control.initialize = function (callback) {
             renderSafehomesTable();
             cleanSafehomeLayers();
             renderSafehomesOnMap();
+        });
+        */
+
+        $('#addSafehome').on('click', () => {
+            addSafehome();
         });
 
         $('#cancelSafehome').on('click', function () {
@@ -2265,6 +2623,7 @@ TABS.mission_control.initialize = function (callback) {
                 renderSafehomesTable();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
+                updateSafehomeInfo();
                 GUI.log('End of getting Safehome points');
                 $('#loadEepromSafehomeButton').removeClass('disabled');
             }, 500);
