@@ -1,7 +1,6 @@
 /*global $*/
 'use strict';
 
-const { ColorManagement } = require("three");
 
 function checkChromeRuntimeError() {
     if (chrome.runtime.lastError) {
