@@ -649,11 +649,19 @@ TABS.mission_control.initialize = function (callback) {
 
         $safehomeBox.find('#safehomeLandHeading1').val(Math.abs(safehome.getLandHeading1())).on('change', event => {
             let val = Number($(event.currentTarget).val());
-            if (val < -360 || val > 360) {
-                $safehomeBox.find('#safehomeLandHeading1').val(safehome.getLandHeading1());
-                return;
+            if (val < 0) {
+                val = 360;
+                $safehomeBox.find('#safehomeLandHeading1').val(360);
+            }
+            if (val > 360) {
+                val = 0;
+                $safehomeBox.find('#safehomeLandHeading1').val(0);
             }
             
+            if ($safehomeBox.find('#safehomeLandHeading1Excl').prop('checked')) {
+                val *= -1;
+            }
+
             safehome.setLandHeading1(val);
             cleanSafehomeLayers();
             renderSafehomesOnMap();
@@ -667,9 +675,17 @@ TABS.mission_control.initialize = function (callback) {
 
         $safehomeBox.find('#safehomeLandHeading2').val(Math.abs(safehome.getLandHeading2())).on('change', event => {
             let val = Number($(event.currentTarget).val());
-            if (val < -360 || val > 360) {
-                $safehomeBox.find('#safehomeLandHeading2').val(safehome.getLandHeading2());
-                return;
+            if (val < 0) {
+                val = 360;
+                $safehomeBox.find('#safehomeLandHeading2').val(360);
+            }
+            if (val > 360) {
+                val = 0;
+                $safehomeBox.find('#safehomeLandHeading2').val(0);
+            }
+
+            if ($safehomeBox.find('#safehomeLandHeading2Excl').prop('checked')) {
+                val *= -1;
             }
 
             safehome.setLandHeading2(val);
@@ -680,7 +696,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#safehomeLandAltM').text(safehome.getLandAltAsl() / 100 + " m");
         $('#safehomeApproachAltM').text(safehome.getApproachAltAsl() / 100 + " m");
         
-        if (safehome.getElevation() != "NaN")
+        if (safehome.getElevation() != NaN)
             $('#safehomeElevation').text(safehome.getElevation() / 100 + " m");
     
         GUI.switchery();
@@ -694,7 +710,6 @@ TABS.mission_control.initialize = function (callback) {
             return false;
         }
         return true;
-
     }
 
     function updateSafehomeInfo(){
@@ -773,7 +788,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function paintApproachLine(pos1, pos2, color) 
     {
-        var line = new ol.geom.LineString([pos1, pos2]);
+        var line = new ol.geom.LineString([ol.proj.fromLonLat([pos1.lon, pos1.lat]), ol.proj.fromLonLat([pos2.lon, pos2.lat])]);
 
         var feature = new ol.Feature({
             geometry: line
@@ -826,24 +841,19 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function paintApproach(landCoord, approachLength, bearing, approachDirection) {
-        var coords = new Array(4);
-        coords[3] = landCoord;
-        coords[2] = calculate_new_cooridatnes(coords[3], bearing, approachLength);
+
+        var pos1 = calculate_new_cooridatnes(landCoord, bearing, approachLength);
         let direction;
         if (approachDirection == ApproachDirection.LEFT) {
             direction = wrap_360(bearing + 90);
         } else {
             direction = wrap_360(bearing - 90);
         }
-        coords[1] = calculate_new_cooridatnes(coords[2], direction, approachLength / 2);
-        coords[0] = calculate_new_cooridatnes(coords[3], direction, approachLength / 2);
-
-        for (let i = 0; i < 3; i++) {
-            let pos1 = ol.proj.fromLonLat([coords[i].lon, coords[i].lat]);
-            let pos2 = ol.proj.fromLonLat([coords[i + 1].lon, coords[i + 1].lat]);
-            paintApproachLine(pos1, pos2, '#f78a05');
-        }       
-
+        var pos2 = calculate_new_cooridatnes(pos1, direction, approachLength / 2);
+        
+        paintApproachLine(landCoord, pos2, '#0025a1');
+        paintApproachLine(pos2, pos1, '#0025a1');
+        paintApproachLine(pos1, landCoord, '#f78a05');
     }
 
     function addFwApproach(safehome)
@@ -859,13 +869,13 @@ TABS.mission_control.initialize = function (callback) {
         }
 
         if (safehome.getLandHeading2() != 0) {
-            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, Math.abs(safehome.getLandHeading2()), safehome.getApproachDirection());
+            let bearing = wrap_360(Math.abs(safehome.getLandHeading2()) + 180);
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, bearing, safehome.getApproachDirection());
         }
 
         if (safehome.getLandHeading2() > 0) {
-            let bearing = wrap_360(safehome.getLandHeading2() + 180);
             let direction = safehome.getApproachDirection() == ApproachDirection.LEFT ? ApproachDirection.RIGHT : ApproachDirection.LEFT;
-            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, bearing, direction);
+            paintApproach({lat: safehome.getLatMap(), lon: safehome.getLonMap()}, settings.fwApproachLength, safehome.getLandHeading2(), direction);
         }
     }
 
