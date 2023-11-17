@@ -137,6 +137,8 @@ sources.js = [
     './node_modules/openlayers/dist/ol.js',
     './js/libraries/plotly-latest.min.js',
     './js/sitl.js',
+    './js/fwApproach.js',
+    './js/fwApproachCollection.js'
 ];
 
 sources.receiverCss = [

@@ -75,20 +75,6 @@ let SafehomeCollection = function () {
             buffer.push(specificByte(safehome.getLon(), 1));
             buffer.push(specificByte(safehome.getLon(), 2));
             buffer.push(specificByte(safehome.getLon(), 3));
-            buffer.push(specificByte(safehome.getApproachAltAsl(), 0));
-            buffer.push(specificByte(safehome.getApproachAltAsl(), 1));
-            buffer.push(specificByte(safehome.getApproachAltAsl(), 2));
-            buffer.push(specificByte(safehome.getApproachAltAsl(), 3));
-            buffer.push(specificByte(safehome.getLandAltAsl(), 0));
-            buffer.push(specificByte(safehome.getLandAltAsl(), 1));
-            buffer.push(specificByte(safehome.getLandAltAsl(), 2));
-            buffer.push(specificByte(safehome.getLandAltAsl(), 3));
-            buffer.push(safehome.getApproachDirection());
-            buffer.push(specificByte(safehome.getLandHeading1(), 0));
-            buffer.push(specificByte(safehome.getLandHeading1(), 1));
-            buffer.push(specificByte(safehome.getLandHeading2(), 0));
-            buffer.push(specificByte(safehome.getLandHeading2(), 1));
-            buffer.push(safehome.getIsSeaLevelRef());
         } else {
             buffer = Array(24).fill(0);
             buffer[0] = safehomeId;

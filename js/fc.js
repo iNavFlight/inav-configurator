@@ -64,7 +64,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    FW_APPROACH;
 
 var FC = {
     restartRequired: false,
@@ -540,6 +541,8 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        FW_APPROACH = new FwApproachCollection();
     },
     getOutputUsages: function() {
         return {
