@@ -1568,30 +1568,35 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_SAFEHOME:
                 let safehome = new Safehome(
+                    data.getUint8(0),
                     data.getUint8(1),
                     data.getInt32(2, true),
                     data.getInt32(6, true),
-                    data.getInt32(10, true),
-                    data.getInt32(14, true),
-                    data.getUint8(18, true),
-                    data.getInt16(19, true),
-                    data.getInt16(21, true),
-                    data.getUint8(23, true),
-                    data.getUint8(0, true),
                 );
-
                 if (safehome.getEnabled()) {
-                    (async () => {
-                        const elevation = await safehome.getElevationFromServer(globalSettings) * 100;
-                        safehome.setElevation(elevation);
-                        SAFEHOMES.put(safehome);
-                    })();
+                    SAFEHOMES.put(safehome);
                 }
 
                 break;
             case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 console.log('Safehome points saved');
                 break;
+
+            case MSPCodes.MSP2_INAV_FW_APPROACH:
+                FW_APPROACH.put(new FwApproach(
+                    data.getUint8(0),
+                    data.getInt32(1, true),
+                    data.getInt32(5, true),
+                    data.getUint8(9, true),
+                    data.getInt16(10, true),
+                    data.getInt16(12, true),
+                    data.getUint8(14, true),
+                ));                
+                break;
+            
+                case MSPCodes.MSP2_INAV_SET_FW_APPROACH:
+                    console.log('FW Approach saved');
+                    break;
 
             case MSPCodes.MSP2_INAV_RATE_DYNAMICS:
                 RATE_DYNAMICS.sensitivityCenter = data.getUint8(0);
@@ -3213,6 +3218,37 @@ var mspHelper = (function (gui) {
             }
             else {
                 MSP.send_message(MSPCodes.MSP2_INAV_SET_SAFEHOME, SAFEHOMES.extractBuffer(safehomeId), false, callback);
+            }
+        };
+    };
+
+    self.loadFwApproach = function (callback) {
+        FW_APPROACH.flush();
+        let id = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
+
+        function nextFwApproach() {
+            id++;
+            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, callback);
+            }
+        };
+    };
+
+    self.saveFwApproach = function (callback) {
+        let id = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+
+        function nextFwApproach() {
+            id++;
+            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, callback);
             }
         };
     };

@@ -65,7 +65,8 @@ var CONFIG,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
     FEATURES,
-    RATE_DYNAMICS;
+    RATE_DYNAMICS,
+    FW_APPROACH;
 
 var FC = {
     restartRequired: false,
@@ -543,27 +544,6 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
-
-        RATE_DYNAMICS = {
-            sensitivityCenter: null,
-            sensitivityEnd: null,
-            correctionCenter: null,
-            correctionEnd: null,
-            weightCenter: null, 
-            weightEnd: null
-        };
-
-        EZ_TUNE = {
-            enabled: null,
-            filterHz: null,
-            axisRatio: null,
-            response: null,
-            damping: null,
-            stability: null,
-            aggressiveness: null,
-            rate: null,
-            expo: null
-        };
     },
     getOutputUsages: function() {
         return {

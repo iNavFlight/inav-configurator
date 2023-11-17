@@ -303,6 +303,38 @@
                                 <tbody id="waypointOptionsTableBody">
                                 </tbody>
                             </table>
+                        <div id="wpFwLanding" style="display: none;">
+                            <div class="point">
+                                <span style="font-weight: bold">Fixed Wing landing settings:</span>
+                            </div>
+                            <div class="point">
+                                <label class="point-label-safehome" for="wpApproachAlt">Approach Alt: (cm):</label>
+                                <input type="number" id="wpApproachAlt"></input>
+                                <span id="wpApproachAltM"></span>
+                            </div>
+                            <div class="point">
+                                <label class="point-label-safehome" for="wpLandAlt">Land Alt: (cm):</label>
+                                <input type="number" id="wpLandAlt"></input>
+                                <span id="wpLandAltM"></span>
+                            </div>
+                            <div class="point">
+                                <label class="point-label-safehome" for="wpApproachDirection">Approach direction:</label>
+                                <select name="wpApproachDirection" id="wpApproachDirection">
+                                    <option value="0">Left</option>
+                                    <option value="1">Right</option>
+                                </select>
+                            </div> 
+                            <div class="point">
+                                <label class="point-label-safehome" for="wpLandHeading1">Heading 1: (deg):</label>
+                                <input type="number" id="wpLandHeading1"></input>
+                                <input id="wpLandHeading1Excl" type="checkbox" value="0" class="togglemedium" required> Excl.
+                            </div>
+                            <div class="point">
+                                <label class="point-label-safehome" for="wpLandHeading2">Heading 2: (deg):</label>
+                                <input type="number" id="wpLandHeading2"></input>
+                                <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" required> Excl.
+                            </div>
+                        </div>
                         </div>
 
                         <!-- <div class="point-radio" id="pointOptionclass" style="display: none">
