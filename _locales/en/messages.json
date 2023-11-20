@@ -4295,8 +4295,8 @@
     "missionMultiAddNewMission": {
         "message": "Add New Mission"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Use Sea Level Earth DEM Model: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Use Ellipsoid Earth DEM Model: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
