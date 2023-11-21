@@ -4296,7 +4296,7 @@
         "message": "Add New Mission"
     },
     "missionEllipsoidEarthDEMModel": {
-        "message": "Use Ellipsoid Earth DEM Model: "
+        "message": "Use Ellipsoid instead of SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
