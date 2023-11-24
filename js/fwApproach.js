@@ -75,7 +75,6 @@ let FwApproach = function (number, approachAltAsl = 0, landAltAsl = 0, approachD
     }
 
     self.cleanup = function () {
-        number = 0;
         approachAltAsl = 0;
         landAltAsl = 0;
         approachDirection = 0;
