@@ -86,6 +86,14 @@
                             <label class="point-label" for="MPdefaultSafeRangeSH">Radius (m): </label>
                             <input id="MPdefaultSafeRangeSH" type="text" value="0" required>
                         </div>
+                        <div class="point">
+                            <label class="point-label" for="MPdefaultFwApproachAlt">FW Approach Alt (m): </label>
+                            <input id="MPdefaultFwApproachAlt" type="text" value="0" required>
+                        </div>
+                        <div class="point">
+                            <label class="point-label" for="MPdefaultLandAlt">FW Land Alt (m): </label>
+                            <input id="MPdefaultLandAlt" type="text" value="0" required>
+                        </div>
                     </div>
                 </div>
 
@@ -166,7 +174,7 @@
                     </div>
                     <div class="point" id="elevationEarthModelclass" style="display: none">
                         <label class="spacer_box_title i18n-replaced" for="elevationEarthModel">Use Sea Level Earth DEM Model: </label>
-                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" required>
+                        <input id="elevationEarthModel" type="checkbox" value="0" class="togglemedium" checked required>
                     </div>
                 </div>
 
@@ -326,12 +334,12 @@
                             <div class="point">
                                 <label class="point-label-safehome" for="wpLandHeading1">Heading 1: (deg):</label>
                                 <input type="number" id="wpLandHeading1"></input>
-                                <input id="wpLandHeading1Excl" type="checkbox" value="0" class="togglemedium" required> Excl.
+                                <input id="wpLandHeading1Excl" type="checkbox" value="0" class="togglemedium" checked required> Excl.
                             </div>
                             <div class="point">
                                 <label class="point-label-safehome" for="wpLandHeading2">Heading 2: (deg):</label>
                                 <input type="number" id="wpLandHeading2"></input>
-                                <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" required> Excl.
+                                <input id="wpLandHeading2Excl" type="checkbox" value="0" class="togglemedium" checked required> Excl.
                             </div>
                         </div>
                         </div>

@@ -270,13 +270,13 @@ gulp.task('apps', gulp.series('dist', function(done) {
         files: './dist/**/*',
         buildDir: appsDir,
         platforms: getPlatforms(),
-        flavor: 'normal',
+        flavor: 'sdk',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
         version: get_nw_version(),
         zip: false
     });
-    //builder.on('log', console.log);
+    builder.on('log', console.log);
     builder.build(function (err) {
         if (err) {
             console.log("Error building NW apps:" + err);
@@ -304,7 +304,7 @@ function get_release_filename(platform, ext, addition = '') {
 function build_win_zip(arch) {
     return function build_win_zip_proc(done) {
         var pkg = require('./package.json');
-    
+
         // Create ZIP
         console.log(`Creating ${arch} ZIP file...`);
         var src = path.join(appsDir, pkg.name, arch);
@@ -330,7 +330,7 @@ function build_win_iss(arch) {
         // Create Installer
         console.log(`Creating ${arch} Installer...`);
         const innoSetup = require('@quanle94/innosetup');
-            
+
         const APPS_DIR = './apps/';
         const pkg = require('./package.json');
 
@@ -388,7 +388,7 @@ gulp.task('release-osx64', function(done) {
 
         // Check if the bundle is signed
         const codesignCheckArgs = [ 'codesign', '-vvv', '--deep', '--strict', src ];
-        execSync.apply(this, codesignCheckArgs);        
+        execSync.apply(this, codesignCheckArgs);
     }
 
     // 'old' .zip mode
@@ -421,7 +421,7 @@ gulp.task('release-osx64', function(done) {
             done();
         });
         archive.finalize();
-    } 
+    }
     // 'new' .dmg mode
     else {
         const appdmg = require('appdmg');
@@ -645,7 +645,7 @@ function release_rpm(arch) {
             vendor: metadata.author,
             summary: metadata.description,
             license: 'GNU General Public License v3.0',
-            requires: ['libgconf-2-4', 'libatomic1'],
+            requires: ['libatomic1'],
             prefix: '/opt',
             files: [{
                 cwd: path.join(appsDir, metadata.name, arch),
