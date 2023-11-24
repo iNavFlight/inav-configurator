@@ -85,9 +85,9 @@ $(document).ready(function () {
     }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
-    GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
+    GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
-        'Configurator: <strong>' + chrome.runtime.getManifest().version + '</strong>');
+        chrome.i18n.getMessage('getConfiguratorVersion') + chrome.runtime.getManifest().version + '</strong>');
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
@@ -300,6 +300,9 @@ $(document).ready(function () {
                         break;
                     case 'cli':
                         TABS.cli.initialize(content_ready);
+                        break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
                         break;
 
                     default:
@@ -540,9 +543,22 @@ $(document).ready(function () {
 
         state = true;
     }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
+        $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
+    });
+
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
+        });
     });
 
     var profile_e = $('#profilechange');
@@ -700,4 +716,29 @@ function updateFirmwareVersion() {
         
         globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
+}
+
+function updateEzTuneTabVisibility(loadMixerConfig) {
+    let useEzTune = true;
+    if (CONFIGURATOR.connectionValid) {
+        if (loadMixerConfig) {
+            mspHelper.loadMixerConfig(function() {
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    $('.tab_ez_tune').removeClass("is-hidden");
+                } else {
+                    $('.tab_ez_tune').addClass("is-hidden");
+                    useEzTune = false;
+                }
+            });
+        } else {
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('.tab_ez_tune').removeClass("is-hidden");
+            } else {
+                $('.tab_ez_tune').addClass("is-hidden");
+                useEzTune = false;
+            }
+        }
+    }
+
+    return useEzTune;
 }

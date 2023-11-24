@@ -38,6 +38,27 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         localize();
         
+        // Set up required field warnings
+        $('#launchIdleThr').keyup(function() {
+            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        });
+
+        $('#launchIdleDelay').keyup(function() {
+            TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        });
+
+        $('#rthHomeAltitude').keyup(function() {
+            TABS.advanced_tuning.checkRequirements_LinearDescent();
+        });
+
+        $('#rthUseLinearDescent').change(function() {
+            TABS.advanced_tuning.checkRequirements_LinearDescent();
+        });
+
+        // Preload required field warnings
+        TABS.advanced_tuning.checkRequirements_IdleThrottle();
+        TABS.advanced_tuning.checkRequirements_LinearDescent();
+
         $('a.save').click(function () {
             Settings.saveInputs().then(function () {
                 var self = this;
@@ -68,8 +89,28 @@ TABS.advanced_tuning.initialize = function (callback) {
         GUI.log(chrome.i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_advanced_tuning a'));
     }
+};
 
+$incLD = 0;
 
+TABS.advanced_tuning.checkRequirements_IdleThrottle = function() {
+    let idleThrottle = $('#launchIdleThr');
+    if ($('#launchIdleDelay').val() > 0 && (idleThrottle.val() == "" || idleThrottle.val() < "1150")) {
+        idleThrottle.addClass('inputRequiredWarning');
+    } else {
+        idleThrottle.removeClass('inputRequiredWarning');
+    }
+};
+
+TABS.advanced_tuning.checkRequirements_LinearDescent = function() {
+    let rthHomeAlt = $('#rthHomeAltitude');
+    let minRthHomeAlt = 1000.0 / rthHomeAlt.data('setting-multiplier'); // 10 metres minimum recommended for safety.
+    
+    if ($('#rthUseLinearDescent').is(":checked") && (rthHomeAlt.val() == "" || parseFloat(rthHomeAlt.val()) < minRthHomeAlt)) {
+        rthHomeAlt.addClass('inputRequiredWarning');
+    } else {
+        rthHomeAlt.removeClass('inputRequiredWarning');
+    }
 };
 
 TABS.advanced_tuning.cleanup = function (callback) {

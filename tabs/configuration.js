@@ -30,12 +30,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     var saveChainer = new MSPChainerClass();
 
     var saveChain = [
-        mspHelper.saveSensorAlignment,
         mspHelper.saveAccTrim,
         mspHelper.saveArmingConfig,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveVTXConfig,
-        mspHelper.saveBoardAlignment,
         mspHelper.saveCurrentMeterConfig,
         mspHelper.saveMiscV2,
         saveSettings,
@@ -114,14 +112,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // translate to user-selected language
         localize();
-
-        let alignments = FC.getSensorAlignments();
-        let orientation_mag_e = $('select.magalign');
-
-        for (i = 0; i < alignments.length; i++) {
-            orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
-        }
-        orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -209,7 +199,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('input[name="board_align_yaw"]').val((BOARD_ALIGNMENT.yaw / 10.0).toFixed(1));
 
         // fill magnetometer
-        $('#mag_declination').val(MISC.mag_declination);
+        //UPDATE: moved to GPS tab and hidden
+        //$('#mag_declination').val(MISC.mag_declination);
 
         // fill battery voltage
         $('#voltagesource').val(MISC.voltage_source);
@@ -264,7 +255,8 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $i2cSpeed.change();
 
         $('a.save').click(function () {
-            MISC.mag_declination = parseFloat($('#mag_declination').val());
+            //UPDATE: moved to GPS tab and hidden
+            //MISC.mag_declination = parseFloat($('#mag_declination').val());
 
             ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
 
@@ -280,8 +272,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
-
-            SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
 
             googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
 
@@ -300,7 +290,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));
             helper.features.execute(function () {
-                BOARD_ALIGNMENT.yaw = Math.round(parseFloat($('input[name="board_align_yaw"]').val()) * 10);
                 CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
                 CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();

@@ -136,8 +136,9 @@
 
 .tab-magnetometer #interactive_block {
     position: absolute;
-    width: calc(100% - 40px);
-    height: calc(100% - 245px);
+    width: calc(100% - 655px);
+    height: 771px;
+    min-height: calc(100% - 200px);
     background-color: #f9f9f9;
     border-radius: 5px;
     border: 1px solid #e4e4e4;
@@ -189,6 +190,17 @@ progress[value]::-webkit-progress-value {
     border-radius: 2px;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.25) inset;
 }
+
+.tab-magnetometer-left-wrapper {
+    float:left;
+    width: calc( 100% - 655px );
+}
+
+.tab-magnetometer-right-wrapper {
+    float:right;
+    width: 600px;
+}
+
 
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
 

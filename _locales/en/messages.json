@@ -2,7 +2,6 @@
     "translation_version": {
         "message": "0"
     },
-
     "options_title": {
         "message": "Application Options"
     },
@@ -21,7 +20,6 @@
     "options_render": {
         "message": "Configurator rendering options"
     },
-
     "connect": {
         "message": "Connect"
     },
@@ -111,6 +109,9 @@
     },
     "tabFailsafe": {
         "message": "Failsafe"
+    },
+    "tabEzTune": {
+        "message": "Ez Tune"
     },
     "tabGPS": {
         "message": "GPS"
@@ -259,7 +260,10 @@
     "sitlSer2TcpHelp": {
         "message": "Devices with a UART interface can be used with SITL via a serial to USB interface. Especially intended for serial receivers to use the full number of channels. "
     },
-     "serialPortOpened": {
+    "auxiliaryAcroEnabled": {
+        "message": "ACRO"
+    },
+    "serialPortOpened": {
         "message": "MSP connection <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
     },
     "serialPortOpenFail": {
@@ -280,7 +284,7 @@
     "connectionBleType": {
         "message": "BLE device type: $1"
     },
-    "connectionBleNotSupported" : {
+    "connectionBleNotSupported": {
         "message": "<span style=\"color: red\">Connection error:</span> Firmware doesn't support BLE connections. Abort."
     },
     "connectionBleInterrupted": {
@@ -310,7 +314,6 @@
     "usbDeviceUdevNotice": {
         "message": "Are <strong>udev rules</strong> installed correctly? See docs for instructions"
     },
-
     "stm32UsbDfuNotFound": {
         "message": "USB DFU not found"
     },
@@ -484,9 +487,17 @@
     "defaultWelcomeIntro": {
         "message": "Welcome to <strong>INAV - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
     },
-
+    "defaultWelcomeHead": {
+        "message": "Firmware & drivers"
+    },
+    "defaultWelcomeHead2": {
+        "message": "INAV Friends"
+    },
+    "defaultWelcomeText2": {
+        "message": "INAV is supported by a great community of users, developers and companies. Here is a short list: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>. "
+    },
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -820,6 +831,12 @@
     "featureBLACKBOXTip": {
         "message": "Configure via the BlackBox tab after enabling."
     },
+    "onboardLoggingBlackbox": {
+        "message": "Blackbox logging device"
+    },
+    "onboardLoggingBlackboxRate": {
+        "message": "Portion of flight loop iterations to log (logging rate)"
+    },
     "featureCHANNEL_FORWARDING": {
         "message": "Forward aux channels to servo outputs"
     },
@@ -883,7 +900,7 @@
     "serialrx_inverted": {
         "message": "Serial Port Inverted (comparing to protocol default)"
     },
-    "serialrx_halfduplex" : {
+    "serialrx_halfduplex": {
         "message": "Serial receiver half-duplex"
     },
     "configurationFeaturesHelp": {
@@ -891,18 +908,6 @@
     },
     "configurationSerialRXHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) for the serial receiver"
-    },
-    "configurationBoardAlignment": {
-        "message": "Board and Sensor Alignment"
-    },
-    "configurationBoardAlignmentRoll": {
-        "message": "Roll Degrees"
-    },
-    "configurationBoardAlignmentPitch": {
-        "message": "Pitch Degrees"
-    },
-    "configurationBoardAlignmentYaw": {
-        "message": "Yaw Degrees"
     },
     "configurationSensorAlignmentMag": {
         "message": "MAG Alignment"
@@ -1132,8 +1137,14 @@
     "configurationGPSProtocol": {
         "message": "Protocol"
     },
-     "configurationGPSUseGalileo": {
-        "message": "Gps use Galileo Satellites"
+    "configurationGPSUseGalileo": {
+        "message": "Gps use Galileo Satellites (EU)"
+    },
+    "configurationGPSUseBeidou": {
+        "message": "Gps use BeiDou Satellites (CN)"
+    },
+    "configurationGPSUseGlonass": {
+        "message": "Gps use Glonass Satellites (RU)"
     },
     "tzOffset": {
         "message": "Timezone Offset"
@@ -1301,7 +1312,7 @@
         "message": "Reset PID Controller"
     },
     "pidTuning_PIDgains": {
-        "message" :"PID gains"
+        "message": "PID gains"
     },
     "pidTuning_Name": {
         "message": "Name"
@@ -1351,6 +1362,24 @@
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
     },
+    "pidTuning_RateDynamics": {
+        "message": "Rate Dynamics"
+    },
+    "pidTuning_RateDynamics_Sensitivity": {
+        "message": "Sensitivity"
+    },
+    "pidTuning_RateDynamics_Correction": {
+        "message": "Correction"
+    },
+    "pidTuning_RateDynamics_Weight": {
+        "message": "Weight"
+    },
+    "pidTuning_RateDynamics_Center": {
+        "message": "Center"
+    },
+    "pidTuning_RateDynamics_End": {
+        "message": "End"
+    },
     "pidTuning_RollPitchRate": {
         "message": "ROLL &amp; PITCH rate"
     },
@@ -1366,7 +1395,7 @@
     "pidTuning_RollAndPitchExpo": {
         "message": "Roll & Pitch Expo"
     },
-    "pidTuning_YawExpo" : {
+    "pidTuning_YawExpo": {
         "message": "Yaw Expo"
     },
     "pidTuning_MaxRollAngle": {
@@ -1523,7 +1552,7 @@
         "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
     },
     "pidTuning_ButtonSave": {
-        "message": "Save"
+        "message": "Save and Reboot"
     },
     "pidTuning_ButtonRefresh": {
         "message": "Refresh"
@@ -1554,6 +1583,9 @@
     },
     "pidTuning_gyro_dyn_lpf_max_hz_help": {
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
+    },
+    "loadedMixerProfile": {
+        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
     },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
@@ -1632,7 +1664,7 @@
     "auxiliaryHelp": {
         "message": "Use ranges to define the switches on your transmitter and corresponding mode assignments.  A receiver channel that gives a reading between a range min/max will activate the mode.  Remember to save your settings using the Save button."
     },
-	"auxiliaryToggleUnused": {
+    "auxiliaryToggleUnused": {
         "message": "Hide unused modes"
     },
     "auxiliaryMin": {
@@ -1644,7 +1676,7 @@
     "auxiliaryAddRange": {
         "message": "Add Range"
     },
-    "auxiliaryAutoChannelSelect" : {
+    "auxiliaryAutoChannelSelect": {
         "message": "AUTO"
     },
     "auxiliaryButtonSave": {
@@ -1708,7 +1740,7 @@
     "adjustmentsGroupPIDTuning": {
         "message": "PID Tuning"
     },
-    "adjustmentsGroupNavigationFlight" : {
+    "adjustmentsGroupNavigationFlight": {
         "message": "Navigation and Flight"
     },
     "adjustmentsGroupMisc": {
@@ -1949,7 +1981,7 @@
         "message": "Mixer wizard"
     },
     "mixerWizardInfo": {
-        "message":"<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
+        "message": "<ol><li>Remove propellers</li><li>Connect LiPo and use Outputs Tab to test all motors</li><li>Note the position of each motor (motor #1 - Left Top and so on)</li><li>Fill the table below</li></ol>"
     },
     "gpsHead": {
         "message": "Position"
@@ -2021,20 +2053,34 @@
         "message": "Signal Strength"
     },
     "magnetometerHead": {
-        "message": "Magnetometer Alignment"
+        "message": "Alignment tool"
     },
     "magnetometerHelp": {
-        "message": "Adjust the magnetometer position until you get the same on the quad.<br/><strong>Note:</strong> If you have changed your flight controller alignment, make your adjustment relative to the FC position and not to the UAV position "
+        "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on Flight Controller</u>.<br/>2. Adjust magnetometer orientation to match physical orientation on the aircraft <u>according to \"compass direction\" arrow or axis markings on magnetometer</u>.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
     },
     "magnetometerOrientationPreset": {
-        "message": "Orientation presets"
+        "message": "Orientation preset (align_mag). Relative to FC orientation"
+    },
+    "boardInfo": {
+        "message": "1. Select Flight Controller alignment<br>(align_board_roll, align_board_pitch, align_board_yaw)"
     },
     "magnetometerInfo": {
-        "message": "Select a preset or create a custom configuration moving the sliders"
+        "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
     },
     "magnetometerElementToShow": {
-        "message": "Element to show"
+        "message": "Element to show: Magnetometer model or axes"
     },
+
+    "axisTableTitleAxis": {
+        "message": "Axis"
+    },
+    "axisTableTitleSlider": {
+        "message": "Slider"
+    },
+    "axisTableTitleValue": {
+        "message": "Value [degree]"
+    },
+
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },
@@ -2042,7 +2088,7 @@
         "message": "Mag Statistics"
     },
     "tabMAGNETOMETER": {
-        "message": "Magnetometer"
+        "message": "Alignment tool"
     },
     "motors": {
         "message": "Motors"
@@ -2098,25 +2144,31 @@
         "message": "CLI output successfully saved to file"
     },
     "cliClearOutputHistoryBtn": {
-        "message": "Clear output history"
+        "message": "Clear Screen"
     },
     "cliCopyToClipboardBtn": {
-        "message": "Copy to clipboard"
+        "message": "Copy to Clipboard"
     },
     "cliExitBtn": {
-        "message": "EXIT"
+        "message": "Exit"
     },
     "cliSaveSettingsBtn": {
-        "message": "SAVE SETTINGS"
+        "message": "Save Settings"
     },
     "cliMscBtn": {
         "message": "MSC"
+    },
+    "cliDiffAllBtn": {
+        "message": "Diff All"
+    },
+    "cliCommandsHelp": {
+        "message": "Type or paste commands in the box to the left. You can use the up and down arrow keys to recall previously typed commands. Type 'help' or click on this icon for more info."
     },
     "cliCopySuccessful": {
         "message": "Copied!"
     },
     "cliLoadFromFileBtn": {
-        "message": "Load from file"
+        "message": "Load from File"
     },
     "cliConfirmSnippetDialogTitle": {
         "message": "Review loaded commands"
@@ -2168,11 +2220,20 @@
         "message": "Blackbox configuration"
     },
     "blackboxButtonSave": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
-
+    "serialLogging": {
+        "message": "Outboard serial logging device"
+    },
     "serialLoggingSupportedNote": {
         "message": "You can log to an external logging device (such as an OpenLog or compatible clone) by using a serial port. Configure the port on the Ports tab."
+    },
+
+    "onboardLoggingFlashLogger": {
+        "message": "Onboard dataflash chip"
+    },
+    "OnboardSDCard": {
+        "message": "Onboard SD card"
     },
     "sdcardNote": {
         "message": "Flight logs can be recorded to your flight controller's onboard SD card slot."
@@ -2198,6 +2259,9 @@
     },
     "dataflashConfirmEraseNote": {
         "message": "This will erase any Blackbox logs or other data contained in the dataflash which will take about 20 seconds, are you sure?"
+    },
+    "dataflashEraseing": {
+        "message": "Erase in progress, please wait..."
     },
     "dataflashSavingTitle": {
         "message": "Saving dataflash to file"
@@ -2309,10 +2373,10 @@
     "firmwareFlasherManualBaudDescription": {
         "message": "Manual selection of baud rate for boards that don't support the default speed or for flashing via bluetooth.<br /><span style=\"color: red\">Note:</span> Not used when flashing via USB DFU"
     },
-    "firmwareFlasherShowDevelopmentReleases":{
+    "firmwareFlasherShowDevelopmentReleases": {
         "message": "Show unstable releases"
     },
-    "firmwareFlasherShowDevelopmentReleasesDescription":{
+    "firmwareFlasherShowDevelopmentReleasesDescription": {
         "message": "Show Release-Candidates and Development Releases."
     },
     "firmwareFlasherOptionLabelSelectFirmware": {
@@ -2397,7 +2461,6 @@
     "ledStripEepromSaved": {
         "message": "EEPROM <span style=\"color: #37a8db\">saved</span>: LED"
     },
-
     "controlAxisRoll": {
         "message": "Roll [A]"
     },
@@ -2409,6 +2472,9 @@
     },
     "controlAxisThrottle": {
         "message": "Throttle [T]"
+    },
+    "controlAxisMotor": {
+        "message": "Motor"
     },
     "radioChannelShort": {
         "message": "CH "
@@ -2534,31 +2600,31 @@
         "message": "ESC protocol"
     },
     "escRefreshRate": {
-        "message" : "ESC refresh rate"
+        "message": "ESC refresh rate"
     },
     "escProtocolHelp": {
-        "message" : "ESC has to support chosen protocol. Change only if you know that ESC supports it!"
+        "message": "ESC has to support chosen protocol. Change only if you know that ESC supports it!"
     },
     "escRefreshRatelHelp": {
-        "message" : "ESC has to support refresh rate. Change only if you know that ESC supports it!"
+        "message": "ESC has to support refresh rate. Change only if you know that ESC supports it!"
     },
     "servoRefreshRate": {
-        "message" : "Servo refresh rate"
+        "message": "Servo refresh rate"
     },
     "servoRefreshRatelHelp": {
-        "message" : "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
+        "message": "Servo has to support refresh rate. Change only if you know that servo supports it. Too high refresh rate might damage servos!"
     },
     "logPwmOutputDisabled": {
-        "message" : "PWM output is disabled. Motors and servos will not work. Use <u>Outputs</u> tab to enable!"
+        "message": "PWM output is disabled. Motors and servos will not work. Use <u>Outputs</u> tab to enable!"
     },
     "configurationGyroSyncTitle": {
-        "message" : "Synchronize looptime with gyroscope"
+        "message": "Synchronize looptime with gyroscope"
     },
     "configurationGyroLpfTitle": {
-        "message" : "Gyroscope LPF cutoff frequency"
+        "message": "Gyroscope LPF cutoff frequency"
     },
     "configurationGyroSyncDenominator": {
-        "message" : "Gyroscope denominator"
+        "message": "Gyroscope denominator"
     },
     "yawJumpPreventionLimit": {
         "message": "Yaw jump prevention"
@@ -2743,6 +2809,46 @@
     "AccBtn": {
         "message": "Calibrate Accelerometer"
     },
+
+    "stepTitle1": {
+        "message": "Step 1"
+    },
+    "stepTitle2": {
+        "message": "Step 2"
+    },
+    "stepTitle3": {
+        "message": "Step 3"
+    },
+    "stepTitle4": {
+        "message": "Step 4"
+    },
+    "stepTitle5": {
+        "message": "Step 5"
+    },
+    "stepTitle6": {
+        "message": "Step 6"
+    },
+    "MagXText": {
+        "message": "Zero X"
+    },
+    "MagYText": {
+        "message": "Zero Y"
+    },
+    "MagZText": {
+        "message": "Zero Z"
+    },
+    "MagGainXText": {
+        "message": "Gain X"
+    },
+    "MagGainYText": {
+        "message": "Gain Y"
+    },
+    "MagGainZText": {
+        "message": "Gain Z"
+    },
+    "OpflowScaleText": {
+        "message": "Scale"
+    },
     "AccResetBtn": {
         "message": "Reset Accelerometer Calibration"
     },
@@ -2796,6 +2902,12 @@
     },
     "tabAdvancedTuningTitle": {
         "message": "Advanced Tuning"
+    },
+    "tabAdvancedTuningAirplaneTuningTitle": {
+        "message": ": Fixed Wing"
+    },
+    "tabAdvancedTuningMultirotorTuningTitle": {
+        "message": ": Multirotors"
     },
     "tabAdvancedTuningGenericTitle": {
         "message": "Generic settings"
@@ -2978,34 +3090,34 @@
         "message": "Used in Extra, Fixed and 'At Least' RTH altitude modes"
     },
     "rthTrackBack": {
-    "message": "RTH Track Back Mode"
+        "message": "RTH Track Back Mode"
     },
     "rthTrackBackHelp": {
-    "message": "When enabled, the aircraft will follow its last path backwards first before flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Track Back. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
+        "message": "When enabled, the aircraft will follow its last path backwards first before flying home directly. Fixed Wing crafts will fly back the path with climbing but not descending. Usage modes for RTH Track Back. OFF = disabled, ON = Normal and Failsafe RTH, FS = Failsafe RTH only."
     },
     "rthTrackBackDistance": {
-    "message": "RTH Track Back Distance"
+        "message": "RTH Track Back Distance"
     },
     "rthTrackBackDistanceHelp": {
-    "message": "Distance flown during Track Back. Normal RTH is executed once this total flight distance is exceeded [m]."
+        "message": "Distance flown during Track Back. Normal RTH is executed once this total flight distance is exceeded [m]."
     },
     "rthSafeHome": {
-    "message": "Safe Home Mode"
+        "message": "Safe Home Mode"
     },
     "rthSafeHomeHelp": {
-    "message": "Used to control when safehomes will be used. Possible values are OFF, RTH and RTH_FS. See Safehome documentation for more information."
+        "message": "Used to control when safehomes will be used. Possible values are OFF, RTH and RTH_FS. See Safehome documentation for more information."
     },
     "rthSafeHomeDistance": {
-    "message": "Safe Home Max Distance"
+        "message": "Safe Home Max Distance"
     },
     "rthSafeHomeDistanceHelp": {
-    "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
+        "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
     },
     "navMaxAltitude": {
-    "message": "Max Altitude for Navigation"
+        "message": "Max Altitude for Navigation"
     },
     "navMaxAltitudeHelp": {
-    "message": "Max allowed altitude (above Home Point) that applies to all NAV modes (including Altitude Hold). 0 means limit is disabled"
+        "message": "Max allowed altitude (above Home Point) that applies to all NAV modes (including Altitude Hold). 0 means limit is disabled"
     },
     "rthHomeAltitudeLabel": {
         "message": "RTH Home altitude"
@@ -3014,16 +3126,28 @@
         "message": "Used when not landing at the home point. Upon arriving at home, the plane will loiter and change altitude to the RTH Home Altitude. Default is 0, which is feature disabled."
     },
     "rthTwoStage": {
-    "message": "Climb First Stage Method"
+        "message": "Climb First Stage Method"
     },
     "rthTwoStageHelp": {
-    "message": "Staged Return To Home Function if Climb First is enabled. Set Climb First Stage Altitude to 0, to use classic Single-Stage RTH."
+        "message": "Staged Return To Home Function if Climb First is enabled. Set Climb First Stage Altitude to 0, to use classic Single-Stage RTH."
     },
     "rthTwoStageAlt": {
-    "message": "Climb First Stage Altitude"
+        "message": "Climb First Stage Altitude"
     },
     "rthTwoStageAltHelp": {
-    "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
+        "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
+    },
+    "rthUseLinearDescent": {
+        "message": "Use Linear Descent"
+    },
+    "rthUseLinearDescentHelp": {
+        "message": "If enabled, the aircraft will slowly descent to the RTH Home Altitude on the heading home leg of RTH."
+    },
+    "rthLinearDescentStart": {
+        "message": "Linear Descent Start Distance"
+    },
+    "rthLinearDescentStartHelp": {
+        "message": "This is the distance away from the home position to start the linear descent. If set to 0, the linear descent will start immediately."
     },
     "landMaxAltVspd": {
         "message": "The craft will start to descend at this speed, once it reaches the <strong>Home</strong> location."
@@ -3133,10 +3257,10 @@
     "loiterDirectionHelp": {
         "message": "This setting allows you to choose the loiter direction. Selecting YAW allows you to change the loiter direction with the yaw stick."
     },
-     "controlSmoothness": {
+    "controlSmoothness": {
         "message": "Control Smoothness"
     },
-     "controlSmoothnessHelp": {
+    "controlSmoothnessHelp": {
         "message": "How smoothly the autopilot controls the airplane to correct the navigation error [0-9]."
     },
     "wpTrackingAccuracy": {
@@ -3239,7 +3363,7 @@
         "message": "The maximum distance between the home point and the first waypoint."
     },
     "fixedWingNavigationConfiguration": {
-      "message": "Fixed Wing Navigation Settings"
+        "message": "Fixed Wing Navigation Settings"
     },
     "fixedWingLandingConfiguration": {
         "message": "Fixed Wing Landing Settings"
@@ -3290,79 +3414,142 @@
         "message": "This value is used when no headwind landing is possible and wind speeds below this value are ignored (inaccuracies in INAV wind measurement)."
     },
     "osd_unsupported_msg1": {
-        "message" : "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
+        "message": "Your flight controller isn't responding to OSD commands. This probably means that it does not have an integrated OSD."
     },
     "osd_unsupported_msg2": {
-        "message" : "Note that some flight controllers have an onboard <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> that can be flashed and configured with <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, however the MinimOSD cannot be configured through this interface."
+        "message": "Note that some flight controllers have an onboard <a href=\"https://www.youtube.com/watch?v=ikKH_6SQ-Tk\" target=\"_blank\">MinimOSD</a> that can be flashed and configured with <a href=\"https://github.com/ShikOfTheRa/scarab-osd/releases/latest\" target=\"_blank\">scarab-osd</a>, however the MinimOSD cannot be configured through this interface."
     },
     "osd_elements": {
-        "message" : "Elements"
+        "message": "Elements"
     },
     "osd_preview_title": {
-        "message" : "Preview <span>(drag to change position)</span>"
+        "message": "Preview <span>(drag to change position)</span>"
     },
-    "osd_preview_title_drag":{
+    "osd_preview_title_drag": {
         "message": ""
     },
     "osd_video_format": {
-        "message" : "Video Format"
+        "message": "Video Format"
     },
     "osd_craft_name": {
-        "message" : "Craft Name"
+        "message": "Craft Name"
     },
-    "osd_pilot_name" : {
-        "message" : "Pilot's Name"
+    "osd_pilot_name": {
+        "message": "Pilot's Name"
+    },
+    "osdElement_PILOT_LOGO_HELP": {
+        "message": "Shows your small pilot logo in the OSD, where you position it. This requires a custom font with your pilot logo."
+    },
+    "osd_use_pilot_logo": {
+        "message": "Use pilot logo"
+    },
+    "osd_use_large_pilot_logo_help": {
+        "message": "Use your large pilot logo with/instead of the INAV logo. This requires a custom font with your pilot logo. This is seen on the arming screen."
     },
     "osd_units": {
-        "message" : "Units"
+        "message": "Units"
     },
     "osd_main_voltage_decimals": {
-        "message" : "Voltage Decimals"
+        "message": "Voltage Decimals"
     },
-    "osd_mah_used_precision": {
-        "message" : "mAh Used Precision"
+    "osd_mah_precision": {
+        "message": "mAh Precision"
     },
     "osd_coordinate_digits": {
-        "message" : "Coordinate Digits"
+        "message": "Coordinate Digits"
     },
     "osd_plus_code_digits": {
-        "message" : "Plus Code Digits"
+        "message": "Plus Code Digits"
     },
     "osd_plus_code_short": {
-        "message" : "Plus Code Remove Leading Digits"
+        "message": "Plus Code Remove Leading Digits"
     },
     "osd_esc_rpm_precision": {
-      "message": "ESC RPM precision"
+        "message": "ESC RPM precision"
     },
     "osd_esc_rpm_precision_help": {
         "message": "The number of digits shown in the RPM display. If the RPM is higher than the number of digits, it will be shown in thousand RPM with as many decimal places as allowed."
-      },
+    },
     "osd_crosshairs_style": {
-        "message" : "Crosshairs Style"
+        "message": "Crosshairs Style"
     },
     "osd_horizon_offset": {
-        "message" : "AHI & HUD offset"
+        "message": "AHI & HUD offset"
     },
-    "osd_horizon_offset_help" : {
-        "message" : "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span style='color:red;'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
+    "osd_horizon_offset_help": {
+        "message": "Move the HUD and AHI up or down on the OSD to get it level with the actual horizon. The AHI can appear high or low depending on the camera angle in flight. <span style='color:red;'>NOTE: </span> This does not work with the Pixel OSD. For that use the `osd_ahi_vertical_offset` command in the CLI."
     },
     "osd_left_sidebar_scroll": {
-        "message" : "Left Sidebar Scroll"
+        "message": "Left Sidebar Scroll"
     },
     "osd_right_sidebar_scroll": {
-        "message" : "Right Sidebar Scroll"
+        "message": "Right Sidebar Scroll"
     },
     "osd_crsf_lq_format": {
-        "message" : "Crossfire LQ Format"
+        "message": "Crossfire LQ Format"
     },
     "osd_sidebar_scroll_arrows": {
-        "message" : "Sidebar Scroll Arrows"
+        "message": "Sidebar Scroll Arrows"
     },
     "osd_home_position_arm_screen": {
-        "message" : "Home Position on Arming Screen"
+        "message": "Home Position on Arming Screen"
     },
+    "osd_hud_settings": {
+        "message": "Heads up Display settings"
+    },
+    "osd_hud_settings_HELP": {
+        "message": "This section allows tweaking the behavior of HUD elements."
+    },
+    "osd_hud_radar_disp": {
+        "message": "Maximum number of radar elements on screen."
+    },
+    "osd_hud_radar_disp_help": {
+        "message": "This is used for INAV Radar/FormationFlight. 0 disables this feature."
+    },
+
+    "osd_hud_radar_range_min": {
+        "message": "Minimum radar range"
+    },
+    "osd_hud_radar_range_min_help": {
+        "message": "Radar aircrafts closer than this will not be displayed in the HUD."
+    },
+
+    "osd_hud_radar_range_max": {
+        "message": "Maximum radar range"
+    },
+    "osd_hud_radar_range_max_help": {
+        "message": "Radar aircrafts further away than this will not be displayed in the HUD."
+    },
+
+
+    "osd_hud_wp_disp": {
+        "message": "Maximum number of waypoint elements on screen."
+    },
+    "osd_hud_wp_disp_help": {
+        "message": "Number of Wayponts to show on screen. 0 disables this feature."
+    },
+    "osd_camera_uptilt": {
+        "message": "Camera uptilt"
+    },
+    "osd_camera_uptilt_help": {
+        "message": "Set the camera uptilt for the FPV camera in degres, positive is up, negative is down, relative to the horizontal. Used for correct display of HUD items and AHI (when enabled)."
+    },
+    "osd_camera_fov_h": {
+        "message": "Camera Horizontal FOV"
+    },
+    "osd_camera_fov_h_help": {
+        "message": "Camera Horizontal Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+    "osd_camera_fov_v": {
+        "message": "Camera Vertical FOV"
+    },
+    "osd_camera_fov_v_help": {
+        "message": "Camera Vertical Field of View in Degrees. It is used to calculate the position of elements in the HUD display."
+    },
+
+
     "osd_alarms": {
-        "message" : "Alarms"
+        "message": "Alarms"
     },
     "osdLayoutDefault": {
         "message": "Default Layout"
@@ -3421,16 +3608,16 @@
     "osdAlarmMAX_NEG_ALTITUDE_HELP": {
         "message": "The altitude indicator will flash when altitude is negative and its absolute value is greater than this alarm. Useful when taking off from elevated places. Zero disables this alarm."
     },
-    "osd_airspeed_min_alarm" : {
+    "osd_airspeed_min_alarm": {
         "message": "Minimum Airspeed"
     },
-    "osd_airspeed_min_alarm_HELP" : {
+    "osd_airspeed_min_alarm_HELP": {
         "message": "The airspeed indicator will flash when the airspeed is below this threshold. Zero disables this alarm."
     },
-    "osd_airspeed_max_alarm" : {
+    "osd_airspeed_max_alarm": {
         "message": "Maximum Airspeed"
     },
-    "osd_airspeed_max_alarm_HELP" : {
+    "osd_airspeed_max_alarm_HELP": {
         "message": "The airspeed indicator will flash when the airspeed is above this threshold. Zero disables this alarm."
     },
     "osd_gforce_alarm": {
@@ -3965,82 +4152,82 @@
         "message": "For HD: red lines show 4:3 screen, HDZero: keep within the blue box for a higher refresh rate, AUTO/PAL: green line is NTSC limit."
     },
     "osd_dji_HD_FPV": {
-        "message" : "DJI HD FPV"
+        "message": "DJI HD FPV"
     },
-       "osd_dji_hide_unsupported": {
+    "osd_dji_hide_unsupported": {
         "message": "Hide unsupported elements"
     },
     "osd_dji_ESC_temp": {
-        "message" : "Source of <i>ESC Temperature</i>"
+        "message": "Source of <i>ESC Temperature</i>"
     },
     "osd_dji_RSSI_source": {
-        "message" : "Source of <i>RSSI</i>"
+        "message": "Source of <i>RSSI</i>"
     },
     "osd_dji_GPS_source": {
-        "message" : "Source of <i>GPS Speed</i>"
+        "message": "Source of <i>GPS Speed</i>"
     },
     "osd_dji_speed_source": {
-        "message" : "Source of <i>3D Speed</i>"
+        "message": "Source of <i>3D Speed</i>"
     },
     "osd_dji_use_craft_name_elements": {
-        "message" : "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
+        "message": "Use craft name for messages and additional elements.</span><br/>Elements in <span class=\"blue\">blue</span> appear in Craft Name."
     },
     "osd_dji_adjustments": {
-        "message" : "Show adjustments in Craft Name"
+        "message": "Show adjustments in Craft Name"
     },
     "osd_dji_cn_alternating_duration": {
-        "message" : "Craft Name alternating duration (in 1/10 sec)"
+        "message": "Craft Name alternating duration (in 1/10 sec)"
     },
     "osd_switch_indicator_settings": {
-        "message" : "Switch Indicator Settings"
+        "message": "Switch Indicator Settings"
     },
     "osd_switch_indicators_align_left": {
-        "message" : "Align switch names to left of switches"
+        "message": "Align switch names to left of switches"
     },
     "osdSwitchInd0": {
-        "message" : "Switch 1"
+        "message": "Switch 1"
     },
     "osdSwitchInd1": {
-        "message" : "Switch 2"
+        "message": "Switch 2"
     },
     "osdSwitchInd2": {
-        "message" : "Switch 3"
+        "message": "Switch 3"
     },
     "osdSwitchInd3": {
-        "message" : "Switch 4"
+        "message": "Switch 4"
     },
     "osd_font_default": {
-        "message" : "Default"
+        "message": "Default"
     },
     "osd_font_vision": {
-        "message" : "Vision"
+        "message": "Vision"
     },
     "osd_font_impact": {
-        "message" : "Impact"
+        "message": "Impact"
     },
     "osd_font_impact_mini": {
-        "message" : "Impact mini"
+        "message": "Impact mini"
     },
     "osd_font_clarity": {
-        "message" : "Clarity"
+        "message": "Clarity"
     },
     "osd_font_clarity_medium": {
-        "message" : "Clarity medium"
+        "message": "Clarity medium"
     },
     "osd_font_bold": {
-        "message" : "Bold"
+        "message": "Bold"
     },
     "osd_font_large": {
-        "message" : "Large"
+        "message": "Large"
     },
     "osd_font_load_file": {
-        "message" : "Open Font File"
+        "message": "Open Font File"
     },
     "osd_font_upload": {
-        "message" : "Upload Font"
+        "message": "Upload Font"
     },
     "osd_font_manager": {
-        "message" : "Font Manager"
+        "message": "Font Manager"
     },
     "uploadingCharacters": {
         "message": "Uploading..."
@@ -4048,8 +4235,23 @@
     "uploadedCharacters": {
         "message": "Uploaded $1 characters"
     },
+    "portsIdentifier": {
+        "message": "Identifier"
+    },
+    "portsConfiguration": {
+        "message": "Data"
+    },
+    "portsTelemetryOut": {
+        "message": "Telemetry"
+    },
+    "portsSerialRx": {
+        "message": "RX"
+    },
     "portColumnSensors": {
         "message": "Sensors"
+    },
+    "portsPeripherals": {
+        "message": "Peripherals"
     },
     "appUpdateNotificationHeader": {
         "message": "New Configurator version available."
@@ -4104,6 +4306,108 @@
     },
     "missionTotalInformationHead": {
         "message": "Total information"
+    },
+    "missionTotalInfoFilenameLoaded": {
+        "message": "Filename loaded:"
+    },
+    "missionTotalInfoDistance": {
+        "message": "Distance (m):"
+    },
+    "missionTotalInfoAvailablePoints": {
+        "message": "Available Points"
+    },
+    "missionTotalInfoMissionValid": {
+        "message": "Mission valid"
+    },
+    "missionDefaultPointAlt": {
+        "message": "Alt (cm): "
+    },
+    "missionDefaultPointSpeed": {
+        "message": "Speed (cm/s): "
+    },
+    "missionDefaultSafeRangeSH": {
+        "message": "Radius (m): "
+    },
+    "missionMultiMissionsInfo": {
+        "message": "Missions Info:"
+    },
+    "missionMultiActiveMission": {
+        "message": "Active Mission:"
+    },
+    "missionMultiMissionNo": {
+        "message": "Mission No."
+    },
+    "missionMultiUpdateAll": {
+        "message": "Update All"
+    },
+    "missionMultiAddNewMission": {
+        "message": "Add New Mission"
+    },
+    "missionLevelEarthDEMModel": {
+        "message": "Use Sea Level Earth DEM Model: "
+    },
+    "SafehomeLegend": {
+        "message": "Legend : "
+    },
+    "SafehomeMaxDistance": {
+        "message": "Max distance (m):"
+    },
+    "SafehomeSafeRadius": {
+        "message": "Safe Radius (m):"
+    },
+    "missionTitleHide": {
+        "message": "Hide"
+    },
+    "missionTitleCancel": {
+        "message": "Cancel"
+    },
+    "missionTitleSave": {
+        "message": "Save"
+    },
+    "missionTitlRemove": {
+        "message": "Remove"
+    },
+    "missionTitleLoadMissionFile": {
+        "message": "Load Mission File"
+    },
+    "missionTitleSaveMissionFile": {
+        "message": "Save Mission File"
+    },
+    "missionTitleLoadMissionFromFC": {
+        "message": "Load mission from FC"
+    },
+    "missionTitleSaveMissionToFC": {
+        "message": "Save mission to FC"
+    },
+    "missionTitleLoadEepromMission": {
+        "message": "Load Eeprom mission"
+    },
+    "missionTitleSaveEepromMission": {
+        "message": "Save Eeprom mission"
+    },
+    "missionTitleRemoveAll": {
+        "message": "Remove all"
+    },
+    "missionTitleSetActive": {
+        "message": "Set Active"
+    },
+    "missionTitleUpdateAll": {
+        "message": "Update All"
+    },
+    "missionTitleAdd": {
+        "message": "Add"
+    },
+    "missionTitleMoveToCenterView": {
+        "message": "move to center view"
+    },
+    "missionTitleSaveEepromSafehome": {
+        "message": "Save Eeprom Safehome"
+    },
+    "missionTitleLoadEepromSafehome": {
+        "message": "Load Eeprom Safehome"
+    },
+    "missionTitlEditMission": {
+        "message": "Edit Mission"
     },
     "missionRTHsettingsTitle": {
         "message": "RTH settings"
@@ -4162,6 +4466,9 @@
     "no_waypoints_to_save": {
         "message": "No waypoints to save !"
     },
+    "mixerThrottleWarning": {
+        "message": "Warning:value beyond normal operation range."
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
@@ -4195,19 +4502,19 @@
     "mixerLoadAndApplyPresetRules": {
         "message": "Load and apply"
     },
-    "mixerApplyModalTitle" : {
+    "mixerApplyModalTitle": {
         "message": "Confirm"
     },
     "mixerButtonSaveAndReboot": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
     },
-    "mixerWizardModalTitle" : {
+    "mixerWizardModalTitle": {
         "message": "Quadcopter Mixer Wizard"
     },
-    "mixerWizardModalApply" : {
+    "mixerWizardModalApply": {
         "message": "Apply"
     },
     "motorWizard0": {
@@ -4268,7 +4575,7 @@
         "message": "This will reset all PID settings to firmware default values and save.\nDo you want to continue?"
     },
     "mappingTableOutput": {
-        "message": "Output"
+        "message": "Output (timer)"
     },
     "mappingTableFunction": {
         "message": "Function"
@@ -4603,9 +4910,6 @@
     "WaypointOptionP2": {
         "message": "P2"
     },
-    "rollPitchAdjustmentsMoved": {
-        "message": "Roll & Pitch board orientation is available only in the CLI. Do not use it to trim the airplane for the level flight! Use Fixed Wing Level Trim on the PID tuning tab under Mechanics instead (<strong>fw_level_pitch_trim</strong>)."
-    },
     "pidId": {
         "message": "#"
     },
@@ -4642,12 +4946,17 @@
     "motor_direction_inverted": {
         "message": "Normal motor direction / Props In configuration"
     },
-    "motor_direction_isInverted" :
-    {
-        "message" : "Reversed motor direction / Props Out configuration"
+    "motor_direction_isInverted": {
+        "message": "Reversed motor direction / Props Out configuration"
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
+    },
+    "mixer_pid_profile_linking": {
+        "message": "PID Profile will use same index as Mixer Profile index"
+    },
+    "mixer_pid_profile_linking_hint": {
+        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want PID Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
     },
     "blackboxFields": {
         "message": "Blackbox fields"
@@ -4727,10 +5036,608 @@
     "pidTuning_MatrixFilterTypeHelp": {
         "message": "Defines the type of Matrix Filter. Default 2D filter is recommended for most users. 7-inch and larger quads may benefit from 3D filter."
     },
-    "nmeaWarning": {
-        "message": "NMEA protocol is deprecated and might be removed in the future. Please use UBLOX or UBLOX7 protocol instead."
-    },
     "softSerialWarning": {
         "message": "It is not advisable to use softserial for flight critical devices like GPS or receiver, or high traffic devices like MSP DisplayPort."
+    },
+    "ledStripColorSetupTitle": {
+        "message": "Color setup"
+    },
+    "ledStripH": {
+        "message": "H"
+    },
+    "ledStripS": {
+        "message": "S"
+    },
+    "ledStripV": {
+        "message": "V"
+    },
+    "ledStripRemainingText": {
+        "message": "Remaining"
+    },
+    "ledStripClearSelectedButton": {
+        "message": "Clear selected"
+    },
+    "ledStripClearAllButton": {
+        "message": "Clear ALL"
+    },
+    "ledStripFunctionSection": {
+        "message": "LED Functions"
+    },
+    "ledStripFunctionTitle": {
+        "message": "Function"
+    },
+    "ledStripFunctionNoneOption": {
+        "message": "None"
+    },
+    "ledStripFunctionColorOption": {
+        "message": "Color"
+    },
+    "ledStripFunctionModesOption": {
+        "message": "Modes &amp; Orientation"
+    },
+    "ledStripFunctionArmOption": {
+        "message": "Arm State"
+    },
+    "ledStripFunctionBatteryOption": {
+        "message": "Battery"
+    },
+    "ledStripFunctionRSSIOption": {
+        "message": "RSSI"
+    },
+    "ledStripFunctionGPSOption": {
+        "message": "GPS"
+    },
+    "ledStripFunctionRingOption": {
+        "message": "Ring"
+    },
+    "ledStripFunctionChannelOption": {
+        "message": "Channel"
+    },
+    "ledStripColorModifierTitle": {
+        "message": "Color modifier"
+    },
+    "ledStripThrottleText": {
+        "message": "Throttle"
+    },
+    "ledStripLarsonscannerText": {
+        "message": "Larson scanner"
+    },
+    "ledStripBlinkTitle": {
+        "message": "Blink"
+    },
+    "ledStripBlinkAlwaysOverlay": {
+        "message": "Blink always"
+    },
+    "ledStripBlinkLandingOverlay": {
+        "message": "Blink on landing"
+    },
+    "ledStripStrobeText": {
+        "message": "Strobe"
+    },
+    "ledStripEnableStrobeLightEffectText": {
+        "message": "Enable strobe light effect"
+    },
+    "ledStripOverlayTitle": {
+        "message": "Overlay"
+    },
+    "ledStripWarningsOverlay": {
+        "message": "Warnings"
+    },
+    "ledStripIndecatorOverlay": {
+        "message": "Indicator"
+    },
+    "colorBlack": {
+        "message": "black"
+    },
+    "colorWhite": {
+        "message": "white"
+    },
+    "colorRed": {
+        "message": "red"
+    },
+    "colorOrange": {
+        "message": "orange"
+    },
+    "colorYellow": {
+        "message": "yellow"
+    },
+    "colorLimeGreen": {
+        "message": "lime green"
+    },
+    "colorGreen": {
+        "message": "green"
+    },
+    "colorMintGreen": {
+        "message": "mint green"
+    },
+    "colorCyan": {
+        "message": "cyan"
+    },
+    "colorLightBlue": {
+        "message": "light blue"
+    },
+    "colorBlue": {
+        "message": "blue"
+    },
+    "colorDarkViolet": {
+        "message": "dark violet"
+    },
+    "colorMagenta": {
+        "message": "magenta"
+    },
+    "colorDeepPink": {
+        "message": "deep pink"
+    },
+    "ledStripSelectChannelFromColorList": {
+        "message": "Select Channel from color list"
+    },
+    "ledStripModeColorsTitle": {
+        "message": "Mode colors"
+    },
+    "ledStripModeColorsModeOrientation": {
+        "message": "Orientation"
+    },
+    "ledStripModeColorsModeHeadfree": {
+        "message": "Headfree"
+    },
+    "ledStripModeColorsModeHorizon": {
+        "message": "Horizon"
+    },
+    "ledStripModeColorsModeAngle": {
+        "message": "Angle"
+    },
+    "ledStripModeColorsModeMag": {
+        "message": "Mag"
+    },
+    "ledStripModeColorsModeBaro": {
+        "message": "Baro"
+    },
+
+    "ledStripDirN": {
+        "message": "N"
+    },
+    "ledStripDirE": {
+        "message": "E"
+    },
+    "ledStripDirS": {
+        "message": "S"
+    },
+    "ledStripDirW": {
+        "message": "W"
+    },
+    "ledStripDirU": {
+        "message": "U"
+    },
+    "ledStripDirD": {
+        "message": "D"
+    },
+    "ledStripModesOrientationTitle": {
+        "message": "LED Orientation and Color"
+    },
+    "ledStripModesSpecialColorsTitle": {
+        "message": "Special colors"
+    },
+    "ledStripModeColorsModeDisarmed": {
+        "message": "Disarmed"
+    },
+    "ledStripModeColorsModeArmed": {
+        "message": "Armed"
+    },
+    "ledStripModeColorsModeAnimation": {
+        "message": "Animation"
+    },
+    "ledStripModeColorsModeBlinkBg": {
+        "message": "Blink background"
+    },
+    "ledStripModeColorsModeGPSNoSats": {
+        "message": "GPS: no sats"
+    },
+    "ledStripModeColorsModeGPSNoLock": {
+        "message": "GPS: no lock"
+    },
+    "ledStripModeColorsModeGPSLocked": {
+        "message": "GPS: locked"
+    },
+    "ledStripWiring": {
+        "message": "LED Strip Wiring"
+    },
+    "ledStripWiringMode": {
+        "message": "Wire Ordering Mode"
+    },
+    "ledStripWiringClearControl": {
+        "message": "Clear selected"
+    },
+    "ledStripWiringClearAllControl": {
+        "message": "Clear ALL Wiring"
+    },
+    "ledStripWiringMessage": {
+        "message": "LEDs without wire ordering number will not be saved."
+    },
+
+
+    "mainLogoText": {
+        "message": "CONFIGURATOR"
+    },
+    "mainLogoTextFirmware": {
+        "message": "FC FIRMWARE"
+    },
+    "mainPortOverrideLabel": {
+        "message": "Port: "
+    },
+    "mainManual": {
+        "message": "Manual"
+    },
+    "sensorDataFlashNotFound": {
+        "message": "No dataflash <br>chip found"
+    },
+    "sensorDataFlashFreeSpace": {
+        "message": "Dataflash: free space"
+    },
+    "mixerProfile1": {
+        "message": "Mixer profile 1"
+    },
+    "mixerProfile2": {
+        "message": "Mixer profile 2"
+    },
+    "sensorProfile1": {
+        "message": "PID profile 1"
+    },
+    "sensorProfile2": {
+        "message": "PID profile 2"
+    },
+    "sensorProfile3": {
+        "message": "PID profile 3"
+    },
+    "sensorBatteryProfile1": {
+        "message": "Battery profile 1"
+    },
+    "sensorBatteryProfile2": {
+        "message": "Battery profile 2"
+    },
+    "sensorBatteryProfile3": {
+        "message": "Battery profile 3"
+    },
+    "sensorStatusGyro": {
+        "message": "Gyroscope"
+    },
+    "sensorStatusGyroShort": {
+        "message": "Gyro",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusAccel": {
+        "message": "Accelerometer"
+    },
+    "sensorStatusAccelShort": {
+        "message": "Accel",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusMag": {
+        "message": "Magnetometer"
+    },
+    "sensorStatusMagShort": {
+        "message": "Mag",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusBaro": {
+        "message": "Barometer"
+    },
+    "sensorStatusBaroShort": {
+        "message": "Baro",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorStatusGPS": {
+        "message": "GPS"
+    },
+    "sensorStatusGPSShort": {
+        "message": "GPS",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorOpticalFlow": {
+        "message": "Optical flow"
+    },
+    "sensorOpticalFlowShort": {
+        "message": "Flow"
+    },
+    "sensorStatusSonar": {
+        "message": "Sonar / Range finder"
+    },
+    "sensorStatusSonarShort": {
+        "message": "Sonar",
+        "description": "Text of the image in the top sensors icons. Please keep it short."
+    },
+    "sensorAirspeed": {
+        "message": "Airspeed"
+    },
+    "sensorAirspeedShort": {
+        "message": "Speed"
+    },
+    "sensorBatteryVoltage": {
+        "message": "Battery voltage"
+    },
+    "mainShowLog": {
+        "message": "Show Log"
+    },
+    "mainHideLog": {
+        "message": "Hide Log"
+    },
+    "waitingForData": {
+        "message": "Waiting for data ..."
+    },
+    "outputStatsTableAcc": {
+        "message": "Acc. noise RMS"
+    },
+    "outputStatsTableCurrent": {
+        "message": "Current [A]"
+    },
+    "outputStatsTableVoltage": {
+        "message": "Voltage [V]"
+    },
+    "LogicConditions": {
+        "message": "Logic Conditions"
+    },
+    "PIDControllers": {
+        "message": "PID Controllers"
+    },
+    "sensorsGyroSelect": {
+        "message": "Gyroscope"
+    },
+    "sensorsAccelSelect": {
+        "message": "Accelerometer"
+    },
+    "sensorsMagSelect": {
+        "message": "Magnetometer"
+    },
+    "sensorsAltitudeSelect": {
+        "message": "Barometer"
+    },
+    "sensorsSonarSelect": {
+        "message": "Sonar"
+    },
+    "sensorsAirSpeedSelect": {
+        "message": "Air speed"
+    },
+    "sensorsTemperaturesSelect": {
+        "message": "Temperatures"
+    },
+
+    "sensorsDebugSelect": {
+        "message": "Debug"
+    },
+    "sensorsDebugTrace": {
+        "message": "Open Debug Trace"
+    },
+    "sensorsGyroscope": {
+        "message": "Gyroscope - deg/s"
+    },
+    "sensorsAccelerometer": {
+        "message": "Accelerometer - g"
+    },
+    "sensorsMagnetometer": {
+        "message": "Magnetometer - Ga"
+    },
+    "sensorsBarometer": {
+        "message": "Barometer - meters"
+    },
+    "sensorsSonar": {
+        "message": "Sonar - cm"
+    },
+    "sensorsAirspeed": {
+        "message": "Air speed - cm/s"
+    },
+    "sensorsTemperature0": {
+        "message": "Temperature 0 - °C"
+    },
+    "sensorsTemperature1": {
+        "message": "Temperature 1 - °C"
+    },
+    "sensorsTemperature2": {
+        "message": "Temperature 2 - °C"
+    },
+    "sensorsTemperature3": {
+        "message": "Temperature 3 - °C"
+    },
+    "sensorsTemperature4": {
+        "message": "Temperature 4 - °C"
+    },
+    "sensorsTemperature5": {
+        "message": "Temperature 5 - °C"
+    },
+    "sensorsTemperature6": {
+        "message": "Temperature 6 - °C"
+    },
+    "sensorsTemperature7": {
+        "message": "Temperature 7 - °C"
+    },
+    "sensorsTemperatureValue": {
+        "message": "value:"
+    },
+    "getRunningOS": {
+        "message": "Running - OS: <strong>"
+    },
+    "getConfiguratorVersion": {
+        "message": "Configurator: <strong>"
+    },
+    "loadedReleaseInfo": {
+        "message": "Loaded release information from GitHub."
+    },
+    "newVersionAvailable": {
+        "message": "New version available!"
+    },
+    "ReceiveTime": {
+        "message": "Receive time: "
+    },
+    "SendTime": {
+        "message": "Send time: "
+    },
+    "ErrorWritingFile": {
+        "message": "<span style=\"color: red\">Error writing file</span>"
+    },
+    "FileSaved": {
+        "message": "File saved"
+    },
+    "selectedTarget": {
+        "message": "selected target = "
+    },
+    "toggledRCs": {
+        "message": "toggled RCs"
+    },
+    "noFirmwareSelectedToLoad": {
+        "message": "<b>No firmware selected to load</b>"
+    },
+    "selectValidSerialPort": {
+        "message": "<span style=\"color: red\">Please select valid serial port</span>'"
+    },
+    "writePermissionsForFile": {
+        "message": "You don\\'t have <span style=\"color: red\">write permissions</span> for this file"
+    },
+    "automaticTargetSelect": {
+        "message": "Attempting automatic target selection"
+    },
+    "notAWAYPOINT": {
+        "message": "Previous selection was not a WAYPOINT!"
+    },
+    "startGettingSafehomePoints": {
+        "message": "Start of getting Safehome points"
+    },
+    "endGettingSafehomePoints": {
+        "message": "End of getting Safehome points"
+    },
+    "startSendingSafehomePoints": {
+        "message": "Start of sending Safehome points"
+    },
+    "endSendingSafehomePoints": {
+        "message": "End of sending Safehome points"
+    },
+    "startGetPoint": {
+        "message": "Start get point"
+    },
+    "startSendPoint": {
+        "message": "Start send point"
+    },
+    "errorReadingFileXml2jsNotFound": {
+        "message": "<span style=\"color: red\">Error reading file (xml2js not found)</span>'"
+    },
+    "errorReadingFile": {
+        "message": "<span style=\"color: red\">Error reading file</span>"
+    },
+    "errorParsingFile": {
+        "message": "<span style=\"color: red\">Error parsing file</span>"
+    },
+    "loadedSuccessfully": {
+        "message": " has been loaded successfully !"
+    },
+    "errorWritingFileXml2jsNotFound": {
+        "message": "<span style=\"color: red\">Error writing file (xml2js not found)</span>"
+    },
+    "savedSuccessfully": {
+        "message": " has been saved successfully !"
+    },
+    "endGetPoint": {
+        "message": "End get point"
+    },
+    "endSendPoint": {
+        "message": "End send point"
+    },
+    "osdSettingsSaved": {
+        "message": "OSD settings saved"
+    },
+    "failedToOpenSerialPort": {
+        "message": "<span style=\"color: red\">Failed</span> to open serial port"
+    },
+    "failedToFlash": {
+        "message": "<span style=\"color: red\">Failed</span> to flash"
+    },
+    "targetPrefetchsuccessful": {
+        "message": "Target prefetch successful: "
+    },
+    "targetPrefetchFail": {
+        "message": "Cannot prefetch target: "
+    },
+    "targetPrefetchFailDFU": {
+        "message": "Cannot prefetch target: Flight Controller in DFU"
+    },
+    "targetPrefetchFailOld": {
+        "message": "Cannot prefetch target: INAV Firmware too old"
+    },
+    "targetPrefetchFailNonINAV": {
+        "message": "Cannot prefetch target: Non-INAV Firmware"
+    },
+    "targetPrefetchFailNoPort": {
+        "message": "Cannot prefetch target: No port"
+    },
+    "timerOutputs": {
+        "message": "Timer outputs"
+    },
+    "ezTuneFilterHz": {
+        "message": "Filter Hz"
+    },
+    "ezTuneAxisRatio": {
+        "message": "Axis ratio"
+    },
+    "ezTuneResponse": {
+        "message": "Response"
+    },
+    "ezTuneDamping": {
+        "message": "Damping"
+    },
+    "ezTuneStability": {
+        "message": "Stability"
+    },
+    "ezTuneAggressiveness": {
+        "message": "Aggressiveness"
+    },
+    "ezTuneRate": {
+        "message": "Rate"
+    },
+    "ezTuneExpo": {
+        "message": "Expo"
+    },
+    "ezTuneFilterHzTips": {
+        "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
+    },
+    "ezTuneAxisRatioTips": {
+        "message": "Describes the weight/moment of inertia distribution of your UAV. The longer the frame (more mass on the front-back axis) more Axis Ratio is requires. Perfect X frame is ratio 100. Most modern frames should fit somewhere between 110 and 130. Default 110 is a good starting point."
+    },
+    "ezTuneResponseTips": {
+        "message": "This setting defines how fast the UAV will react to stick movements and gyro signal. Higher values will result in faster reaction, but also in more overshoots and oscillations. If UAV feels sluggish or has a slow wobble, increase the Response. If it has hot motors, audibly osciallates, overshoots or feels too nervous, decrease the Response. Most modern quads should beefy motors will fly best with Response below 80. Should be tuned together with Damping. It is a P-term equivalent."
+    },
+    "ezTuneDampingTips": {
+        "message": "Describes the stengths of a force that opposes any rotation speed change. It dampens roll and pitch acceleration and causes smoother and more stable flight. Your task during tuning is to find out how much you can increase it before any negative symptoms appear: hot motors, audible osciallations, overshoot. Most modern quads should accept 'Damping' up to 150-180. It is a D-term equivalent."
+    },
+    "ezTuneStabilityTips": {
+        "message": "Defines long-term stabilization strength. Most modern quads should tolerate 'Stability' even up to 120-130. Usually does not have to be tuned at all. If UAV suffers from heavy propwash during vertical descent, lowering 'Stability' might help. It is a I-term equivalent"
+    },
+    "ezTuneAggressivenessTips": {
+        "message": "Defines how fast your UAV will react to fast stick movements. Higher 'Aggressiveness' results in snappier fast manouvers. It does not affect stabilization, only stick feeling. It is a FF-term equivalent."
+    },
+    "ezTuneRateTips": {
+        "message": "Defines how fast your UAV will rotate around roll, pitch and yaw axis. Higher 'Rate' results in faster rotation. Value of 0 is the equivalent of 300dps, 100 is the equivalent of 600dps, 200 is the equivalent of 900dps."
+    },
+    "ezTuneExpoTips": {
+        "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+    },
+    "ezTunePidPreview": {
+        "message": "PID preview"
+    },
+    "ezTuneRatePreview": {
+        "message": "Rate preview"
+    },
+    "ezTuneRatePreviewAxis" : {
+        "message": "Axis"
+    },
+    "ezTuneRatePreviewRate" : {
+        "message": "Rate"
+    },
+    "ezTuneRatePreviewExpo" : {
+        "message": "Expo"
+    },
+    "ezTuneEnabledTips": {
+        "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+    },
+    "ezTuneDisclaimer": {
+        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+    },
+    "ezTuneNote": {
+        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
     }
 }

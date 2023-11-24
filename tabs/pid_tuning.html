@@ -1,7 +1,14 @@
 <!--suppress ALL -->
 <div id="content-watermark"></div>
 <div class="tab-pid_tuning toolbar_fixed_bottom">
-    <div class="content_wrapper">
+    <div id="note-wrapper" class="content_wrapper">
+        <div class="note spacebottom">
+            <div class="note_spacer">
+                <p i18n="ezTuneNote"></p>
+            </div>
+        </div>
+    </div>
+    <div id="tuning-wrapper" class="content_wrapper">
         <div class="tab_title subtab__header">
             <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDgains"></span>
             <span class="subtab__header_label" for="subtab-rates" data-i18n="pidTuning_RatesAndExpo"></span>
@@ -339,6 +346,72 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="clear-both"></div>
+            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RateDynamics"></div>
+            <div class="clear-both"></div>
+            <div class="cf_doc_version_bt"><a href="https://github.com/iNavFlight/inav/wiki/Rate-Dynamics" target="_blank" style="margin-top: -35px;">Rate Dynamics Documentation</a></div>
+
+            <div class="pid-sliders-axis" data-axis="roll">
+                <h3 data-i18n="pidTuning_RateDynamics_Sensitivity"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_sensitivity" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_sensitivity" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
+            <div class="pid-sliders-axis" data-axis="pitch">
+                <h3 data-i18n="pidTuning_RateDynamics_Correction"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_correction" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_correction" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
+            <div class="pid-sliders-axis" data-axis="yaw">
+                <h3 data-i18n="pidTuning_RateDynamics_Weight"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_Center"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_center_weight" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_RateDynamics_End"></span>
+                    <div class="number no-border">
+                        <input id="rate_dynamics_end_weight" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
         </div>
 
         <div id="subtab-filters" class="subtab__content">
@@ -617,7 +690,7 @@
         </div>
     </div>
     <div class="clear-both"></div>
-    <div class="content_toolbar">
+    <div id="tuning-footer" class="content_toolbar">
         <div class="btn save_btn">
             <a class="update" href="#" data-i18n="pidTuning_ButtonSave"></a>
         </div>

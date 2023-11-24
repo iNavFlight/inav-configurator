@@ -350,6 +350,7 @@ const mixerList = [
         enabled: true,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -373,6 +374,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.1),
             new MotorMixRule(1.0, 0.0, 0.0, -0.1)
@@ -399,6 +401,7 @@ const mixerList = [
         enabled: true,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -427,6 +430,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
@@ -456,6 +460,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -486,6 +491,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
@@ -516,6 +522,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -542,6 +549,7 @@ const mixerList = [
         legacy: false,
         platform: PLATFORM_AIRPLANE,
         hasFlaps: true,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -568,6 +576,7 @@ const mixerList = [
         enabled: false,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [],
         servoMixer: []
     }, // 24

@@ -112,8 +112,13 @@ SYM.GLIDE_RANGE = 0xD4;
 SYM.FLIGHT_MINS_REMAINING = 0xDA;
 SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.ODOMETER = 0X168;
+SYM.PILOT_LOGO_SML_L = 0x1D5;
+SYM.PILOT_LOGO_SML_C = 0x1D6;
+SYM.PILOT_LOGO_SML_R = 0x1D7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -423,9 +428,11 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
-function osdmAhdrawnPreview() {
-    let precision = Settings.getInputValue('osd_mah_used_precision');
-    let preview = "1215075".substring(0, precision);
+function osdmAhPrecisionPreview() {
+    let precision = Settings.getInputValue('osd_mah_precision');
+    let rnd = (Math.floor(10000000000000 + Math.random() * 90000000000000)).toString();
+    rnd = rnd.replace('0', '');
+    let preview = rnd.substring(0, precision);
 
     return preview + FONT.symbol(SYM.MAH);
 }
@@ -857,6 +864,11 @@ OSD.constants = {
                     preview: '[PILOT_NAME]'
                 },
                 {
+                    name: 'PILOT_LOGO',
+                    id: 146,
+                    preview: FONT.symbol(SYM.PILOT_LOGO_SML_L) + FONT.symbol(SYM.PILOT_LOGO_SML_C) + FONT.symbol(SYM.PILOT_LOGO_SML_R)
+                },
+                {
                     name: 'FLYMODE',
                     id: 7,
                     preview: 'ACRO'
@@ -996,6 +1008,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 144,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
@@ -1305,7 +1323,7 @@ OSD.constants = {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        return osdmAhdrawnPreview();
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1326,7 +1344,7 @@ OSD.constants = {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
                     preview: function() {
-                        return '1276' + FONT.symbol(SYM.MAH); // 4 chars
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1552,6 +1570,22 @@ OSD.constants = {
                                 return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
                                 return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
+                {
+                    name: 'ODOMETER',
+                    id: 145,
+                    min_version: '6.1.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00016.9') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00014.7') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00027.2') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
@@ -2155,7 +2189,7 @@ OSD.updateDisplaySize = function () {
     $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
     $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
     $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
-    
+
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
@@ -3090,7 +3124,7 @@ TABS.osd.initialize = function (callback) {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log('OSD settings saved');
+                GUI.log(chrome.i18n.getMessage('osdSettingsSaved'));
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
@@ -3103,7 +3137,7 @@ TABS.osd.initialize = function (callback) {
         chrome.storage.local.get('showOSDGuides', function (result) {
             if (typeof result.showOSDGuides !== 'undefined') {
                 isGuidesChecked = result.showOSDGuides;
-            }     
+            }
         });
 
         // Setup switch indicators
@@ -3278,7 +3312,7 @@ TABS.osd.initialize = function (callback) {
                             });
                         } else {
                             console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log('You don\'t have <span style="color: red">write permissions</span> for this file');
+                            GUI.log(chrome.i18n.getMessage('writePermissionsForFile'));
                         }
                     });
                 });
@@ -3355,7 +3389,7 @@ function refreshOSDSwitchIndicators() {
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);
     let foundCraftName = ($('#craft_name').val() == undefined);
-    
+
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
     })[0];
@@ -3407,7 +3441,7 @@ function updatePanServoPreview() {
     let servoRules = SERVO_RULES;
     $('#panServoOutput option').each(function() {
         let servoIndex = $(this).val();
-        
+
         if (servoIndex === "0") {
             $(this).text("OFF");
         } else {
