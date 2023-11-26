@@ -1541,7 +1541,7 @@ TABS.mission_control.initialize = function (callback) {
          // * @param {Object=} opt_options Control options.
          // */
         app.PlannerMultiMissionControl = function (opt_options) {
-            
+
             var options = opt_options || {};
             var button = document.createElement('button');
 
@@ -1847,7 +1847,7 @@ TABS.mission_control.initialize = function (callback) {
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
 
-                
+
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
                     if (dictOfLabelParameterPoint[selectedMarker.getAction()][j] != '') {
@@ -2114,7 +2114,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointP3Alt').on('change', function (event) {
             if (selectedMarker) {
                 P3Value = selectedMarker.getP3();
-                
+
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
                 }
@@ -2124,18 +2124,26 @@ TABS.mission_control.initialize = function (callback) {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
+
                     if (P3Value != selectedMarker.getP3()) {
                         selectedMarker.setP3(P3Value);
-                        
+
+                        let groundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                        if (isNaN(groundClearance)) {
+                            groundClearance = settings.alt; // use default altitude if no current ground clearance
+                        }
+
                         if ($('#pointP3Alt').prop("checked")) {
-                            if (altitude < 0) {
-                                altitude = settings.alt;
-                            }
-                            selectedMarker.setAlt(altitude + elevationAtWP * 100);
+                            selectedMarker.setAlt(groundClearance + elevationAtWP * 100);
                         } else {
-                            selectedMarker.setAlt(altitude - Number(elevationAtWP) * 100);
+                            let elevationAtHome = HOME.getAlt();
+                            if (isNaN(elevationAtHome)) {
+                                elevationAtHome = elevationAtWP;
+                            }
+                            selectedMarker.setAlt(groundClearance + 100 * (elevationAtWP - elevationAtHome));
                         }
                     }
+
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
                     selectedMarker.setAlt(returnAltitude);
                     $('#pointAlt').val(selectedMarker.getAlt());
@@ -2158,7 +2166,7 @@ TABS.mission_control.initialize = function (callback) {
 
                 P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
                 selectedMarker.setP3(P3Value);
-    
+
                 mission.updateWaypoint(selectedMarker);
                 mission.update(singleMissionActive());
                 redrawLayer();
@@ -2185,7 +2193,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
                 }
-    
+
                 P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
@@ -2200,7 +2208,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (disableMarkerEdit) {
                     changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
                 }
-    
+
                 P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
                 selectedMarker.setP3(P3Value);
 
@@ -2833,7 +2841,11 @@ TABS.mission_control.initialize = function (callback) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
-                    altitude = settings.alt + 100 * (elevation - elevationAtHome);
+                    let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                    if (isNaN(currentGroundClearance) || selectedMarker == null) {
+                        currentGroundClearance = settings.alt;  // use default altitude if no current ground clearance
+                    }
+                    altitude = currentGroundClearance + 100 * (elevation - elevationAtHome);
                 }
             }
             groundClearance = altitude / 100 + (elevationAtHome - elevation);
