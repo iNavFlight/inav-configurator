@@ -567,7 +567,6 @@ $(document).ready(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
             GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
-            updateActivatedTab();
         });
     });
 
@@ -577,7 +576,6 @@ $(document).ready(function () {
         var batteryprofile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [batteryprofile], false, function () {
             GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1]));
-            updateActivatedTab();
         });
     });
 });
