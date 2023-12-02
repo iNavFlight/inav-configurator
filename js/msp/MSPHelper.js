@@ -2944,7 +2944,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
-    self.sendTimerOutputModes = function(callback) {
+    self.sendTimerOutputModes = function(onCompleteCallback) {
         var nextFunction = send_next_output_mode;
         var idIndex = 0;
 

@@ -4355,6 +4355,12 @@
     "SafehomeSafeRadius": {
         "message": "Safe Radius (m):"
     },
+    "SafehomeFwAppraoch": {
+        "message": "FW Approach:"
+    },
+    "safehomeEdit": {
+        "message": "Edit Safehome"
+    },
     "missionTitleHide": {
         "message": "Hide"
     },
@@ -4396,7 +4402,7 @@
     },
     "missionTitleAdd": {
         "message": "Add"
-    },
+    }, 
     "missionTitleMoveToCenterView": {
         "message": "move to center view"
     },
@@ -4408,6 +4414,60 @@
     },
     "missionTitlEditMission": {
         "message": "Edit Mission"
+    },
+    "MissionPlannerFwLAndingAltitudeChangeReset": {
+        "message": "Altitude below min land altitude. Change ignored" 
+    },
+    "missionWpType": {
+        "message": "Type:"
+    },
+    "missionWpLat": {
+        "message": "Lat:"
+    },
+    "missionWpLon": {
+        "message": "Lon:"
+    },
+    "missionSeaLevelRef": {
+        "message": "Sea level Ref: "
+    },
+    "missionElevation": {
+        "message": "Elevation (m):"
+    },
+    "missionNA": {
+        "message": "N/A"
+    },
+    "missionGroundDist": {
+        "message": "Grd Dist (m):"
+    },
+    "missionParameter1": {
+        "message": "Parameter 1:"
+    },
+    "missionParameter2": {
+        "message": "Parameter 2:"
+    },
+    "missionUserActions": {
+        "message": "User Actions:"
+    },
+    "missionFwLandingSettings": {
+        "message": "Fixed Wing landing settings:"
+    },
+    "missionFwApproachAlt": {
+        "message": "Approach Alt: (cm):"
+    },
+    "missionFwLandAlt": {
+        "message": "Land Alt: (cm):"
+    },
+    "missionFwApproachDir": {
+        "message": "Approach direction:"
+    },
+    "missionFwLandHeading1": {
+        "message": "Heading 1: (deg):"
+    },
+    "missionFwLandHeading2": {
+        "message": "Heading 2: (deg):"
+    },
+    "missionExclusive": {
+        "message": "Excl."
     },
     "missionRTHsettingsTitle": {
         "message": "RTH settings"
