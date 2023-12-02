@@ -1281,7 +1281,7 @@ var FC = {
                     38: "Active MixerProfile",
                     39: "MixerTransition Active",
                     40: "Yaw [deg]",
-                    38: "FW Land State"
+                    41: "FW Land State"
                 }
             },
             3: {

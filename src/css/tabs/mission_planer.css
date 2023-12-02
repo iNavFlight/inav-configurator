@@ -525,9 +525,6 @@
 .tab-mission-control .textLegend{
     margin:2px;
 }
-.tab-mission-control .valueLegend{
-    float:right;
-}
 
 .tab-mission-control .userActionContainer {
     display: inline-block;

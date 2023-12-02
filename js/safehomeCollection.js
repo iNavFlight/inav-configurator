@@ -76,7 +76,7 @@ let SafehomeCollection = function () {
             buffer.push(specificByte(safehome.getLon(), 2));
             buffer.push(specificByte(safehome.getLon(), 3));
         } else {
-            buffer = Array(24).fill(0);
+            buffer = Array(10).fill(0);
             buffer[0] = safehomeId;
         }
         
