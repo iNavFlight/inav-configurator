@@ -420,6 +420,45 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         return (parseInt(weight) + 100) * 1000 / 200 + 1000;
     }
 
+
+    function labelMotorNumbers() {
+
+        let index = 0;
+        var rules
+
+        if (currentMixerPreset.id == loadedMixerPresetID) {
+            rules = MOTOR_RULES.get();
+        } else {
+            rules = currentMixerPreset.motorMixer;
+        }
+
+        for (const i in rules) {
+            if (rules.hasOwnProperty(i)) {
+                const rule = rules[i];
+                index++;
+
+                if (currentMixerPreset.image != 'quad_x') {
+                    $("#motorNumber"+index).css("visibility", "hidden");
+                    continue;
+                }
+
+                let top_px = 30;
+                let left_px = 28;
+                if (rule.getRoll() < -0.5) {
+                  left_px = $("#motor-mixer-preview-img").width() - 42;
+                }
+
+                if (rule.getPitch() > 0.5) {
+                  top_px = $("#motor-mixer-preview-img").height() - 42;
+                }
+                $("#motorNumber"+index).css("left", left_px + "px");
+                $("#motorNumber"+index).css("top", top_px + "px");
+                $("#motorNumber"+index).css("visibility", "visible");
+            }
+        }
+    }
+
+
     function renderMotorMixRules() {
 
         /*
@@ -483,6 +522,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
         }
+        labelMotorNumbers();
         localize();
     }
 
@@ -590,7 +630,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                         r.getYaw()
                     )
                 );
-                
+
             }
 
             renderMotorMixRules();
@@ -669,7 +709,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
             updateRefreshButtonStatus();
-
+            labelMotorNumbers();
             updateMotorDirection();
         });
 
