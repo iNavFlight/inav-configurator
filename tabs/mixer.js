@@ -29,7 +29,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotorMixRules,
         mspHelper.loadOutputMappingExt,
         mspHelper.loadTimerOutputModes,
-        mspHelper.loadLogicConditions
+        mspHelper.loadLogicConditions,
+        mspHelper.loadEzTune,
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
