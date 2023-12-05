@@ -400,6 +400,7 @@ TABS.mission_control.initialize = function (callback) {
     var disableMarkerEdit = false;
     var selectedFwApproachWp = null;
     var selectedFwApproachSh = null;
+    var lockShExclHeading = false;
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -1391,7 +1392,8 @@ TABS.mission_control.initialize = function (callback) {
 
     function renderSafeHomeOptions()  {
         if (selectedSafehome && selectedFwApproachSh) {
-                    
+            
+            lockShExclHeading = true;
             if (!$('#missionPlannerSafehome').is(':visible')) {
                 $('#missionPlannerSafehome').fadeIn(300);
             }
@@ -1426,6 +1428,7 @@ TABS.mission_control.initialize = function (callback) {
             changeSwitchery($('#safehomeLandHeading2Excl'), selectedFwApproachSh.getLandHeading2() < 0);
             $('#safehomeLandAltM').text(selectedFwApproachSh.getLandAltAsl() / 100 + " m");
             $('#safehomeApproachAltM').text(selectedFwApproachSh.getApproachAltAsl() / 100 + " m");
+            lockShExclHeading = false;
         } else {
             $('#SafehomeContentBox').hide();
         }
@@ -2134,7 +2137,7 @@ TABS.mission_control.initialize = function (callback) {
             }
             else if (selectedFeature && tempMarker.kind == "safehome" && tempMarker.selection) {
                 updateSelectedShAndFwAp(tempMarker.number);
-                renderSafeHomeOptions();               
+                //renderSafeHomeOptions();               
             }
             else if (selectedFeature && tempMarker.kind == "home" && tempMarker.selection) {
                 selectedMarker = HOME;
@@ -2821,7 +2824,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#safehomeLandHeading1Excl').on('change', event => {
-            if (selectedFwApproachSh) {
+            if (selectedFwApproachSh && !lockShExclHeading) {
                 selectedFwApproachSh.setLandHeading1(selectedFwApproachSh.getLandHeading1() * -1);
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
@@ -2852,7 +2855,7 @@ TABS.mission_control.initialize = function (callback) {
         
 
         $('#safehomeLandHeading2Excl').on('change', event => {
-            if (selectedFwApproachSh) {
+            if (selectedFwApproachSh && !lockShExclHeading) {
                 selectedFwApproachSh.setLandHeading2(selectedFwApproachSh.getLandHeading2() * -1);
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
