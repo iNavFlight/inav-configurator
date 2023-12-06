@@ -58,14 +58,6 @@ helper.defaultsDialog = (function () {
                 value: "PT3"
             },
             {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -271,14 +263,6 @@ helper.defaultsDialog = (function () {
                 value: "PT3"
             },
             {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -460,14 +444,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "dterm_lpf_type",
                 value: "PT3"
-            },
-            {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
             },
             {
                 key: "dynamic_gyro_notch_enabled",
