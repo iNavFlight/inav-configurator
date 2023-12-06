@@ -2949,7 +2949,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = callback;
+                nextFunction = onCompleteCallback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
