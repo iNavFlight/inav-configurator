@@ -1145,19 +1145,20 @@ helper.defaultsDialog = (function () {
     privateScope.setSettings = function (selectedDefaultPreset) {
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
+
         //Save analytics
         googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
         Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
             return mspHelper.getSetting(input.key);
         }).then(function () {
             Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-                if (FC.isControlProfileParameter(input.key)) {
-                    return privateScope.setSettingForAllControlProfiles(input.key, input.value);
-                } else if (FC.isBatteryProfileParameter(input.key)) {
-                    return privateScope.setSettingForAllBatteryProfiles(input.key, input.value);
-                } else {
-                    return mspHelper.setSetting(input.key, input.value);
-                }
+                // if (FC.isControlProfileParameter(input.key)) {
+                    // return privateScope.setSettingForAllControlProfiles(input.key, input.value);
+                // } else if (FC.isBatteryProfileParameter(input.key)) {
+                    // return privateScope.setSettingForAllBatteryProfiles(input.key, input.value);
+                // } else {
+                return mspHelper.setSetting(input.key, input.value);
+                // }
             }).then(function () {
 
                 // If default preset is associated to a mixer, apply the mixer as well
@@ -1181,18 +1182,24 @@ helper.defaultsDialog = (function () {
                         mspHelper.sendServoMixer(function () {
                             mspHelper.sendMotorMixer(function () {
                                 MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
+                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, function() {
+                                        privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile)
+                                    });
                                 });
                             });
                         });
                     });
                     
                 } else {
-                    MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
-                    });
+                    privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile);
                 }
             })
+        });
+    };
+
+    privateScope.setOriginalProfile = function (selectedDefaultPreset, currentBatteryProfile, currentControlProfile) {
+        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
         });
     };
 
