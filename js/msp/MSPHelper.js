@@ -68,6 +68,7 @@ var mspHelper = (function (gui) {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
+                let profile_changed = false;
                 CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 CONFIG.i2cError = data.getUint16(offset, true);
@@ -76,15 +77,28 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 CONFIG.cpuload = data.getUint16(offset, true);
                 offset += 2;
+
                 profile_byte = data.getUint8(offset++)
-                CONFIG.profile = profile_byte & 0x0F;
-                CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
-                profile_byte = data.getUint8(offset++)
-                CONFIG.mixer_profile = profile_byte & 0x0F;
+                let profile = profile_byte & 0x0F;
+                profile_changed |= (profile !== CONFIG.profile) && (CONFIG.profile !==-1);
+                CONFIG.profile = profile;
+
+                let battery_profile = (profile_byte & 0xF0) >> 4;
+                profile_changed |= (battery_profile !== CONFIG.battery_profile) && (CONFIG.battery_profile !==-1);
+                CONFIG.battery_profile = battery_profile;
+
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
+                
+                //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
+                //read mixer profile as the last byte in the the message
+                profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
+                let mixer_profile = profile_byte & 0x0F;
+                profile_changed |= (mixer_profile !== CONFIG.mixer_profile) && (CONFIG.mixer_profile !==-1);
+                CONFIG.mixer_profile = mixer_profile;
+
                 gui.updateStatusBar();
-                gui.updateProfileChange();
+                gui.updateProfileChange(profile_changed);
                 break;
 
             case MSPCodes.MSP_ACTIVEBOXES:
@@ -2910,7 +2924,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
-    self.sendTimerOutputModes = function(callback) {
+    self.sendTimerOutputModes = function(onCompleteCallback) {
         var nextFunction = send_next_output_mode;
         var idIndex = 0;
 
@@ -2935,7 +2949,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = callback;
+                nextFunction = onCompleteCallback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);

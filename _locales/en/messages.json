@@ -1552,7 +1552,7 @@
         "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
     },
     "pidTuning_ButtonSave": {
-        "message": "Save"
+        "message": "Save and Reboot"
     },
     "pidTuning_ButtonRefresh": {
         "message": "Refresh"
@@ -2220,7 +2220,7 @@
         "message": "Blackbox configuration"
     },
     "blackboxButtonSave": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "serialLogging": {
         "message": "Outboard serial logging device"
@@ -4452,7 +4452,7 @@
         "message": "Confirm"
     },
     "mixerButtonSaveAndReboot": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
