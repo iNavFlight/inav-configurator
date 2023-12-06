@@ -1152,13 +1152,13 @@ helper.defaultsDialog = (function () {
             return mspHelper.getSetting(input.key);
         }).then(function () {
             Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-                // if (FC.isControlProfileParameter(input.key)) {
-                    // return privateScope.setSettingForAllControlProfiles(input.key, input.value);
-                // } else if (FC.isBatteryProfileParameter(input.key)) {
-                    // return privateScope.setSettingForAllBatteryProfiles(input.key, input.value);
-                // } else {
-                return mspHelper.setSetting(input.key, input.value);
-                // }
+                if (FC.isControlProfileParameter(input.key)) {
+                    return privateScope.setSettingForAllControlProfiles(input.key, input.value);
+                } else if (FC.isBatteryProfileParameter(input.key)) {
+                    return privateScope.setSettingForAllBatteryProfiles(input.key, input.value);
+                } else {
+                    return mspHelper.setSetting(input.key, input.value);
+                }
             }).then(function () {
 
                 // If default preset is associated to a mixer, apply the mixer as well
