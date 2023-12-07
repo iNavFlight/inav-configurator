@@ -1063,7 +1063,7 @@
         "message": "Idle Throttle Delay"
     },
     "configurationLaunchIdleDelayHelp": {
-        "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0 [0-60000]"
+        "message": "Set a time delay between raising the throttle for the launch, and the motor starting at idle throttle. Default: 0s [0-60s]"
     },
     "configurationLaunchMotorDelay": {
         "message": "Motor Delay"
@@ -1081,19 +1081,19 @@
         "message": "Minimum Launch Time"
     },
     "configurationLaunchMinTimeHelp": {
-        "message": "Allow launch mode to execute at least this time [ms] and ignore stick movements. Default: 0 [0-60000]"
+        "message": "Allow launch mode to execute at least this time and ignore stick movements. Default: 0s [0-60s]"
     },
     "configurationLaunchTimeout": {
         "message": "Launch Timeout"
     },
     "configurationLaunchTimeoutHelp": {
-        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5000 [0-60000]"
+        "message": "Maximum time for launch sequence to be executed. After this time LAUNCH mode will be turned off and regular flight mode will take over. Default: 5s [0-60s]"
     },
     "configurationLaunchEndTime": {
         "message": "End Transition Time"
     },
     "configurationLaunchEndTimeHelp": {
-        "message": "Smooth transition time at the end of the launch (ms). This is added to the Launch Timeout. Default: 2000 [0-5000]"
+        "message": "Smooth transition time at the end of the launch. This is added to the Launch Timeout. Default: 2s [0-5s]"
     },
     "configurationLaunchMaxAltitude": {
         "message": "Maximum Altitude"
@@ -2531,7 +2531,7 @@
         "message": "<strong>Note:</strong> When Stage 2 is DISABLED, the fallback setting <strong>Auto</strong> is used instead of the user settings for all flightchannels (Roll, Pitch, Yaw and Throttle)."
     },
     "failsafeDelayItem": {
-        "message": "Guard time for activation after signal lost [For deciseconds (ds): 1 = 0.1 sec.]"
+        "message": "Guard time for activation after signal lost"
     },
     "failsafeDelayHelp": {
         "message": "Time for stage 1 to wait for recovery"
@@ -2540,7 +2540,7 @@
         "message": "Throttle value used while landing"
     },
     "failsafeOffDelayItem": {
-        "message": "Delay for turning off the Motors during Failsafe [For deciseconds (ds):1 = 0.1 sec.]"
+        "message": "Delay for turning off the Motors during Failsafe"
     },
     "failsafeOffDelayHelp": {
         "message": "Time to stay in landing mode untill the motors are turned off and the craft is disarmed"
@@ -2576,7 +2576,7 @@
         "message": "Failsafe Minimum Distance in centimeters"
     },
     "failsafeMinDistanceHelp": {
-        "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in centimeters away from Home. For example if set to 2000 centimeters (20 meters), and the craft is at 13 meters, the Failsafe Minimum Distance Procedure will be followed. When the craft is at 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
+        "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in centimeters away from Home. For example if set to 20 meters, and the craft is at 13 meters, the Failsafe Minimum Distance Procedure will be followed. When the craft is at 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times."
     },
     "failsafeMinDistanceProcedureItem": {
         "message": "Failsafe Minimum Distance Procedure"
@@ -2973,10 +2973,10 @@
         "message": "Maximum horizonal velocity allowed for pilot manual control during POSHOLD/CRUISE mode"
     },
     "posholdMaxClimbRate": {
-        "message": "Max. navigation climb rate [cm/s]"
+        "message": "Max. navigation climb rate [m/s]"
     },
     "posholdMaxManualClimbRate": {
-        "message": "Max. ALTHOLD climb rate [cm/s]"
+        "message": "Max. ALTHOLD climb rate [m/s]"
     },
     "posholdMaxBankAngle": {
         "message": "Multirotor max. banking angle"
@@ -3111,7 +3111,7 @@
         "message": "Safe Home Max Distance"
     },
     "rthSafeHomeDistanceHelp": {
-        "message": "In order for a safehome to be used, it must be less than this distance [in cm] from the arming point."
+        "message": "In order for a safehome to be used, it must be less than this distance from the arming point."
     },
     "navMaxAltitude": {
         "message": "Max Altitude for Navigation"
@@ -3135,7 +3135,7 @@
         "message": "Climb First Stage Altitude"
     },
     "rthTwoStageAltHelp": {
-        "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-65000cm]"
+        "message": "Altitude Setting for the first Stage of Staged RTH. Set to 0 to Disable Two-Stage RTH [0-650m]"
     },
     "rthUseLinearDescent": {
         "message": "Use Linear Descent"
@@ -3210,13 +3210,13 @@
         "message": "Max. Alt-hold climb rate"
     },
     "navManualClimbRateHelp": {
-        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode [cm/s]"
+        "message": "Maximum climb/descent rate firmware is allowed when processing pilot input for ALTHOLD control mode"
     },
     "navAutoClimbRate": {
         "message": "Max. navigation climb rate"
     },
     "navAutoClimbRateHelp": {
-        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes. [cm/s]"
+        "message": "Maximum climb/descent rate that UAV is allowed to reach during navigation modes."
     },
     "maxDiveAngle": {
         "message": "Max. navigation dive angle"
@@ -3294,7 +3294,7 @@
         "message": "Cruise speed"
     },
     "cruiseSpeedHelp": {
-        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in cm/s"
+        "message": "Speed for the plane/wing at cruise throttle used for remaining flight time/distance estimation in km/h"
     },
     "rthEnergyMargin": {
         "message": "RTH energy margin"
@@ -3318,7 +3318,7 @@
         "message": "Enforce Altitude at Waypoint"
     },
     "wpEnforceAltHelp": {
-        "message": "Ensures that the altitude at each waypoint is reached before continue to the next one. Craft will hold position [loiter for fixed wing] and climb/decent until the altitude is within the set range [1-2000 cm] from the waypoint altitude. Set to [0] to disable. Fixed wing crafts should not be set below 500cm."
+        "message": "Ensures that the altitude at each waypoint is reached before continue to the next one. Craft will hold position [loiter for fixed wing] and climb/decent until the altitude is within the set range [1-20m] from the waypoint altitude. Set to 0 to disable. Fixed wing crafts should not be set below 5m."
     },
     "waypointRadius": {
         "message": "Waypoint radius"
