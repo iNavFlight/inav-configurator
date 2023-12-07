@@ -1302,6 +1302,9 @@
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP DisplayPort"
     },
+    "portsFunction_SBUS_OUTPUT": {
+        "message": "SBus Output"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
