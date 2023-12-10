@@ -29,7 +29,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotorMixRules,
         mspHelper.loadOutputMappingExt,
         mspHelper.loadTimerOutputModes,
-        mspHelper.loadLogicConditions
+        mspHelper.loadLogicConditions,
+        mspHelper.loadEzTune,
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -170,8 +171,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             motors.push(outputPad);
                         } else {
                             let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
+                            if (servo == null) {continue;}
                             let divID = "servoPreview" + omIndex[1];
-
+                            
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
                                 case STABILIZED_PITCH_POSITIVE:
@@ -435,7 +437,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $motorMixTableBody.append('\
                     <tr>\
                     <td><span class="mix-rule-motor"></span></td>\
-                    <td><input type="number" class="mix-rule-throttle" step="0.001" min="0" max="1" /></td>\
+                    <td>\
+                        <input type="number" class="mix-rule-throttle" step="0.001" min="-2" max="2" />\
+                        <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>\
+                    </td>\
                     <td><input type="number" class="mix-rule-roll" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-pitch" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-yaw" step="0.001" min="-2" max="2" /></td>\
@@ -446,9 +451,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const $row = $motorMixTableBody.find('tr:last');
 
                 $row.find('.mix-rule-motor').html(index);
-                $row.find('.mix-rule-throttle').val(rule.getThrottle()).change(function () {
-                    rule.setThrottle($(this).val());
-                });
+                const $throttleInput = $row.find('.mix-rule-throttle').val(rule.getThrottle());
+                const $warningBox = $row.find('.throttle-warning-text');
+    
+                // Function to update throttle and show/hide warning box
+                function updateThrottle() {
+                    rule.setThrottle($throttleInput.val());
+                    // Change color if value exceeds 1
+                    if (parseFloat($throttleInput.val()) > 1 || parseFloat($throttleInput.val()) < 0) {
+                        $throttleInput.css('background-color', 'orange');
+                        // Show warning box
+                        $warningBox.show();
+                    } else {
+                        $throttleInput.css('background-color', ''); // Reset to default
+                        // Hide warning box
+                        $warningBox.hide();
+                    }
+                }
+                updateThrottle();
+                $throttleInput.change(updateThrottle);
+
                 $row.find('.mix-rule-roll').val(rule.getRoll()).change(function () {
                     rule.setRoll($(this).val());
                 });
@@ -645,6 +667,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             } else {
                 $('#motor_direction_inverted').parent().addClass("is-hidden");
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
+            }
+
+            if (!updateEzTuneTabVisibility(false)) {
+                EZ_TUNE.enabled = 0;
+                mspHelper.saveEzTune();
             }
 
             updateRefreshButtonStatus();

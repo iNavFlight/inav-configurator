@@ -58,14 +58,6 @@ helper.defaultsDialog = (function () {
                 value: "PT3"
             },
             {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -271,14 +263,6 @@ helper.defaultsDialog = (function () {
                 value: "PT3"
             },
             {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -460,14 +444,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "dterm_lpf_type",
                 value: "PT3"
-            },
-            {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
             },
             {
                 key: "dynamic_gyro_notch_enabled",
@@ -822,10 +798,6 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-            {
-                key: "motorstop_on_low",
-                value: "ON"
-            },
         ],
     },
     {
@@ -1039,10 +1011,6 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
-            {
-                key: "motorstop_on_low",
-                value: "ON"
-            },
         ],
     },
     {
@@ -1177,6 +1145,7 @@ helper.defaultsDialog = (function () {
     privateScope.setSettings = function (selectedDefaultPreset) {
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
+
         //Save analytics
         googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
         Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
@@ -1201,6 +1170,7 @@ helper.defaultsDialog = (function () {
                     
                     MIXER_CONFIG.platformType = currentMixerPreset.platform;
                     MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+                    MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
                     MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
                     SERVO_RULES.cleanup();
@@ -1212,18 +1182,24 @@ helper.defaultsDialog = (function () {
                         mspHelper.sendServoMixer(function () {
                             mspHelper.sendMotorMixer(function () {
                                 MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
+                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, function() {
+                                        privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile)
+                                    });
                                 });
                             });
                         });
                     });
                     
                 } else {
-                    MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
-                    });
+                    privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile);
                 }
             })
+        });
+    };
+
+    privateScope.setOriginalProfile = function (selectedDefaultPreset, currentBatteryProfile, currentControlProfile) {
+        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
         });
     };
 
