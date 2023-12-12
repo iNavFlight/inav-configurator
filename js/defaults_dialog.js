@@ -1174,10 +1174,9 @@ helper.defaultsDialog = (function () {
         var chain = [];
 
         miscSettings.forEach(input => {
-            chain.push(setSetting);
-            function setSetting(callback) {
+            chain.push(function (callback) {
                 mspHelper.setSetting(input.key, input.value, callback);
-            }
+            });
         });
 
         for (var i = 0; i < 3; i++ ) {
@@ -1185,10 +1184,9 @@ helper.defaultsDialog = (function () {
                 MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [i], false, callback);
             });
             controlProfileSettings.forEach(input => {
-                chain.push(setSetting);
-                function setSetting(callback) {
+                chain.push(function (callback) {
                     mspHelper.setSetting(input.key, input.value, callback);
-                }
+                });
             });
         }
 
@@ -1197,10 +1195,9 @@ helper.defaultsDialog = (function () {
                 MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [i], false, callback);
             });
             batterySettings.forEach(input => {
-                chain.push(setSetting);
-                function setSetting(callback) {
+                chain.push(function (callback) {
                     mspHelper.setSetting(input.key, input.value, callback);
-                }
+                });
             });
         }
         
