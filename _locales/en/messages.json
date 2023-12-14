@@ -1876,7 +1876,7 @@
         "message": "Pos Z P Adjustment"
     },
     "adjustmentsFunction43": {
-        "message": "Pos Z I Adjustment"
+        "message": "Vel Z P Adjustment"
     },
     "adjustmentsFunction44": {
         "message": "Pos Z D Adjustment"
@@ -1894,13 +1894,13 @@
         "message": "Vel XY D Adjustment"
     },
     "adjustmentsFunction49": {
-        "message": "Vel Z P Adjustment"
+        "message": "Accel Z P Adjustment"
     },
     "adjustmentsFunction50": {
-        "message": "Vel Z I Adjustment"
+        "message": "Accel Z I Adjustment"
     },
     "adjustmentsFunction51": {
-        "message": "Vel Z D Adjustment"
+        "message": "Accel Z D Adjustment"
     },
     "adjustmentsFunction52": {
         "message": "FW min thr down pitch angle Adjustment"
@@ -3956,14 +3956,17 @@
     "osdElement_POS_XY_PIDS": {
         "message": "Position XY PIDs"
     },
-    "osdElement_POS_Z_PIDS": {
+    "osdElement_POS_Z_P": {
         "message": "Position Z Proportional"
     },
     "osdElement_VEL_XY_PIDS": {
         "message": "Velocity XY PIDs"
     },
-    "osdElement_VEL_Z_PIDS": {
+    "osdElement_VEL_Z_P": {
         "message": "Velocity Z Proportional"
+    },
+    "osdElement_ACC_Z_PIDS": {
+        "message": "Acceleration Z PIDs"
     },
     "osdElement_FW_ALT_PID_OUTPUTS": {
         "message": "FW Altitude PID controller outputs"
@@ -3977,8 +3980,11 @@
     "osdElement_MC_VEL_Y_PID_OUTPUTS": {
         "message": "MC Velocity Y PID controller outputs"
     },
-    "osdElement_MC_VEL_Z_PID_OUTPUTS": {
+    "osdElement_MC_VEL_Z_P_OUTPUT": {
         "message": "MC Velocity Z Proportional controller output"
+    },
+    "osdElement_MC_ACCEL_Z_PID_OUTPUTS": {
+        "message": "MC Acceleration Z PID controller output"
     },
     "osdElement_MC_POS_XYZ_P_OUTPUTS": {
         "message": "MC Position XYZ Proportional controllers outputs"

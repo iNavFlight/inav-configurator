@@ -163,7 +163,7 @@
                             <td><input class="controlProfileHighlight" type="number" class="rpy_ff" name="ff" step="1" min="0" max="255" /></td>
                         </tr>
                     </table>
-                    <table id="pid_baro" class="pid_tuning">
+                    <table id="pid_baroMC" class="pid_tuning">
                         <tr>
                             <th colspan="5">
                                 <div class="pid_mode" data-i18n="pidTuning_Altitude"></div>
@@ -183,6 +183,29 @@
                         </tr>
                         <tr class="ACELZ" data-pid-bank-position="11">
                             <!-- 11 -->
+                            <td></td>
+                            <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input class="controlProfileHighlight" type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input class="controlProfileHighlight" type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <table id="pid_baro" class="pid_tuning">
+                        <tr>
+                            <th colspan="5">
+                                <div class="pid_mode" data-i18n="pidTuning_Altitude"></div>
+                            </th>
+                        </tr>
+                        <tr class="POSZ" data-pid-bank-position="3">
+                            <!-- 3 -->
+                            <td></td>
+                            <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>
+                            <td><input class="controlProfileHighlight" type="number" name="i" step="1" min="0" max="255" /></td>
+                            <td><input class="controlProfileHighlight" type="number" name="d" step="1" min="0" max="255" /></td>
+                            <td></td>
+                        </tr>
+                        <tr class="VELZ" data-pid-bank-position="9">
+                            <!-- 9 -->
                             <td></td>
                             <td><input class="controlProfileHighlight" type="number" name="p" step="1" min="0" max="255" /></td>
                             <td><input class="controlProfileHighlight" type="number" name="i" step="1" min="0" max="255" /></td>

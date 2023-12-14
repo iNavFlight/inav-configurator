@@ -112,7 +112,11 @@ TABS.pid_tuning.initialize = function (callback) {
         $('#pid_accel').show();
       }
       if (have_sensor(sensors_detected, 'baro')) {
-        $('#pid_baro').show();
+        if(FC.isMultirotor()) {
+            $('#pid_baroMC').show();
+        } else {
+            $('#pid_baro').show();
+        }
       }
       if (have_sensor(sensors_detected, 'mag')) {
         $('#pid_mag').show();
@@ -121,7 +125,11 @@ TABS.pid_tuning.initialize = function (callback) {
         $('#pid_gps').show();
       }
       if (have_sensor(sensors_detected, 'sonar')) {
-        $('#pid_baro').show();
+        if(FC.isMultirotor()) {
+            $('#pid_baroMC').show();
+        } else {
+            $('#pid_baro').show();
+        }
       }
     }
     function process_html() {

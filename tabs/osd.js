@@ -1871,19 +1871,24 @@ OSD.constants = {
                     preview: 'PXY  20  15  80'
                 },
                 {
-                    name: 'POS_Z_PIDS',
-                    id: 58,
-                    preview: 'PZ   20  15  80'
-                },
-                {
                     name: 'VEL_XY_PIDS',
-                    id: 59,
+                    id: 60,
                     preview: 'VXY  20  15  80'
                 },
                 {
-                    name: 'VEL_Z_PIDS',
-                    id: 60,
-                    preview: 'VZ   20  15  80'
+                    name: 'POS_Z_P',
+                    id: 58,
+                    preview: 'PZ  10'
+                },
+                {
+                    name: 'VEL_Z_P',
+                    id: 59,
+                    preview: 'VZ  50'
+                },
+                {
+                    name: 'ACC_Z_PIDS',
+                    id: 147,
+                    preview: 'AZ  5  10  0'
                 },
                 {
                     name: 'HEADING_P',
@@ -2011,6 +2016,11 @@ OSD.constants = {
                     preview: 'PXYO ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
                 },
                 {
+                    name: 'MC_POS_XYZ_P_OUTPUTS',
+                    id: 84,
+                    preview: 'POSO ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0')
+                },
+                {
                     name: 'MC_VEL_X_PID_OUTPUTS',
                     id: 81,
                     preview: 'VXO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
@@ -2021,14 +2031,14 @@ OSD.constants = {
                     preview: 'VYO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
                 },
                 {
-                    name: 'MC_VEL_Z_PID_OUTPUTS',
+                    name: 'MC_VEL_Z_P_OUTPUT',
                     id: 83,
-                    preview: 'VZO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0') + ' ' + FONT.embed_dot('  1.3')
+                    preview: 'VZO  ' + FONT.embed_dot('  1.2')
                 },
                 {
-                    name: 'MC_POS_XYZ_P_OUTPUTS',
-                    id: 84,
-                    preview: 'POSO ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0')
+                    name: 'MC_ACCEL_Z_PID_OUTPUTS',
+                    id: 148,
+                    preview: 'AZO  ' + FONT.embed_dot('  1.2') + ' ' + FONT.embed_dot('  0.1') + ' ' + FONT.embed_dot('  0.0')
                 },
             ]
         }
