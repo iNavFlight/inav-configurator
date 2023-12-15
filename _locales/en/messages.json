@@ -1879,7 +1879,7 @@
         "message": "Vel Z P Adjustment"
     },
     "adjustmentsFunction44": {
-        "message": "Pos Z D Adjustment"
+        "message": "Pos Z D Adjustment (FW Only)"
     },
     "adjustmentsFunction45": {
         "message": "Heading P Adjustment"
@@ -1925,6 +1925,9 @@
     },
     "adjustmentsFunction59": {
         "message": "Multi Mission Index Adjustment"
+    },
+    "adjustmentsFunction60": {
+        "message": "Pos Z I Adjustment (FW Only)"
     },
     "adjustmentsSave": {
         "message": "Save"
