@@ -160,6 +160,19 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function process_html() {
+        if(FC.isMultirotor()) {
+            $('#alt_accel_p_adjMC').show();
+            $('#alt_accel_i_adjMC').show();
+            $('#alt_accel_d_adjMC').show();
+            $('#alt_pos_i_adjFW').hide();
+            $('#alt_pos_d_adjFW').hide();
+        } else {
+            $('#alt_pos_i_adjFW').show();
+            $('#alt_pos_d_adjFW').show();
+            $('#alt_accel_p_adjMC').hide();
+            $('#alt_accel_i_adjMC').hide();
+            $('#alt_accel_d_adjMC').hide();
+        }
 
         var auxChannelCount = RC.active_channels - 4;
 

@@ -105,32 +105,43 @@ TABS.pid_tuning.initialize = function (callback) {
 
     }
     function hideUnusedPids(sensors_detected) {
-      $('.tab-pid_tuning table.pid_tuning').hide();
-      $('#pid_main').show();
+        $('.tab-pid_tuning table.pid_tuning').hide();
+        $('#pid_main').show();
+        
+        // This condition prevents the multirotor PID tuning box from duplicating with the PID tuning box of the airplane, rover and boat profile when the user clicks on the "Show All PIDs" button
+        if(FC.isMultirotor()) {
+            $("#pid_baro").remove(); // Removes the PID tuning box from the airplane, rover and boat when the profile is multirotor
+        } else {
+            $('#pid_baroMC').remove(); // Removes the multirotor PID tuning box when the profile is airplane, rover and boat
+        }
 
-      if (have_sensor(sensors_detected, 'acc')) {
-        $('#pid_accel').show();
-      }
-      if (have_sensor(sensors_detected, 'baro')) {
-        if(FC.isMultirotor()) {
-            $('#pid_baroMC').show();
-        } else {
-            $('#pid_baro').show();
+        if (have_sensor(sensors_detected, 'acc')) {
+            $('#pid_accel').show();
         }
-      }
-      if (have_sensor(sensors_detected, 'mag')) {
-        $('#pid_mag').show();
-      }
-      if (bit_check(FEATURES, 7)) {
-        $('#pid_gps').show();
-      }
-      if (have_sensor(sensors_detected, 'sonar')) {
-        if(FC.isMultirotor()) {
-            $('#pid_baroMC').show();
-        } else {
-            $('#pid_baro').show();
+      
+        if (have_sensor(sensors_detected, 'baro')) {
+            if(FC.isMultirotor()) {
+                $('#pid_baroMC').show();
+            } else {
+                $('#pid_baro').show();
+            }
         }
-      }
+
+        if (have_sensor(sensors_detected, 'mag')) {
+            $('#pid_mag').show();
+        }
+
+        if (bit_check(FEATURES, 7)) {
+            $('#pid_gps').show();
+        }
+
+        if (have_sensor(sensors_detected, 'sonar')) {
+            if(FC.isMultirotor()) {
+                $('#pid_baroMC').show();
+            } else {
+                $('#pid_baro').show();
+            }
+        }
     }
     function process_html() {
         // translate to user-selected language
