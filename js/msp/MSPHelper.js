@@ -1496,6 +1496,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES:
                 console.log('OSD preferences saved');
                 break;
+            case MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE:
+                console.log('Battery profile selected');
+                break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
@@ -2969,7 +2972,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = callback;
+                nextFunction = onCompleteCallback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
@@ -3362,6 +3365,12 @@ var mspHelper = (function (gui) {
 
     self.encodeSetting = function (name, value) {
         return this._getSetting(name).then(function (setting) {
+            
+            if (!setting) {
+                console.log("Setting invalid: " + name);
+                return null;
+            }
+
             if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
@@ -3409,7 +3418,11 @@ var mspHelper = (function (gui) {
 
     self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+            if (data) {
+                return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+            } else {
+                return Promise.resolve().then(callback);
+            }
         });
     };
 

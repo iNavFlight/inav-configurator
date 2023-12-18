@@ -1443,8 +1443,6 @@ var FC = {
             'max_angle_inclination_pit',
             'dterm_lpf_hz',
             'dterm_lpf_type',
-            'dterm_lpf2_hz',
-            'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
             'fw_reference_airspeed',
