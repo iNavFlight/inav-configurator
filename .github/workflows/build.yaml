@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: [ main ]
+    tags:
+    - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download node.js
+        run: wget -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar -xJvf node-v20.10.0-linux-x64.tar.xz -C /usr/local
+      - name: Install deps
+        run: npm install
+      - name: build linux64 release
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
+      - name: build linux32 release
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
