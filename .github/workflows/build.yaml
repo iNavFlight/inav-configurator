@@ -6,11 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Install linux packages
+        run: sudo apt update && sudo apt install wine
       - name: Download node.js
-        run: wget -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar -xJvf node-v20.10.0-linux-x64.tar.xz -C /usr/local
+        run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
       - name: Install deps
         run: npm install
       - name: build linux64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
       - name: build linux32 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
+      - name: build win64 release
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64
