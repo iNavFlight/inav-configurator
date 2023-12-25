@@ -1,19 +1,17 @@
 'use strict';
 
-var child_process = require('child_process');
-var fs = require('fs');
-var path = require('path');
-var minimist = require('minimist');
-
-var archiver = require('archiver');
-var del = require('del');
-var NwBuilder = require('nw-builder');
-var semver = require('semver');
-
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-
-const commandExistsSync = require('command-exists').sync;
+import child_process from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import minimist from 'minimist';
+import archiver from 'archiver';
+import del from 'del';
+import nwbuild from 'nw-builder';
+import semver from 'semver';
+import gulp from 'gulp';
+import concat from 'gulp-concat';
+import { createRequire } from 'module';
+import commandExistsSync from 'command-exists';
 
 // Each key in the *sources* variable must be an array of
 // the source files that will be combined into a single
@@ -265,31 +263,65 @@ gulp.task('dist',  gulp.series('clean', 'dist-build'));
 
 // Create app directories in ./apps
 gulp.task('apps', gulp.series('dist', function(done) {
-    var builder = new NwBuilder({
-        files: './dist/**/*',
-        buildDir: appsDir,
-        platforms: getPlatforms(),
-        flavor: 'normal',
-        macIcns: './images/inav.icns',
-        winIco: './images/inav.ico',
-        version: get_nw_version(),
-        zip: false
-    });
-    builder.on('log', console.log);
-    builder.build(function (err) {
+
+    fs.readFile('./package.json', 'utf8', function (err, data) {
+    
         if (err) {
-            console.log("Error building NW apps:" + err);
+            console.log("Error reading package.json:" + err);
             done();
             return;
         }
-        // Package apps as .zip files
-        done();
-    });
-}));
+    
+        var pkg = JSON.parse(data);
+    
+        const version = semver.valid(semver.coerce(pkg.dependencies.nw));
+        
+        nwbuild({
+            srcDir: './dist/**/*',
+            mode: "build",
+            version: version,
+            flavor: "normal",
+            platform: "win",
+            arch: "x64",
+            outDir: appsDir,
+            cache: true,
+            zip: false,
+            app: {
+                name: pkg.description,
+                version: pkg.version,
+                icon: './images/inav.ico'
+            }
+        }).then(function () {
+            done();
+        });
 
-function get_nw_version() {
-    return semver.valid(semver.coerce(require('./package.json').dependencies.nw));
-}
+    });
+    
+    
+
+    //   done();
+
+    // var builder = new NwBuilder({
+    //     files: './dist/**/*',
+    //     buildDir: appsDir,
+    //     platforms: getPlatforms(),
+    //     flavor: 'normal',
+    //     macIcns: './images/inav.icns',
+    //     winIco: './images/inav.ico',
+    //     version: get_nw_version(),
+    //     zip: false
+    // });
+    // builder.on('log', console.log);
+    // builder.build(function (err) {
+    //     if (err) {
+    //         console.log("Error building NW apps:" + err);
+    //         done();
+    //         return;
+    //     }
+    //     // Package apps as .zip files
+    //     done();
+    // });
+}));
 
 function get_release_filename_base(platform) {
     return 'INAV-Configurator_' + platform;
