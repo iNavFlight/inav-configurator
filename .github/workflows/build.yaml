@@ -61,17 +61,17 @@ jobs:
       #continue-on-error: true
  
     - name: Upload deb
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Linux64 deb
         path: apps/*.deb
     - name: Upload rpm
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Linux64 rpm
         path: apps/*.rpm
     - name: Upload linux binary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Linux64 tar.gz
         path: apps/*.tar.gz
@@ -117,7 +117,7 @@ jobs:
     - name: build macos release
       run: node ./node_modules/gulp/bin/gulp.js release --platform=osx64 -LLLL
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{env.BUILD_NAME}} MacOSX zip
         path: apps/*.zip
@@ -162,20 +162,21 @@ jobs:
     - name: build win64 release
       run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
     - name: Upload msi
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Windows 64 msi
         path: apps/*.msi
     - name: Upload exe
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Windows 64 exe
         path: apps/*.exe
     - name: Upload zip
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_NAME }} Windows 64 zip
         path: apps/*.zip
+        compression-level: 0
  
  
  
