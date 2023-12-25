@@ -1552,7 +1552,7 @@
         "message": "Pitch trim for self-leveling flight modes. In degrees. +5 means airplane nose should be raised 5 deg from level"
     },
     "pidTuning_ButtonSave": {
-        "message": "Save and Reboot"
+        "message": "Save"
     },
     "pidTuning_ButtonRefresh": {
         "message": "Refresh"
