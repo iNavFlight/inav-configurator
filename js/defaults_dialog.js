@@ -192,6 +192,11 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
+            },
+            // Ez Tune
+            {
+                key: "ez_filter_hz",
+                value: 90
             }
         ]
     },
@@ -397,6 +402,11 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
+            },
+            // Ez Tune
+            {
+                key: "ez_filter_hz",
+                value: 110
             }
         ]
     },
@@ -584,6 +594,11 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
+            },
+            // Ez Tune
+            {
+                key: "ez_filter_hz",
+                value: 90
             }
         ]
     },
@@ -769,10 +784,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_rth_altitude",
                 value: 5000
-            },
-            {
-                key: "failsafe_mission",
-                value: "ON"
             },
             {
                 key: "nav_wp_radius",
@@ -984,10 +995,6 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
-                key: "failsafe_mission",
-                value: "ON"
-            },
-            {
                 key: "nav_wp_radius",
                 value: 5000
             },
@@ -1146,92 +1153,93 @@ helper.defaultsDialog = (function () {
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
 
+        var controlProfileSettings = [];
+        var batterySettings = [];
+        var miscSettings = [];
+
+        selectedDefaultPreset.settings.forEach(input => {
+            if (FC.isControlProfileParameter(input.key)) {
+                controlProfileSettings.push(input);
+            } else if (FC.isBatteryProfileParameter(input.key)) {
+                batterySettings.push(input);
+            } else {
+                miscSettings.push(input);
+            }
+        });
+
         //Save analytics
-        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
-        Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-            return mspHelper.getSetting(input.key);
-        }).then(function () {
-            Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-                if (FC.isControlProfileParameter(input.key)) {
-                    return privateScope.setSettingForAllControlProfiles(input.key, input.value);
-                } else if (FC.isBatteryProfileParameter(input.key)) {
-                    return privateScope.setSettingForAllBatteryProfiles(input.key, input.value);
-                } else {
-                    return mspHelper.setSetting(input.key, input.value);
-                }
-            }).then(function () {
+        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title); 
+        
+        var settingsChainer = MSPChainerClass();
+        var chain = [];
 
-                // If default preset is associated to a mixer, apply the mixer as well
-                if (selectedDefaultPreset.mixerToApply) {
-                    let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
-
-                    helper.mixer.loadServoRules(currentMixerPreset);
-                    helper.mixer.loadMotorRules(currentMixerPreset);
-                    
-                    MIXER_CONFIG.platformType = currentMixerPreset.platform;
-                    MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
-                    MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
-                    MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
-
-                    SERVO_RULES.cleanup();
-                    SERVO_RULES.inflate();
-                    MOTOR_RULES.cleanup();
-                    MOTOR_RULES.inflate();
-
-                    mspHelper.saveMixerConfig(function() {
-                        mspHelper.sendServoMixer(function () {
-                            mspHelper.sendMotorMixer(function () {
-                                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-                                    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, function() {
-                                        privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile)
-                                    });
-                                });
-                            });
-                        });
-                    });
-                    
-                } else {
-                    privateScope.setOriginalProfile(selectedDefaultPreset, currentBatteryProfile, currentControlProfile);
-                }
-            })
-        });
-    };
-
-    privateScope.setOriginalProfile = function (selectedDefaultPreset, currentBatteryProfile, currentControlProfile) {
-        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, function() {
-            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, privateScope.finalize(selectedDefaultPreset));
-        });
-    };
-
-    privateScope.setSettingForAllControlProfiles = function (key, value) {
-        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, function () {
-            mspHelper.setSetting(key, value, function() {
-                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [1], false, function () {
-                    mspHelper.setSetting(key, value, function() {
-                        MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [2], false, function () {
-                            mspHelper.setSetting(key, value);
-                        });
-                    });
-                });
+        miscSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
             });
         });
-        return;
-    };
 
-    privateScope.setSettingForAllBatteryProfiles = function (key, value) {
-        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [0], false, function () {
-            mspHelper.setSetting(key, value, function() {
-                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [1], false, function () {
-                    mspHelper.setSetting(key, value, function() {
-                        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [2], false, function () {
-                            mspHelper.setSetting(key, value);
-                        });
-                    });
+        for (var i = 0; i < 3; i++ ) {
+            chain.push(function (callback) {
+                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [i], false, callback);
+            });
+            controlProfileSettings.forEach(input => {
+                chain.push(function (callback) {
+                    mspHelper.setSetting(input.key, input.value, callback);
                 });
             });
+        }
+
+        for (var i = 0; i < 3; i++ ) {
+            chain.push(function (callback) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [i], false, callback);
+            });
+            batterySettings.forEach(input => {
+                chain.push(function (callback) {
+                    mspHelper.setSetting(input.key, input.value, callback);
+                });
+            });
+        }
+        
+        // Set Mixers
+        if (selectedDefaultPreset.mixerToApply) {
+            let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
+
+            helper.mixer.loadServoRules(currentMixerPreset);
+            helper.mixer.loadMotorRules(currentMixerPreset);
+            
+            MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+            MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+
+            SERVO_RULES.cleanup();
+            SERVO_RULES.inflate();
+            MOTOR_RULES.cleanup();
+            MOTOR_RULES.inflate();
+            
+            chain = chain.concat([
+                mspHelper.saveMixerConfig,
+                mspHelper.sendServoMixer,
+                mspHelper.sendMotorMixer
+            ]);
+        }
+            
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, callback);
         });
-        return;
-    };
+            
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, callback);
+        });
+        
+        settingsChainer.setChain(chain);
+        settingsChainer.setExitPoint(function () {
+            privateScope.finalize(selectedDefaultPreset);
+        });
+        
+        settingsChainer.execute();        
+    }
 
     privateScope.onPresetClick = function (event) {
         savingDefaultsModal = new jBox('Modal', {
