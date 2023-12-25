@@ -41,15 +41,25 @@ jobs:
         timeout_minutes: 10
     - name: Create apps folder
       run: mkdir -p apps
-    - name: build linux64 release
+    - name: build linux64
       id: build1
       uses: nick-fields/retry@v2
       with:
         max_attempts: 3
         retry_on: error
         timeout_minutes: 20
-        command: sync && node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
+        command: node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js clean && node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js build
       #continue-on-error: true
+    - name: linux64 release
+      id: release1
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        timeout_minutes: 20
+        command: node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
+      #continue-on-error: true
+ 
     - name: Upload deb
       uses: actions/upload-artifact@v3
       with:
