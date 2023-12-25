@@ -22,7 +22,16 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    ConnectionSerial.getDevices(function(current_ports) {
+    ConnectionSerial.getDevices(function(all_ports) {
+
+        // filter out ports that are not serial
+        let current_ports = [];
+        for (var i = 0; i < all_ports.length; i++) {
+            if (all_ports[i].indexOf(':') === -1) {
+                current_ports.push(all_ports[i]);
+            }
+        }
+
         // port got removed or initial_ports wasn't initialized yet
         if (self.array_difference(self.initial_ports, current_ports).length > 0 || !self.initial_ports) {
             var removed_ports = self.array_difference(self.initial_ports, current_ports);
