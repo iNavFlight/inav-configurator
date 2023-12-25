@@ -23,17 +23,17 @@ jobs:
       - name: Upload deb
         uses: actions/upload-artifact@v3
         with:
-          name: Deb files
+          name: Configurator deb
           path: apps/*.deb
       - name: Upload rpm
         uses: actions/upload-artifact@v3
         with:
-          name: Deb files
+          name: Configurator rpm
           path: apps/*.rpm
       - name: Upload linux binary
         uses: actions/upload-artifact@v3
         with:
-          name: Deb files
+          name: Configurator tar.gz
           path: apps/*.tar.gz
  
   build-mac:
