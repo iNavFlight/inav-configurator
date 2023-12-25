@@ -69,38 +69,38 @@ jobs:
       with:
         name: MacOSX Binary
         path: apps/*.zip
-    build-win:
-      runs-on: windows-latest
-      steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts
-          check-latest: true
-          cache: 'npm'
-      - name: Install deps
-        uses: nick-fields/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          command: npm install
-      - name: build win64 release
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
-      - name: Upload msi
-        uses: actions/upload-artifact@v3
-        with:
-          name: Configurator win64 msi
-          path: apps/*.msi
-      - name: Upload exe
-        uses: actions/upload-artifact@v3
-        with:
-          name: Configurator win64 exe
-          path: apps/*.exe
-      - name: Upload zip
-        uses: actions/upload-artifact@v3
-        with:
-          name: Configurator win64 zip
-          path: apps/*.zip
+  build-win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts
+        check-latest: true
+        cache: 'npm'
+    - name: Install deps
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: npm install
+    - name: build win64 release
+      run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
+    - name: Upload msi
+      uses: actions/upload-artifact@v3
+      with:
+        name: Configurator win64 msi
+        path: apps/*.msi
+    - name: Upload exe
+      uses: actions/upload-artifact@v3
+      with:
+        name: Configurator win64 exe
+        path: apps/*.exe
+    - name: Upload zip
+      uses: actions/upload-artifact@v3
+      with:
+        name: Configurator win64 zip
+        path: apps/*.zip
  
  
  
