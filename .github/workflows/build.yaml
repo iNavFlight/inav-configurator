@@ -17,11 +17,11 @@ jobs:
       - name: List files
         run: ls -lR .
       - name: build linux64 release
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
       - name: List files 2
         run: ls -lR .
       - name: build win64 release
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 --installer
       - name: List files 3
         run: ls -lR .
       - name: Upload artifacts
