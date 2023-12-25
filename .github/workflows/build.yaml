@@ -21,6 +21,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           command: npm install
+          timeout_minutes: 10
       - name: Create apps folder
         run: mkdir -p apps
       - name: build linux64 release
@@ -60,6 +61,7 @@ jobs:
         max_attempts: 3
         retry_on: error
         command: npm install
+        timeout_minutes: 10
     - name: Create apps folder
       run: mkdir -p apps
     - name: build macos release
@@ -84,6 +86,7 @@ jobs:
         max_attempts: 3
         retry_on: error
         command: npm install
+        timeout_minutes: 10
     - name: build win64 release
       run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
     - name: Upload msi
