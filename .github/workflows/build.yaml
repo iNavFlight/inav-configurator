@@ -26,7 +26,12 @@ jobs:
         run: mkdir -p apps
       - name: build linux64 release
         id: build1
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          timeout_minutes: 20
+          command: sync && node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
         continue-on-error: true
       - name: build linux64 release 2
         id: build2
