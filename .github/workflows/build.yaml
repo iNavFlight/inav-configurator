@@ -8,22 +8,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: lts
+        check-latest: true
           cache: 'npm'
       - name: Install linux packages
         run: sudo apt-get update && sudo apt-get install wine devscripts sbuild rpm
       #- name: Download node.js
       #  run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
       - name: Install deps
-        run: npm install
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          command: npm install
       - name: Create apps folder
         run: mkdir -p apps
-      - name: List files
-        run: ls -lR .
       - name: build linux64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
-      - name: List files 2
-        run: ls -lR .
       - name: Upload deb
         uses: actions/upload-artifact@v3
         with:
@@ -46,22 +47,23 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: lts
+        check-latest: true
         cache: 'npm'
     - name: Install  packages
       run: brew install nodejs
     #- name: Download node.js
     #  run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
     - name: Install deps
-      run: npm install
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: npm install
     - name: Create apps folder
       run: mkdir -p apps
-    - name: List files
-      run: ls -lR .
     - name: build macos release
       run: node ./node_modules/gulp/bin/gulp.js release --platform=osx64 -LLLL
-    - name: List files 2
-      run: ls -lR .
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -69,10 +71,39 @@ jobs:
         path: apps/*.zip
  
 
-#  build-win:
-#      runs-on: windows-latest
-#      steps:
-#      - uses: actions/checkout@v3
-#      - name: Install windows packages
-#        run: brew install nodejs
+  build-win:
+      runs-on: windows-latest
+      steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts
+          check-latest: true
+          cache: 'npm'
+      - name: Install deps
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          command: npm install
+      - name: build win64 release
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
+      - name: Upload msi
+        uses: actions/upload-artifact@v3
+        with:
+          name: Configurator win64 msi
+          path: apps/*.msi
+      - name: Upload exe
+        uses: actions/upload-artifact@v3
+        with:
+          name: Configurator win64 exe
+          path: apps/*.exe
+      - name: Upload zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: Configurator win64 zip
+          path: apps/*.zip
+ 
+ 
+ 
  
