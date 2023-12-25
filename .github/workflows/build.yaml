@@ -52,8 +52,8 @@ jobs:
       run: brew install nodejs
     #- name: Download node.js
     #  run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
-    #- name: Install deps
-    #  run: npm install
+    - name: Install deps
+      run: npm install
     - name: Create apps folder
       run: mkdir -p apps
     - name: List files
