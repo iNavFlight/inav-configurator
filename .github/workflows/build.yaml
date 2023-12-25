@@ -20,12 +20,51 @@ jobs:
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
       - name: List files 2
         run: ls -lR .
-      - name: build win64 release
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 --installer
-      - name: List files 3
-        run: ls -lR .
-      - name: Upload artifacts
+      - name: Upload deb
         uses: actions/upload-artifact@v3
         with:
-          name: Binaries
-          path: apps/*.{zip,rpm,deb,pkg,dmg,tar.gz}
+          name: Deb files
+          path: apps/*.deb
+      - name: Upload rpm
+        uses: actions/upload-artifact@v3
+        with:
+          name: Deb files
+          path: apps/*.rpm
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: Deb files
+          path: apps/*.tar.gz
+ 
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install  packages
+      run: brew install nodejs
+    - name: Download node.js
+      run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
+    - name: Install deps
+      run: npm install
+    - name: Create apps folder
+      run: mkdir -p apps
+    - name: List files
+      run: ls -lR .
+    - name: build macos release
+      run: node ./node_modules/gulp/bin/gulp.js release --platform=osx64 -LLLL
+    - name: List files 2
+      run: ls -lR .
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: MacOSX Binary
+        path: apps/*.zip
+ 
+
+#  build-win:
+#      runs-on: windows-latest
+#      steps:
+#      - uses: actions/checkout@v3
+#      - name: Install windows packages
+#        run: brew install nodejs
+ 
