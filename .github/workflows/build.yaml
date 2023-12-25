@@ -3,7 +3,7 @@ on: pull_request
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: debian-latest
     steps:
     - uses: actions/checkout@v4
     - name: Setup environment
@@ -20,6 +20,7 @@ jobs:
         COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
         BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
         VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+        echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
         echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
         echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
     - uses: actions/setup-node@v4
@@ -135,6 +136,7 @@ jobs:
         COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
         BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
         VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+        echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
         echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
         echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
       shell: bash
