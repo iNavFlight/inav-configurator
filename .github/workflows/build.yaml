@@ -15,7 +15,7 @@ jobs:
       - name: Create apps folder
         run: mkdir -p apps
       - name: build linux64 release
-        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
+        run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL
       - name: build win64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=win64
       - name: Upload artifacts
