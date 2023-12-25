@@ -119,6 +119,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install linux utils
+      run: choco install --force -y awk grep sed
     - name: Setup environment
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -132,7 +134,7 @@ jobs:
         # why we try github.event.pull_request.head.sha first
         set COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
         set BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
-        set VERSION=$(grep version package.json | cut -d: -f2 | sed 's/[",]//g' | awk '{print $1}')
+        set VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
         echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
         echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
 
