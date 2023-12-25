@@ -48,12 +48,12 @@ jobs:
         max_attempts: 3
         retry_on: error
         timeout_minutes: 20
-        command: sync && node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
+        command: sync && node ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
       continue-on-error: true
     - name: build linux64 release 2
       id: build2
       if: steps.build1.outcome == 'failure'
-      run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL --installer
+      run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
     - name: Upload deb
       uses: actions/upload-artifact@v3
       with:
