@@ -12,6 +12,8 @@ jobs:
         run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
       - name: Install deps
         run: npm install
+      - name: Create apps folder
+        run: mkdir -p apps
       - name: build linux64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64
       - name: build win64 release
