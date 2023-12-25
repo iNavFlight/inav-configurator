@@ -18,6 +18,8 @@ jobs:
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL
       - name: build win64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=win64
+      - name: List files
+        run: ls -lR .
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
