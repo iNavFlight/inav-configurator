@@ -597,18 +597,6 @@ function post_release_deb(arch) {
             done();
             return null;
         }
-        if ((arch === 'linux32') || (arch === 'linux64')) {
-            var rename = require("gulp-rename");
-            const metadata = require('./package.json');
-            const renameFrom = path.join(appsDir, metadata.name + '_' + metadata.version + '_' + getLinuxPackageArch('.deb', arch) + '.deb');
-            const renameTo = path.join(appsDir, get_release_filename_base(arch) + '_' + metadata.version + '.deb');
-            // Rename .deb build to common naming
-            console.log(`Renaming .deb installer ${renameFrom} to ${renameTo}`);
-            return gulp.src(renameFrom)
-                    .pipe(rename(renameTo))
-                    .pipe(gulp.dest("."));
-        }
-
         return done();
     }
 }
