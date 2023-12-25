@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts
-        check-latest: true
+          check-latest: true
           cache: 'npm'
       - name: Install linux packages
         run: sudo apt-get update && sudo apt-get install wine devscripts sbuild rpm
@@ -69,9 +69,7 @@ jobs:
       with:
         name: MacOSX Binary
         path: apps/*.zip
- 
-
-  build-win:
+    build-win:
       runs-on: windows-latest
       steps:
       - uses: actions/checkout@v3
