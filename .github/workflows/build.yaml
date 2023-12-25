@@ -14,11 +14,15 @@ jobs:
         run: npm install
       - name: Create apps folder
         run: mkdir -p apps
+      - name: List files
+        run: ls -lR .
       - name: build linux64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=linux64 -LLLL
+      - name: List files 2
+        run: ls -lR .
       - name: build win64 release
         run: node ./node_modules/gulp/bin/gulp.js release --platform=win64
-      - name: List files
+      - name: List files 3
         run: ls -lR .
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
