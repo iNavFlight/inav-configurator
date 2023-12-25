@@ -5,11 +5,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
       - name: Install linux packages
         run: sudo apt-get update && sudo apt-get install wine devscripts sbuild rpm
-      - name: Download node.js
-        run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
+      #- name: Download node.js
+      #  run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
       - name: Install deps
         run: npm install
       - name: Create apps folder
@@ -39,13 +43,17 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
     - name: Install  packages
       run: brew install nodejs
-    - name: Download node.js
-      run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
-    - name: Install deps
-      run: npm install
+    #- name: Download node.js
+    #  run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
+    #- name: Install deps
+    #  run: npm install
     - name: Create apps folder
       run: mkdir -p apps
     - name: List files
