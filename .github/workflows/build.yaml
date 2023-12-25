@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install linux packages
-        run: sudo apt update && sudo apt install wine win32
+        run: sudo apt-get update && sudo apt-get install wine
       - name: Download node.js
         run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
       - name: Install deps
