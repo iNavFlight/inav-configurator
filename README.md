@@ -8,23 +8,23 @@ Various types of aircraft are supported by the tool and by INAV, e.g. quadcopter
 
 # Support
 
-INAV Configurator comes `as is`, without any warranty and support from authors. If you found a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
+INAV Configurator comes `as is`, without any warranty and support from the authors. If you find a bug, please create an issue on [GitHub](https://github.com/iNavFlight/inav-configurator/issues).
 
-The GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to setup
-everything, the hardware is not working or have any other _support_ problem, please consult:
+The GitHub issue tracker is reserved for bugs and other technical problems. If you do not know how to set up
+everything, the hardware is not working, or you have any other _support_ problem, please consult:
 
 * [INAV Discord Server](https://discord.gg/peg2hhbYwN)
 * [INAV Official on Facebook](https://www.facebook.com/groups/INAVOfficial)
 * [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [INAV Official on Telegram](https://t.me/INAVFlight)
 
-## INAV Configurator start minimized, what should I do?
+## INAV Configurator starts minimized, what should I do?
 
 You have to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
 
 [https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
 
-Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script that will do the cleaning. (thank you James Cherrill)
+Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script that will do the cleaning. (thank you, James Cherrill)
 
 ## Installation
 
@@ -114,7 +114,7 @@ in the configurator. If new files are added, they must be included in `gulpfile.
 in the `./dist/` directory.
 - **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
 directory. Running this task on macOS or Linux requires Wine since it's needed to set the icon
-for the Windows app. If you don't have Wine installed you can create a release by running the **release-only-Linux** task.
+for the Windows app. If you don't have Wine installed, you can create a release by running the **release-only-Linux** task.
 <br>`--installer` argument can be added to build installers for a particular OS. NOTE: MacOS Installer can be built with MacOS only.
 
 To build a specific release, use the command `release --platform="win64"` for example.
@@ -160,7 +160,7 @@ INAV Configurator is shipped **WITHOUT** API key for Bing Maps. That means: ever
 
 ## Font Customisation
 
-INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analogue and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analogue** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts, and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analogue](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
+INAV provides the font images so that custom fonts can be created for your personal preference. This is the case for both analogue and digital fonts. The resources can be found in the [osd](/resources/osd) folder. Within the **analogue** and **digital** subfolders, you will find information on compiling your own fonts. There is also an [INAV Character Map](/resources/osd/INAV%20Character%20Map.md) document. This contains previews of all the character images in the fonts and the appropriate variable names within the firmware and Configurator. There are tools for compiling the [analogue](https://github.com/fiam/max7456tool) and [digital](https://github.com/MrD-RC/hdosd-font-tool) fonts. New font submissions via pull requests are welcome.
 
 ## Notes
 
@@ -174,7 +174,7 @@ For INAV configurator issues raise them here
 
 https://github.com/iNavFlight/inav-configurator/issues
 
-For INAV firmware issues raise them here
+For INAV firmware issues, raise them here
 
 https://github.com/iNavFlight/inav/issues
 

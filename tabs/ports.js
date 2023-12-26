@@ -114,6 +114,12 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1,
         defaultBaud: 57600 }
     );
+    portFunctionRules.push({
+        name: 'SBUS_OUTPUT',
+        groups: ['peripherals'],
+        maxPorts: 1,
+        defaultBaud: 115200 }
+    );
 
     for (var i = 0; i < portFunctionRules.length; i++) {
         portFunctionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + portFunctionRules[i].name);

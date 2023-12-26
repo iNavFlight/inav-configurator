@@ -1305,6 +1305,9 @@
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP DisplayPort"
     },
+    "portsFunction_SBUS_OUTPUT": {
+        "message": "SBus Output"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
@@ -2223,7 +2226,7 @@
         "message": "Blackbox configuration"
     },
     "blackboxButtonSave": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "serialLogging": {
         "message": "Outboard serial logging device"
@@ -4298,8 +4301,8 @@
     "missionMultiAddNewMission": {
         "message": "Add New Mission"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Use Sea Level Earth DEM Model: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Use Ellipsoid instead of SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
@@ -4455,7 +4458,7 @@
         "message": "Confirm"
     },
     "mixerButtonSaveAndReboot": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"

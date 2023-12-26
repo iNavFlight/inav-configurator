@@ -260,10 +260,16 @@ GUI_control.prototype.updateStatusBar = function() {
     $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
-GUI_control.prototype.updateProfileChange = function() {
+GUI_control.prototype.updateProfileChange = function(refresh) {
     $('#mixerprofilechange').val(CONFIG.mixer_profile);
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
+    if (refresh) {
+        GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
+        GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
+        GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
+        updateActivatedTab();
+    }
 };
 
 GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {
