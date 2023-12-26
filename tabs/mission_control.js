@@ -364,23 +364,14 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for default Settings
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var vMaxDistSH = 0;
-    var settings = {};
+    var settings = {speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, bingDemModel : false};
+
     if (CONFIGURATOR.connectionValid) {
         mspHelper.getSetting("safehome_max_distance").then(function (s) {
             if (s) {
-                vMaxDistSH = Number(s.value)/100;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-            }
-            else {
-                vMaxDistSH = 0;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+                settings.maxDistSH = Number(s.value)/100;
             }
         });
-    }
-    else {
-        vMaxDistSH = 0;
-        settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,6 +670,7 @@ TABS.mission_control.initialize = function (callback) {
 
         if (globalSettings.mapProviderType == 'bing') {
             $('#elevationEarthModelclass').fadeIn(300);
+            changeSwitchery($('#elevationEarthModel'), settings.bingDemModel);
         } else {
             $('#elevationEarthModelclass').fadeOut(300);
         }
@@ -2326,6 +2318,9 @@ TABS.mission_control.initialize = function (callback) {
                     redrawLayer();
                     plotElevation();
                 })()
+
+                settings.bingDemModel = $('#elevationEarthModel').prop("checked") ? true : false;
+                saveSettings();
             }
         });
 
@@ -2477,13 +2472,19 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#saveSettings').on('click', function () {
             let oldSafeRadiusSH = settings.safeRadiusSH;
-            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()), maxDistSH : vMaxDistSH};
+
+            settings.speed = Number($('#MPdefaultPointSpeed').val());
+            settings.alt = Number($('#MPdefaultPointAlt').val());
+            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
+
             saveSettings();
+
             if (settings.safeRadiusSH != oldSafeRadiusSH  && $('#showHideSafehomeButton').is(":visible")) {
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
                 $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
             }
+
             closeSettingsPanel();
         });
 

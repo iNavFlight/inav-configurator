@@ -257,6 +257,7 @@ function onValidFirmware()
 
                 $('#tabs ul.mode-connected .tab_setup a').click();
 
+                updateEzTuneTabVisibility(true);
                 updateFirmwareVersion();
             });
         });
