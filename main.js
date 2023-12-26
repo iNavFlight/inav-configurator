@@ -78,6 +78,14 @@ $(document).ready(function () {
         // Update CSS on to show highlighing or not
         updateProfilesHighlightColours();
     });
+    chrome.storage.local.get('cli_autocomplete', function (result) {
+        if (typeof result.cliAutocomplete === 'undefined') {
+            result.cli_autocomplete = 1;
+        }
+        globalSettings.cliAutocomplete = result.cli_autocomplete;
+        CliAutoComplete.setEnabled(globalSettings.cliAutocomplete);
+    });
+
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
     if (!CONFIGURATOR.connectionValid) {
@@ -371,6 +379,15 @@ $(document).ready(function () {
                     activeTab.removeClass('active');  
                     activeTab.find('a').click(); 
                 });
+                $('div.cli_autocomplete input').change(function () {
+                    globalSettings.cliAutocomplete = $(this).is(':checked');
+                    chrome.storage.local.set({
+                        'cli_autocomplete': globalSettings.cliAutocomplete
+                    });
+
+                    CliAutoComplete.setEnabled($(this).is(':checked'));
+                });
+
 
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
@@ -378,6 +395,7 @@ $(document).ready(function () {
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);   
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+                $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                 
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
