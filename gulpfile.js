@@ -574,7 +574,7 @@ function release_deb(arch) {
                 architecture: getLinuxPackageArch('deb', arch),
                 maintainer: metadata.author,
                 description: metadata.description,
-                preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${metadata.name}`],
+                preinst: [`rm -rfv ${LINUX_INSTALL_DIR}/${metadata.name}`],
                 postinst: [
                     `chown root:root ${LINUX_INSTALL_DIR}`,
                     `chown -R root:root ${LINUX_INSTALL_DIR}/${metadata.name}`,
@@ -587,6 +587,7 @@ function release_deb(arch) {
                 _out: appsDir,
                 _copyright: 'assets/linux/copyright',
                 _clean: true,
+                _verbose: true
         }));
     }
 }
