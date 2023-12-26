@@ -48,7 +48,7 @@ jobs:
         max_attempts: 3
         retry_on: error
         timeout_minutes: 20
-        command: node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js clean && node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js build
+        command: node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js clean && node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js build
       #continue-on-error: true
     - name: linux64 release
       id: release1
@@ -57,7 +57,7 @@ jobs:
         max_attempts: 3
         retry_on: error
         timeout_minutes: 20
-        command: node --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
+        command: node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
       #continue-on-error: true
  
     - name: Upload deb
@@ -115,7 +115,7 @@ jobs:
     - name: Create apps folder
       run: mkdir -p apps
     - name: build macos release
-      run: node ./node_modules/gulp/bin/gulp.js release --platform=osx64 -LLLL
+      run: node --trace-deprecation ./node_modules/gulp/bin/gulp.js release --platform=osx64
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -160,7 +160,7 @@ jobs:
         command: npm install
         timeout_minutes: 10
     - name: build win64 release
-      run: node ./node_modules/gulp/bin/gulp.js release --platform=win64 -LLLL --installer
+      run: node --trace-deprecation ./node_modules/gulp/bin/gulp.js release --platform=win64 --installer
     - name: Upload msi
       uses: actions/upload-artifact@v4
       with:
