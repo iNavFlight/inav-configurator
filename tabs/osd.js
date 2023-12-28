@@ -2689,7 +2689,7 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().size() > 0) {
+        if (groupContainer.find('.display-fields').children().length > 0) {
             $tmpl.parent().append(groupContainer);
         }
     }
