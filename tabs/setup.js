@@ -69,7 +69,10 @@ TABS.setup.initialize = function (callback) {
                     GUI.log(chrome.i18n.getMessage('initialSetupSettingsRestored'));
     
                     GUI.tab_switch_cleanup(function () {
-                        TABS.setup.initialize();
+                        MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
+                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.handleReconnect();
+                        });
                     });
                 });
             }
