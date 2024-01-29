@@ -2987,8 +2987,11 @@
     "posholdMaxPitchBankAngle": {
         "message": "Multirotor max. pitch banking angle"
     },
-    "posholdMaxBankAngleHelp": {
-        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL and PITCH angle in PID tuning tab."
+    "posholdMaxBankAngleRollHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
+    },
+    "posholdMaxBankAnglePitchHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "posholdHoverThrottle": {
         "message": "Hover throttle"
