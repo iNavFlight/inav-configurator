@@ -4893,10 +4893,10 @@
         "message": "Illegal state. Restart required."
     },
     "motor_direction_inverted": {
-        "message": "Normal motor direction / Props In configuration"
+        "message": "Normal motor direction / Props-in configuration"
     },
     "motor_direction_isInverted": {
-        "message": "Reversed motor direction / Props Out configuration"
+        "message": "Reversed motor direction / Props-out configuration"
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
