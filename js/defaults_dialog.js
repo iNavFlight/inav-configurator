@@ -370,52 +370,44 @@ helper.defaultsDialog = (function () {
                 value: "DSHOT300"
             },
             /*
-            Filtering
+            Ez Tune setup
             */
             {
-                key: "gyro_main_lpf_hz",
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
                 value: 90
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "PT1"
+                key: "ez_axis_ratio",
+                value: 110
             },
             {
-                key: "dterm_lpf_hz",
-                value: 80
+                key: "ez_response",
+                value: 101
             },
             {
-                key: "dterm_lpf_type",
-                value: "PT3"
+                key: "ez_damping",
+                value: 115
             },
             {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
+                key: "ez_stability",
+                value: 100
             },
             {
-                key: "dynamic_gyro_notch_mode",
-                value: "3D"
+                key: "ez_aggressiveness",
+                value: 100
             },
             {
-                key: "dynamic_gyro_notch_q",
-                value: 250
+                key: "ez_rate",
+                value: 134
             },
             {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 60
-            },
-            {
-                key: "setpoint_kalman_enabled",
-                value: "ON"
-            },
-            {
-                key: "setpoint_kalman_q",
-                value: 200
-            },
-            {
-                key: "smith_predictor_delay",   // Enable Smith Predictor 
-                value: 1.5
-            },   
+                key: "ez_expo",
+                value: 118
+            }, 
             /*
             Mechanics
             */
@@ -448,64 +440,6 @@ helper.defaultsDialog = (function () {
                 value: 5
             },
             /*
-            Rates
-            */
-            {
-                key: "rc_yaw_expo",
-                value: 75
-            },
-            {
-                key: "rc_expo",
-                value: 75
-            },
-            {
-                key: "roll_rate",
-                value: 70
-            },
-            {
-                key: "pitch_rate",
-                value: 70
-            },
-            {
-                key: "yaw_rate",
-                value: 60
-            },
-            /*
-            PIDs
-            */
-            {
-                key: "mc_p_pitch",
-                value: 44
-            },
-            {
-                key: "mc_i_pitch",
-                value: 85
-            },
-            {
-                key: "mc_d_pitch",
-                value: 28
-            },
-            {
-                key: "mc_p_roll",
-                value: 40
-            },
-            {
-                key: "mc_i_roll",
-                value: 75
-            },
-            {
-                key: "mc_d_roll",
-                value: 26
-            },
-            {
-                key: "mc_p_yaw",
-                value: 40
-            },
-            {
-                key: "mc_i_yaw",
-                value: 80
-            },
-            /*
              * TPA
              */
             {
@@ -527,11 +461,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
-            },
-            // Ez Tune
-            {
-                key: "ez_filter_hz",
-                value: 90
             }
         ]
     },
