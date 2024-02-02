@@ -1,7 +1,11 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
+<<<<<<< HEAD
   "version": "7.1.0",
+=======
+  "version": "7.0.0",
+>>>>>>> parent of 181ac34a (Version bump)
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
