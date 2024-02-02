@@ -138,6 +138,8 @@ sources.js = [
     './node_modules/openlayers/dist/ol.js',
     './js/libraries/plotly-latest.min.js',
     './js/sitl.js',
+    './js/CliAutoComplete.js',
+    './node_modules/jquery-textcomplete/dist/jquery.textcomplete.js'
 ];
 
 sources.receiverCss = [
