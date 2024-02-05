@@ -81,7 +81,7 @@ TABS.mission_control.initialize = function (callback) {
     var textGeom;
     let isOffline = false;
     let rthUpdateInterval = 0;    
-    let settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, fwApproachLength: 0, fwApproachAlt: 60, fwLandAlt: 5};
+    let settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, fwApproachLength: 0, fwApproachAlt: 60, fwLandAlt: 5, fwLoiterRadius:  0};
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -105,6 +105,11 @@ TABS.mission_control.initialize = function (callback) {
                     settings.maxDistSH = parseInt(data.value) / 100;    
                 }).then(callback);
             },
+            function (callback) {
+                mspHelper.getSetting(("nav_fw_loiter_radius")).then((data) => {
+                    settings.fwLoiterRadius = parseInt(data.value);
+                }).then(callback);
+            }
         ]);
         loadChainer.setExitPoint(loadHtml);
         loadChainer.execute();
@@ -636,7 +641,7 @@ TABS.mission_control.initialize = function (callback) {
         } else {
             direction = wrap_360(bearing - 90);
         }
-        var pos2 = calculate_new_cooridatnes(pos1, direction, approachLength / 2);
+        var pos2 = calculate_new_cooridatnes(pos1, direction, settings.fwLoiterRadius * 2.5);
         
         paintApproachLine(landCoord, pos2, '#0025a1', layers);
         paintApproachLine(pos2, pos1, '#0025a1', layers);
