@@ -151,6 +151,19 @@ TABS.cli.initialize = function (callback) {
         CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
+        CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
+        $(CliAutoComplete).on('build:start', function() {
+            textarea
+                .val('')
+                .attr('placeholder', chrome.i18n.getMessage('cliInputPlaceholderBuilding'))
+                .prop('disabled', true);
+        });
+        $(CliAutoComplete).on('build:stop', function() {
+            textarea
+                .attr('placeholder', chrome.i18n.getMessage('cliInputPlaceholder'))
+                .prop('disabled', false)
+                .focus();
+        });
 
         $('.tab-cli .save').click(function() {
             var prefix = 'cli';
@@ -266,12 +279,19 @@ TABS.cli.initialize = function (callback) {
             if (event.which == tabKeyCode) {
                 // prevent default tabbing behaviour
                 event.preventDefault();
-                const outString = textarea.val();
-                const lastCommand = outString.split("\n").pop();
-                const command = getCliCommand(lastCommand, self.cliBuffer);
-                if (command) {
-                    self.sendAutoComplete(command);
-                    textarea.val('');
+
+                if (!CliAutoComplete.isEnabled()) {
+                    const outString = textarea.val();
+                    const lastCommand = outString.split("\n").pop();
+                    const command = getCliCommand(lastCommand, self.cliBuffer);
+                    if (command) {
+                        self.sendAutoComplete(command);
+                        textarea.val('');
+                    }
+                }
+                else if (!CliAutoComplete.isOpen() && !CliAutoComplete.isBuilding()) {
+                    // force show autocomplete on Tab
+                    CliAutoComplete.openLater(true);
                 }
             }
         });
@@ -280,6 +300,10 @@ TABS.cli.initialize = function (callback) {
             const enterKeyCode = 13;
             if (event.which == enterKeyCode) {
                 event.preventDefault(); // prevent the adding of new line
+
+                if (CliAutoComplete.isBuilding()) {
+                    return; // silently ignore commands if autocomplete is still building
+                }
 
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
@@ -299,6 +323,10 @@ TABS.cli.initialize = function (callback) {
         textarea.keyup(function (event) {
             var keyUp = {38: true},
                 keyDown = {40: true};
+
+            if (CliAutoComplete.isOpen()) {
+                return; // disable history keys if autocomplete is open
+            }
 
             if (event.keyCode in keyUp) {
                 textarea.val(self.history.prev());
@@ -335,7 +363,7 @@ TABS.cli.initialize = function (callback) {
                 }, 400);
             } 
         }
-    
+
         GUI.content_ready(callback);
     });
 };
@@ -370,6 +398,11 @@ function writeToOutput(text) {
 }
 
 function writeLineToOutput(text) {
+    if (CliAutoComplete.isBuilding()) {
+        CliAutoComplete.builderParseLine(text);
+        return; // suppress output if in building state
+    }
+
     if (text.startsWith("### ERROR: ")) {
         writeToOutput('<span class="error_message">' + text + '</span><br>');
     } else {
@@ -444,7 +477,10 @@ TABS.cli.read = function (readInfo) {
                 this.cliBuffer += currentChar;
         }
 
-        this.outputHistory += currentChar;
+        if (!CliAutoComplete.isBuilding()) {
+            // do not include the building dialog into the history
+            this.outputHistory += currentChar;
+        }
 
         if (this.cliBuffer == 'Rebooting') {
             CONFIGURATOR.cliActive = false;
@@ -459,7 +495,16 @@ TABS.cli.read = function (readInfo) {
     if (!CONFIGURATOR.cliValid && validateText.indexOf('CLI') !== -1) {
         GUI.log(chrome.i18n.getMessage('cliEnter'));
         CONFIGURATOR.cliValid = true;
-        validateText = "";
+
+        if (CliAutoComplete.isEnabled() && !CliAutoComplete.isBuilding()) {
+            // start building autoComplete
+            CliAutoComplete.builderStart();
+        }
+    }
+
+    // fallback to native autocomplete
+    if (!CliAutoComplete.isEnabled()) {
+        setPrompt(removePromptHash(this.cliBuffer));
     }
 
     setPrompt(removePromptHash(this.cliBuffer));
@@ -498,5 +543,8 @@ TABS.cli.cleanup = function (callback) {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;
+
+        CliAutoComplete.cleanup();
+        $(CliAutoComplete).off();
     });
 };

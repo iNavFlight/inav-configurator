@@ -14,6 +14,9 @@
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
     },
+    "options_cliAutocomplete": {
+        "message": "Advanced CLI AutoComplete"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -1301,6 +1304,9 @@
     },
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP DisplayPort"
+    },
+    "portsFunction_SBUS_OUTPUT": {
+        "message": "SBus Output"
     },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
@@ -4343,8 +4349,8 @@
     "missionMultiAddNewMission": {
         "message": "Add New Mission"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Use Sea Level Earth DEM Model: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Use Ellipsoid instead of SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
@@ -5004,10 +5010,10 @@
         "message": "Illegal state. Restart required."
     },
     "motor_direction_inverted": {
-        "message": "Normal motor direction / Props In configuration"
+        "message": "Normal motor direction / Props-in configuration"
     },
     "motor_direction_isInverted": {
-        "message": "Reversed motor direction / Props Out configuration"
+        "message": "Reversed motor direction / Props-out configuration"
     },
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
