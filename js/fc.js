@@ -545,6 +545,27 @@ var FC = {
 
         SAFEHOMES = new SafehomeCollection();
 
+        RATE_DYNAMICS = {
+            sensitivityCenter: null,
+            sensitivityEnd: null,
+            correctionCenter: null,
+            correctionEnd: null,
+            weightCenter: null, 
+            weightEnd: null
+        };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
+        };
+
         FW_APPROACH = new FwApproachCollection();
     },
     getOutputUsages: function() {
