@@ -1,6 +1,8 @@
 /*global $,nwdialog*/
 'use strict';
 
+const inflection = require( 'inflection' );
+
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
 SYM.BLANK = 0x20;
@@ -114,7 +116,6 @@ SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
-SYM.ADSB = 0xFD;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 SYM.ODOMETER = 0X168;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
@@ -481,8 +482,6 @@ OSD.initData = function () {
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
             baro_temp_alarm_max: null,
-            adsb_distance_warning: null,
-            adsb_distance_alert: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
@@ -783,24 +782,6 @@ OSD.constants = {
             from_display: function(osd_data, value) { return value * 10 },
             min: -55,
             max: 125
-        },
-        {
-            name: 'ADSB_MAX_DISTANCE_WARNING',
-            field: 'adsb_distance_warning',
-            step: 1,
-            unit: "meters",
-            min: 1,
-            max: 64000,
-            min_version: '7.1.0',
-        },
-        {
-            name: 'ADSB_MAX_DISTANCE_ALERT',
-            field: 'adsb_distance_alert',
-            step: 1,
-            unit: "meters",
-            min: 1,
-            max: 64000,
-            min_version: '7.1.0',
         },
     ],
 
@@ -1676,18 +1657,6 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
                 },
                 {
-                    name: 'ADSB_WARNING_MESSAGE',
-                    id: 147,
-                    min_version: '7.1.0',
-                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
-                },
-                {
-                    name: 'ADSB_INFO',
-                    id: 148,
-                    min_version: '7.1.0',
-                    preview: FONT.symbol(SYM.ADSB) + '2',
-                },
-                {
                     name: 'CROSS TRACK ERROR',
                     id: 141,
                     min_version: '6.0.0',
@@ -2137,7 +2106,7 @@ OSD.reload = function(callback) {
         OSD.msp.decodeLayoutCounts(resp);
         // Get data for all layouts
         var ids = Array.apply(null, {length: OSD.data.layout_count}).map(Number.call, Number);
-        var layouts = Promise.mapSeries(ids, function (layoutIndex, ii) {
+        var layouts = mapSeries(ids, function (layoutIndex, ii) {
             var data = [];
             data.push8(layoutIndex);
             return MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS, data).then(function (resp) {
@@ -2297,8 +2266,6 @@ OSD.msp = {
         result.push16(OSD.data.alarms.imu_temp_alarm_max);
         result.push16(OSD.data.alarms.baro_temp_alarm_min);
         result.push16(OSD.data.alarms.baro_temp_alarm_max);
-        result.push16(OSD.data.alarms.adsb_distance_warning);
-        result.push16(OSD.data.alarms.adsb_distance_alert);
         return result;
     },
 
@@ -2318,8 +2285,6 @@ OSD.msp = {
         OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
-        OSD.data.alarms.adsb_distance_warning = alarms.read16();
-        OSD.data.alarms.adsb_distance_alert = alarms.read16();
     },
 
     encodePreferences: function() {
@@ -2576,7 +2541,7 @@ OSD.GUI.updateUnits = function() {
         if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
             continue;
         }
-        var name = chrome.i18n.getMessage(unitType.name);
+        var name = localization.getMessage(unitType.name);
         var $option = $('<option>' + name + '</option>');
         $option.attr('value', name);
         $option.data('type', unitType.value);
@@ -2589,7 +2554,7 @@ OSD.GUI.updateUnits = function() {
         var unitType = OSD.constants.UNIT_TYPES[OSD.data.preferences.units];
         var tip;
         if (unitType.tip) {
-            tip = chrome.i18n.getMessage(unitType.tip);
+            tip = localization.getMessage(unitType.tip);
         }
         if (tip) {
             $unitTip.attr('title', tip);
@@ -2630,9 +2595,9 @@ OSD.GUI.updateFields = function() {
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
         groupContainer.attr('id', group.name);
         var groupTitleContainer = groupContainer.find('.spacer_box_title');
-        var groupTitle = chrome.i18n.getMessage(group.name);
+        var groupTitle = localization.getMessage(group.name);
         groupTitleContainer.text(groupTitle);
-        var groupHelp = chrome.i18n.getMessage(group.name + '_HELP');
+        var groupHelp = localization.getMessage(group.name + '_HELP');
         if (groupHelp) {
             $('<div class="helpicon cf_tip"></div>')
                 .css('margin-top', '1px')
@@ -2656,7 +2621,7 @@ OSD.GUI.updateFields = function() {
             var $field = $('<div class="display-field field-' + item.id + '"/>');
             var name = item.name;
             var nameKey = 'osdElement_' + name;
-            var nameMessage = chrome.i18n.getMessage(nameKey);
+            var nameMessage = localization.getMessage(nameKey);
             if (nameMessage) {
                 name = nameMessage;
             } else {
@@ -2666,7 +2631,7 @@ OSD.GUI.updateFields = function() {
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
-            var help = chrome.i18n.getMessage(nameKey + '_HELP');
+            var help = localization.getMessage(nameKey + '_HELP');
             if (help) {
                 $('<div class="helpicon cf_tip"></div>')
                     .css('margin-top', '1px')
@@ -2726,7 +2691,7 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().length > 0) {
+        if (groupContainer.find('.display-fields').children().size() > 0) {
             $tmpl.parent().append(groupContainer);
         }
     }
@@ -2737,7 +2702,7 @@ OSD.GUI.updateFields = function() {
             .attr('checked', isGuidesChecked)
             .on('change', function () {
                 OSD.GUI.updateGuidesView(this.checked);
-                chrome.storage.local.set({'showOSDGuides': this.checked});
+                store.set('showOSDGuides', this.checked);
                 OSD.GUI.updatePreviews();
             })
         );
@@ -2802,7 +2767,7 @@ OSD.GUI.updateDjiMessageElements = function(on) {
 };
 
 OSD.GUI.updateGuidesView = function(on) {
-    isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
+    let isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
     $('.hd_43_margin_left').toggleClass('hdzero_43_left', (isHdZero && on))
     $('.hd_43_margin_right').toggleClass('hdzero_43_right', (isHdZero && on))
     $('.hd_3016_box_top').toggleClass('hd_3016_top', (isHdZero && on))
@@ -2810,11 +2775,11 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_3016_box_left').toggleClass('hd_3016_left', (isHdZero && on))
     $('.hd_3016_box_right').toggleClass('hd_3016_right', (isHdZero && on))
 
-    isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
+    let isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
     $('.hd_43_margin_left').toggleClass('dji_hd_43_left', (isDJIWTF && on))
     $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
 
-    isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
+    let isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
     $('.hd_43_margin_left').toggleClass('hd_avatar_43_left', (isAvatar && on))
     $('.hd_43_margin_right').toggleClass('hd_avatar_43_right', (isAvatar && on))
     $('.hd_avatar_bottom_bar').toggleClass('hd_avatar_bottom', (isAvatar && on))
@@ -2823,13 +2788,13 @@ OSD.GUI.updateGuidesView = function(on) {
     $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
     $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
 
-    isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
     $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
     $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
     $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
     $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
 
-    isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
+    let isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
     $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
 };
 
@@ -2901,7 +2866,7 @@ OSD.GUI.updatePreviews = function() {
     OSD.data.preview = [];
 
     // clear the buffer
-    for (i = 0; i < OSD.data.display_size.total; i++) {
+    for (let i = 0; i < OSD.data.display_size.total; i++) {
         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
     };
 
@@ -2938,7 +2903,7 @@ OSD.GUI.updatePreviews = function() {
         }
         var x = 0;
         var y = 0;
-        for (i = 0; i < preview.length; i++) {
+        for (let i = 0; i < preview.length; i++) {
             var charCode = preview.charCodeAt(i);
             if (charCode == '\n'.charCodeAt(0)) {
                 x = 0;
@@ -2980,7 +2945,7 @@ OSD.GUI.updatePreviews = function() {
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-        for (i = 0; i < 9; i++) {
+        for (let i = 0; i < 9; i++) {
             OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
@@ -3012,7 +2977,7 @@ OSD.GUI.updatePreviews = function() {
     if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-        for (i = -hudheight; i <= hudheight; i++) {
+        for (let i = -hudheight; i <= hudheight; i++) {
             OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
             OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
@@ -3028,7 +2993,7 @@ OSD.GUI.updatePreviews = function() {
     // render
     var $preview = $('.display-layout .preview').empty();
     var $row = $('<div class="row"/>');
-    for (i = 0; i < OSD.data.display_size.total;) {
+    for (let i = 0; i < OSD.data.display_size.total;) {
         var charCode = OSD.data.preview[i];
         var colorStyle = '';
 
@@ -3053,7 +3018,7 @@ OSD.GUI.updatePreviews = function() {
         $img.find('img').css('pointer-events', 'none');
         if (item && item.positionable !== false) {
             var nameKey = 'osdElement_' + item.name;
-            var nameMessage = chrome.i18n.getMessage(nameKey);
+            var nameMessage = localization.getMessage(nameKey);
 
             if (!nameMessage) {
                 nameMessage = inflection.titleize(item.name);
@@ -3083,7 +3048,7 @@ OSD.GUI.updateAll = function() {
     if (OSD.data.layout_count > 1) {
         layouts.empty();
         for (var ii = 0; ii < OSD.data.layout_count; ii++) {
-            var name = ii > 0 ? chrome.i18n.getMessage('osdLayoutAlternative', [ii]) : chrome.i18n.getMessage('osdLayoutDefault');
+            var name = ii > 0 ? localization.getMessage('osdLayoutAlternative', [ii]) : localization.getMessage('osdLayoutDefault');
             var opt = $('<option/>').val(ii).text(name).appendTo(layouts);
         }
         layouts.val(OSD.data.selected_layout);
@@ -3140,9 +3105,9 @@ TABS.osd.initialize = function (callback) {
         GUI.active_tab = 'osd';
     }
 
-    GUI.load("./tabs/osd.html", Settings.processHtml(function () {
+    GUI.load(path.join(__dirname, "tabs/osd.html"), Settings.processHtml(function () {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // Open modal window
         OSD.GUI.jbox = new jBox('Modal', {
@@ -3161,7 +3126,7 @@ TABS.osd.initialize = function (callback) {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log(chrome.i18n.getMessage('osdSettingsSaved'));
+                GUI.log(localization.getMessage('osdSettingsSaved'));
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
@@ -3171,12 +3136,8 @@ TABS.osd.initialize = function (callback) {
         });
 
         // Initialise guides checkbox
-        chrome.storage.local.get('showOSDGuides', function (result) {
-            if (typeof result.showOSDGuides !== 'undefined') {
-                isGuidesChecked = result.showOSDGuides;
-            }
-        });
-
+        isGuidesChecked = store.get('showOSDGuides', false); 
+        
         // Setup switch indicators
         $(".osdSwitchInd_channel option").each(function() {
             $(this).text("Ch " + $(this).text());
@@ -3260,22 +3221,23 @@ TABS.osd.initialize = function (callback) {
                 FONT.preview($preview);
                 OSD.GUI.update();
             });
-            chrome.storage.local.set({'osd_font': $(this).data('font-file')});
+            store.set('osd_font', $(this).data('font-file'));
         });
 
         // load the last selected font when we change tabs
-        chrome.storage.local.get('osd_font', function (result) {
-            if (result.osd_font != undefined) {
-                previous_font_button = $('.fontbuttons button[data-font-file="' + result.osd_font + '"]');
-                if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
-            }
+        var osd_font = store.get('osd_font', false);
+        var previous_font_button;
+        if (osd_font) {
+            previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
+            if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
+        }
 
-            if (typeof previous_font_button == "undefined") {
-                $fontPicker.first().click();
-            } else {
-                previous_font_button.click();
-            }
-        });
+        if (typeof previous_font_button == "undefined") {
+            $fontPicker.first().click();
+        } else {
+            previous_font_button.click();
+        }
+        
 
         $('button.load_font_file').click(function () {
             $fontPicker.removeClass('active');
@@ -3290,12 +3252,12 @@ TABS.osd.initialize = function (callback) {
             if (!GUI.connect_lock) { // button disabled while flashing is in progress
                 var progressLabel = $('.progressLabel');
                 var progressBar = $('.progress');
-                var uploading = chrome.i18n.getMessage('uploadingCharacters');
+                var uploading = localization.getMessage('uploadingCharacters');
                 progressLabel.text(uploading);
                 var progressCallback = function(done, total, percentage) {
                     progressBar.val(percentage);
                     if (done == total) {
-                        progressLabel.text(chrome.i18n.getMessage('uploadedCharacters'), [total]);
+                        progressLabel.text(localization.getMessage('uploadedCharacters'), [total]);
                     } else {
                         progressLabel.text(uploading + ' (' + done + '/' + total + ')');
                     }
@@ -3349,7 +3311,7 @@ TABS.osd.initialize = function (callback) {
                             });
                         } else {
                             console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log(chrome.i18n.getMessage('writePermissionsForFile'));
+                            GUI.log(localization.getMessage('writePermissionsForFile'));
                         }
                     });
                 });

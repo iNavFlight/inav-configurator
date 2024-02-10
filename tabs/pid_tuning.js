@@ -27,11 +27,10 @@ TABS.pid_tuning.initialize = function (callback) {
 
     if (GUI.active_tab != 'pid_tuning') {
         GUI.active_tab = 'pid_tuning';
-        googleAnalytics.sendAppView('PID Tuning');
     }
 
     function load_html() {
-        GUI.load("./tabs/pid_tuning.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "tabs/pid_tuning.html"), Settings.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {
@@ -135,7 +134,7 @@ TABS.pid_tuning.initialize = function (callback) {
             $("#note-wrapper").remove();
         }
 
-        localize();
+       localization.localize();;
 
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
@@ -156,7 +155,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('#resetPIDs').on('click', function() {
 
-            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
+            if (confirm(localization.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 updateActivatedTab();
             }
@@ -164,14 +163,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('#resetDefaults').on('click', function() {
 
-            if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
+            if (confirm(localization.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
-                        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+                        GUI.log(localization.getMessage('configurationEepromSaved'));
     
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.log(localization.getMessage('deviceRebooting'));
                                 GUI.handleReconnect();
                             });
                         });
@@ -184,25 +183,24 @@ TABS.pid_tuning.initialize = function (callback) {
 
         let $theOtherPids = $('#the-other-pids');
         let $showAdvancedPids = $('#show-advanced-pids');
-
-        chrome.storage.local.get('showOtherPids', function (result) {
-            if (result.showOtherPids) {
-                $theOtherPids.removeClass("is-hidden");
-                $showAdvancedPids.prop('checked', true);
-            } else {
-                $theOtherPids.addClass("is-hidden");
-                $showAdvancedPids.prop('checked', false);
-            }
-            $showAdvancedPids.change();
-        });
+        
+        if (store.get('showOtherPids', false) ) {
+            $theOtherPids.removeClass("is-hidden");
+            $showAdvancedPids.prop('checked', true);
+        } else {
+            $theOtherPids.addClass("is-hidden");
+            $showAdvancedPids.prop('checked', false);
+        }
+        $showAdvancedPids.change();
+        
 
         $showAdvancedPids.on('change', function() {
             if ($showAdvancedPids.is(':checked')) {
                 $theOtherPids.removeClass("is-hidden");
-                chrome.storage.local.set({ showOtherPids: true });
+                store.set('showOtherPids', true);
             } else {
                 $theOtherPids.addClass("is-hidden");
-                chrome.storage.local.set({ showOtherPids: false });
+                store.set('showOtherPids', false);
             }
         });
 
@@ -277,7 +275,7 @@ TABS.pid_tuning.initialize = function (callback) {
             $(".tab-pid_tuning").remove();
 
             GUI.tab_switch_cleanup(function () {
-                GUI.log(chrome.i18n.getMessage('pidTuningDataRefreshed'));
+                GUI.log(localization.getMessage('pidTuningDataRefreshed'));
                 TABS.pid_tuning.initialize();
             });
         });
@@ -312,7 +310,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('pidTuningEepromSaved'));
+                    GUI.log(localization.getMessage('pidTuningEepromSaved'));
                 });
             }
 

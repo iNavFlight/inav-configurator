@@ -183,7 +183,7 @@ GUI_control.prototype.content_ready = function (callback) {
     const documentationDiv = $('<div>').addClass('cf_doc_version_bt');
     $('<a>').attr('href', 'https://github.com/iNavFlight/inav/wiki')
         .attr('target', '_blank').attr('id', 'button-documentation')
-        .html(chrome.i18n.getMessage('documentation')).appendTo(documentationDiv);
+        .html(localization.getMessage('documentation')).appendTo(documentationDiv);
     documentationDiv.insertAfter(tabTitle);
 
     // loading tooltip
@@ -256,7 +256,7 @@ GUI_control.prototype.updateStatusBar = function() {
 
     $('span.i2c-error').text(CONFIG.i2cError);
     $('span.cycle-time').text(CONFIG.cycleTime);
-    $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+    $('span.cpu-load').text(localization.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
     $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
@@ -265,9 +265,9 @@ GUI_control.prototype.updateProfileChange = function(refresh) {
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
     if (refresh) {
-        GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
-        GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
-        GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
+        GUI.log(localization.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
+        GUI.log(localization.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
+        GUI.log(localization.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
         updateActivatedTab();
     }
 };
@@ -379,7 +379,7 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
 GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
     let $select = $container.append('<select class="mix-rule-condition">').find("select"),
-        lcCount = logicConditions.getCount();
+        lcCount = logicConditions.getCount(),
         option  = "";
 
     if (withAlways) {

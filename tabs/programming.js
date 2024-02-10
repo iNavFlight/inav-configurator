@@ -1,4 +1,4 @@
-/*global TABS,MSPChainerClass,mspHelper,googleAnalytics,GUI,LOGIC_CONDITIONS,PROGRAMMING_PID,GLOBAL_VARIABLES_STATUS,helper,LOGIC_CONDITIONS_STATUS,PROGRAMMING_PID_STATUS*/
+/*global TABS,MSPChainerClass,mspHelper,GUI,LOGIC_CONDITIONS,PROGRAMMING_PID,GLOBAL_VARIABLES_STATUS,helper,LOGIC_CONDITIONS_STATUS,PROGRAMMING_PID_STATUS*/
 'use strict';
 
 TABS.programming = {};
@@ -10,7 +10,6 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'programming') {
         GUI.active_tab = 'programming';
-        googleAnalytics.sendAppView('Programming');
     }
 
     loadChainer.setChain([
@@ -36,7 +35,7 @@ TABS.programming.initialize = function (callback, scrollPosition) {
     statusChainer.setExitPoint(onStatusPullDone);
 
     function loadHtml() {
-        GUI.load("./tabs/programming.html", processHtml);
+        GUI.load(path.join(__dirname, "tabs/programming.html"), processHtml);
     }
 
     function processHtml() {
@@ -50,11 +49,11 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
         helper.tabs.init($('.tab-programming'));
 
-        localize();
+       localization.localize();;
 
         $('#save-button').click(function () {
             saveChainer.execute();
-            GUI.log(chrome.i18n.getMessage('programmingEepromSaved'));
+            GUI.log(localization.getMessage('programmingEepromSaved'));
         });
 
         helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {

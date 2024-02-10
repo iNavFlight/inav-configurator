@@ -1,5 +1,9 @@
 "use strict";
 
+window.$ = window.jQuery = require('jquery');
+
+var localization = new Localiziation("en");;
+
 var
     CHANNEL_MIN_VALUE = 1000,
     CHANNEL_MID_VALUE = 1500,
@@ -63,7 +67,7 @@ function transmitChannels() {
     // Callback given to us by the window creator so we can have it send data over MSP for us:
     if (!window.setRawRx(channelValues)) {
         // MSP connection has gone away
-        chrome.app.window.current().close();
+        window.current().close();
     }
 }
 
@@ -118,12 +122,12 @@ function localizeAxisNames() {
         var 
             gimbal = gimbalElems.get(gimbalIndex);
         
-        $(".gimbal-label-vert", gimbal).text(chrome.i18n.getMessage("controlAxis" + gimbals[gimbalIndex][0]));
-        $(".gimbal-label-horz", gimbal).text(chrome.i18n.getMessage("controlAxis" + gimbals[gimbalIndex][1]));
+        $(".gimbal-label-vert", gimbal).text(localization.getMessage("controlAxis" + gimbals[gimbalIndex][0]));
+        $(".gimbal-label-horz", gimbal).text(localization.getMessage("controlAxis" + gimbals[gimbalIndex][1]));
     }
     
     for (var sliderIndex = 0; sliderIndex < 8; sliderIndex++) {
-        $(".slider-label", sliderElems.get(sliderIndex)).text(chrome.i18n.getMessage("radioChannelShort") + (sliderIndex + 5));
+        $(".slider-label", sliderElems.get(sliderIndex)).text(localization.getMessage("radioChannelShort") + (sliderIndex + 5));
     }
 }
 
@@ -133,9 +137,9 @@ $(document).ready(function() {
             shrinkHeight = $(".warning").height();
         
         $(".warning").slideUp("short", function() {
-            chrome.app.window.current().innerBounds.minHeight -= shrinkHeight;
-            chrome.app.window.current().innerBounds.height -= shrinkHeight;
-            chrome.app.window.current().innerBounds.maxHeight -= shrinkHeight;
+            window.current().innerBounds.minHeight -= shrinkHeight;
+            window.current().innerBounds.height -= shrinkHeight;
+            window.current().innerBounds.maxHeight -= shrinkHeight;
         });
         
         enableTX = true;

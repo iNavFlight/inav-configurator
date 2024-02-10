@@ -7,7 +7,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'configuration') {
         GUI.active_tab = 'configuration';
-        googleAnalytics.sendAppView('Configuration');
+
     }
 
     var loadChainer = new MSPChainerClass();
@@ -49,7 +49,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -58,12 +58,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_configuration a'));
     }
 
     function load_html() {
-        GUI.load("./tabs/configuration.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "tabs/configuration.html"), Settings.processHtml(process_html));
     }
 
     function process_html() {
@@ -74,17 +74,17 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         var features = FC.getFeatures();
 
         var features_e = $('.features');
-        for (i = 0; i < features.length; i++) {
+        for (let i = 0; i < features.length; i++) {
             var row_e,
                 tips = [],
                 feature_tip_html = '';
 
             if (features[i].showNameInTip) {
-                tips.push(chrome.i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
+                tips.push(localization.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
             }
 
             if (features[i].haveTip) {
-                tips.push(chrome.i18n.getMessage("feature" + features[i].name + "Tip"));
+                tips.push(localization.getMessage("feature" + features[i].name + "Tip"));
             }
 
             if (tips.length > 0) {
@@ -111,7 +111,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         helper.features.updateUI($('.tab-configuration'), FEATURES);
 
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -121,7 +121,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             vtx_band.empty();
             var vtx_no_band_note = $('#vtx_no_band');
             if (VTX_CONFIG.band < VTX.BAND_MIN || VTX_CONFIG.band > VTX.BAND_MAX) {
-                var noBandName = chrome.i18n.getMessage("configurationNoBand");
+                var noBandName = localization.getMessage("configurationNoBand");
                 $('<option value="0">' + noBandName + '</option>').appendTo(vtx_band);
                 vtx_no_band_note.show();
             } else {
@@ -170,7 +170,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             var vtx_low_power_disarm = $('#vtx_low_power_disarm');
             vtx_low_power_disarm.empty();
             for (var ii = VTX.LOW_POWER_DISARM_MIN; ii <= VTX.LOW_POWER_DISARM_MAX; ii++) {
-                var name = chrome.i18n.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
+                var name = localization.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
                 if (!name) {
                     name = ii;
                 }
@@ -234,7 +234,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $i2cSpeedInfo.addClass('info-box');
                 $i2cSpeedInfo.removeClass('warning-box');
 
-                $i2cSpeedInfo.html(chrome.i18n.getMessage('i2cSpeedSuggested800khz'));
+                $i2cSpeedInfo.html(localization.getMessage('i2cSpeedSuggested800khz'));
                 $i2cSpeedInfo.show();
 
             } else if (value == "800KHZ") {
@@ -246,7 +246,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $i2cSpeedInfo.removeClass('ok-box');
                 $i2cSpeedInfo.removeClass('info-box');
                 $i2cSpeedInfo.addClass('warning-box');
-                $i2cSpeedInfo.html(chrome.i18n.getMessage('i2cSpeedTooLow'));
+                $i2cSpeedInfo.html(localization.getMessage('i2cSpeedTooLow'));
                 $i2cSpeedInfo.show();
             }
 
@@ -272,20 +272,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
             MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
-
-            googleAnalytics.sendEvent('Setting', 'I2CSpeed', $('#i2c_speed').children("option:selected").text());
-
-            googleAnalytics.sendEvent('Board', 'Accelerometer', $('#sensor-acc').children("option:selected").text());
-            googleAnalytics.sendEvent('Board', 'Magnetometer', $('#sensor-mag').children("option:selected").text());
-            googleAnalytics.sendEvent('Board', 'Barometer', $('#sensor-baro').children("option:selected").text());
-            googleAnalytics.sendEvent('Board', 'Pitot', $('#sensor-pitot').children("option:selected").text());
-
-            for (var i = 0; i < features.length; i++) {
-                var featureName = features[i].name;
-                if (FC.isFeatureEnabled(featureName, features)) {
-                    googleAnalytics.sendEvent('Setting', 'Feature', featureName);
-                }
-            }
 
             helper.features.reset();
             helper.features.fromUI($('.tab-configuration'));

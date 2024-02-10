@@ -81,7 +81,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
                 self.initialize();
             } else {
-                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
+                GUI.log(localization.getMessage('failedToOpenSerialPort'));
             }
         });
     } else {
@@ -108,7 +108,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                                     retries++;
                                     if (retries > maxRetries) {
                                         clearInterval(interval);
-                                            GUI.log(chrome.i18n.getMessage('failedToFlash') + port);
+                                            GUI.log(localization.getMessage('failedToFlash') + port);
                                     }
                                 }
                                 // Check for DFU devices
@@ -145,7 +145,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                     });
                 });
             } else {
-                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
+                GUI.log(localization.getMessage('failedToOpenSerialPort'));
             }
         });
     }
@@ -183,7 +183,6 @@ STM32_protocol.prototype.initialize = function () {
             $('span.progressLabel').text('STM32 - timed out, programming: FAILED');
             self.progress_bar_e.addClass('invalid');
 
-            googleAnalytics.sendEvent('Flashing', 'Programming', 'timeout');
 
             // protocol got stuck, clear timer and disconnect
             helper.interval.remove('STM32_timeout');
@@ -722,7 +721,6 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         if (verify) {
                             console.log('Programming: SUCCESSFUL');
                             $('span.progressLabel').text('Programming: SUCCESSFUL');
-                            googleAnalytics.sendEvent('Flashing', 'Programming', 'success');
 
                             // update progress bar
                             self.progress_bar_e.addClass('valid');
@@ -732,7 +730,6 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         } else {
                             console.log('Programming: FAILED');
                             $('span.progressLabel').text('Programming: FAILED');
-                            googleAnalytics.sendEvent('Flashing', 'Programming', 'fail');
 
                             // update progress bar
                             self.progress_bar_e.addClass('invalid');

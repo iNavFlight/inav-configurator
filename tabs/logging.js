@@ -10,7 +10,6 @@ TABS.logging.initialize = function (callback) {
 
     if (GUI.active_tab != 'logging') {
         GUI.active_tab = 'logging';
-        googleAnalytics.sendAppView('Logging');
     }
 
     var requested_properties = [],
@@ -24,7 +23,7 @@ TABS.logging.initialize = function (callback) {
         }
 
         var load_html = function () {
-            GUI.load("./tabs/logging.html", process_html);
+            GUI.load(path.join(__dirname, "tabs/logging.html"), process_html);
         }
 
         MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);
@@ -32,7 +31,7 @@ TABS.logging.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // UI hooks
         $('a.log_file').click(prepare_file);
@@ -85,24 +84,24 @@ TABS.logging.initialize = function (callback) {
                             }, 1000);
 
                             $('.speed').prop('disabled', true);
-                            $(this).text(chrome.i18n.getMessage('loggingStop'));
+                            $(this).text(localization.getMessage('loggingStop'));
                             $(this).data("clicks", !clicks);
                         } else {
-                            GUI.log(chrome.i18n.getMessage('loggingErrorOneProperty'));
+                            GUI.log(localization.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
                         helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
                         helper.mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
-                        $(this).text(chrome.i18n.getMessage('loggingStart'));
+                        $(this).text(localization.getMessage('loggingStart'));
                         $(this).data("clicks", !clicks);
                     }
                 } else {
-                    GUI.log(chrome.i18n.getMessage('loggingErrorLogFile'));
+                    GUI.log(localization.getMessage('loggingErrorLogFile'));
                 }
             } else {
-                GUI.log(chrome.i18n.getMessage('loggingErrorNotConnected'));
+                GUI.log(localization.getMessage('loggingErrorNotConnected'));
             }
         });
 
@@ -235,10 +234,9 @@ TABS.logging.initialize = function (callback) {
         nwdialog.saveFileDialog(filename, accepts, '', function(file) {
             loggingFileName = file;
             readyToWrite = true;
-            chrome.storage.local.set({
-                    'logging_file_name': loggingFileName,
-                    'logging_file_ready': readyToWrite
-                });                
+            store.set('logging_file_name', loggingFileName);
+            store.set('logging_file_ready', readyToWrite);
+                          
         });
     }
 };

@@ -245,7 +245,5 @@ var MSPCodes = {
     MSP2_INAV_EZ_TUNE:                  0x2070,
     MSP2_INAV_EZ_TUNE_SET:              0x2071,
 
-    MSP2_INAV_SELECT_MIXER_PROFILE:     0x2080,
-
-    MSP2_ADSB_VEHICLE_LIST:             0x2090,
+    MSP2_INAV_SELECT_MIXER_PROFILE:     0x2080
 };

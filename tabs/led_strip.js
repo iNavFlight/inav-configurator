@@ -19,7 +19,6 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'led_strip') {
         GUI.active_tab = 'led_strip';
-        googleAnalytics.sendAppView('LED Strip');
     }
 
     function load_led_config() {
@@ -35,7 +34,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load("./tabs/led_strip.html", process_html);
+        GUI.load(path.join(__dirname, "tabs/led_strip.html"), process_html);
     }
 
     load_led_config();
@@ -55,7 +54,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     function process_html() {
 
-        localize();
+       localization.localize();;
 
         // Build Grid
         var theHTML = [];
@@ -539,7 +538,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function() {
-                    GUI.log(chrome.i18n.getMessage('ledStripEepromSaved'));
+                    GUI.log(localization.getMessage('ledStripEepromSaved'));
                 });
             }
 

@@ -11,7 +11,6 @@ TABS.receiver.initialize = function (callback) {
 
     if (GUI.active_tab != 'receiver') {
         GUI.active_tab = 'receiver';
-        googleAnalytics.sendAppView('Receiver');
     }
 
     var loadChainer = new MSPChainerClass();
@@ -30,7 +29,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        GUI.load("./tabs/receiver.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "tabs/receiver.html"), Settings.processHtml(process_html));
     }
 
     function saveSettings(onComplete) {
@@ -74,7 +73,7 @@ TABS.receiver.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
@@ -121,10 +120,10 @@ TABS.receiver.initialize = function (callback) {
 
         // generate bars
         var bar_names = [
-                chrome.i18n.getMessage('controlAxisRoll'),
-                chrome.i18n.getMessage('controlAxisPitch'),
-                chrome.i18n.getMessage('controlAxisYaw'),
-                chrome.i18n.getMessage('controlAxisThrottle')
+                localization.getMessage('controlAxisRoll'),
+                localization.getMessage('controlAxisPitch'),
+                localization.getMessage('controlAxisYaw'),
+                localization.getMessage('controlAxisThrottle')
             ],
             bar_container = $('.tab-receiver .bars');
 
@@ -133,7 +132,7 @@ TABS.receiver.initialize = function (callback) {
             if (i < bar_names.length) {
                 name = bar_names[i];
             } else {
-                name = chrome.i18n.getMessage("radioChannelShort") + (i + 1);
+                name = localization.getMessage("radioChannelShort") + (i + 1);
             }
 
             bar_container.append('\
@@ -298,16 +297,10 @@ TABS.receiver.initialize = function (callback) {
             var rcMapValue = $('input[name="rcmap"]').val();
             var strBuffer = rcMapValue.split('');
 
-            /*
-             * Send tracking event so we can know if users are using different mappings than EATR
-             */
-            googleAnalytics.sendEvent('Setting', 'RcMappingSave', rcMapValue);
 
             for (var i = 0; i < RC_MAP.length; i++) {
                 RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
-
-            googleAnalytics.sendEvent('Setting', 'RcProtocol', $('#receiver_type option:selected').text() + ":" + $('#serialrx_provider option:selected').text());
 
             // catch rssi aux
             MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());
@@ -330,11 +323,11 @@ TABS.receiver.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('receiverEepromSaved'));
+                    GUI.log(localization.getMessage('receiverEepromSaved'));
 
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.log(localization.getMessage('deviceRebooting'));
                             GUI.handleReconnect($('.tab_receiver a'));
                         });
                     });
@@ -349,7 +342,7 @@ TABS.receiver.initialize = function (callback) {
                 windowWidth = 420,
                 windowHeight = Math.min(window.innerHeight, 720);
 
-            chrome.app.window.create("/tabs/receiver_msp.html", {
+            window.open("/html/receiver_msp.html", {
                 id: "receiver_msp",
                 innerBounds: {
                     minWidth: windowWidth, minHeight: windowHeight,
@@ -394,7 +387,7 @@ TABS.receiver.initialize = function (callback) {
             var i;
 
             // update bars with latest data
-            for (i = 0; i < RC.active_channels; i++) {
+            for (let i = 0; i < RC.active_channels; i++) {
                 meter_fill_array[i].css('width', ((RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
                 meter_label_array[i].text(RC.channels[i]);
             }

@@ -3,8 +3,110 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link type="text/css" rel="stylesheet" href="./build/styles.css" media="all" />
-    <script type="text/javascript" src="./build/script.js"></script>
+    <link type="text/css" rel="stylesheet" href="./src/css/styles.css" media="all" />
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script type="text/javascript" src="./js/main.js"></script>
+    <script type="text/javascript" src="./js/sitl.js"></script>
+    <script type="text/javascript" src="./js/libraries/d3.min.js"></script>
+    <script type="text/javascript" src="./js/libraries/jquery.nouislider.all.min.js"></script>
+    <script type="text/javascript" src="./js/libraries/three/three.min.js"></script>
+    <script type="text/javascript" src="./js/libraries/three/GLTFLoader.js"></script>
+    <script type="text/javascript" src="./js/libraries/three/OrbitControls.js"></script>
+    <script type="text/javascript" src="./js/libraries/nw-dialog.js"></script>
+    <script type="text/javascript" src="./js/libraries/bundle_xml2js.js"></script>
+    <script type="text/javascript" src="./js/libraries/Projector.js"></script>
+    <script type="text/javascript" src="./js/libraries/CanvasRenderer.js"></script>
+    <script type="text/javascript" src="./js/libraries/jquery.flightindicators.js"></script>
+    <script type="text/javascript" src="./js/libraries/semver.js"></script>
+    <script type="text/javascript" src="./js/libraries/jbox/jBox.min.js"></script>
+    <script type="text/javascript" src="./js/libraries/switchery/switchery.js"></script>
+    <script type="text/javascript" src="./js/libraries/jquery.ba-throttle-debounce.js"></script>
+    <script type="text/javascript" src="./js/helpers.js"></script>
+    <script type="text/javascript" src="./js/injected_methods.js"></script>
+    <script type="text/javascript" src="./js/intervals.js"></script>
+    <script type="text/javascript" src="./js/timeouts.js"></script>
+    <script type="text/javascript" src="./js/pid_controller.js"></script>
+    <script type="text/javascript" src="./js/simple_smooth_filter.js"></script>
+    <script type="text/javascript" src="./js/walking_average_filter.js"></script>
+    <script type="text/javascript" src="./js/gui.js"></script>
+    <script type="text/javascript" src="./js/msp/MSPCodes.js"></script>
+    <script type="text/javascript" src="./js/msp/MSPHelper.js"></script>
+    <script type="text/javascript" src="./js/msp/MSPchainer.js"></script>
+    <script type="text/javascript" src="./js/port_handler.js"></script>
+    <script type="text/javascript" src="./js/connection/connection.js"></script>
+    <script type="text/javascript" src="./js/connection/connectionBle.js"></script>
+    <script type="text/javascript" src="./js/connection/connectionSerial.js"></script>
+    <script type="text/javascript" src="./js/connection/connectionTcp.js"></script>
+    <script type="text/javascript" src="./js/connection/connectionUdp.js"></script>
+    <script type="text/javascript" src="./js/servoMixRule.js"></script>
+    <script type="text/javascript" src="./js/motorMixRule.js"></script>
+    <script type="text/javascript" src="./js/logicCondition.js"></script>
+    <script type="text/javascript" src="./js/settings.js"></script>
+    <script type="text/javascript" src="./js/outputMapping.js"></script>
+    <script type="text/javascript" src="./js/model.js"></script>
+    <script type="text/javascript" src="./js/serial_backend.js"></script>
+    <script type="text/javascript" src="./js/data_storage.js"></script>
+    <script type="text/javascript" src="./js/fc.js"></script>
+    <script type="text/javascript" src="./js/msp.js"></script>
+    <script type="text/javascript" src="./js/protocols/stm32.js"></script>
+    <script type="text/javascript" src="./js/protocols/stm32usbdfu.js"></script>
+    <script type="text/javascript" src="./js/localization.js"></script>
+    <script type="text/javascript" src="./js/boards.js"></script>
+    <script type="text/javascript" src="./js/servoMixerRuleCollection.js"></script>
+    <script type="text/javascript" src="./js/motorMixerRuleCollection.js"></script>
+    <script type="text/javascript" src="./js/logicConditionsCollection.js"></script>
+    <script type="text/javascript" src="./js/logicConditionsStatus.js"></script>
+    <script type="text/javascript" src="./js/globalVariablesStatus.js"></script>
+    <script type="text/javascript" src="./js/programmingPid.js"></script>
+    <script type="text/javascript" src="./js/programmingPidCollection.js"></script>
+    <script type="text/javascript" src="./js/programmingPidStatus.js"></script>
+    <script type="text/javascript" src="./js/vtx.js"></script>
+    <script type="text/javascript" src="./js/tabs.js"></script>
+    <script type="text/javascript" src="./js/eventFrequencyAnalyzer.js"></script>
+    <script type="text/javascript" src="./js/periodicStatusUpdater.js"></script>
+    <script type="text/javascript" src="./js/serial_queue.js"></script>
+    <script type="text/javascript" src="./js/msp_balanced_interval.js"></script>gt
+    <script type="text/javascript" src="./js/peripherals.js"></script>
+    <script type="text/javascript" src="./js/appUpdater.js"></script>
+    <script type="text/javascript" src="./js/feature_framework.js"></script>
+    <script type="text/javascript" src="./js/defaults_dialog.js"></script>
+    <script type="text/javascript" src="./js/safehomeCollection.js"></script>
+    <script type="text/javascript" src="./js/safehome.js"></script>
+    <script type="text/javascript" src="./js/waypointCollection.js"></script>
+    <script type="text/javascript" src="./js/waypoint.js"></script>
+    <script type="text/javascript" src="./js/libraries/plotly-latest.min.js"></script>
+
+    <script type="text/javascript" src="./tabs/adjustments.js"></script>
+    <script type="text/javascript" src="./tabs/advanced_tuning.js"></script>
+    <script type="text/javascript" src="./tabs/auxiliary.js"></script>
+    <script type="text/javascript" src="./tabs/calibration.js"></script>
+    <script type="text/javascript" src="./tabs/cli.js"></script>
+    <script type="text/javascript" src="./tabs/configuration.js"></script>
+    <script type="text/javascript" src="./tabs/ez_tune.js"></script>
+    <script type="text/javascript" src="./tabs/failsafe.js"></script>
+    <script type="text/javascript" src="./tabs/firmware_flasher.js"></script>
+    <script type="text/javascript" src="./tabs/gps.js"></script>
+    <script type="text/javascript" src="./tabs/landing.js"></script>
+    <script type="text/javascript" src="./tabs/led_strip.js"></script>
+    <script type="text/javascript" src="./tabs/logging.js"></script>
+    <script type="text/javascript" src="./tabs/magnetometer.js"></script>
+    <script type="text/javascript" src="./tabs/mission_control.js"></script>
+    <script type="text/javascript" src="./tabs/mixer.js"></script>
+    <script type="text/javascript" src="./tabs/modes.js"></script>
+    <script type="text/javascript" src="./tabs/onboard_logging.js"></script>
+    <script type="text/javascript" src="./tabs/osd.js"></script>
+    <script type="text/javascript" src="./tabs/outputs.js"></script>
+    <script type="text/javascript" src="./tabs/pid_tuning.js"></script>
+    <script type="text/javascript" src="./tabs/ports.js"></script>
+    <script type="text/javascript" src="./tabs/programming.js"></script>
+    <script type="text/javascript" src="./tabs/receiver.js"></script>
+    <script type="text/javascript" src="./tabs/receiver_msp.js"></script>
+    <script type="text/javascript" src="./tabs/sensors.js"></script>
+    <script type="text/javascript" src="./tabs/setup.js"></script>
+    <script type="text/javascript" src="./tabs/sitl.js"></script>
+
+    <script>if (window.module) module = window.module;</script>
     <title></title>
 </head>
 

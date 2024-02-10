@@ -59,7 +59,7 @@ class ConnectionBle extends Connection {
         await this.openDevice()
             .then(() => {
                 this.addOnReceiveErrorListener(error => {
-                    GUI.log(chrome.i18n.getMessage('connectionBleInterrupted'));
+                    GUI.log(localization.getMessage('connectionBleInterrupted'));
                     this.abort();
                 });
 
@@ -71,7 +71,7 @@ class ConnectionBle extends Connection {
                     });
                 }
             }).catch(error => {
-                GUI.log(chrome.i18n.getMessage('connectionBleError', [error]));
+                GUI.log(localization.getMessage('connectionBleError', [error]));
                 if (callback) {
                     callback(false);
                 }
@@ -119,7 +119,7 @@ class ConnectionBle extends Connection {
         return device.gatt.connect()
             .then(server => {
                 console.log("Connect to: " + device.name);
-                GUI.log(chrome.i18n.getMessage('connectionConnected', [device.name]));
+                GUI.log(localization.getMessage('connectionConnected', [device.name]));
                 return server.getPrimaryServices();
             }).then(services => {
                 let connectedService = services.find(service => {
@@ -131,7 +131,7 @@ class ConnectionBle extends Connection {
                     throw new Error("Unsupported device (service UUID mismatch).");
                 }
 
-                GUI.log(chrome.i18n.getMessage('connectionBleType', [this._deviceDescription.name]));
+                GUI.log(localization.getMessage('connectionBleType', [this._deviceDescription.name]));
                 return connectedService.getCharacteristics();
             }).then(characteristics => {
                 characteristics.forEach(characteristic => {

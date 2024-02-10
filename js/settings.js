@@ -6,7 +6,7 @@ var Settings = (function () {
     self.fillSelectOption = function(s, ii) {
         var name = (s.setting.table ? s.setting.table.values[ii] : null);
         if (name) {
-            var localizedName = chrome.i18n.getMessage(name);
+            var localizedName = localization.getMessage(name);
             if (localizedName) {
                 name = localizedName;
             }
@@ -26,7 +26,7 @@ var Settings = (function () {
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
 
@@ -580,7 +580,7 @@ var Settings = (function () {
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             return self.saveInput(input);
         });
     };
@@ -602,7 +602,7 @@ var Settings = (function () {
             helpIcons.push($(this));
         });
 
-        return Promise.mapSeries(helpIcons, function(helpIcon, ii) {
+        return mapSeries(helpIcons, function(helpIcon, ii) {
             let forAtt = helpIcon.attr('for');
 
             if (typeof forAtt !== "undefined" && forAtt !== "") {

@@ -50,7 +50,6 @@ TABS.calibration.initialize = function (callback) {
 
     if (GUI.active_tab != 'calibration') {
         GUI.active_tab = 'calibration';
-        googleAnalytics.sendAppView('Calibration');
     }
     loadChainer.setChain([
         mspHelper.queryFcStatus,
@@ -68,7 +67,7 @@ TABS.calibration.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -77,12 +76,12 @@ TABS.calibration.initialize = function (callback) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_calibration a'));
     }
 
     function loadHtml() {
-        GUI.load("./tabs/calibration.html", processHtml);
+        GUI.load(path.join(__dirname, "tabs/calibration.html"), processHtml);
     }
 
     function updateCalibrationSteps() {
@@ -162,7 +161,7 @@ TABS.calibration.initialize = function (callback) {
             }).open();
 
             MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibStarted'));
+                GUI.log(localization.getMessage('initialSetupAccelCalibStarted'));
             });
 
             helper.timeout.add('acc_calibration_timeout', function () {
@@ -170,20 +169,20 @@ TABS.calibration.initialize = function (callback) {
 
                 modalProcessing.close();
                 MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, checkFinishAccCalibrate);
-                GUI.log(chrome.i18n.getMessage('initialSetupAccelCalibEnded'));
+                GUI.log(localization.getMessage('initialSetupAccelCalibEnded'));
             }, 2000);
         }
     }
 
     function setupCalibrationButton(callback) {
         if (FC.getAccelerometerCalibrated()) {
-            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccResetBtn"));
-            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').html(localization.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').prop("title", localization.getMessage("AccResetBtn"));
             $('#calibrate-start-button').removeClass("calibrate");
             $('#calibrate-start-button').addClass("resetCalibration");
         } else {
-            $('#calibrate-start-button').html(chrome.i18n.getMessage("AccBtn"));
-            $('#calibrate-start-button').prop("title", chrome.i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').html(localization.getMessage("AccBtn"));
+            $('#calibrate-start-button').prop("title", localization.getMessage("AccBtn"));
             $('#calibrate-start-button').addClass("calibrate");
             $('#calibrate-start-button').removeClass("resetCalibration");
         }
@@ -198,7 +197,7 @@ TABS.calibration.initialize = function (callback) {
             calibrateNew();
         }
     
-        if (callback) callback();
+        
     }
 
     function resetAccCalibration() {
@@ -229,7 +228,7 @@ TABS.calibration.initialize = function (callback) {
 
         $('#mag_btn').on('click', function () {
             MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupMagCalibStarted'));
+                GUI.log(localization.getMessage('initialSetupMagCalibStarted'));
             });
 
             var button = $(this);
@@ -253,13 +252,13 @@ TABS.calibration.initialize = function (callback) {
                         $(button).removeClass('disabled');
 
                         modalProcessing.close();
-                        GUI.log(chrome.i18n.getMessage('initialSetupMagCalibEnded'));
+                        GUI.log(localization.getMessage('initialSetupMagCalibEnded'));
                         
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         helper.interval.remove('compass_calibration_interval');
 
                         //Cleanup
-                        delete modalProcessing;
+                       //delete modalProcessing;
                         $('.jBox-wrapper').remove();
                     }, 1000);
                 } else {
@@ -271,7 +270,7 @@ TABS.calibration.initialize = function (callback) {
 
         $('#opflow_btn').on('click', function () {
             MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, function () {
-                GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibStarted'));
+                GUI.log(localization.getMessage('initialSetupOpflowCalibStarted'));
             });
 
             var button = $(this);
@@ -295,7 +294,7 @@ TABS.calibration.initialize = function (callback) {
                     $(button).removeClass('disabled');
 
                     modalProcessing.close();
-                    GUI.log(chrome.i18n.getMessage('initialSetupOpflowCalibEnded'));
+                    GUI.log(localization.getMessage('initialSetupOpflowCalibEnded'));
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('opflow_calibration_interval');
                 }
@@ -312,7 +311,7 @@ TABS.calibration.initialize = function (callback) {
         });
 
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         setupCalibrationButton();
         $('#calibrate-start-button').on('click', actionCalibrateButton);

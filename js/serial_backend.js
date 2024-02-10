@@ -65,7 +65,7 @@ $(document).ready(function () {
             helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
                 MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, function () {
                     //noinspection JSUnresolvedVariable
-                    GUI.log(chrome.i18n.getMessage('deviceReady'));
+                    GUI.log(localization.getMessage('deviceReady'));
                     //noinspection JSValidateTypes
                     TABS.configuration.initialize(false, $('#content').scrollTop());
                 });
@@ -117,12 +117,11 @@ $(document).ready(function () {
     GUI.updateManualPortVisibility();
 
     $portOverride.change(function () {
-        chrome.storage.local.set({'portOverride': $portOverride.val()});
+        store.set('portOverride', $portOverride.val());
     });
 
-    chrome.storage.local.get('portOverride', function (data) {
-        $portOverride.val(data.portOverride);
-    });
+    $portOverride.val(store.get('portOverride', ''));
+    
 
     $port.change(function (target) {
         GUI.updateManualPortVisibility();
@@ -138,7 +137,7 @@ $(document).ready(function () {
                     String($port.val());
             
             if (selected_port === 'DFU') {
-                GUI.log(chrome.i18n.getMessage('dfu_connect_message'));
+                GUI.log(localization.getMessage('dfu_connect_message'));
             }
             else if (selected_port != '0') {
                 if (!clicks) {
@@ -147,7 +146,7 @@ $(document).ready(function () {
 
                     // lock port select & baud while we are connecting / connected
                     $('#port, #baud, #delay').prop('disabled', true);
-                    $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connecting'));
+                    $('div.connect_controls a.connect_state').text(localization.getMessage('connecting'));
 
                     if (selected_port == 'tcp' || selected_port == 'udp') {
                         CONFIGURATOR.connection.connect($portOverride.val(), {}, onOpen);
@@ -210,7 +209,7 @@ $(document).ready(function () {
 
                         // reset connect / disconnect button
                         $('div.connect_controls a.connect').removeClass('active');
-                        $('div.connect_controls a.connect_state').text(chrome.i18n.getMessage('connect'));
+                        $('div.connect_controls a.connect_state').text(localization.getMessage('connect'));
 
                         // reset active sensor indicators
                         sensor_status(0);
@@ -236,17 +235,15 @@ function onValidFirmware()
 {
     MSP.send_message(MSPCodes.MSP_BUILD_INFO, false, false, function () {
 
-        googleAnalytics.sendEvent('Firmware', 'Using', CONFIG.buildInfo);
-        GUI.log(chrome.i18n.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
+        GUI.log(localization.getMessage('buildInfoReceived', [CONFIG.buildInfo]));
 
         MSP.send_message(MSPCodes.MSP_BOARD_INFO, false, false, function () {
 
-            googleAnalytics.sendEvent('Board', 'Using', CONFIG.boardIdentifier + ',' + CONFIG.boardVersion);
-            GUI.log(chrome.i18n.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
+            GUI.log(localization.getMessage('boardInfoReceived', [CONFIG.boardIdentifier, CONFIG.boardVersion]));
 
             MSP.send_message(MSPCodes.MSP_UID, false, false, function () {
 
-                GUI.log(chrome.i18n.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
+                GUI.log(localization.getMessage('uniqueDeviceIdReceived', [CONFIG.uid[0].toString(16) + CONFIG.uid[1].toString(16) + CONFIG.uid[2].toString(16)]));
 
                 // continue as usually
                 CONFIGURATOR.connectionValid = true;
@@ -266,7 +263,7 @@ function onValidFirmware()
 
 function onInvalidFirmwareVariant()
 {
-    GUI.log(chrome.i18n.getMessage('firmwareVariantNotSupported'));
+    GUI.log(localization.getMessage('firmwareVariantNotSupported'));
     CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
     GUI.allowedTabs = ['cli'];
     onConnect();
@@ -275,7 +272,7 @@ function onInvalidFirmwareVariant()
 
 function onInvalidFirmwareVersion()
 {
-    GUI.log(chrome.i18n.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted, CONFIGURATOR.maxFirmwareVersionAccepted]));
+    GUI.log(localization.getMessage('firmwareVersionNotSupported', [CONFIGURATOR.minfirmwareVersionAccepted, CONFIGURATOR.maxFirmwareVersionAccepted]));
     CONFIGURATOR.connectionValid = true; // making it possible to open the CLI tab
     GUI.allowedTabs = ['cli'];
     onConnect();
@@ -283,7 +280,7 @@ function onInvalidFirmwareVersion()
 }
 
 function onBleNotSupported() {
-    GUI.log(chrome.i18n.getMessage('connectionBleNotSupported'));
+    GUI.log(localization.getMessage('connectionBleNotSupported'));
     CONFIGURATOR.connection.abort();
 }
 
@@ -291,7 +288,7 @@ function onBleNotSupported() {
 function onOpen(openInfo) {
 
     if (FC.restartRequired) {
-        GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+        GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + localization.getMessage("illegalStateRestartRequired") + "</strong></span>");
         $('div.connect_controls a').click(); // disconnect
         return;
     }
@@ -303,30 +300,31 @@ function onOpen(openInfo) {
         // reset connecting_to
         GUI.connecting_to = false;
 
-        GUI.log(chrome.i18n.getMessage('serialPortOpened', [openInfo.connectionId]));
+        GUI.log(localization.getMessage('serialPortOpened', [openInfo.connectionId]));
 
         // save selected port with chrome.storage if the port differs
-        chrome.storage.local.get('last_used_port', function (result) {
-            if (result.last_used_port) {
-                if (result.last_used_port != GUI.connected_to) {
-                    // last used port doesn't match the one found in local db, we will store the new one
-                    chrome.storage.local.set({'last_used_port': GUI.connected_to});
-                }
-            } else {
-                // variable isn't stored yet, saving
-                chrome.storage.local.set({'last_used_port': GUI.connected_to});
+        var last_used_port = store.get('last_used_port', false);
+        if (last_used_port) {
+            if (last_used_port != GUI.connected_to) {
+                // last used port doesn't match the one found in local db, we will store the new one
+                store.set('last_used_port', GUI.connected_to);
             }
-        });
+        } else {
+            // variable isn't stored yet, saving
+            store.set('last_used_port', GUI.connected_to);
+        }
+    
 
-        chrome.storage.local.set({last_used_bps: CONFIGURATOR.connection.bitrate});
-        chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
+        store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
+        store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
         CONFIGURATOR.connection.addOnReceiveListener(read_serial);
 
+        /*
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
             if (!CONFIGURATOR.connectionValid) {
-                GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
+                GUI.log(localization.getMessage('noConfigurationReceived'));
 
                 helper.mspQueue.flush();
                 helper.mspQueue.freeHardLock();
@@ -336,6 +334,7 @@ function onOpen(openInfo) {
                 $('div.connect_controls a').click(); // disconnect
             }
         }, 10000);
+        */
 
         FC.resetState();
 
@@ -345,18 +344,18 @@ function onOpen(openInfo) {
         MSP.send_message(MSPCodes.MSP_API_VERSION, false, false, function () {
             
             if (CONFIG.apiVersion === "0.0.0") {
-                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("illegalStateRestartRequired") + "</strong></span>");
+                GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + localization.getMessage("illegalStateRestartRequired") + "</strong></span>");
                 FC.restartRequired = true;
                 return;
             }
 
-            GUI.log(chrome.i18n.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
+            GUI.log(localization.getMessage('apiVersionReceived', [CONFIG.apiVersion]));
 
             MSP.send_message(MSPCodes.MSP_FC_VARIANT, false, false, function () {
                 if (CONFIG.flightControllerIdentifier == 'INAV') {
                     MSP.send_message(MSPCodes.MSP_FC_VERSION, false, false, function () {
-                        googleAnalytics.sendEvent('Firmware', 'Variant', CONFIG.flightControllerIdentifier + ',' + CONFIG.flightControllerVersion);
-                        GUI.log(chrome.i18n.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
+
+                        GUI.log(localization.getMessage('fcInfoReceived', [CONFIG.flightControllerIdentifier, CONFIG.flightControllerVersion]));
                         if (semver.gte(CONFIG.flightControllerVersion, CONFIGURATOR.minfirmwareVersionAccepted) && semver.lt(CONFIG.flightControllerVersion, CONFIGURATOR.maxFirmwareVersionAccepted)) {
                             if (CONFIGURATOR.connection.type == ConnectionType.BLE && semver.lt(CONFIG.flightControllerVersion, "5.0.0")) {  
                                 onBleNotSupported();
@@ -379,11 +378,11 @@ function onOpen(openInfo) {
         });
     } else {
         console.log('Failed to open serial port');
-        GUI.log(chrome.i18n.getMessage('serialPortOpenFail'));
+        GUI.log(localization.getMessage('serialPortOpenFail'));
 
         var $connectButton = $('#connectbutton');
 
-        $connectButton.find('.connect_state').text(chrome.i18n.getMessage('connect'));
+        $connectButton.find('.connect_state').text(localization.getMessage('connect'));
         $connectButton.find('.connect').removeClass('active');
 
         // unlock port select & baud
@@ -396,7 +395,7 @@ function onOpen(openInfo) {
 
 function onConnect() {
     helper.timeout.remove('connecting'); // kill connecting timer
-    $('#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
+    $('#connectbutton a.connect_state').text(localization.getMessage('disconnect')).addClass('active');
     $('#connectbutton a.connect').addClass('active');
     $('.mode-disconnected').hide();
     $('.mode-connected').show();
@@ -434,9 +433,9 @@ function onConnect() {
 
 function onClosed(result) {
     if (result) { // All went as expected
-        GUI.log(chrome.i18n.getMessage('serialPortClosedOk'));
+        GUI.log(localization.getMessage('serialPortClosedOk'));
     } else { // Something went wrong
-        GUI.log(chrome.i18n.getMessage('serialPortClosedFail'));
+        GUI.log(localization.getMessage('serialPortClosedFail'));
     }
 
     $('.mode-connected').hide();

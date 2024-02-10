@@ -1,4 +1,4 @@
-/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,googleAnalytics,LOGIC_CONDITIONS,TABS,ServoMixRule*/
+/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,LOGIC_CONDITIONS,TABS,ServoMixRule*/
 'use strict';
 
 TABS.mixer = {};
@@ -19,7 +19,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'mixer') {
         GUI.active_tab = 'mixer';
-        googleAnalytics.sendAppView('Mixer');
     }
 
     loadChainer.setChain([
@@ -51,7 +50,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -60,12 +59,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_mixer a'));
     }
 
     function loadHtml() {
-        GUI.load("./tabs/mixer.html", Settings.processHtml(processHtml));
+        GUI.load(path.join(__dirname, "tabs/mixer.html"), Settings.processHtml(processHtml));
     }
 
     function renderOutputTable() {
@@ -109,7 +108,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         let usedTimers = OUTPUT_MAPPING.getUsedTimerIds();
 
-        for (t of usedTimers) {
+        for (let t of usedTimers) {
             var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
             $container.append(
                         '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + OUTPUT_MAPPING.getTimerColor(t) + '">' +
@@ -389,7 +388,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         rate_inputs.attr("min", -1000);
         rate_inputs.attr("max", 1000);
 
-        localize();
+       localization.localize();;
     }
 
     function updateFixedValueVisibility(row, $mixRuleInput) {
@@ -433,15 +432,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             rules = currentMixerPreset.motorMixer;
         }
 
+        if (currentMixerPreset.image != 'quad_x') {
+            return;
+        }
+
         for (const i in rules) {
             if (rules.hasOwnProperty(i)) {
                 const rule = rules[i];
                 index++;
-
-                if (currentMixerPreset.image != 'quad_x') {
-                    $("#motorNumber"+index).css("visibility", "hidden");
-                    continue;
-                }
 
                 let top_px = 30;
                 let left_px = 28;
@@ -454,7 +452,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 }
                 $("#motorNumber"+index).css("left", left_px + "px");
                 $("#motorNumber"+index).css("top", top_px + "px");
-                $("#motorNumber"+index).css("visibility", "visible");
+                $("#motorNumber"+index).removeClass("is-hidden");
             }
         }
     }
@@ -524,17 +522,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         }
         labelMotorNumbers();
-        localize();
+       localization.localize();;
     }
 
     function saveAndReboot() {
-
-        /*
-         * Send tracking
-         */
-        googleAnalytics.sendEvent('Mixer', 'Platform type', helper.platform.getById(MIXER_CONFIG.platformType).name);
-        googleAnalytics.sendEvent('Mixer', 'Mixer preset',  helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).name);
-
         /*
          * Send mixer rules
          */
@@ -559,7 +550,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             let mixers = helper.mixer.getByPlatform(MIXER_CONFIG.platformType);
 
             $mixerPreset.find("*").remove();
-            for (i in mixers) {
+            for (let i in mixers) {
                 if (mixers.hasOwnProperty(i)) {
                     let m = mixers[i];
                     $mixerPreset.append('<option value="' + m.id + '">' + m.name + '</option>');
@@ -578,7 +569,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             closeButton: 'title',
             animation: false,
             attach: $wizardButton,
-            title: chrome.i18n.getMessage("mixerWizardModalTitle"),
+            title: localization.getMessage("mixerWizardModalTitle"),
             content: $('#mixerWizardContent')
         });
 
@@ -650,9 +641,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
             if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
                 if (isReversed) {
-                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_isInverted"));
+                    motorDirectionCheckbox.parent().find("label span").html(localization.getMessage("motor_direction_isInverted"));
                 } else {
-                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_inverted"));
+                    motorDirectionCheckbox.parent().find("label span").html(localization.getMessage("motor_direction_inverted"));
                 }
             }
 
@@ -733,7 +724,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             closeButton: 'title',
             animation: false,
             attach: $('#load-and-apply-mixer-button'),
-            title: chrome.i18n.getMessage("mixerApplyModalTitle"),
+            title: localization.getMessage("mixerApplyModalTitle"),
             content: $('#mixerApplyContent')
         });
 
@@ -821,7 +812,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
-        localize();
+       localization.localize();;
 
         helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
 
@@ -850,8 +841,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 };
 
 TABS.mixer.cleanup = function (callback) {
-    delete modal;
-    delete motorWizardModal;
+    //delete modal;
+    //delete motorWizardModal;
     $('.jBox-wrapper').remove();
     if (callback) callback();
 };

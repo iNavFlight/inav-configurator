@@ -1,4 +1,4 @@
-/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
+/*global helper,MSP,MSPChainerClass,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.outputs = {
@@ -17,7 +17,6 @@ TABS.outputs.initialize = function (callback) {
 
     if (GUI.active_tab !== 'outputs') {
         GUI.active_tab = 'outputs';
-        googleAnalytics.sendAppView('Outputs');
     }
 
     var loadChainer = new MSPChainerClass();
@@ -56,12 +55,12 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
-        GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
+        GUI.log(localization.getMessage('eeprom_saved_ok'));
         MOTOR_RULES.cleanup();
     });
 
     function load_html() {
-        GUI.load("./tabs/outputs.html", Settings.processHtml(onLoad));
+        GUI.load(path.join(__dirname, "tabs/outputs.html"), Settings.processHtml(onLoad));
     }
 
     function saveSettings(onComplete) {
@@ -104,14 +103,14 @@ TABS.outputs.initialize = function (callback) {
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
                 $('.hide-for-shot').hide();
                 if ($idlePercent.val() > 7.0) {
-                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                    $idleInfoBox.html(localization.getMessage('throttleIdleDigitalInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
             } else {
                 $('.hide-for-shot').show();
                 if ($idlePercent.val() > 10.0) {
-                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                    $idleInfoBox.html(localization.getMessage('throttleIdleAnalogInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
@@ -120,7 +119,7 @@ TABS.outputs.initialize = function (callback) {
 
         let $escProtocol = $('#esc-protocol');
         
-        for (i in escProtocols) {
+        for (let i in escProtocols) {
             if (escProtocols.hasOwnProperty(i)) {
                 var protocolData = escProtocols[i];
                 $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
@@ -140,7 +139,7 @@ TABS.outputs.initialize = function (callback) {
 
         let $servoRate = $('#servo-rate');
 
-        for (i in servoRates) {
+        for (let i in servoRates) {
             if (servoRates.hasOwnProperty(i)) {
                 $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
             }
@@ -227,7 +226,7 @@ TABS.outputs.initialize = function (callback) {
             }
         }
         while (data[0].length > 40) {
-            for (i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 data[i].shift();
             }
         }
@@ -378,11 +377,11 @@ TABS.outputs.initialize = function (callback) {
         $('a.save').click(function () {
             saveChainer.setExitPoint(function () {
                 //noinspection JSUnresolvedVariable
-                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+                GUI.log(localization.getMessage('configurationEepromSaved'));
 
                 GUI.tab_switch_cleanup(function () {
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.log(localization.getMessage('deviceRebooting'));
                         GUI.handleReconnect($('.tab_outputs a'));
                     });
                 });
@@ -555,7 +554,7 @@ TABS.outputs.initialize = function (callback) {
 
                 $('div.values li').eq(index).text(getMotorOutputValue($(this).val()));
 
-                for (i = 0; i < 8; i++) {
+                for (let i = 0; i < 8; i++) {
                     var val = parseInt($('div.sliders input').eq(i).val());
 
                     buffer.push(lowByte(val));
@@ -683,7 +682,7 @@ TABS.outputs.initialize = function (callback) {
                 color,
                 i;
 
-            for (i = 0; i < MOTOR_DATA.length; i++) {
+            for (let i= 0; i < MOTOR_DATA.length; i++) {
                 data = MOTOR_DATA[i] - MISC.mincommand;
                 margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
                 height = (data * (block_height / full_block_scale)).clamp(0, block_height);
@@ -694,7 +693,7 @@ TABS.outputs.initialize = function (callback) {
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
-            for (i = 0; i < SERVO_DATA.length; i++) {
+            for (let i= 0; i < SERVO_DATA.length; i++) {
                 data = SERVO_DATA[i] - 1000;
                 margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
                 height = (data * (block_height / 1000)).clamp(0, block_height);
@@ -727,7 +726,7 @@ TABS.outputs.initialize = function (callback) {
     }
 
     function finalize() {
-        localize();
+       localization.localize();;
         GUI.content_ready(callback);
     }
 

@@ -1,4 +1,6 @@
 'use strict';
+
+
 /*global chrome,GUI,TABS,nwdialog,$*/
 TABS.cli = {
     lineDelayMs: 50,
@@ -49,7 +51,7 @@ function copyToClipboard(text) {
         const button = $('.tab-cli .copy');
         const origText = button.text();
         const origWidth = button.css("width");
-        button.text(chrome.i18n.getMessage("cliCopySuccessful"));
+        button.text(localization.getMessage("cliCopySuccessful"));
         button.css({
             width: origWidth,
             textAlign: "center",
@@ -117,7 +119,6 @@ TABS.cli.initialize = function (callback) {
 
     if (GUI.active_tab != 'cli') {
         GUI.active_tab = 'cli';
-        googleAnalytics.sendAppView('CLI');
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
@@ -142,28 +143,15 @@ TABS.cli.initialize = function (callback) {
         Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
     }
 
-    GUI.load("./tabs/cli.html", function () {
+    GUI.load(path.join(__dirname, "tabs/cli.html"), function () {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
 
         CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
-        CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
-        $(CliAutoComplete).on('build:start', function() {
-            textarea
-                .val('')
-                .attr('placeholder', chrome.i18n.getMessage('cliInputPlaceholderBuilding'))
-                .prop('disabled', true);
-        });
-        $(CliAutoComplete).on('build:stop', function() {
-            textarea
-                .attr('placeholder', chrome.i18n.getMessage('cliInputPlaceholder'))
-                .prop('disabled', false)
-                .focus();
-        });
 
         $('.tab-cli .save').click(function() {
             var prefix = 'cli';
@@ -178,17 +166,17 @@ TABS.cli.initialize = function (callback) {
             nwdialog.setContext(document);
             nwdialog.saveFileDialog(filename, accepts, '', function(result) {
                 if (!result) {
-                    GUI.log(chrome.i18n.getMessage('cliSaveToFileAborted'));
+                    GUI.log(localization.getMessage('cliSaveToFileAborted'));
                     return;
                 }
                 const fs = require('fs');
 
                 fs.writeFile(result, self.outputHistory, (err) => {
                     if (err) {
-                        GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
+                        GUI.log(localization.getMessage('ErrorWritingFile'));
                         return console.error(err);
                     }
-                    GUI.log(chrome.i18n.getMessage('FileSaved'));
+                    GUI.log(localization.getMessage('FileSaved'));
                 });
 
             });
@@ -250,7 +238,7 @@ TABS.cli.initialize = function (callback) {
                             closeButton: 'title',
                             animation: false,
                             isolateScroll: false,
-                            title: chrome.i18n.getMessage("cliConfirmSnippetDialogTitle"),
+                            title: localization.getMessage("cliConfirmSnippetDialogTitle"),
                             content: $('#snippetpreviewcontent'),
                             onCreated: () => $("#snippetpreviewcontent a.confirm").click(() => executeSnippet()),
                         });
@@ -263,7 +251,7 @@ TABS.cli.initialize = function (callback) {
 
                 fs.readFile(result, (err, data) => {
                     if (err) {
-                        GUI.log(chrome.i18n.getMessage('ErrorReadingFile'));
+                        GUI.log(localization.getMessage('ErrorReadingFile'));
                         return console.error(err);
                     }
 
@@ -279,19 +267,12 @@ TABS.cli.initialize = function (callback) {
             if (event.which == tabKeyCode) {
                 // prevent default tabbing behaviour
                 event.preventDefault();
-
-                if (!CliAutoComplete.isEnabled()) {
-                    const outString = textarea.val();
-                    const lastCommand = outString.split("\n").pop();
-                    const command = getCliCommand(lastCommand, self.cliBuffer);
-                    if (command) {
-                        self.sendAutoComplete(command);
-                        textarea.val('');
-                    }
-                }
-                else if (!CliAutoComplete.isOpen() && !CliAutoComplete.isBuilding()) {
-                    // force show autocomplete on Tab
-                    CliAutoComplete.openLater(true);
+                const outString = textarea.val();
+                const lastCommand = outString.split("\n").pop();
+                const command = getCliCommand(lastCommand, self.cliBuffer);
+                if (command) {
+                    self.sendAutoComplete(command);
+                    textarea.val('');
                 }
             }
         });
@@ -300,10 +281,6 @@ TABS.cli.initialize = function (callback) {
             const enterKeyCode = 13;
             if (event.which == enterKeyCode) {
                 event.preventDefault(); // prevent the adding of new line
-
-                if (CliAutoComplete.isBuilding()) {
-                    return; // silently ignore commands if autocomplete is still building
-                }
 
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
@@ -323,10 +300,6 @@ TABS.cli.initialize = function (callback) {
         textarea.keyup(function (event) {
             var keyUp = {38: true},
                 keyDown = {40: true};
-
-            if (CliAutoComplete.isOpen()) {
-                return; // disable history keys if autocomplete is open
-            }
 
             if (event.keyCode in keyUp) {
                 textarea.val(self.history.prev());
@@ -359,11 +332,11 @@ TABS.cli.initialize = function (callback) {
             if (delay > 0) {    
                 helper.timeout.add('cli_delay', () =>  {
                     self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
-                    self.send(getCliCommand('# ' + chrome.i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand('# ' + localization.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
                 }, 400);
             } 
         }
-
+    
         GUI.content_ready(callback);
     });
 };
@@ -398,11 +371,6 @@ function writeToOutput(text) {
 }
 
 function writeLineToOutput(text) {
-    if (CliAutoComplete.isBuilding()) {
-        CliAutoComplete.builderParseLine(text);
-        return; // suppress output if in building state
-    }
-
     if (text.startsWith("### ERROR: ")) {
         writeToOutput('<span class="error_message">' + text + '</span><br>');
     } else {
@@ -477,34 +445,22 @@ TABS.cli.read = function (readInfo) {
                 this.cliBuffer += currentChar;
         }
 
-        if (!CliAutoComplete.isBuilding()) {
-            // do not include the building dialog into the history
-            this.outputHistory += currentChar;
-        }
+        this.outputHistory += currentChar;
 
         if (this.cliBuffer == 'Rebooting') {
             CONFIGURATOR.cliActive = false;
             CONFIGURATOR.cliValid = false;
-            GUI.log(chrome.i18n.getMessage('cliReboot'));
-            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+            GUI.log(localization.getMessage('cliReboot'));
+            GUI.log(localization.getMessage('deviceRebooting'));
             GUI.handleReconnect();
         }
 
     }
 
     if (!CONFIGURATOR.cliValid && validateText.indexOf('CLI') !== -1) {
-        GUI.log(chrome.i18n.getMessage('cliEnter'));
+        GUI.log(localization.getMessage('cliEnter'));
         CONFIGURATOR.cliValid = true;
-
-        if (CliAutoComplete.isEnabled() && !CliAutoComplete.isBuilding()) {
-            // start building autoComplete
-            CliAutoComplete.builderStart();
-        }
-    }
-
-    // fallback to native autocomplete
-    if (!CliAutoComplete.isEnabled()) {
-        setPrompt(removePromptHash(this.cliBuffer));
+        validateText = "";
     }
 
     setPrompt(removePromptHash(this.cliBuffer));
@@ -543,8 +499,5 @@ TABS.cli.cleanup = function (callback) {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;
-
-        CliAutoComplete.cleanup();
-        $(CliAutoComplete).off();
     });
 };

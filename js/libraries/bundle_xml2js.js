@@ -548,14 +548,14 @@ Buffer.concat = function concat (list, length) {
   var i
   if (length === undefined) {
     length = 0
-    for (i = 0; i < list.length; ++i) {
+    for (let i = 0; i < list.length; ++i) {
       length += list[i].length
     }
   }
 
   var buffer = Buffer.allocUnsafe(length)
   var pos = 0
-  for (i = 0; i < list.length; ++i) {
+  for (let i = 0; i < list.length; ++i) {
     var buf = list[i]
     if (isInstance(buf, Uint8Array)) {
       buf = Buffer.from(buf)
@@ -922,7 +922,7 @@ function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
   var i
   if (dir) {
     var foundIndex = -1
-    for (i = byteOffset; i < arrLength; i++) {
+    for (let i = byteOffset; i < arrLength; i++) {
       if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
         if (foundIndex === -1) foundIndex = i
         if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
@@ -933,7 +933,7 @@ function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
     }
   } else {
     if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
-    for (i = byteOffset; i >= 0; i--) {
+    for (let i = byteOffset; i >= 0; i--) {
       var found = true
       for (var j = 0; j < valLength; j++) {
         if (read(arr, i + j) !== read(val, j)) {
@@ -1759,7 +1759,7 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
 
   var i
   if (typeof val === 'number') {
-    for (i = start; i < end; ++i) {
+    for (let i = start; i < end; ++i) {
       this[i] = val
     }
   } else {
@@ -1771,7 +1771,7 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
       throw new TypeError('The value "' + val +
         '" is invalid for argument "value"')
     }
-    for (i = 0; i < end - start; ++i) {
+    for (let i = 0; i < end - start; ++i) {
       this[i + start] = bytes[i % len]
     }
   }
@@ -2240,7 +2240,7 @@ EventEmitter.prototype.emit = function emit(type) {
       // slower
     default:
       args = new Array(len - 1);
-      for (i = 1; i < len; i++)
+      for (let i = 1; i < len; i++)
         args[i - 1] = arguments[i];
       emitMany(handler, isFn, this, args);
   }
@@ -2399,7 +2399,7 @@ EventEmitter.prototype.removeListener =
       } else if (typeof list !== 'function') {
         position = -1;
 
-        for (i = list.length - 1; i >= 0; i--) {
+        for (let i = list.length - 1; i >= 0; i--) {
           if (list[i] === listener || list[i].listener === listener) {
             originalListener = list[i].listener;
             position = i;
@@ -2451,7 +2451,7 @@ EventEmitter.prototype.removeAllListeners =
       if (arguments.length === 0) {
         var keys = objectKeys(events);
         var key;
-        for (i = 0; i < keys.length; ++i) {
+        for (let i = 0; i < keys.length; ++i) {
           key = keys[i];
           if (key === 'removeListener') continue;
           this.removeAllListeners(key);
@@ -2468,7 +2468,7 @@ EventEmitter.prototype.removeAllListeners =
         this.removeListener(type, listeners);
       } else if (listeners) {
         // LIFO order
-        for (i = listeners.length - 1; i >= 0; i--) {
+        for (let i = listeners.length - 1; i >= 0; i--) {
           this.removeListener(type, listeners[i]);
         }
       }
@@ -5815,12 +5815,12 @@ module.exports = deprecate;
  * Mark that a method should not be used.
  * Returns a modified function which warns once by default.
  *
- * If `localStorage.noDeprecation = true` is set, then it is a no-op.
+ * If `localstore.noDeprecation = true` is set, then it is a no-op.
  *
- * If `localStorage.throwDeprecation = true` is set, then deprecated functions
+ * If `localstore.throwDeprecation = true` is set, then deprecated functions
  * will throw an Error when invoked.
  *
- * If `localStorage.traceDeprecation = true` is set, then deprecated functions
+ * If `localstore.traceDeprecation = true` is set, then deprecated functions
  * will invoke `console.trace()` instead of `console.error()`.
  *
  * @param {Function} fn - the function to deprecate
@@ -7516,7 +7516,7 @@ function config (name) {
               element.txt(obj);
             }
           } else if (Array.isArray(obj)) {
-            for (index in obj) {
+            for (let index in obj) {
               if (!hasProp.call(obj, index)) continue;
               child = obj[index];
               for (key in child) {
@@ -7542,7 +7542,7 @@ function config (name) {
                   element = element.txt(child);
                 }
               } else if (Array.isArray(child)) {
-                for (index in child) {
+                for (let index in child) {
                   if (!hasProp.call(child, index)) continue;
                   entry = child[index];
                   if (typeof entry === 'string') {
@@ -7686,7 +7686,7 @@ function config (name) {
 
   processItem = function(processors, item, key) {
     var i, len, process;
-    for (i = 0, len = processors.length; i < len; i++) {
+    for (let i = 0, len = processors.length; i < len; i++) {
       process = processors[i];
       item = process(item, key);
     }
@@ -7865,7 +7865,7 @@ function config (name) {
             xpath = "/" + ((function() {
               var i, len, results;
               results = [];
-              for (i = 0, len = stack.length; i < len; i++) {
+              for (let i = 0, len = stack.length; i < len; i++) {
                 node = stack[i];
                 results.push(node["#name"]);
               }
@@ -8106,7 +8106,7 @@ function config (name) {
     if (isFunction(Object.assign)) {
       Object.assign.apply(null, arguments);
     } else {
-      for (i = 0, len = sources.length; i < len; i++) {
+      for (let i = 0, len = sources.length; i < len; i++) {
         source = sources[i];
         if (source != null) {
           for (key in source) {
@@ -8819,12 +8819,12 @@ function config (name) {
         value = value.valueOf();
       }
       if (Array.isArray(target)) {
-        for (i = 0, len = target.length; i < len; i++) {
+        for (let i = 0, len = target.length; i < len; i++) {
           insTarget = target[i];
           this.instruction(insTarget);
         }
       } else if (isObject(target)) {
-        for (insTarget in target) {
+        for (let insTarget in target) {
           if (!hasProp.call(target, insTarget)) continue;
           insValue = target[insTarget];
           this.instruction(insTarget, insValue);
@@ -9145,7 +9145,7 @@ function config (name) {
       }
       name = name.valueOf();
       if (Array.isArray(name)) {
-        for (i = 0, len = name.length; i < len; i++) {
+        for (let i = 0, len = name.length; i < len; i++) {
           attName = name[i];
           delete this.attributes[attName];
         }
@@ -9396,7 +9396,7 @@ function config (name) {
           this.instruction(insTarget);
         }
       } else if (isObject(target)) {
-        for (insTarget in target) {
+        for (let insTarget in target) {
           if (!hasProp.call(target, insTarget)) continue;
           insValue = target[insTarget];
           this.instruction(insTarget, insValue);
@@ -9446,7 +9446,7 @@ function config (name) {
       doc = this.document();
       doctype = new XMLDocType(doc, pubID, sysID);
       ref1 = doc.children;
-      for (i = j = 0, len = ref1.length; j < len; i = ++j) {
+      for (let i = j = 0, len = ref1.length; j < len; i = ++j) {
         child = ref1[i];
         if (child instanceof XMLDocType) {
           doc.children[i] = doctype;
@@ -9454,7 +9454,7 @@ function config (name) {
         }
       }
       ref2 = doc.children;
-      for (i = k = 0, len1 = ref2.length; k < len1; i = ++k) {
+      for (let i = k = 0, len1 = ref2.length; k < len1; i = ++k) {
         child = ref2[i];
         if (child.isRoot) {
           doc.children.splice(i, 0, doctype);
@@ -9722,7 +9722,7 @@ function config (name) {
     XMLStreamWriter.prototype.document = function(doc) {
       var child, i, j, len, len1, ref, ref1, results;
       ref = doc.children;
-      for (i = 0, len = ref.length; i < len; i++) {
+      for (let i = 0, len = ref.length; i < len; i++) {
         child = ref[i];
         child.isLastRootNode = false;
       }
@@ -9790,7 +9790,7 @@ function config (name) {
         this.stream.write(' [');
         this.stream.write(this.endline(node));
         ref = node.children;
-        for (i = 0, len = ref.length; i < len; i++) {
+        for (let i = 0, len = ref.length; i < len; i++) {
           child = ref[i];
           switch (false) {
             case !(child instanceof XMLDTDAttList):
@@ -9850,7 +9850,7 @@ function config (name) {
       } else {
         this.stream.write('>' + this.newline);
         ref1 = node.children;
-        for (i = 0, len = ref1.length; i < len; i++) {
+        for (let i = 0, len = ref1.length; i < len; i++) {
           child = ref1[i];
           switch (false) {
             case !(child instanceof XMLCData):
@@ -10004,7 +10004,7 @@ function config (name) {
       this.textispresent = false;
       r = '';
       ref = doc.children;
-      for (i = 0, len = ref.length; i < len; i++) {
+      for (let i = 0, len = ref.length; i < len; i++) {
         child = ref[i];
         r += (function() {
           switch (false) {
@@ -10068,7 +10068,7 @@ function config (name) {
         r += ' [';
         r += this.newline;
         ref = node.children;
-        for (i = 0, len = ref.length; i < len; i++) {
+        for (let i = 0, len = ref.length; i < len; i++) {
           child = ref[i];
           r += (function() {
             switch (false) {
@@ -10133,7 +10133,7 @@ function config (name) {
       } else {
         if (this.dontprettytextnodes) {
           ref1 = node.children;
-          for (i = 0, len = ref1.length; i < len; i++) {
+          for (let i = 0, len = ref1.length; i < len; i++) {
             child = ref1[i];
             if (child.value != null) {
               this.textispresent++;

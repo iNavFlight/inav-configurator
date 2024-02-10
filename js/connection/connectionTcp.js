@@ -43,7 +43,6 @@ class ConnectionTcp extends Connection {
 
                             this.addOnReceiveErrorListener(info => {
                                 console.error(info);
-                                googleAnalytics.sendException('TCP: ' + info.error, false);
 
                                 let message;
                                 switch (info.resultCode) {
@@ -79,7 +78,7 @@ class ConnectionTcp extends Connection {
                                 this.abort();      
                             });
                             
-                            GUI.log(chrome.i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
+                            GUI.log(localization.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
                             
                             if (callback) {
                                 callback({

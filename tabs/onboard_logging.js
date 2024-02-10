@@ -30,7 +30,6 @@ TABS.onboard_logging.initialize = function (callback) {
 
     if (GUI.active_tab != 'onboard_logging') {
         GUI.active_tab = 'onboard_logging';
-        googleAnalytics.sendAppView('onboard_logging');
     }
 
     if (CONFIGURATOR.connectionValid) {
@@ -55,7 +54,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reboot() {
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -63,14 +62,14 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reinitialize() {
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_onboard_logging a'));
     }
 
     function load_html() {
-        GUI.load("./tabs/onboard_logging.html", function() {
+        GUI.load(path.join(__dirname, "tabs/onboard_logging.html"), function() {
             // translate to user-selected language
-            localize();
+           localization.localize();;
 
             var
                 dataflashPresent = DATAFLASH.totalSize > 0,
@@ -136,7 +135,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 label.attr("for",FIELD_ID)
 
                 const span = $('<span></span>');
-                span.html(chrome.i18n.getMessage(FIELD_ID))
+                span.html(localization.getMessage(FIELD_ID))
                 label.append(span);
 
                 const checkbox = $('<div class="checkbox"></div>')

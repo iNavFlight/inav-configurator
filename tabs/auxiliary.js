@@ -7,8 +7,6 @@ TABS.auxiliary = {};
 TABS.auxiliary.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'auxiliary';
-    googleAnalytics.sendAppView('Auxiliary');
-
     function get_mode_ranges() {
         MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
     }
@@ -31,7 +29,7 @@ TABS.auxiliary.initialize = function (callback) {
 
     function load_html() {
         sort_modes_for_display();
-        GUI.load("./tabs/auxiliary.html", process_html);
+        GUI.load(path.join(__dirname, "tabs/auxiliary.html"), process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
@@ -55,7 +53,7 @@ TABS.auxiliary.initialize = function (callback) {
         var found = false;
         var sortedID = 0;
 
-        for (i=0; i<AUX_CONFIG.length; i++) {
+        for (let i=0; i<AUX_CONFIG.length; i++) {
             tmpAUX_CONFIG[i] = AUX_CONFIG[i];
             tmpAUX_CONFIG_IDS[i] = AUX_CONFIG_IDS[i];
         }
@@ -65,8 +63,8 @@ TABS.auxiliary.initialize = function (callback) {
 
         for (let categoryModesIndex in modeSections) {
             let categoryModes = modeSections[categoryModesIndex];
-            for (cM=0; cM<categoryModes.length; cM++){
-                for(j=0; j<tmpAUX_CONFIG.length; j++) {
+            for (let cM=0; cM<categoryModes.length; cM++){
+                for(let j=0; j<tmpAUX_CONFIG.length; j++) {
                     if (categoryModes[cM] === tmpAUX_CONFIG[j]) {
                         AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
                         AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
@@ -80,9 +78,9 @@ TABS.auxiliary.initialize = function (callback) {
 
         // There are modes that are missing from the modeSections object. Add them to the end until they are ordered correctly.
         if (tmpAUX_CONFIG.length > AUX_CONFIG.length) {
-            for (i=0; i<tmpAUX_CONFIG.length; i++) {
+            for (let i=0; i<tmpAUX_CONFIG.length; i++) {
                 found = false;
-                for (j=0; j<AUX_CONFIG.length; j++) {
+                for (let j=0; j<AUX_CONFIG.length; j++) {
                     if (tmpAUX_CONFIG[i] === AUX_CONFIG[j]) {
                         found = true;
                         break;
@@ -140,7 +138,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         //add value to autodetect channel
         let channelOption = channelOptionTemplate.clone();
-        channelOption.text(chrome.i18n.getMessage('auxiliaryAutoChannelSelect'));
+        channelOption.text(localization.getMessage('auxiliaryAutoChannelSelect'));
         channelOption.val(-1);
         channelList.append(channelOption);
 
@@ -279,7 +277,7 @@ TABS.auxiliary.initialize = function (callback) {
         });
 
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // UI Hooks
         $('a.save').click(function () {
@@ -330,19 +328,9 @@ TABS.auxiliary.initialize = function (callback) {
             //
             mspHelper.sendModeRanges(save_to_eeprom);
 
-            /*
-             * Send some data to analytics
-             */
-            uniqueModes = $.unique(uniqueModes);
-            for (var mode in uniqueModes) {
-                if (uniqueModes.hasOwnProperty(mode)) {
-                    googleAnalytics.sendEvent('Setting', 'AuxModes', uniqueModes[mode]);
-                }
-            }
-
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('auxiliaryEepromSaved'));
+                    GUI.log(localization.getMessage('auxiliaryEepromSaved'));
                 });
             }
         });
@@ -409,7 +397,7 @@ TABS.auxiliary.initialize = function (callback) {
                 } else {
                     // Check to see if the mode is in range
                     var modeRanges = modeElement.find(' .range');
-                    for (r = 0; r < modeRanges.length; r++) {
+                    for (let r = 0; r < modeRanges.length; r++) {
                         var rangeLow = $(modeRanges[r]).find('.lowerLimitValue').html();
                         var rangeHigh = $(modeRanges[r]).find('.upperLimitValue').html();
                         var markerPosition = $(modeRanges[r]).find('.marker')[0].style.left;
@@ -464,8 +452,8 @@ TABS.auxiliary.initialize = function (callback) {
          */
         function auto_select_channel(RC_channels, activeChannels, RSSI_channel) {
             const auto_option = $('.tab-auxiliary select.channel option[value="-1"]:selected');
+            var prevChannelsValues = null;
             if (auto_option.length === 0) {
-                prevChannelsValues = null;
                 return;
             }
 
@@ -497,16 +485,16 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         let hideUnusedModes = false;
-        chrome.storage.local.get('hideUnusedModes', function (result) {
-            $("input#switch-toggle-unused")
-                .change(function() {
-                    hideUnusedModes = $(this).prop("checked");
-                    chrome.storage.local.set({ hideUnusedModes: hideUnusedModes });
-                    update_ui();
-                })
-                .prop("checked", !!result.hideUnusedModes)
-                .change();
-        });
+        let hideUnusedModesStore =  store.get('hideUnusedModes', false);
+        $("input#switch-toggle-unused")
+            .change(function() {
+                hideUnusedModes = $(this).prop("checked");
+                store.set('hideUnusedModes', hideUnusedModes);
+                update_ui();
+            })
+            .prop("checked", !!hideUnusedModesStore)
+            .change();
+        
         // update ui instantly on first load
         update_ui();
 

@@ -122,7 +122,7 @@ TABS.ports.initialize = function (callback) {
     );
 
     for (var i = 0; i < portFunctionRules.length; i++) {
-        portFunctionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + portFunctionRules[i].name);
+        portFunctionRules[i].displayName = localization.getMessage('portsFunction_' + portFunctionRules[i].name);
     }
 
     var mspBaudRates = [
@@ -167,7 +167,6 @@ TABS.ports.initialize = function (callback) {
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
-        googleAnalytics.sendAppView('Ports');
     }
 
     load_configuration_from_fc();
@@ -176,7 +175,7 @@ TABS.ports.initialize = function (callback) {
         MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
 
         function on_configuration_loaded_handler() {
-            GUI.load("./tabs/ports.html", on_tab_loaded_handler);
+            GUI.load(path.join(__dirname, "tabs/ports.html"), on_tab_loaded_handler);
         }
     }
 
@@ -202,22 +201,22 @@ TABS.ports.initialize = function (callback) {
             $elements;
 
         $elements = $('select.sensors_baudrate');
-        for (i = 0; i < gpsBaudRates.length; i++) {
+        for (let i = 0; i < gpsBaudRates.length; i++) {
             $elements.append('<option value="' + gpsBaudRates[i] + '">' + gpsBaudRates[i] + '</option>');
         }
 
         $elements = $('select.msp_baudrate');
-        for (i = 0; i < mspBaudRates.length; i++) {
+        for (let i = 0; i < mspBaudRates.length; i++) {
             $elements.append('<option value="' + mspBaudRates[i] + '">' + mspBaudRates[i] + '</option>');
         }
 
         $elements = $('select.telemetry_baudrate');
-        for (i = 0; i < telemetryBaudRates_post1_6_3.length; i++) {
+        for (let i = 0; i < telemetryBaudRates_post1_6_3.length; i++) {
             $elements.append('<option value="' + telemetryBaudRates_post1_6_3[i] + '">' + telemetryBaudRates_post1_6_3[i] + '</option>');
         }
 
         $elements = $('select.peripherals_baudrate');
-        for (i = 0; i < peripheralsBaudRates.length; i++) {
+        for (let i = 0; i < peripheralsBaudRates.length; i++) {
             $elements.append('<option value="' + peripheralsBaudRates[i] + '">' + peripheralsBaudRates[i] + '</option>');
         }
 
@@ -253,7 +252,7 @@ TABS.ports.initialize = function (callback) {
                 let functions_e_id = "portFunc-" + column + "-" + portIndex;
                 functions_e.attr("id", functions_e_id);
 
-                for (i = 0; i < portFunctionRules.length; i++) {
+                for (let i = 0; i < portFunctionRules.length; i++) {
                     var functionRule = portFunctionRules[i];
                     var functionName = functionRule.name;
 
@@ -276,11 +275,11 @@ TABS.ports.initialize = function (callback) {
                         var selectElementName = 'function-' + column;
                         var selectElementSelector = 'select[name=' + selectElementName + ']';
                         select_e = functions_e.find(selectElementSelector);
-                        
-                        if (select_e.length == 0) {
+
+                        if (select_e.size() == 0) {
                             functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
                             select_e = functions_e.find(selectElementSelector);
-                            var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
+                            var disabledText = localization.getMessage('portsTelemetryDisabled');
                             select_e.append('<option value="">' + disabledText + '</option>');
                         }
                         select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
@@ -298,7 +297,7 @@ TABS.ports.initialize = function (callback) {
 
     function on_tab_loaded_handler() {
 
-        localize();
+       localization.localize();;
 
         update_ui();
 
@@ -337,10 +336,6 @@ TABS.ports.initialize = function (callback) {
                 functions.push(sensorsFunction);
             }
 
-            if (telemetryFunction.length > 0) {
-                googleAnalytics.sendEvent('Setting', 'Telemetry Protocol', telemetryFunction);
-            }
-
             var serialPort = {
                 functions: functions,
                 msp_baudrate: $(portConfiguration_e).find('.msp_baudrate').val(),
@@ -359,7 +354,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_saved_handler() {
-            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+            GUI.log(localization.getMessage('configurationEepromSaved'));
 
             GUI.tab_switch_cleanup(function() {
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, on_reboot_success_handler);
@@ -367,7 +362,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_reboot_success_handler() {
-            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+            GUI.log(localization.getMessage('deviceRebooting'));
             GUI.handleReconnect($('.tab_ports a'));
         }
     }
@@ -378,7 +373,7 @@ function updateDefaultBaud(baudSelect, column) {
     let portName = section.find('.function-' + column).val();
     let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
 
-    for (i = 0; i < portFunctionRules.length; i++) {
+    for (let i = 0; i < portFunctionRules.length; i++) {
         if (portFunctionRules[i].name === portName) {
             if (typeof portFunctionRules[i].defaultBaud !== 'undefined') {
                 baudRate = portFunctionRules[i].defaultBaud;

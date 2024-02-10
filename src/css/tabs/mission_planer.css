@@ -34,71 +34,71 @@
 }
 
 .tab-mission-control .ic_save2FC {
-    background-image: url(../images/icons/cf_icon_MP_save2FC_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_save2FC_grey.svg);
 }
 
 .tab-mission-control .ic_loadFromFC {
-    background-image: url(../images/icons/cf_icon_MP_loadFromFC_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_loadFromFC_grey.svg);
 }
 
 .tab-mission-control .ic_save2File {
-    background-image: url(../images/icons/cf_icon_MP_saveFile_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_saveFile_grey.svg);
 }
 
 .tab-mission-control .ic_loadFromFile {
-    background-image: url(../images/icons/cf_icon_MP_loadFile_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_loadFile_grey.svg);
 }
 
 .tab-mission-control .ic_save2Eprom {
-    background-image: url(../images/icons/cf_icon_MP_save2Eprom_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_save2Eprom_grey.svg);
 }
 
 .tab-mission-control .ic_loadFromEprom {
-    background-image: url(../images/icons/cf_icon_MP_loadFromEprom_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_loadFromEprom_grey.svg);
 }
 
 .tab-mission-control .ic_removeAll {
-    background-image: url(../images/icons/cf_icon_MP_removeAll_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_removeAll_grey.svg);
 }
 
 .tab-mission-control .ic_openMultimission {
-    background-image: url(../images/icons/cf_icon_multimission_white.svg);
+    background-image: url(./../../../images/icons/cf_icon_multimission_white.svg);
 }
 
 .tab-mission-control .ic_save {
-    background-image: url(../images/icons/cf_icon_MP_save_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_save_grey.svg);
 }
 
 .tab-mission-control .ic_cancel {
-    background-image: url(../images/icons/cf_icon_MP_cancel_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_cancel_grey.svg);
 }
 
 .tab-mission-control .ic_add {
-    background-image: url(../images/icons/cf_icon_MP_add_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_add_grey.svg);
 }
 
 .tab-mission-control .ic_show {
-    background-image: url(../images/icons/cf_icon_MP_show_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_show_grey.svg);
 }
 
 .tab-mission-control .ic_hide {
-    background-image: url(../images/icons/cf_icon_MP_hide_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_hide_grey.svg);
 }
 
 .tab-mission-control .ic_play {
-    background-image: url(../images/icons/cf_icon_MP_play_grey.svg);
+    background-image: url(../..//images/icons/cf_icon_MP_play_grey.svg);
 }
 
 .tab-mission-control .ic_stop {
-    background-image: url(../images/icons/cf_icon_MP_stop_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_stop_grey.svg);
 }
 
 .tab-mission-control .ic_center {
-    background-image: url(../images/icons/cf_icon_MP_center_grey.svg);
+    background-image: url(./../../../images/icons/cf_icon_MP_center_grey.svg);
 }
 
 .tab-mission-control .ic_setup {
-    background-image: url(../images/icons/cf_icon_setup_white.svg);
+    background-image: url(./../../../images/icons/cf_icon_setup_white.svg);
 }
 
 .tab-mission-control .btnicon {

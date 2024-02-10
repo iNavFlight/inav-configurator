@@ -35,19 +35,19 @@ helper.periodicStatusUpdater = (function () {
 
         if (FC.isModeEnabled('ARM'))
             $(".armedicon").css({
-                'background-image': 'url("../images/icons/cf_icon_armed_active.svg")'
+                'background-image': 'url("./images/icons/cf_icon_armed_active.svg")'
             });
         else
             $(".armedicon").css({
-                'background-image': 'url("../images/icons/cf_icon_armed_grey.svg")'
+                'background-image': 'url("./images/icons/cf_icon_armed_grey.svg")'
             });
         if (FC.isModeEnabled('FAILSAFE'))
             $(".failsafeicon").css({
-                'background-image': 'url("../images/icons/cf_icon_failsafe_active.svg")'
+                'background-image': 'url("./images/icons/cf_icon_failsafe_active.svg")'
             });
         else
             $(".failsafeicon").css({
-                'background-image': 'url("../images/icons/cf_icon_failsafe_grey.svg")'
+                'background-image': 'url("./images/icons/cf_icon_failsafe_grey.svg")'
             });
 
         if (ANALOG != undefined) {
@@ -65,11 +65,11 @@ helper.periodicStatusUpdater = (function () {
         
             if (active) {
                 $(".linkicon").css({
-                    'background-image': 'url("../images/icons/cf_icon_link_active.svg")'
+                    'background-image': 'url("./images/icons/cf_icon_link_active.svg")'
                 });
             } else {
                 $(".linkicon").css({
-                    'background-image': 'url("../images/icons/cf_icon_link_grey.svg")'
+                    'background-image': 'url("./images/icons/cf_icon_link_grey.svg")'
                 });
             }
 

@@ -66,22 +66,16 @@ TABS.sitl.initialize = (callback) => {
  
     if (GUI.active_tab != 'sitl') {
         GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
     }
 
-    if (GUI.active_tab != 'sitl') {
-        GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
-    }
-
-    GUI.load("./tabs/sitl.html", function () {
-        localize();
+    GUI.load(path.join(__dirname, "tabs/sitl.html"), function () {
+        localization.localize();
     
     var os = GUI.operating_system;
     if (os != 'Windows' && os != 'Linux') {
 
         $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${chrome.i18n.getMessage('sitlOSNotSupported')}</h2>`);
+        $('.content_wrapper').append(`<h2>${localization.getMessage('sitlOSNotSupported')}</h2>`);
         
         GUI.content_ready(callback);
         return;
@@ -121,12 +115,12 @@ TABS.sitl.initialize = (callback) => {
     $('#sitlLog').animate({scrollTop: $('#sitlLog').scrollHeight}, "fast");
 
     profiles = stdProfiles.slice(0);
-    chrome.storage.local.get('sitlProfiles', (result) => {
-        if(result.sitlProfiles) 
-            profiles.push(...result.sitlProfiles);
-  
-        initElements(true);
-    });
+    var sitlProfiles = store.get('sitlProfiles', false);
+    if (sitlProfiles) {
+        profiles.push(...sitlProfiles);
+    }
+    initElements(true);
+    
     
     Ser2TCP.resetPortsList();
     Ser2TCP.pollSerialPorts(ports => {
@@ -235,7 +229,7 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
         Ser2TCP.stop();
         SITLProcess.stop();
-        appendLog(chrome.i18n.getMessage('sitlStopped'));
+        appendLog(localization.getMessage('sitlStopped'));
     });
 
     profileSaveBtn_e.on('click', () => {
@@ -243,12 +237,12 @@ TABS.sitl.initialize = (callback) => {
     });
 
     profileNewBtn_e.on('click', () => {
-        var name = prompt(chrome.i18n.getMessage('sitlNewProfile'), chrome.i18n.getMessage('sitlEnterName'));
+        var name = prompt(localization.getMessage('sitlNewProfile'), localization.getMessage('sitlEnterName'));
         if (!name)
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(chrome.i18n.getMessage('sitlProfileExists'))
+            alert(localization.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -279,7 +273,7 @@ TABS.sitl.initialize = (callback) => {
     profileDeleteBtn_e.on('click', () => {
 
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantDeleted'));
+            alert(localization.getMessage('sitlStdProfileCantDeleted'));
             return;
         }
 
@@ -364,17 +358,15 @@ TABS.sitl.initialize = (callback) => {
                 protocollPreset_e.append(`<option value="${protocoll.name}">${protocoll.name}</option>`);
             });
 
-            chrome.storage.local.get('sitlLastProfile', (result) => {
-                if (result.sitlLastProfile) {    
-                    var element = profiles.find(profile => {
-                        return profile.name == result.sitlLastProfile;
-                    });
+            var sitlLastProfile = store.get('sitlLastProfile', false);
+            if (sitlLastProfile) {    
+                var element = profiles.find(profile => {
+                    return profile.name == sitlLastProfile;
+                });
 
-                    if (element)
-                        profiles_e.val(element.name).trigger('change');
-                }
-            });
-
+                if (element)
+                    profiles_e.val(element.name).trigger('change');
+            }
         }
         
         updateCurrentProfile();
@@ -382,7 +374,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantOverwritten'));
+            alert(localization.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];
@@ -391,9 +383,7 @@ TABS.sitl.initialize = (callback) => {
                 profilesToSave.push(profile);
         });
 
-        chrome.storage.local.set({
-            'sitlProfiles': profilesToSave
-        });
+        store.set('sitlProfiles', profilesToSave);
     
     }
 
@@ -461,9 +451,7 @@ TABS.sitl.initialize = (callback) => {
         simIp_e.val(currentProfile.ip).trigger('change'); 
         useImu_e.prop('checked', currentProfile.useImu).trigger('change');
 
-        chrome.storage.local.set({
-            'sitlLastProfile': selected
-        });
+        store.set('sitlLastProfile', selected);
     }
 
     function renderChanMapTable() 
@@ -485,7 +473,7 @@ TABS.sitl.initialize = (callback) => {
 
             row.find(".inavChannel").val(mapping[i]).on('change', (sender) => {
                 mapping[$(sender.target).data('out')] = parseInt($(sender.target).val());
-                chrome.storage.local.set({'sitlMapping': mapping});
+                store.set('sitlMapping', mapping);
             });
         }
     }

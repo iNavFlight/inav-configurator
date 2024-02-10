@@ -46,7 +46,7 @@ class ConnectionUdp extends Connection {
 
                             this._timeoutId = setTimeout(() => {
                                 if (!this._isCli) { // Disable timeout for CLI
-                                    GUI.log(chrome.i18n.getMessage('connectionUdpTimeout'));
+                                    GUI.log(localization.getMessage('connectionUdpTimeout'));
                                     this.abort();
                                 }
                             }, 10000);
@@ -55,7 +55,6 @@ class ConnectionUdp extends Connection {
                         // Actually useless, but according to chrome documentation also UDP triggers error events ¯\_(ツ)_/¯
                         this.addOnReceiveErrorListener(info => {
                             console.error(info);
-                            googleAnalytics.sendException('UDP: ' + info.error, false);
 
                             let message;
                             switch (info.resultCode) {
@@ -91,7 +90,7 @@ class ConnectionUdp extends Connection {
                             this.abort();        
                         });
                         
-                        GUI.log(chrome.i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
+                        GUI.log(localization.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
 
                         if (callback) {
                             callback({

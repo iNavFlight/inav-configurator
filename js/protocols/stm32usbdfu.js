@@ -97,7 +97,7 @@ STM32DFU_protocol.prototype.connect = function (device, hex, options, callback) 
             self.openDevice(result[0]);
         } else {
             console.log('USB DFU not found');
-            GUI.log(chrome.i18n.getMessage('stm32UsbDfuNotFound'));
+            GUI.log(localization.getMessage('stm32UsbDfuNotFound'));
         }
     });
 };
@@ -108,16 +108,16 @@ STM32DFU_protocol.prototype.openDevice = function (device) {
     chrome.usb.openDevice(device, function (handle) {
         if (checkChromeRuntimeError()) {
             console.log('Failed to open USB device!');
-            GUI.log(chrome.i18n.getMessage('usbDeviceOpenFail'));
+            GUI.log(localization.getMessage('usbDeviceOpenFail'));
             if(GUI.operating_system === 'Linux') {
-                GUI.log(chrome.i18n.getMessage('usbDeviceUdevNotice'));
+                GUI.log(localization.getMessage('usbDeviceUdevNotice'));
             }
             return;
         }
 
         self.handle = handle;
 
-        GUI.log(chrome.i18n.getMessage('usbDeviceOpened', handle.handle.toString()));
+        GUI.log(localization.getMessage('usbDeviceOpened', handle.handle.toString()));
         console.log('Device opened with Handle ID: ' + handle.handle);
         self.claimInterface(0);
     });
@@ -129,10 +129,10 @@ STM32DFU_protocol.prototype.closeDevice = function () {
     chrome.usb.closeDevice(this.handle, function closed() {
         if (checkChromeRuntimeError()) {
             console.log('Failed to close USB device!');
-            GUI.log(chrome.i18n.getMessage('usbDeviceCloseFail'));
+            GUI.log(localization.getMessage('usbDeviceCloseFail'));
         }
 
-        GUI.log(chrome.i18n.getMessage('usbDeviceClosed'));
+        GUI.log(localization.getMessage('usbDeviceClosed'));
         console.log('Device closed with Handle ID: ' + self.handle.handle);
 
         self.handle = null;
@@ -568,10 +568,10 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                         self.flash_layout = chipInfo.internal_flash;
                         self.available_flash_size = self.flash_layout.total_size - (self.hex.start_linear_address - self.flash_layout.start_address);
 
-                        GUI.log(chrome.i18n.getMessage('dfu_device_flash_info', (self.flash_layout.total_size / 1024).toString()));
+                        GUI.log(localization.getMessage('dfu_device_flash_info', (self.flash_layout.total_size / 1024).toString()));
 
                         if (self.hex.bytes_total > self.available_flash_size) {
-                            GUI.log(chrome.i18n.getMessage('dfu_error_image_size',
+                            GUI.log(localization.getMessage('dfu_error_image_size',
                                 [(self.hex.bytes_total / 1024.0).toFixed(1),
                                 (self.available_flash_size / 1024.0).toFixed(1)]));
                             self.cleanup();
@@ -595,10 +595,10 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
 
                         self.available_flash_size = firmware_partition_size;
 
-                        GUI.log(chrome.i18n.getMessage('dfu_device_flash_info', (self.flash_layout.total_size / 1024).toString()));
+                        GUI.log(localization.getMessage('dfu_device_flash_info', (self.flash_layout.total_size / 1024).toString()));
 
                         if (self.hex.bytes_total > self.available_flash_size) {
-                            GUI.log(chrome.i18n.getMessage('dfu_error_image_size',
+                            GUI.log(localization.getMessage('dfu_error_image_size',
                                 [(self.hex.bytes_total / 1024.0).toFixed(1),
                                 (self.available_flash_size / 1024.0).toFixed(1)]));
                             self.cleanup();
@@ -631,7 +631,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
 
             var unprotect = function() {
                 console.log('Initiate read unprotect');
-                let messageReadProtected = chrome.i18n.getMessage('stm32ReadProtected');
+                let messageReadProtected = localization.getMessage('stm32ReadProtected');
                 GUI.log(messageReadProtected);
                 TABS.firmware_flasher.flashingMessage(messageReadProtected, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.ACTION);
 
@@ -654,9 +654,9 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                                 self.controlTransfer('in', self.request.GETSTATUS, 0, 0, 6, 0, function (data, error) { // should stall/disconnect
                                     if(error) { // we encounter an error, but this is expected. should be a stall.
                                         console.log('Unprotect memory command ran successfully. Unplug flight controller. Connect again in DFU mode and try flashing again.');
-                                        GUI.log(chrome.i18n.getMessage('stm32UnprotectSuccessful'));
+                                        GUI.log(localization.getMessage('stm32UnprotectSuccessful'));
 
-                                        let messageUnprotectUnplug = chrome.i18n.getMessage('stm32UnprotectUnplug');
+                                        let messageUnprotectUnplug = localization.getMessage('stm32UnprotectUnplug');
                                         GUI.log(messageUnprotectUnplug);
 
                                         TABS.firmware_flasher.flashingMessage(messageUnprotectUnplug, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.ACTION)
@@ -665,8 +665,8 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                                     } else { // unprotecting the flight controller did not work. It did not reboot.
                                         console.log('Failed to execute unprotect memory command');
 
-                                        GUI.log(chrome.i18n.getMessage('stm32UnprotectFailed'));
-                                        TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32UnprotectFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                                        GUI.log(localization.getMessage('stm32UnprotectFailed'));
+                                        TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32UnprotectFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
                                         console.log(data);
                                         self.cleanup();
                                     }
@@ -674,7 +674,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                             }, incr);
                         } else {
                                 console.log('Failed to initiate unprotect memory command');
-                                let messageUnprotectInitFailed = chrome.i18n.getMessage('stm32UnprotectInitFailed');
+                                let messageUnprotectInitFailed = localization.getMessage('stm32UnprotectInitFailed');
                                 GUI.log(messageUnprotectInitFailed);
                                 TABS.firmware_flasher.flashingMessage(messageUnprotectInitFailed, TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
                                 self.cleanup();
@@ -695,7 +695,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                     if (data[4] == self.state.dfuUPLOAD_IDLE && ob_data.length == self.chipInfo.option_bytes.total_size) {
                         console.log('Option bytes read successfully');
                         console.log('Chip does not appear read protected');
-                        GUI.log(chrome.i18n.getMessage('stm32NotReadProtected'));
+                        GUI.log(localization.getMessage('stm32NotReadProtected'));
                         // it is pretty safe to continue to erase flash
                         self.clearStatus(function() {
                             self.upload_procedure(2);
@@ -744,14 +744,14 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                 // if address load fails with this specific error though, it is very likely bc of read protection
                 if(loadAddressResponse[4] == self.state.dfuERROR && loadAddressResponse[0] == self.status.errVENDOR) {
                     // read protected
-                    GUI.log(chrome.i18n.getMessage('stm32AddressLoadFailed'));
+                    GUI.log(localization.getMessage('stm32AddressLoadFailed'));
                     self.clearStatus(unprotect);
                     return;
                 } else if(loadAddressResponse[4] == self.state.dfuDNLOAD_IDLE) {
                     console.log('Address load for option bytes sector succeeded.');
                     self.clearStatus(tryReadOB);
                 } else {
-                    GUI.log(chrome.i18n.getMessage('stm32AddressLoadUnknown'));
+                    GUI.log(localization.getMessage('stm32AddressLoadUnknown'));
                     self.cleanup();
                 }
             };
@@ -793,13 +793,13 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
 
                 if (erase_pages.length === 0) {
                     console.log('Aborting, No flash pages to erase');
-                    TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32InvalidHex'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                    TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32InvalidHex'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
                     self.cleanup();
                     break;
                 }
 
 
-                TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32Erase'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+                TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32Erase'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
                 console.log('Executing local chip erase', erase_pages);
 
                 var page = 0;
@@ -811,7 +811,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
 
                     if(page == erase_pages.length) {
                         console.log("Erase: complete");
-                        GUI.log(chrome.i18n.getMessage('dfu_erased_kilobytes', (total_erased / 1024).toString()));
+                        GUI.log(localization.getMessage('dfu_erased_kilobytes', (total_erased / 1024).toString()));
                         self.upload_procedure(4);
                     } else {
                         erase_page();
@@ -881,7 +881,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
             // upload
             // we dont need to clear the state as we are already using DFU_DNLOAD
             console.log('Writing data ...');
-            TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32Flashing'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+            TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32Flashing'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
 
             var blocks = self.hex.data.length - 1;
             var flashing_block = 0;
@@ -953,7 +953,7 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
         case 5:
             // verify
             console.log('Verifying data ...');
-            TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32Verifying'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
+            TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32Verifying'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.NEUTRAL);
 
             var blocks = self.hex.data.length - 1;
             var reading_block = 0;
@@ -1021,14 +1021,14 @@ STM32DFU_protocol.prototype.upload_procedure = function (step) {
                         if (verify) {
                             console.log('Programming: SUCCESSFUL');
                             // update progress bar
-                            TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32ProgrammingSuccessful'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.VALID);
+                            TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32ProgrammingSuccessful'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.VALID);
 
                             // proceed to next step
                             self.leave();
                         } else {
                             console.log('Programming: FAILED');
                             // update progress bar
-                            TABS.firmware_flasher.flashingMessage(chrome.i18n.getMessage('stm32ProgrammingFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
+                            TABS.firmware_flasher.flashingMessage(localization.getMessage('stm32ProgrammingFailed'), TABS.firmware_flasher.FLASH_MESSAGE_TYPES.INVALID);
 
                             // disconnect
                             self.cleanup();
