@@ -273,7 +273,7 @@ gulp.task('apps', gulp.series('dist', function(done) {
         files: './dist/**/*',
         buildDir: appsDir,
         platforms: getPlatforms(),
-        flavor: 'sdk',
+        flavor: 'normal',
         macIcns: './images/inav.icns',
         winIco: './images/inav.ico',
         version: get_nw_version(),

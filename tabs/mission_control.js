@@ -641,7 +641,8 @@ TABS.mission_control.initialize = function (callback) {
         } else {
             direction = wrap_360(bearing - 90);
         }
-        var pos2 = calculate_new_cooridatnes(pos1, direction, settings.fwLoiterRadius * 2.5);
+
+        var pos2 = calculate_new_cooridatnes(pos1, direction, Math.max(settings.fwLoiterRadius * 4, settings.fwApproachLength / 2));
         
         paintApproachLine(landCoord, pos2, '#0025a1', layers);
         paintApproachLine(pos2, pos1, '#0025a1', layers);
