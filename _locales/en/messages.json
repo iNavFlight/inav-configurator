@@ -4397,6 +4397,9 @@
     "missionTitleSaveEepromMission": {
         "message": "Save Eeprom mission"
     },
+    "missionTitleDelete": {
+        "message": "Delete"
+    },
     "missionTitleRemoveAll": {
         "message": "Remove all"
     },
