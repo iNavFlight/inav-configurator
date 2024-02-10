@@ -2104,6 +2104,14 @@ TABS.mission_control.initialize = function (callback) {
                 changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
                 $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
                 changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
+                                
+
+                                
+                $('#wpApproachDirection').val(selectedFwApproachWp.getApproachDirection());
+                $('#wpLandHeading1').val(Math.abs(selectedFwApproachWp.getLandHeading1()));
+                changeSwitchery($('#wpLandHeading1Excl'), selectedFwApproachWp.getLandHeading1() < 0);
+                $('#wpLandHeading2').val(Math.abs(selectedFwApproachWp.getLandHeading2()));
+                changeSwitchery($('#wpLandHeading2Excl'), selectedFwApproachWp.getLandHeading2() < 0);
 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -2421,12 +2429,29 @@ TABS.mission_control.initialize = function (callback) {
                         if ($('#pointP3Alt').prop("checked")) {
                             selectedMarker.setAlt(groundClearance + elevationAtWP * 100);
                         } else {
-                            let elevationAtHome = HOME.getAlt();
-                            if (isNaN(elevationAtHome)) {
-                                elevationAtHome = elevationAtWP;
-                            }
-                            selectedMarker.setAlt(groundClearance + 100 * (elevationAtWP - elevationAtHome));
+                            selectedMarker.setAlt(altitude - Number(elevationAtWP) * 100);
                         }
+
+                        if (selectedMarker.getAction() == MWNP.WPTYPE.LAND && selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
+                        
+                            let oldElevation = 0; 
+                            if (selectedFwApproachWp.getIsSeaLevelRef()) {
+                                oldElevation = selectedFwApproachWp.getElevation();
+                            }
+
+                            if ($('#pointP3Alt').prop("checked")) {
+                                selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - oldElevation + elevationAtWP * 100);
+                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - oldElevation + elevationAtWP * 100);
+                            } else {
+                                selectedFwApproachWp.setApproachAltAsl(selectedFwApproachWp.getApproachAltAsl() - elevationAtWP * 100);
+                                selectedFwApproachWp.setLandAltAsl(selectedFwApproachWp.getLandAltAsl() - elevationAtWP * 100);
+                            }
+                            selectedFwApproachWp.setElevation(elevationAtWP * 100);
+                            selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked") ? 1 : 0);
+                            $('#wpApproachAlt').val(selectedFwApproachWp.getApproachAltAsl());
+                            $('#wpLandAlt').val(selectedFwApproachWp.getLandAltAsl()); 
+                        }
+
                     }
 
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
@@ -2434,7 +2459,10 @@ TABS.mission_control.initialize = function (callback) {
                     $('#pointAlt').val(selectedMarker.getAlt());
                     altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
                     $('#altitudeInMeters').text(` ${altitudeMeters}m`);
-
+                    
+                    $('#wpLandAltM').text(selectedFwApproachWp.getLandAltAsl() / 100 + " m");
+                    $('#wpApproachAltM').text(selectedFwApproachWp.getApproachAltAsl() / 100 + " m");
+                    
                     if (selectedFwApproachWp && selectedFwApproachWp.getIsSeaLevelRef() != $('#pointP3Alt').prop("checked")) {
                         selectedFwApproachWp.setIsSeaLevelRef($('#pointP3Alt').prop("checked"));
                         selectedFwApproachWp.setElevation(elevationAtWP * 100);
@@ -2681,7 +2709,7 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromSafehomeButton').on('click', function () {
             $(this).addClass('disabled');
-            GUI.log(chrome.i18n.getMessage('startGettingSafehomePoints'));
+            GUI.log('Start of getting Safehome points');
             var loadChainer = new MSPChainerClass();
             loadChainer.setChain([
                 mspHelper.loadSafehomes,
@@ -2697,7 +2725,7 @@ TABS.mission_control.initialize = function (callback) {
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                     updateSafehomeInfo();
-                    GUI.log('End of getting Safehome points');
+                    GUI.log(chrome.i18n.getMessage('endGettingSafehomePoints'));
                     $('#loadEepromSafehomeButton').removeClass('disabled');
                 }
             ]);
@@ -3091,11 +3119,7 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#saveSettings').on('click', function () {
             let oldSafeRadiusSH = settings.safeRadiusSH;
-
-            settings.speed = Number($('#MPdefaultPointSpeed').val());
-            settings.alt = Number($('#MPdefaultPointAlt').val());
-            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
-
+            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()), maxDistSH : vMaxDistSH, fwApproachAlt: Number($('#MPdefaultFwApproachAlt').val()), fwLandAlt:Number($('#MPdefaultLandAlt').val())};
             saveSettings();
 
             if (settings.safeRadiusSH != oldSafeRadiusSH  && $('#showHideSafehomeButton').is(":visible")) {

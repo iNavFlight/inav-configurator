@@ -544,6 +544,8 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        FW_APPROACH = new FwApproachCollection();
     },
     getOutputUsages: function() {
         return {
