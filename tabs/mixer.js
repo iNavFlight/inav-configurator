@@ -701,7 +701,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
-            if (updateEzTuneTabVisibility(false)) {
+            if (!updateEzTuneTabVisibility(false)) {
                 EZ_TUNE.enabled = 0;
                 mspHelper.saveEzTune();
             }
