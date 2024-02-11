@@ -424,7 +424,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     function labelMotorNumbers() {
 
         let index = 0;
-        var rules
+        var rules;
 
         if (currentMixerPreset.id == loadedMixerPresetID) {
             rules = MOTOR_RULES.get();

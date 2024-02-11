@@ -155,7 +155,11 @@
                             <label for="maxBankAngle"><span data-i18n="maxBankAngle"></span></label>
                             <div for="maxBankAngle" class="helpicon cf_tip" data-i18n_title="maxBankAngleHelp"></div>
                         </div>
-
+                        <div class="number">
+                            <input type="number" id="navManualClimbRate" data-unit="v-cms" data-setting="nav_fw_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
+                            <div for="navManualClimbRate" class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
+                        </div>
                         <div class="number">
                             <input id="maxClimbAngle" type="number" data-unit="deg" data-setting="nav_fw_climb_angle" data-setting-multiplier="1" step="1" min="5" max="80" />
                             <label for="maxClimbAngle"><span data-i18n="maxClimbAngle"></span></label>
@@ -237,6 +241,16 @@
                             <input id="max-manual-speed" data-unit="cms" type="number" data-setting="nav_manual_speed" data-setting-multiplier="1" step="1" min="10" max="2000" />
                             <label for="max-manual-speed"><span data-i18n="posholdMaxManualSpeed"></span></label>
                             <div for="max-manual-speed" class="helpicon cf_tip" data-i18n_title="posholdMaxManualSpeedHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="navAutoClimbRate" data-unit="v-cms" data-setting="nav_mc_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
+                            <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
+                        </div>
+                        <div class="number">
+                            <input type="number" id="navManualClimbRate" data-unit="v-cms" data-setting="nav_mc_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
+                            <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
+                            <div for="navManualClimbRate" class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
                         </div>
                         <div class="number">
                             <input id="max-bank-angle" type="number" data-unit="deg" data-setting="nav_mc_bank_angle" data-setting-multiplier="1" step="1" min="15" max="45" />
@@ -465,17 +479,6 @@
                         <div class="spacer_box_title" data-i18n="generalNavigationSettings"></div>
                     </div>
                     <div class="spacer_box">
-                        <div class="number">
-                            <input type="number" id="navManualClimbRate" data-unit="v-cms" data-setting="nav_manual_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="navManualClimbRate"><span data-i18n="navManualClimbRate"></span></label>
-                            <div for="navManualClimbRate" class="helpicon cf_tip" data-i18n_title="navManualClimbRateHelp"></div>
-                        </div>
-
-                        <div class="number">
-                            <input type="number" id="navAutoClimbRate" data-unit="v-cms" data-setting="nav_auto_climb_rate" data-setting-multiplier="1" step="1" min="10" max="2000" />
-                            <label for="navAutoClimbRate"><span data-i18n="navAutoClimbRate"></span></label>
-                            <div for="navAutoClimbRate" class="helpicon cf_tip" data-i18n_title="navAutoClimbRateHelp"></div>
-                        </div>
 
                         <div class="number">
                             <input type="number" id="navMaxAltitude" data-unit="cm" data-setting="nav_max_altitude" data-setting-multiplier="1" step="1" min="0" max="65000" />

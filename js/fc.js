@@ -29,6 +29,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    ADSB_VEHICLES,
     MISSION_PLANNER,
     ANALOG,
     ARMING_CONFIG,
@@ -250,6 +251,12 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0
+        };
+        
+        DSB_VEHICLES = {
+            vehiclesCount: 0,
+            callsignLength: 0,
+            vehicles: []
         };
 
         MISSION_PLANNER = new WaypointCollection();
@@ -1237,7 +1244,13 @@ var FC = {
                 operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "raw"
-            },        
+            },
+            54: {
+                name: "Mag calibration",
+                operandType: "Set Flight Parameter",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
