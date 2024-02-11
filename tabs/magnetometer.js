@@ -1,11 +1,18 @@
-'use strict';
 /*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,helper,$*/
+"use strict";
+
+
 
 TABS.magnetometer = {};
 
 
 TABS.magnetometer.initialize = function (callback) {
     var self = this;
+
+    var modal;
+    var accel_data_flat = [0, 0, 0];
+    var accel_data_45 = [0, 0, 0];
+    var heading_flat;
 
     if (GUI.active_tab != 'magnetometer') {
         GUI.active_tab = 'magnetometer';
@@ -46,6 +53,7 @@ TABS.magnetometer.initialize = function (callback) {
         function (callback) {
             mspHelper.getSetting("align_mag_roll").then(function (data) {
                 self.alignmentConfig.roll = parseInt(data.value, 10) / 10;
+                self.mag_saved_roll = self.alignmentConfig.roll;
             }).then(callback)
         },
         function (callback) {
@@ -56,6 +64,7 @@ TABS.magnetometer.initialize = function (callback) {
         function (callback) {
             mspHelper.getSetting("align_mag_yaw").then(function (data) {
                 self.alignmentConfig.yaw = parseInt(data.value, 10) / 10;
+                self.mag_saved_yaw = self.alignmentConfig.yaw;
             }).then(callback)
         }
     ];
@@ -65,7 +74,7 @@ TABS.magnetometer.initialize = function (callback) {
     loadChainer.execute();
 
     function areAnglesZero() {
-        return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0
+        return self.alignmentConfig.pitch === 0 && self.alignmentConfig.roll === 0 && self.alignmentConfig.yaw === 0;
     }
 
     function isBoardAlignmentZero() {
@@ -446,6 +455,11 @@ TABS.magnetometer.initialize = function (callback) {
             saveChainer.execute()
         });
 
+        $('#fc-align-start-button').on('click', {"step": "1"}, accAutoAlignButton);
+        $('#modal-acc-align-2').on('click', {"step": "2" }, accAutoAlignButton);
+        $('#modal-acc-align-3').on('click', {"step": "3" }, accAutoAlignButton);
+        $('#modal-acc-align-4').on('click', {"step": "4" }, accAutoAlignButton);
+
         self.pageElements.roll_slider.noUiSlider({
             start: [self.alignmentConfig.roll],
             range: {
@@ -527,9 +541,195 @@ TABS.magnetometer.initialize = function (callback) {
 
         helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
-        GUI.content_ready(callback);
+
+    function acc_alignments(changed) {
+        // Corrections needed relative to current settings
+        var corrections = {
+            up: {
+                same: {
+                      dn: [0,0,0],
+                      up: [180,0,0]
+                      }
+
+             },
+             same: {
+                 up: {
+                     dn: [0,0,90],
+                     up: [180,0,270],
+                 },
+                 dn: {
+                     dn: [0,0,270],
+                     up: [180, 0, 90]
+                 }
+
+            },
+            dn: {
+                same: {
+                      dn: [0,0,180],
+                      up: [180,0,180]
+                      }
+             },
+        };
+
+        console.log("axischanged: " + changed);
+
+        console.log("board alignment:");
+        if ( corrections[changed[0]][changed[1]][changed[2]] ) {
+            console.log(corrections[changed[0]][changed[1]][changed[2]]);
+            return (corrections[changed[0]][changed[1]][changed[2]]);
+        } else {
+            return([ -1, -1, -1 ]);
+        }
     }
 
+    function valChanged(oldVal, newVal) {
+        if (newVal - oldVal > 0.18) {
+            return "up";
+        } else if (oldVal - newVal > 0.18) {
+            return "dn";
+        } else {
+            return "same";
+        }
+    }
+
+    function compassReadFlat() {
+        heading_flat = SENSOR_DATA.kinematics[2]
+        accel_data_flat = [...SENSOR_DATA.accelerometer];
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: false,
+            content: $('#modal-acc-align-45')
+        }).open();
+    }
+
+    function headingSettled(next_step) {
+        var heading = SENSOR_DATA.kinematics[2];
+        var i = 0;
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: false,
+            content: 'Waiting for compass to settle ...'
+        }).open();
+
+        var intervalId = setInterval(function() {
+            console.log("i: " + i + " heading: " + heading + " , sensor: " + SENSOR_DATA.kinematics[2]);
+            if( (i++ > 1) && SENSOR_DATA.kinematics[2] == heading) {
+                clearInterval(intervalId);
+                modal.close();
+                next_step();
+            }
+            heading = SENSOR_DATA.kinematics[2];
+        }, 1000);
+    }
+
+
+    function accAutoAlignRead45() {
+        var changed = [0, 0, 0];
+        // var boardflipped = (accel_data_flat[3] < -0.5);
+        var acc_align;
+        var i;
+
+        accel_data_45 = [...SENSOR_DATA.accelerometer];
+
+
+        for (i = 0; i < accel_data_flat.length; i++) {
+            changed[i] = valChanged(accel_data_flat[i], accel_data_45[i]);
+        }
+
+        acc_align = acc_alignments(changed);
+        $("#modal-acc-align-setting").text(acc_align.toString());
+        $("#modal-compass-align-setting").text('180, 0, 0');
+
+        updateBoardPitchAxis( (Math.round(BOARD_ALIGNMENT.pitch / 10) + acc_align[0]) % 360 );
+        updateBoardRollAxis( (Math.round(BOARD_ALIGNMENT.roll / 10) + acc_align[1]) % 360 );
+        updateBoardYawAxis( (Math.round(BOARD_ALIGNMENT.yaw / 10) + acc_align[2]) % 360 );
+    }
+
+    function accAutoAlignCompass() {
+        var upside_down = false;
+
+        console.log("current yaw: " + self.alignmentConfig.yaw + ", current roll: " + self.alignmentConfig.roll);
+
+        var heading_change = (SENSOR_DATA.kinematics[2] - heading_flat + 360) % 360;
+        correction_needed = (450 - SENSOR_DATA.kinematics[2]) % 360;
+
+        heading_change = Math.round(heading_change / 90) * 90;
+        if (heading_change > 180) {
+            console.log("mag upside down");
+            var rollCurrent90 = Math.round(self.mag_saved_roll / 90) * 90;
+            updateRollAxis((rollCurrent90 + 180) % 360);
+            correction_needed = correction_needed + 180;
+        }
+        correction_needed = Math.round(correction_needed / 45) * 45;
+        console.log("heading change: " + heading_change + ", correction: " + correction_needed);
+        updateYawAxis( (self.mag_saved_yaw + correction_needed) % 360 );
+        modal = new jBox('Modal', {
+            width: 460,
+            height: 360,
+            animation: false,
+            closeOnClick: true,
+            content: $('#modal-acc-align-done')
+        }).open();
+    }
+
+    function accAutoAlignButton(event) {
+        var step = event.data.step;
+
+        // Steps: 1 start, 2 craft is flat north, 3 craft is nose up, 4 craft is flat and east
+        if ( typeof step == "undefined" ) {
+            step = "1";
+        }
+
+        if ( typeof modal != "undefined" ) {
+          modal.close();
+        }
+
+
+        if (step == "1") {
+            modal = new jBox("Modal", {
+                animation: false,
+                height: 200,
+                width: 500,
+                closeOnClick: false,
+                content: $("#modal-acc-align-start")
+            }).open();
+        }
+
+
+        else if (step == "2") {
+            MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, headingSettled(compassReadFlat));
+        }
+
+        else if (step == "3") {
+          // Do not prompt for easterly reading if there is no compass.
+            var next_step;
+            if (SENSOR_DATA.magnetometer[0] == 0) {
+              next_step = $('#modal-acc-align-done');
+            } else {
+              next_step = $('#modal-acc-align-east');
+            }
+
+            MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, accAutoAlignRead45);
+            modal = new jBox('Modal', {
+                width: 460,
+                height: 360,
+                animation: false,
+                closeOnClick: true,
+                content: next_step
+            }).open();
+
+        }
+        else if (step == "4") {
+            headingSettled(accAutoAlignCompass)
+        }
+    }
+
+        GUI.content_ready(callback);
+    }
 };
 
 

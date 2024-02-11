@@ -5591,5 +5591,11 @@
     },
     "ezTuneNote": {
         "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
+    },
+    "accAlignTitle" : {
+        "message": "Automatic Alignment Wizard"
+    },
+    "accAlignFinished" : {
+        "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
     }
 }
