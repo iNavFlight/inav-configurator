@@ -36,6 +36,7 @@
     "fs": "0.0.1-security",
     "jquery": "3.7.1",
     "jquery-ui-dist": "1.12.1",
+    "jquery-textcomplete": "^1.8.5",
     "marked": "^11.2.0",
     "minimist": "^1.2.0",
     "openlayers": "^4.6.5",

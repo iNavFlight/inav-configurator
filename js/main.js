@@ -1,5 +1,8 @@
-window.$ = window.jQuery = require('jquery'), 
-    require('jquery-ui-dist/jquery-ui');
+window.$ = window.jQuery =  require('jquery'), 
+                            require('jquery-ui-dist/jquery-ui'), 
+                            require('jquery-textcomplete');
+
+             
 const { SerialPort } = require('serialport');
 const path = require('path');
 const { app, dialog } = require('@electron/remote');
@@ -34,7 +37,7 @@ let globalSettings = {
     docsTreeLocation: 'master',
 };
 
-$(document).on("ready", () => {
+$(function() {
     localization = new Localiziation("en");
     localization.localize();
 
@@ -45,6 +48,11 @@ $(document).on("ready", () => {
     globalSettings.proxyLayer = store.get('proxylayer', 'your_proxy_layer_name');
     globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
     updateProfilesHighlightColours();
+
+    if (store.get('cli_autocomplete', false)) {
+        globalSettings.cliAutocomplete = true;
+        CliAutoComplete.setEnabled(true);
+    };
 
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
     if (!CONFIGURATOR.connectionValid) {
@@ -233,7 +241,7 @@ $(document).on("ready", () => {
             el.addClass('active');
             el.after('<div id="options-window"></div>');
 
-            $('div#options-window').load('/html//options.html', function () {
+            $('div#options-window').load('./tabs/options.html', function () {
 
                 // translate to user-selected language
                 localization.localize();
@@ -265,12 +273,21 @@ $(document).on("ready", () => {
                     activeTab.find('a').click();
                 });
 
+                $('div.cli_autocomplete input').change(function () {
+                    globalSettings.cliAutocomplete = $(this).is(':checked');
+                     store.set('cli_autocomplete', globalSettings.cliAutocomplete);
+
+                    CliAutoComplete.setEnabled($(this).is(':checked'));
+                });
+
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+                $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
+
 
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
