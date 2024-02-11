@@ -6210,6 +6210,11 @@
   "javascriptTranspile": { "message": "Transpile to INAV" },
   "javascriptLoad": { "message": "Load from FC" },
   "javascriptSave": { "message": "Save to FC" },
-  "javascriptClear": { "message": "Clear Editor" }
-
+  "javascriptClear": { "message": "Clear Editor" },
+    "accAlignTitle" : {
+        "message": "Automatic Alignment Wizard"
+    },
+    "accAlignFinished" : {
+        "message": "Board alignment <span style=\"color: #37a8db\">finished</span>"
+    }
 }
