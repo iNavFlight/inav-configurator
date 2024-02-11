@@ -10,8 +10,7 @@ TABS.magnetometer.initialize = function (callback) {
     var self = this;
 
     var modal;
-    var accel_data_flat = [0, 0, 0];
-    var accel_data_45 = [0, 0, 0];
+    // var accel_data_45 = [0, 0, 0];
     var heading_flat;
 
     if (GUI.active_tab != 'magnetometer') {
@@ -541,7 +540,7 @@ TABS.magnetometer.initialize = function (callback) {
 
         helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
-
+    /*
     function acc_alignments(changed) {
         // Corrections needed relative to current settings
         var corrections = {
@@ -591,10 +590,35 @@ TABS.magnetometer.initialize = function (callback) {
             return "same";
         }
     }
+    */
+
+
+    function rad2degrees(radians) {
+        return radians * (180/Math.PI);
+    }
 
     function compassReadFlat() {
-        heading_flat = SENSOR_DATA.kinematics[2]
-        accel_data_flat = [...SENSOR_DATA.accelerometer];
+        heading_flat = SENSOR_DATA.kinematics[2];
+        let acc_g_flat = [...SENSOR_DATA.accelerometer];
+
+        // Alternate method, needs correction for upside down
+        /*
+        let A = Math.sqrt(acc_g_flat[0] ** 2 + acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2);
+        self.acc_flat_xyz = new Array(Math.asin(acc_g_flat[0] / A), Math.asin(acc_g_flat[1] / A), Math.atan2(acc_g_flat[1] , acc_g_flat[0]));
+        console.log("flat_axy: " +  
+                rad2degrees(self.acc_flat_xyz[0]) + ", " + 
+                rad2degrees(self.acc_flat_xyz[1]) + ", " +
+                rad2degrees(self.acc_flat_xyz[2])
+        );
+        */
+
+        // Seems to work better upside down
+        let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
+        let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
+        self.acc_flat_xyz = new Array(pitch, roll, 0);
+
+        console.log("pitch: " + pitch + ", roll: " + roll);
+
         modal = new jBox('Modal', {
             width: 460,
             height: 360,
@@ -617,7 +641,7 @@ TABS.magnetometer.initialize = function (callback) {
 
         var intervalId = setInterval(function() {
             console.log("i: " + i + " heading: " + heading + " , sensor: " + SENSOR_DATA.kinematics[2]);
-            if( (i++ > 1) && SENSOR_DATA.kinematics[2] == heading) {
+            if( (i++ > 0) && SENSOR_DATA.kinematics[2] == heading) {
                 clearInterval(intervalId);
                 modal.close();
                 next_step();
@@ -627,26 +651,89 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
 
+    function accComputeYaw_Alternate(changed) {
+        var corrections = {
+            45: {
+                0: 180
+             },
+             0: {
+                 '45': -90,
+                '-45':  90,
+                '315':  90, 
+            },
+            '-45': {
+                0: 0
+             },
+        };
+        if ( corrections[changed[0]][changed[1]] ) {
+            console.log(corrections[changed[0]][changed[1]]);
+            return (corrections[changed[0]][changed[1]]);
+        } else {
+            return(-1);
+        }
+    }
+
+
+
+    function accComputeYaw(changed) {
+        var corrections = {
+            '-45': {
+                0: 180
+             },
+             0: {
+                 '45': -90,
+                '-45':  90
+            },
+            '45': {
+                0: 0
+             },
+        };
+        if (typeof corrections[changed[0]][changed[1]] != 'undefined') {
+            console.log(corrections[changed[0]][changed[1]]);
+            return (corrections[changed[0]][changed[1]]);
+        } else {
+            return(-1);
+        }
+    }
+
+
     function accAutoAlignRead45() {
         var changed = [0, 0, 0];
-        // var boardflipped = (accel_data_flat[3] < -0.5);
         var acc_align;
         var i;
 
-        accel_data_45 = [...SENSOR_DATA.accelerometer];
+        let acc_g_45 = [...SENSOR_DATA.accelerometer];
 
+        let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
+        let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
+        let acc_45_xyz = new Array(pitch, roll, 0);
 
-        for (i = 0; i < accel_data_flat.length; i++) {
-            changed[i] = valChanged(accel_data_flat[i], accel_data_45[i]);
+        /*
+        console.log("45_xyz: " +
+                rad2degrees(acc_45_xyz[0]) + ", " +
+                rad2degrees(acc_45_xyz[1]) + ", " +
+                rad2degrees(acc_45_xyz[2])
+        );
+        */
+
+        for (i = 0; i < acc_g_45.length; i++) {
+            self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
+            // acc_45_xyz[i] = rad2degrees(acc_45_xyz[i]);
+            changed[i] = ( Math.round((self.acc_flat_xyz[i] - acc_45_xyz[i]) / 45) * 45 ) % 360;
         }
+        console.log("changed:");
+        console.log(changed);
 
-        acc_align = acc_alignments(changed);
-        $("#modal-acc-align-setting").text(acc_align.toString());
+        acc_yaw = accComputeYaw(changed);
+        // acc_align = new Array(self.acc_flat_xyz[0], self.acc_flat_xyz[1], yaw );
+        self.acc_flat_xyz[2] = acc_yaw;
+
+        $("#modal-acc-align-setting").text(self.acc_flat_xyz.toString());
         $("#modal-compass-align-setting").text('180, 0, 0');
 
-        updateBoardPitchAxis( (Math.round(BOARD_ALIGNMENT.pitch / 10) + acc_align[0]) % 360 );
-        updateBoardRollAxis( (Math.round(BOARD_ALIGNMENT.roll / 10) + acc_align[1]) % 360 );
-        updateBoardYawAxis( (Math.round(BOARD_ALIGNMENT.yaw / 10) + acc_align[2]) % 360 );
+        updateBoardPitchAxis( (Math.round(self.acc_flat_xyz[0] / 45) * 45) % 360 );
+        updateBoardRollAxis ( (Math.round(self.acc_flat_xyz[1] / 45) * 45) % 360 );
+        updateBoardYawAxis(acc_yaw);
     }
 
     function accAutoAlignCompass() {
