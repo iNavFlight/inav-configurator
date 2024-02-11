@@ -253,7 +253,7 @@ var FC = {
             packetCount: 0
         };
         
-        DSB_VEHICLES = {
+        ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
             vehicles: []

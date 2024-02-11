@@ -2,7 +2,7 @@ window.$ = window.jQuery = require('jquery'),
     require('jquery-ui-dist/jquery-ui');
 const { SerialPort } = require('serialport');
 const path = require('path');
-const { app } = require('@electron/remote');
+const { app, dialog } = require('@electron/remote');
 const ol = require('openlayers');
 const Store = require('electron-store');
 const store = new Store();

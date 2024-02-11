@@ -95,8 +95,9 @@ class ConnectionBle extends Connection {
         });
         
         return navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
-            optionalServices: ids
+            //acceptAllDevices: true,
+            //optionalServices: ids
+            filters: [{ services: ['generic_attribute'] }],
         }).then(device => {
             console.log("Found BLE device: " + device.name);
             this._device = device;

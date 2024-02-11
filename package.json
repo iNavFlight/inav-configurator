@@ -34,7 +34,7 @@
     "serialport": "^12.0.0",
     "inflection": "1.12.0",
     "fs": "0.0.1-security",
-    "jquery": "2.1.4",
+    "jquery": "3.7.1",
     "jquery-ui-dist": "1.12.1",
     "marked": "^11.2.0",
     "minimist": "^1.2.0",
