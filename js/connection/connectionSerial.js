@@ -14,31 +14,36 @@ class ConnectionSerial extends Connection {
     }
 
     connectImplementation(path, options, callback) {                       
-        this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
-            
-            this._serialport.on('data', buffer => {
-                this._onReceiveListeners.forEach(listener => {
-                    listener({
-                        connectionId: this._connectionId,
-                        data: buffer
+        try {
+            this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
+                
+                this._serialport.on('data', buffer => {
+                    this._onReceiveListeners.forEach(listener => {
+                        listener({
+                            connectionId: this._connectionId,
+                            data: buffer
+                        });
+                    });
+                })
+
+                this._serialport.on('error', error => {
+                    console.log("Serial error: " + error);
+                    this._onReceiveErrorListeners.forEach(listener => {
+                        listener(error);    
                     });
                 });
-             })
-
-            this._serialport.on('error', error => {
-                console.log("Serial error: " + error);
-                this._onReceiveErrorListeners.forEach(listener => {
-                    listener(error);    
-                });
+                
+                if (callback) {
+                    callback({
+                        connectionId: ++this._connectionId,
+                        bitrate: options.bitrate 
+                    });
+                }
             });
-            
-            if (callback) {
-                callback({
-                    connectionId: ++this._connectionId,
-                    bitrate: options.bitrate 
-                });
-            }
-        });
+        } catch (error) {
+            console.log(error);
+            callback(false);
+        }
     }
 
     disconnectImplementation(callback) {        
@@ -55,19 +60,21 @@ class ConnectionSerial extends Connection {
     }
     
     sendImplementation(data, callback) {
-        this._serialport.write(Buffer.from(data), error => {
-            var result = 0;
-            if (error) {
-                result = 1;
-                console.log("Serial wrire error: " + error)
-            }
-            if (callback) {
-                callback({
-                    bytesSent: data.byteLength,
-                    resultCode: result
-                });
-            }
-        });
+        if (this._serialport && this._serialport.isOpen) {
+            this._serialport.write(Buffer.from(data), error => {
+                var result = 0;
+                if (error) {
+                    result = 1;
+                    console.log("Serial wrire error: " + error)
+                }
+                if (callback) {
+                    callback({
+                        bytesSent: data.byteLength,
+                        resultCode: result
+                    });
+                }
+            });
+        }
     }
 
     addOnReceiveCallback(callback){

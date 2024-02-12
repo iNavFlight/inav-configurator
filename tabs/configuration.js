@@ -217,8 +217,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         // fill battery capacity
         $('#battery_capacity').val(MISC.battery_capacity);
-        $('#battery_capacity_warning').val(Math.round(MISC.battery_capacity_warning * 100 / MISC.battery_capacity));
-        $('#battery_capacity_critical').val(Math.round(MISC.battery_capacity_critical * 100 / MISC.battery_capacity));
+        let batCapWarn = Math.round(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
+        $('#battery_capacity_warning').val(isNaN(batCapWarn) ? "" : batCapWarn);
+        let batCapWarnCrit = Math.round(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
+        $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
         $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
 
         let $i2cSpeed = $('#i2c_speed'),

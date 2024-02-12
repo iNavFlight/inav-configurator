@@ -93,7 +93,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         for(let i =0; i < timers.length;++i) {
             let timerId = timers[i];
-            $select = $('#timer-output-' + timerId);
+            let $select = $('#timer-output-' + timerId);
             if(!$select) {
                 continue;
             }

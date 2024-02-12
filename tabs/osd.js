@@ -238,13 +238,25 @@ FONT.parseMCMFontFile = function (data) {
 //noinspection JSUnusedLocalSymbols
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
-
-        nwdialog.setContext(document);
-        nwdialog.openFileDialog('.mcm', function(filename) {
-            const fs = require('fs');
-            const fontData = fs.readFileSync(filename, {flag: "r"});
-            FONT.parseMCMFontFile(fontData.toString());
-            resolve();
+        var options = {
+            filters: [ 
+                { name: 'Font file', extensions: ['mcm'] }
+            ],
+        };
+        dialog.showOpenDialog(options).then(result =>  {
+            if (result.canceled) {
+                console.log('No file selected');
+                return;
+            }
+            
+            if (result.filePaths.length == 1) {
+                const fs = require('fs');
+                const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
+                FONT.parseMCMFontFile(fontData.toString());
+                resolve();
+            }
+        }).catch (err => {
+            console.log(err);
         });
     });
 };
@@ -2728,7 +2740,7 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().size() > 0) {
+        if (groupContainer.find('.display-fields').children().length > 0) {
             $tmpl.parent().append(groupContainer);
         }
     }
@@ -3144,12 +3156,12 @@ TABS.osd.initialize = function (callback) {
 
     GUI.load(path.join(__dirname, "tabs/osd.html"), Settings.processHtml(function () {
         // translate to user-selected language
-       localization.localize();;
+       localization.localize();
 
         // Open modal window
         OSD.GUI.jbox = new jBox('Modal', {
-            width: 708,
-            height: 240,
+            width: 750, 
+            height: 300,
             position: {y:'bottom'},
             offset: {y:-50},
             closeButton: 'title',
@@ -3253,7 +3265,7 @@ TABS.osd.initialize = function (callback) {
             }
             $fontPicker.removeClass('active');
             $(this).addClass('active');
-            $.get('/resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
+            $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
                 FONT.preview($preview);
                 OSD.GUI.update();

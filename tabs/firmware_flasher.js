@@ -24,7 +24,7 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         function parse_hex(str, callback) {
             // parsing hex in different thread
-            var worker = new Worker('/js/workers/hex_parser.js');
+            var worker = new Worker('./js/workers/hex_parser.js');
 
             // "callback"
             worker.onmessage = function (event) {

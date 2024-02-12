@@ -276,7 +276,7 @@ TABS.ports.initialize = function (callback) {
                         var selectElementSelector = 'select[name=' + selectElementName + ']';
                         select_e = functions_e.find(selectElementSelector);
 
-                        if (select_e.size() == 0) {
+                        if (select_e.length == 0) {
                             functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
                             select_e = functions_e.find(selectElementSelector);
                             var disabledText = localization.getMessage('portsTelemetryDisabled');
