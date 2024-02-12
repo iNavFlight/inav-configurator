@@ -3455,6 +3455,12 @@
     "osd_hud_settings": {
         "message": "Heads up Display settings"
     },
+    "osd_custom_element_settings": {
+        "message": "Custom OSD elements"
+    },
+    "custom_element": {
+        "message": "Custom element"
+    },
     "osd_hud_settings_HELP": {
         "message": "This section allows tweaking the behavior of HUD elements."
     },
