@@ -3247,25 +3247,25 @@ TABS.mission_control.initialize = function (callback) {
                                         point.setMultiMissionIdx(missionIdx);
                                     }
                                     mission.put(point);
-                                } else if (node['#name'].match(/fwApproach/i) && node.$) {
+                                } else if (node['#name'].match(/fwapproach/i) && node.$) {
                                     var fwApproach = new FwApproach(0);
                                     var idx = -1;
                                     for (var attr in node.$) {
-                                        if (attr.match(/Index/i)) {
+                                        if (attr.match(/index/i)) {
                                             idx = parseInt(node.$[attr]);
-                                        } else if (attr.match(/No/i)) {
+                                        } else if (attr.match(/no/i)) {
                                             fwApproach.setNumber(parseInt(node.$[attr]));
-                                        } else if (attr.match(/ApproachAlt/i)) {
+                                        } else if (attr.match(/approach-alt/i)) {
                                             fwApproach.setApproachAltAsl(parseInt(node.$[attr]));
-                                        } else if (attr.match(/LandAlt/i)) {
+                                        } else if (attr.match(/land-alt/i)) {
                                             fwApproach.setLandAltAsl(parseInt(node.$[attr]));
-                                        } else if (attr.match(/ApproachDirection/i)) {
-                                            fwApproach.setApproachDirection(node.$[attr] == 'Left' ? 0 : 1);
-                                        } else if (attr.match(/LandHeading1/i)) {
+                                        } else if (attr.match(/approach-direction/i)) {
+                                            fwApproach.setApproachDirection(node.$[attr] == 'left' ? 0 : 1);
+                                        } else if (attr.match(/landheading1/i)) {
                                             fwApproach.setLandHeading1(parseInt(node.$[attr]));
-                                        } else if (attr.match(/LandHeading2/i)) {
+                                        } else if (attr.match(/landheading2/i)) {
                                             fwApproach.setLandHeading2(parseInt(node.$[attr]));
-                                        } else if (attr.match(/SeaLevelRef/i)) {
+                                        } else if (attr.match(/sealevel-ref/i)) {
                                             fwApproach.setIsSeaLevelRef(parseBooleans(node.$[attr]) ? 1 : 0);
                                         }
                                     }
@@ -3343,7 +3343,7 @@ TABS.mission_control.initialize = function (callback) {
                           'home-y' : HOME.getLatMap(),
                           'zoom': zoom } },
             'missionitem': [],
-            'fwApproach': []
+            'fwapproach': []
         };
 
         let missionStartWPNumber = 0;
@@ -3378,16 +3378,16 @@ TABS.mission_control.initialize = function (callback) {
             let approach = FW_APPROACH.get()[i];    
             if (approach.getLandHeading1() != 0 || approach.getLandHeading2() != 0) {            
                 var item = { $: {
-                    'Index': approachIdx,
-                    'No': approach.getNumber(),
-                    'ApproachAlt': approach.getApproachAltAsl(),
-                    'LandAlt': approach.getLandAltAsl(),
-                    'ApproachDirection': approach.getApproachDirection() == 0 ? 'Left' : 'Right',
-                    'LandHeading1': approach.getLandHeading1(),
-                    'LandHeading2': approach.getLandHeading2(),
-                    'SeaLevelRef': approach.getIsSeaLevelRef() ? 'True' : 'False'
+                    'index': approachIdx,
+                    'no': approach.getNumber(),
+                    'approach-alt': approach.getApproachAltAsl(),
+                    'land-alt': approach.getLandAltAsl(),
+                    'approach-direction': approach.getApproachDirection() == 0 ? 'left' : 'right',
+                    'landheading1': approach.getLandHeading1(),
+                    'landheading2': approach.getLandHeading2(),
+                    'sealevel-ref': approach.getIsSeaLevelRef() ? 'true' : 'false'
                 }};
-                data.fwApproach.push(item);
+                data.fw_approach.push(item);
             }
             approachIdx++;
         }
