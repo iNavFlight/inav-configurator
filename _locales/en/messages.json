@@ -4091,6 +4091,12 @@
     "osdElement_OSD_RANGEFINDER": {
         "message": "Rangefinder distance"
     },
+    "osdElement_QNE_ALTITUDE": {
+        "message": "QNE Altitude"
+    },
+    "osdElement_QNE_ALTITUDE_HELP": {
+        "message": "Altitude above normal pressure"
+    },
     "osdSettingPLUS_CODE_DIGITS_HELP": {
         "message": "Precision at the equator: 10=13.9x13.9m; 11=2.8x3.5m; 12=56x87cm; 13=11x22cm."
     },
