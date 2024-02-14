@@ -65,7 +65,9 @@ var CONFIG,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
     FEATURES,
-    RATE_DYNAMICS;
+    RATE_DYNAMICS,
+    OSD_CUSTOM_ELEMENTS
+;
 
 var FC = {
     restartRequired: false,
@@ -563,6 +565,11 @@ var FC = {
             aggressiveness: null,
             rate: null,
             expo: null
+        };
+
+        OSD_CUSTOM_ELEMENTS = {
+           settings: {customElementsCount: 0, customElementTextSize: 0},
+           items: [],
         };
     },
     getOutputUsages: function() {
