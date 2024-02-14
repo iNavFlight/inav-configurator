@@ -850,7 +850,7 @@
         "message": "External PWM servo driver"
     },
     "featurePWM_SERVO_DRIVERTip": {
-        "message": "Use external PCA9685 PMW driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
+        "message": "Use external PCA9685 PWM driver to connect up to 16 servos to flight controller. PCA9685 has to be connected to enable this feature."
     },
     "featureRSSI_ADCTip": {
         "message": "RSSI is a measurement of signal strength and is very handy so you know when your aircraft is going out of range or if it is suffering RF interference."
@@ -3502,6 +3502,12 @@
     },
     "osd_hud_settings": {
         "message": "Heads up Display settings"
+    },
+    "osd_custom_element_settings": {
+        "message": "Custom OSD elements"
+    },
+    "custom_element": {
+        "message": "Custom element"
     },
     "osd_hud_settings_HELP": {
         "message": "This section allows tweaking the behavior of HUD elements."

@@ -66,7 +66,9 @@ var CONFIG,
     CURRENT_METER_CONFIG,
     FEATURES,
     RATE_DYNAMICS,
-    FW_APPROACH;
+    FW_APPROACH,
+    OSD_CUSTOM_ELEMENTS;
+
 
 var FC = {
     restartRequired: false,
@@ -566,7 +568,14 @@ var FC = {
             expo: null
         };
 
+
         FW_APPROACH = new FwApproachCollection();
+
+        OSD_CUSTOM_ELEMENTS = {
+           settings: {customElementsCount: 0, customElementTextSize: 0},
+           items: [],
+        };
+
     },
     getOutputUsages: function() {
         return {
