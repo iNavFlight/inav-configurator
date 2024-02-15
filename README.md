@@ -1,4 +1,4 @@
-# INAV Configurator (+Greek translation)
+# INAV Configurator
 
 INAV Configurator is a crossplatform configuration tool for the [INAV](https://github.com/iNavFlight/inav) flight control system.
 
