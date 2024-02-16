@@ -124,22 +124,25 @@ var Ser2TCP = {
     },
 
     getDevices: function(callback) {
-        chrome.serial.getDevices((devices_array) => {
+        SerialPort.list().then((ports, error) => {
             var devices = [];
-            devices_array.forEach((device) => {
-
-                if (GUI.operating_system == 'Windows') {
-                    var m = device.path.match(/COM\d?\d/g)
+            if (error) {
+                GUI.log("Unable to list serial ports.");
+            } else {  
+                 ports.forEach((device) => {
+                    if (GUI.operating_system == 'Windows') {
+                        var m = device.path.match(/COM\d?\d/g)
                         if (m)
-                          devices.push(m[0]);
-                } else {
-                    if (device.displayName != null) {
-			var m = device.path.match(/\/dev\/.*/)
-                        if (m)
-                          devices.push(m[0]);
+                            devices.push(m[0]);
+                    } else {
+                        if (device.displayName != null) {
+                            var m = device.path.match(/\/dev\/.*/)
+                            if (m)
+                                devices.push(m[0]);
+                        }
                     }
-		}
-            });
+                });
+            }
             callback(devices);
         });
     },

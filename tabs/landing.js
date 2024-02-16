@@ -1,19 +1,18 @@
 'use strict';
-/*global $,TABS,GUI,googleAnalytics*/
+
+/*global $,TABS,GUI*/
 
 TABS.landing = {};
 TABS.landing.initialize = function (callback) {
 
     if (GUI.active_tab != 'landing') {
         GUI.active_tab = 'landing';
-        googleAnalytics.sendAppView('Landing');
     }
-
-    GUI.load("./tabs/landing.html", function () {
-        localize();
+    GUI.load(path.join(__dirname, "tabs/landing.html"), function () {
+        localization.localize();
 
         $('.tab-landing a').click(function () {
-            googleAnalytics.sendEvent('ExternalUrls', 'Click', $(this).prop('href'));
+           // googleAnalytics.sendEvent('ExternalUrls', 'Click', $(this).prop('href'));
         });
 
         GUI.content_ready(callback);

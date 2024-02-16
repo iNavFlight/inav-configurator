@@ -66,7 +66,8 @@ var CONFIG,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
     FEATURES,
-    RATE_DYNAMICS;
+    RATE_DYNAMICS,
+    EZ_TUNE;
 
 var FC = {
     restartRequired: false,
@@ -251,7 +252,7 @@ var FC = {
             timeouts: 0,
             packetCount: 0
         };
-
+        
         ADSB_VEHICLES = {
             vehiclesCount: 0,
             callsignLength: 0,
@@ -1243,7 +1244,7 @@ var FC = {
                 operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "raw"
-            },   
+            },
             54: {
                 name: "Mag calibration",
                 operandType: "Set Flight Parameter",

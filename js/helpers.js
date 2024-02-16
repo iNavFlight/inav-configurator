@@ -1,15 +1,8 @@
 /*global $*/
+
 'use strict';
 
 function checkChromeRuntimeError() {
-    if (chrome.runtime.lastError) {
-        console.error(
-            `Chrome API Error: ${chrome.runtime.lastError.message}.\n Traced ${
-                new Error().stack
-            }`
-        );
-        return true;
-    }
     return false;
 }
 

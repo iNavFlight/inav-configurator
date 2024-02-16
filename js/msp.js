@@ -298,7 +298,7 @@ var MSP = {
                 view[4] = code;
 
                 checksum = view[3] ^ view[4];
-                for (ii = 0; ii < payloadLength; ii++) {
+                for (let ii = 0; ii < payloadLength; ii++) {
                     view[ii + 5] = data[ii];
                     checksum ^= data[ii];
                 }
@@ -316,11 +316,11 @@ var MSP = {
                 view[5] = (code & 0xFF00) >> 8; // code upper byte
                 view[6] = payloadLength & 0xFF; // payloadLength lower byte
                 view[7] = (payloadLength & 0xFF00) >> 8; // payloadLength upper byte
-                for (ii = 0; ii < payloadLength; ii++) {
+                for (let ii = 0; ii < payloadLength; ii++) {
                     view[8+ii] = data[ii];
                 }
                 checksum = 0;
-                for (ii = 3; ii < length-1; ii++) {
+                for (let ii = 3; ii < length-1; ii++) {
                     checksum = this._crc8_dvb_s2(checksum, view[ii]);
                 }
                 view[length-1] = checksum;

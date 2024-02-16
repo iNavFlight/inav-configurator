@@ -6,7 +6,6 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
     if (GUI.active_tab != 'failsafe') {
         GUI.active_tab = 'failsafe';
-        googleAnalytics.sendAppView('Failsafe');
     }
 
     // Can get rid of this when MSPHelper supports strings (fixed in #7734, awaiting merge)
@@ -15,11 +14,11 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load("./tabs/failsafe.html", Settings.processHtml(function() {
+        GUI.load(path.join(__dirname, "tabs/failsafe.html"), Settings.processHtml(function() {
             GUI.simpleBind();
 
             // translate to user-selected language
-            localize();
+           localization.localize();;
 
             // for some odd reason chrome 38+ changes scroll according to the touched select element
             // i am guessing this is a bug, since this wasn't happening on 37
@@ -52,7 +51,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             switch (FAILSAFE_CONFIG.failsafe_procedure) {
                 default:
                 case 0:
-                    element = $('input[id="land"]');
+                    let element = $('input[id="land"]');
                     element.prop('checked', true);
                     element.change();
                     break;
@@ -131,7 +130,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
@@ -139,7 +138,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_failsafe a'));
     }
 };

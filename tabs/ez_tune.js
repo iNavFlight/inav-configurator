@@ -34,24 +34,23 @@ TABS.ez_tune.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
     }
 
     function reinitialize() {
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(localization.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_ez_tune a'));
     }
 
     if (GUI.active_tab != 'ez_tune') {
         GUI.active_tab = 'ez_tune';
-        googleAnalytics.sendAppView('Ez Tune');
     }
 
     function load_html() {
-        GUI.load("./tabs/ez_tune.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "tabs/ez_tune.html"), Settings.processHtml(process_html));
     }
 
     function getYawPidScale(input) {
@@ -102,7 +101,7 @@ TABS.ez_tune.initialize = function (callback) {
     }
 
     function process_html() {
-        localize();
+       localization.localize();;
 
         helper.tabs.init($('.tab-ez_tune'));
         helper.features.updateUI($('.tab-ez_tune'), FEATURES);

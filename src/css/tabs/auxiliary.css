@@ -203,7 +203,7 @@
     float: right;
     margin-right: 5px;
     margin-top: -9px;
-    background: url('../../../images/icons/close1.svg') no-repeat center 100%;
+    background: url('./../../../images/icons/close1.svg') no-repeat center 100%;
     display: block;
 }
 

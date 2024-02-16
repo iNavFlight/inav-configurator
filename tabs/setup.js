@@ -16,7 +16,6 @@ TABS.setup.initialize = function (callback) {
 
     if (GUI.active_tab != 'setup') {
         GUI.active_tab = 'setup';
-        googleAnalytics.sendAppView('Setup');
     }
 
     var loadChainer = new MSPChainerClass();
@@ -33,26 +32,26 @@ TABS.setup.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        GUI.load("./tabs/setup.html", process_html);
+        GUI.load(path.join(__dirname, "tabs/setup.html"), process_html);
     }
 
     function process_html() {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         if (!FC.isMotorOutputEnabled()) {
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + localization.getMessage("logPwmOutputDisabled") + "</strong></span>");
         }
 
         // initialize 3D
         self.initialize3D();
 
 		// set roll in interactive block
-        $('span.roll').text(chrome.i18n.getMessage('initialSetupAttitude', [0]));
+        $('span.roll').text(localization.getMessage('initialSetupAttitude', [0]));
 		// set pitch in interactive block
-        $('span.pitch').text(chrome.i18n.getMessage('initialSetupAttitude', [0]));
+        $('span.pitch').text(localization.getMessage('initialSetupAttitude', [0]));
         // set heading in interactive block
-        $('span.heading').text(chrome.i18n.getMessage('initialSetupAttitude', [0]));
+        $('span.heading').text(localization.getMessage('initialSetupAttitude', [0]));
 
 
         // check if we have magnetometer
@@ -64,13 +63,13 @@ TABS.setup.initialize = function (callback) {
         self.initializeInstruments();
 
         $('a.resetSettings').click(function () {
-            if (confirm(chrome.i18n.getMessage('confirm_reset_settings'))) {
+            if (confirm(localization.getMessage('confirm_reset_settings'))) {
                 MSP.send_message(MSPCodes.MSP_RESET_CONF, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('initialSetupSettingsRestored'));
+                    GUI.log(localization.getMessage('initialSetupSettingsRestored'));
     
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function() {
-                            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                            GUI.log(localization.getMessage('deviceRebooting'));
                             GUI.handleReconnect();
                         });
                     });
@@ -79,12 +78,12 @@ TABS.setup.initialize = function (callback) {
         });
 
         // display current yaw fix value (important during tab re-initialization)
-        $('div#interactive_block > a.reset').text(chrome.i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
+        $('div#interactive_block > a.reset').text(localization.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
 
         // reset yaw button hook
         $('div#interactive_block > a.reset').click(function () {
             self.yaw_fix = SENSOR_DATA.kinematics[2] * - 1.0;
-            $(this).text(chrome.i18n.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
+            $(this).text(localization.getMessage('initialSetupButtonResetZaxisValue', [self.yaw_fix]));
 
             console.log('YAW reset to 0 deg, fix: ' + self.yaw_fix + ' deg');
         });
@@ -120,11 +119,11 @@ TABS.setup.initialize = function (callback) {
                 }
 
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
-                    var gpsFixType = chrome.i18n.getMessage('gpsFixNone');
+                    var gpsFixType = localization.getMessage('gpsFixNone');
                     if (GPS_DATA.fix >= 2)
-                        gpsFixType = chrome.i18n.getMessage('gpsFix3D');
+                        gpsFixType = localization.getMessage('gpsFix3D');
                     else if (GPS_DATA.fix >= 1)
-                        gpsFixType = chrome.i18n.getMessage('gpsFix2D');
+                        gpsFixType = localization.getMessage('gpsFix2D');
                     gpsFix_e.html(gpsFixType);
                     gpsSats_e.text(GPS_DATA.numSat);
                     gpsLat_e.text((GPS_DATA.lat / 10000000).toFixed(4) + ' deg');
@@ -143,9 +142,9 @@ TABS.setup.initialize = function (callback) {
             }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
-	            roll_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
-	            pitch_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
-                heading_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
+	            roll_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
+	            pitch_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
+                heading_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
                 self.render3D();
                 self.updateInstruments();
             });
@@ -155,21 +154,21 @@ TABS.setup.initialize = function (callback) {
         helper.mspBalancedInterval.add('setup_data_pull_slow', 250, 1, get_slow_data);
 
         helper.interval.add('gui_analog_update', function () {
-            bat_cells_e.text(chrome.i18n.getMessage('initialSetupBatteryDetectedCellsValue', [ANALOG.cell_count]));
-            bat_voltage_e.text(chrome.i18n.getMessage('initialSetupBatteryVoltageValue', [ANALOG.voltage]));
-            remaining_capacity_wh_decimals = ANALOG.battery_remaining_capacity.toString().length < 5 ? 3 : (7 - ANALOG.battery_remaining_capacity.toString().length);
-            remaining_capacity_value = MISC.battery_capacity_unit == 'mAh' ? ANALOG.battery_remaining_capacity : (ANALOG.battery_remaining_capacity / 1000).toFixed(remaining_capacity_wh_decimals < 0 ? 0 : remaining_capacity_wh_decimals);
-            remaining_capacity_unit = MISC.battery_capacity_unit == 'mAh' ? 'mAh' : 'Wh';
-            bat_remaining_e.text(chrome.i18n.getMessage('initialSetupBatteryRemainingCapacityValue', ((MISC.battery_capacity > 0) && ANALOG.battery_full_when_plugged_in) ? [remaining_capacity_value, remaining_capacity_unit] : ['NA', '']));
-            bat_percent_e.text(chrome.i18n.getMessage('initialSetupBatteryPercentageValue', [ANALOG.battery_percentage]));
-            bat_full_e.text(chrome.i18n.getMessage('initialSetupBatteryFullValue', [ANALOG.battery_full_when_plugged_in]));
-            bat_thresh_e.text(chrome.i18n.getMessage('initialSetupBatteryThresholdsValue', [ANALOG.use_capacity_thresholds]));
-            bat_mah_drawn_e.text(chrome.i18n.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
-            capacity_drawn_decimals = ANALOG.mWhdrawn.toString().length < 5 ? 3 : (7 - ANALOG.mWhdrawn.toString().length);
-            bat_wh_drawn_e.text(chrome.i18n.getMessage('initialSetup_Wh_drawnValue', [(ANALOG.mWhdrawn / 1000).toFixed(capacity_drawn_decimals < 0 ? 0 : capacity_drawn_decimals)]));
-            bat_current_draw_e.text(chrome.i18n.getMessage('initialSetupCurrentDrawValue', [ANALOG.amperage.toFixed(2)]));
-            bat_power_draw_e.text(chrome.i18n.getMessage('initialSetupPowerDrawValue', [ANALOG.power.toFixed(2)]));
-            rssi_e.text(chrome.i18n.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
+            bat_cells_e.text(localization.getMessage('initialSetupBatteryDetectedCellsValue', [ANALOG.cell_count]));
+            bat_voltage_e.text(localization.getMessage('initialSetupBatteryVoltageValue', [ANALOG.voltage]));
+            let remaining_capacity_wh_decimals = ANALOG.battery_remaining_capacity.toString().length < 5 ? 3 : (7 - ANALOG.battery_remaining_capacity.toString().length);
+            let remaining_capacity_value = MISC.battery_capacity_unit == 'mAh' ? ANALOG.battery_remaining_capacity : (ANALOG.battery_remaining_capacity / 1000).toFixed(remaining_capacity_wh_decimals < 0 ? 0 : remaining_capacity_wh_decimals);
+            let remaining_capacity_unit = MISC.battery_capacity_unit == 'mAh' ? 'mAh' : 'Wh';
+            bat_remaining_e.text(localization.getMessage('initialSetupBatteryRemainingCapacityValue', ((MISC.battery_capacity > 0) && ANALOG.battery_full_when_plugged_in) ? [remaining_capacity_value, remaining_capacity_unit] : ['NA', '']));
+            bat_percent_e.text(localization.getMessage('initialSetupBatteryPercentageValue', [ANALOG.battery_percentage]));
+            bat_full_e.text(localization.getMessage('initialSetupBatteryFullValue', [ANALOG.battery_full_when_plugged_in]));
+            bat_thresh_e.text(localization.getMessage('initialSetupBatteryThresholdsValue', [ANALOG.use_capacity_thresholds]));
+            bat_mah_drawn_e.text(localization.getMessage('initialSetupBatteryMahValue', [ANALOG.mAhdrawn]));
+            let capacity_drawn_decimals = ANALOG.mWhdrawn.toString().length < 5 ? 3 : (7 - ANALOG.mWhdrawn.toString().length);
+            bat_wh_drawn_e.text(localization.getMessage('initialSetup_Wh_drawnValue', [(ANALOG.mWhdrawn / 1000).toFixed(capacity_drawn_decimals < 0 ? 0 : capacity_drawn_decimals)]));
+            bat_current_draw_e.text(localization.getMessage('initialSetupCurrentDrawValue', [ANALOG.amperage.toFixed(2)]));
+            bat_power_draw_e.text(localization.getMessage('initialSetupPowerDrawValue', [ANALOG.power.toFixed(2)]));
+            rssi_e.text(localization.getMessage('initialSetupRSSIValue', [((ANALOG.rssi / 1023) * 100).toFixed(0)]));
         }, 100, true);
 
         function updateArminFailure() {
@@ -177,10 +176,10 @@ TABS.setup.initialize = function (callback) {
             for (var bit in flagNames) {
                 if (flagNames.hasOwnProperty(bit)) {
                     if (bit_check(CONFIG.armingFlags, bit)) {
-                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckFail'));
+                        $('#reason-' + flagNames[bit]).html(localization.getMessage('armingCheckFail'));
                     }
                     else {
-                        $('#reason-' + flagNames[bit]).html(chrome.i18n.getMessage('armingCheckPass'));
+                        $('#reason-' + flagNames[bit]).html(localization.getMessage('armingCheckPass'));
                     }
                 }
             }
@@ -196,7 +195,7 @@ TABS.setup.initialize = function (callback) {
 };
 
 TABS.setup.initializeInstruments = function() {
-    var options = {size:90, showBox : false, img_directory: 'images/flightindicators/'};
+    var options = {size:90, showBox : false, img_directory: path.join(__dirname, '/images/flightindicators/')};
     var attitude = $.flightIndicator('#attitude', 'attitude', options);
     var heading = $.flightIndicator('#heading', 'heading', options);
 
@@ -246,7 +245,7 @@ TABS.setup.initialize3D = function () {
     if (useWebGlRenderer) {
         if (MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + localization.getMessage("mixerNotConfigured") + "</strong></span>");
         } else {
             model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
         }
@@ -306,7 +305,7 @@ TABS.setup.initialize3D = function () {
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 
-        this.render3D();
+        self.render3D();
     };
 
     $(window).on('resize', this.resize3D);

@@ -10,7 +10,7 @@ const ConnectionType = {
 class Connection {
 
     constructor() {       
-        this._connectionId   = false;
+        this._connectionId   = 0;
         this._openRequested  = false;
         this._openCanceled   = false;
         this._bitrate        = 0;
@@ -100,6 +100,7 @@ class Connection {
 
     connect(path, options, callback) {
         this._openRequested = true;
+        this._openCanceled = false;
         this._failed = 0;
         this.connectImplementation(path, options, connectionInfo => {                   
             if (connectionInfo && !this._openCanceled) { 
@@ -118,7 +119,7 @@ class Connection {
                 if (callback) { 
                     callback(connectionInfo);
                 }
-            } else if (connectionInfo && this.openCanceled) {
+            } else if (connectionInfo && this._openCanceled) {
                 // connection opened, but this connect sequence was canceled
                 // we will disconnect without triggering any callbacks
                 this._connectionId = connectionInfo.connectionId;
@@ -145,7 +146,6 @@ class Connection {
             } else {
                 this._openRequested = false;
                 console.log('Failed to open');
-                googleAnalytics.sendException('FailedToOpen', false);
                 if (callback) {
                     callback(false);
                 }
@@ -163,13 +163,11 @@ class Connection {
             this.removeAllListeners();
             
             this.disconnectImplementation(result => {           
-                this.checkChromeLastError();
     
                 if (result) {
                     console.log('Connection with ID: ' + this._connectionId + ' closed, Sent: ' + this._bytesSent + ' bytes, Received: ' + this._bytesReceived + ' bytes');
                 } else {
                     console.log('Failed to close connection with ID: ' + this._connectionId + ' closed, Sent: ' + this._bytesSent + ' bytes, Received: ' + this._bytesReceived + ' bytes');
-                    googleAnalytics.sendException('Connection: FailedToClose', false);
                 }
                 
                 this._connectionId = false;
@@ -238,12 +236,6 @@ class Connection {
         } else {
             this.disconnect();
         }
-    }
-
-    checkChromeLastError() {
-        if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError.message);
-        } 
     }
 
     addOnReceiveCallback(callback) {

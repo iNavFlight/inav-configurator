@@ -1,4 +1,4 @@
-/*global $,MSPChainerClass,googleAnalytics,mspHelper,MSPCodes,GUI,chrome,MSP,TABS,Settings,helper,ol*/
+/*global $,MSPChainerClass,mspHelper,MSPCodes,GUI,chrome,MSP,TABS,Settings,helper,ol*/
 'use strict';
 
 TABS.gps = {};
@@ -6,7 +6,6 @@ TABS.gps.initialize = function (callback) {
 
     if (GUI.active_tab != 'gps') {
         GUI.active_tab = 'gps';
-        googleAnalytics.sendAppView('GPS');
     }
 
     // mavlink ADSB_EMITTER_TYPE
@@ -32,8 +31,6 @@ TABS.gps.initialize = function (callback) {
         18: 'adsb_10.png', // ADSB_EMITTER_TYPE_SERVICE_SURFACE
         19: 'adsb_12.png', // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
-
-
 
     var loadChainer = new MSPChainerClass();
 
@@ -63,19 +60,19 @@ TABS.gps.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(localization.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                 //noinspection JSUnresolvedVariable
-                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.log(localization.getMessage('deviceRebooting'));
                 GUI.handleReconnect($('.tab_gps a'));
             });
         });
     }
 
     function load_html() {
-        GUI.load("./tabs/gps.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "tabs/gps.html"), Settings.processHtml(process_html));
     }
 
     let cursorInitialized = false;
@@ -87,9 +84,8 @@ TABS.gps.initialize = function (callback) {
     let vehicleVectorSource;
     let vehiclesCursorInitialized = false;
 
-
     function process_html() {
-        localize();
+       localization.localize();;
 
         var features = FC.getFeatures();
 
@@ -100,7 +96,7 @@ TABS.gps.initialize = function (callback) {
         var gpsSbas = FC.getGpsSbasProviders();
 
         var gps_protocol_e = $('#gps_protocol');
-        for (i = 0; i < gpsProtocols.length; i++) {
+        for (let i = 0; i < gpsProtocols.length; i++) {
             gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
         }
 
@@ -112,7 +108,7 @@ TABS.gps.initialize = function (callback) {
         gps_protocol_e.change();
 
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
-        for (i = 0; i < gpsSbas.length; i++) {
+        for (let i = 0; i < gpsSbas.length; i++) {
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
         }
 
@@ -212,11 +208,11 @@ TABS.gps.initialize = function (callback) {
             let lat = GPS_DATA.lat / 10000000;
             let lon = GPS_DATA.lon / 10000000;
 
-            let gpsFixType = chrome.i18n.getMessage('gpsFixNone');
+            let gpsFixType = localization.getMessage('gpsFixNone');
             if (GPS_DATA.fix >= 2) {
-                gpsFixType = chrome.i18n.getMessage('gpsFix3D');
+                gpsFixType = localization.getMessage('gpsFix3D');
             } else if (GPS_DATA.fix >= 1) {
-                gpsFixType = chrome.i18n.getMessage('gpsFix2D');
+                gpsFixType = localization.getMessage('gpsFix2D');
             }
 
             $('.GPS_info td.fix').html(gpsFixType);
@@ -253,7 +249,7 @@ TABS.gps.initialize = function (callback) {
                             anchor: [0.5, 1],
                             opacity: 1,
                             scale: 0.5,
-                            src: '../images/icons/cf_icon_position.png'
+                            src: '../../images/icons/cf_icon_position.png'
                         }))
                     });
 
@@ -340,7 +336,6 @@ TABS.gps.initialize = function (callback) {
                     }
                 });
             }
-
         }
 
         /*
@@ -363,20 +358,6 @@ TABS.gps.initialize = function (callback) {
 
 
         $('a.save').on('click', function () {
-            if (FC.isFeatureEnabled('GPS', features)) {
-                googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
-                googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
-            }
-
-            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
-
-            for (var i = 0; i < features.length; i++) {
-                var featureName = features[i].name;
-                if (FC.isFeatureEnabled(featureName, features)) {
-                    googleAnalytics.sendEvent('Setting', 'Feature', featureName);
-                }
-            }
-
             helper.features.reset();
             helper.features.fromUI($('.tab-gps'));
             helper.features.execute(function () {
@@ -391,7 +372,7 @@ TABS.gps.initialize = function (callback) {
 
 TABS.gps.cleanup = function (callback) {
     if (callback) callback();
-    if(TABS.gps.toolboxAdsbVehicle){
+    if (TABS.gps.toolboxAdsbVehicle){
         TABS.gps.toolboxAdsbVehicle.close();
     }
 };

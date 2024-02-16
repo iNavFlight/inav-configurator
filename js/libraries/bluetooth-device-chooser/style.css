@@ -1,0 +1,38 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: black;
+    margin: 10px;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+#id {
+    margin: 5px;
+}
+
+#list {
+    color: white;
+}
+
+.item {
+    margin: 5px;
+    padding: 5px;
+    height: 40px;
+    line-height: 40px;
+    width: 345px;
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px solid whitesmoke;
+}
+
+.item:hover {
+    background-color: rgb(88, 88, 192);
+}
+
+#cancel {
+    text-align: center;
+}

@@ -344,7 +344,7 @@
     right: 0;
     z-index: -1;
     overflow: hidden;
-    background: url("../../../images/light-wide-2.svg") no-repeat 95% 20%;
+    background: url("./../../../images/light-wide-2.svg") no-repeat 95% 20%;
     background-size: 430px;
     height: 174px;
     opacity: 0.15;

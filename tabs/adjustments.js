@@ -6,7 +6,6 @@ TABS.adjustments = {};
 TABS.adjustments.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
-    googleAnalytics.sendAppView('Adjustments');
 
     function get_adjustment_ranges() {
         MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
@@ -21,7 +20,7 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load("./tabs/adjustments.html", process_html);
+        GUI.load(path.join(__dirname, "tabs/adjustments.html"), process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
@@ -170,7 +169,7 @@ TABS.adjustments.initialize = function (callback) {
         }
 
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // UI Hooks
         $('a.save').click(function () {
@@ -223,7 +222,7 @@ TABS.adjustments.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('adjustmentsEepromSaved'));
+                    GUI.log(localization.getMessage('adjustmentsEepromSaved'));
                 });
             }
 

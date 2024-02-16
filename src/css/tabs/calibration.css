@@ -48,7 +48,7 @@
     height: 30px;
     text-align: center;
     display: none;
-    background-image: url(../../../images/icons/check.svg);
+    background-image: url(./../../../images/icons/check.svg);
     background-size: contain;
     
 }
@@ -77,55 +77,55 @@
 }
 
  .tab-calibration .step1 {
-    background-image: url(../../../images/icons/pos1_grey.svg);
+    background-image: url(./../../../images/icons/pos1_grey.svg);
     background-size: 185px;
     background-position-y: 10px;
 }
 
  .tab-calibration .step1.active, .tab-calibration .step1.finished {
-    background-image: url(../../../images/icons/pos1.svg);
+    background-image: url(./../../../images/icons/pos1.svg);
 }
 
 .tab-calibration .step2 {
-    background-image: url(../../../images/icons/pos2_grey.svg);
+    background-image: url(./../../../images/icons/pos2_grey.svg);
     background-size: 185px;
     background-position-y: 10px;
 }
 
  .tab-calibration .step2.active, .tab-calibration .step2.finished {
-    background-image: url(../../../images/icons/pos2.svg);
+    background-image: url(./../../../images/icons/pos2.svg);
 }
 
  .tab-calibration .step3 {
-    background-image: url(../../../images/icons/pos3_grey.svg);
+    background-image: url(./../../../images/icons/pos3_grey.svg);
 }
 
  .tab-calibration .step3.active, .tab-calibration .step3.finished {
-    background-image: url(../../../images/icons/pos3.svg);
+    background-image: url(./../../../images/icons/pos3.svg);
 }
 
  .tab-calibration .step4 {
-    background-image: url(../../../images/icons/pos4_grey.svg);
+    background-image: url(./../../../images/icons/pos4_grey.svg);
 }
 
 .tab-calibration .step4.active, .tab-calibration .step4.finished {
-    background-image: url(../../../images/icons/pos4.svg);
+    background-image: url(./../../../images/icons/pos4.svg);
 }
 
 .tab-calibration .step5 {
-    background-image: url(../../../images/icons/pos5_grey.svg);
+    background-image: url(./../../../images/icons/pos5_grey.svg);
 }
 
 .tab-calibration .step5.active, .tab-calibration .step5.finished {
-    background-image: url(../../../images/icons/pos5.svg);
+    background-image: url(./../../../images/icons/pos5.svg);
 }
 
 .tab-calibration .step6 {
-    background-image: url(../../../images/icons/pos6_grey.svg);
+    background-image: url(./../../../images/icons/pos6_grey.svg);
 }
 
  .tab-calibration .step6.active, .tab-calibration .step6.finished {
-    background-image: url(../../../images/icons/pos6.svg);
+    background-image: url(./../../../images/icons/pos6.svg);
 }
 
  .tab-calibration .note {

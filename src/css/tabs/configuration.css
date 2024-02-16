@@ -166,17 +166,17 @@ hr {
 
 .tab-configuration .pitch {
     background-size: 20px;
-    background: url(../images/icons/cf_icon_pitch.svg) no-repeat center;
+    background: url(./../../../images/icons/cf_icon_pitch.svg) no-repeat center;
 }
 
 .tab-configuration .yaw {
     background-size: 20px;
-    background: url(../images/icons/cf_icon_yaw.svg) no-repeat center;
+    background: url(./../../../images/icons/cf_icon_yaw.svg) no-repeat center;
 }
 
 .tab-configuration .roll {
     background-size: 20px;
-    background: url(../images/icons/cf_icon_roll.svg) no-repeat center;
+    background: url(./../../../images/icons/cf_icon_roll.svg) no-repeat center;
 }
 
 .tab-configuration .board select {

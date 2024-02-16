@@ -40,6 +40,8 @@ Depending on the target operating system, _INAV Configurator_ is distributed as 
 
 ### Linux
 
+### Outdated, TODO: Update for Electron
+
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
 2. Download Configurator for Linux platform (linux32 and linux64 are present)
    *  **.rpm** is the Fedora installation file. Just download and install using `sudo dnf localinstall /path/to/INAV-Configurator_linux64-x.y.z-x86_64.rpm` or open it with a package manager (e.g. via Files)
@@ -101,29 +103,25 @@ For local development, the **node.js** build system is used.
 1. Install node.js
 1. From the project folder run `npm install`
 1. To build the JS and CSS files and start the configurator:
-    - With NW.js: Run `npm start`.
-    - With Chrome: Run `npm run gulp`. Then open `chrome://extensions`, enable
-    the `Developer mode`, click on the `Load unpacked extension...` button, and select the `inav-configurator` directory.
+    - Run `npm start`.
 
-Other tasks are also defined in `gulpfile.js`. To run a task, use `node ./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
+To build the App run `npm run make` to build for your platform.
 
-- **build**: Generate JS and CSS output files used by the configurator from their sources. It must be run whenever changes are made to any `.js` or `.css` files in order to have those changes appear
-in the configurator. If new files are added, they must be included in `gulpfile.js`. See the comments at the top of `gulpfile.js` to learn how to do so. See also the `watch` task.
-- **watch**: Watch JS and CSS sources for changes and run the `build` task whenever they're edited.
-- **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or NW.js app)
-in the `./dist/` directory.
-- **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
-directory. Running this task on macOS or Linux requires Wine since it's needed to set the icon
-for the Windows app. If you don't have Wine installed, you can create a release by running the **release-only-Linux** task.
-<br>`--installer` argument can be added to build installers for a particular OS. NOTE: MacOS Installer can be built with MacOS only.
+Options:
+* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el". 
 
-To build a specific release, use the command `release --platform="win64"` for example.
+See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
+
+Example (note the double -- ):
+``` npm start -- --arch="ia32 ```
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, you will need SDK flavours of NW.js
+To be able to open Inspector, set envorinment variable `NODE_ENV` to `develpoment` or set the flag directly when run `npm start`:
 
-`npm install nw@0.61.0 --nwjs_build_type=sdk`
+``` NODE_ENV=development npm start ```
+
+Or use vscode and start a debug session `Electron Main` (Just hit F5!)
 
 ## Different map providers
 

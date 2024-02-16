@@ -6,7 +6,6 @@ TABS.sensors.initialize = function (callback) {
 
     if (GUI.active_tab != 'sensors') {
         GUI.active_tab = 'sensors';
-        googleAnalytics.sendAppView('Sensors');
     }
 
     function initSensorData(){
@@ -44,7 +43,7 @@ TABS.sensors.initialize = function (callback) {
             }
         }
         while (data[0].length > 300) {
-            for (i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 data[i].shift();
             }
         }
@@ -198,9 +197,9 @@ TABS.sensors.initialize = function (callback) {
         }
     }
 
-    GUI.load("./tabs/sensors.html", function load_html() {
+    GUI.load(path.join(__dirname, "tabs/sensors.html"), function load_html() {
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // disable graphs for sensors that are missing
         var checkboxes = $('.tab-sensors .info .checkboxes input');
@@ -257,10 +256,10 @@ TABS.sensors.initialize = function (callback) {
 
             $('.tab-sensors .rate select:first').change();
 
-            chrome.storage.local.set({'graphs_enabled': checkboxes});
+            store.set('graphs_enabled', checkboxes);
         });
 
-        chrome.storage.local.get('graphs_enabled', function (result) {
+        store.get('graphs_enabled', function (result) {
             if (result.graphs_enabled) {
                 var checkboxes = $('.tab-sensors .info .checkboxes input');
                 for (var i = 0; i < result.graphs_enabled.length; i++) {
@@ -299,7 +298,7 @@ TABS.sensors.initialize = function (callback) {
             initDataArray(1),
             initDataArray(1)
         ];
-            debug_data = [
+        var debug_data = [
             initDataArray(1),
             initDataArray(1),
             initDataArray(1),
@@ -354,31 +353,31 @@ TABS.sensors.initialize = function (callback) {
         });
 
         // set refresh speeds according to configuration saved in storage
-        chrome.storage.local.get('sensor_settings', function (result) {
-            if (result.sensor_settings) {
-                $('.tab-sensors select[name="gyro_refresh_rate"]').val(result.sensor_settings.rates.gyro);
-                $('.tab-sensors select[name="gyro_scale"]').val(result.sensor_settings.scales.gyro);
+        var sensor_settings = store.get('sensor_settings', false) 
+        if (sensor_settings) {
+            $('.tab-sensors select[name="gyro_refresh_rate"]').val(sensor_settings.rates.gyro);
+            $('.tab-sensors select[name="gyro_scale"]').val(sensor_settings.scales.gyro);
 
-                $('.tab-sensors select[name="accel_refresh_rate"]').val(result.sensor_settings.rates.accel);
-                $('.tab-sensors select[name="accel_scale"]').val(result.sensor_settings.scales.accel);
+            $('.tab-sensors select[name="accel_refresh_rate"]').val(sensor_settings.rates.accel);
+            $('.tab-sensors select[name="accel_scale"]').val(sensor_settings.scales.accel);
 
-                $('.tab-sensors select[name="mag_refresh_rate"]').val(result.sensor_settings.rates.mag);
-                $('.tab-sensors select[name="mag_scale"]').val(result.sensor_settings.scales.mag);
+            $('.tab-sensors select[name="mag_refresh_rate"]').val(sensor_settings.rates.mag);
+            $('.tab-sensors select[name="mag_scale"]').val(sensor_settings.scales.mag);
 
-                $('.tab-sensors select[name="baro_refresh_rate"]').val(result.sensor_settings.rates.baro);
-                $('.tab-sensors select[name="sonar_refresh_rate"]').val(result.sensor_settings.rates.sonar);
+            $('.tab-sensors select[name="baro_refresh_rate"]').val(sensor_settings.rates.baro);
+            $('.tab-sensors select[name="sonar_refresh_rate"]').val(sensor_settings.rates.sonar);
 
-                $('.tab-sensors select[name="airspeed_refresh_rate"]').val(result.sensor_settings.rates.airspeed);
+            $('.tab-sensors select[name="airspeed_refresh_rate"]').val(sensor_settings.rates.airspeed);
 
-                $('.tab-sensors select[name="debug_refresh_rate"]').val(result.sensor_settings.rates.debug);
+            $('.tab-sensors select[name="debug_refresh_rate"]').val(sensor_settings.rates.debug);
 
-                // start polling data by triggering refresh rate change event
-                $('.tab-sensors .rate select:first').change();
-            } else {
-                // start polling immediatly (as there is no configuration saved in the storage)
-                $('.tab-sensors .rate select:first').change();
-            }
-        });
+            // start polling data by triggering refresh rate change event
+            $('.tab-sensors .rate select:first').change();
+        } else {
+            // start polling immediatly (as there is no configuration saved in the storage)
+            $('.tab-sensors .rate select:first').change();
+        }
+        
 
         $('.tab-sensors .rate select, .tab-sensors .scale select').change(function () {
             // if any of the select fields change value, all of the select values are grabbed
@@ -406,7 +405,7 @@ TABS.sensors.initialize = function (callback) {
             var fastest = d3.min([rates.gyro, rates.accel, rates.mag]);
 
             // store current/latest refresh rates in the storage
-            chrome.storage.local.set({'sensor_settings': {'rates': rates, 'scales': scales}});
+            store.set('sensor_settings', {'rates': rates, 'scales': scales});
 
             // re-initialize domains with new scales
             gyroHelpers = initGraphHelpers('#gyro', samples_gyro_i, [-scales.gyro, scales.gyro]);
@@ -596,7 +595,7 @@ TABS.sensors.initialize = function (callback) {
             var windowWidth = 500;
             var windowHeight = 510;
 
-            chrome.app.window.create("/tabs/debug_trace.html", {
+           window.open("/tabs/debug_trace.html", {
                 id: "debug_trace",
                 innerBounds: {
                     minWidth: windowWidth, minHeight: windowHeight,

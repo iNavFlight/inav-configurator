@@ -8,7 +8,6 @@ TABS.modes.initialize = function (callback) {
 
     if (GUI.active_tab != 'modes') {
         GUI.active_tab = 'modes';
-        googleAnalytics.sendAppView('Modes');
     }
 
     function get_active_box_data() {
@@ -24,7 +23,7 @@ TABS.modes.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load("./tabs/modes.html", process_html);
+        GUI.load(path.join(__dirname, "tabs/modes.html"), process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_active_box_data);
@@ -45,7 +44,7 @@ TABS.modes.initialize = function (callback) {
         }
 
         // translate to user-selected language
-        localize();
+       localization.localize();;
 
         // generate table from the supplied AUX names and AUX data
         for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -88,7 +87,7 @@ TABS.modes.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('auxiliaryEepromSaved'));
+                    GUI.log(localization.getMessage('auxiliaryEepromSaved'));
                 });
             }
 
