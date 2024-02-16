@@ -1,13 +1,12 @@
 'use strict';
 
-const { findByIds } = require('usb');
+const { ipcRenderer } = require('electron');
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
     { 'vendorId': 11836, 'productId': 57105}
 ];
 
-// TODO: Replace with events
 
 var PortHandler = new function () {
     this.initial_ports = false;
@@ -152,7 +151,7 @@ PortHandler.check = function () {
             self.initial_ports = current_ports;
         }
 
-        //self.check_usb_devices();
+        self.check_usb_devices();
 
         GUI.updateManualPortVisibility();
         setTimeout(function () {
@@ -164,28 +163,32 @@ PortHandler.check = function () {
 PortHandler.check_usb_devices = function (callback) {
     
     self.dfu_available = false;
-    for (const device of usbDevices) {
-        if (findByIds(device.vendorId, device.productId)) {
-            self.dfu_available = true;
-            break;
-        }
-    }   
+    
+    navigator.usb.getDevices().then(devices => {
+        devices.forEach(device  => {
+            usbDevices.forEach(usbDev => {
+                if (device.vendorId == usbDev.vendorId && device.productId == usbDev.productId) {
+                    self.dfu_available = true;
+                    return;
+                }
+            });
+        });
 
-    if (self.dfu_available) {
-        if (!$("div#port-picker #port [value='DFU']").length) {
-            $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
-            $('div#port-picker #port').val('DFU');
+        if (self.dfu_available) {
+            if (!$("div#port-picker #port [value='DFU']").length) {
+                $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
+                $('div#port-picker #port').val('DFU');
+            }
+        } else {
+            if ($("div#port-picker #port [value='DFU']").length) {
+                $("div#port-picker #port [value='DFU']").remove();
+            }
         }
-    } else {
-        if ($("div#port-picker #port [value='DFU']").length) {
-            $("div#port-picker #port [value='DFU']").remove();
-        }
-    }
-
-    if (callback) 
-        callback(self.dfu_available);
-
-};
+    
+        if (callback) 
+            callback(self.dfu_available);
+    });
+}
 
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one

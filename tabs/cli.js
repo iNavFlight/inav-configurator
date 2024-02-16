@@ -1,7 +1,7 @@
 'use strict';
 
 
-/*global chrome,GUI,TABS,nwdialog,$*/
+/*global chrome,GUI,TABS,$*/
 TABS.cli = {
     lineDelayMs: 50,
     profileSwitchDelayMs: 100,
@@ -159,7 +159,7 @@ TABS.cli.initialize = function (callback) {
                 }
                 
                 const fs = require('fs');
-                fs.writeFile(result.filePath , self.outputHistory, (err) => {
+                fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
                         GUI.log(localization.getMessage('ErrorWritingFile'));
                         return console.error(err);

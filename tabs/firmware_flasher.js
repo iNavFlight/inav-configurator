@@ -1,4 +1,4 @@
-/*global $,nwdialog*/
+/*global $*/
 'use strict';
 
 const { marked } = require('marked');
@@ -223,8 +223,19 @@ TABS.firmware_flasher.initialize = function (callback) {
 
         $('a.load_file').on('click', function () {
 
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog('.hex', function(filename) {
+            var options = {
+                filters: [ { name: "HEX file", extensions: ['hex'] } ]
+            };
+            dialog.showOpenDialog(options).then(result =>  {
+                if (result.canceled) {
+                    return;
+                }
+
+                let filename;
+                if (result.filePaths.length == 1) {
+                    filename = result.filePaths[0];
+                }
+
                 const fs = require('fs');
                 
                 $('div.git_info').slideUp();

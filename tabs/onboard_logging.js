@@ -1,4 +1,4 @@
-/*global $,MSP,MSPCodes,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
+/*global $,MSP,MSPCodes,TABS,GUI,CONFIGURATOR,helper,mspHelper,SDCARD,chrome*/
 'use strict';
 
 var
@@ -394,9 +394,15 @@ TABS.onboard_logging.initialize = function (callback) {
                 + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
                 + zeroPad(date.getSeconds(), 2) + '.TXT';
 
-        nwdialog.setContext(document);
-        nwdialog.saveFileDialog(filename, function(file) {
-            onComplete(file);
+        var options = {
+            defaultPath: filename,
+            filters: [ { name: "TXT file", extensions: ['txt'] } ]
+        };
+        dialog.showSaveDialog(options).then(result => {
+            if (result.canceled) {
+                return;
+            }
+            onComplete(result.filePath);
         });
     }
 

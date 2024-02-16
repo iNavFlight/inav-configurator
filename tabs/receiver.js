@@ -338,29 +338,16 @@ TABS.receiver.initialize = function (callback) {
         });
 
         $("a.sticks").click(function () {
-            var
-                windowWidth = 420,
-                windowHeight = Math.min(window.innerHeight, 720);
-
-            window.open("/html/receiver_msp.html", {
-                id: "receiver_msp",
-                innerBounds: {
-                    minWidth: windowWidth, minHeight: windowHeight,
-                    width: windowWidth, height: windowHeight,
-                    maxWidth: windowWidth, maxHeight: windowHeight
-                },
-                alwaysOnTop: true
-            }, function (createdWindow) {
-                // Give the window a callback it can use to send the channels (otherwise it can't see those objects)
-                createdWindow.contentWindow.setRawRx = function (channels) {
-                    if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
-                        mspHelper.setRawRx(channels);
-                        return true;
-                    } else {
-                        return false;
-                    }
+            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=720,menubar=no,contextIsolation=no,nodeIntegration=yes");
+            
+            mspWin.window.setRawRx = function (channels) {
+                if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
+                    mspHelper.setRawRx(channels);
+                    return true;
+                } else {
+                    return false;
                 }
-            });
+            }
         });
 
         // Only show the MSP control sticks if the MSP Rx feature is enabled

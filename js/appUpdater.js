@@ -12,7 +12,7 @@ appUpdater.checkRelease = function (currVersion) {
         let newPrerelase = releaseData[0].prerelease;
 
         if (newPrerelase == false && semver.gt(newVersion, currVersion)) {
-            GUI.log(newVersion, chrome.runtime.getManifest().version);
+            GUI.log(newVersion, app.getVersion());
             GUI.log(currVersion);
 
             GUI.log(localization.getMessage('newVersionAvailable'));

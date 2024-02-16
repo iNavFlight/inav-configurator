@@ -2,6 +2,7 @@
 
 const fs = require('fs')
 
+
 let Localiziation = function(locale) {
     let self  = { };
     let messages = null;
@@ -9,19 +10,28 @@ let Localiziation = function(locale) {
     let local = locale;
     
     self.loadMessages = function () { 
-        var data;
+        const path = require('path');
+        let fileName = path.join(__dirname, "./locale/" + local + "/messages.json");
+        if (!fs.existsSync(fileName)) {
+            fileName = path.join(__dirname, "./../locale/" + local + "/messages.json");
+        }
+        console.log(fileName);
         try {
-            data = fs.readFileSync(path.join(__dirname, "./locale/" + local + "/messages.json"), 'utf8',);
+            var data = fs.readFileSync(fileName, 'utf8',);
             messages = JSON.parse(data);
         } catch (err) {
-            console.log("Error while reading languge file");
+            console.log("Error while reading language file: " + fileName);
         }   
     }
     
     self.getMessage = function(messageID, substitutions = null) {
-        try {
+        try {           
+            if (messages == null) {
+                self.loadMessages();
+            }
+
             if (substitutions) {
-                 return messages[messageID].message.replace(/\{(\d+)\}/g, function (t, i) {
+                 return messages[messageID].message.replace(/\{(\d+)\}/g, (t, i) => {
                     return substitutions[i] !== void 0 ? substitutions[i] : "{" + (i - substitutions.length) + "}";
                 });
             } else {

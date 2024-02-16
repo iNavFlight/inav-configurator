@@ -1,4 +1,4 @@
-/*global chrome, chrome.i18n*/
+/*global chrome*/
 'use strict';
 
 $(document).ready(function () {
@@ -29,7 +29,7 @@ $(document).ready(function () {
 
             modal = new jBox('Modal', {
                 width: 400,
-                height: 100,
+                height: 120,
                 animation: false,
                 closeOnClick: false,
                 closeOnEsc: false,
@@ -302,7 +302,7 @@ function onOpen(openInfo) {
 
         GUI.log(localization.getMessage('serialPortOpened', [openInfo.connectionId]));
 
-        // save selected port with chrome.storage if the port differs
+        // save selected port if the port differs
         var last_used_port = store.get('last_used_port', false);
         if (last_used_port) {
             if (last_used_port != GUI.connected_to) {

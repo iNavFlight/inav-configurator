@@ -1,4 +1,3 @@
-/*global nwdialog*/
 'use strict';
 
 TABS.logging = {};
@@ -226,13 +225,17 @@ TABS.logging.initialize = function (callback) {
         const filename = 'inav_data_log_' + date.getFullYear() + '-'  + zeroPad(date.getMonth() + 1, 2) + '-'
                 + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
                 + zeroPad(date.getSeconds(), 2);
-        const accepts = [{
-            description: 'TXT files', extensions: ['txt'],
-        }];
 
-        nwdialog.setContext(document);
-        nwdialog.saveFileDialog(filename, accepts, '', function(file) {
-            loggingFileName = file;
+        var options = {
+            defaultPath: filename,
+            filters: [ { name: "TXT file", extensions: ['txt'] } ]
+        };
+        dialog.showSaveDialog(options).then(result => {
+            if (result.canceled) {
+                return;
+            }
+            
+            loggingFileName = result.filePath;
             readyToWrite = true;
             store.set('logging_file_name', loggingFileName);
             store.set('logging_file_ready', readyToWrite);

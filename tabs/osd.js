@@ -1,4 +1,4 @@
-/*global $,nwdialog*/
+/*global $*/
 'use strict';
 
 const inflection = require( 'inflection' );
@@ -3313,58 +3313,6 @@ TABS.osd.initialize = function (callback) {
                 }
                 FONT.upload(progressCallback);
             }
-        });
-
-        $(document).on('click', 'span.progressLabel a.save_font', function () {
-            //noinspection JSUnresolvedVariable
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'baseflight', accepts: [
-                {extensions: ['mcm']}
-            ]}, function (fileEntry) {
-                //noinspection JSUnresolvedVariable
-                if (chrome.runtime.lastError) {
-                    //noinspection JSUnresolvedVariable
-                    console.error(chrome.runtime.lastError.message);
-                    return;
-                }
-
-                //noinspection JSUnresolvedVariable
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Saving firmware to: ' + path);
-
-                    // check if file is writable
-                    //noinspection JSUnresolvedVariable
-                    chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
-                        if (isWritable) {
-                            var blob = new Blob([intel_hex], {type: 'text/plain'});
-
-                            fileEntry.createWriter(function (writer) {
-                                var truncated = false;
-
-                                writer.onerror = function (e) {
-                                    console.error(e);
-                                };
-
-                                writer.onwriteend = function () {
-                                    if (!truncated) {
-                                        // onwriteend will be fired again when truncation is finished
-                                        truncated = true;
-                                        writer.truncate(blob.size);
-
-                                        return;
-                                    }
-                                };
-
-                                writer.write(blob);
-                            }, function (e) {
-                                console.error(e);
-                            });
-                        } else {
-                            console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log(localization.getMessage('writePermissionsForFile'));
-                        }
-                    });
-                });
-            });
         });
 
         $('.update_preview').on('change', function () {

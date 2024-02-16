@@ -1033,7 +1033,7 @@ helper.defaultsDialog = (function () {
     privateScope.onPresetClick = function (event) {
         savingDefaultsModal = new jBox('Modal', {
             width: 400,
-            height: 100,
+            height: 120,
             animation: false,
             closeOnClick: false,
             closeOnEsc: false,

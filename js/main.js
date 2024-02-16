@@ -11,6 +11,18 @@ const Store = require('electron-store');
 const store = new Store();
 var localization;
 
+process.on('uncaughtException', function (error) {   
+    if (process.env.NODE_ENV !== 'development') {
+        GUI.log(localization.getMessage('unexpectedError', error));
+        if (GUI.connected_to || GUI.connecting_to) {
+            GUI.log(localization.getMessage('disconnecting'));
+            $('a.connect').trigger('click');
+        } 
+    } else {
+        throw error;
+    }
+});
+
 // Set how the units render on the configurator only
 const UnitType = {
     none: "none",

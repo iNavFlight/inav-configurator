@@ -1,5 +1,5 @@
 'use strict';
-/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,helper,$*/
+/*global chrome,GUI,BOARD_ALIGNMENT,TABS,helper,$*/
 
 TABS.magnetometer = {};
 

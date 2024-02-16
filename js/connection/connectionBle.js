@@ -95,9 +95,8 @@ class ConnectionBle extends Connection {
         });
         
         return navigator.bluetooth.requestDevice({
-            //acceptAllDevices: true,
-            //optionalServices: ids
-            filters: [{ services: ['generic_attribute'] }],
+            acceptAllDevices: true,
+            optionalServices: ids
         }).then(device => {
             console.log("Found BLE device: " + device.name);
             this._device = device;
@@ -250,5 +249,13 @@ class ConnectionBle extends Connection {
 
     removeOnReceiveErrorCallback(callback) {
         this._onDisconnectListeners = this._onDisconnectListeners.filter(listener => listener !== callback);
+    }
+
+    static getBleUUIDs() {
+        var ids = [];
+        BleDevices.forEach(device => {
+            ids.push(device.serviceUuid)
+        });
+        return ids;
     }
 }

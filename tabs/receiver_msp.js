@@ -2,7 +2,7 @@
 
 window.$ = window.jQuery = require('jquery');
 
-var localization = new Localiziation("en");;
+var localization = new Localiziation("en");
 
 var
     CHANNEL_MIN_VALUE = 1000,
@@ -11,10 +11,10 @@ var
     
     // What's the index of each channel in the MSP channel list?
     channelMSPIndexes = {
-        roll: 0,
-        pitch: 1,
-        yaw: 3,
-        throttle: 2,
+        Roll: 0,
+        Pitch: 1,
+        Yaw: 3,
+        Throttle: 2,
         ch5: 4,
         ch6: 5,
         ch7: 6,
@@ -27,10 +27,10 @@ var
     
     // Set reasonable initial stick positions (Mode 2)
     stickValues = {
-        throttle: CHANNEL_MIN_VALUE,
-        pitch: CHANNEL_MID_VALUE,
-        roll: CHANNEL_MID_VALUE,
-        yaw: CHANNEL_MID_VALUE,
+        Throttle: CHANNEL_MIN_VALUE,
+        Pitch: CHANNEL_MID_VALUE,
+        Roll: CHANNEL_MID_VALUE,
+        Yaw: CHANNEL_MID_VALUE,
         ch5: CHANNEL_MIN_VALUE,
         ch6: CHANNEL_MIN_VALUE,
         ch7: CHANNEL_MIN_VALUE,
@@ -43,8 +43,8 @@ var
     
     // First the vertical axis, then the horizontal:
     gimbals = [
-        ["throttle", "yaw"],
-        ["pitch", "roll"]
+        ["Throttle", "Yaw"],
+        ["Pitch", "Roll"]
     ],
     
     gimbalElems,
@@ -133,14 +133,16 @@ function localizeAxisNames() {
 
 $(document).ready(function() {
     $("a.button-enable").click(function() {
-        var
-            shrinkHeight = $(".warning").height();
+        
+        
+        var shrinkHeight = $(".warning").height();
         
         $(".warning").slideUp("short", function() {
             window.current().innerBounds.minHeight -= shrinkHeight;
             window.current().innerBounds.height -= shrinkHeight;
             window.current().innerBounds.maxHeight -= shrinkHeight;
         });
+        
         
         enableTX = true;
     });

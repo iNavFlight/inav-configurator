@@ -100,6 +100,7 @@ class Connection {
 
     connect(path, options, callback) {
         this._openRequested = true;
+        this._openCanceled = false;
         this._failed = 0;
         this.connectImplementation(path, options, connectionInfo => {                   
             if (connectionInfo && !this._openCanceled) { 
@@ -118,7 +119,7 @@ class Connection {
                 if (callback) { 
                     callback(connectionInfo);
                 }
-            } else if (connectionInfo && this.openCanceled) {
+            } else if (connectionInfo && this._openCanceled) {
                 // connection opened, but this connect sequence was canceled
                 // we will disconnect without triggering any callbacks
                 this._connectionId = connectionInfo.connectionId;

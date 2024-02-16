@@ -1,9 +1,16 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const windowStateKeeper = require('electron-window-state');
+const path = require('path');
 const Store = require('electron-store');
 Store.initRenderer();
 
 require('@electron/remote/main').initialize();
+
+const usbBootloaderIds =  [
+  { vendorId: 1155, productId: 57105}, 
+  { vendorId: 11836, productId: 57105}
+];
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -11,6 +18,40 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow = null;
+let bluetoothDeviceChooser = null;
+let btDeviceList = null;
+let selectBluetoothCallback = null;
+
+// In Eletrcon the bluetooth device chooser didn't exist, so we have to buid our own
+function createDeviceChooser() {
+  bluetoothDeviceChooser = new BrowserWindow({
+    parent: mainWindow,
+    width: 400,
+    height: 400,
+    webPreferences: {
+      preload: path.join(__dirname, 'js/libraries/bluetooth-device-chooser/preload.js')
+    }
+  });
+  bluetoothDeviceChooser.removeMenu();
+  bluetoothDeviceChooser.loadFile(path.join(__dirname, 'js/libraries/bluetooth-device-chooser/index.html'));
+
+  bluetoothDeviceChooser.on('closed', () => {
+    btDeviceList = null;
+    if (selectBluetoothCallback) {
+      selectBluetoothCallback('');
+      selectBluetoothCallback = null;
+    }
+    bluetoothDeviceChooser = null;
+  });
+
+  ipcMain.on('deviceSelected', (_event, deviceID) => {
+    if (selectBluetoothCallback) {
+      selectBluetoothCallback(deviceID);
+      selectBluetoothCallback = null;
+    }
+  });
+
+}
 
 app.on('ready', () => {
 
@@ -31,6 +72,69 @@ app.on('ready', () => {
       webSecurity: false
     },
   });
+
+  mainWindow.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
+    event.preventDefault();
+    selectBluetoothCallback = callback;
+
+    const compare = (a, b) => {
+      if (a.length !== b.length) {
+        return false;
+      }
+      a.every((element, index) => {
+        if (element.deviceId !== b[index].deviceId) {
+          return false;
+        }
+      })
+      return true;
+    }
+
+    if (!btDeviceList || !compare(btDeviceList, deviceList)) {
+      btDeviceList = [...deviceList];
+  
+      if (!bluetoothDeviceChooser) {
+        createDeviceChooser();
+      }
+      bluetoothDeviceChooser.webContents.send('ble-scan', btDeviceList);
+    }
+  });
+
+  
+  mainWindow.webContents.session.on('select-usb-device', (event, details, callback) => {
+    console.log(details.deviceList)
+    let premittedDevice = null;
+    if (details.deviceList) {
+      details.deviceList.every((device, idx) => {
+        if (device.productId == usbBootloaderIds[idx].productId && device.vendorId == usbBootloaderIds[idx].vendorId) {
+          premittedDevice = device.deviceId;
+          return;
+        }
+      });
+    } 
+
+    if (premittedDevice) {
+      callback(premittedDevice);
+    } else {
+      callback();
+    }
+  
+  });
+
+  mainWindow.webContents.session.setDevicePermissionHandler((details) => {
+    if (details.deviceType === 'usb' && details.origin === 'file://') {     
+        return true;
+    }
+  })
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        autoHideMenuBar: true
+      }
+    }
+  });
+
   app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
   require("@electron/remote/main").enable(mainWindow.webContents);

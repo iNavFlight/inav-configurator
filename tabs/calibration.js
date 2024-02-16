@@ -153,7 +153,7 @@ TABS.calibration.initialize = function (callback) {
 
             modalProcessing = new jBox('Modal', {
                 width: 400,
-                height: 100,
+                height: 120,
                 animation: false,
                 closeOnClick: false,
                 closeOnEsc: false,
@@ -237,7 +237,7 @@ TABS.calibration.initialize = function (callback) {
 
             let modalProcessing = new jBox('Modal', {
                 width: 400,
-                height: 100,
+                height: 120,
                 animation: false,
                 closeOnClick: false,
                 closeOnEsc: false,
@@ -279,7 +279,7 @@ TABS.calibration.initialize = function (callback) {
 
             modalProcessing = new jBox('Modal', {
                 width: 400,
-                height: 100,
+                height: 120,
                 animation: false,
                 closeOnClick: false,
                 closeOnEsc: false,

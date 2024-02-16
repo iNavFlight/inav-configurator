@@ -79,6 +79,10 @@ TABS.mission_control.initialize = function (callback) {
     var textGeom;
     let isOffline = false;
     let rthUpdateInterval = 0;
+    let $safehomesTable;
+    let $safehomesTableBody;
+    let $waypointOptionsTable;
+    let $waypointOptionsTableBody;
 
     if (GUI.active_tab != 'mission_control') {
         GUI.active_tab = 'mission_control';
@@ -948,13 +952,22 @@ TABS.mission_control.initialize = function (callback) {
         if (singleMissionActive()) {
             return true;
         } else if (confirm(localization.getMessage('confirm_overwrite_multimission_file_load_option'))) {
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog(function(result) {
-                loadMissionFile(result);
-                multimissionCount = 0;
-                multimission.flush();
-                renderMultimissionTable();
-            })
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showOpenDialog(options).then(result => {
+                if (result.canceled) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                if (result.filePaths.length == 1) {
+                    loadMissionFile(result.filePaths[0]);
+                    multimissionCount = 0;
+                    multimission.flush();
+                    renderMultimissionTable();
+                }
+            });
         }
         return false;
     }
@@ -2139,7 +2152,7 @@ TABS.mission_control.initialize = function (callback) {
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
                     selectedMarker.setAlt(returnAltitude);
                     $('#pointAlt').val(selectedMarker.getAlt());
-                    altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
+                    let altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
                     $('#altitudeInMeters').text(` ${altitudeMeters}m`);
 
                     mission.updateWaypoint(selectedMarker);
@@ -2416,17 +2429,30 @@ TABS.mission_control.initialize = function (callback) {
             if (!fileLoadMultiMissionCheck()) return;
 
             if (markers.length && !confirm(localization.getMessage('confirm_delete_all_points'))) return;
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog('.mission', function(result) {
-                loadMissionFile(result);
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showOpenDialog(options).then(result => {
+                if (result.canceled) {
+                    console.log('No file selected');
+                    return;
+                }
+                if (result.filePaths.length == 1) {
+                    loadMissionFile(result.filePaths[0]);
+                }
             })
         });
 
         $('#saveFileMissionButton').on('click', function () {
-            nwdialog.setContext(document);
-            nwdialog.saveFileDialog('', '.mission', function(result) {
-                saveMissionFile(result);
-            })
+            var options = {
+                filters: [ { name: "Mission file", extensions: ['mission'] } ]
+            };
+            dialog.showSaveDialog(options).then(result =>  {
+                if (result.canceled) {
+                    return;
+                }
+                saveMissionFile(result.filePath);
+            });
         });
 
         $('#loadMissionButton').on('click', function () {

@@ -23,6 +23,12 @@
     "options_render": {
         "message": "Configurator rendering options"
     },
+    "unexpectedError" : {
+        "message": "Unexpected error: {0}"
+    },
+    "disconnecting": {
+        "message": "Disconnecting..."
+    },
     "connect": {
         "message": "Connect"
     },
@@ -303,7 +309,7 @@
         "message": "UDP connection timed out."
     },
     "usbDeviceOpened": {
-        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened with ID: {0}"
+        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened"
     },
     "usbDeviceOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open USB device!"
