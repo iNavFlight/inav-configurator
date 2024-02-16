@@ -16,7 +16,8 @@
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
         <div class="modal__text">Place the aircraft flat on the table, facing roughly north (+/- 20°).<br />
-        Click OK after the aircraft is flat and pointing north.</div>
+        Click OK after the aircraft is flat and pointing north.
+        </div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-2" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -39,7 +40,7 @@
 <div id="modal-acc-align-east" class="is-hidden">
     <div class="modal__content">
         <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
-        <div class="modal__text">If you are using a compass, place the aircraft flat and pointing roughly <em>east</em></div>
+        <div class="modal__text">Place the aircraft flat and pointing roughly <em>east</em>, then click OK.</div>
     </div>
     <div class="modal__buttons">
         <a id="modal-acc-align-4" class="modal__button modal__button--main" data-i18n="OK"></a>
@@ -48,19 +49,34 @@
 
 <div id="modal-acc-align-done" class="is-hidden">
     <div class="modal__content">
-        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <h1 class="modal__title" data-i18n="accAlignFinished"></h1>
         <div class="modal__text">
             <div data-i18n="accAlignFinished">accAlignFinished></div>
-            Reminder to Ray - Add a step to turn it about 90 degrees, so I can see if it's upside down.
             Board alignment set to <span id="modal-acc-align-setting"></span><br />
             Compass alignment set to <span id="modal-compass-align-setting"></span>
         </div>
     </div>
     <div class="modal__buttons">
         <!-- <a class="save" href="#" data-i18n="configurationButtonSave"></a> -->
-        <a id="modal-acc-align-done" class="modal__button modal__button--main" data-i18n="OK"></a>
+        <a id="modal-acc-align-done-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
     </div>
 </div>
+
+<div id="modal-acc-align-calibration-error" class="is-hidden">
+    <div class="modal__content">
+        <h1 class="modal__title" data-i18n="accAlignTitle"></h1>
+        <div class="modal__text">
+            <div data-i18n="accAlignCalibrationError">Wrong Planet</div>
+            Accelerometer is not correctly calibrated for the current planet.
+            Please use the calibration tab to calibrate for the local gravity.
+        </div>
+    </div>
+    <div class="modal__buttons">
+        <!-- <a class="save" href="#" data-i18n="configurationButtonSave"></a> -->
+        <a id="modal-acc-align-error-calibration-ok" class="modal__button modal__button--main" data-i18n="OK"></a>
+    </div>
+</div>
+
 
 
         <div class="tab_title" data-i18n="tabMagnetometer">Magnetometer</div>
