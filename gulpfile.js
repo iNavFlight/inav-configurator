@@ -408,18 +408,39 @@ gulp.task('release-osx64', function(done) {
         archive.directory(src, 'INAV Configurator.app');
         output.on('close', function() {
             if (getArguments().notarize) {
-                console.log('Notarizing DMG file: ' + zipFilename);
-                const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
+                console.log('Notarizing ZIP file: ' + zipFilename);
+                const notarizeArgs = ['xcrun', 'notarytool', 'submit'];
+                notarizeArgs.push(zipFilename);
                 const notarizationUsername = getArguments()['notarization-username'];
                 if (notarizationUsername) {
-                    notarizeArgs.push('-u', notarizationUsername)
+                    notarizeArgs.push('--apple-id', notarizationUsername)
+                } else {
+                    throw new Error('Missing notarization username');
                 }
                 const notarizationPassword = getArguments()['notarization-password'];
                 if (notarizationPassword) {
-                    notarizeArgs.push('-p', notarizationPassword)
+                    notarizeArgs.push('--password', notarizationPassword)
+                } else {
+                    throw new Error('Missing notarization password');
                 }
-                notarizeArgs.push(zipFilename)
+                const notarizationTeamId = getArguments()['notarization-team-id'];
+                if (notarizationTeamId) {
+                    notarizeArgs.push('--team-id', notarizationTeamId)
+                } else {
+                    throw new Error('Missing notarization Team ID');
+                }
+                notarizeArgs.push('--wait');
+
+                const notarizationWebhook = getArguments()['notarization-webhook'];
+                if (notarizationWebhook) {
+                    notarizeArgs.push('--webhook', notarizationWebhook);
+                }
                 execSync.apply(this, notarizeArgs);
+
+                console.log('Stapling ZIP file: ' + zipFilename);
+                const stapleArgs = ['macapptool', '-v', '1', 'staple'];
+                stapleArgs.push(zipFilename)
+                execSync.apply(this, stapleArgs);
             }
             done();
         });
