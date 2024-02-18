@@ -787,7 +787,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 5000
+                value: 800
             },
             {
                 key: "nav_wp_max_safe_distance",
@@ -996,7 +996,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 5000
+                value: 1000
             },
             {
                 key: "nav_wp_max_safe_distance",
