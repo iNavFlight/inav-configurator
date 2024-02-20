@@ -29,6 +29,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    ADSB_VEHICLES,
     MISSION_PLANNER,
     ANALOG,
     ARMING_CONFIG,
@@ -118,8 +119,9 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
-            profile: 0,
-            battery_profile: 0,
+            mixer_profile: -1,
+            profile: -1,
+            battery_profile: -1,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
             armingFlags: 0,
@@ -248,6 +250,12 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0
+        };
+
+        ADSB_VEHICLES = {
+            vehiclesCount: 0,
+            callsignLength: 0,
+            vehicles: []
         };
 
         MISSION_PLANNER = new WaypointCollection();
@@ -550,6 +558,18 @@ var FC = {
             correctionEnd: null,
             weightCenter: null, 
             weightEnd: null
+        };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
         };
     },
     getOutputUsages: function() {
@@ -1218,6 +1238,18 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },   
+            54: {
+                name: "Mag calibration",
+                operandType: "Set Flight Parameter",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1281,6 +1313,7 @@ var FC = {
                     37: "Rangefinder [cm]",
                     38: "Active MixerProfile",
                     39: "MixerTransition Active",
+                    40: "Yaw [deg]"
                 }
             },
             3: {
@@ -1419,8 +1452,6 @@ var FC = {
             'max_angle_inclination_pit',
             'dterm_lpf_hz',
             'dterm_lpf_type',
-            'dterm_lpf2_hz',
-            'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
             'fw_reference_airspeed',

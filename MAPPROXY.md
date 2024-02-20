@@ -175,13 +175,13 @@ https://hub.docker.com/r/yagajs/mapproxy/ Docker image (untested)
         base: GLOBAL_MERCATOR
         origin: ul
     ```
-1. You can use any map provider that is compatible with MapProxy, and once you zoom in on the region you will be flying in, the map tiles will be cached for offline use. You can test this by disabling your internet connection and browsing the demo url in a browser
+1. You can use any map provider that is compatible with MapProxy, and once you zoom in on the region you will be flying in, the map tiles will be cached for offline use. You can test this by disabling your internet connection and browsing the demo URL in a browser
 	  
     https://wiki.openstreetmap.org/wiki/WMS#OSM_WMS_Servers OpenStreetMap WSM servers 
 	  
     https://lpdaac.usgs.gov/data_access/web_map_services_wms # USGS currently has 400+ WMS layers
     
-    * You can use QGIS to browse different provieders and pick the maps you like for your iNav layers
+    * You can use QGIS to browse different providers and pick the maps you like for your iNav layers
 	  https://qgis.org/en/site/
     
-    * There are many government and public wms providers available in different regions worldwide
+    * There are many government and public WMS providers available in different regions worldwide

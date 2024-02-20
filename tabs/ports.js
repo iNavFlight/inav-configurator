@@ -114,6 +114,12 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1,
         defaultBaud: 57600 }
     );
+    portFunctionRules.push({
+        name: 'SBUS_OUTPUT',
+        groups: ['peripherals'],
+        maxPorts: 1,
+        defaultBaud: 115200 }
+    );
 
     for (var i = 0; i < portFunctionRules.length; i++) {
         portFunctionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + portFunctionRules[i].name);
@@ -270,8 +276,8 @@ TABS.ports.initialize = function (callback) {
                         var selectElementName = 'function-' + column;
                         var selectElementSelector = 'select[name=' + selectElementName + ']';
                         select_e = functions_e.find(selectElementSelector);
-
-                        if (select_e.size() == 0) {
+                        
+                        if (select_e.length == 0) {
                             functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
                             select_e = functions_e.find(selectElementSelector);
                             var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');

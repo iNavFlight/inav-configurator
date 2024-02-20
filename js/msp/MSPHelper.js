@@ -42,6 +42,7 @@ var mspHelper = (function (gui) {
         'GSM_SMS': 19,
         'FRSKY_OSD': 20,
         'DJI_FPV': 21,
+        'SBUS_OUTPUT': 22,
         'SMARTPORT_MASTER': 23,
         'MSP_DISPLAYPORT': 25,
     };
@@ -68,6 +69,7 @@ var mspHelper = (function (gui) {
             color;
         if (!dataHandler.unsupported || dataHandler.unsupported) switch (dataHandler.code) {
             case MSPCodes.MSPV2_INAV_STATUS:
+                let profile_changed = false;
                 CONFIG.cycleTime = data.getUint16(offset, true);
                 offset += 2;
                 CONFIG.i2cError = data.getUint16(offset, true);
@@ -76,13 +78,28 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 CONFIG.cpuload = data.getUint16(offset, true);
                 offset += 2;
+
                 profile_byte = data.getUint8(offset++)
-                CONFIG.profile = profile_byte & 0x0F;
-                CONFIG.battery_profile = (profile_byte & 0xF0) >> 4;
+                let profile = profile_byte & 0x0F;
+                profile_changed |= (profile !== CONFIG.profile) && (CONFIG.profile !==-1);
+                CONFIG.profile = profile;
+
+                let battery_profile = (profile_byte & 0xF0) >> 4;
+                profile_changed |= (battery_profile !== CONFIG.battery_profile) && (CONFIG.battery_profile !==-1);
+                CONFIG.battery_profile = battery_profile;
+
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
+                
+                //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
+                //read mixer profile as the last byte in the the message
+                profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
+                let mixer_profile = profile_byte & 0x0F;
+                profile_changed |= (mixer_profile !== CONFIG.mixer_profile) && (CONFIG.mixer_profile !==-1);
+                CONFIG.mixer_profile = mixer_profile;
+
                 gui.updateStatusBar();
-                gui.updateProfileChange();
+                gui.updateProfileChange(profile_changed);
                 break;
 
             case MSPCodes.MSP_ACTIVEBOXES:
@@ -170,6 +187,35 @@ var mspHelper = (function (gui) {
                 GPS_DATA.eph = data.getUint16(16, true);
                 GPS_DATA.epv = data.getUint16(18, true);
                 break;
+            case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
+                var byteOffsetCounter = 0;
+                ADSB_VEHICLES.vehicles = [];
+                ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
+                ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
+
+                for(i = 0; i < ADSB_VEHICLES.vehiclesCount; i++){
+
+                    var vehicle = {callSignByteArray: [], callsign: "", icao: 0, lat: 0, lon: 0, alt: 0, heading: 0, ttl: 0, tslc: 0, emitterType: 0};
+
+                    for(ii = 0; ii < ADSB_VEHICLES.callsignLength; ii++){
+                        vehicle.callSignByteArray.push(data.getUint8(byteOffsetCounter++));
+                    }
+
+                    vehicle.callsign = (String.fromCharCode(...vehicle.callSignByteArray)).replace(/[^\x20-\x7E]/g, '');
+                    vehicle.icao = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lat = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lon = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.altCM = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.headingDegrees = data.getUint16(byteOffsetCounter, true); byteOffsetCounter += 2;
+                    vehicle.tslc = data.getUint8(byteOffsetCounter++);
+                    vehicle.emitterType = data.getUint8(byteOffsetCounter++);
+                    vehicle.ttl = data.getUint8(byteOffsetCounter++);
+
+                    ADSB_VEHICLES.vehicles.push(vehicle);
+                }
+
+                break;
+
             case MSPCodes.MSP_ATTITUDE:
                 SENSOR_DATA.kinematics[0] = data.getInt16(0, true) / 10.0; // x
                 SENSOR_DATA.kinematics[1] = data.getInt16(2, true) / 10.0; // y
@@ -1480,6 +1526,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_OSD_SET_PREFERENCES:
                 console.log('OSD preferences saved');
                 break;
+            case MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE:
+                console.log('Battery profile selected');
+                break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
@@ -1569,6 +1618,22 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS:
                 console.log('Rate dynamics saved');
+                break;
+
+            case MSPCodes.MSP2_INAV_EZ_TUNE:
+                EZ_TUNE.enabled = data.getUint8(0);
+                EZ_TUNE.filterHz = data.getUint16(1, true);
+                EZ_TUNE.axisRatio = data.getUint8(3);
+                EZ_TUNE.response = data.getUint8(4);
+                EZ_TUNE.damping = data.getUint8(5);
+                EZ_TUNE.stability = data.getUint8(6);
+                EZ_TUNE.aggressiveness = data.getUint8(7);
+                EZ_TUNE.rate = data.getUint8(8);
+                EZ_TUNE.expo = data.getUint8(9);
+                break;
+
+            case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
+                console.log('EzTune settings saved');
                 break;
 
             default:
@@ -2206,6 +2271,22 @@ var mspHelper = (function (gui) {
                 buffer.push(RATE_DYNAMICS.weightCenter);
                 buffer.push(RATE_DYNAMICS.weightEnd);
                 break;
+
+            case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
+
+                buffer.push(EZ_TUNE.enabled);
+                buffer.push(lowByte(EZ_TUNE.filterHz));
+                buffer.push(highByte(EZ_TUNE.filterHz));
+                buffer.push(EZ_TUNE.axisRatio);
+                buffer.push(EZ_TUNE.response);
+                buffer.push(EZ_TUNE.damping);
+                buffer.push(EZ_TUNE.stability);
+                buffer.push(EZ_TUNE.aggressiveness);
+                buffer.push(EZ_TUNE.rate);
+                buffer.push(EZ_TUNE.expo);
+                console.log(buffer);
+                break;
+
 
             default:
                 return false;
@@ -2876,7 +2957,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
-    self.sendTimerOutputModes = function(callback) {
+    self.sendTimerOutputModes = function(onCompleteCallback) {
         var nextFunction = send_next_output_mode;
         var idIndex = 0;
 
@@ -2901,7 +2982,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = callback;
+                nextFunction = onCompleteCallback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
@@ -3263,6 +3344,12 @@ var mspHelper = (function (gui) {
 
     self.encodeSetting = function (name, value) {
         return this._getSetting(name).then(function (setting) {
+            
+            if (!setting) {
+                console.log("Setting invalid: " + name);
+                return null;
+            }
+
             if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
@@ -3310,7 +3397,11 @@ var mspHelper = (function (gui) {
 
     self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
-            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+            if (data) {
+                return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+            } else {
+                return Promise.resolve().then(callback);
+            }
         });
     };
 
@@ -3407,6 +3498,14 @@ var mspHelper = (function (gui) {
 
     self.saveRateDynamics = function (callback) {
         MSP.send_message(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS, mspHelper.crunch(MSPCodes.MSP2_INAV_SET_RATE_DYNAMICS), false, callback);
+    }
+
+    self.loadEzTune = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_EZ_TUNE, false, false, callback);
+    }
+
+    self.saveEzTune = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_EZ_TUNE_SET, mspHelper.crunch(MSPCodes.MSP2_INAV_EZ_TUNE_SET), false, callback);
     }
 
     self.loadParameterGroups = function (callback) {

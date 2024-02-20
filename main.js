@@ -78,6 +78,14 @@ $(document).ready(function () {
         // Update CSS on to show highlighing or not
         updateProfilesHighlightColours();
     });
+    chrome.storage.local.get('cli_autocomplete', function (result) {
+        if (typeof result.cliAutocomplete === 'undefined') {
+            result.cli_autocomplete = 1;
+        }
+        globalSettings.cliAutocomplete = result.cli_autocomplete;
+        CliAutoComplete.setEnabled(globalSettings.cliAutocomplete);
+    });
+
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
     if (!CONFIGURATOR.connectionValid) {
@@ -122,10 +130,14 @@ $(document).ready(function () {
         //Get saved size and position
         chrome.storage.local.get('windowSize', function (result) {
             if (result.windowSize) {
-                win.height = result.windowSize.height;
-                win.width = result.windowSize.width;
-                win.x = result.windowSize.x;
-                win.y = result.windowSize.y;
+                if (result.windowSize.height <= window.screen.availHeight)
+                   win.height = result.windowSize.height;
+                if (result.windowSize.width <= window.screen.availWidth)
+                   win.width = result.windowSize.width;
+                if (result.windowSize.x >= window.screen.availLeft)
+                   win.x = result.windowSize.x;
+                if (result.windowSize.y >= window.screen.availTop)
+                    win.y = result.windowSize.y;
             }
         });
 
@@ -301,6 +313,9 @@ $(document).ready(function () {
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
+                        break;
 
                     default:
                         console.log('Tab not found:' + tab);
@@ -364,6 +379,15 @@ $(document).ready(function () {
                     activeTab.removeClass('active');  
                     activeTab.find('a').click(); 
                 });
+                $('div.cli_autocomplete input').change(function () {
+                    globalSettings.cliAutocomplete = $(this).is(':checked');
+                    chrome.storage.local.set({
+                        'cli_autocomplete': globalSettings.cliAutocomplete
+                    });
+
+                    CliAutoComplete.setEnabled($(this).is(':checked'));
+                });
+
 
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
@@ -371,6 +395,7 @@ $(document).ready(function () {
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);   
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+                $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                 
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
@@ -545,13 +570,25 @@ $(document).ready(function () {
 
     });
 
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
+        });
+    });
+
     var profile_e = $('#profilechange');
 
     profile_e.change(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
             GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
-            updateActivatedTab();
         });
     });
 
@@ -561,7 +598,6 @@ $(document).ready(function () {
         var batteryprofile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [batteryprofile], false, function () {
             GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1]));
-            updateActivatedTab();
         });
     });
 });
@@ -700,4 +736,29 @@ function updateFirmwareVersion() {
         
         globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
+}
+
+function updateEzTuneTabVisibility(loadMixerConfig) {
+    let useEzTune = true;
+    if (CONFIGURATOR.connectionValid) {
+        if (loadMixerConfig) {
+            mspHelper.loadMixerConfig(function() {
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    $('.tab_ez_tune').removeClass("is-hidden");
+                } else {
+                    $('.tab_ez_tune').addClass("is-hidden");
+                    useEzTune = false;
+                }
+            });
+        } else {
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('.tab_ez_tune').removeClass("is-hidden");
+            } else {
+                $('.tab_ez_tune').addClass("is-hidden");
+                useEzTune = false;
+            }
+        }
+    }
+
+    return useEzTune;
 }

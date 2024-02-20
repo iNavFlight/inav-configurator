@@ -16,7 +16,8 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadPidAdvanced,
         mspHelper.loadFilterConfig,
         mspHelper.loadFeatures,
-        mspHelper.loadRateDynamics
+        mspHelper.loadRateDynamics,
+        mspHelper.loadEzTune
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -125,6 +126,15 @@ TABS.pid_tuning.initialize = function (callback) {
     }
     function process_html() {
         // translate to user-selected language
+
+        if (EZ_TUNE.enabled) {
+            $("#tuning-wrapper").remove();
+            $("#tuning-footer").remove();
+            $('#note-wrapper').show();
+        } else {
+            $("#note-wrapper").remove();
+        }
+
         localize();
 
         helper.tabs.init($('.tab-pid_tuning'));

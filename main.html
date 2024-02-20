@@ -87,6 +87,16 @@
                             <div class="legend" i18n="sensorDataFlashFreeSpace"></div>
                         </li>
                     </ul>
+                    <div id="mixer_profile_change">
+                        <div class="dropdown  dropdown-dark">
+                            <form name="mixer-profile-change" id="mixer-profile-change">
+                                <select class="dropdown-select" id="mixerprofilechange">
+                                <option value="0" i18n="mixerProfile1"></option>
+                                <option value="1" i18n="mixerProfile2"></option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
                     <div id="profile_change">
                         <div class="dropdown dropdown-dark">
                             <form name="profile-change" id="profile-change">
@@ -205,6 +215,9 @@
                     <li class="tab_failsafe">
                         <a href="#" data-i18n="tabFailsafe" class="tabicon ic_failsafe" title="Failsafe"></a>
                     </li>
+                    <li class="tab_ez_tune">
+                        <a href="#" data-i18n="tabEzTune" class="tabicon ic_wizzard"></a>
+                    </li>
                     <li class="tab_pid_tuning">
                         <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" title="PID Tuning"></a>
                     </li>
@@ -251,8 +264,7 @@
                         <a href="#" data-i18n="tabCLI" class="tabicon ic_cli" title="CLI"></a>
                     </li>
 
-                    <!--<li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li>-->
-                    <!--<li class=""><a href="#" class="tabicon ic_wizzard">Wizzard (spare icon)</a></li>-->
+                    <!-- <li class=""><a href="#" class="tabicon ic_advanced">Advanced (spare icon)</a></li> -->
                 </ul>
             </div>
             <div class="clear-both"></div>

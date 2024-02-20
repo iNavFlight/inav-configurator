@@ -126,6 +126,7 @@ sources.js = [
     './js/serial_queue.js',
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
+    './tabs/ez_tune.js',
     './js/peripherals.js',
     './js/appUpdater.js',
     './js/feature_framework.js',
@@ -137,6 +138,8 @@ sources.js = [
     './node_modules/openlayers/dist/ol.js',
     './js/libraries/plotly-latest.min.js',
     './js/sitl.js',
+    './js/CliAutoComplete.js',
+    './node_modules/jquery-textcomplete/dist/jquery.textcomplete.js'
 ];
 
 sources.receiverCss = [
