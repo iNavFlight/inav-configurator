@@ -2147,7 +2147,10 @@ OSD.reload = function(callback) {
         });
     });
 
-    MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
+    if(semver.gte(CONFIG.flightControllerVersion, '7.1.0'))
+    {
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
+    }
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -3384,13 +3387,16 @@ TABS.osd.initialize = function (callback) {
             GUI.content_ready(callback);
         });
 
-        mspHelper.loadOsdCustomElements(createCustomElements);
+        if(semver.gte(CONFIG.flightControllerVersion, '7.1.0')) {
+            mspHelper.loadOsdCustomElements(createCustomElements);
+        }
     }));
 };
 
 function createCustomElements(){
     if(OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
         $('.custom-element-container').remove();
+        return;
     }
 
     var customElementsContainer = $('#osdCustomElements');
@@ -3602,6 +3608,7 @@ function customElementGetDataForRow(row){
     switch (parseInt(elementVisibilityType.val())){
         case 1:
             visibilityValue = parseInt(valueVisibilityCell.find('.gv').find(':selected').val());
+            break;
         case 2:
             visibilityValue = parseInt(valueVisibilityCell.find('.lc').find(':selected').val());
             break;

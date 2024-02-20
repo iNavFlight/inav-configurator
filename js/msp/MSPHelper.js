@@ -1635,6 +1635,12 @@ var mspHelper = (function (gui) {
 
                 var index = 0;
 
+                if(data.byteLength == 0){
+                    OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
+                    OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    return;
+                }
+
                 OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(index++);
                 OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(index++);
 
