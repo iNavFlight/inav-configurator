@@ -114,7 +114,12 @@ SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
+SYM.ADSB = 0xFD;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.ODOMETER = 0X168;
+SYM.PILOT_LOGO_SML_L = 0x1D5;
+SYM.PILOT_LOGO_SML_C = 0x1D6;
+SYM.PILOT_LOGO_SML_R = 0x1D7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -424,9 +429,11 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
-function osdmAhdrawnPreview() {
-    let precision = Settings.getInputValue('osd_mah_used_precision');
-    let preview = "1215075".substring(0, precision);
+function osdmAhPrecisionPreview() {
+    let precision = Settings.getInputValue('osd_mah_precision');
+    let rnd = (Math.floor(10000000000000 + Math.random() * 90000000000000)).toString();
+    rnd = rnd.replace('0', '');
+    let preview = rnd.substring(0, precision);
 
     return preview + FONT.symbol(SYM.MAH);
 }
@@ -474,6 +481,8 @@ OSD.initData = function () {
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
             baro_temp_alarm_max: null,
+            adsb_distance_warning: null,
+            adsb_distance_alert: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
@@ -775,6 +784,24 @@ OSD.constants = {
             min: -55,
             max: 125
         },
+        {
+            name: 'ADSB_MAX_DISTANCE_WARNING',
+            field: 'adsb_distance_warning',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
+        },
+        {
+            name: 'ADSB_MAX_DISTANCE_ALERT',
+            field: 'adsb_distance_alert',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
+        },
     ],
 
     // All display fields, from every version, do not remove elements, only add!
@@ -840,7 +867,6 @@ OSD.constants = {
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-
                     preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
@@ -857,6 +883,11 @@ OSD.constants = {
                     name: 'PILOT_NAME',
                     id: 142,
                     preview: '[PILOT_NAME]'
+                },
+                {
+                    name: 'PILOT_LOGO',
+                    id: 146,
+                    preview: FONT.symbol(SYM.PILOT_LOGO_SML_L) + FONT.symbol(SYM.PILOT_LOGO_SML_C) + FONT.symbol(SYM.PILOT_LOGO_SML_R)
                 },
                 {
                     name: 'FLYMODE',
@@ -1313,7 +1344,7 @@ OSD.constants = {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        return osdmAhdrawnPreview();
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1334,7 +1365,7 @@ OSD.constants = {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
                     preview: function() {
-                        return '1276' + FONT.symbol(SYM.MAH); // 4 chars
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1564,6 +1595,22 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'ODOMETER',
+                    id: 145,
+                    min_version: '6.1.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00016.9') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00014.7') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00027.2') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
+                {
                     name: 'GPS_HDOP',
                     id: 31,
                     preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + FONT.embed_dot('1.8')
@@ -1627,6 +1674,18 @@ OSD.constants = {
                     id: 140,
                     min_version: '6.0.0',
                     preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'ADSB_WARNING_MESSAGE',
+                    id: 147,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                },
+                {
+                    name: 'ADSB_INFO',
+                    id: 148,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '2',
                 },
                 {
                     name: 'CROSS TRACK ERROR',
@@ -2238,6 +2297,8 @@ OSD.msp = {
         result.push16(OSD.data.alarms.imu_temp_alarm_max);
         result.push16(OSD.data.alarms.baro_temp_alarm_min);
         result.push16(OSD.data.alarms.baro_temp_alarm_max);
+        result.push16(OSD.data.alarms.adsb_distance_warning);
+        result.push16(OSD.data.alarms.adsb_distance_alert);
         return result;
     },
 
@@ -2257,6 +2318,8 @@ OSD.msp = {
         OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
+        OSD.data.alarms.adsb_distance_warning = alarms.read16();
+        OSD.data.alarms.adsb_distance_alert = alarms.read16();
     },
 
     encodePreferences: function() {
@@ -2663,7 +2726,7 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().size() > 0) {
+        if (groupContainer.find('.display-fields').children().length > 0) {
             $tmpl.parent().append(groupContainer);
         }
     }

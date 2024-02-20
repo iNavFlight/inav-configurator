@@ -285,6 +285,7 @@
 | ![Home distance](/resources/osd/digital/default/24x36/357.png)    | SYM_HOME_DIST              |                              | Home distance icon                    | 357        | 0x165         |
 | ![Crosshair centre](/resources/osd/digital/default/24x36/358.png) | SYM_AH_CH_CENTER           | SYM.AH_CROSSHAIRS            | Default crosshair centre              | 358        | 0x166         |
 | ![Flight dist rem](/resources/osd/digital/default/24x36/359.png)  | SYM_FLIGHT_DIST_REMAINING  | SYM.FLIGHT_DIST_REMAINING    | Flight distance remaining             | 359        | 0x167         |
+| ![Odometer](/resources/osd/digital/default/24x36/360.png)         | SYM_ODOMETER               | SYM.ODOMETER                 | Odometer (total aircraft distance)    | 360        | 0x168         |
 | ![Crosshair 3](/resources/osd/digital/default/24x36/400_402.png)  | SYM_AH_CH_TYPE3            | SYM.AH_CROSSHAIRS            | Crosshair type 3                      | 400 - 402  | 0x190 - 0x192 |
 | ![Crosshair 4](/resources/osd/digital/default/24x36/403_405.png)  | SYM_AH_CH_TYPE4            | SYM.AH_CROSSHAIRS            | Crosshair type 4                      | 403 - 405  | 0x193 - 0x195 |
 | ![Crosshair 5](/resources/osd/digital/default/24x36/406_408.png)  | SYM_AH_CH_TYPE5            | SYM.AH_CROSSHAIRS            | Crosshair type 5                      | 406 - 408  | 0x196 - 0x198 |
@@ -323,5 +324,7 @@
 | ![Pan centred](/resources/osd/digital/default/24x36/454.png)      | SYM_SERVO_PAN_IS_CENTRED   |                              | Pan servo is centred                  | 454        | 0x1C6         |
 | ![Pan Left](/resources/osd/digital/default/24x36/455.png)         | SYM_SERVO_PAN_IS_OFFSET_L  | SYM.PAN_SERVO_IS_OFFSET_L    | Pan servo is moved to the left        | 455        | 0x1C7         |
 | ![Pan Right](/resources/osd/digital/default/24x36/456.png)        | SYM_SERVO_PAN_IS_OFFSET_R  |                              | Pan servo is moved to the right       | 456        | 0x1C8         |
+| ![Pilot Logo S](/resources/osd/digital/default/24x36/469_471.png) | SYM_PILOT_LOGO_SML_L       | SYM.PILOT_LOGO_SML_L         | Small Pilot logo                      | 469 - 471  | 0x1D5 - 0x1D7 |
+| ![Pilot Logo L](/resources/osd/digital/default/24x36/472_511.png) | SYM_PILOT_LOGO_LRG_START   |                              | Large Pilot logo                      | 472 - 511  | 0x1D5 - 0x1D7 |
 
 _*_ Do not change the IDs of these characters

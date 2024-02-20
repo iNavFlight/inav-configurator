@@ -14,6 +14,9 @@
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
     },
+    "options_cliAutocomplete": {
+        "message": "Advanced CLI AutoComplete"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -109,6 +112,9 @@
     },
     "tabFailsafe": {
         "message": "Failsafe"
+    },
+    "tabEzTune": {
+        "message": "Ez Tune"
     },
     "tabGPS": {
         "message": "GPS"
@@ -485,10 +491,16 @@
         "message": "Welcome to <strong>INAV - Configurator</strong>, a utility designed to simplify updating, configuring and tuning of your flight controller."
     },
     "defaultWelcomeHead": {
-        "message": "Hardware"
+        "message": "Firmware & drivers"
+    },
+    "defaultWelcomeHead2": {
+        "message": "INAV Friends"
+    },
+    "defaultWelcomeText2": {
+        "message": "INAV is supported by a great community of users, developers and companies. Here is a short list: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>. "
     },
     "defaultWelcomeText": {
-        "message": "The application supports all hardware that can run INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> and many other). The full list of recommended hardware is available <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">here</a>.<br /><br />The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
+        "message": "The firmware source code can be downloaded from <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Contributing"
@@ -1293,6 +1305,9 @@
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP DisplayPort"
     },
+    "portsFunction_SBUS_OUTPUT": {
+        "message": "SBus Output"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
@@ -1574,6 +1589,9 @@
     },
     "pidTuning_gyro_dyn_lpf_max_hz_help": {
         "message": "Defines the gyro LPF cutoff frequency at maximum throttle. When throttle is decreased, LPF cutoff frequency is decreased as well, down to the minimum cutoff frequency."
+    },
+    "loadedMixerProfile": {
+        "message": "Loaded Mixer Profile: <strong style=\"color: #37a8db\">$1</strong>, Check modes tab: MIXER PROFILE 2 if you don't see the changes"
     },
     "loadedBatteryProfile": {
         "message": "Loaded Battery Profile: <strong style=\"color: #37a8db\">$1</strong>"
@@ -2208,7 +2226,7 @@
         "message": "Blackbox configuration"
     },
     "blackboxButtonSave": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "serialLogging": {
         "message": "Outboard serial logging device"
@@ -3377,14 +3395,23 @@
     "osd_pilot_name": {
         "message": "Pilot's Name"
     },
+    "osdElement_PILOT_LOGO_HELP": {
+        "message": "Shows your small pilot logo in the OSD, where you position it. This requires a custom font with your pilot logo."
+    },
+    "osd_use_pilot_logo": {
+        "message": "Use pilot logo"
+    },
+    "osd_use_large_pilot_logo_help": {
+        "message": "Use your large pilot logo with/instead of the INAV logo. This requires a custom font with your pilot logo. This is seen on the arming screen."
+    },
     "osd_units": {
         "message": "Units"
     },
     "osd_main_voltage_decimals": {
         "message": "Voltage Decimals"
     },
-    "osd_mah_used_precision": {
-        "message": "mAh Used Precision"
+    "osd_mah_precision": {
+        "message": "mAh Precision"
     },
     "osd_coordinate_digits": {
         "message": "Coordinate Digits"
@@ -3569,6 +3596,12 @@
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
         "message": "The axes g force elements will start blinking when greater than this value"
     },
+    "osdAlarmADSB_MAX_DISTANCE_WARNING": {
+        "message": "Distance in meters of ADSB aircraft that is displayed"
+    },
+    "osdAlarmADSB_MAX_DISTANCE_ALERT": {
+        "message": "Distance inside which ADSB data flashes for proximity warning"
+    },
     "osd_current_alarm": {
         "message": "Current (A)"
     },
@@ -3607,6 +3640,12 @@
     },
     "osd_rssi_dbm_alarm": {
         "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_adsb_distance_warning": {
+        "message": "ADSB distance warning"
+    },
+    "osd_adsb_distance_alert": {
+        "message": "ADSB distance alert"
     },
     "osd_rssi_dbm_alarm_HELP": {
         "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
@@ -4274,8 +4313,8 @@
     "missionMultiAddNewMission": {
         "message": "Add New Mission"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Use Sea Level Earth DEM Model: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Use Ellipsoid instead of SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
@@ -4391,6 +4430,9 @@
     "no_waypoints_to_save": {
         "message": "No waypoints to save !"
     },
+    "mixerThrottleWarning": {
+        "message": "Warning:value beyond normal operation range."
+    },
     "servoMixer": {
         "message": "Servo mixer"
     },
@@ -4428,7 +4470,7 @@
         "message": "Confirm"
     },
     "mixerButtonSaveAndReboot": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"
@@ -4874,6 +4916,12 @@
     "motor_direction_inverted_hint": {
         "message": "Enable if the motor direction is reversed and the props are mounted in the opposite direction."
     },
+    "mixer_pid_profile_linking": {
+        "message": "PID Profile will use same index as Mixer Profile index"
+    },
+    "mixer_pid_profile_linking_hint": {
+        "message": "mixer_pid_profile_linking: Enable on both Mixer Profile if you want PID Profile switching handled by Mixer Profile switching(Recommend in vtol/mixed plaform type setup)"
+    },
     "blackboxFields": {
         "message": "Blackbox fields"
     },
@@ -5189,14 +5237,20 @@
     "sensorDataFlashFreeSpace": {
         "message": "Dataflash: free space"
     },
+    "mixerProfile1": {
+        "message": "Mixer profile 1"
+    },
+    "mixerProfile2": {
+        "message": "Mixer profile 2"
+    },
     "sensorProfile1": {
-        "message": "Profile 1"
+        "message": "PID profile 1"
     },
     "sensorProfile2": {
-        "message": "Profile 2"
+        "message": "PID profile 2"
     },
     "sensorProfile3": {
-        "message": "Profile 3"
+        "message": "PID profile 3"
     },
     "sensorBatteryProfile1": {
         "message": "Battery profile 1"
@@ -5477,5 +5531,77 @@
     },
     "timerOutputs": {
         "message": "Timer outputs"
+    },
+    "ezTuneFilterHz": {
+        "message": "Filter Hz"
+    },
+    "ezTuneAxisRatio": {
+        "message": "Axis ratio"
+    },
+    "ezTuneResponse": {
+        "message": "Response"
+    },
+    "ezTuneDamping": {
+        "message": "Damping"
+    },
+    "ezTuneStability": {
+        "message": "Stability"
+    },
+    "ezTuneAggressiveness": {
+        "message": "Aggressiveness"
+    },
+    "ezTuneRate": {
+        "message": "Rate"
+    },
+    "ezTuneExpo": {
+        "message": "Expo"
+    },
+    "ezTuneFilterHzTips": {
+        "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
+    },
+    "ezTuneAxisRatioTips": {
+        "message": "Describes the weight/moment of inertia distribution of your UAV. The longer the frame (more mass on the front-back axis) more Axis Ratio is requires. Perfect X frame is ratio 100. Most modern frames should fit somewhere between 110 and 130. Default 110 is a good starting point."
+    },
+    "ezTuneResponseTips": {
+        "message": "This setting defines how fast the UAV will react to stick movements and gyro signal. Higher values will result in faster reaction, but also in more overshoots and oscillations. If UAV feels sluggish or has a slow wobble, increase the Response. If it has hot motors, audibly osciallates, overshoots or feels too nervous, decrease the Response. Most modern quads should beefy motors will fly best with Response below 80. Should be tuned together with Damping. It is a P-term equivalent."
+    },
+    "ezTuneDampingTips": {
+        "message": "Describes the stengths of a force that opposes any rotation speed change. It dampens roll and pitch acceleration and causes smoother and more stable flight. Your task during tuning is to find out how much you can increase it before any negative symptoms appear: hot motors, audible osciallations, overshoot. Most modern quads should accept 'Damping' up to 150-180. It is a D-term equivalent."
+    },
+    "ezTuneStabilityTips": {
+        "message": "Defines long-term stabilization strength. Most modern quads should tolerate 'Stability' even up to 120-130. Usually does not have to be tuned at all. If UAV suffers from heavy propwash during vertical descent, lowering 'Stability' might help. It is a I-term equivalent"
+    },
+    "ezTuneAggressivenessTips": {
+        "message": "Defines how fast your UAV will react to fast stick movements. Higher 'Aggressiveness' results in snappier fast manouvers. It does not affect stabilization, only stick feeling. It is a FF-term equivalent."
+    },
+    "ezTuneRateTips": {
+        "message": "Defines how fast your UAV will rotate around roll, pitch and yaw axis. Higher 'Rate' results in faster rotation. Value of 0 is the equivalent of 300dps, 100 is the equivalent of 600dps, 200 is the equivalent of 900dps."
+    },
+    "ezTuneExpoTips": {
+        "message": "Defines expo of the RC input. Lower values result in more sensitive stick in the center. Higher values result in less sensitive center and more rapid response at the end of the stick. Value of 0 is the equivalent of 0 expo, 100 is the equivalent of 0.7 expo, 200 is the equivalent of 1.0 expo."
+    },
+    "ezTunePidPreview": {
+        "message": "PID preview"
+    },
+    "ezTuneRatePreview": {
+        "message": "Rate preview"
+    },
+    "ezTuneRatePreviewAxis" : {
+        "message": "Axis"
+    },
+    "ezTuneRatePreviewRate" : {
+        "message": "Rate"
+    },
+    "ezTuneRatePreviewExpo" : {
+        "message": "Expo"
+    },
+    "ezTuneEnabledTips": {
+        "message": "When enabled, <strong>Ez Tune</strong> will override multiple INAV setting to simplify the tuning process. Instead of setting each PID and filtering setting independently, you only have to work with 7 sliders. Ez Tune will automatically adjust all other settings to match your needs. Ez Tune is a great starting point for new users and a great way to quickly tune a new UAV. It is not recommended to use Ez Tune on advanced builds, as it will override all your settings and you will not be able to fine tune your UAV. When Ez Tune is enabled, settings from the <strong>PID tuning</strong> tab will be overriden by EzTune."
+    },
+    "ezTuneDisclaimer": {
+        "message": "<strong>Disclaimer:</strong> Ez Tune is an experimental function. It is not guaranteed to work on all UAVs. It is not guaranteed to work with all frame types. It is not guaranteed to work with all propellers. All computations and tuning result can change in future versions of INAV. We still encourage you to check it out and share your experience on INAV Discord in the <strong>#ez-tune</strong> channel"
+    },
+    "ezTuneNote": {
+        "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
     }
 }
