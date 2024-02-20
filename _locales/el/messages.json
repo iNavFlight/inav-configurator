@@ -14,6 +14,9 @@
     "options_showProfileParameters": {
         "message": "Επισήμανση παραμέτρων που αλλάζουν κατά την εναλλαγή προφίλ μπαταρίας ή ελέγχου"
     },
+	"options_cliAutocomplete": {
+        "message": "αυτόματη συμπλήρωση CLI"
+    },
     "options_unit_type": {
         "message": "Ορίστε πώς εμφανίζονται οι μονάδες στον ρυθμιστή μόνο"
     },
@@ -50,12 +53,15 @@
     "fcNotConnected": {
         "message": "Μη συνδεδεμένο"
     },
+
     "backupFileIncompatible": {
         "message": "Το αρχείο αντιγράφου ασφαλείας που παρέχεται δημιουργήθηκε για προηγούμενη έκδοση του ρυθμιστή και είναι ασύμβατο με αυτήν την έκδοση του ρυθμιστή. Λυπάμαι"
     },
+
     "backupFileUnmigratable": {
         "message": "Το αρχείο αντιγράφου ασφαλείας που παρέχεται δημιουργήθηκε από προηγούμενη έκδοση του ρυθμιστή και δεν είναι δυνατό να μεταφερθεί. Λυπάμαι."
     },
+
     "configMigrationFrom": {
         "message": "Μετανάστευση αρχείου ρυθμίσεων που δημιουργήθηκε από τον ρυθμιστή: $1"
     },
@@ -106,6 +112,9 @@
     },
     "tabFailsafe": {
         "message": "Failsafe"
+    },
+	"tabEzTune": {
+        "message": "Ez Tune"
     },
     "tabGPS": {
         "message": "Σύστημα GPS"
@@ -196,12 +205,6 @@
     },
     "sitlDelete": {
         "message": "Διαγραφή"
-    },
-    "sitlNewProfile": {
-        "message": "New SITL Profile"
-    },
-    "sitlEnterName": {
-        "message": "(Profile name)"
     },
     "sitlNewProfile": {
         "message": "Νέο Προφίλ SITL"
@@ -395,6 +398,7 @@
     "stm32UnprotectInitFailed": {
         "message": "Αποτυχία εκκίνησης της διαδικασίας απενεργοποίησης"
     },
+	
     "noConfigurationReceived": {
         "message": "Δεν λήφθηκαν ρυθμίσεις μέσα σε <span style=\"color: red\">10 δευτερόλεπτα</span>, αποτυχία επικοινωνίας <span style=\"color: red\">απέτυχε</span>"
     },
@@ -487,10 +491,16 @@
         "message": "Καλώς ήρθατε στο <strong>INAV - Configurator</strong>, ένα εργαλείο που σχεδιάστηκε για να απλοποιήσει την ενημέρωση, τη διαμόρφωση και την ρύθμισή του ελεγκτή πτήσης σας."
     },
     "defaultWelcomeHead": {
-        "message": "Υλικό"
+        "message": "Firmware & drivers"
+	},
+	"defaultWelcomeHead2": {
+        "message": "INAV Friends"
+    },
+    "defaultWelcomeText2": {
+        "message": "Το INAV στηρίζεται απο μια μεγάλη κοινότητα χρηστών, προγραμματιστων και εταιριών. Εδώ είναι μία μικρή λίστα: <a href=\"http://www.mateksys.com/\" target=\"_blank\">Mateksys</a>, <a href=\"https://www.speedybee.com/\" target=\"_blank\">SpeedyBee</a>, <a href=\"https://geprc.com/\" target=\"_blank\">GEPRC</a>. "
     },
     "defaultWelcomeText": {
-        "message": "Η εφαρμογή υποστηρίζει όλο το υλικό που μπορεί να τρέξει το INAV (<a href=\"https://inavflight.com/shop/s/bg/1890404\" target=\"_blank\">Matek F765-WSE</a>, <a href=\"https://inavflight.com/shop/s/bg/1755036\" target=\"_blank\">Matek H743-SLIM</a> και πολλά άλλα). Η πλήρης λίστα με το συνιστώμενο υλικό είναι διαθέσιμη <a href=\"https://github.com/iNavFlight/inav/wiki/Welcome-to-INAV,-useful-links-and-products\" target=\"_blank\">εδώ</a>.<br /><br />Ο πηγαίος κώδικας του λογισμικού μπορεί να ληφθεί από <a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">εδώ</a><br />Η πιο πρόσφατη δυαδική εικόνα τοθ λογισμικού είναι διαθέσιμη <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">εδώ</a>.<br /><br />Οι <strong>Προγράμματα Οδήγησης USB VCP της STM</strong> μπορούν να ληφθούν από <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">εδώ</a><br />Το πιο πρόσφατο <strong>Zadig</strong> για την αναβάθμιση DFU των Windows μπορεί να ληφθεί από <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">εδώ</a><br />"
+        "message": "Μπορείτε να κατεβάσετε τον πηγαίο κώδικα του firmware από εδώ:<a href=\"https://github.com/iNavFlight\" title=\"www.github.com\" target=\"_blank\">here</a><br />The newest binary firmware image is available <a href=\"https://github.com/iNavFlight/inav/releases\" title=\"www.github.com\" target=\"_blank\">here</a>.<br /><br />Latest <strong>STM USB VCP Drivers</strong> can be downloaded from <a href=\"http://www.st.com/web/en/catalog/tools/PF257938\" title=\"http://www.st.com\" target=\"_blank\">here</a><br />Latest <strong>Zadig</strong> for Windows DFU flashing can be downloaded from <a href=\"http://zadig.akeo.ie/\" title=\"http://zadig.akeo.ie\" target=\"_blank\">here</a><br />"
     },
     "defaultContributingHead": {
         "message": "Συνεισφορά"
@@ -608,1398 +618,1406 @@
     },
     "initialSetupRoll": {
     "message": "Roll:"
-},
-"initialSetupMagHead": {
+    },
+    "initialSetupMagHead": {
     "message": "Μαγνητόμετρο"
-},
-"initialSetupDeclination": {
-    "message": "Απόκλιση:"
-},
-"initialSetupInfoHead": {
-    "message": "Πληροφορίες"
-},
-"initialSetupBatteryVoltage": {
-    "message": "Τάση μπαταρίας:"
-},
-"initialSetupBatteryDetectedCells": {
-    "message": "Ανιχνευμένος αριθμός κελιών μπαταρίας:"
-},
-"initialSetupBatteryDetectedCellsValue": {
-    "message": "$1"
-},
-"initialSetupBatteryPercentage": {
-    "message": "Υπολειπόμενη μπαταρία:"
-},
-"initialSetupBatteryPercentageValue": {
-    "message": "$1 %"
-},
-"initialSetupBatteryRemainingCapacity": {
-    "message": "Υπολειπόμενη χωρητικότητα μπαταρίας"
-},
-"initialSetupBatteryRemainingCapacityValue": {
-    "message": "$1 $2"
-},
-"initialSetupBatteryFull": {
-    "message": "Μπαταρία πλήρης όταν είναι συνδεδεμένη"
-},
-"initialSetupBatteryFullValue": {
-    "message": "$1"
-},
-"initialSetupBatteryThresholds": {
-    "message": "Κατώτατα όρια χωρητικότητας μπαταρίας"
-},
-"initialSetupBatteryThresholdsValue": {
-    "message": "$1"
-},
-"initialSetup_Wh_drawn": {
-    "message": "Χωρητικότητα που καταναλώθηκε:"
-},
-"initialSetup_Wh_drawnValue": {
-    "message": "$1 Wh"
-},
-"initialSetupBatteryVoltageValue": {
-    "message": "$1 V"
-},
-"initialSetupDrawn": {
-    "message": "Χωρητικότητα που καταναλώθηκε:"
-},
-"initialSetupCurrentDraw": {
-    "message": "Τρέχουσα κατανάλωση:"
-},
-"initialSetupPowerDraw": {
-    "message": "Κατανάλωση ισχύος:"
-},
-"initialSetupPowerDrawValue": {
-    "message": "$1 W"
-},
-"initialSetupBatteryMahValue": {
-    "message": "$1 mAh"
-},
-"initialSetupCurrentDrawValue": {
-    "message": "$1 A"
-},
-"initialSetupRSSI": {
-    "message": "RSSI:"
-},
-"initialSetupRSSIValue": {
-    "message": "$1 %"
-},
-"initialSetupGPSHead": {
-    "message": "GPS"
-},
-"initialSetupInstrumentsHead": {
-    "message": "Οργάνα"
-},
-"initialSetupButtonSave": {
-    "message": "Αποθήκευση"
-},
-"initialSetupModel": {
-    "message": "Μοντέλο: $1"
-},
-"initialSetupAttitude": {
-    "message": "$1 μοίρες"
-},
-"initialSetupAccelCalibStarted": {
-    "message": "Έναρξη βαθμονόμησης επιταχυνσιόμετρου"
-},
-"initialSetupAccelCalibEnded": {
-    "message": "Η βαθμονόμηση επιταχυνσιόμετρου <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
-},
-"initialSetupMagCalibStarted": {
-    "message": "Έναρξη βαθμονόμησης μαγνητόμετρου"
-},
-"initialSetupMagCalibEnded": {
-    "message": "Η βαθμονόμηση μαγνητόμετρου <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
-},
-"initialSetupOpflowCalibStarted": {
-    "message": "Έναρξη βαθμονόμησης οπτικής ροής"
-},
-"initialSetupOpflowCalibEnded": {
-    "message": "Η βαθμονόμηση οπτικής ροής <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
-},
-"initialSetupSettingsRestored": {
-    "message": "Οι ρυθμίσεις επαναφέρθηκαν στις <strong>προεπιλεγμένες</strong>"
-},
-"initialSetupEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Ρύθμιση"
-},
-"RX_PPM": {
-    "message": "Είσοδος PPM RX"
-},
-"RX_SERIAL": {
-    "message": "Δέκτης με βάση τη σειριακή σύνδεση (SPEKSAT, SBUS, SUMD)"
-},
-"RX_PWM": {
-    "message": "Είσοδος PWM RX (ένα καλώδιο ανά κανάλι)"
-},
-"RX_MSP": {
-    "message": "Είσοδος MSP RX (έλεγχος μέσω θύρας MSP)"
-},
-"RX_SPI": {
-    "message": "Είσοδος RX βασισμένη σε SPI (NRF24L01, RFM22)"
-},
-"RX_NONE": {
-    "message": "Χωρίς δέκτη"
-},
-"featureVBAT": {
-    "message": "Παρακολούθηση τάσης μπαταρίας"
-},
-"featureTX_PROF_SEL": {
-    "message": "Επιλογή προφίλ με εντολή μοχλού τηλεκατεύθυνσης"
-},
-"featureINFLIGHT_ACC_CAL": {
-    "message": "Βαθμονόμηση επιπέδου κατά την πτήση"
-},
-"featureMOTOR_STOP": {
-    "message": "σβήσιμο κινητήρων σε χαμηλό γκάζι"
-},
-"featureSERVO_TILT": {
-    "message": "σέρβο gimbal"
-},
-"featureBAT_PROFILE_AUTOSWITCH": {
-    "message": "Αυτόματη επιλογή προφίλ μπαταρίας"
-},
-"featureBAT_PROFILE_AUTOSWITCHTip": {
-    "message": "Αυτόματη επιλογή του προφίλ μπαταρίας με βάση την τάση της μπαταρίας όταν αυτή συνδέεται"
-},
-"featureTHR_VBAT_COMP": {
-    "message": "Αποζημίωση τάσης γκαζιού"
-},
-"featureTHR_VBAT_COMPTip": {
-    "message": "Αυτόματη αποζημίωση της πτώσης της τάσης όταν η μπαταρία απεκφορτίζεται για να διατηρηθεί η σταθερή έξοδος σε σχέση με το γκάζι"
-},
-"featureSOFTSERIAL": {
-    "message": "Ενεργοποίηση softserial θυρών  βάσει της CPU"
-},
-"featureSOFTSERIALTip": {
-    "message": "Διαμόρφωση softserial θυρών στην καρτέλα Θύρες μετά την ενεργοποίηση."
-},
-"featureGPS": {
-    "message": "GPS για πλοήγηση και τηλεμετρία"
-},
-"featureGPSTip": {
-    "message": "Διαμορφώστε πρώτα τo gps απο τις θύρες"
-},
-"featureFAILSAFE": {
-    "message": "Εφαρμογή ρυθμίσεων Failsafe σε περίπτωση απώλειας σήματος RX"
-},
-"featureSONAR": {
-    "message": "Sonar"
-},
-"featureTELEMETRY": {
-    "message": "Έξοδος τηλεμετρίας"
-},
-"featureCURRENT_METER": {
-    "message": "Παρακολούθηση ρεύματος μπαταρίας"
-},
-"featureREVERSIBLE_MOTORS": {
-    "message": "Λειτουργία αντιστρεψίμων κινητήρων (3D) (για χρήση με αντιστρεψίμους ESC)"
-},
-"featureRSSI_ADC": {
-    "message": "Αναλογική είσοδος RSSI"
-},
-"featureLED_STRIP": {
-    "message": "Υποστήριξη πολύχρωμης RGB λωρίδας LED"
-},
-"featureDASHBOARD": {
-    "message": "Οθόνη OLED"
     },
-    "featureONESHOT125": {
-    "message": "Υποστήριξη ESC ONESHOT"
-},
-"featureONESHOT125Tip": {
-    "message": "Αποσυνδέστε την μπαταρία και αφαιρέστε τις προπέλες προτού ενεργοποιήσετε αυτή τη λειτουργία."
-},
-"featurePWM_OUTPUT_ENABLE": {
-    "message": "Ενεργοποίηση εξόδου κινητήρα και σερβο"
-},
-"featurePWM_OUTPUT_ENABLETip": {
-    "message": "Η ενεργοποίηση αυτής της επιλογής απαιτείται για να στείλει το INAV σήματα στο ESC. Είναι μια προφύλαξη ασφαλείας που αποτρέπει τα σερβο από βλάβη αμέσως μετά το φλασάρισμα του ελεγκτή πτήσης."
-},
-"featureBLACKBOX": {
-    "message": "Καταγραφή δεδομένων πτήσης Blackbox"
-},
-"featureBLACKBOXTip": {
-    "message": "Διαμορφώστε μέσω της καρτέλας BlackBox μετά την ενεργοποίηση."
-},
-"onboardLoggingBlackbox": {
-    "message": "Συσκευή καταγραφής Blackbox"
-},
-"onboardLoggingBlackboxRate": {
-    "message": "Ποσοστό επαναλήψεων βρόχου πτήσης προς καταγραφή (ποσοστό καταγραφής)"
-},
-"featureCHANNEL_FORWARDING": {
-    "message": "Προώθηση βοηθητικών καναλιών σε εξόδους σερβοκινητήρων"
-},
-"featureSOFTSPI": {
-    "message": "SPI βάσει CPU"
-},
-"featurePWM_SERVO_DRIVER": {
-    "message": "Εξωτερικός οδηγός PWM σερβο"
-},
-"featurePWM_SERVO_DRIVERTip": {
-    "message": "Χρησιμοποιήστε εξωτερικό οδηγό PCA9685 PMW για σύνδεση έως 16 σερβοκινητήρων με τοn ελεγκτή πτήσης. Το PCA9685 πρέπει να συνδεθεί για να ενεργοποιηθεί αυτή η λειτουργία."
-},
-"featureRSSI_ADCTip": {
-    "message": "Το RSSI είναι μέτρηση της ισχύος του σήματος και είναι πολύ βολικό για να γνωρίζετε πότε το αεροσκάφος σας βγαίνει εκτός εμβέλειας ή αν υποφέρει από παρεμβολές ραδιοσυχνοτήτων."
-},
-"featureOSD": {
-    "message": "OSD"
-},
-"featureAIRMODE": {
-    "message": "Ενεργοποίηση AIRMODE μόνιμα"
-},
-"featureFW_LAUNCH": {
-    "message": "Ενεργοποίηση μόνιμης λειτουργίας Launch για αεροσκάφος με σταθερή πτέρυγα"
-},
-"featureFW_AUTOTRIM": {
-    "message": "Συνεχές τριμμάρισμα σερβο σε αεροσκάφος με σταθερή πτέρυγα"
-},
-"featureFW_AUTOTRIMTip": {
-    "message": "κατα τη σταθεροποιημένη λειτουργία, τριμμαρίζονται συνεχώς τα μέσα σημεία των σερβο έτσι ώστε το αεροσκάφος να συνεχίζει να πετά όταν μεταβαίνετε σε χειροκίνητη λειτουργία. Απαιτεί GPS."
-},
-"featureDYNAMIC_FILTERS": {
-    "message": "Δυναμικά φίλτρα γυροσκοπίων"
-},
-"featureDYNAMIC_FILTERSTip": {
-    "message": "Χρησιμοποιήστε αυτόματη ανάλυση FFT για τη ρύθμιση φίλτρων κοιλότητας για την μείωση θορύβου γυροσκοπίων. Πρέπει να είναι ενεργοποιημένο πάντα!"
-},
-"configurationFeatureEnabled": {
-    "message": "Ενεργοποιημένο"
-},
-"configurationFeatureName": {
-    "message": "Χαρακτηριστικό"
-},
-"configurationFeatureDescription": {
-    "message": "Περιγραφή"
-},
-"configurationMixer": {
-    "message": "Μίκτης"
-},
-"configurationFeatures": {
-    "message": "Άλλες Λειτουργίες"
-},
-"configurationReceiver": {
-    "message": "Λειτουργία δέκτη"
-},
-"configurationRSSI": {
-    "message": "RSSI (ισχύς σήματος)"
-},
-"configurationEscFeatures": {
-    "message": "Λειτουργίες ESC/Κινητήρα"
-},
-"serialrx_inverted": {
-    "message": "Αντιστραμμένη σειριακή θύρα (σε σύγκριση με την προεπιλεγμένη πρωτοκολλική ρύθμιση)"
-},
-"serialrx_halfduplex": {
-    "message": "Semiduplex σειριακός δέκτης"
-},
-"configurationFeaturesHelp": {
-    "message": "<strong>Σημείωση:</strong> Δεν είναι όλοι οι συνδυασμοί χαρακτηριστικών έγκυροι. Όταν το firmware του ελεγκτή πτήσης ανιχνεύσει μη έγκυρους συνδυασμούς χαρακτηριστικών, τα αντιφατικά χαρακτηριστικά θα απενεργοποιηθούν.<br /><strong>Σημείωση:</strong> Διαμορφώστε τις σειριακές θύρες <span style=\"color: red\">πριν</span> ενεργοποιήσετε τα χαρακτηριστικά που θα χρησιμοποιήσουν αυτές τις θύρες."
-},
-"configurationSerialRXHelp": {
-    "message": "<strong>Σημείωση:</strong> Θυμηθείτε να διαμορφώσετε μια σειριακή θύρα (μέσω της καρτέλας Θύρες) για το σειριακό δέκτη"
-},
-"configurationSensorAlignmentMag": {
-    "message": "Συντονισμός MAG"
-},
-"configurationSensorAlignmentMagRoll": {
-    "message": "Roll"
-},
-"configurationSensorAlignmentMagPitch": {
-    "message": "Pitch"
-},
-"configurationSensorAlignmentMagYaw": {
-    "message": "Yaw"
-},
-"configurationAccelTrims": {
-    "message": "τριμ γυροσκοπίου"
-},
-"configurationAccelTrimRoll": {
-    "message": "τριμ Roll γυροσκοπίου"
-},
-"configurationAccelTrimPitch": {
-    "message": "τριμ Pitch γυροσκοπίου"
-},
-"configurationMagDeclination": {
-    "message": "Αποκλίνουσα μαγνητόμετρου [μοίρες]"
-},
-"configurationAutoDisarmDelay": {
-    "message": "Δευτερόλεπτα μέχρι disarm λόγω χαμηλού THR"
-},
-"configurationAutoDisarmDelayHelp": {
-    "message": "Χρησιμοποιείται μόνο για ενεργοποίηση με το χειριστήριο (δηλαδή χωρίς χρήση διακόπτη)"
-},
-"configurationThrottleMinimum": {
-    "message": "Ελάχιστο γκάζι"
-},
-"configurationThrottleMid": {
-    "message": "Μέσο γκάζι [μέση μοχλού RC]"
-},
-"configurationThrottleMaximum": {
-    "message": "Μέγιστο γκάζι"
-},
-"configurationThrottleMinimumCommand": {
-    "message": "Ελάχιστη εντολή"
-},
-"configurationVoltageCurrentSensor": {
-    "message": "Αισθητήρες τάσης και ρεύματος"
-},
-"configurationBatteryCurrent": {
-    "message": "Ρεύμα μπαταρίας"
-},
-"configurationVoltageSource": {
-    "message": "Πηγή τάσης που θα χρησιμοποιηθεί για ειδοποιήσεις και τηλεμετρία"
-},
-"configurationVoltageSourceHelp": {
-    "message": "Η ωμή τάση είναι η τάση που μετριέται απευθείας από την μπαταρία. Η λειτουργεία αποζημίωσης προσομοιώνει την ιδανική τάση της μπαταρίας χωρίς φορτίο (εξαλείφει τις ψευδείς ειδοποιήσεις που προκαλούνται από υψηλά φορτία)"
-},
-"configurationBatteryCells": {
-    "message": "Αριθμός κελιών (0 = αυτόματα)"
-},
-"configurationBatteryCellsHelp": {
-    "message": "Ορίστε αυτόν τον αριθμό κελιών της μπαταρίας σας για να απενεργοποιήσετε την αυτόματη ανίχνευση των κελιών ή για να κάνετε την αυτόματη μετάβαση στα προφίλ της μπαταρίας δυνατή. Οι μπαταρίες 7S, 9S και 11S δεν μπορούν να ανιχνευθούν αυτόματα."
-},
-"configurationBatteryCellDetectVoltage": {
-    "message": "Μέγιστη τάση κελιού για την ανίχνευση αρίθμησης κελιού"
-},
-"configurationBatteryCellDetectVoltageHelp": {
-    "message": "Η μέγιστη τάση του κελιού που χρησιμοποιείται για την αυτόματη ανίχνευση των κελιών. Πρέπει να είναι υψηλότερη από τη μέγιστη τάση του κελιού για να ληφθεί υπόψη η πιθανή παραστρέβλωση της μετρημένης τάσης και να διατηρηθεί η ακρίβεια της ανίχνευσης των κελιών."
-},
-"configurationBatteryMinimum": {
-    "message": "Ελάχιστη τάση κελιού"
-},
-"configurationBatteryMaximum": {
-    "message": "Μέγιστη τάση κελιού"
-},
-"configurationBatteryWarning": {
-    "message": "Τάση προειδοποίησης κελιού"
-},
-"configurationBatteryScale": {
-    "message": "Κλίμακα τάσης"
-},
-"configurationBatteryVoltage": {
-    "message": "Τάση μπαταρίας"
-},
-"configurationCurrentScale": {
-    "message": "Κλίμακα μέτρησης ρεύματος"
-},
-"configurationCurrentScaleHelp": {
-    "message": "Κλιμακώστε την έξοδο τάσης σε χιλιοστά αμπερ [1/10 mV/A]"
-},
-"configurationCurrentOffset": {
-    "message": "Μετατόπιση σε βήματα μιλιβόλτ"
-},
-"configurationBatteryMultiwiiCurrent": {
-    "message": "Ενεργοποίηση υποστήριξης της legacy Multiwii MSP εξόδου ρεύματος"
-},
-"configurationBatterySettings": {
-    "message": "Ρυθμίσεις μπαταρίας"
-},
-"configurationBatterySettingsHelp": {
-    "message": "Αυτές οι ρυθμίσεις ισχύουν για το προς το παρόν επιλεγμένο προφίλ μπαταρίας "
-},
-"configurationBatteryCapacityValue": {
-    "message": "Χωρητικότητα"
-},
-"configurationBatteryCapacityWarning": {
-    "message": "Χωρητικότητα προειδοποίησης (υπολειπόμενο %)"
-},
-"configurationBatteryCapacityCritical": {
-    "message": "Κρίσιμη χωρητικότητα (υπολειπόμενο %)"
-},
-"configurationBatteryCapacityUnit": {
-    "message": "Μονάδα χωρητικότητας μπαταρίας"
-},
-"configurationLaunch": {
-    "message": "Ρυθμίσεις εκκίνησης- αεροσκάφους με σταθερή πτέρυγα"
-},
-"configurationLaunchVelocity": {
-    "message": "Κατώτατο όριο ταχύτητας"
-},
-"configurationLaunchVelocityHelp": {
-    "message": "Κατώτατο όριο ταχύτητας προς τα εμπρός για ανίχνευση εκτόξευσης με καταπέλτη. Προεπιλογή: 300 [100-10000]"
-},
-"configurationLaunchAccel": {
-    "message": "Κατώτατο όριο επιτάχυνσης"
-},
-"configurationLaunchAccelHelp": {
-    "message": "Κατώτατο όριο προς τα εμπρός επιτάχυνσης για εκτόξευση με καταπέλτη ή εκτόξευση με ρίψη, 1G = 981 cm/s/s. Προεπιλογή: 1863 [1000-20000]"
-},
-"configurationLaunchMaxAngle": {
-    "message": "Μέγιστη γωνία ρίψης"
-},
-"configurationLaunchMaxAngleHelp": {
-    "message": "Μέγιστη γωνία ρίψης (συνδιασμένων pitch/roll) για να θεωρηθεί επιτυχημένη η εκτόξευση. Ορίστε το σε 180 για να το απενεργοποιήσετε πλήρως. Προεπιλογή: 45 [5-180]"
-},
-"configurationLaunchDetectTime": {
-    "message": "Χρόνος ανίχνευσης"
-},
-"configurationLaunchDetectTimeHelp": {
-    "message": "Χρόνος για τον οποίο πρέπει να υπερβαίνονται τα όρια για να θεωρηθεί ότι έχει συμβεί εκτόξευση. Προεπιλογή: 40 [10-1000]"
-},
-"configurationLaunchThr": {
-    "message": "Γκάζι ανίχνευσης"
-},
-"configurationLaunchThrHelp": {
-    "message": "Γκάζι ανίχνευσης - γκάζι που πρέπει να οριστεί κατά τη διάρκεια της ακολουθίας εκτόξευσης. Προεπιλογή: 1700 [1000-2000]"
-},
-"configurationLaunchIdleThr": {
-    "message": "ρελαντί"
-},
-"configurationLaunchIdleThrHelp": {
-    "message": "ρελαντί - γκάζι που πρέπει να οριστεί πριν από την έναρξη της ακολουθίας εκτόξευσης. Εάν οριστεί κάτω από το ρελαντί, θα εξαναγκάσει τον κινητήρα να σταματήσει ή σε ρελαντί (ανάλογα με το αν είναι ενεργοποιημένο το MOTOR_STOP). Εάν οριστεί πάνω από το ρελαντί, θα εξαναγκάσει το γκάζι να έχει αυτήν την τιμή (εάν το MOTOR_STOP είναι ενεργοποιημένο, θα διαχειριστεί ανάλογα με τη θέση του χειριστηρίου γκάζι). Προεπιλογή: 1000 [1000-2000]"
-},
-"configurationLaunchIdleDelay": {
-    "message": "Καθυστέρηση ρελαντί γκάζι"
-},
-"configurationLaunchIdleDelayHelp": {
-    "message": "Ορίστε ένα χρονικό διάστημα μεταξύ του ανύψωσης του γκαζιού για την εκκίνηση και της εκκίνησης του κινητήρα με ρελαντί. Προεπιλογή: 0 [0-60000]"
-},
-"configurationLaunchMotorDelay": {
-    "message": "Καθυστέρηση κινητήρα"
-},
-"configurationLaunchMotorDelayHelp": {
-    "message": "Καθυστέρηση μεταξύ της ανίχνευσης εκτόξευσης και της έναρξης της ακολουθίας εκτόξευσης και της αύξησης της ταχύτητας. Προεπιλογή: 500 [0-5000]"
-},
-"configurationLaunchSpinupTime": {
-    "message": "Χρόνος εκκίνησης κινητήρα"
-},
-"configurationLaunchSpinupTimeHelp": {
-    "message": "Χρόνος που απαιτείται για τη μετάβαση της ισχύος από το ρελαντί στο nav_fw_launch_thr, για να αποφευχθεί μεγάλη ένταση στο ESC και μεγάλη ροπή από την προπέλα. Προεπιλογή: 100 [0-1000]"
-},
-"configurationLaunchMinTime": {
-    "message": "Ελάχιστος χρόνος εκκίνησης"
-},
-"configurationLaunchMinTimeHelp": {
-    "message": "Επιτρέψτε στη λειτουργία εκκίνησης να εκτελέσει τουλάχιστον αυτόν το χρόνο [ms] και να αγνοήσει τις κινήσεις των μοχλών. Προεπιλογή: 0 [0-60000]"
-},
-"configurationLaunchTimeout": {
-    "message": "Χρόνος ολοκλήρωσης εκκίνησης"
-},
-"configurationLaunchTimeoutHelp": {
-    "message": "Μέγιστος χρόνος για την εκτέλεση της ακολουθίας εκκίνησης. Μετά από αυτό το χρόνο, η λειτουργία εκκίνησης θα απενεργοποιηθεί και θα αναλάβει η κανονική λειτουργία πτήσης. Προεπιλογή: 5000 [0-60000]"
-},
-"configurationLaunchEndTime": {
-    "message": "Χρόνος ολοκλήρωσης μετάβασης"
-},
-"configurationLaunchEndTimeHelp": {
-    "message": "Χρόνος ομαλής μετάβασης στο τέλος της εκκίνησης (ms). Αυτό προστίθεται στον Χρόνος Ολοκλήρωσης Εκκίνησης. Προεπιλογή: 2000 [0-5000]"
-},
-"configurationLaunchMaxAltitude": {
-    "message": "Μέγιστο υψόμετρο"
-},
-"configurationLaunchMaxAltitudeHelp": {
-    "message": "Υψόμετρο στο οποίο η λειτουργία εκκίνησης θα απενεργοποιηθεί και θα αναλάβει η κανονική λειτουργία πτήσης. Προεπιλογή: 0 [0-60000]"
-},
-"configurationLaunchClimbAngle": {
-    "message": "Γωνία ανόδου"
-},
-"configurationLaunchClimbAngleHelp": {
-    "message": "Γωνία ανόδου (γωνία του μοντέλου, όχι γωνια ανώδου) για την ακολουθία εκκίνησης (βαθμοί), περιορίζεται επίσης από την global max_angle_inclination_pit. Προεπιλογή: 18 [5-45]"
-    },
-    "configuration3d": {
-    "message": "Αντιστρεπτικοί (3d) κινητήρες"
-},
-"configuration3dDeadbandLow": {
-    "message": "Χαμηλή αντιστρεπτική ζώνη κινητήρων"
-},
-"configuration3dDeadbandHigh": {
-    "message": "Υψηλή αντιστρεπτική ζώνη κινητήρων"
-},
-"configuration3dNeutral": {
-    "message": "Φυσική θέση κινητήρων"
-},
-"configuration3dDeadbandThrottle": {
-    "message": "Αντιστρεπτική ζώνη κινητήρων γκαζιού"
-},
-"configurationSystem": {
-    "message": "Ρυθμίσεις συστήματος"
-},
-"configurationLoopTime": {
-    "message": "Χρόνος εκτέλεσης βρόχου ελεγκτή πτήσης"
-},
-"configurationCalculatedCyclesSec": {
-    "message": "Κύκλοι/δευτερόλεπτο (Hz)"
-},
-"configurationGPS": {
-    "message": "Ρυθμίσεις GPS"
-},
-"configurationGPSProtocol": {
-    "message": "Πρωτόκολλο"
-},
-"configurationGPSUseGalileo": {
-    "message": "Χρήση δορυφόρων Galileo (ΕΕ)"
-},
-"configurationGPSUseBeidou": {
-    "message": "Χρήση δορυφόρων BeiDou (Κίνα)"
-},
-"configurationGPSUseGlonass": {
-    "message": "Χρήση δορυφόρων Glonass (Ρωσία)"
-},
-"tzOffset": {
-    "message": "Απόκλιση ώρας"
-},
-"tzOffsetHelp": {
-    "message": "Απόκλιση ώρας από τον Παγκόσμιο Χρόνο (UTC). Αυτό εφαρμόζεται στην ώρα GPS για την καταγραφή και τη σήμανση των αρχείων Blackbox. (Προεπιλογή = 0 λεπτά)"
-},
-"tzAutomaticDST": {
-    "message": "Αυτόματη ρύθμιση θερινής ώρας"
-},
-"tzAutomaticDSTHelp": {
-    "message": "Προσθέτει αυτόματα τη θερινή ώρα στην ώρα GPS όταν απαιτείται ή απλώς τη αγνοεί. Περιλαμβάνει προεπιλεγμένες ρυθμίσεις για την ΕΕ και τις ΗΠΑ - αν ζείτε εκτός αυτών των περιοχών, συνιστάται να διαχειριστείτε τη θερινή ώρα χειροκίνητα μέσω του tz_offset. (Προεπιλογή = Απενεργοποιημένο)"
-},
-"configurationGPSBaudrate": {
-    "message": "Ρυθμός μετάδοσης (Baudrate)"
-},
-"configurationGPSubxSbas": {
-    "message": "Τύπος επίγειας βοήθειας"
-},
-"configurationGPSHelp": {
-    "message": "<strong>Σημείωση:</strong> Θυμηθείτε να ρυθμίσετε μία σειριακή θύρα (μέσω της καρτέλας Θύρες) όταν χρησιμοποιείτε τη λειτουργία GPS."
-},
-"receiverType": {
-    "message": "Τύπος δέκτη"
-},
-"configurationSerialRX": {
-    "message": "Παροχέας σειριακού δέκτη"
-},
-"configurationSPIProtocol": {
-    "message": "Πρωτόκολλο σειριακού διαύλου επικοινωνίας (SPI) δέκτη"
-},
-"configurationEepromSaved": {
-    "message": "Αποθηκευμένες ρυθμίσεις EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκαν</span>: Ρυθμίσεις"
-},
-"configurationButtonSave": {
-    "message": "Αποθήκευση και επανεκκίνηση"
-},
-"configurationVTX": {
-    "message": "VTX"
-},
-"configurationVTXBand": {
-    "message": "Ζώνη"
-},
-"configurationNoBand": {
-    "message": "Καμία"
-},
-"configurationVTXNoBandHelp": {
-    "message": "Η συχνότητα του VTX έχει οριστεί χειροκίνητα. Η επιλογή μιας ζώνης θα αντικαταστήσει τη ρυθμισμένη συχνότητα."
-},
-"configurationVTXChannel": {
-    "message": "Κανάλι"
-},
-"configurationVTXPower": {
-    "message": "Επίπεδο ισχύος"
-},
-"configurationVTXPowerHelp": {
-    "message": "Επίπεδο ισχύος VTX. Η ακριβής ισχύς σε mw (ή dBm) θα εξαρτηθεί από το συγκεκριμένο υλικό. Ελέγξτε το εγχειρίδιο του VTX σας."
-},
-"configurationVTXLowerPowerDisarm": {
-    "message": "Χρήση χαμηλής ισχύος κατά τη διάρκεια αφόπλισης του μοντέλου"
-},
-"configurationVTXLowerPowerDisarmHelp": {
-    "message": "Ενεργοποιώντας αυτήν την επιλογή, το VTX θα χρησιμοποιεί τη χαμηλότερη ισχύ κατά τη διάρκεια της αφόπλισης του μοντέλου. Χρησιμοποιήστε 'Μέχρι την πρώτη ενεργοποίηση' για να χρησιμοποιεί τη χαμηλότερη ισχύ μόνο μέχρι την πρώτη ενεργοποίηση."
-},
-"configurationVTXLowPowerDisarmValue_0": {
-    "message": "Απενεργοποιημένο"
-},
-"configurationVTXLowPowerDisarmValue_1": {
-    "message": "Πάντα"
-},
-"configurationVTXLowPowerDisarmValue_2": {
-    "message": "Μέχρι την πρώτη ενεργοποίηση"
-},
-"portsHelp": {
-    "message": "<strong>Σημείωση:</strong> Δεν είναι όλοι οι συνδυασμοί είναι έγκυροι. Όταν το firmware του ελεγκτή πτήσης το ανιχνεύσει αυτό, η ρύθμιση της σειριακής θύρας θα επαναφερθεί."
-},
-"portsMSPHelp": {
-    "message": "<strong>Σημείωση:</strong> ΜΗΝ απενεργοποιήσετε το MSP στην πρώτη σειριακή θύρα εκτός αν γνωρίζετε τι κάνετε. Ενδέχεται να χρειαστεί να ξαναφλασάρετε και να διαγράψετε τη ρύθμισή σας αν το κάνετε."
-},
-"portsFirmwareUpgradeRequired": {
-    "message": "Απαιτείται αναβάθμιση <span style=\"color: red\">του firmware</span>."
-},
-"portsButtonSave": {
-    "message": "Αποθήκευση και επανεκκίνηση"
-},
-"portsTelemetryDisabled": {
-    "message": "Απενεργοποιημένο"
-},
-"portsFunction_MSP": {
-    "message": "MSP"
-},
-"portsFunction_GPS": {
-    "message": "GPS"
-},
-"portsFunction_RANGEFINDER": {
-    "message": "Αισθητήρας απόστασης"
-},
-"portsFunction_OPFLOW": {
-    "message": "Οπτική ροή"
-},
-"portsFunction_ESC": {
-    "message": "Έξοδος/τηλεμετρία ESC"
-},
-"portsFunction_TELEMETRY_FRSKY": {
-    "message": "FrSky"
-},
-"portsFunction_TELEMETRY_HOTT": {
-    "message": "HoTT"
-},
-"portsFunction_TELEMETRY_LTM": {
-    "message": "LTM"
-},
-"portsFunction_TELEMETRY_MAVLINK": {
-    "message": "MAVLink"
-},
-"portsFunction_TELEMETRY_IBUS": {
-    "message": "IBUS"
-},
-"portsFunction_GSM_SMS": {
-    "message": "GSM SMS"
-},
-"portsFunction_TELEMETRY_MSP": {
-    "message": "MSP"
-},
-"portsFunction_TELEMETRY_SMARTPORT": {
-    "message": "SmartPort"
-},
-"portsFunction_SMARTPORT_MASTER": {
-    "message": "Κεντρική μονάδα SmartPort"
-},
-"portsFunction_RX_SERIAL": {
-    "message": "Σειριακός δέκτης"
-},
-"portsFunction_BLACKBOX": {
-    "message": "Blackbox"
-},
-"portsFunction_RUNCAM_DEVICE_CONTROL": {
-    "message": "Συσκευή RunCam"
-},
-"portsFunction_TBS_SMARTAUDIO": {
-    "message": "TBS SmartAudio"
-},
-"portsFunction_IRC_TRAMP": {
-    "message": "IRC Tramp"
-},
-"portsFunction_VTX_FFPV": {
-    "message": "FuriousFPV Vtx"
-},
-"portsFunction_FRSKY_OSD": {
-    "message": "FrSky OSD"
-},
-"portsFunction_DJI_FPV": {
-    "message": "DJI FPV VTX"
-},
-"portsFunction_MSP_DISPLAYPORT": {
-    "message": "MSP DisplayPort"
-},
-"pidTuning_ShowAllPIDs": {
-    "message": "Εμφάνιση όλων των PIDs"
-},
-"pidTuning_SelectNewDefaults": {
-    "message": "Επιλογή νέων προεπιλεγμένων τιμών"
-},
-"pidTuning_ResetPIDController": {
-    "message": "Επαναφορά PID ελεγκτή"
-},
-"pidTuning_PIDgains": {
-    "message": "Κέρδη PID"
-},
-"pidTuning_Name": {
-    "message": "Όνομα"
-},
-"pidTuning_Proportional": {
-    "message": "Proportional"
-},
-"pidTuning_Integral": {
-    "message": "Integral"
-},
-"pidTuning_Derivative": {
-    "message": "Derivative"
-},
-"pidTuning_FeedForward": {
-    "message": "FeedForward"
-},
-"pidTuning_ControlDerivative": {
-    "message": "Derivative ελέγχου"
-},
-"pidTuning_Basic": {
-    "message": "Βασικό/Acro"
-},
-"pidTuning_Level": {
-    "message": "Angle/Horizon"
-},
-"pidTuning_Altitude": {
-    "message": "Βαρόμετρο & Sonar/Υψόμετρο"
-},
-"pidTuning_Mag": {
-    "message": "Μαγνητόμετρο/Κατεύθυνση"
-},
-"pidTuning_GPS": {
-    "message": "Πλοήγηση GPS"
-},
-"pidTuning_LevelP": {
-    "message": "Ισχύς"
-},
-"pidTuning_LevelI": {
-    "message": "Φίλτρο χαμηλής πέρασης (Hz)"
-},
-"pidTuning_LevelD": {
-    "message": "Μετάβαση (Horizon)"
-},
-"pidTuning_LevelHelp": {
-    "message": "Οι τιμές παρακάτω αλλάζουν τη συμπεριφορά των λειτουργιών πτήσης Angle και Horizon. Διάφοροι PID ελεγκτές χειρίζονται διαφορετικά τις τιμές Level. Παρακαλούμε ελέγξτε την τεκμηρίωση."
-},
-"pidTuning_RatesAndExpo": {
-    "message": "Ρυθμοί & Expo"
-},
-"pidTuning_RateDynamics": {
-    "message": "Δυναμικά Ρυθμών"
-},
-"pidTuning_RateDynamics_Sensitivity": {
-    "message": "Ευαισθησία"
-},
-"pidTuning_RateDynamics_Correction": {
-    "message": "Διόρθωση"
-},
-"pidTuning_RateDynamics_Weight": {
-    "message": "Βάρος"
-},
-"pidTuning_RateDynamics_Center": {
-    "message": "Κέντρο"
-},
-"pidTuning_RateDynamics_End": {
-    "message": "Τέλος"
-},
-"pidTuning_RollPitchRate": {
-    "message": "Ρυθμός ROLL &amp; PITCH"
-},
-"pidTuning_RollRate": {
-    "message": "Ρυθμός ROLL"
-},
-"pidTuning_PitchRate": {
-    "message": "Ρυθμός PITCH"
-},
-"pidTuning_YawRate": {
-    "message": "Ρυθμός YAW"
-},
-"pidTuning_RollAndPitchExpo": {
-    "message": "Expo ROLL & PITCH"
-},
-"pidTuning_YawExpo": {
-    "message": "Expo YAW"
-},
-"pidTuning_MaxRollAngle": {
-    "message": "Μέγιστη γωνία ROLL"
-},
-"pidTuning_MaxRollAngleHelp": {
-    "message": "Μέγιστη γωνία ROLL στη λειτουργία Angle. Αυτό περιορίζει επίσης τη μέγιστη κλίση στις λειτουργίες πλοήγησης."
-},
-"pidTuning_MaxPitchAngle": {
-    "message": "Μέγιστη γωνία PITCH"
-    },
-   "pidTuning_MaxPitchAngleHelp": {
-    "message": "Μέγιστη γωνία PITCH σε λειτουργία Angle. Αυτό περιορίζει επίσης το μέγιστο ανέβασμα και κατεβασμα σε λειτουργίες πλοήγησης."
-},
-"pidTuning_ManualRollRate": {
-    "message": "Χειροκίνητος ρυθμός ROLL"
-},
-"pidTuning_ManualPitchRate": {
-    "message": "Χειροκίνητος ρυθμός PITCH"
-},
-"pidTuning_ManualYawRate": {
-    "message": "Χειροκίνητος ρυθμός YAW"
-},
-"pidTuning_magHoldYawRate": {
-    "message": "Όριο ρυθμού διατήρησης κατεύθυνσης"
-},
-"pidTuning_MagHoldYawRateHelp": {
-    "message": "Μέγιστος ρυθμός περιστροφής YAW που μπορεί να απαιτήσει ο ελεγκτής MagHold από το UAV. Χρησιμοποιείται μόνο όταν είναι ενεργοποιημένη η λειτουργία MagHold, κατά την επιστροφή στη βάση και την πλοήγηση σε σημεία. Τιμές κάτω από 30dps δίνουν ωραίες «κινηματογραφικές» στροφές."
-},
-"pidTuning_Filters": {
-    "message": "Φίλτρα"
-},
-"pidTuning_mainFilters": {
-    "message": "Φίλτρα γυροσκοπίου"
-},
-"pidTuning_advancedFilters": {
-    "message": "Προηγμένα φίλτρα γυροσκοπίου"
-},
-"pidTuning_gyro_main_lpf_hz": {
-    "message": "Κυρίως συχνότητα lpf γυροσκοπίου"
-},
-"pidTuning_gyro_main_lpf_hz_help": {
-    "message": "Υψηλότερες τιμές προσφέρουν χαμηλή καθυστέρηση αλλά περισσότερο θόρυβο. Χαμηλότερες τιμές προσφέρουν λιγότερο θόρυβο, αλλά περισσότερη καθυστέρηση στην επεξεργασία του γυροσκοπίου."
-},
-"pidTuning_MatrixFilterMinFrequency": {
-    "message": "Ελάχιστη συχνότητα Matrix"
-},
-"pidTuning_MatrixFilterMinFrequencyHelp": {
-    "message": "Ελάχιστη συχνότητα για το Matrix. Η τιμή θα πρέπει να εξαρτάται από το μέγεθος του προπέλας. Τα 150Hz δουλεύουν καλά με προπέλες 5&quot; και μικρότερες. Για προπέλες 7&quot; και μεγαλύτερες, ακόμα χαμηλότερα ακόμα και κάτω από τα 100Hz."
-},
-"pidTuning_MatrixFilterQFactor": {
-    "message": "Συντελεστής Q Matrix"
-},
-"pidTuning_MatrixFilterQFactorHelp": {
-    "message": "Όσο υψηλότερη η τιμή, τόσο μεγαλύτερη η εκλεκτικότητα του Matrix. Συνιστώνται τιμές μεταξύ 150 και 300."
-},
-"pidTuning_UnicornFilterQFactor": {
-    "message": "Συντελεστής Q Φίλτρου Unicorn"
-},
-"pidTuning_dtermFilters": {
-    "message": "Φίλτρα D-term"
-},
-"pidTuning_dtermLpfCutoffFrequency": {
-    "message": "Συχνότητα lpf D-term"
-},
-"pidTuning_dtermLpfCutoffFrequencyHelp": {
-    "message": "Φίλτρο αποκοπής χαμηλής περίοδου για Dterm για όλους τους PID ελεγκτές."
-},
-"pidTuning_rpmFilters": {
-    "message": "Φίλτρα γυροσκοπίου RPM"
-},
-"pidTuning_rpm_gyro_filter_enabled": {
-    "message": "Φίλτρο γυροσκοπίου RPM (απαιτεί τηλεμετρία ESC)"
-},
-"pidTuning_rpm_gyro_min_hz": {
-    "message": "Ελάχιστη συχνότητα γυροσκοπίου RPM"
-},
-"pidTuning_Mechanics": {
-    "message": "Μηχανικές"
-},
-"pidTuning_ITermMechanics": {
-    "message": "Μηχανική I-term"
-},
-"pidTuning_itermRelaxCutoff": {
-    "message": "Συχνότητα αποκοπής lpf Iterm Relax"
-},
-"pidTuning_itermRelaxCutoffHelp": {
-    "message": "Οι χαμηλότερες τιμές ανοίγουν ένα μεγαλύτερο χρονικό παράθυρο για το Iterm Relax να λειτουργήσει και ισχυρότερη κατάσταση Iterm. Οι υψηλότερες τιμές μειώνουν τα χρονικά παράθυρα και μειώνουν την κατάσταση κατάστασης."
-},
-"pidTuning_antigravityGain": {
-    "message": "Κέρδος αντιβαρύτητας"
-},
-"pidTuning_antigravityAccelerator": {
-    "message": "Επιταχυντής αντιβαρύτητας"
-},
-"pidTuning_antigravityCutoff": {
-    "message": "Συχνότητα αποκοπής αντιβαρύτητας"
-},
-"pidTuning_itermBankAngleFreeze": {
-    "message": "Πάγωμα γωνίας κλίσης Iterm"
-},
-"pidTuning_itermBankAngleFreezeHelp": {
-    "message": "Πάγωμα του Iterm όταν το αεροσκάφος κλίνεται περισσότερο από αυτό τον αριθμό μοιρών. Αυτό βοηθάει να σταματήσει το ρότορα να αντιδράσει στην στροφή. Η τιμή 0 απενεργοποιεί αυτήν τη λειτουργία. Ισχύει μόνο για αεροσκάφη με σταθερή πτέρυγα."
-},
-"pidTuning_dTermMechanics": {
-    "message": "Μηχανική D-term"
-},
-"pidTuning_d_boost_min": {
-    "message": "Ελάχιστη κλίμακα D-Boost"
-    },
-    "pidTuning_d_boost_min_help": {
-    "message": "Καθορίζει το μέγιστο επιτρεπόμενο Dterm απόκοψη κατά τη φάση επιτάχυνσης του μοχλού. Η τιμή 1.0 σημαίνει ότι το Dterm δεν αποκόπτεται. Η τιμή 0.5 σημαίνει ότι επιτρέπεται να συρρικνωθεί κατά το μισό. Χαμηλότερες τιμές οδηγούν σε πιο γρήγορη απόκριση κατά τη γρήγορη κίνηση του μοχλού."
-},
-"pidTuning_d_boost_max": {
-    "message": "Μέγιστη κλίμακα D-Boost"
-},
-"pidTuning_d_boost_max_help": {
-    "message": "Καθορίζει τη μέγιστη ενίσχυση Dterm όταν επιτυγχάνεται μέγιστη γωνιακή επιτάχυνση. Η τιμή 1.0 σημαίνει ότι το D-Boost είναι απενεργοποιημένο, 2.0 σημαίνει ότι το Dterm επιτρέπεται να αυξηθεί κατά 100%. Τιμές μεταξύ 1.5 και 1.7 είναι συνήθως το ιδανικό σημείο."
-},
-"pidTuning_d_boost_max_at_acceleration": {
-    "message": "Κορυφή D-Boost κατά την επιτάχυνση [dps^2]"
-},
-"pidTuning_d_boost_max_at_acceleration_help": {
-    "message": "Το D-Boost είναι πλήρως ενεργό όταν η γωνιακή επιτάχυνση (είτε ανιχνεύεται από το γυροσκόπιο είτε από τον στόχο ρυθμού) επιτυγχάνει τη δοθείσα επιτάχυνση. Ανάμεσα στο 0 και σε αυτήν την τιμή, ο παράγοντας D-Boost κλιμακώνεται γραμμικά."
-},
-"pidTuning_d_boost_gyro_delta_lpf_hz": {
-    "message": "D-Boost γυροσκοπίου LPF"
-},
-"pidTuning_d_boost_gyro_delta_lpf_hz_help": {
-    "message": "Θα πρέπει να οριστεί στη συχνότητα των ταλαντώσεων της αεροτομής της προπέλας. Τα τετρακόπτερα 5 ιντσών λειτουργούν καλύτερα στα περίπου 80Hz, τα τετρακόπτερα 7 ιντσών στα περίπου 50Hz"
-},
-"pidTuning_tpaMechanics": {
-    "message": "Απόκοψη PID επιτάχυνσης κινητήρα"
-},
-"pidTuning_TPA": {
-    "message": "Απόκοψη PID επιτάχυνσης κινητήρα (TPA)"
-},
-"pidTuning_TPABreakPoint": {
-    "message": "Σημείο απόκοψης TPA"
-},
-"pidTuning_FW_TPATimeConstant": {
-    "message": "Σταθερά TPA σταθερής πτέρυγας"
-},
-"pidTuning_FW_TPATimeConstantHelp": {
-    "message": "Σταθερή περίοδος χρόνου εξομάλυνσης και καθυστέρησης για να αντικατοπτρίζει τη μη-άμεση απόκριση της ταχύτητας/γκαζιού του αεροσκάφους."
-},
-"pidTuning_fwLevelTrimMechanics": {
-    "message": "Σταθερή ρύθμιση επιπέδου πτέρυγας"
-},
-"pidTuning_fw_level_pitch_trim": {
-    "message": "Ρύθμιση επιπέδου [μοίρες]"
-},
-"pidTuning_fw_level_pitch_trim_help": {
-    "message": "Ρύθμιση κλίσης για λειτουργίες πτήσης αυτο-εξομάλυνσης. Σε μοίρες. +5 σημαίνει ότι το μπροστινό μέρος του αεροπλάνου πρέπει να ανυψωθεί κατά 5 μοίρες από το οριζόντιο επίπεδο."
-},
-"pidTuning_ButtonSave": {
-    "message": "Αποθήκευση"
-},
-"pidTuning_ButtonRefresh": {
-    "message": "Ανανέωση"
-},
-"pidTuning_ProfileHead": {
-    "message": "Προφίλ"
-},
-"pidTuning_LoadedProfile": {
-    "message": "Φορτωμένο προφίλ: <strong style=\"color: #37a8db\">$1</strong>"
-},
-"pidTuning_gyro_use_dyn_lpf": {
-    "message": "Δυναμικό φίλτρο lpf γυροσκοπίου"
-},
-"pidTuning_gyro_use_dyn_lpf_help": {
-    "message": "Όταν είναι ενεργοποιημένο, η κυρίως συχνότητα φίλτρου lpf γυροσκοπίου προσαρμόζεται αυτόματα με βάση την τρέχουσα θέση του γκάζιου. Όταν απενεργοποιηθεί, χρησιμοποιείται στατική lpf."
-},
-"pidTuning_gyro_dyn_lpf_min_hz": {
-    "message": "Δυναμική ελάχιστη συχνότητα lpf"
-},
-"pidTuning_gyro_dyn_lpf_max_hz": {
-    "message": "Δυναμική μέγιστη συχνότητα lpf"
-},
-"pidTuning_gyro_dyn_lpf_curve_expo": {
-    "message": "Δυναμική καμπύλη ελέγχου ελάχιστης συχνότητας lpf"
-},
-"pidTuning_gyro_dyn_lpf_min_hz_help": {
-    "message": "Καθορίζει τη συχνότητα αποκοπής φίλτρου γυροσκοπίου στο ελάχιστο γκάζι. Όταν το γκάζι αυξάνεται, η συχνότητα αποκοπής φίλτρου αυξάνεται επίσης, μέχρι τη μέγιστη συχνότητα αποκοπής."
-},
-"pidTuning_gyro_dyn_lpf_max_hz_help": {
-    "message": "Καθορίζει τη συχνότητα αποκοπής φίλτρου γυροσκοπίου στο μέγιστο γκάζι. Όταν το γκάζι μειώνεται, η συχνότητα αποκοπής φίλτρου μειώνεται επίσης, μέχρι την ελάχιστη συχνότητα αποκοπής."
-},
-"loadedBatteryProfile": {
-    "message": "Φορτωμένο προφίλ μπαταρίας: <strong style=\"color: #37a8db\">$1</strong>"
-},
-"pidTuningDataRefreshed": {
-    "message": "Δεδομένα PID <strong>ανανεώθηκαν</strong>"
-},
-"pidTuningEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Ρύθμιση PID"
-},
+	"initialSetupDeclination": {
+		"message": "Απόκλιση:"
+	},
+	"initialSetupInfoHead": {
+		"message": "Πληροφορίες"
+	},
+	"initialSetupBatteryVoltage": {
+		"message": "Τάση μπαταρίας:"
+	},
+	"initialSetupBatteryDetectedCells": {
+		"message": "Ανιχνευμένος αριθμός κελιών μπαταρίας:"
+	},
+	"initialSetupBatteryDetectedCellsValue": {
+		"message": "$1"
+	},
+	"initialSetupBatteryPercentage": {
+		"message": "Υπολειπόμενη μπαταρία:"
+	},
+	"initialSetupBatteryPercentageValue": {
+		"message": "$1 %"
+	},
+	"initialSetupBatteryRemainingCapacity": {
+		"message": "Υπολειπόμενη χωρητικότητα μπαταρίας"
+	},
+	"initialSetupBatteryRemainingCapacityValue": {
+		"message": "$1 $2"
+	},
+	"initialSetupBatteryFull": {
+		"message": "Μπαταρία πλήρης όταν είναι συνδεδεμένη"
+	},
+	"initialSetupBatteryFullValue": {
+		"message": "$1"
+	},
+	"initialSetupBatteryThresholds": {
+		"message": "Κατώτατα όρια χωρητικότητας μπαταρίας"
+	},
+	"initialSetupBatteryThresholdsValue": {
+		"message": "$1"
+	},
+	"initialSetup_Wh_drawn": {
+		"message": "Χωρητικότητα που καταναλώθηκε:"
+	},
+	"initialSetup_Wh_drawnValue": {
+		"message": "$1 Wh"
+	},
+	"initialSetupBatteryVoltageValue": {
+		"message": "$1 V"
+	},
+	"initialSetupDrawn": {
+		"message": "Χωρητικότητα που καταναλώθηκε:"
+	},
+	"initialSetupCurrentDraw": {
+		"message": "Τρέχουσα κατανάλωση:"
+	},
+	"initialSetupPowerDraw": {
+		"message": "Κατανάλωση ισχύος:"
+	},
+	"initialSetupPowerDrawValue": {
+		"message": "$1 W"
+	},
+	"initialSetupBatteryMahValue": {
+		"message": "$1 mAh"
+	},
+	"initialSetupCurrentDrawValue": {
+		"message": "$1 A"
+	},
+	"initialSetupRSSI": {
+		"message": "RSSI:"
+	},
+	"initialSetupRSSIValue": {
+		"message": "$1 %"
+	},
+	"initialSetupGPSHead": {
+		"message": "GPS"
+	},
+	"initialSetupInstrumentsHead": {
+		"message": "Οργάνα"
+	},
+	"initialSetupButtonSave": {
+		"message": "Αποθήκευση"
+	},
+	"initialSetupModel": {
+		"message": "Μοντέλο: $1"
+	},
+	"initialSetupAttitude": {
+		"message": "$1 μοίρες"
+	},
+	"initialSetupAccelCalibStarted": {
+		"message": "Έναρξη βαθμονόμησης επιταχυνσιόμετρου"
+	},
+	"initialSetupAccelCalibEnded": {
+		"message": "Η βαθμονόμηση επιταχυνσιόμετρου <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
+	},
+	"initialSetupMagCalibStarted": {
+		"message": "Έναρξη βαθμονόμησης μαγνητόμετρου"
+	},
+	"initialSetupMagCalibEnded": {
+		"message": "Η βαθμονόμηση μαγνητόμετρου <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
+	},
+	"initialSetupOpflowCalibStarted": {
+		"message": "Έναρξη βαθμονόμησης οπτικής ροής"
+	},
+	"initialSetupOpflowCalibEnded": {
+		"message": "Η βαθμονόμηση οπτικής ροής <span style=\"color: #37a8db\">ολοκληρώθηκε</span>"
+	},
+	"initialSetupSettingsRestored": {
+		"message": "Οι ρυθμίσεις επαναφέρθηκαν στις <strong>προεπιλεγμένες</strong>"
+	},
+	"initialSetupEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Ρύθμιση"
+	},
 
-"receiverHelp": {
-    "message": "Παρακαλώ διαβάστε το κεφάλαιο του δέκτη του εγχειριδίου. Ρυθμίστε τη σειριακή θύρα (εάν απαιτείται), τη λειτουργία δέκτη (σειριακή/ppm/pwm), τον πάροχο (για σειριακούς δέκτες), δέστε το δέκτη, ορίστε τον χάρτη καναλιού, ρυθμίστε τις άκρες/εύρος του καναλιού στον πομπό, έτσι ώστε όλα τα κανάλια να πηγαίνουν από περίπου 1000 έως περίπου 2000. Ορίστε το μεσαίο σημείο (προεπιλεγμένο 1500), ρυθμίστε τα κανάλια σε 1500, διορθώστε το deadband του μοχλού, επαληθεύστε τη συμπεριφορά όταν ο πομπός είναι απενεργοποιημένος ή εκτός εμβέλειας. Βεβαιωθείτε ότι οι τιμές του καναλιού αυξάνονται όλες όταν σπρώχνετε τα μοχλούς προς τα πάνω και προς τα δεξιά. Εάν όχι, αντιστρέψτε το κανάλι στον πομπό. Μην εφαρμόζετε κανένα άλλο μίξιμο στον πομπό. <br /><span style=\"color: red\">ΣΗΜΑΝΤΙΚΟ:</span> Πριν από την πτήση, διαβάστε το κεφάλαιο Failsafe του εγχειριδίου και ρυθμίστε το Failsafe."
-},
-"receiverThrottleMid": {
-    "message": "Κέντρο γκάζιου"
-},
-"receiverThrottleExpo": {
-    "message": "Expo γκάζιου"
-},
-"receiverRcRate": {
-    "message": "Ρυθμός RC"
-},
-"receiverDeadband": {
-    "message": "RC deadband"
-},
-"receiverHelpDeadband": {
-    "message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν τα είσοδος RC κουνιέται κατά τη διάρκεια της αδράνειας."
-},
-"receiverHelpYawDeadband": {
-    "message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν τα είσοδος RC κουνιέται κατά τη διάρκεια της αδράνειας. <strong>Αυτή η ρύθμιση αφορά μόνο το γύρο.</strong>"
-},
-"receiverYawDeadband": {
-    "message": "YawDeadband"
-},
-"receiverRcExpo": {
-    "message": "Expo RC"
-},
-"receiverRcYawExpo": {
-    "message": "RcYawExpo"
-},
-"receiverManualRcExpo": {
-    "message": "Χειροκίνητo RC Expo"
-},
-"receiverManualRcYawExpo": {
-    "message": "Χειροκίνητo RcYawExpo"
-},
-"receiverChannelMap": {
-    "message": "ChannelMap"
-},
-"receiverChannelMapTitle": {
-    "message": "Μπορείτε να ορίσετε τον δικό σας ChannelMap κάνοντας κλικ μέσα στο κουτί"
-},
-"receiverRssiChannel": {
-    "message": "Κανάλι RSSI"
-},
-"receiverRefreshRateTitle": {
-    "message": "Ρυθμός ανανέωσης γραφήματος"
-},
-"receiverButtonSave": {
-    "message": "Αποθήκευση"
-},
-"receiverButtonRefresh": {
-    "message": "Ανανέωση"
-},
-"receiverButtonSticks": {
-    "message": "Μοχλοί ελέγχου"
-},
-"receiverDataRefreshed": {
-    "message": "Δεδομένα ρύθμισης RC <strong>ανανεώθηκαν</strong>"
-},
-"receiverEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Δέκτης"
-},
+	"RX_PPM": {
+		"message": "Είσοδος PPM RX"
+	},
+	"RX_SERIAL": {
+		"message": "Δέκτης με βάση τη σειριακή σύνδεση (SPEKSAT, SBUS, SUMD)"
+	},
+	"RX_PWM": {
+		"message": "Είσοδος PWM RX (ένα καλώδιο ανά κανάλι)"
+	},
+	"RX_MSP": {
+		"message": "Είσοδος MSP RX (έλεγχος μέσω θύρας MSP)"
+	},
+	"RX_SPI": {
+		"message": "Είσοδος RX βασισμένη σε SPI (NRF24L01, RFM22)"
+	},
+	"RX_NONE": {
+		"message": "Χωρίς δέκτη"
+	},
 
-"auxiliaryHelp": {
-    "message": "Χρησιμοποιήστε τις περιοχές για να ορίσετε τους διακόπτες στον πομπό σας και τις αντίστοιχες αναθέσεις λειτουργιών. Ένα κανάλι δέκτη που δίνει μια ανάγνωση μεταξύ μιας ελάχιστης/μέγιστης περιοχής θα ενεργοποιήσει τη λειτουργία. Μην ξεχάσετε να αποθηκεύσετε τις ρυθμίσεις σας χρησιμοποιώντας το κουμπί 'Αποθήκευση'."
-},
-"auxiliaryToggleUnused": {
-    "message": "Απόκρυψη αχρησιμοποίητων λειτουργιών"
-},
-"auxiliaryMin": {
-    "message": "Ελάχιστο"
-},
-"auxiliaryMax": {
-    "message": "Μέγιστο"
-},
-"auxiliaryAddRange": {
-    "message": "Προσθήκη εύρους"
-},
-"auxiliaryAutoChannelSelect": {
-    "message": "ΑΥΤΟΜΑΤΟ"
-},
-"auxiliaryButtonSave": {
-    "message": "Αποθήκευση"
-},
-"auxiliaryEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
-},
-
-"adjustmentsHelp": {
-    "message": "Ρυθμίστε τους διακόπτες προσαρμογής. Δείτε την ενότητα 'ρυθμίσεις κατά τη διάρκεια πτήσης' του εγχειριδίου για λεπτομέρειες. Οι αλλαγές που κάνουν οι λειτουργίες προσαρμογής δεν αποθηκεύονται αυτόματα. Υπάρχουν 4 θέσεις. Κάθε διακόπτης που χρησιμοποιείται για να κάνει παράλληλα προσαρμογές απαιτεί αποκλειστική χρήση μιας θέσης."
-},
-"adjustmentsExamples": {
-    "message": "Παραδείγματα"
-},
-"adjustmentsExample1": {
-    "message": "Χρησιμοποιήστε τη Θέση 1 και έναν διακόπτη 3 θέσεων στο CH5 για να επιλέξετε μεταξύ Pitch/Roll P, I και D και άλλον έναν διακόπτη 3 θέσεων στο CH6 για να αυξήσετε ή να μειώσετε την τιμή όταν κρατηθεί προς τα πάνω ή προς τα κάτω."
-},
-"adjustmentsExample2": {
-    "message": "Χρησιμοποιήστε τη Θέση 2 και έναν διακόπτη 3 θέσεων στο CH8 για να ενεργοποιήσετε την επιλογή επιλογής του προφίλ ρυθμού μέσω του ίδιου διακόπτη 3 θέσεων στον ίδιο κανάλι."
-},
-"adjustmentsColumnEnable": {
-    "message": "Εάν είναι ενεργοποιημένο"
-},
-"adjustmentsColumnUsingSlot": {
-    "message": "χρησιμοποιώντας θέση"
-},
-"adjustmentsColumnWhenChannel": {
-    "message": "όταν το κανάλι"
-},
-"adjustmentsColumnIsInRange": {
-    "message": "είναι εντός του εύρους"
+	"featureVBAT": {
+		"message": "Παρακολούθηση τάσης μπαταρίας"
+	},
+	"featureTX_PROF_SEL": {
+		"message": "Επιλογή προφίλ με εντολή μοχλού τηλεκατεύθυνσης"
+	},
+	"featureINFLIGHT_ACC_CAL": {
+		"message": "Βαθμονόμηση επιπέδου κατά την πτήση"
+	},
+	"featureMOTOR_STOP": {
+		"message": "σβήσιμο κινητήρων σε χαμηλό γκάζι"
+	},
+	"featureSERVO_TILT": {
+		"message": "σέρβο gimbal"
+	},
+	"featureBAT_PROFILE_AUTOSWITCH": {
+		"message": "Αυτόματη επιλογή προφίλ μπαταρίας"
+	},
+	"featureBAT_PROFILE_AUTOSWITCHTip": {
+		"message": "Αυτόματη επιλογή του προφίλ μπαταρίας με βάση την τάση της μπαταρίας όταν αυτή συνδέεται"
+	},
+	"featureTHR_VBAT_COMP": {
+		"message": "Αποζημίωση τάσης γκαζιού"
+	},
+	"featureTHR_VBAT_COMPTip": {
+		"message": "Αυτόματη αποζημίωση της πτώσης της τάσης όταν η μπαταρία απεκφορτίζεται για να διατηρηθεί η σταθερή έξοδος σε σχέση με το γκάζι"
+	},
+	"featureSOFTSERIAL": {
+		"message": "Ενεργοποίηση softserial θυρών  βάσει της CPU"
+	},
+	"featureSOFTSERIALTip": {
+		"message": "Διαμόρφωση softserial θυρών στην καρτέλα Θύρες μετά την ενεργοποίηση."
+	},
+	"featureGPS": {
+		"message": "GPS για πλοήγηση και τηλεμετρία"
+	},
+	"featureGPSTip": {
+		"message": "Διαμορφώστε πρώτα τo gps απο τις θύρες"
+	},
+	"featureFAILSAFE": {
+		"message": "Εφαρμογή ρυθμίσεων Failsafe σε περίπτωση απώλειας σήματος RX"
+	},
+	"featureSONAR": {
+		"message": "Sonar"
+	},
+	"featureTELEMETRY": {
+		"message": "Έξοδος τηλεμετρίας"
+	},
+	"featureCURRENT_METER": {
+		"message": "Παρακολούθηση ρεύματος μπαταρίας"
+	},
+	"featureREVERSIBLE_MOTORS": {
+		"message": "Λειτουργία αντιστρεψίμων κινητήρων (3D) (για χρήση με αντιστρεψίμους ESC)"
+	},
+	"featureRSSI_ADC": {
+		"message": "Αναλογική είσοδος RSSI"
+	},
+	"featureLED_STRIP": {
+		"message": "Υποστήριξη πολύχρωμης RGB λωρίδας LED"
+	},
+	"featureDASHBOARD": {
+		"message": "Οθόνη OLED"
+		},
+		"featureONESHOT125": {
+		"message": "Υποστήριξη ESC ONESHOT"
+	},
+	"featureONESHOT125Tip": {
+		"message": "Αποσυνδέστε την μπαταρία και αφαιρέστε τις προπέλες προτού ενεργοποιήσετε αυτή τη λειτουργία."
+	},
+	"featurePWM_OUTPUT_ENABLE": {
+		"message": "Ενεργοποίηση εξόδου κινητήρα και σερβο"
+	},
+	"featurePWM_OUTPUT_ENABLETip": {
+		"message": "Η ενεργοποίηση αυτής της επιλογής απαιτείται για να στείλει το INAV σήματα στο ESC. Είναι μια προφύλαξη ασφαλείας που αποτρέπει τα σερβο από βλάβη αμέσως μετά το φλασάρισμα του ελεγκτή πτήσης."
+	},
+	"featureBLACKBOX": {
+		"message": "Καταγραφή δεδομένων πτήσης Blackbox"
+	},
+	"featureBLACKBOXTip": {
+		"message": "Διαμορφώστε μέσω της καρτέλας BlackBox μετά την ενεργοποίηση."
+	},
+	"onboardLoggingBlackbox": {
+		"message": "Συσκευή καταγραφής Blackbox"
+	},
+	"onboardLoggingBlackboxRate": {
+		"message": "Ποσοστό επαναλήψεων βρόχου πτήσης προς καταγραφή (ποσοστό καταγραφής)"
+	},
+	"featureCHANNEL_FORWARDING": {
+		"message": "Προώθηση βοηθητικών καναλιών σε εξόδους σερβοκινητήρων"
+	},
+	"featureSOFTSPI": {
+		"message": "SPI βάσει CPU"
+	},
+	"featurePWM_SERVO_DRIVER": {
+		"message": "Εξωτερικός οδηγός PWM σερβο"
+	},
+	"featurePWM_SERVO_DRIVERTip": {
+		"message": "Χρησιμοποιήστε εξωτερικό οδηγό PCA9685 PWM για σύνδεση έως 16 σερβοκινητήρων με τοn ελεγκτή πτήσης. Το PCA9685 πρέπει να συνδεθεί για να ενεργοποιηθεί αυτή η λειτουργία."
+	},
+	"featureRSSI_ADCTip": {
+		"message": "Το RSSI είναι μέτρηση της ισχύος του σήματος και είναι πολύ βολικό για να γνωρίζετε πότε το αεροσκάφος σας βγαίνει εκτός εμβέλειας ή αν υποφέρει από παρεμβολές ραδιοσυχνοτήτων."
+	},
+	"featureOSD": {
+		"message": "OSD"
+	},
+	"featureAIRMODE": {
+		"message": "Ενεργοποίηση AIRMODE μόνιμα"
+	},
+	"featureFW_LAUNCH": {
+		"message": "Ενεργοποίηση μόνιμης λειτουργίας Launch για αεροσκάφος με σταθερή πτέρυγα"
+	},
+	"featureFW_AUTOTRIM": {
+		"message": "Συνεχές τριμμάρισμα σερβο σε αεροσκάφος με σταθερή πτέρυγα"
+	},
+	"featureFW_AUTOTRIMTip": {
+		"message": "κατα τη σταθεροποιημένη λειτουργία, τριμμαρίζονται συνεχώς τα μέσα σημεία των σερβο έτσι ώστε το αεροσκάφος να συνεχίζει να πετά όταν μεταβαίνετε σε χειροκίνητη λειτουργία. Απαιτεί GPS."
+	},
+	"featureDYNAMIC_FILTERS": {
+		"message": "Δυναμικά φίλτρα γυροσκοπίων"
+	},
+	"featureDYNAMIC_FILTERSTip": {
+		"message": "Χρησιμοποιήστε αυτόματη ανάλυση FFT για τη ρύθμιση φίλτρων κοιλότητας για την μείωση θορύβου γυροσκοπίων. Πρέπει να είναι ενεργοποιημένο πάντα!"
+	},
+	"configurationFeatureEnabled": {
+		"message": "Ενεργοποιημένο"
+	},
+	"configurationFeatureName": {
+		"message": "Χαρακτηριστικό"
+	},
+	"configurationFeatureDescription": {
+		"message": "Περιγραφή"
+	},
+	"configurationMixer": {
+		"message": "Μίκτης"
+	},
+	"configurationFeatures": {
+		"message": "Άλλες Λειτουργίες"
+	},
+	"configurationReceiver": {
+		"message": "Λειτουργία δέκτη"
+	},
+	"configurationRSSI": {
+		"message": "RSSI (ισχύς σήματος)"
+	},
+	"configurationEscFeatures": {
+		"message": "Λειτουργίες ESC/Κινητήρα"
+	},
+	"serialrx_inverted": {
+		"message": "Αντιστραμμένη σειριακή θύρα (σε σύγκριση με την προεπιλεγμένη πρωτοκολλική ρύθμιση)"
+	},
+	"serialrx_halfduplex": {
+		"message": "Semiduplex σειριακός δέκτης"
+	},
+	"configurationFeaturesHelp": {
+		"message": "<strong>Σημείωση:</strong> Δεν είναι όλοι οι συνδυασμοί χαρακτηριστικών έγκυροι. Όταν το firmware του ελεγκτή πτήσης ανιχνεύσει μη έγκυρους συνδυασμούς χαρακτηριστικών, τα αντιφατικά χαρακτηριστικά θα απενεργοποιηθούν.<br /><strong>Σημείωση:</strong> Διαμορφώστε τις σειριακές θύρες <span style=\"color: red\">πριν</span> ενεργοποιήσετε τα χαρακτηριστικά που θα χρησιμοποιήσουν αυτές τις θύρες."
+	},
+	"configurationSerialRXHelp": {
+		"message": "<strong>Σημείωση:</strong> Θυμηθείτε να διαμορφώσετε μια σειριακή θύρα (μέσω της καρτέλας Θύρες) για το σειριακό δέκτη"
+	},
+	"configurationSensorAlignmentMag": {
+		"message": "Συντονισμός MAG"
+	},
+	"configurationSensorAlignmentMagRoll": {
+		"message": "Roll"
+	},
+	"configurationSensorAlignmentMagPitch": {
+		"message": "Pitch"
+	},
+	"configurationSensorAlignmentMagYaw": {
+		"message": "Yaw"
+	},
+	"configurationAccelTrims": {
+		"message": "τριμ γυροσκοπίου"
+	},
+	"configurationAccelTrimRoll": {
+		"message": "τριμ Roll γυροσκοπίου"
+	},
+	"configurationAccelTrimPitch": {
+		"message": "τριμ Pitch γυροσκοπίου"
+	},
+	"configurationMagDeclination": {
+		"message": "Αποκλίνουσα μαγνητόμετρου [μοίρες]"
+	},
+	"configurationAutoDisarmDelay": {
+		"message": "Δευτερόλεπτα μέχρι disarm λόγω χαμηλού THR"
+	},
+	"configurationAutoDisarmDelayHelp": {
+		"message": "Χρησιμοποιείται μόνο για ενεργοποίηση με το χειριστήριο (δηλαδή χωρίς χρήση διακόπτη)"
+	},
+	"configurationThrottleMinimum": {
+		"message": "Ελάχιστο γκάζι"
+	},
+	"configurationThrottleMid": {
+		"message": "Μέσο γκάζι [μέση μοχλού RC]"
+	},
+	"configurationThrottleMaximum": {
+		"message": "Μέγιστο γκάζι"
+	},
+	"configurationThrottleMinimumCommand": {
+		"message": "Ελάχιστη εντολή"
+	},
+	"configurationVoltageCurrentSensor": {
+		"message": "Αισθητήρες τάσης και ρεύματος"
+	},
+	"configurationBatteryCurrent": {
+		"message": "Ρεύμα μπαταρίας"
+	},
+	"configurationVoltageSource": {
+		"message": "Πηγή τάσης που θα χρησιμοποιηθεί για ειδοποιήσεις και τηλεμετρία"
+	},
+	"configurationVoltageSourceHelp": {
+		"message": "Η ωμή τάση είναι η τάση που μετριέται απευθείας από την μπαταρία. Η λειτουργεία αποζημίωσης προσομοιώνει την ιδανική τάση της μπαταρίας χωρίς φορτίο (εξαλείφει τις ψευδείς ειδοποιήσεις που προκαλούνται από υψηλά φορτία)"
+	},
+	"configurationBatteryCells": {
+		"message": "Αριθμός κελιών (0 = αυτόματα)"
+	},
+	"configurationBatteryCellsHelp": {
+		"message": "Ορίστε αυτόν τον αριθμό κελιών της μπαταρίας σας για να απενεργοποιήσετε την αυτόματη ανίχνευση των κελιών ή για να κάνετε την αυτόματη μετάβαση στα προφίλ της μπαταρίας δυνατή. Οι μπαταρίες 7S, 9S και 11S δεν μπορούν να ανιχνευθούν αυτόματα."
+	},
+	"configurationBatteryCellDetectVoltage": {
+		"message": "Μέγιστη τάση κελιού για την ανίχνευση αρίθμησης κελιού"
+	},
+	"configurationBatteryCellDetectVoltageHelp": {
+		"message": "Η μέγιστη τάση του κελιού που χρησιμοποιείται για την αυτόματη ανίχνευση των κελιών. Πρέπει να είναι υψηλότερη από τη μέγιστη τάση του κελιού για να ληφθεί υπόψη η πιθανή παραστρέβλωση της μετρημένης τάσης και να διατηρηθεί η ακρίβεια της ανίχνευσης των κελιών."
+	},
+	"configurationBatteryMinimum": {
+		"message": "Ελάχιστη τάση κελιού"
+	},
+	"configurationBatteryMaximum": {
+		"message": "Μέγιστη τάση κελιού"
+	},
+	"configurationBatteryWarning": {
+		"message": "Τάση προειδοποίησης κελιού"
+	},
+	"configurationBatteryScale": {
+		"message": "Κλίμακα τάσης"
+	},
+	"configurationBatteryVoltage": {
+		"message": "Τάση μπαταρίας"
+	},
+	"configurationCurrentScale": {
+		"message": "Κλίμακα μέτρησης ρεύματος"
+	},
+	"configurationCurrentScaleHelp": {
+		"message": "Κλιμακώστε την έξοδο τάσης σε χιλιοστά αμπερ [1/10 mV/A]"
+	},
+	"configurationCurrentOffset": {
+		"message": "Μετατόπιση σε βήματα μιλιβόλτ"
+	},
+	"configurationBatteryMultiwiiCurrent": {
+		"message": "Ενεργοποίηση υποστήριξης της legacy Multiwii MSP εξόδου ρεύματος"
+	},
+	"configurationBatterySettings": {
+		"message": "Ρυθμίσεις μπαταρίας"
+	},
+	"configurationBatterySettingsHelp": {
+		"message": "Αυτές οι ρυθμίσεις ισχύουν για το προς το παρόν επιλεγμένο προφίλ μπαταρίας "
+	},
+	"configurationBatteryCapacityValue": {
+		"message": "Χωρητικότητα"
+	},
+	"configurationBatteryCapacityWarning": {
+		"message": "Χωρητικότητα προειδοποίησης (υπολειπόμενο %)"
+	},
+	"configurationBatteryCapacityCritical": {
+		"message": "Κρίσιμη χωρητικότητα (υπολειπόμενο %)"
+	},
+	"configurationBatteryCapacityUnit": {
+		"message": "Μονάδα χωρητικότητας μπαταρίας"
+	},
+	"configurationLaunch": {
+		"message": "Ρυθμίσεις εκκίνησης- αεροσκάφους με σταθερή πτέρυγα"
+	},
+	"configurationLaunchVelocity": {
+		"message": "Κατώτατο όριο ταχύτητας"
+	},
+	"configurationLaunchVelocityHelp": {
+		"message": "Κατώτατο όριο ταχύτητας προς τα εμπρός για ανίχνευση εκτόξευσης με καταπέλτη. Προεπιλογή: 300 [100-10000]"
+	},
+	"configurationLaunchAccel": {
+		"message": "Κατώτατο όριο επιτάχυνσης"
+	},
+	"configurationLaunchAccelHelp": {
+		"message": "Κατώτατο όριο προς τα εμπρός επιτάχυνσης για εκτόξευση με καταπέλτη ή εκτόξευση με ρίψη, 1G = 981 cm/s/s. Προεπιλογή: 1863 [1000-20000]"
+	},
+	"configurationLaunchMaxAngle": {
+		"message": "Μέγιστη γωνία ρίψης"
+	},
+	"configurationLaunchMaxAngleHelp": {
+		"message": "Μέγιστη γωνία ρίψης (συνδιασμένων pitch/roll) για να θεωρηθεί επιτυχημένη η εκτόξευση. Ορίστε το σε 180 για να το απενεργοποιήσετε πλήρως. Προεπιλογή: 45 [5-180]"
+	},
+	"configurationLaunchDetectTime": {
+		"message": "Χρόνος ανίχνευσης"
+	},
+	"configurationLaunchDetectTimeHelp": {
+		"message": "Χρόνος για τον οποίο πρέπει να υπερβαίνονται τα όρια για να θεωρηθεί ότι έχει συμβεί εκτόξευση. Προεπιλογή: 40 [10-1000]"
+	},
+	"configurationLaunchThr": {
+		"message": "Γκάζι ανίχνευσης"
+	},
+	"configurationLaunchThrHelp": {
+		"message": "Γκάζι ανίχνευσης - γκάζι που πρέπει να οριστεί κατά τη διάρκεια της ακολουθίας εκτόξευσης. Προεπιλογή: 1700 [1000-2000]"
+	},
+	"configurationLaunchIdleThr": {
+		"message": "ρελαντί"
+	},
+	"configurationLaunchIdleThrHelp": {
+		"message": "ρελαντί - γκάζι που πρέπει να οριστεί πριν από την έναρξη της ακολουθίας εκτόξευσης. Εάν οριστεί κάτω από το ρελαντί, θα εξαναγκάσει τον κινητήρα να σταματήσει ή σε ρελαντί (ανάλογα με το αν είναι ενεργοποιημένο το MOTOR_STOP). Εάν οριστεί πάνω από το ρελαντί, θα εξαναγκάσει το γκάζι να έχει αυτήν την τιμή (εάν το MOTOR_STOP είναι ενεργοποιημένο, θα διαχειριστεί ανάλογα με τη θέση του χειριστηρίου γκάζι). Προεπιλογή: 1000 [1000-2000]"
+	},
+	"configurationLaunchIdleDelay": {
+		"message": "Καθυστέρηση ρελαντί γκάζι"
+	},
+	"configurationLaunchIdleDelayHelp": {
+		"message": "Ορίστε ένα χρονικό διάστημα μεταξύ του ανύψωσης του γκαζιού για την εκκίνηση και της εκκίνησης του κινητήρα με ρελαντί. Προεπιλογή: 0 [0-60000]"
+	},
+	"configurationLaunchMotorDelay": {
+		"message": "Καθυστέρηση κινητήρα"
+	},
+	"configurationLaunchMotorDelayHelp": {
+		"message": "Καθυστέρηση μεταξύ της ανίχνευσης εκτόξευσης και της έναρξης της ακολουθίας εκτόξευσης και της αύξησης της ταχύτητας. Προεπιλογή: 500 [0-5000]"
+	},
+	"configurationLaunchSpinupTime": {
+		"message": "Χρόνος εκκίνησης κινητήρα"
+	},
+	"configurationLaunchSpinupTimeHelp": {
+		"message": "Χρόνος που απαιτείται για τη μετάβαση της ισχύος από το ρελαντί στο nav_fw_launch_thr, για να αποφευχθεί μεγάλη ένταση στο ESC και μεγάλη ροπή από την προπέλα. Προεπιλογή: 100 [0-1000]"
+	},
+	"configurationLaunchMinTime": {
+		"message": "Ελάχιστος χρόνος εκκίνησης"
+	},
+	"configurationLaunchMinTimeHelp": {
+		"message": "Επιτρέψτε στη λειτουργία εκκίνησης να εκτελέσει τουλάχιστον αυτόν το χρόνο [ms] και να αγνοήσει τις κινήσεις των μοχλών. Προεπιλογή: 0 [0-60000]"
+	},
+	"configurationLaunchTimeout": {
+		"message": "Χρόνος ολοκλήρωσης εκκίνησης"
+	},
+	"configurationLaunchTimeoutHelp": {
+		"message": "Μέγιστος χρόνος για την εκτέλεση της ακολουθίας εκκίνησης. Μετά από αυτό το χρόνο, η λειτουργία εκκίνησης θα απενεργοποιηθεί και θα αναλάβει η κανονική λειτουργία πτήσης. Προεπιλογή: 5000 [0-60000]"
+	},
+	"configurationLaunchEndTime": {
+		"message": "Χρόνος ολοκλήρωσης μετάβασης"
+	},
+	"configurationLaunchEndTimeHelp": {
+		"message": "Χρόνος ομαλής μετάβασης στο τέλος της εκκίνησης (ms). Αυτό προστίθεται στον Χρόνος Ολοκλήρωσης Εκκίνησης. Προεπιλογή: 2000 [0-5000]"
+	},
+	"configurationLaunchMaxAltitude": {
+		"message": "Μέγιστο υψόμετρο"
+	},
+	"configurationLaunchMaxAltitudeHelp": {
+		"message": "Υψόμετρο στο οποίο η λειτουργία εκκίνησης θα απενεργοποιηθεί και θα αναλάβει η κανονική λειτουργία πτήσης. Προεπιλογή: 0 [0-60000]"
+	},
+	"configurationLaunchClimbAngle": {
+		"message": "Γωνία ανόδου"
+	},
+	"configurationLaunchClimbAngleHelp": {
+		"message": "Γωνία ανόδου (γωνία του μοντέλου, όχι γωνια ανώδου) για την ακολουθία εκκίνησης (βαθμοί), περιορίζεται επίσης από την global max_angle_inclination_pit. Προεπιλογή: 18 [5-45]"
+		},
+		"configuration3d": {
+		"message": "Αντιστρεπτικοί (3d) κινητήρες"
+	},
+	"configuration3dDeadbandLow": {
+		"message": "Χαμηλή αντιστρεπτική ζώνη κινητήρων"
+	},
+	"configuration3dDeadbandHigh": {
+		"message": "Υψηλή αντιστρεπτική ζώνη κινητήρων"
+	},
+	"configuration3dNeutral": {
+		"message": "Φυσική θέση κινητήρων"
+	},
+	"configuration3dDeadbandThrottle": {
+		"message": "Αντιστρεπτική ζώνη κινητήρων γκαζιού"
+	},
+	"configurationSystem": {
+		"message": "Ρυθμίσεις συστήματος"
+	},
+	"configurationLoopTime": {
+		"message": "Χρόνος εκτέλεσης βρόχου ελεγκτή πτήσης"
+	},
+	"configurationCalculatedCyclesSec": {
+		"message": "Κύκλοι/δευτερόλεπτο (Hz)"
+	},
+	"configurationGPS": {
+		"message": "Ρυθμίσεις GPS"
+	},
+	"configurationGPSProtocol": {
+		"message": "Πρωτόκολλο"
+	},
+	"configurationGPSUseGalileo": {
+		"message": "Χρήση δορυφόρων Galileo (ΕΕ)"
+	},
+	"configurationGPSUseBeidou": {
+		"message": "Χρήση δορυφόρων BeiDou (Κίνα)"
+	},
+	"configurationGPSUseGlonass": {
+		"message": "Χρήση δορυφόρων Glonass (Ρωσία)"
+	},
+	"tzOffset": {
+		"message": "Απόκλιση ώρας"
+	},
+	"tzOffsetHelp": {
+		"message": "Απόκλιση ώρας από τον Παγκόσμιο Χρόνο (UTC). Αυτό εφαρμόζεται στην ώρα GPS για την καταγραφή και τη σήμανση των αρχείων Blackbox. (Προεπιλογή = 0 λεπτά)"
+	},
+	"tzAutomaticDST": {
+		"message": "Αυτόματη ρύθμιση θερινής ώρας"
+	},
+	"tzAutomaticDSTHelp": {
+		"message": "Προσθέτει αυτόματα τη θερινή ώρα στην ώρα GPS όταν απαιτείται ή απλώς τη αγνοεί. Περιλαμβάνει προεπιλεγμένες ρυθμίσεις για την ΕΕ και τις ΗΠΑ - αν ζείτε εκτός αυτών των περιοχών, συνιστάται να διαχειριστείτε τη θερινή ώρα χειροκίνητα μέσω του tz_offset. (Προεπιλογή = Απενεργοποιημένο)"
+	},
+	"configurationGPSBaudrate": {
+		"message": "Ρυθμός μετάδοσης (Baudrate)"
+	},
+	"configurationGPSubxSbas": {
+		"message": "Τύπος επίγειας βοήθειας"
+	},
+	"configurationGPSHelp": {
+		"message": "<strong>Σημείωση:</strong> Θυμηθείτε να ρυθμίσετε μία σειριακή θύρα (μέσω της καρτέλας Θύρες) όταν χρησιμοποιείτε τη λειτουργία GPS."
+	},
+	"receiverType": {
+		"message": "Τύπος δέκτη"
+	},
+	"configurationSerialRX": {
+		"message": "Παροχέας σειριακού δέκτη"
+	},
+	"configurationSPIProtocol": {
+		"message": "Πρωτόκολλο σειριακού διαύλου επικοινωνίας (SPI) δέκτη"
+	},
+	"configurationEepromSaved": {
+		"message": "Αποθηκευμένες ρυθμίσεις EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκαν</span>: Ρυθμίσεις"
+	},
+	"configurationButtonSave": {
+		"message": "Αποθήκευση και επανεκκίνηση"
+	},
+	"configurationVTX": {
+		"message": "VTX"
+	},
+	"configurationVTXBand": {
+		"message": "Ζώνη"
+	},
+	"configurationNoBand": {
+		"message": "Καμία"
+	},
+	"configurationVTXNoBandHelp": {
+		"message": "Η συχνότητα του VTX έχει οριστεί χειροκίνητα. Η επιλογή μιας ζώνης θα αντικαταστήσει τη ρυθμισμένη συχνότητα."
+	},
+	"configurationVTXChannel": {
+		"message": "Κανάλι"
+	},
+	"configurationVTXPower": {
+		"message": "Επίπεδο ισχύος"
+	},
+	"configurationVTXPowerHelp": {
+		"message": "Επίπεδο ισχύος VTX. Η ακριβής ισχύς σε mw (ή dBm) θα εξαρτηθεί από το συγκεκριμένο υλικό. Ελέγξτε το εγχειρίδιο του VTX σας."
+	},
+	"configurationVTXLowerPowerDisarm": {
+		"message": "Χρήση χαμηλής ισχύος κατά τη διάρκεια αφόπλισης του μοντέλου"
+	},
+	"configurationVTXLowerPowerDisarmHelp": {
+		"message": "Ενεργοποιώντας αυτήν την επιλογή, το VTX θα χρησιμοποιεί τη χαμηλότερη ισχύ κατά τη διάρκεια της αφόπλισης του μοντέλου. Χρησιμοποιήστε 'Μέχρι την πρώτη ενεργοποίηση' για να χρησιμοποιεί τη χαμηλότερη ισχύ μόνο μέχρι την πρώτη ενεργοποίηση."
+	},
+	"configurationVTXLowPowerDisarmValue_0": {
+		"message": "Απενεργοποιημένο"
+	},
+	"configurationVTXLowPowerDisarmValue_1": {
+		"message": "Πάντα"
+	},
+	"configurationVTXLowPowerDisarmValue_2": {
+		"message": "Μέχρι την πρώτη ενεργοποίηση"
+	},
+	"portsHelp": {
+		"message": "<strong>Σημείωση:</strong> Δεν είναι όλοι οι συνδυασμοί είναι έγκυροι. Όταν το firmware του ελεγκτή πτήσης το ανιχνεύσει αυτό, η ρύθμιση της σειριακής θύρας θα επαναφερθεί."
+	},
+	"portsMSPHelp": {
+		"message": "<strong>Σημείωση:</strong> ΜΗΝ απενεργοποιήσετε το MSP στην πρώτη σειριακή θύρα εκτός αν γνωρίζετε τι κάνετε. Ενδέχεται να χρειαστεί να ξαναφλασάρετε και να διαγράψετε τη ρύθμισή σας αν το κάνετε."
+	},
+	"portsFirmwareUpgradeRequired": {
+		"message": "Απαιτείται αναβάθμιση <span style=\"color: red\">του firmware</span>."
+	},
+	"portsButtonSave": {
+		"message": "Αποθήκευση και επανεκκίνηση"
+	},
+	"portsTelemetryDisabled": {
+		"message": "Απενεργοποιημένο"
+	},
+	"portsFunction_MSP": {
+		"message": "MSP"
+	},
+	"portsFunction_GPS": {
+		"message": "GPS"
+	},
+	"portsFunction_RANGEFINDER": {
+		"message": "Αισθητήρας απόστασης"
+	},
+	"portsFunction_OPFLOW": {
+		"message": "Οπτική ροή"
+	},
+	"portsFunction_ESC": {
+		"message": "Έξοδος/τηλεμετρία ESC"
+	},
+	"portsFunction_TELEMETRY_FRSKY": {
+		"message": "FrSky"
+	},
+	"portsFunction_TELEMETRY_HOTT": {
+		"message": "HoTT"
+	},
+	"portsFunction_TELEMETRY_LTM": {
+		"message": "LTM"
+	},
+	"portsFunction_TELEMETRY_MAVLINK": {
+		"message": "MAVLink"
+	},
+	"portsFunction_TELEMETRY_IBUS": {
+		"message": "IBUS"
+	},
+	"portsFunction_GSM_SMS": {
+		"message": "GSM SMS"
+	},
+	"portsFunction_TELEMETRY_MSP": {
+		"message": "MSP"
+	},
+	"portsFunction_TELEMETRY_SMARTPORT": {
+		"message": "SmartPort"
+	},
+	"portsFunction_SMARTPORT_MASTER": {
+		"message": "Κεντρική μονάδα SmartPort"
+	},
+	"portsFunction_RX_SERIAL": {
+		"message": "Σειριακός δέκτης"
+	},
+	"portsFunction_BLACKBOX": {
+		"message": "Blackbox"
+	},
+	"portsFunction_RUNCAM_DEVICE_CONTROL": {
+		"message": "Συσκευή RunCam"
+	},
+	"portsFunction_TBS_SMARTAUDIO": {
+		"message": "TBS SmartAudio"
+	},
+	"portsFunction_IRC_TRAMP": {
+		"message": "IRC Tramp"
+	},
+	"portsFunction_VTX_FFPV": {
+		"message": "FuriousFPV Vtx"
+	},
+	"portsFunction_FRSKY_OSD": {
+		"message": "FrSky OSD"
+	},
+	"portsFunction_DJI_FPV": {
+		"message": "DJI FPV VTX"
+	},
+	"portsFunction_MSP_DISPLAYPORT": {
+		"message": "MSP DisplayPort"
+	},
+	"portsFunction_SBUS_OUTPUT": {
+        "message": "Έξοδος SBus"
     },
-    "adjustmentsColumnThenApplyFunction": {
-    "message": "στη συνέχεια εφαρμόστε"
-},
-"adjustmentsColumnViaChannel": {
-    "message": "μέσω καναλιού"
-},
-"adjustmentsSlot0": {
-    "message": "Θέση 1"
-},
-"adjustmentsSlot1": {
-    "message": "Θέση 2"
-},
-"adjustmentsSlot2": {
-    "message": "Θέση 3"
-},
-"adjustmentsSlot3": {
-    "message": "Θέση 4"
-},
-"adjustmentsMin": {
-    "message": "Ελάχιστο"
-},
-"adjustmentsMax": {
-    "message": "Μέγιστο"
-},
-"adjustmentsGroupRates": {
-    "message": "Ρυθμοί & Expo"
-},
-"adjustmentsGroupPIDTuning": {
-    "message": "Ρύθμιση PID"
-},
-"adjustmentsGroupNavigationFlight": {
-    "message": "Πλοήγηση και Πτήση"
-},
-"adjustmentsGroupMisc": {
-    "message": "Διάφορα"
-},
-"adjustmentsFunction0": {
-    "message": "Χωρίς αλλαγές"
-},
-"adjustmentsFunction1": {
-    "message": "Προσαρμογή RC Rate"
-},
-"adjustmentsFunction2": {
-    "message": "Προσαρμογή RC Expo"
-},
-"adjustmentsFunction3": {
-    "message": "Προσαρμογή Throttle Expo"
-},
-"adjustmentsFunction4": {
-    "message": "Προσαρμογή Pitch & Roll Rate"
-},
-"adjustmentsFunction5": {
-    "message": "Προσαρμογή Yaw Rate"
-},
-"adjustmentsFunction6": {
-    "message": "Προσαρμογή Pitch & Roll P"
-},
-"adjustmentsFunction7": {
-    "message": "Προσαρμογή Pitch & Roll I"
-},
-"adjustmentsFunction8": {
-    "message": "Pitch & Roll D"
-},
-"adjustmentsFunction9": {
-    "message": "Προσαρμογή Pitch & Roll CD/FF"
-},
-"adjustmentsFunction10": {
-    "message": "Προσαρμογή Pitch P"
-},
-"adjustmentsFunction11": {
-    "message": "Προσαρμογή Pitch I"
-},
-"adjustmentsFunction12": {
-    "message": "Προσαρμογή Pitch D"
-},
-"adjustmentsFunction13": {
-    "message": "Προσαρμογή Pitch CD/FF"
-},
-"adjustmentsFunction14": {
-    "message": "Προσαρμογή Roll P"
-},
-"adjustmentsFunction15": {
-    "message": "Προσαρμογή Roll I"
-},
-"adjustmentsFunction16": {
-    "message": "Προσαρμογή Roll D"
-},
-"adjustmentsFunction17": {
-    "message": "Προσαρμογή Roll CD/FF"
-},
-"adjustmentsFunction18": {
-    "message": "Προσαρμογή Yaw P"
-},
-"adjustmentsFunction19": {
-    "message": "Προσαρμογή Yaw I"
-},
-"adjustmentsFunction20": {
-    "message": "Προσαρμογή Yaw D"
-},
-"adjustmentsFunction21": {
-    "message": "Προσαρμογή Yaw CD/FF"
-},
-"adjustmentsFunction22": {
-    "message": "Επιλογή Προφίλ Ρυθμού"
-},
-"adjustmentsFunction23": {
-    "message": "Ρυθμός Pitch"
-},
-"adjustmentsFunction24": {
-    "message": "Ρυθμός Roll"
-},
-"adjustmentsFunction25": {
-    "message": "Προσαρμογή RC Yaw Expo"
-},
-"adjustmentsFunction26": {
-    "message": "Προσαρμογή Manual RC Expo"
-},
-"adjustmentsFunction27": {
-    "message": "Προσαρμογή Manual RC Yaw Expo"
-},
-"adjustmentsFunction28": {
-    "message": "Προσαρμογή Manual Pitch & Roll Rate"
-},
-"adjustmentsFunction29": {
-    "message": "Προσαρμογή Manual Roll Rate"
-},
-"adjustmentsFunction30": {
-    "message": "Προσαρμογή Manual Pitch Rate"
-},
-"adjustmentsFunction31": {
-    "message": "Προσαρμογή Manual Yaw Rate"
-},
-"adjustmentsFunction32": {
-    "message": "Προσαρμογή Ρυθμού Cruise Throttle για σταθερές πτέρυγες"
-},
-"adjustmentsFunction33": {
-    "message": "Προσαρμογή Pitch σε Throttle για σταθερές πτέρυγες"
-},
-"adjustmentsFunction34": {
-    "message": "Προσαρμογή προσανατολισμού ελεγκτή πτήσης σε roll"
-},
-"adjustmentsFunction35": {
-    "message": "Προσαρμογή προσανατολισμού ελεγκτή πτήσης σε Pitch"
-},
-"adjustmentsFunction36": {
-    "message": "Προσαρμογή Level P"
-},
-"adjustmentsFunction37": {
-    "message": "Προσαρμογή Level I"
-},
-"adjustmentsFunction38": {
-    "message": "Προσαρμογή Level D"
-},
-"adjustmentsFunction39": {
-    "message": "Προσαρμογή Pos XY P"
-},
-"adjustmentsFunction40": {
-    "message": "Προσαρμογή Pos XY I"
-},
-"adjustmentsFunction41": {
-    "message": "Προσαρμογή Pos XY D"
-},
-"adjustmentsFunction42": {
-    "message": "Προσαρμογή Pos Z P"
-},
-"adjustmentsFunction43": {
-    "message": "Προσαρμογή Pos Z I"
-},
-"adjustmentsFunction44": {
-    "message": "Προσαρμογή Pos Z D"
-},
-"adjustmentsFunction45": {
-    "message": "Προσαρμογή Heading P"
-},
-"adjustmentsFunction46": {
-    "message": "Προσαρμογή Vel XY P"
-},
-"adjustmentsFunction47": {
-    "message": "Προσαρμογή Vel XY I"
-},
-"adjustmentsFunction48": {
-    "message": "Προσαρμογή Vel XY D"
-},
-"adjustmentsFunction49": {
-    "message": "Προσαρμογή Vel Z P"
-},
-"adjustmentsFunction50": {
-    "message": "Προσαρμογή Vel Z I"
-},
-"adjustmentsFunction51": {
-    "message": "Προσαρμογή Vel Z D"
-},
-"adjustmentsFunction52": {
-    "message": "Προσαρμογή γωνίας pitch σε σταθερή πτέρυγα"
-},
-"adjustmentsFunction53": {
-    "message": "Προσαρμογή επίπεδου ισχύος VTX"
-},
-"adjustmentsFunction54": {
-    "message": "Προσαρμογή Αδράνειας Ελέγχου Throttle PID (TPA)"
-},
-"adjustmentsFunction55": {
-    "message": "Προσαρμογή Σημείου Αλλαγής Αδράνειας Ελέγχου Throttle PID (TPA)"
-},
-"adjustmentsFunction56": {
-    "message": "Προσαρμογή Ελεγχομένης Απαλότητας"
-},
-"adjustmentsFunction57": {
-    "message": "σταθερά TPA για σταθερές πτέρυγες"
-},
-"adjustmentsFunction58": {
-    "message": "Προσαρμογή Επιπέδου Σταθεροποίησης"
-},
-"adjustmentsFunction59": {
-    "message": "Προσαρμογή Δείκτη Πολλαπλών Αποστολών"
-},
-"adjustmentsSave": {
-    "message": "Αποθήκευση"
-},
-"adjustmentsEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Προσαρμογές"
-},
-"programmingEepromSaved": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Προγραμματισμός"
-},
-"servosChangeDirection": {
-    "message": "Αλλαγή Κατεύθυνσης στον πομπό για ταιριαστή κατεύθυνση"
-},
-"servosName": {
-    "message": "Όνομα"
-},
-"servosMid": {
-    "message": "Μέσο"
-},
-"servosMin": {
-    "message": "Ελάχιστο"
-},
-"servosMax": {
-    "message": "Μέγιστο"
-},
-"servosReverse": {
-    "message": "Αντιστροφή"
-},
-"servoOutput": {
-    "message": "Έξοδος"
-},
-"servosRate": {
-    "message": "Ρυθμός (%)"
-},
-"servosLiveMode": {
-    "message": "Ενεργοποίηση λειτουργίας ζωντανής εμφάνισης"
-},
-"servosButtonSave": {
-    "message": "Αποθήκευση"
-},
-"servosNormal": {
-    "message": "Κανονικό"
-},
-"servoEmptyTableInfo": {
-    "message": "Δεν έχουν διαμορφωθεί servos. Προσθέστε τα χρησιμοποιώντας την καρτέλα Mixer."
-},
-"servosEepromSave": {
-    "message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
-},
-"mixerSaved": {
-    "message": "Mixer <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
-},
-"mixerWizard": {
-    "message": "Οδηγός Mixer"
-},
-"mixerWizardInfo": {
-    "message": "<ol><li>Αφαιρέστε τις προπέλες</li><li>Συνδέστε τη LiPo μπαταρία και χρησιμοποιήστε την καρτέλα Outputs για να δοκιμάσετε όλους τους κινητήρες</li><li>Σημειώστε τη θέση κάθε κινητήρα (κινητήρας #1 - Πάνω Αριστερά και ούτω καθεξής)</li><li>Συμπληρώστε τον παρακάτω πίνακα</li></ol>"
-},
-"gpsHead": {
-    "message": "Θέση"
-},
-"gpsStatHead": {
-    "message": "Στατιστικά"
-},
-"gpsMapHead": {
-    "message": "Τρέχουσα θέση GPS"
-},
-"gpsMapMessage1": {
-    "message": "Παρακαλώ ελέγξτε τη σύνδεσή σας στο internet"
-},
-"gpsMapMessage2": {
-    "message": "Αναμονή για GPS 3D fix…"
-},
-"gpsFix": {
-    "message": "Τύπος Fix:"
-},
-"gpsFix2D": {
-    "message": "<span class=\"fix2d\">2D</span>"
-},
-"gpsFix3D": {
-    "message": "<span class=\"fix3d\">3D</span>"
-},
-"gpsFixNone": {
-    "message": "<span class=\"fixnone\">Κανένα</span>"
-},
-"gpsAltitude": {
-    "message": "Υψόμετρο:"
+	"pidTuning_ShowAllPIDs": {
+		"message": "Εμφάνιση όλων των PIDs"
+	},
+	"pidTuning_SelectNewDefaults": {
+		"message": "Επιλογή νέων προεπιλεγμένων τιμών"
+	},
+	"pidTuning_ResetPIDController": {
+		"message": "Επαναφορά PID ελεγκτή"
+	},
+	"pidTuning_PIDgains": {
+		"message": "Κέρδη PID"
+	},
+	"pidTuning_Name": {
+		"message": "Όνομα"
+	},
+	"pidTuning_Proportional": {
+		"message": "Proportional"
+	},
+	"pidTuning_Integral": {
+		"message": "Integral"
+	},
+	"pidTuning_Derivative": {
+		"message": "Derivative"
+	},
+	"pidTuning_FeedForward": {
+		"message": "FeedForward"
+	},
+	"pidTuning_ControlDerivative": {
+		"message": "Derivative ελέγχου"
+	},
+	"pidTuning_Basic": {
+		"message": "Βασικό/Acro"
+	},
+	"pidTuning_Level": {
+		"message": "Angle/Horizon"
+	},
+	"pidTuning_Altitude": {
+		"message": "Βαρόμετρο & Sonar/Υψόμετρο"
+	},
+	"pidTuning_Mag": {
+		"message": "Μαγνητόμετρο/Κατεύθυνση"
+	},
+	"pidTuning_GPS": {
+		"message": "Πλοήγηση GPS"
+	},
+	"pidTuning_LevelP": {
+		"message": "Ισχύς"
+	},
+	"pidTuning_LevelI": {
+		"message": "Φίλτρο χαμηλής πέρασης (Hz)"
+	},
+	"pidTuning_LevelD": {
+		"message": "Μετάβαση (Horizon)"
+	},
+	"pidTuning_LevelHelp": {
+		"message": "Οι τιμές παρακάτω αλλάζουν τη συμπεριφορά των λειτουργιών πτήσης Angle και Horizon. Διάφοροι PID ελεγκτές χειρίζονται διαφορετικά τις τιμές Level. Παρακαλούμε ελέγξτε την τεκμηρίωση."
+	},
+	"pidTuning_RatesAndExpo": {
+		"message": "Ρυθμοί & Expo"
+	},
+	"pidTuning_RateDynamics": {
+		"message": "Δυναμικά Ρυθμών"
+	},
+	"pidTuning_RateDynamics_Sensitivity": {
+		"message": "Ευαισθησία"
+	},
+	"pidTuning_RateDynamics_Correction": {
+		"message": "Διόρθωση"
+	},
+	"pidTuning_RateDynamics_Weight": {
+		"message": "Βάρος"
+	},
+	"pidTuning_RateDynamics_Center": {
+		"message": "Κέντρο"
+	},
+	"pidTuning_RateDynamics_End": {
+		"message": "Τέλος"
+	},
+	"pidTuning_RollPitchRate": {
+		"message": "Ρυθμός ROLL &amp; PITCH"
+	},
+	"pidTuning_RollRate": {
+		"message": "Ρυθμός ROLL"
+	},
+	"pidTuning_PitchRate": {
+		"message": "Ρυθμός PITCH"
+	},
+	"pidTuning_YawRate": {
+		"message": "Ρυθμός YAW"
+	},
+	"pidTuning_RollAndPitchExpo": {
+		"message": "Expo ROLL & PITCH"
+	},
+	"pidTuning_YawExpo": {
+		"message": "Expo YAW"
+	},
+	"pidTuning_MaxRollAngle": {
+		"message": "Μέγιστη γωνία ROLL"
+	},
+	"pidTuning_MaxRollAngleHelp": {
+		"message": "Μέγιστη γωνία ROLL στη λειτουργία Angle. Αυτό περιορίζει επίσης τη μέγιστη κλίση στις λειτουργίες πλοήγησης."
+	},
+	"pidTuning_MaxPitchAngle": {
+		"message": "Μέγιστη γωνία PITCH"
+		},
+	   "pidTuning_MaxPitchAngleHelp": {
+		"message": "Μέγιστη γωνία PITCH σε λειτουργία Angle. Αυτό περιορίζει επίσης το μέγιστο ανέβασμα και κατεβασμα σε λειτουργίες πλοήγησης."
+	},
+	"pidTuning_ManualRollRate": {
+		"message": "Χειροκίνητος ρυθμός ROLL"
+	},
+	"pidTuning_ManualPitchRate": {
+		"message": "Χειροκίνητος ρυθμός PITCH"
+	},
+	"pidTuning_ManualYawRate": {
+		"message": "Χειροκίνητος ρυθμός YAW"
+	},
+	"pidTuning_magHoldYawRate": {
+		"message": "Όριο ρυθμού διατήρησης κατεύθυνσης"
+	},
+	"pidTuning_MagHoldYawRateHelp": {
+		"message": "Μέγιστος ρυθμός περιστροφής YAW που μπορεί να απαιτήσει ο ελεγκτής MagHold από το UAV. Χρησιμοποιείται μόνο όταν είναι ενεργοποιημένη η λειτουργία MagHold, κατά την επιστροφή στη βάση και την πλοήγηση σε σημεία. Τιμές κάτω από 30dps δίνουν ωραίες «κινηματογραφικές» στροφές."
+	},
+	"pidTuning_Filters": {
+		"message": "Φίλτρα"
+	},
+	"pidTuning_mainFilters": {
+		"message": "Φίλτρα γυροσκοπίου"
+	},
+	"pidTuning_advancedFilters": {
+		"message": "Προηγμένα φίλτρα γυροσκοπίου"
+	},
+	"pidTuning_gyro_main_lpf_hz": {
+		"message": "Κυρίως συχνότητα lpf γυροσκοπίου"
+	},
+	"pidTuning_gyro_main_lpf_hz_help": {
+		"message": "Υψηλότερες τιμές προσφέρουν χαμηλή καθυστέρηση αλλά περισσότερο θόρυβο. Χαμηλότερες τιμές προσφέρουν λιγότερο θόρυβο, αλλά περισσότερη καθυστέρηση στην επεξεργασία του γυροσκοπίου."
+	},
+	"pidTuning_MatrixFilterMinFrequency": {
+		"message": "Ελάχιστη συχνότητα Matrix"
+	},
+	"pidTuning_MatrixFilterMinFrequencyHelp": {
+		"message": "Ελάχιστη συχνότητα για το Matrix. Η τιμή θα πρέπει να εξαρτάται από το μέγεθος του προπέλας. Τα 150Hz δουλεύουν καλά με προπέλες 5&quot; και μικρότερες. Για προπέλες 7&quot; και μεγαλύτερες, ακόμα χαμηλότερα ακόμα και κάτω από τα 100Hz."
+	},
+	"pidTuning_MatrixFilterQFactor": {
+		"message": "Συντελεστής Q Matrix"
+	},
+	"pidTuning_MatrixFilterQFactorHelp": {
+		"message": "Όσο υψηλότερη η τιμή, τόσο μεγαλύτερη η εκλεκτικότητα του Matrix. Συνιστώνται τιμές μεταξύ 150 και 300."
+	},
+	"pidTuning_UnicornFilterQFactor": {
+		"message": "Συντελεστής Q Φίλτρου Unicorn"
+	},
+	"pidTuning_dtermFilters": {
+		"message": "Φίλτρα D-term"
+	},
+	"pidTuning_dtermLpfCutoffFrequency": {
+		"message": "Συχνότητα lpf D-term"
+	},
+	"pidTuning_dtermLpfCutoffFrequencyHelp": {
+		"message": "Φίλτρο αποκοπής χαμηλής περίοδου για Dterm για όλους τους PID ελεγκτές."
+	},
+	"pidTuning_rpmFilters": {
+		"message": "Φίλτρα γυροσκοπίου RPM"
+	},
+	"pidTuning_rpm_gyro_filter_enabled": {
+		"message": "Φίλτρο γυροσκοπίου RPM (απαιτεί τηλεμετρία ESC)"
+	},
+	"pidTuning_rpm_gyro_min_hz": {
+		"message": "Ελάχιστη συχνότητα γυροσκοπίου RPM"
+	},
+	"pidTuning_Mechanics": {
+		"message": "Μηχανικές"
+	},
+	"pidTuning_ITermMechanics": {
+		"message": "Μηχανική I-term"
+	},
+	"pidTuning_itermRelaxCutoff": {
+		"message": "Συχνότητα αποκοπής lpf Iterm Relax"
+	},
+	"pidTuning_itermRelaxCutoffHelp": {
+		"message": "Οι χαμηλότερες τιμές ανοίγουν ένα μεγαλύτερο χρονικό παράθυρο για το Iterm Relax να λειτουργήσει και ισχυρότερη κατάσταση Iterm. Οι υψηλότερες τιμές μειώνουν τα χρονικά παράθυρα και μειώνουν την κατάσταση κατάστασης."
+	},
+	"pidTuning_antigravityGain": {
+		"message": "Κέρδος αντιβαρύτητας"
+	},
+	"pidTuning_antigravityAccelerator": {
+		"message": "Επιταχυντής αντιβαρύτητας"
+	},
+	"pidTuning_antigravityCutoff": {
+		"message": "Συχνότητα αποκοπής αντιβαρύτητας"
+	},
+	"pidTuning_itermBankAngleFreeze": {
+		"message": "Πάγωμα γωνίας κλίσης Iterm"
+	},
+	"pidTuning_itermBankAngleFreezeHelp": {
+		"message": "Πάγωμα του Iterm όταν το αεροσκάφος κλίνεται περισσότερο από αυτό τον αριθμό μοιρών. Αυτό βοηθάει να σταματήσει το ρότορα να αντιδράσει στην στροφή. Η τιμή 0 απενεργοποιεί αυτήν τη λειτουργία. Ισχύει μόνο για αεροσκάφη με σταθερή πτέρυγα."
+	},
+	"pidTuning_dTermMechanics": {
+		"message": "Μηχανική D-term"
+	},
+	"pidTuning_d_boost_min": {
+		"message": "Ελάχιστη κλίμακα D-Boost"
+		},
+		"pidTuning_d_boost_min_help": {
+		"message": "Καθορίζει το μέγιστο επιτρεπόμενο Dterm απόκοψη κατά τη φάση επιτάχυνσης του μοχλού. Η τιμή 1.0 σημαίνει ότι το Dterm δεν αποκόπτεται. Η τιμή 0.5 σημαίνει ότι επιτρέπεται να συρρικνωθεί κατά το μισό. Χαμηλότερες τιμές οδηγούν σε πιο γρήγορη απόκριση κατά τη γρήγορη κίνηση του μοχλού."
+	},
+	"pidTuning_d_boost_max": {
+		"message": "Μέγιστη κλίμακα D-Boost"
+	},
+	"pidTuning_d_boost_max_help": {
+		"message": "Καθορίζει τη μέγιστη ενίσχυση Dterm όταν επιτυγχάνεται μέγιστη γωνιακή επιτάχυνση. Η τιμή 1.0 σημαίνει ότι το D-Boost είναι απενεργοποιημένο, 2.0 σημαίνει ότι το Dterm επιτρέπεται να αυξηθεί κατά 100%. Τιμές μεταξύ 1.5 και 1.7 είναι συνήθως το ιδανικό σημείο."
+	},
+	"pidTuning_d_boost_max_at_acceleration": {
+		"message": "Κορυφή D-Boost κατά την επιτάχυνση [dps^2]"
+	},
+	"pidTuning_d_boost_max_at_acceleration_help": {
+		"message": "Το D-Boost είναι πλήρως ενεργό όταν η γωνιακή επιτάχυνση (είτε ανιχνεύεται από το γυροσκόπιο είτε από τον στόχο ρυθμού) επιτυγχάνει τη δοθείσα επιτάχυνση. Ανάμεσα στο 0 και σε αυτήν την τιμή, ο παράγοντας D-Boost κλιμακώνεται γραμμικά."
+	},
+	"pidTuning_d_boost_gyro_delta_lpf_hz": {
+		"message": "D-Boost γυροσκοπίου LPF"
+	},
+	"pidTuning_d_boost_gyro_delta_lpf_hz_help": {
+		"message": "Θα πρέπει να οριστεί στη συχνότητα των ταλαντώσεων της αεροτομής της προπέλας. Τα τετρακόπτερα 5 ιντσών λειτουργούν καλύτερα στα περίπου 80Hz, τα τετρακόπτερα 7 ιντσών στα περίπου 50Hz"
+	},
+	"pidTuning_tpaMechanics": {
+		"message": "Απόκοψη PID επιτάχυνσης κινητήρα"
+	},
+	"pidTuning_TPA": {
+		"message": "Απόκοψη PID επιτάχυνσης κινητήρα (TPA)"
+	},
+	"pidTuning_TPABreakPoint": {
+		"message": "Σημείο απόκοψης TPA"
+	},
+	"pidTuning_FW_TPATimeConstant": {
+		"message": "Σταθερά TPA σταθερής πτέρυγας"
+	},
+	"pidTuning_FW_TPATimeConstantHelp": {
+		"message": "Σταθερή περίοδος χρόνου εξομάλυνσης και καθυστέρησης για να αντικατοπτρίζει τη μη-άμεση απόκριση της ταχύτητας/γκαζιού του αεροσκάφους."
+	},
+	"pidTuning_fwLevelTrimMechanics": {
+		"message": "Σταθερή ρύθμιση επιπέδου πτέρυγας"
+	},
+	"pidTuning_fw_level_pitch_trim": {
+		"message": "Ρύθμιση επιπέδου [μοίρες]"
+	},
+	"pidTuning_fw_level_pitch_trim_help": {
+		"message": "Ρύθμιση κλίσης για λειτουργίες πτήσης αυτο-εξομάλυνσης. Σε μοίρες. +5 σημαίνει ότι το μπροστινό μέρος του αεροπλάνου πρέπει να ανυψωθεί κατά 5 μοίρες από το οριζόντιο επίπεδο."
+	},
+	"pidTuning_ButtonSave": {
+		"message": "Αποθήκευση"
+	},
+	"pidTuning_ButtonRefresh": {
+		"message": "Ανανέωση"
+	},
+	"pidTuning_ProfileHead": {
+		"message": "Προφίλ"
+	},
+	"pidTuning_LoadedProfile": {
+		"message": "Φορτωμένο προφίλ: <strong style=\"color: #37a8db\">$1</strong>"
+	},
+	"pidTuning_gyro_use_dyn_lpf": {
+		"message": "Δυναμικό φίλτρο lpf γυροσκοπίου"
+	},
+	"pidTuning_gyro_use_dyn_lpf_help": {
+		"message": "Όταν είναι ενεργοποιημένο, η κυρίως συχνότητα φίλτρου lpf γυροσκοπίου προσαρμόζεται αυτόματα με βάση την τρέχουσα θέση του γκάζιου. Όταν απενεργοποιηθεί, χρησιμοποιείται στατική lpf."
+	},
+	"pidTuning_gyro_dyn_lpf_min_hz": {
+		"message": "Δυναμική ελάχιστη συχνότητα lpf"
+	},
+	"pidTuning_gyro_dyn_lpf_max_hz": {
+		"message": "Δυναμική μέγιστη συχνότητα lpf"
+	},
+	"pidTuning_gyro_dyn_lpf_curve_expo": {
+		"message": "Δυναμική καμπύλη ελέγχου ελάχιστης συχνότητας lpf"
+	},
+	"pidTuning_gyro_dyn_lpf_min_hz_help": {
+		"message": "Καθορίζει τη συχνότητα αποκοπής φίλτρου γυροσκοπίου στο ελάχιστο γκάζι. Όταν το γκάζι αυξάνεται, η συχνότητα αποκοπής φίλτρου αυξάνεται επίσης, μέχρι τη μέγιστη συχνότητα αποκοπής."
+	},
+	"pidTuning_gyro_dyn_lpf_max_hz_help": {
+		"message": "Καθορίζει τη συχνότητα αποκοπής φίλτρου γυροσκοπίου στο μέγιστο γκάζι. Όταν το γκάζι μειώνεται, η συχνότητα αποκοπής φίλτρου μειώνεται επίσης, μέχρι την ελάχιστη συχνότητα αποκοπής."
+	},
+	"loadedMixerProfile": {
+        "message": "φορτωμένο προφίλ Mixer: <strong style=\"color: #37a8db\">$1</strong>, ελέγξετε στην καρτέλα επιλογή λειτουργειών: MIXER PROFILE 2 εάν δεν παρατηρείτε τις αλλαγές"
+    },
+	"loadedBatteryProfile": {
+		"message": "Φορτωμένο προφίλ μπαταρίας: <strong style=\"color: #37a8db\">$1</strong>"
+	},
+	"pidTuningDataRefreshed": {
+		"message": "Δεδομένα PID <strong>ανανεώθηκαν</strong>"
+	},
+	"pidTuningEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Ρύθμιση PID"
+	},
+
+	"receiverHelp": {
+		"message": "Παρακαλώ διαβάστε το κεφάλαιο του δέκτη του εγχειριδίου. Ρυθμίστε τη σειριακή θύρα (εάν απαιτείται), τη λειτουργία δέκτη (σειριακή/ppm/pwm), τον πάροχο (για σειριακούς δέκτες), δέστε το δέκτη, ορίστε τον χάρτη καναλιού, ρυθμίστε τις άκρες/εύρος του καναλιού στον πομπό, έτσι ώστε όλα τα κανάλια να πηγαίνουν από περίπου 1000 έως περίπου 2000. Ορίστε το μεσαίο σημείο (προεπιλεγμένο 1500), ρυθμίστε τα κανάλια σε 1500, διορθώστε το deadband του μοχλού, επαληθεύστε τη συμπεριφορά όταν ο πομπός είναι απενεργοποιημένος ή εκτός εμβέλειας. Βεβαιωθείτε ότι οι τιμές του καναλιού αυξάνονται όλες όταν σπρώχνετε τα μοχλούς προς τα πάνω και προς τα δεξιά. Εάν όχι, αντιστρέψτε το κανάλι στον πομπό. Μην εφαρμόζετε κανένα άλλο μίξιμο στον πομπό. <br /><span style=\"color: red\">ΣΗΜΑΝΤΙΚΟ:</span> Πριν από την πτήση, διαβάστε το κεφάλαιο Failsafe του εγχειριδίου και ρυθμίστε το Failsafe."
+	},
+	"receiverThrottleMid": {
+		"message": "Κέντρο γκάζιου"
+	},
+	"receiverThrottleExpo": {
+		"message": "Expo γκάζιου"
+	},
+	"receiverRcRate": {
+		"message": "Ρυθμός RC"
+	},
+	"receiverDeadband": {
+		"message": "RC deadband"
+	},
+	"receiverHelpDeadband": {
+		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν τα είσοδος RC κουνιέται κατά τη διάρκεια της αδράνειας."
+	},
+	"receiverHelpYawDeadband": {
+		"message": "Αυτές είναι οι τιμές (σε μικροδευτερόλεπτα) με τις οποίες μπορεί να διαφέρει η είσοδος RC πριν θεωρηθεί έγκυρη. Για πομπούς με θόρυβο στις εξόδους, αυτή η τιμή μπορεί να αυξηθεί εάν τα είσοδος RC κουνιέται κατά τη διάρκεια της αδράνειας. <strong>Αυτή η ρύθμιση αφορά μόνο το γύρο.</strong>"
+	},
+	"receiverYawDeadband": {
+		"message": "YawDeadband"
+	},
+	"receiverRcExpo": {
+		"message": "Expo RC"
+	},
+	"receiverRcYawExpo": {
+		"message": "RcYawExpo"
+	},
+	"receiverManualRcExpo": {
+		"message": "Χειροκίνητo RC Expo"
+	},
+	"receiverManualRcYawExpo": {
+		"message": "Χειροκίνητo RcYawExpo"
+	},
+	"receiverChannelMap": {
+		"message": "ChannelMap"
+	},
+	"receiverChannelMapTitle": {
+		"message": "Μπορείτε να ορίσετε τον δικό σας ChannelMap κάνοντας κλικ μέσα στο κουτί"
+	},
+	"receiverRssiChannel": {
+		"message": "Κανάλι RSSI"
+	},
+	"receiverRefreshRateTitle": {
+		"message": "Ρυθμός ανανέωσης γραφήματος"
+	},
+	"receiverButtonSave": {
+		"message": "Αποθήκευση"
+	},
+	"receiverButtonRefresh": {
+		"message": "Ανανέωση"
+	},
+	"receiverButtonSticks": {
+		"message": "Μοχλοί ελέγχου"
+	},
+	"receiverDataRefreshed": {
+		"message": "Δεδομένα ρύθμισης RC <strong>ανανεώθηκαν</strong>"
+	},
+	"receiverEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Δέκτης"
+	},
+
+	"auxiliaryHelp": {
+		"message": "Χρησιμοποιήστε τις περιοχές για να ορίσετε τους διακόπτες στον πομπό σας και τις αντίστοιχες αναθέσεις λειτουργιών. Ένα κανάλι δέκτη που δίνει μια ανάγνωση μεταξύ μιας ελάχιστης/μέγιστης περιοχής θα ενεργοποιήσει τη λειτουργία. Μην ξεχάσετε να αποθηκεύσετε τις ρυθμίσεις σας χρησιμοποιώντας το κουμπί 'Αποθήκευση'."
+	},
+	"auxiliaryToggleUnused": {
+		"message": "Απόκρυψη αχρησιμοποίητων λειτουργιών"
+	},
+	"auxiliaryMin": {
+		"message": "Ελάχιστο"
+	},
+	"auxiliaryMax": {
+		"message": "Μέγιστο"
+	},
+	"auxiliaryAddRange": {
+		"message": "Προσθήκη εύρους"
+	},
+	"auxiliaryAutoChannelSelect": {
+		"message": "ΑΥΤΟΜΑΤΟ"
+	},
+	"auxiliaryButtonSave": {
+		"message": "Αποθήκευση"
+	},
+	"auxiliaryEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
+	},
+
+	"adjustmentsHelp": {
+		"message": "Ρυθμίστε τους διακόπτες προσαρμογής. Δείτε την ενότητα 'ρυθμίσεις κατά τη διάρκεια πτήσης' του εγχειριδίου για λεπτομέρειες. Οι αλλαγές που κάνουν οι λειτουργίες προσαρμογής δεν αποθηκεύονται αυτόματα. Υπάρχουν 4 θέσεις. Κάθε διακόπτης που χρησιμοποιείται για να κάνει παράλληλα προσαρμογές απαιτεί αποκλειστική χρήση μιας θέσης."
+	},
+	"adjustmentsExamples": {
+		"message": "Παραδείγματα"
+	},
+	"adjustmentsExample1": {
+		"message": "Χρησιμοποιήστε τη Θέση 1 και έναν διακόπτη 3 θέσεων στο CH5 για να επιλέξετε μεταξύ Pitch/Roll P, I και D και άλλον έναν διακόπτη 3 θέσεων στο CH6 για να αυξήσετε ή να μειώσετε την τιμή όταν κρατηθεί προς τα πάνω ή προς τα κάτω."
+	},
+	"adjustmentsExample2": {
+		"message": "Χρησιμοποιήστε τη Θέση 2 και έναν διακόπτη 3 θέσεων στο CH8 για να ενεργοποιήσετε την επιλογή επιλογής του προφίλ ρυθμού μέσω του ίδιου διακόπτη 3 θέσεων στον ίδιο κανάλι."
+	},
+	"adjustmentsColumnEnable": {
+		"message": "Εάν είναι ενεργοποιημένο"
+	},
+	"adjustmentsColumnUsingSlot": {
+		"message": "χρησιμοποιώντας θέση"
+	},
+	"adjustmentsColumnWhenChannel": {
+		"message": "όταν το κανάλι"
+	},
+	"adjustmentsColumnIsInRange": {
+		"message": "είναι εντός του εύρους"
+		},
+		"adjustmentsColumnThenApplyFunction": {
+		"message": "στη συνέχεια εφαρμόστε"
+	},
+	"adjustmentsColumnViaChannel": {
+		"message": "μέσω καναλιού"
+	},
+	"adjustmentsSlot0": {
+		"message": "Θέση 1"
+	},
+	"adjustmentsSlot1": {
+		"message": "Θέση 2"
+	},
+	"adjustmentsSlot2": {
+		"message": "Θέση 3"
+	},
+	"adjustmentsSlot3": {
+		"message": "Θέση 4"
+	},
+	"adjustmentsMin": {
+		"message": "Ελάχιστο"
+	},
+	"adjustmentsMax": {
+		"message": "Μέγιστο"
+	},
+	"adjustmentsGroupRates": {
+		"message": "Ρυθμοί & Expo"
+	},
+	"adjustmentsGroupPIDTuning": {
+		"message": "Ρύθμιση PID"
+	},
+	"adjustmentsGroupNavigationFlight": {
+		"message": "Πλοήγηση και Πτήση"
+	},
+	"adjustmentsGroupMisc": {
+		"message": "Διάφορα"
+	},
+	"adjustmentsFunction0": {
+		"message": "Χωρίς αλλαγές"
+	},
+	"adjustmentsFunction1": {
+		"message": "Προσαρμογή RC Rate"
+	},
+	"adjustmentsFunction2": {
+		"message": "Προσαρμογή RC Expo"
+	},
+	"adjustmentsFunction3": {
+		"message": "Προσαρμογή Throttle Expo"
+	},
+	"adjustmentsFunction4": {
+		"message": "Προσαρμογή Pitch & Roll Rate"
+	},
+	"adjustmentsFunction5": {
+		"message": "Προσαρμογή Yaw Rate"
+	},
+	"adjustmentsFunction6": {
+		"message": "Προσαρμογή Pitch & Roll P"
+	},
+	"adjustmentsFunction7": {
+		"message": "Προσαρμογή Pitch & Roll I"
+	},
+	"adjustmentsFunction8": {
+		"message": "Pitch & Roll D"
+	},
+	"adjustmentsFunction9": {
+		"message": "Προσαρμογή Pitch & Roll CD/FF"
+	},
+	"adjustmentsFunction10": {
+		"message": "Προσαρμογή Pitch P"
+	},
+	"adjustmentsFunction11": {
+		"message": "Προσαρμογή Pitch I"
+	},
+	"adjustmentsFunction12": {
+		"message": "Προσαρμογή Pitch D"
+	},
+	"adjustmentsFunction13": {
+		"message": "Προσαρμογή Pitch CD/FF"
+	},
+	"adjustmentsFunction14": {
+		"message": "Προσαρμογή Roll P"
+	},
+	"adjustmentsFunction15": {
+		"message": "Προσαρμογή Roll I"
+	},
+	"adjustmentsFunction16": {
+		"message": "Προσαρμογή Roll D"
+	},
+	"adjustmentsFunction17": {
+		"message": "Προσαρμογή Roll CD/FF"
+	},
+	"adjustmentsFunction18": {
+		"message": "Προσαρμογή Yaw P"
+	},
+	"adjustmentsFunction19": {
+		"message": "Προσαρμογή Yaw I"
+	},
+	"adjustmentsFunction20": {
+		"message": "Προσαρμογή Yaw D"
+	},
+	"adjustmentsFunction21": {
+		"message": "Προσαρμογή Yaw CD/FF"
+	},
+	"adjustmentsFunction22": {
+		"message": "Επιλογή Προφίλ Ρυθμού"
+	},
+	"adjustmentsFunction23": {
+		"message": "Ρυθμός Pitch"
+	},
+	"adjustmentsFunction24": {
+		"message": "Ρυθμός Roll"
+	},
+	"adjustmentsFunction25": {
+		"message": "Προσαρμογή RC Yaw Expo"
+	},
+	"adjustmentsFunction26": {
+		"message": "Προσαρμογή Manual RC Expo"
+	},
+	"adjustmentsFunction27": {
+		"message": "Προσαρμογή Manual RC Yaw Expo"
+	},
+	"adjustmentsFunction28": {
+		"message": "Προσαρμογή Manual Pitch & Roll Rate"
+	},
+	"adjustmentsFunction29": {
+		"message": "Προσαρμογή Manual Roll Rate"
+	},
+	"adjustmentsFunction30": {
+		"message": "Προσαρμογή Manual Pitch Rate"
+	},
+	"adjustmentsFunction31": {
+		"message": "Προσαρμογή Manual Yaw Rate"
+	},
+	"adjustmentsFunction32": {
+		"message": "Προσαρμογή Ρυθμού Cruise Throttle για σταθερές πτέρυγες"
+	},
+	"adjustmentsFunction33": {
+		"message": "Προσαρμογή Pitch σε Throttle για σταθερές πτέρυγες"
+	},
+	"adjustmentsFunction34": {
+		"message": "Προσαρμογή προσανατολισμού ελεγκτή πτήσης σε roll"
+	},
+	"adjustmentsFunction35": {
+		"message": "Προσαρμογή προσανατολισμού ελεγκτή πτήσης σε Pitch"
+	},
+	"adjustmentsFunction36": {
+		"message": "Προσαρμογή Level P"
+	},
+	"adjustmentsFunction37": {
+		"message": "Προσαρμογή Level I"
+	},
+	"adjustmentsFunction38": {
+		"message": "Προσαρμογή Level D"
+	},
+	"adjustmentsFunction39": {
+		"message": "Προσαρμογή Pos XY P"
+	},
+	"adjustmentsFunction40": {
+		"message": "Προσαρμογή Pos XY I"
+	},
+	"adjustmentsFunction41": {
+		"message": "Προσαρμογή Pos XY D"
+	},
+	"adjustmentsFunction42": {
+		"message": "Προσαρμογή Pos Z P"
+	},
+	"adjustmentsFunction43": {
+		"message": "Προσαρμογή Pos Z I"
+	},
+	"adjustmentsFunction44": {
+		"message": "Προσαρμογή Pos Z D"
+	},
+	"adjustmentsFunction45": {
+		"message": "Προσαρμογή Heading P"
+	},
+	"adjustmentsFunction46": {
+		"message": "Προσαρμογή Vel XY P"
+	},
+	"adjustmentsFunction47": {
+		"message": "Προσαρμογή Vel XY I"
+	},
+	"adjustmentsFunction48": {
+		"message": "Προσαρμογή Vel XY D"
+	},
+	"adjustmentsFunction49": {
+		"message": "Προσαρμογή Vel Z P"
+	},
+	"adjustmentsFunction50": {
+		"message": "Προσαρμογή Vel Z I"
+	},
+	"adjustmentsFunction51": {
+		"message": "Προσαρμογή Vel Z D"
+	},
+	"adjustmentsFunction52": {
+		"message": "Προσαρμογή γωνίας pitch σε σταθερή πτέρυγα"
+	},
+	"adjustmentsFunction53": {
+		"message": "Προσαρμογή επίπεδου ισχύος VTX"
+	},
+	"adjustmentsFunction54": {
+		"message": "Προσαρμογή Αδράνειας Ελέγχου Throttle PID (TPA)"
+	},
+	"adjustmentsFunction55": {
+		"message": "Προσαρμογή Σημείου Αλλαγής Αδράνειας Ελέγχου Throttle PID (TPA)"
+	},
+	"adjustmentsFunction56": {
+		"message": "Προσαρμογή Ελεγχομένης Απαλότητας"
+	},
+	"adjustmentsFunction57": {
+		"message": "σταθερά TPA για σταθερές πτέρυγες"
+	},
+	"adjustmentsFunction58": {
+		"message": "Προσαρμογή Επιπέδου Σταθεροποίησης"
+	},
+	"adjustmentsFunction59": {
+		"message": "Προσαρμογή Δείκτη Πολλαπλών Αποστολών"
+	},
+	"adjustmentsSave": {
+		"message": "Αποθήκευση"
+	},
+	"adjustmentsEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Προσαρμογές"
+	},
+	"programmingEepromSaved": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>: Προγραμματισμός"
+	},
+	"servosChangeDirection": {
+		"message": "Αλλαγή Κατεύθυνσης στον πομπό για ταιριαστή κατεύθυνση"
+	},
+	"servosName": {
+		"message": "Όνομα"
+	},
+	"servosMid": {
+		"message": "Μέσο"
+	},
+	"servosMin": {
+		"message": "Ελάχιστο"
+	},
+	"servosMax": {
+		"message": "Μέγιστο"
+	},
+	"servosReverse": {
+		"message": "Αντιστροφή"
+	},
+	"servoOutput": {
+		"message": "Έξοδος"
+	},
+	"servosRate": {
+		"message": "Ρυθμός (%)"
+	},
+	"servosLiveMode": {
+		"message": "Ενεργοποίηση λειτουργίας ζωντανής εμφάνισης"
+	},
+	"servosButtonSave": {
+		"message": "Αποθήκευση"
+	},
+	"servosNormal": {
+		"message": "Κανονικό"
+	},
+	"servoEmptyTableInfo": {
+		"message": "Δεν έχουν διαμορφωθεί servos. Προσθέστε τα χρησιμοποιώντας την καρτέλα Mixer."
+	},
+	"servosEepromSave": {
+		"message": "EEPROM <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
+	},
+	"mixerSaved": {
+		"message": "Mixer <span style=\"color: #37a8db\">αποθηκεύτηκε</span>"
+	},
+	"mixerWizard": {
+		"message": "Οδηγός Mixer"
+	},
+	"mixerWizardInfo": {
+		"message": "<ol><li>Αφαιρέστε τις προπέλες</li><li>Συνδέστε τη LiPo μπαταρία και χρησιμοποιήστε την καρτέλα Outputs για να δοκιμάσετε όλους τους κινητήρες</li><li>Σημειώστε τη θέση κάθε κινητήρα (κινητήρας #1 - Πάνω Αριστερά και ούτω καθεξής)</li><li>Συμπληρώστε τον παρακάτω πίνακα</li></ol>"
+	},
+	"gpsHead": {
+		"message": "Θέση"
+	},
+	"gpsStatHead": {
+		"message": "Στατιστικά"
+	},
+	"gpsMapHead": {
+		"message": "Τρέχουσα θέση GPS"
+	},
+	"gpsMapMessage1": {
+		"message": "Παρακαλώ ελέγξτε τη σύνδεσή σας στο internet"
+	},
+	"gpsMapMessage2": {
+		"message": "Αναμονή για GPS 3D fix…"
+	},
+	"gpsFix": {
+		"message": "Τύπος Fix:"
+	},
+	"gpsFix2D": {
+		"message": "<span class=\"fix2d\">2D</span>"
+	},
+	"gpsFix3D": {
+		"message": "<span class=\"fix3d\">3D</span>"
+	},
+	"gpsFixNone": {
+		"message": "<span class=\"fixnone\">Κανένα</span>"
+	},
+	"gpsAltitude": {
+		"message": "Υψόμετρο:"
     },
     "gpsLat": {
         "message": "Γεωγραφικό πλάτος:"
@@ -2147,7 +2165,7 @@
         "message": "MSC"
     },
     "cliDiffAllBtn": {
-        "message": "Διαφοροποίηση Όλων"
+        "message": "Diff All"
     },
     "cliCommandsHelp": {
         "message": "Πληκτρολογήστε ή επικολλήστε εντολές στο πλαίσιο αριστερά. Μπορείτε να χρησιμοποιήσετε τα πλήκτρα επάνω και κάτω βέλους για να ανακαλέσετε προηγουμένως πληκτρολογημένες εντολές. Γράψτε 'help' ή κάντε κλικ σε αυτό το εικονίδιο για περισσότερες πληροφορίες."
@@ -2208,7 +2226,7 @@
         "message": "Διαμόρφωση Blackbox"
     },
     "blackboxButtonSave": {
-        "message": "Αποθήκευση και επανεκκίνηση"
+        "message": "Αποθήκευση και Eπανεκκίνηση"
     },
     "serialLogging": {
         "message": "Εξωτερική συσκευή καταγραφής σειριακής σύνδεσης"
@@ -2439,6 +2457,7 @@
     "firmwareFlasherFailedToLoadOnlineFirmware": {
         "message": "Αποτυχία φόρτωσης απομακρυσμένου firmware"
     },
+
     "ledStripHelp": {
         "message": "Ο ελεγκτής πτήσης μπορεί να ελέγχει τα χρώματα και τα εφέ των μεμονωμένων LEDs σε μια ταινία.<br />Διαμορφώστε τα LEDs στο πλέγμα, διαμορφώστε τη σειρά σύνδεσης και στη συνέχεια συνδέστε τα LEDs στο αεροσκάφος σας σύμφωνα με τις θέσεις του πλέγματος. Τα LEDs χωρίς αριθμό ταξινόμησης καλωδίων δεν θα αποθηκευτούν.<br />Κάντε διπλό κλικ σε ένα χρώμα για να επεξεργαστείτε τις τιμές HSV."
     },
@@ -2639,6 +2658,9 @@
     },
     "yawLpfCutoffFrequency": {
         "message": "Συχνότητα lpf φίλτρου του προσανατολισμού Yaw"
+    },
+	"yawLpfCutoffFrequencyHelp": {
+    "message": "συχνότητα κοπής LPF Yaw P-term"
     },
     "rollPitchItermIgnoreRate": {
         "message": "Ποσοστό αγνόησης του I-term στην κλίση/κύλιση"
@@ -3122,16 +3144,16 @@
         "message": "Ρύθμιση ύψους για το πρώτο στάδιο της σταδιακής RTH. Ορίστε το σε 0 για να απενεργοποιήσετε τη διπλοσταδιακή RTH [0-65000εκατοστά]."
     },
     "rthUseLinearDescent": {
-        "message": "Χρησιμοποιήστε γραμμική πτώση"
+        "message": "Χρησιμοποιήστε γραμμική κάθοδος"
     },
     "rthUseLinearDescentHelp": {
         "message": "Εάν ενεργοποιηθεί, το αεροσκάφος θα κατεβαίνει αργά στο Υψόμετρο σημείου εκκίνησης RTH κατά τη διάρκεια της πτήσης επιστροφής στο σημείο εκκίνησης."
     },
     "rthLinearDescentStart": {
-        "message": "Απόσταση έναρξης γραμμικής πτώσης"
+        "message": "Απόσταση έναρξης γραμμικής καθόδου"
     },
     "rthLinearDescentStartHelp": {
-        "message": "Αυτή είναι η απόσταση μακριά από το σημείο εκκίνησης για να αρχίσει η γραμμική πτώση. Εάν οριστεί σε 0, η γραμμική πτώση θα αρχίσει αμέσως."
+        "message": "Αυτή είναι η απόσταση μακριά από το σημείο εκκίνησης για να αρχίσει η γραμμική κάθοδος. Εάν οριστεί σε 0, η γραμμική κάθοδος θα αρχίσει αμέσως."
     },
     "landMaxAltVspd": {
         "message": "Το αεροσκάφος θα αρχίσει να κατεβαίνει με αυτήν την ταχύτητα, αφού φτάσει στο <strong>Σπίτι</strong>."
@@ -3349,6 +3371,54 @@
     "fixedWingNavigationConfiguration": {
         "message": "Ρυθμίσεις πλοήγησης σε σταθερή πτέρυγα"
     },
+    "fixedWingLandingConfiguration": {
+        "message": "Ρυθμίσεις προσγείωσης σταθερής πτέρυγας"
+    },
+    "MissionPlannerOnlyOneLandWp": {
+        "message": "Μπορείτε να ορίσετε μόνο ένα σημείο προσγείωσης ανα αποστολή."
+    },
+    "fwLandApproachLength" : {
+        "message": "Μήκος τελικής προσέγγισης"
+    },
+    "fwLandApproachLengthHelp": {
+        "message": "Μήκος τελικής προσέγγισης, περιλαμβάνει τη φάση ολίσθησης και αναχαίτησης. Αυτό είναι το μήκος από το safehome έως την τελική στροφή."
+    },
+    "fwLandFinalApproachPitch2throttle": {
+        "message": "Τροποποιητής για την αναλογία pitch προς throttle κατα την τελική προσέγγιση"
+    },
+    "fwLandFinalApproachPitch2throttleHelp": {
+        "message": "Αυτή η τιμή πολλαπλασιάζεται απο την τιμή της\"αναλογίας pitch προς throttle\" κατα τη διαρκεια της τελικής προσέγγισης. επιτρεπει να μειωθεί η ταχύτητα."
+    },
+    "fwLandGlideAlt" : {
+        "message": "Αρχικό υψόμετρο φάσης ολίσθησης"
+    },
+    "fwLandGlideAltHelp" : {
+        "message": "Σε αυτό το υψόμετρο (μετρημένο απο το σημείο προσγείωσης) ο κινητήρας απενεργοποιήται και το σκαφος συνεχίζει ολισθαίνοντας."
+    },
+    "fwLandFlareAlt" : {
+        "message": "αρχικό υψόμετρο φάσης flare"
+    },
+    "fwLandFlareAltHelp" : {
+        "message": "σε αθτό το υψος (μετρημένο απο το σημείο προσγείωσης) εκτελείται η τελευταία φάση της προσγείωση."
+    },
+    "fwLandGlidePitch" : {
+        "message": "Τιμή pitch για τη φάση ολίσθησης"
+    },
+    "fwLandGlidePitchHelp" : {
+        "message": "Αυτή η γωνία pitch χρησιμοποιήται κατα τη δειάρκεια φάσης ολίσθησης."
+    },
+    "fwLandFlarePitch" : {
+        "message": "Τιμή pitch για τη φάση flare"
+    },
+    "fwLandFlarePitchHelp" : {
+        "message": "Αυτή η γωνία pitch χρησιμοποιήται κατα τη δειάρκεια της φάσης flare."
+    },
+    "fwLandMaxTailwind": {
+        "message": "Max. ούριος_άνεμος"
+    },
+    "fwLandMaxTailwindHelp": {
+        "message": "Αυτή η τιμή χρησιμοποιείται όταν δεν είναι δυνατή η προσγείωση με αντίθετο άνεμο και οι ταχύτητες ανέμου κάτω από αυτήν την τιμή αγνοούνται (ανακρίβειες στη μέτρηση ανέμου από το INAV)."
+	},
     "osd_unsupported_msg1": {
         "message": "Ο ελεγκτής πτήσης σας δεν ανταποκρίνεται σε εντολές OSD. Αυτό σημαίνει πιθανώς ότι δεν διαθέτει ενσωματωμένο OSD."
     },
@@ -3371,16 +3441,25 @@
         "message": "Όνομα αεροσκάφους"
     },
     "osd_pilot_name": {
-        "message": "Όνομα χειριστή"
+        "message": "Όνομα πιλότου"
     },
+	"osdElement_PILOT_LOGO_HELP": {
+        "message": "Εμφανίζει το μικρό pilot logo σας στο OSD, όπου το τοποθετείτε. Αυτό απαιτεί μια προσαρμοσμένη γραμματοσειρά με το pilot logo σας."
+    },
+    "osd_use_pilot_logo": {
+        "message": "Χρήση pilot logo"
+    },
+    "osd_use_large_pilot_logo_help": {
+        "message": "Χρησιμοποιήστε το μεγάλο pilot logo σας με/αντί για το λογότυπο INAV. Αυτό απαιτεί μια προσαρμοσμένη γραμματοσειρά με το pilot logo σας. Αυτό φαίνεται στην οθόνη arm."
+	},
     "osd_units": {
         "message": "Μονάδες"
     },
     "osd_main_voltage_decimals": {
         "message": "Δεκαδικά της τάσης"
     },
-    "osd_mah_used_precision": {
-        "message": "Ακρίβεια χρήσης mAh"
+    "osd_mah_precision": {
+        "message": "Ακρίβεια mAh"
     },
     "osd_coordinate_digits": {
         "message": "Ψηφία συντεταγμένων"
@@ -3424,6 +3503,12 @@
     "osd_hud_settings": {
         "message": "Ρυθμίσεις εμφάνισης HUD"
     },
+	"osd_custom_element_settings": {
+        "message": "Custom στοιχεία OSD"
+    },
+    "custom_element": {
+        "message": "Custom Στοιχείο"
+    },
     "osd_hud_settings_HELP": {
         "message": "Αυτή η ενότητα επιτρέπει την προσαρμογή της συμπεριφοράς των στοιχείων του HUD."
     },
@@ -3433,12 +3518,14 @@
     "osd_hud_radar_disp_help": {
         "message": "Αυτό χρησιμοποιείται για το INAV Radar/FormationFlight. Το 0 απενεργοποιεί αυτή τη δυνατότητα."
     },
+
     "osd_hud_radar_range_min": {
         "message": "Ελάχιστη απόσταση ραντάρ"
     },
     "osd_hud_radar_range_min_help": {
         "message": "Τα αεροσκάφη του ραντάρ πιο κοντά από αυτή την απόσταση δεν θα εμφανίζονται στο HUD."
     },
+
     "osd_hud_radar_range_max": {
         "message": "Μέγιστη απόσταση ραντάρ"
     },
@@ -3449,753 +3536,755 @@
 
     "osd_hud_wp_disp": {
     "message": "Μέγιστος αριθμός στοιχείων σημείου πορείας στην οθόνη."
-},
-"osd_hud_wp_disp_help": {
-    "message": "Αριθμός σημείων πορείας προς εμφάνιση στην οθόνη. Το 0 απενεργοποιεί αυτήν τη λειτουργία."
-},
-"osd_camera_uptilt": {
-    "message": "Κλίση κάμερας προς τα πάνω."
-},
-"osd_camera_uptilt_help": {
-    "message": "Ορίστε την κλίση της κάμερας προς τα πάνω για την κάμερα FPV σε μοίρες, θετική είναι πάνω, αρνητική είναι κάτω, σε σχέση με το οριζόντιο. Χρησιμοποιείται για τη σωστή εμφάνιση των στοιχείων του HUD και του AHI (όταν είναι ενεργοποιημένο)."
-},
-"osd_camera_fov_h": {
-    "message": "Οριζόντια γωνία πεδίου της κάμερας."
-},
-"osd_camera_fov_h_help": {
-    "message": "Οριζόντια γωνία πεδίου θέασης της κάμερας σε μοίρες. Χρησιμοποιείται για τον υπολογισμό της θέσης των στοιχείων στην οθόνη του HUD."
-},
-"osd_camera_fov_v": {
-    "message": "Κατακόρυφη γωνία πεδίου της κάμερας."
-},
-"osd_camera_fov_v_help": {
-    "message": "Κατακόρυφη γωνία πεδίου θέασης της κάμερας σε μοίρες. Χρησιμοποιείται για τον υπολογισμό της θέσης των στοιχείων στην οθόνη του HUD."
-},
-"osd_alarms": {
-    "message": "Συναγερμοί"
-},
-"osdLayoutDefault": {
-    "message": "Προεπιλεγμένη διάταξη"
-},
-"osdLayoutAlternative": {
-    "message": "Εναλλακτική διάταξη #$1"
-},
-"osdUnitImperial": {
-    "message": "Αγγλική"
-},
-"osdUnitMetric": {
-    "message": "Μετρική"
-},
-"osdUnitMetricMPH": {
-    "message": "Μετρική + MPH"
-},
-"osdUnitMetricMPHTip": {
-    "message": "Χρησιμοποιήστε μετρικές μονάδες εκτός από την ταχύτητα, η οποία εμφανίζεται σε μίλια ανά ώρα."
-},
-"osdUnitUK": {
-    "message": "Βρετανική"
-},
-"osdUnitUKTip": {
-    "message": "Χρησιμοποιήστε αγγλικές μονάδες εκτός από τη θερμοκρασία, η οποία εμφανίζεται σε βαθμούς Κελσίου."
-},
-"osdUnitGA": {
-    "message": "Γενική αεροπορία"
-},
-"osdUnitGATip": {
-    "message": "Χρησιμοποιήστε τυπικές μονάδες ΓΑ (μη SI): ναυτικά μίλια, πόδια, κόμβοι, βαθμούς Κελσίου."
-},
-"osd_rssi_alarm": {
-    "message": "RSSI (%)"
-},
-"osdAlarmBATT_CAP": {
-    "message": "Χρησιμοποιημένη μπαταρία"
-},
-"osdAlarmBATT_CAP_HELP": {
-    "message": "Το ενδεικτικό χρησιμοποιούμενης μπαταρίας (mah drawn) θα αναβοσβήνει όταν το συνολικό ενεργοποιημένο mah είναι μεγαλύτερο από αυτήν την τιμή. Απαιτεί αισθητήρα ρεύματος. Το μηδέν απενεργοποιεί αυτόν το συναγερμό."
-},
-"osd_time_alarm": {
-    "message": "Χρόνος πτήσης (λεπτά)"
-},
-"osd_alt_alarm": {
-    "message": "Υψόμετρο"
-},
-"osd_dist_alarm": {
-    "message": "Απόσταση"
-},
-"osdAlarmDIST_HELP": {
-    "message": "O δείκτης απόστασης από το σημείο εκκίνησης θα αναβοσβήνει όταν η απόσταση είναι μεγαλύτερη από αυτήν την τιμή. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osd_neg_alt_alarm": {
-    "message": "Αρνητικό ύψος"
-},
-"osdAlarmMAX_NEG_ALTITUDE_HELP": {
-    "message": "Ο δείκτης ύψους θα αναβοσβήνει όταν το ύψος είναι αρνητικό και η απόλυτη τιμή του είναι μεγαλύτερη από αυτόν τον συναγερμό. Χρήσιμο όταν απογειώνεστε από ψηλά μέρη. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osd_airspeed_min_alarm": {
-    "message": "Ελάχιστη ταχύτητα αέρα"
-},
-"osd_airspeed_min_alarm_HELP": {
-    "message": "Ο δείκτης ταχύτητας αέρα θα αναβοσβήνει όταν η ταχύτητα αέρα είναι κάτω από αυτό το όριο. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osd_airspeed_max_alarm": {
-    "message": "Μέγιστη ταχύτητα αέρα"
-},
-"osd_airspeed_max_alarm_HELP": {
-    "message": "Ο δείκτης ταχύτητας αέρα θα αναβοσβήνει όταν η ταχύτητα αέρα είναι πάνω από αυτό το όριο. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osd_gforce_alarm": {
-    "message": "Δύναμη g"
-},
-"osdAlarmGFORCE_HELP": {
-    "message": "Το δείκτης επιτάχυνσης βαρύτητας g θα αρχίσει να αναβοσβήνει όταν είναι μεγαλύτερο από αυτήν την τιμή."
-},
-"osd_gforce_axis_alarm_min": {
-    "message": "Ελάχιστη επιτάχυνση g άξονα"
-    },
-    "osdAlarmGFORCE_AXIS_MIN_HELP": {
-    "message": "Τα στοιχεία των άξονων της βαρύτητας g θα αρχίσουν να αναβοσβήνουν όταν είναι χαμηλότερα από αυτήν την τιμή."
-},
-"osd_gforce_axis_alarm_max": {
-    "message": "Μέγιστη επιτάχυνση g άξονα"
-},
-"osdAlarmGFORCE_AXIS_MAX_HELP": {
-    "message": "Τα στοιχεία των άξονων της βαρύτητας g θα αρχίσουν να αναβοσβήνουν όταν είναι μεγαλύτερα από αυτήν την τιμή."
-},
-"osd_current_alarm": {
-    "message": "Ρεύμα (A)"
-},
-"osdAlarmCURRENT_HELP": {
-    "message": "Το στοιχείο κατανάλωσης ρεύματος θα αρχίσει να αναβοσβήνει όταν η κατανάλωση είναι μεγαλύτερη από αυτήν την τιμή. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osd_imu_temp_alarm_min": {
-    "message": "Ελάχιστη θερμοκρασία IMU"
-},
-"osd_imu_temp_alarm_max": {
-    "message": "Μέγιστη θερμοκρασία IMU"
-},
-"osd_baro_temp_alarm_min": {
-    "message": "Ελάχιστη θερμοκρασία baro"
-},
-"osd_baro_temp_alarm_max": {
-    "message": "Μέγιστη θερμοκρασία baro"
-},
-"osd_esc_temp_alarm_min": {
-    "message": "Ελάχιστη θερμοκρασία ESC"
-},
-"osd_esc_temp_alarm_max": {
-    "message": "Μέγιστη θερμοκρασία ESC"
-},
-"osd_snr_alarm": {
-    "message": "Επίπεδο συναγερμού CRSF SNR"
-},
-"osdalarmSNR_HELP": {
-    "message": "Το SNR εμφανίζεται μόνο κάτω από αυτήν την τιμή. 0dB (αναλογία 1:1), υποδηλώνει ότι το ληφθέν σήμα είναι ίσο με το επίπεδο θορύβου."
-},
-"osd_link_quality_alarm": {
-    "message": "Συναγερμός link quality CRSF"
-},
-"osdalarmLQ_HELP": {
-    "message": "Για χρήση Crossfire χρησιμοποιήστε το 70%. Για Tracer χρησιμοποιήστε το 50%."
-},
-"osd_rssi_dbm_alarm": {
-    "message": "Συναγερμός CRSF RSSI dBm"
-},
-"osd_rssi_dbm_alarm_HELP": {
-    "message": "Ο δείκτης RSSI αναβοσβήνει κάτω από αυτήν την τιμή. Εύρος: [-130,0]. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
-},
-"osdGroupGeneral": {
-    "message": "Γενικά"
-},
-"osdGroupAltitude": {
-    "message": "Υψόμετρο"
-},
-"osdGroupTimers": {
-    "message": "Χρονόμετρα"
-},
-"osdGroupGForce": {
-    "message": "Δύναμη g"
-},
-"osdGroupTemperature": {
-    "message": "Θερμοκρασία"
-},
-"osdGroupAttitude": {
-    "message": "Στάση"
-},
-"osdGroupCurrentMeter": {
-    "message": "Μετρητής ρεύματος"
-},
-"osdGroupGPS": {
-    "message": "GPS"
-},
-"osdGroupPowerLimits": {
-    "message": "Όρια ισχύος"
-},
-"osdGroupPIDs": {
-    "message": "Ρυθμίσεις προσαρμοστικών τιμών RC"
-},
-"osdGroupPIDOutputs": {
-    "message": "Έξοδοι ελεγκτών PID"
-},
-"osdGroupVTX": {
-    "message": "VTX"
-},
-"osdGroupCRSF": {
-    "message": "Στατιστικά CRSF RX"
-},
-"osdGroupMapsAndRadars": {
-    "message": "Χάρτες και ραντάρ"
-},
-"osdGroupMapsAndRadars_HELP": {
-    "message": "Οι χάρτες και τα ραντάρ επιτρέπουν την τοποθέτηση επιπλέον στοιχείων πάνω τους, όσο δεν επικαλύπτουν καμένα από τα μέρη του χάρτη που είναι ορατά στην προεπισκόπηση."
-},
-"osdElement_ONTIME_FLYTIME": {
-    "message": "Χρόνος λειτουργίας / Χρόνος πτήσης"
-},
-"osdElement_RSSI_VALUE": {
-    "message": "RSSI (Ισχύς Σήματος)"
-},
-"osdElement_RSSI_VALUE_HELP": {
-    "message": "Εμφανίζει την ποιότητα του σήματος που λαμβάνεται από την RC τηλεκατεύθυνση (όσο υψηλή, τόσο καλύτερη)."
-},
-"osdElement_MAIN_BATT_VOLTAGE": {
-    "message": "Τάση μπαταρίας"
-},
-"osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
-    "message": "αντισταθμισμένη τάση μπαταρίας"
-},
-"osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
-    "message": "Υπολογισμένη τάση που θα έπρεπε να έχει η μπαταρία χωρίς φορτίο (προσομοιώνει ιδανική μπαταρία)"
-},
-"osdElement_MESSAGES": {
-    "message": "Μηνύματα συστήματος"
-},
-"osdElement_MESSAGES_HELP": {
-    "message": "Εμφανίζει διάφορα μηνύματα συστήματος όπως προειδοποιήσεις, βλάβες υλικού και επεκταμένες λεπτομέρειες της τρέχουσας λειτουργίας πτήσης (π.χ. λειτουργίες AUTOTUNE και AUTOTRIM και στάδια RTH)."
-},
-"osdElement_MAIN_BATT_CELL_VOLTAGE": {
-    "message": "Τάση κυψέλης μπαταρίας"
-},
-"osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
-    "message": "αντισταθμισμένη τάση κυψέλης μπαταρίας"
-},
-"osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
-    "message": "Υπολογισμένη μέση τάση κυψέλης που θα έπρεπε να έχει η μπαταρία χωρίς φορτίο (προσομοιώνει ιδανική μπαταρία)"
-},
-"osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
-    "message": "Υπολειπόμενο ποσοστό μπαταρίας"
-},
-"osdElement_MAIN_BATT_REMAINING_CAPACITY": {
-    "message": "Υπολειπόμενη χωρητικότητα μπαταρίας"
-},
-"osdElement_REMAINING_FLIGHT_TIME_HELP": {
-    "message": "Εκτιμώμενος υπολειπόμενος χρόνος πτήσης πριν από το αεροσκάφος να χρειαστεί να επιστρέψει στο σπίτι βασισμένος στην υπολειπόμενη ενέργεια της μπαταρίας, τη μέση ισχύ και την απόσταση μέχρι το σπίτι (μόνο για αεροσκάφη με σταθερή πτέρυγα, παρακαλούμε διαβάστε την τεκμηρίωση)"
-},
-"osdElement_REMAINING_FLIGHT_DISTANCE_HELP": {
-    "message": "Εκτιμώμενη υπολειπόμενη απόσταση πτήσης πριν από το αεροσκάφος να χρειαστεί να επιστρέψει στο σπίτι βασισμένος στην υπολειπόμενη ενέργεια της μπαταρίας, τη μέση ισχύ και την απόσταση μέχρι το σπίτι (μόνο για αεροσκάφη με σταθερή πτέρυγα, παρακαλούμε διαβάστε την τεκμηρίωση)"
-},
-"osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
-    "message": "Εμφανίζει τη μέση τάση κυψέλης από την κύρια μπαταρία"
-},
-"osdElement_MAH_DRAWN": {
-    "message": "mAh καταναλωθέντα"
-    },
-    "osdElement_EFFICIENCY_MAH": {
-    "message": "Αποδοτικότητα mAh/Km"
-},
-"osdElement_EFFICIENCY_WH": {
-    "message": "Αποδοτικότητα Wh/Km"
-},
-"osdElement_PLIMIT_REMAINING_BURST_TIME": {
-    "message": "Υπολειπόμενος χρόνος υψηλού γκαζιού"
-},
-"osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
-    "message": "Ενεργό όριο ρεύματος"
-},
-"osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
-    "message": "Ενεργό όριο ισχύος"
-},
-"osdElement_THROTTLE_POSITION_HELP": {
-    "message": "Εμφανίζει τη θέση του γκαζιού σε λειτουργίες πτήσης όπου <i>αυτό</i> ελέγχει την έξοδο του κινητήρα. Σε λειτουργίες πλοήγησης, εμφανίζει την τιμή του γκαζιού που ελέγχεται από το INAV."
-},
-"osdElement_SCALED_THROTTLE_POSITION_HELP": {
-    "message": "Εμφανίζει τη θέση του γκαζιόυ σε λειτουργίες πτήσης όπου <i>αυτό</i> ελέγχει την έξοδο του κινητήρα. Σε λειτουργίες πλοήγησης, εμφανίζει την τιμή του γκαζιού που ελέγχεται από το INAV. Αυτή η τιμή κλιμακώνεται με βάση την ελάχιστη και τη μέγιστη θέση του γκαζιού."
-},
-"osdElement_GPS_SPEED": {
-    "message": "Ταχύτητα εδάφους"
-},
-"osdElement_GPS_SPEED_HELP": {
-    "message": "Εμφανίζει την ταχύτητα εδάφους από το GPS."
-},
-"osdElement_GPS_MAX_SPEED": {
-    "message": "Μέγιστη ταχύτητα GPS"
-},
-"osdElement_GPS_MAX_SPEED_HELP": {
-    "message": "Εμφανίζει την υψηλότερη ταχύτητα εδάφους από το GPS."
-},
-"osdElement_MSL_ALTITUDE": {
-    "message": "Υψόμετρο MSL"
-},
-"osdElement_MSL_ALTITUDE_HELP": {
-    "message": "Υψόμετρο πάνω από τη μέση στάθμη της θάλασσας"
-},
-"osdElement_3D_SPEED": {
-    "message": "Ταχύτητα 3D"
-},
-"osdElement_3D_SPEED_HELP": {
-    "message": "Εμφανίζει την 3D ταχύτητα λαμβάνοντας υπόψη την οριζόντια και κατακόρυφη ταχύτητα."
-},
-"osdElement_3D_MAX_SPEED": {
-    "message": "Μέγιστη ταχύτητα 3D"
-},
-"osdElement_3D_MAX_SPEED_HELP": {
-    "message": "Εμφανίζει την υψηλότερη 3D ταχύτητα λαμβάνοντας υπόψη την οριζόντια και κατακόρυφη ταχύτητα."
-},
-"osdElement_AIR_MAX_SPEED": {
-    "message": "Μέγιστη ταχύτητα αέρα"
-},
-"osdElement_AIR_MAX_SPEED_HELP": {
-    "message": "Εμφανίζει την υψηλότερη ταχύτητα αέρα."
-},
-"osdElement_GPS_SATS": {
-    "message": "Δορυφόροι GPS"
-},
-"osdElement_GPS_SATS_HELP": {
-    "message": "Εμφανίζει τον αριθμό των δορυφόρων GPS που εντοπίζονται από τον δέκτη GPS."
-},
-"osdElement_GPS_HDOP": {
-    "message": "Διακύμανση οριζόντιας ακρίβειας GPS (HDOP)"
-},
-"osdElement_GPS_HDOP_HELP": {
-    "message": "Εμφανίζει τη Διακύμανση Οριζόντιας Ακρίβειας (HDOP) από το GPS. Όσο χαμηλότερη είναι η τιμή, τόσο πιο ακριβής είναι η θέση του GPS."
-},
-"osdElement_PLUS_CODE": {
-    "message": "Plus Code (γεωγραφικό πλάτος + γεωγραφικό μήκος)"
-},
-"osdElement_PLUS_CODE_HELP": {
-    "message": "Τα plus codes κωδικοποιούν τόσο το γεωγραφικό πλάτος όσο και το γεωγραφικό μήκος σε μια μοναδική τιμή που μπορεί να εισαχθεί απευθείας στο Google Maps. Παρέχει το ίδιο επίπεδο ακρίβειας με το γεωγραφικό πλάτος και το γεωγραφικό μήκος, χρησιμοποιώντας λιγότερο χώρο οθόνης."
-},
-"osdElement_AZIMUTH": {
-    "message": "Αζιμούθιο"
-},
-"osdElement_AZIMUTH_HELP": {
-    "message": "Το αζιμούθιο είναι η κατεύθυνση του αεροσκάφους σε σχέση με το σημείο εκκίνησης. Είναι χρήσιμο για να κρατήσετε το αεροσκάφος στη σωστή πορεία ή για να κρατήσετε το αεροσκάφος μπροστά από μια σταθερή κατευθυντική κεραία."
-},
-"osdElement_TRIP_DIST": {
-    "message": "Απόσταση ταξιδιού"
-},
-"osdElement_VARIO_HELP": {
-    "message": "Εμφανίζει την κατακόρυφη ταχύτητα χρησιμοποιώντας βέλη προς τα πάνω ή προς τα κάτω. Κάθε βέλος αντιπροσωπεύει 10cm (~4 ίντσες) ανά δευτερόλεπτο."
-},
-"osdElement_VARIO_NUM": {
-    "message": "Αριθμητική κατακόρυφη ταχύτητα"
-},
-"osdElement_VARIO_NUM_HELP": {
-    "message": "Εμφανίζει την κατακόρυφη ταχύτητα χρησιμοποιώντας έναν αριθμό."
-},
-"osdElement_G_FORCE": {
-    "message": "Δύναμη g"
-},
-"osdElement_G_FORCE_HELP": {
-    "message": "Εμφανίζει τη δύναμη g λαμβάνοντας υπόψη όλους τους άξονες."
-    },
-    "osdElement_G_FORCE_X": {
-    "message": "Επικαθήμενη δύναμη g στον σώμα (X)"
-},
-"osdElement_G_FORCE_X_HELP": {
-    "message": "Εμφανίζει τη δύναμη g στον άξονα X (μήκος)"
-},
-"osdElement_G_FORCE_Y": {
-    "message": "Πλευρική δύναμη g στον σώμα (Y)"
-},
-"osdElement_G_FORCE_Y_HELP": {
-    "message": "Εμφανίζει τη δύναμη g στον άξονα Y (πλάτος)"
-},
-"osdElement_G_FORCE_Z": {
-    "message": "Κατακόρυφη δύναμη g στον σώμα (Z)"
-},
-"osdElement_G_FORCE_Z_HELP": {
-    "message": "Εμφανίζει τη δύναμη g στον άξονα Z (κατακόρυφη)"
-},
-"osdElement_ROLL_PIDS": {
-    "message": "Roll PIDs"
-},
-"osdElement_PITCH_PIDS": {
-    "message": "Pitch PIDs"
-},
-"osdElement_YAW_PIDS": {
-    "message": "Yaw PIDs"
-},
-"osdElement_ONTIME_FLYTIME_HELP": {
-    "message": "Εμφανίζει το \"On Time\" όταν δεν είναι οπλισμένο και το \"Fly Time\" όταν είναι οπλισμένο."
-},
-"osdElement_RTC_TIME": {
-    "message": "Ωρα"
-},
-"osdElement_RTC_TIME_HELP": {
-    "message": "Εμφανίζει την τρέχουσα ώρα, όπως ανακτάται από το GPS."
-},
-"osdElement_RC_SOURCE": {
-    "message": "Πηγή RC"
-},
-"osdElement_RC_SOURCE_HELP": {
-    "message": "Εμφανίζει την τρέχουσα πηγή RC, STD ή MSP (χρήσιμο όταν χρησιμοποιείτε MSP override)"
-},
-"osdElement_VTX_POWER": {
-    "message": "Επίπεδο ισχύος βίντεο TX"
-},
-"osdElement_VTX_POWER_HELP": {
-    "message": "Εμφανίζει το τρέχον επίπεδο ισχύος του VTX. Αναβοσβήνει όταν επιλέγεται ο αντίστοιχος έλεγχος RC"
-},
-"osdElement_ESC_RPM": {
-    "message": "Στροφές κινητήρα από την τηλεμετρία ESC"
-},
-"osdElement_GLIDESLOPE": {
-    "message": "Κλίση κάθοδου"
-},
-"osdElement_GLIDESLOPE_HELP": {
-    "message": "Ποσότητα οριζόντιας απόστασης που διανύεται ανά μονάδα χαμένου υψομέτρου"
-},
-"osdElement_PAN_SERVO_CENTRED": {
-    "message": "Κεντραρισμένη υπηρεσία περιστροφής"
-},
-"osdElement_PAN_SERVO_CENTRED_HELP": {
-    "message": "Εμφανίζει αν η υπηρεσία περιστροφής είναι κεντραρισμένη (0) ή μετατοπισμένη (βέλη). Ελέγξτε τις ρυθμίσεις <b>osd_pan_servo_</b> για την παραμετροποίηση της υπηρεσίας περιστροφής."
-},
-"osdElement_VTX_CHANNEL": {
-    "message": "Μπάντα και κανάλι βίντεο TX"
-},
-"osdElement_VTX_CHANNEL_HELP": {
-    "message": "Εμφανίζει την τρέχουσα Μπάντα και κανάλι του VTX. Απαιτείται είτε ένα VTX με SmartAudio είτε Tramp είτε ένα VTX που ενσωματώνεται στον ελεγκτή πτήσης."
-},
-"osdElement_CRSF_RSSI_DBM": {
-    "message": "RX RSSI σε dBm"
-},
-"osdElement_CRSF_LQ": {
-    "message": "Ποιότητα σύνδεσης RX %"
-},
-"osdElement_CRSF_LQ_HELP": {
-    "message": "Χρησιμοποιήστε τη ρύθμιση Crossfire LQ Format για να επιλέξετε τον τύπο μορφής."
-},
-"osdElement_CRSF_SNR_DB": {
-    "message": "SNR Uplink RX σε dB"
-},
-"osdElement_CRSF_SNR_DB_HELP": {
-    "message": "Εμφανίζεται μόνο όταν το SNR πέσει κάτω από το επίπεδο συναγερμού. Στα 0dB, το επίπεδο του σήματος που λαμβάνεται ισούται με το επίπεδο του θορύβου."
-},
-"osdElement_CRSF_TX_POWER": {
-    "message": "Ισχύς TX σε mW"
-},
-"osdElement_MAP_NORTH": {
-    "message": "Χάρτης (Πάνω είναι βόρεια)"
-},
-"osdElement_MAP_TAKEOFF": {
-    "message": "Χάρτης (Πάνω είναι η κατεύθυνση απογείωσης)"
-},
-"osdElement_RADAR": {
-    "message": "Ραντάρ"
-},
-"osdElement_MAP_SCALE": {
-    "message": "Κλίμακα χάρτη"
-},
-"osdElement_MAP_SCALE_HELP": {
-    "message": "Κλίμακα του τρέχοντος χάρτη/ραντάρ που εμφανίζεται."
-},
-"osdElement_MAP_REFERENCE": {
-    "message": "Αναφορά χάρτη"
-},
-"osdElement_MAP_REFERENCE_HELP": {
-    "message": "Η αναφορά (κατεύθυνση που δείχνει πάνω) του τρέχοντος χάρτη. Ν για βόρεια και Τ για την κατεύθυνση απογείωσης."
-},
-"osdElement_WIND_SPEED_HORIZONTAL": {
-    "message": "Οριζόντια ταχύτητα ανέμου"
-},
-"osdElement_WIND_SPEED_HORIZONTAL_HELP": {
-    "message": "Εμφανίζει εκτιμώμενη οριζόντια ταχύτητα ανέμου και κατεύθυνση."
-},
-"osdElement_WIND_SPEED_VERTICAL": {
-    "message": "Κατακόρυφη ταχύτητα ανέμου"
-},
-"osdElement_WIND_SPEED_VERTICAL_HELP": {
-    "message": "Εμφανίζει εκτιμώμενη κατακόρυφη ταχύτητα ανέμου και κατεύθυνση (πάνω ή κάτω)."
-},
-"osdElement_ACTIVE_PROFILE": {
-    "message": "Εμφάνιση του ενεργού προφίλ"
-},
-"osdElement_LEVEL_PIDS": {
-    "message": "Level PIDs"
-},
-"osdElement_POS_XY_PIDS": {
-    "message": "Θέση XY PIDs"
-},
-"osdElement_POS_Z_PIDS": {
-    "message": "Θέση Z PIDs"
-},
-"osdElement_VEL_XY_PIDS": {
-    "message": "Ταχύτητα XY PIDs"
-},
-"osdElement_VEL_Z_PIDS": {
-    "message": "Ταχύτητα Z PIDs"
-},
-"osdElement_FW_ALT_PID_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή PID υψομέτρου FW"
-},
-"osdElement_FW_POS_PID_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή θέσης PID FW"
-},
-"osdElement_MC_VEL_X_PID_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή PID ταχύτητας X MC"
-},
-"osdElement_MC_VEL_Y_PID_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή PID ταχύτητας Y MC"
-},
-"osdElement_MC_VEL_Z_PID_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή PID ταχύτητας Z MC"
-},
-"osdElement_MC_POS_XYZ_P_OUTPUTS": {
-    "message": "Έξοδοι ελεγκτή P PID θέσης XYZ MC"
-},
-"osdElement_IMU_TEMPERATURE": {
-    "message": "Θερμοκρασία IMU"
-},
-"osdElement_IMU_TEMPERATURE_HELP": {
-    "message": "Θερμοκρασία της IMU"
-},
-"osdElement_BARO_TEMPERATURE": {
-    "message": "Θερμοκρασία βαρόμετρου"
-},
-"osdElement_BARO_TEMPERATURE_HELP": {
-    "message": "Θερμοκρασία του βαρόμετρου"
-},
-"osdElement_ESC_TEMPERATURE": {
-    "message": "Θερμοκρασία ESC"
-},
-"osdElement_ESC_TEMPERATURE_HELP": {
-    "message": "Θερμοκρασία του ESC αναγνωσμένη από την τηλεμετρία DSHOT"
-},
-"osdGroupSwitchIndicators": {
-    "message": "ενδείξεις διακοπτών"
-},
-"osdElement_SWITCH_INDICATOR_0": {
-    "message": "Δείκτης διακόπτη 1"
-},
-"osdElement_SWITCH_INDICATOR_1": {
-    "message": "Δείκτης διακόπτη 2"
-},
-"osdElement_SWITCH_INDICATOR_2": {
-    "message": "Δείκτης διακόπτη 3"
-},
-"osdElement_SWITCH_INDICATOR_3": {
-    "message": "Δείκτης διακόπτη 4"
-},
-"osd_pan_servo_settings": {
-    "message": "Ρυθμίσεις OSD της υπηρεσίας περιστροφής"
-},
-"osd_pan_servo_settings_HELP": {
-    "message": "Αυτή η ενότητα ενεργοποιεί και ρυθμίζει το χαρακτηριστικό μετατόπισης της υπηρεσίας περιστροφής της κάμερας απο σέρβο. Χρησιμοποιείται για να κρατήσει τα στοιχεία OSD, όπως ο βολές στο σπίτι και τα POI, να δείχνουν προς την σωστή κατεύθυνση. Ακόμη και όταν έχετε περιστρέψει την κάμερα."
-},
-"osdPanServoIndex": {
-    "message": "Έξοδος υπηρεσίας περιστροφής"
-},
-"osdPanServoIndex_HELP": {
-    "message": "Ορίστε τον αριθμό έξοδου της υπηρεσίας περιστροφής· όπως φαίνεται στον πίνακα εξόδων ανάμειξης. Για παράδειγμα, η έξοδος S6."
-    },
-    "osdPanServoPwm2centideg": {
-    "message": "Συνολικοί βαθμοί κίνησης της υπηρεσίας περιστροφής pan"
-},
-"osdPanServoPwm2centideg_HELP": {
-    "message": "Βαθμοί περιστροφής της υπηρεσίας περιστροφής pan. Μια υπηρεσία με 180 βαθμούς περιστροφής από 1000 έως 2000 μικροδευτερόλεπτα PWM χρειάζεται συνήθως 180 για αυτή τη ρύθμιση. Κάντε την τιμή αρνητική για αντιστροφή της κατεύθυνσης."
-},
-"osdPanServoIndicatorShowDegrees": {
-    "message": "Εμφάνιση βαθμών μετατόπισης δίπλα στο δείκτη περιστροφής"
-},
-"osdPanServoOffcentreWarning": {
-    "message": "Προειδοποίηση εκτός κέντρου"
-},
-"osdPanServoOffcentreWarning_HELP": {
-    "message": "Βαθμοί από το κέντρο της υπηρεσίας περιστροφής pan, όπου υποθέτεται ότι η κάμερα θέλει να κοιτάει μπροστά, αλλά δεν είναι στο 0. Εάν βρίσκεται σε αυτό το εύρος και δεν είναι 0 για περισσότερο από 10 δευτερόλεπτα, το στοιχείο OSD μετατόπισης της υπηρεσίας περιστροφής θα αναβοσβήνει. Το 0 σημαίνει ότι η προειδοποίηση είναι απενεργοποιημένη."
-},
-"osdGroupGVars": {
-    "message": "Παγκόσμιες Μεταβλητές"
-},
-"osdElement_GVAR_0": {
-    "message": "Παγκόσμια Μεταβλητή 0"
-},
-"osdElement_GVAR_1": {
-    "message": "Παγκόσμια Μεταβλητή 1"
-},
-"osdElement_GVAR_2": {
-    "message": "Παγκόσμια Μεταβλητή 2"
-},
-"osdElement_GVAR_3": {
-    "message": "Παγκόσμια Μεταβλητή 3"
-},
-"osdElement_SENSOR1_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 1"
-},
-"osdElement_SENSOR2_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 2"
-},
-"osdElement_SENSOR3_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 3"
-},
-"osdElement_SENSOR4_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 4"
-},
-"osdElement_SENSOR5_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 5"
-},
-"osdElement_SENSOR6_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 6"
-},
-"osdElement_SENSOR7_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 7"
-},
-"osdElement_SENSOR8_TEMPERATURE": {
-    "message": "Αισθητήρας θερμοκρασίας 8"
-},
-"osdSettingMainVoltageDecimals": {
-    "message": "Δεκαδικά κύριας τάσης"
-},
-"osdElement_OSD_RANGEFINDER": {
-    "message": "Απόσταση από αισθητήρα απόστασης"
-},
-"osdSettingPLUS_CODE_DIGITS_HELP": {
-    "message": "Ακρίβεια στον ισημερινό: 10=13.9x13.9μ; 11=2.8x3.5μ; 12=56x87εκ; 13=11x22εκ."
-},
-"osdSettingPLUS_CODE_SHORT_HELP": {
-    "message": "Η αφαίρεση 2, 4 και 6 προηγούμενων ψηφίων απαιτεί μια αναφορά τοποθεσίας εντός, αντίστοιχα, ~800km, ~40km και ~2km για την ανάκτηση των αρχικών συντεταγμένων."
-},
-"osdSettingCRSF_LQ_FORMAT_HELP": {
-    "message": "Ο ΤΥΠΟΣ1 εμφανίζει το LQ% όπως χρησιμοποιείται από το TBS υλικό. Ο ΤΥΠΟΣ2 δείχνει τα λειτουργικά προφίλ RF (2=150Hz, 1=50Hz, 0=4Hz συντελεστές ενημέρωσης) και LQ % [0..100%]. Το Tracer δείχνει τη λειτουργία RF 1 (1=250Hz) και LQ % [0..100%]."
-},
-"osd_video_show_guides": {
-    "message": "Εμφάνιση οδηγιών προεπισκόπησης"
-},
-"osd_video_HELP": {
-    "message": "Για HD: οι κόκκινες γραμμές δείχνουν 4:3 οθόνη, HDZero: κρατήστε τα όρια εντός του μπλε κουτιού για υψηλότερο ρυθμό ανανέωσης, AUTO/PAL: η πράσινη γραμμή είναι το όριο NTSC."
-},
-"osd_dji_HD_FPV": {
-    "message": "DJI HD FPV (οχι ο3)"
-},
-"osd_dji_hide_unsupported": {
-    "message": "Απόκρυψη μη υποστηριζόμενων στοιχείων"
-},
-"osd_dji_ESC_temp": {
-    "message": "Πηγή <i>θερμοκρασίας ESC</i>"
-},
-"osd_dji_RSSI_source": {
-    "message": "Πηγή <i>RSSI</i>"
-},
-"osd_dji_GPS_source": {
-    "message": "Πηγή <i>Ταχύτητας GPS</i>"
-},
-"osd_dji_speed_source": {
-    "message": "Πηγή <i>3D Ταχύτητας</i>"
-},
-"osd_dji_use_craft_name_elements": {
-    "message": "Χρησιμοποιήστε το όνομα του αεροσκάφους για μηνύματα και επιπλέον στοιχεία.</span><br/>Τα στοιχεία σε <span class=\"blue\">μπλε</span> εμφανίζονται στο όνομα του αεροσκάφους."
-},
-"osd_dji_adjustments": {
-    "message": "Εμφάνιση προσαρμογών στο όνομα του αεροσκάφους"
-},
-"osd_dji_cn_alternating_duration": {
-    "message": "Διάρκεια εναλλαγής ονόματος αεροσκάφους (σε 1/10 δευτ.)"
-},
-"osd_switch_indicator_settings": {
-    "message": "Ρυθμίσεις δεικτών διακοπτών"
-},
-"osd_switch_indicators_align_left": {
-    "message": "Ευθυγράμμιση ονομάτων διακοπτών αριστερά από τους διακόπτες"
-},
-"osdSwitchInd0": {
-    "message": "Διακόπτης 1"
-},
-"osdSwitchInd1": {
-    "message": "Διακόπτης 2"
-},
-"osdSwitchInd2": {
-    "message": "Διακόπτης 3"
-},
-"osdSwitchInd3": {
-    "message": "Διακόπτης 4"
-},
-"osd_font_default": {
-    "message": "Προεπιλογή"
-},
-"osd_font_vision": {
-    "message": "Όραση"
-},
-"osd_font_impact": {
-    "message": "Επίδραση"
-},
-"osd_font_impact_mini": {
-    "message": "Επίδραση mini"
-},
-"osd_font_clarity": {
-    "message": "Καθαρότητα"
-},
-"osd_font_clarity_medium": {
-    "message": "Καθαρότητα μεσαίου μεγέθους"
-},
-"osd_font_bold": {
-    "message": "Έντονο"
-},
-"osd_font_large": {
-    "message": "Μεγάλο"
-},
-"osd_font_load_file": {
-    "message": "Άνοιγμα αρχείου γραμματοσειράς"
-},
-"osd_font_upload": {
-    "message": "Μεταφόρτωση γραμματοσειράς"
-},
-"osd_font_manager": {
-    "message": "Διαχειριστής γραμματοσειράς"
-},
-"uploadingCharacters": {
-    "message": "Μεταφόρτωση..."
-},
-"uploadedCharacters": {
-    "message": "Μεταφορτώθηκαν $1 χαρακτήρες"
-},
-"portsIdentifier": {
-    "message": "Αναγνωριστικό"
-},
-"portsConfiguration": {
-    "message": "Δεδομένα"
-},
-"portsTelemetryOut": {
-    "message": "Τηλεμετρία"
-},
-"portsSerialRx": {
-    "message": "Δεκτή σειριακή"
-},
-"portColumnSensors": {
-    "message": "Αισθητήρες"
-},
-"portsPeripherals": {
-    "message": "Περιφερειακά"
-},
-"appUpdateNotificationHeader": {
-    "message": "Διαθέσιμη νέα έκδοση Configurator."
-},
-"appUpdateNotificationDescription": {
-    "message": "Παρακαλούμε επισκεφτείτε την <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">ιστοσελίδα</a> για να διαβάσετε τις σημειώσεις έκδοσης και να κάνετε λήψη."
-},
-"closeUpdateBtn": {
-    "message": "Κλείσιμο"
-},
-"downloadUpdatesBtn": {
-    "message": "Λήψη νέας εφαρμογής"
-},
-"tabMissionControl": {
-    "message": "Έλεγχος αποστολής"
-},
-"loadMissionButton": {
-    "message": "Φόρτωση αποστολής από τον ελεγκτή πτήσης"
-},
-"saveMissionButton": {
-    "message": "Αποθήκευση αποστολής στον ελεγκτή πτήσης"
+	},
+	"osd_hud_wp_disp_help": {
+		"message": "Αριθμός σημείων πορείας προς εμφάνιση στην οθόνη. Το 0 απενεργοποιεί αυτήν τη λειτουργία."
+	},
+	"osd_camera_uptilt": {
+		"message": "Κλίση κάμερας προς τα πάνω."
+	},
+	"osd_camera_uptilt_help": {
+		"message": "Ορίστε την κλίση της κάμερας προς τα πάνω για την κάμερα FPV σε μοίρες, θετική είναι πάνω, αρνητική είναι κάτω, σε σχέση με το οριζόντιο. Χρησιμοποιείται για τη σωστή εμφάνιση των στοιχείων του HUD και του AHI (όταν είναι ενεργοποιημένο)."
+	},
+	"osd_camera_fov_h": {
+		"message": "Οριζόντια γωνία πεδίου της κάμερας."
+	},
+	"osd_camera_fov_h_help": {
+		"message": "Οριζόντια γωνία πεδίου θέασης της κάμερας σε μοίρες. Χρησιμοποιείται για τον υπολογισμό της θέσης των στοιχείων στην οθόνη του HUD."
+	},
+	"osd_camera_fov_v": {
+		"message": "Κατακόρυφη γωνία πεδίου της κάμερας."
+	},
+	"osd_camera_fov_v_help": {
+		"message": "Κατακόρυφη γωνία πεδίου θέασης της κάμερας σε μοίρες. Χρησιμοποιείται για τον υπολογισμό της θέσης των στοιχείων στην οθόνη του HUD."
+	},
+
+
+	"osd_alarms": {
+		"message": "Συναγερμοί"
+	},
+	"osdLayoutDefault": {
+		"message": "Προεπιλεγμένη διάταξη"
+	},
+	"osdLayoutAlternative": {
+		"message": "Εναλλακτική διάταξη #$1"
+	},
+	"osdUnitImperial": {
+		"message": "Αγγλική"
+	},
+	"osdUnitMetric": {
+		"message": "Μετρική"
+	},
+	"osdUnitMetricMPH": {
+		"message": "Μετρική + MPH"
+	},
+	"osdUnitMetricMPHTip": {
+		"message": "Χρησιμοποιήστε μετρικές μονάδες εκτός από την ταχύτητα, η οποία εμφανίζεται σε μίλια ανά ώρα."
+	},
+	"osdUnitUK": {
+		"message": "Βρετανική"
+	},
+	"osdUnitUKTip": {
+		"message": "Χρησιμοποιήστε αγγλικές μονάδες εκτός από τη θερμοκρασία, η οποία εμφανίζεται σε βαθμούς Κελσίου."
+	},
+	"osdUnitGA": {
+		"message": "Γενική αεροπορία"
+	},
+	"osdUnitGATip": {
+		"message": "Χρησιμοποιήστε τυπικές μονάδες ΓΑ (μη SI): ναυτικά μίλια, πόδια, κόμβοι, βαθμούς Κελσίου."
+	},
+	"osd_rssi_alarm": {
+		"message": "RSSI (%)"
+	},
+	"osdAlarmBATT_CAP": {
+		"message": "Χρησιμοποιημένη μπαταρία"
+	},
+	"osdAlarmBATT_CAP_HELP": {
+		"message": "Το ενδεικτικό χρησιμοποιούμενης μπαταρίας (mah drawn) θα αναβοσβήνει όταν το συνολικό ενεργοποιημένο mah είναι μεγαλύτερο από αυτήν την τιμή. Απαιτεί αισθητήρα ρεύματος. Το μηδέν απενεργοποιεί αυτόν το συναγερμό."
+	},
+	"osd_time_alarm": {
+		"message": "Χρόνος πτήσης (λεπτά)"
+	},
+	"osd_alt_alarm": {
+		"message": "Υψόμετρο"
+	},
+	"osd_dist_alarm": {
+		"message": "Απόσταση"
+	},
+	"osdAlarmDIST_HELP": {
+		"message": "O δείκτης απόστασης από το σημείο εκκίνησης θα αναβοσβήνει όταν η απόσταση είναι μεγαλύτερη από αυτήν την τιμή. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osd_neg_alt_alarm": {
+		"message": "Αρνητικό ύψος"
+	},
+	"osdAlarmMAX_NEG_ALTITUDE_HELP": {
+		"message": "Ο δείκτης ύψους θα αναβοσβήνει όταν το ύψος είναι αρνητικό και η απόλυτη τιμή του είναι μεγαλύτερη από αυτόν τον συναγερμό. Χρήσιμο όταν απογειώνεστε από ψηλά μέρη. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osd_airspeed_min_alarm": {
+		"message": "Ελάχιστη ταχύτητα αέρα"
+	},
+	"osd_airspeed_min_alarm_HELP": {
+		"message": "Ο δείκτης ταχύτητας αέρα θα αναβοσβήνει όταν η ταχύτητα αέρα είναι κάτω από αυτό το όριο. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osd_airspeed_max_alarm": {
+		"message": "Μέγιστη ταχύτητα αέρα"
+	},
+	"osd_airspeed_max_alarm_HELP": {
+		"message": "Ο δείκτης ταχύτητας αέρα θα αναβοσβήνει όταν η ταχύτητα αέρα είναι πάνω από αυτό το όριο. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osd_gforce_alarm": {
+		"message": "Δύναμη g"
+	},
+	"osdAlarmGFORCE_HELP": {
+		"message": "Το δείκτης επιτάχυνσης βαρύτητας g θα αρχίσει να αναβοσβήνει όταν είναι μεγαλύτερο από αυτήν την τιμή."
+	},
+	"osd_gforce_axis_alarm_min": {
+		"message": "Ελάχιστη επιτάχυνση g άξονα"
+		},
+		"osdAlarmGFORCE_AXIS_MIN_HELP": {
+		"message": "Τα στοιχεία των άξονων της βαρύτητας g θα αρχίσουν να αναβοσβήνουν όταν είναι χαμηλότερα από αυτήν την τιμή."
+	},
+	"osd_gforce_axis_alarm_max": {
+		"message": "Μέγιστη επιτάχυνση g άξονα"
+	},
+	"osdAlarmGFORCE_AXIS_MAX_HELP": {
+		"message": "Τα στοιχεία των άξονων της βαρύτητας g θα αρχίσουν να αναβοσβήνουν όταν είναι μεγαλύτερα από αυτήν την τιμή."
+	},
+	"osd_current_alarm": {
+		"message": "Ρεύμα (A)"
+	},
+	"osdAlarmCURRENT_HELP": {
+		"message": "Το στοιχείο κατανάλωσης ρεύματος θα αρχίσει να αναβοσβήνει όταν η κατανάλωση είναι μεγαλύτερη από αυτήν την τιμή. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osd_imu_temp_alarm_min": {
+		"message": "Ελάχιστη θερμοκρασία IMU"
+	},
+	"osd_imu_temp_alarm_max": {
+		"message": "Μέγιστη θερμοκρασία IMU"
+	},
+	"osd_baro_temp_alarm_min": {
+		"message": "Ελάχιστη θερμοκρασία baro"
+	},
+	"osd_baro_temp_alarm_max": {
+		"message": "Μέγιστη θερμοκρασία baro"
+	},
+	"osd_esc_temp_alarm_min": {
+		"message": "Ελάχιστη θερμοκρασία ESC"
+	},
+	"osd_esc_temp_alarm_max": {
+		"message": "Μέγιστη θερμοκρασία ESC"
+	},
+	"osd_snr_alarm": {
+		"message": "Επίπεδο συναγερμού CRSF SNR"
+	},
+	"osdalarmSNR_HELP": {
+		"message": "Το SNR εμφανίζεται μόνο κάτω από αυτήν την τιμή. 0dB (αναλογία 1:1), υποδηλώνει ότι το ληφθέν σήμα είναι ίσο με το επίπεδο θορύβου."
+	},
+	"osd_link_quality_alarm": {
+		"message": "Συναγερμός link quality CRSF"
+	},
+	"osdalarmLQ_HELP": {
+		"message": "Για χρήση Crossfire χρησιμοποιήστε το 70%. Για Tracer χρησιμοποιήστε το 50%."
+	},
+	"osd_rssi_dbm_alarm": {
+		"message": "Συναγερμός CRSF RSSI dBm"
+	},
+	"osd_rssi_dbm_alarm_HELP": {
+		"message": "Ο δείκτης RSSI αναβοσβήνει κάτω από αυτήν την τιμή. Εύρος: [-130,0]. Το μηδέν απενεργοποιεί αυτόν τον συναγερμό."
+	},
+	"osdGroupGeneral": {
+		"message": "Γενικά"
+	},
+	"osdGroupAltitude": {
+		"message": "Υψόμετρο"
+	},
+	"osdGroupTimers": {
+		"message": "Χρονόμετρα"
+	},
+	"osdGroupGForce": {
+		"message": "Δύναμη g"
+	},
+	"osdGroupTemperature": {
+		"message": "Θερμοκρασία"
+	},
+	"osdGroupAttitude": {
+		"message": "Στάση"
+	},
+	"osdGroupCurrentMeter": {
+		"message": "Μετρητής ρεύματος"
+	},
+	"osdGroupGPS": {
+		"message": "GPS"
+	},
+	"osdGroupPowerLimits": {
+		"message": "Όρια ισχύος"
+	},
+	"osdGroupPIDs": {
+		"message": "Ρυθμίσεις προσαρμοστικών τιμών RC"
+	},
+	"osdGroupPIDOutputs": {
+		"message": "Έξοδοι ελεγκτών PID"
+	},
+	"osdGroupVTX": {
+		"message": "VTX"
+	},
+	"osdGroupCRSF": {
+		"message": "Στατιστικά CRSF RX"
+	},
+	"osdGroupMapsAndRadars": {
+		"message": "Χάρτες και ραντάρ"
+	},
+	"osdGroupMapsAndRadars_HELP": {
+		"message": "Οι χάρτες και τα ραντάρ επιτρέπουν την τοποθέτηση επιπλέον στοιχείων πάνω τους, όσο δεν επικαλύπτουν καμένα από τα μέρη του χάρτη που είναι ορατά στην προεπισκόπηση."
+	},
+	"osdElement_ONTIME_FLYTIME": {
+		"message": "Χρόνος λειτουργίας / Χρόνος πτήσης"
+	},
+	"osdElement_RSSI_VALUE": {
+		"message": "RSSI (Ισχύς Σήματος)"
+	},
+	"osdElement_RSSI_VALUE_HELP": {
+		"message": "Εμφανίζει την ποιότητα του σήματος που λαμβάνεται από την RC τηλεκατεύθυνση (όσο υψηλή, τόσο καλύτερη)."
+	},
+	"osdElement_MAIN_BATT_VOLTAGE": {
+		"message": "Τάση μπαταρίας"
+	},
+	"osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
+		"message": "αντισταθμισμένη τάση μπαταρίας"
+	},
+	"osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
+		"message": "Υπολογισμένη τάση που θα έπρεπε να έχει η μπαταρία χωρίς φορτίο (προσομοιώνει ιδανική μπαταρία)"
+	},
+	"osdElement_MESSAGES": {
+		"message": "Μηνύματα συστήματος"
+	},
+	"osdElement_MESSAGES_HELP": {
+		"message": "Εμφανίζει διάφορα μηνύματα συστήματος όπως προειδοποιήσεις, βλάβες υλικού και επεκταμένες λεπτομέρειες της τρέχουσας λειτουργίας πτήσης (π.χ. λειτουργίες AUTOTUNE και AUTOTRIM και στάδια RTH)."
+	},
+	"osdElement_MAIN_BATT_CELL_VOLTAGE": {
+		"message": "Τάση κυψέλης μπαταρίας"
+	},
+	"osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
+		"message": "αντισταθμισμένη τάση κυψέλης μπαταρίας"
+	},
+	"osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
+		"message": "Υπολογισμένη μέση τάση κυψέλης που θα έπρεπε να έχει η μπαταρία χωρίς φορτίο (προσομοιώνει ιδανική μπαταρία)"
+	},
+	"osdElement_MAIN_BATT_REMAINING_PERCENTAGE": {
+		"message": "Υπολειπόμενο ποσοστό μπαταρίας"
+	},
+	"osdElement_MAIN_BATT_REMAINING_CAPACITY": {
+		"message": "Υπολειπόμενη χωρητικότητα μπαταρίας"
+	},
+	"osdElement_REMAINING_FLIGHT_TIME_HELP": {
+		"message": "Εκτιμώμενος υπολειπόμενος χρόνος πτήσης πριν από το αεροσκάφος να χρειαστεί να επιστρέψει στο σπίτι βασισμένος στην υπολειπόμενη ενέργεια της μπαταρίας, τη μέση ισχύ και την απόσταση μέχρι το σπίτι (μόνο για αεροσκάφη με σταθερή πτέρυγα, παρακαλούμε διαβάστε την τεκμηρίωση)"
+	},
+	"osdElement_REMAINING_FLIGHT_DISTANCE_HELP": {
+		"message": "Εκτιμώμενη υπολειπόμενη απόσταση πτήσης πριν από το αεροσκάφος να χρειαστεί να επιστρέψει στο σπίτι βασισμένος στην υπολειπόμενη ενέργεια της μπαταρίας, τη μέση ισχύ και την απόσταση μέχρι το σπίτι (μόνο για αεροσκάφη με σταθερή πτέρυγα, παρακαλούμε διαβάστε την τεκμηρίωση)"
+	},
+	"osdElement_MAIN_BATT_CELL_VOLTAGE_HELP": {
+		"message": "Εμφανίζει τη μέση τάση κυψέλης από την κύρια μπαταρία"
+	},
+	"osdElement_MAH_DRAWN": {
+		"message": "mAh καταναλωθέντα"
+		},
+		"osdElement_EFFICIENCY_MAH": {
+		"message": "Αποδοτικότητα mAh/Km"
+	},
+	"osdElement_EFFICIENCY_WH": {
+		"message": "Αποδοτικότητα Wh/Km"
+	},
+	"osdElement_PLIMIT_REMAINING_BURST_TIME": {
+		"message": "Υπολειπόμενος χρόνος υψηλού γκαζιού"
+	},
+	"osdElement_PLIMIT_ACTIVE_CURRENT_LIMIT": {
+		"message": "Ενεργό όριο ρεύματος"
+	},
+	"osdElement_PLIMIT_ACTIVE_POWER_LIMIT": {
+		"message": "Ενεργό όριο ισχύος"
+	},
+	"osdElement_THROTTLE_POSITION_HELP": {
+		"message": "Εμφανίζει τη θέση του γκαζιού σε λειτουργίες πτήσης όπου <i>αυτό</i> ελέγχει την έξοδο του κινητήρα. Σε λειτουργίες πλοήγησης, εμφανίζει την τιμή του γκαζιού που ελέγχεται από το INAV."
+	},
+	"osdElement_SCALED_THROTTLE_POSITION_HELP": {
+		"message": "Εμφανίζει τη θέση του γκαζιόυ σε λειτουργίες πτήσης όπου <i>αυτό</i> ελέγχει την έξοδο του κινητήρα. Σε λειτουργίες πλοήγησης, εμφανίζει την τιμή του γκαζιού που ελέγχεται από το INAV. Αυτή η τιμή κλιμακώνεται με βάση την ελάχιστη και τη μέγιστη θέση του γκαζιού."
+	},
+	"osdElement_GPS_SPEED": {
+		"message": "Ταχύτητα εδάφους"
+	},
+	"osdElement_GPS_SPEED_HELP": {
+		"message": "Εμφανίζει την ταχύτητα εδάφους από το GPS."
+	},
+	"osdElement_GPS_MAX_SPEED": {
+		"message": "Μέγιστη ταχύτητα GPS"
+	},
+	"osdElement_GPS_MAX_SPEED_HELP": {
+		"message": "Εμφανίζει την υψηλότερη ταχύτητα εδάφους από το GPS."
+	},
+	"osdElement_MSL_ALTITUDE": {
+		"message": "Υψόμετρο MSL"
+	},
+	"osdElement_MSL_ALTITUDE_HELP": {
+		"message": "Υψόμετρο πάνω από τη μέση στάθμη της θάλασσας"
+	},
+	"osdElement_3D_SPEED": {
+		"message": "Ταχύτητα 3D"
+	},
+	"osdElement_3D_SPEED_HELP": {
+		"message": "Εμφανίζει την 3D ταχύτητα λαμβάνοντας υπόψη την οριζόντια και κατακόρυφη ταχύτητα."
+	},
+	"osdElement_3D_MAX_SPEED": {
+		"message": "Μέγιστη ταχύτητα 3D"
+	},
+	"osdElement_3D_MAX_SPEED_HELP": {
+		"message": "Εμφανίζει την υψηλότερη 3D ταχύτητα λαμβάνοντας υπόψη την οριζόντια και κατακόρυφη ταχύτητα."
+	},
+	"osdElement_AIR_MAX_SPEED": {
+		"message": "Μέγιστη ταχύτητα αέρα"
+	},
+	"osdElement_AIR_MAX_SPEED_HELP": {
+		"message": "Εμφανίζει την υψηλότερη ταχύτητα αέρα."
+	},
+	"osdElement_GPS_SATS": {
+		"message": "Δορυφόροι GPS"
+	},
+	"osdElement_GPS_SATS_HELP": {
+		"message": "Εμφανίζει τον αριθμό των δορυφόρων GPS που εντοπίζονται από τον δέκτη GPS."
+	},
+	"osdElement_GPS_HDOP": {
+		"message": "Διακύμανση οριζόντιας ακρίβειας GPS (HDOP)"
+	},
+	"osdElement_GPS_HDOP_HELP": {
+		"message": "Εμφανίζει τη Διακύμανση Οριζόντιας Ακρίβειας (HDOP) από το GPS. Όσο χαμηλότερη είναι η τιμή, τόσο πιο ακριβής είναι η θέση του GPS."
+	},
+	"osdElement_PLUS_CODE": {
+		"message": "Plus Code (γεωγραφικό πλάτος + γεωγραφικό μήκος)"
+	},
+	"osdElement_PLUS_CODE_HELP": {
+		"message": "Τα plus codes κωδικοποιούν τόσο το γεωγραφικό πλάτος όσο και το γεωγραφικό μήκος σε μια μοναδική τιμή που μπορεί να εισαχθεί απευθείας στο Google Maps. Παρέχει το ίδιο επίπεδο ακρίβειας με το γεωγραφικό πλάτος και το γεωγραφικό μήκος, χρησιμοποιώντας λιγότερο χώρο οθόνης."
+	},
+	"osdElement_AZIMUTH": {
+		"message": "Αζιμούθιο"
+	},
+	"osdElement_AZIMUTH_HELP": {
+		"message": "Το αζιμούθιο είναι η κατεύθυνση του αεροσκάφους σε σχέση με το σημείο εκκίνησης. Είναι χρήσιμο για να κρατήσετε το αεροσκάφος στη σωστή πορεία ή για να κρατήσετε το αεροσκάφος μπροστά από μια σταθερή κατευθυντική κεραία."
+	},
+	"osdElement_TRIP_DIST": {
+		"message": "Απόσταση ταξιδιού"
+	},
+	"osdElement_VARIO_HELP": {
+		"message": "Εμφανίζει την κατακόρυφη ταχύτητα χρησιμοποιώντας βέλη προς τα πάνω ή προς τα κάτω. Κάθε βέλος αντιπροσωπεύει 10cm (~4 ίντσες) ανά δευτερόλεπτο."
+	},
+	"osdElement_VARIO_NUM": {
+		"message": "Αριθμητική κατακόρυφη ταχύτητα"
+	},
+	"osdElement_VARIO_NUM_HELP": {
+		"message": "Εμφανίζει την κατακόρυφη ταχύτητα χρησιμοποιώντας έναν αριθμό."
+	},
+	"osdElement_G_FORCE": {
+		"message": "Δύναμη g"
+	},
+	"osdElement_G_FORCE_HELP": {
+		"message": "Εμφανίζει τη δύναμη g λαμβάνοντας υπόψη όλους τους άξονες."
+		},
+		"osdElement_G_FORCE_X": {
+		"message": "Επικαθήμενη δύναμη g στον σώμα (X)"
+	},
+	"osdElement_G_FORCE_X_HELP": {
+		"message": "Εμφανίζει τη δύναμη g στον άξονα X (μήκος)"
+	},
+	"osdElement_G_FORCE_Y": {
+		"message": "Πλευρική δύναμη g στον σώμα (Y)"
+	},
+	"osdElement_G_FORCE_Y_HELP": {
+		"message": "Εμφανίζει τη δύναμη g στον άξονα Y (πλάτος)"
+	},
+	"osdElement_G_FORCE_Z": {
+		"message": "Κατακόρυφη δύναμη g στον σώμα (Z)"
+	},
+	"osdElement_G_FORCE_Z_HELP": {
+		"message": "Εμφανίζει τη δύναμη g στον άξονα Z (κατακόρυφη)"
+	},
+	"osdElement_ROLL_PIDS": {
+		"message": "Roll PIDs"
+	},
+	"osdElement_PITCH_PIDS": {
+		"message": "Pitch PIDs"
+	},
+	"osdElement_YAW_PIDS": {
+		"message": "Yaw PIDs"
+	},
+	"osdElement_ONTIME_FLYTIME_HELP": {
+		"message": "Εμφανίζει το \"On Time\" όταν δεν είναι οπλισμένο και το \"Fly Time\" όταν είναι οπλισμένο."
+	},
+	"osdElement_RTC_TIME": {
+		"message": "Ωρα"
+	},
+	"osdElement_RTC_TIME_HELP": {
+		"message": "Εμφανίζει την τρέχουσα ώρα, όπως ανακτάται από το GPS."
+	},
+	"osdElement_RC_SOURCE": {
+		"message": "Πηγή RC"
+	},
+	"osdElement_RC_SOURCE_HELP": {
+		"message": "Εμφανίζει την τρέχουσα πηγή RC, STD ή MSP (χρήσιμο όταν χρησιμοποιείτε MSP override)"
+	},
+	"osdElement_VTX_POWER": {
+		"message": "Επίπεδο ισχύος βίντεο TX"
+	},
+	"osdElement_VTX_POWER_HELP": {
+		"message": "Εμφανίζει το τρέχον επίπεδο ισχύος του VTX. Αναβοσβήνει όταν επιλέγεται ο αντίστοιχος έλεγχος RC"
+	},
+	"osdElement_ESC_RPM": {
+		"message": "Στροφές κινητήρα από την τηλεμετρία ESC"
+	},
+	"osdElement_GLIDESLOPE": {
+		"message": "Κλίση κάθοδου"
+	},
+	"osdElement_GLIDESLOPE_HELP": {
+		"message": "Ποσότητα οριζόντιας απόστασης που διανύεται ανά μονάδα χαμένου υψομέτρου"
+	},
+	"osdElement_PAN_SERVO_CENTRED": {
+		"message": "Κεντραρισμένη υπηρεσία περιστροφής"
+	},
+	"osdElement_PAN_SERVO_CENTRED_HELP": {
+		"message": "Εμφανίζει αν η υπηρεσία περιστροφής είναι κεντραρισμένη (0) ή μετατοπισμένη (βέλη). Ελέγξτε τις ρυθμίσεις <b>osd_pan_servo_</b> για την παραμετροποίηση της υπηρεσίας περιστροφής."
+	},
+	"osdElement_VTX_CHANNEL": {
+		"message": "Μπάντα και κανάλι βίντεο TX"
+	},
+	"osdElement_VTX_CHANNEL_HELP": {
+		"message": "Εμφανίζει την τρέχουσα Μπάντα και κανάλι του VTX. Απαιτείται είτε ένα VTX με SmartAudio είτε Tramp είτε ένα VTX που ενσωματώνεται στον ελεγκτή πτήσης."
+	},
+	"osdElement_CRSF_RSSI_DBM": {
+		"message": "RX RSSI σε dBm"
+	},
+	"osdElement_CRSF_LQ": {
+		"message": "Ποιότητα σύνδεσης RX %"
+	},
+	"osdElement_CRSF_LQ_HELP": {
+		"message": "Χρησιμοποιήστε τη ρύθμιση Crossfire LQ Format για να επιλέξετε τον τύπο μορφής."
+	},
+	"osdElement_CRSF_SNR_DB": {
+		"message": "SNR Uplink RX σε dB"
+	},
+	"osdElement_CRSF_SNR_DB_HELP": {
+		"message": "Εμφανίζεται μόνο όταν το SNR πέσει κάτω από το επίπεδο συναγερμού. Στα 0dB, το επίπεδο του σήματος που λαμβάνεται ισούται με το επίπεδο του θορύβου."
+	},
+	"osdElement_CRSF_TX_POWER": {
+		"message": "Ισχύς TX σε mW"
+	},
+	"osdElement_MAP_NORTH": {
+		"message": "Χάρτης (Πάνω είναι βόρεια)"
+	},
+	"osdElement_MAP_TAKEOFF": {
+		"message": "Χάρτης (Πάνω είναι η κατεύθυνση απογείωσης)"
+	},
+	"osdElement_RADAR": {
+		"message": "Ραντάρ"
+	},
+	"osdElement_MAP_SCALE": {
+		"message": "Κλίμακα χάρτη"
+	},
+	"osdElement_MAP_SCALE_HELP": {
+		"message": "Κλίμακα του τρέχοντος χάρτη/ραντάρ που εμφανίζεται."
+	},
+	"osdElement_MAP_REFERENCE": {
+		"message": "Αναφορά χάρτη"
+	},
+	"osdElement_MAP_REFERENCE_HELP": {
+		"message": "Η αναφορά (κατεύθυνση που δείχνει πάνω) του τρέχοντος χάρτη. Ν για βόρεια και Τ για την κατεύθυνση απογείωσης."
+	},
+	"osdElement_WIND_SPEED_HORIZONTAL": {
+		"message": "Οριζόντια ταχύτητα ανέμου"
+	},
+	"osdElement_WIND_SPEED_HORIZONTAL_HELP": {
+		"message": "Εμφανίζει εκτιμώμενη οριζόντια ταχύτητα ανέμου και κατεύθυνση."
+	},
+	"osdElement_WIND_SPEED_VERTICAL": {
+		"message": "Κατακόρυφη ταχύτητα ανέμου"
+	},
+	"osdElement_WIND_SPEED_VERTICAL_HELP": {
+		"message": "Εμφανίζει εκτιμώμενη κατακόρυφη ταχύτητα ανέμου και κατεύθυνση (πάνω ή κάτω)."
+	},
+	"osdElement_ACTIVE_PROFILE": {
+		"message": "Εμφάνιση του ενεργού προφίλ"
+	},
+	"osdElement_LEVEL_PIDS": {
+		"message": "Level PIDs"
+	},
+	"osdElement_POS_XY_PIDS": {
+		"message": "Θέση XY PIDs"
+	},
+	"osdElement_POS_Z_PIDS": {
+		"message": "Θέση Z PIDs"
+	},
+	"osdElement_VEL_XY_PIDS": {
+		"message": "Ταχύτητα XY PIDs"
+	},
+	"osdElement_VEL_Z_PIDS": {
+		"message": "Ταχύτητα Z PIDs"
+	},
+	"osdElement_FW_ALT_PID_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή PID υψομέτρου FW"
+	},
+	"osdElement_FW_POS_PID_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή θέσης PID FW"
+	},
+	"osdElement_MC_VEL_X_PID_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή PID ταχύτητας X MC"
+	},
+	"osdElement_MC_VEL_Y_PID_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή PID ταχύτητας Y MC"
+	},
+	"osdElement_MC_VEL_Z_PID_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή PID ταχύτητας Z MC"
+	},
+	"osdElement_MC_POS_XYZ_P_OUTPUTS": {
+		"message": "Έξοδοι ελεγκτή P PID θέσης XYZ MC"
+	},
+	"osdElement_IMU_TEMPERATURE": {
+		"message": "Θερμοκρασία IMU"
+	},
+	"osdElement_IMU_TEMPERATURE_HELP": {
+		"message": "Θερμοκρασία της IMU"
+	},
+	"osdElement_BARO_TEMPERATURE": {
+		"message": "Θερμοκρασία βαρόμετρου"
+	},
+	"osdElement_BARO_TEMPERATURE_HELP": {
+		"message": "Θερμοκρασία του βαρόμετρου"
+	},
+	"osdElement_ESC_TEMPERATURE": {
+		"message": "Θερμοκρασία ESC"
+	},
+	"osdElement_ESC_TEMPERATURE_HELP": {
+		"message": "Θερμοκρασία του ESC αναγνωσμένη από την τηλεμετρία DSHOT"
+	},
+	"osdGroupSwitchIndicators": {
+		"message": "ενδείξεις διακοπτών"
+	},
+	"osdElement_SWITCH_INDICATOR_0": {
+		"message": "Δείκτης διακόπτη 1"
+	},
+	"osdElement_SWITCH_INDICATOR_1": {
+		"message": "Δείκτης διακόπτη 2"
+	},
+	"osdElement_SWITCH_INDICATOR_2": {
+		"message": "Δείκτης διακόπτη 3"
+	},
+	"osdElement_SWITCH_INDICATOR_3": {
+		"message": "Δείκτης διακόπτη 4"
+	},
+	"osd_pan_servo_settings": {
+		"message": "Ρυθμίσεις OSD της υπηρεσίας περιστροφής"
+	},
+	"osd_pan_servo_settings_HELP": {
+		"message": "Αυτή η ενότητα ενεργοποιεί και ρυθμίζει το χαρακτηριστικό μετατόπισης της υπηρεσίας περιστροφής της κάμερας απο σέρβο. Χρησιμοποιείται για να κρατήσει τα στοιχεία OSD, όπως ο βολές στο σπίτι και τα POI, να δείχνουν προς την σωστή κατεύθυνση. Ακόμη και όταν έχετε περιστρέψει την κάμερα."
+	},
+	"osdPanServoIndex": {
+		"message": "Έξοδος υπηρεσίας περιστροφής"
+	},
+	"osdPanServoIndex_HELP": {
+		"message": "Ορίστε τον αριθμό έξοδου της υπηρεσίας περιστροφής· όπως φαίνεται στον πίνακα εξόδων ανάμειξης. Για παράδειγμα, η έξοδος S6."
+		},
+		"osdPanServoPwm2centideg": {
+		"message": "Συνολικοί βαθμοί κίνησης της υπηρεσίας περιστροφής pan"
+	},
+	"osdPanServoPwm2centideg_HELP": {
+		"message": "Βαθμοί περιστροφής της υπηρεσίας περιστροφής pan. Μια υπηρεσία με 180 βαθμούς περιστροφής από 1000 έως 2000 μικροδευτερόλεπτα PWM χρειάζεται συνήθως 180 για αυτή τη ρύθμιση. Κάντε την τιμή αρνητική για αντιστροφή της κατεύθυνσης."
+	},
+	"osdPanServoIndicatorShowDegrees": {
+		"message": "Εμφάνιση βαθμών μετατόπισης δίπλα στο δείκτη περιστροφής"
+	},
+	"osdPanServoOffcentreWarning": {
+		"message": "Προειδοποίηση εκτός κέντρου"
+	},
+	"osdPanServoOffcentreWarning_HELP": {
+		"message": "Βαθμοί από το κέντρο της υπηρεσίας περιστροφής pan, όπου υποθέτεται ότι η κάμερα θέλει να κοιτάει μπροστά, αλλά δεν είναι στο 0. Εάν βρίσκεται σε αυτό το εύρος και δεν είναι 0 για περισσότερο από 10 δευτερόλεπτα, το στοιχείο OSD μετατόπισης της υπηρεσίας περιστροφής θα αναβοσβήνει. Το 0 σημαίνει ότι η προειδοποίηση είναι απενεργοποιημένη."
+	},
+	"osdGroupGVars": {
+		"message": "Παγκόσμιες Μεταβλητές"
+	},
+	"osdElement_GVAR_0": {
+		"message": "Παγκόσμια Μεταβλητή 0"
+	},
+	"osdElement_GVAR_1": {
+		"message": "Παγκόσμια Μεταβλητή 1"
+	},
+	"osdElement_GVAR_2": {
+		"message": "Παγκόσμια Μεταβλητή 2"
+	},
+	"osdElement_GVAR_3": {
+		"message": "Παγκόσμια Μεταβλητή 3"
+	},
+	"osdElement_SENSOR1_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 1"
+	},
+	"osdElement_SENSOR2_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 2"
+	},
+	"osdElement_SENSOR3_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 3"
+	},
+	"osdElement_SENSOR4_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 4"
+	},
+	"osdElement_SENSOR5_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 5"
+	},
+	"osdElement_SENSOR6_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 6"
+	},
+	"osdElement_SENSOR7_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 7"
+	},
+	"osdElement_SENSOR8_TEMPERATURE": {
+		"message": "Αισθητήρας θερμοκρασίας 8"
+	},
+	"osdSettingMainVoltageDecimals": {
+		"message": "Δεκαδικά κύριας τάσης"
+	},
+	"osdElement_OSD_RANGEFINDER": {
+		"message": "Απόσταση από αισθητήρα απόστασης"
+	},
+	"osdSettingPLUS_CODE_DIGITS_HELP": {
+		"message": "Ακρίβεια στον ισημερινό: 10=13.9x13.9μ; 11=2.8x3.5μ; 12=56x87εκ; 13=11x22εκ."
+	},
+	"osdSettingPLUS_CODE_SHORT_HELP": {
+		"message": "Η αφαίρεση 2, 4 και 6 προηγούμενων ψηφίων απαιτεί μια αναφορά τοποθεσίας εντός, αντίστοιχα, ~800km, ~40km και ~2km για την ανάκτηση των αρχικών συντεταγμένων."
+	},
+	"osdSettingCRSF_LQ_FORMAT_HELP": {
+		"message": "Ο ΤΥΠΟΣ1 εμφανίζει το LQ% όπως χρησιμοποιείται από το TBS υλικό. Ο ΤΥΠΟΣ2 δείχνει τα λειτουργικά προφίλ RF (2=150Hz, 1=50Hz, 0=4Hz συντελεστές ενημέρωσης) και LQ % [0..100%]. Το Tracer δείχνει τη λειτουργία RF 1 (1=250Hz) και LQ % [0..100%]."
+	},
+	"osd_video_show_guides": {
+		"message": "Εμφάνιση οδηγιών προεπισκόπησης"
+	},
+	"osd_video_HELP": {
+		"message": "Για HD: οι κόκκινες γραμμές δείχνουν 4:3 οθόνη, HDZero: κρατήστε τα όρια εντός του μπλε κουτιού για υψηλότερο ρυθμό ανανέωσης, AUTO/PAL: η πράσινη γραμμή είναι το όριο NTSC."
+	},
+	"osd_dji_HD_FPV": {
+		"message": "DJI HD FPV (οχι ο3)"
+	},
+	"osd_dji_hide_unsupported": {
+		"message": "Απόκρυψη μη υποστηριζόμενων στοιχείων"
+	},
+	"osd_dji_ESC_temp": {
+		"message": "Πηγή <i>θερμοκρασίας ESC</i>"
+	},
+	"osd_dji_RSSI_source": {
+		"message": "Πηγή <i>RSSI</i>"
+	},
+	"osd_dji_GPS_source": {
+		"message": "Πηγή <i>Ταχύτητας GPS</i>"
+	},
+	"osd_dji_speed_source": {
+		"message": "Πηγή <i>3D Ταχύτητας</i>"
+	},
+	"osd_dji_use_craft_name_elements": {
+		"message": "Χρησιμοποιήστε το όνομα του αεροσκάφους για μηνύματα και επιπλέον στοιχεία.</span><br/>Τα στοιχεία σε <span class=\"blue\">μπλε</span> εμφανίζονται στο όνομα του αεροσκάφους."
+	},
+	"osd_dji_adjustments": {
+		"message": "Εμφάνιση προσαρμογών στο όνομα του αεροσκάφους"
+	},
+	"osd_dji_cn_alternating_duration": {
+		"message": "Διάρκεια εναλλαγής ονόματος αεροσκάφους (σε 1/10 δευτ.)"
+	},
+	"osd_switch_indicator_settings": {
+		"message": "Ρυθμίσεις δεικτών διακοπτών"
+	},
+	"osd_switch_indicators_align_left": {
+		"message": "Ευθυγράμμιση ονομάτων διακοπτών αριστερά από τους διακόπτες"
+	},
+	"osdSwitchInd0": {
+		"message": "Διακόπτης 1"
+	},
+	"osdSwitchInd1": {
+		"message": "Διακόπτης 2"
+	},
+	"osdSwitchInd2": {
+		"message": "Διακόπτης 3"
+	},
+	"osdSwitchInd3": {
+		"message": "Διακόπτης 4"
+	},
+	"osd_font_default": {
+		"message": "Προεπιλογή"
+	},
+	"osd_font_vision": {
+		"message": "Όραση"
+	},
+	"osd_font_impact": {
+		"message": "Επίδραση"
+	},
+	"osd_font_impact_mini": {
+		"message": "Επίδραση mini"
+	},
+	"osd_font_clarity": {
+		"message": "Καθαρότητα"
+	},
+	"osd_font_clarity_medium": {
+		"message": "Καθαρότητα μεσαίου μεγέθους"
+	},
+	"osd_font_bold": {
+		"message": "Έντονο"
+	},
+	"osd_font_large": {
+		"message": "Μεγάλο"
+	},
+	"osd_font_load_file": {
+		"message": "Άνοιγμα αρχείου γραμματοσειράς"
+	},
+	"osd_font_upload": {
+		"message": "Μεταφόρτωση γραμματοσειράς"
+	},
+	"osd_font_manager": {
+		"message": "Διαχειριστής γραμματοσειράς"
+	},
+	"uploadingCharacters": {
+		"message": "Μεταφόρτωση..."
+	},
+	"uploadedCharacters": {
+		"message": "Μεταφορτώθηκαν $1 χαρακτήρες"
+	},
+	"portsIdentifier": {
+		"message": "Αναγνωριστικό"
+	},
+	"portsConfiguration": {
+		"message": "Δεδομένα"
+	},
+	"portsTelemetryOut": {
+		"message": "Τηλεμετρία"
+	},
+	"portsSerialRx": {
+		"message": "RX"
+	},
+	"portColumnSensors": {
+		"message": "Αισθητήρες"
+	},
+	"portsPeripherals": {
+		"message": "Περιφερειακά"
+	},
+	"appUpdateNotificationHeader": {
+		"message": "Διαθέσιμη νέα έκδοση Configurator."
+	},
+	"appUpdateNotificationDescription": {
+		"message": "Παρακαλούμε επισκεφτείτε την <a href=\"https://github.com/iNavFlight/inav-configurator/releases\" target=\"_blank\">ιστοσελίδα</a> για να διαβάσετε τις σημειώσεις έκδοσης και να κάνετε λήψη."
+	},
+	"closeUpdateBtn": {
+		"message": "Κλείσιμο"
+	},
+	"downloadUpdatesBtn": {
+		"message": "Λήψη νέας εφαρμογής"
+	},
+	"tabMissionControl": {
+		"message": "Έλεγχος αποστολής"
+	},
+	"loadMissionButton": {
+		"message": "Φόρτωση αποστολής από τον ελεγκτή πτήσης"
+	},
+	"saveMissionButton": {
+		"message": "Αποθήκευση αποστολής στον ελεγκτή πτήσης"
     },
    "loadEepromMissionButton": {
         "message": "Φόρτωση αποστολής Eeprom"
@@ -4266,8 +4355,8 @@
     "missionMultiAddNewMission": {
         "message": "Προσθήκη Νέας Αποστολής"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Χρήση μοντέλου DEM της επιπέδου της θάλασσας της Γης: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Χρήση Ellipsoid αντί για SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Υποσημείωση : "
@@ -4277,6 +4366,12 @@
     },
     "SafehomeSafeRadius": {
         "message": "Ασφαλής ακτίνα (μ):"
+    },
+	"SafehomeFwAppraoch": {
+        "message": "Προσέγγιση σταθερής πτέρυγας:"
+    },
+    "safehomeEdit": {
+        "message": "Τροποποίηση Safehome"
     },
     "missionTitleHide": {
         "message": "Απόκρυψη"
@@ -4308,13 +4403,16 @@
     "missionTitleSaveEepromMission": {
         "message": "Αποθήκευση αποστολής Eeprom"
     },
+	"missionTitleDelete": {
+        "message": "Διαγραφή"
+    },
     "missionTitleRemoveAll": {
         "message": "Κατάργηση όλων"
     },
     "missionTitleSetActive": {
         "message": "Ορισμός ως Ενεργή"
     },
-    "missionTitleUpdateAll": {
+	"missionTitleUpdateAll": {
         "message": "Ενημέρωση Όλων"
     },
     "missionTitleAdd": {
@@ -4332,6 +4430,60 @@
     "missionTitlEditMission": {
         "message": "Επεξεργασία Αποστολής"
     },
+	"MissionPlannerFwLAndingAltitudeChangeReset": {
+        "message": "Υψόμετρο κάτω από το ελάχιστο υψόμετρο εδάφους. Η αλλαγή αγνοήθηκε" 
+    },
+    "missionWpType": {
+        "message": "Τύπος:"
+    },
+    "missionWpLat": {
+        "message": "Γ.πλατ:"
+    },
+    "missionWpLon": {
+        "message": "Γ.μηκ:"
+    },
+    "missionSeaLevelRef": {
+        "message": "Επίπεδο θάλασσας ως σημείο αναφοράς: "
+    },
+    "missionElevation": {
+        "message": "Ύψος (μ):"
+    },
+    "missionNA": {
+        "message": "N/A"
+    },
+    "missionGroundDist": {
+        "message": "Απόσταση εδάφους (μ):"
+    },
+    "missionParameter1": {
+        "message": "Παράμετρος 1:"
+    },
+    "missionParameter2": {
+        "message": "Παράμετρος 2:"
+    },
+    "missionUserActions": {
+        "message": "Ενέργειες χρήστη:"
+    },
+    "missionFwLandingSettings": {
+        "message": "Ρυθμήσεις προσγείωσης σταθερής πτέρυγας:"
+    },
+    "missionFwApproachAlt": {
+        "message": "Υψόμετρο προσέγγισης: (εκ):"
+    },
+    "missionFwLandAlt": {
+        "message": "Υψόμετρο προσγείωσης: (εκ):"
+    },
+    "missionFwApproachDir": {
+        "message": "διεύθυνση προσέγγισης:"
+    },
+    "missionFwLandHeading1": {
+        "message": "Προσανατολισμός 1: (μοίρες):"
+    },
+    "missionFwLandHeading2": {
+        "message": "προσανατολισμός 2: (μοίρες):"
+    },
+    "missionExclusive": {
+        "message": "αποκλ."
+    },
     "missionRTHsettingsTitle": {
         "message": "Ρυθμίσεις επιστροφής στη βάση"
     },
@@ -4346,6 +4498,12 @@
     },
     "missionSafehomeHead": {
         "message": "Διαχείριση Ασφαλούς Βάσης"
+    },
+	"missionSafehomeAvailableSafehomes" : {
+        "message": "διαθέσιμα Safehomes:"
+    },
+    "missionSafehomeMaxSafehomesReached": {
+        "message": "Συμπληρώθηκε ο μέγιστος αριθμός safehome."
     },
     "missionMultiMissionHead": {
         "message": "Πολλαπλές Αποστολές"
@@ -4382,6 +4540,9 @@
     },
     "no_waypoints_to_save": {
         "message": "Δεν υπάρχουν σημεία για αποθήκευση!"
+    },
+	"mixerThrottleWarning": {
+        "message": "Προειδοποίηση: τιμή πέρα από το κανονικό εύρος λειτουργίας."
     },
     "servoMixer": {
         "message": "μείκτης Σέρβο"
@@ -4866,6 +5027,12 @@
     "motor_direction_inverted_hint": {
         "message": "Ενεργοποιήστε αν η κατεύθυνση του κινητήρα είναι ανάποδη και τα προπέλλα είναι τοποθετημένες με αντίθετη κατεύθυνση."
     },
+	"mixer_pid_profile_linking": {
+        "message": "Το προφίλ PID θα χρησιμοποιεί την ίδια καρτελα με το Προφίλ Mixer"
+    },
+    "mixer_pid_profile_linking_hint": {
+        "message": "mixer_pid_profile_linking: Ενεργοποιήστε και στα δύο Προφίλ Mixer, εάν θέλετε η εναλλαγή προφίλ PID να γίνεται με εναλλαγή προφίλ μίκτη (Συστήνεται σε ρύθμιση τύπου vtol/μικτής πλατφόρμας)"
+    },
     "blackboxFields": {
         "message": "Πεδία Blackbox"
     },
@@ -4942,7 +5109,7 @@
         "message": "Τύπος Φίλτρου Matrix"
     },
     "pidTuning_MatrixFilterTypeHelp": {
-        "message": "Καθορίζει τον τύπο του φίλτρου Matrix. Το προεπιλεγμένο 2D φίλτρο συνιστάται για τους περισσότερους χρήστες. Τα quad 7 ιντσών και μεγαλύτερα μπορεί να επωφεληθούν από το 3D φίλτρο."
+        "message": "Καθορίζει τον τύπο του φίλτρου Matrix. Το προεπιλεγμένο 2D φίλτρο συνιστάται για τους περισσότερους χρήστες. Τα τετρακόπτερα 7 ιντσών και μεγαλύτερα μπορεί να επωφεληθούν από το 3D φίλτρο."
     },
     "softSerialWarning": {
         "message": "Δεν συνιστάται η χρήση της softserial για συσκευές πτήσης όπως GPS ή δέκτες, ή για συσκευές υψηλής κυκλοφορίας όπως το MSP DisplayPort."
@@ -4951,16 +5118,16 @@
         "message": "Ρύθμιση Χρώματος"
     },
     "ledStripH": {
-        "message": "Κ"
+        "message": "H"
     },
     "ledStripS": {
-        "message": "Σ"
+        "message": "S"
     },
     "ledStripV": {
-        "message": "Α"
+        "message": "V"
     },
     "ledStripRemainingText": {
-        "message": "Υπολειπόμενο"
+        "message": "Υπολειπόμενα"
     },
     "ledStripClearSelectedButton": {
         "message": "Εκκαθάριση Επιλεγμένου"
@@ -5011,13 +5178,13 @@
         "message": "Σαρωτής Larson"
     },
     "ledStripBlinkTitle": {
-        "message": "Αναβοσβήνει"
+        "message": "Αναλαμπές"
     },
     "ledStripBlinkAlwaysOverlay": {
-        "message": "Αναβοσβήνει πάντα"
+        "message": "Αναλαμπές πάντα"
     },
     "ledStripBlinkLandingOverlay": {
-        "message": "Αναβοσβήνει κατά την προσγείωση"
+        "message": "Αναλαμπές κατά την προσγείωση"
     },
     "ledStripStrobeText": {
         "message": "Φακός"
@@ -5095,372 +5262,456 @@
         "message": "angle mode"
     },
     "ledStripModeColorsModeMag": {
-        "message": "Μαγνητικός"
+        "message": "Μαγνηόμετρο"
     },
+    "ledStripModeColorsModeBaro": {
+        "message": "Βαρόμετρο"
+	},
+
     "ledStripDirN": {
-    "message": "Β"
-},
-"ledStripDirE": {
-    "message": "Α"
-},
-"ledStripDirS": {
-    "message": "Ν"
-},
-"ledStripDirW": {
-    "message": "Δ"
-},
-"ledStripDirU": {
-    "message": "Π"
-},
-"ledStripDirD": {
-    "message": "Κ"
-},
-"ledStripModesOrientationTitle": {
-    "message": "Προσανατολισμός και Χρώμα LED"
-},
-"ledStripModesSpecialColorsTitle": {
-    "message": "Ειδικά Χρώματα"
-},
-"ledStripModeColorsModeDisarmed": {
-    "message": "Απενεργοποιημένο"
-},
-"ledStripModeColorsModeArmed": {
-    "message": "Ενεργοποιημένο"
-},
-"ledStripModeColorsModeAnimation": {
-    "message": "Κινούμενα σχέδια"
-},
-"ledStripModeColorsModeBlinkBg": {
-    "message": "Αναβοσβήνει φόντο"
-},
-"ledStripModeColorsModeGPSNoSats": {
-    "message": "GPS: καμία εντοπισμένη δορυφορική σύνδεση"
-},
-"ledStripModeColorsModeGPSNoLock": {
-    "message": "GPS: καμία κλείδωση"
-},
-"ledStripModeColorsModeGPSLocked": {
-    "message": "GPS: κλειδωμένο"
-},
-"ledStripWiring": {
-    "message": "Σύνδεση Επιλέγματος LED"
-},
-"ledStripWiringMode": {
-    "message": "Λειτουργία Ταξινόμησης Καλωδίωσης"
-},
-"ledStripWiringClearControl": {
-    "message": "Καθαρισμός επιλεγμένου"
-},
-"ledStripWiringClearAllControl": {
-    "message": "Καθαρισμός ΟΛΩΝ των Συνδέσεων"
-},
-"ledStripWiringMessage": {
-    "message": "Οι LEDs χωρίς αριθμό ταξινόμησης καλωδίωσης δεν θα αποθηκεύονται."
-},
+        "message": "Β"
+	},	
+	"ledStripDirE": {
+		"message": "Α"
+	},
+	"ledStripDirS": {
+		"message": "Ν"
+	},
+	"ledStripDirW": {
+		"message": "Δ"
+	},
+	"ledStripDirU": {
+		"message": "Π"
+	},
+	"ledStripDirD": {
+		"message": "Κ"
+	},
+	"ledStripModesOrientationTitle": {
+		"message": "Προσανατολισμός και Χρώμα LED"
+	},
+	"ledStripModesSpecialColorsTitle": {
+		"message": "Ειδικά Χρώματα"
+	},
+	"ledStripModeColorsModeDisarmed": {
+		"message": "Απενεργοποιημένο"
+	},
+	"ledStripModeColorsModeArmed": {
+		"message": "Ενεργοποιημένο"
+	},
+	"ledStripModeColorsModeAnimation": {
+		"message": "Κινούμενα σχέδια"
+	},
+	"ledStripModeColorsModeBlinkBg": {
+		"message": "Φόντο αναλαμπών"
+	},
+	"ledStripModeColorsModeGPSNoSats": {
+		"message": "GPS: καμία εντοπισμένη δορυφορική σύνδεση"
+	},
+	"ledStripModeColorsModeGPSNoLock": {
+		"message": "GPS: κανένα κλείδωμα"
+	},
+	"ledStripModeColorsModeGPSLocked": {
+		"message": "GPS: κλειδωμένο"
+	},
+	"ledStripWiring": {
+		"message": "Σύνδεση Επιλέγματος LED"
+	},
+	"ledStripWiringMode": {
+		"message": "Λειτουργία Ταξινόμησης Καλωδίωσης"
+	},
+	"ledStripWiringClearControl": {
+		"message": "Καθαρισμός επιλεγμένου"
+	},
+	"ledStripWiringClearAllControl": {
+		"message": "Καθαρισμός ΟΛΩΝ των Συνδέσεων"
+	},
+	"ledStripWiringMessage": {
+		"message": "Τα LEDs χωρίς αριθμό ταξινόμησης καλωδίωσης δεν θα αποθηκεύονται."
+	},
 
 
-"mainLogoText": {
-    "message": "ΔΙΑΜΟΡΦΩΤΗΣ"
-},
-"mainLogoTextFirmware": {
-    "message": "ΕΝΗΜΕΡΩΤΙΚΟ ΣΥΣΤΗΜΑ Ελέγχου"
-},
-"mainPortOverrideLabel": {
-    "message": "Θύρα: "
-},
-"mainManual": {
-    "message": "Εγχειρίδιο"
-},
-"sensorDataFlashNotFound": {
-    "message": "Δεν βρέθηκε dataflash <br>τσιπ"
-},
-"sensorDataFlashFreeSpace": {
-    "message": "Dataflash: ελεύθερος χώρος"
-},
-"sensorProfile1": {
-    "message": "Προφίλ 1"
-},
-"sensorProfile2": {
-    "message": "Προφίλ 2"
-},
-"sensorProfile3": {
-    "message": "Προφίλ 3"
-},
-"sensorBatteryProfile1": {
-    "message": "Προφίλ μπαταρίας 1"
-},
-"sensorBatteryProfile2": {
-    "message": "Προφίλ μπαταρίας 2"
-},
-"sensorBatteryProfile3": {
-    "message": "Προφίλ μπαταρίας 3"
-},
-"sensorStatusGyro": {
-    "message": "Γυροσκόπιο"
-},
-"sensorStatusGyroShort": {
-    "message": "Γυρο.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorStatusAccel": {
-    "message": "Επιταχυνσιόμετρο"
-},
-"sensorStatusAccelShort": {
-    "message": "Επιτ.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorStatusMag": {
-    "message": "Μαγνητόμετρο"
-},
-"sensorStatusMagShort": {
-    "message": "Μαγν.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorStatusBaro": {
-    "message": "Βαρόμετρο"
-},
-"sensorStatusBaroShort": {
-    "message": "Βάρο.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorStatusGPS": {
-    "message": "GPS"
-},
-"sensorStatusGPSShort": {
-    "message": "GPS",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorOpticalFlow": {
-    "message": "Οπτική ροή"
-},
-"sensorOpticalFlowShort": {
-    "message": "Ροή"
-},
-"sensorStatusSonar": {
-    "message": "Sonar / Αισθητήρας απόστασης"
-},
-"sensorStatusSonarShort": {
-    "message": "Υπέρ.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorAirspeed": {
-    "message": "Ταχύτητα αέρα"
-},
-"sensorAirspeedShort": {
-    "message": "Ταχ_α.",
-    "description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
-},
-"sensorBatteryVoltage": {
-    "message": "Τάση μπαταρίας"
-},
-"mainShowLog": {
-    "message": "Εμφάνιση Καταγραφής"
-},
-"mainHideLog": {
-    "message": "Απόκρυψη Καταγραφής"
-},
-"waitingForData": {
-    "message": "Αναμονή για δεδομένα ..."
-},
-"outputStatsTableAcc": {
-    "message": "Μέσος όρος θορύβου επιτάχυνσης"
-},
-"outputStatsTableCurrent": {
-    "message": "Ρεύμα [A]"
-},
-"outputStatsTableVoltage": {
-    "message": "Τάση [V]"
-},
-"LogicConditions": {
-    "message": "Λογικές Συνθήκες"
-},
-"PIDControllers": {
-    "message": "Ελεγκτές PID"
-},
-"sensorsGyroSelect": {
-    "message": "Γυροσκόπιο"
-},
-"sensorsAccelSelect": {
-    "message": "Επιταχυνσιόμετρο"
-},
-"sensorsMagSelect": {
-    "message": "Μαγνητόμετρο"
-},
-"sensorsAltitudeSelect": {
-    "message": "Βαρόμετρο"
-},
-"sensorsSonarSelect": {
-    "message": "sonar"
-},
-"sensorsAirSpeedSelect": {
-    "message": "Ταχύτητα αέρα"
+	"mainLogoText": {
+		"message": "ΔΙΑΜΟΡΦΩΤΗΣ"
+	},
+	"mainLogoTextFirmware": {
+		"message": "ΕΝΗΜΕΡΩΤΙΚΟ ΣΥΣΤΗΜΑ Ελέγχου"
+	},
+	"mainPortOverrideLabel": {
+		"message": "Θύρα: "
+	},
+	"mainManual": {
+		"message": "Εγχειρίδιο"
+	},
+	"sensorDataFlashNotFound": {
+		"message": "Δεν βρέθηκε dataflash <br>τσιπ"
+	},
+	"sensorDataFlashFreeSpace": {
+		"message": "Dataflash: ελεύθερος χώρος"
+	},
+	"mixerProfile1": {
+        "message": "Προφίλ μείκτη 1"
     },
-    "sensorsDebugSelect": {
-    "message": "Αποσφαλμάτωση"
-},
-"sensorsDebugTrace": {
-    "message": "Άνοιγμα ίχνους αποσφαλμάτωσης"
-},
-"sensorsGyroscope": {
-    "message": "Γυροσκόπιο - μοίρες/δευτερόλεπτο"
-},
-"sensorsAccelerometer": {
-    "message": "Επιταχυνσιόμετρο - g"
-},
-"sensorsMagnetometer": {
-    "message": "Μαγνητόμετρο - Ga"
-},
-"sensorsBarometer": {
-    "message": "Βαρόμετρο - μέτρα"
-},
-"sensorsSonar": {
-    "message": "Υπέρηχος - cm"
-},
-"sensorsAirspeed": {
-    "message": "Ταχύτητα αέρα - cm/s"
-},
-"sensorsTemperature0": {
-    "message": "Θερμοκρασία 0 - °C"
-},
-"sensorsTemperature1": {
-    "message": "Θερμοκρασία 1 - °C"
-},
-"sensorsTemperature2": {
-    "message": "Θερμοκρασία 2 - °C"
-},
-"sensorsTemperature3": {
-    "message": "Θερμοκρασία 3 - °C"
-},
-"sensorsTemperature4": {
-    "message": "Θερμοκρασία 4 - °C"
-},
-"sensorsTemperature5": {
-    "message": "Θερμοκρασία 5 - °C"
-},
-"sensorsTemperature6": {
-    "message": "Θερμοκρασία 6 - °C"
-},
-"sensorsTemperature7": {
-    "message": "Θερμοκρασία 7 - °C"
-},
-"sensorsTemperatureValue": {
-    "message": "τιμή:"
-},
-"getRunningOS": {
-    "message": "Λειτουργία - Λειτουργικό σύστημα: <strong>"
-},
-"getConfiguratorVersion": {
-    "message": "ρυθμιστής: <strong>"
-},
-"loadedReleaseInfo": {
-    "message": "Φορτώθηκαν πληροφορίες έκδοσης από το GitHub."
-},
-"newVersionAvailable": {
-    "message": "Διαθέσιμη νέα έκδοση!"
-},
-"ReceiveTime": {
-    "message": "Χρόνος λήψης: "
-},
-"SendTime": {
-    "message": "Χρόνος αποστολής: "
-},
-"ErrorWritingFile": {
-    "message": "<span style=\"color: red\">Σφάλμα κατά την εγγραφή του αρχείου</span>"
-},
-"FileSaved": {
-    "message": "Το αρχείο αποθηκεύτηκε"
-},
-"selectedTarget": {
-    "message": "επιλεγμένος στόχος = "
-},
-"toggledRCs": {
-    "message": "εναλλαγή RCs"
-},
-"noFirmwareSelectedToLoad": {
-    "message": "<b>Δεν επιλέχθηκε καμία firmware για φόρτωση</b>"
-},
-"selectValidSerialPort": {
-    "message": "<span style=\"color: red\">Επιλέξτε έγκυρη σειριακή θύρα</span>'"
-},
-"writePermissionsForFile": {
-    "message": "Δεν έχετε <span style=\"color: red\">δικαιώματα εγγραφής</span> για αυτό το αρχείο"
-},
-"automaticTargetSelect": {
-    "message": "Προσπάθεια αυτόματης επιλογής στόχου"
-},
-"notAWAYPOINT": {
-    "message": "Η προηγούμενη επιλογή δεν ήταν WAYPOINT!"
-},
-"startGettingSafehomePoints": {
-    "message": "Έναρξη λήψης των σημείων Safehome"
-},
-"endGettingSafehomePoints": {
-    "message": "Τέλος λήψης των σημείων Safehome"
-},
-"startSendingSafehomePoints": {
-    "message": "Έναρξη αποστολής των σημείων Safehome"
-},
-"endSendingSafehomePoints": {
-    "message": "Τέλος αποστολής των σημείων Safehome"
-},
-"startGetPoint": {
-    "message": "Έναρξη λήψης σημείου"
-},
-"startSendPoint": {
-    "message": "Έναρξη αποστολής σημείου"
-},
-"errorReadingFileXml2jsNotFound": {
-    "message": "<span style=\"color: red\">Σφάλμα κατά την ανάγνωση του αρχείου (xml2js δεν βρέθηκε)</span>'"
-},
-"errorReadingFile": {
-    "message": "<span style=\"color: red\">Σφάλμα κατά την ανάγνωση του αρχείου</span>"
-},
-"errorParsingFile": {
-    "message": "<span style=\"color: red\">Σφάλμα κατά την ανάλυση του αρχείου</span>"
-},
-"loadedSuccessfully": {
-    "message": " φορτώθηκε με επιτυχία!"
-},
-"errorWritingFileXml2jsNotFound": {
-    "message": "<span style=\"color: red\">Σφάλμα κατά την εγγραφή του αρχείου (xml2js δεν βρέθηκε)</span>"
-},
-"savedSuccessfully": {
-    "message": " αποθηκεύτηκε με επιτυχία!"
-},
-"endGetPoint": {
-    "message": "Τέλος λήψης σημείου"
-},
-"endSendPoint": {
-    "message": "Τέλος αποστολής σημείου"
-},
-"osdSettingsSaved": {
-    "message": "Οι ρυθμίσεις OSD αποθηκεύτηκαν"
-},
-"failedToOpenSerialPort": {
-    "message": "<span style=\"color: red\">Αποτυχία</span> ανοίγματος σειριακής θύρας"
-},
-"failedToFlash": {
-    "message": "<span style=\"color: red\">Αποτυχία</span> φλασαρίσματος"
-},
-"targetPrefetchsuccessful": {
-    "message": "Επιτυχής προφόρτωση στόχου: "
-},
-"targetPrefetchFail": {
-    "message": "Δεν είναι δυνατή η προφόρτωση του στόχου: "
-},
-"targetPrefetchFailDFU": {
-    "message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Ο ελεγκτής πτήσης βρίσκεται σε DFU"
-},
-"targetPrefetchFailOld": {
-    "message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Η INAV Firmware είναι πολύ παλιά"
-},
-"targetPrefetchFailNonINAV": {
-    "message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Η Firmware δεν είναι της INAV"
-},
-"targetPrefetchFailNoPort": {
-    "message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Χωρίς θύρα"
-},
-"timerOutputs": {
-    "message": "Έξοδοι χρονοδιακόπτη"
-    }
-}
+    "mixerProfile2": {
+        "message": "Προφίλ μείκτη 2"
+	},
+	"sensorProfile1": {
+		"message": "PID προφίλ 1"
+	},
+	"sensorProfile2": {
+		"message": "PID προφίλ 2"
+	},
+	"sensorProfile3": {
+		"message": "PID προφίλ 3"
+	},
+	"sensorBatteryProfile1": {
+		"message": "Προφίλ μπαταρίας 1"
+	},
+	"sensorBatteryProfile2": {
+		"message": "Προφίλ μπαταρίας 2"
+	},
+	"sensorBatteryProfile3": {
+		"message": "Προφίλ μπαταρίας 3"
+	},
+	"sensorStatusGyro": {
+		"message": "Γυροσκόπιο"
+	},
+	"sensorStatusGyroShort": {
+		"message": "Γυρο.",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorStatusAccel": {
+		"message": "Επιταχυνσιόμετρο"
+	},
+	"sensorStatusAccelShort": {
+		"message": "Επιτ.",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorStatusMag": {
+		"message": "Μαγνητόμετρο"
+	},
+	"sensorStatusMagShort": {
+		"message": "Μαγν.",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorStatusBaro": {
+		"message": "Βαρόμετρο"
+	},
+	"sensorStatusBaroShort": {
+		"message": "Βάρο.",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorStatusGPS": {
+		"message": "GPS"
+	},
+	"sensorStatusGPSShort": {
+		"message": "GPS",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorOpticalFlow": {
+		"message": "Οπτική ροή"
+	},
+	"sensorOpticalFlowShort": {
+		"message": "Ροή"
+	},
+	"sensorStatusSonar": {
+		"message": "Sonar / Αισθητήρας απόστασης"
+	},
+	"sensorStatusSonarShort": {
+		"message": "Υπέρ.",
+		"description": "Κείμενο της εικόνας πάνω απο τα εικονίδια αισθητήρων. Παρακαλούμε κρατήστε το σύντομο."
+	},
+	"sensorAirspeed": {
+		"message": "Ταχύτητα αέρα"
+	},
+	"sensorAirspeedShort": {
+		"message": "Ταχ_α.",
+	},
+	"sensorBatteryVoltage": {
+		"message": "Τάση μπαταρίας"
+	},
+	"mainShowLog": {
+		"message": "Εμφάνιση Καταγραφής"
+	},
+	"mainHideLog": {
+		"message": "Απόκρυψη Καταγραφής"
+	},
+	"waitingForData": {
+		"message": "Αναμονή για δεδομένα ..."
+	},
+	"outputStatsTableAcc": {
+		"message": "Μέσος όρος θορύβου επιτάχυνσης"
+	},
+	"outputStatsTableCurrent": {
+		"message": "Ρεύμα [A]"
+	},
+	"outputStatsTableVoltage": {
+		"message": "Τάση [V]"
+	},
+	"LogicConditions": {
+		"message": "Λογικές Συνθήκες"
+	},
+	"PIDControllers": {
+		"message": "Ελεγκτές PID"
+	},
+	"sensorsGyroSelect": {
+		"message": "Γυροσκόπιο"
+	},
+	"sensorsAccelSelect": {
+		"message": "Επιταχυνσιόμετρο"
+	},
+	"sensorsMagSelect": {
+		"message": "Μαγνητόμετρο"
+	},
+	"sensorsAltitudeSelect": {
+		"message": "Βαρόμετρο"
+	},
+	"sensorsSonarSelect": {
+		"message": "sonar"
+	},
+	"sensorsAirSpeedSelect": {
+		"message": "Ταχύτητα αέρα"
+	},
+    "sensorsTemperaturesSelect": {
+        "message": "θερμοκρασίες"
+	},	
+	
+	"sensorsDebugSelect": {
+		"message": "Αποσφαλμάτωση"
+	},
+	"sensorsDebugTrace": {
+		"message": "Άνοιγμα ίχνους αποσφαλμάτωσης"
+	},
+	"sensorsGyroscope": {
+		"message": "Γυροσκόπιο - μοίρες/δευτερόλεπτο"
+	},
+	"sensorsAccelerometer": {
+		"message": "Επιταχυνσιόμετρο - g"
+	},
+	"sensorsMagnetometer": {
+		"message": "Μαγνητόμετρο - Ga"
+	},
+	"sensorsBarometer": {
+		"message": "Βαρόμετρο - μέτρα"
+	},
+	"sensorsSonar": {
+		"message": "Υπέρηχος - εκ"
+	},
+	"sensorsAirspeed": {
+		"message": "Ταχύτητα αέρα - εκ/δ"
+	},
+	"sensorsTemperature0": {
+		"message": "Θερμοκρασία 0 - °C"
+	},
+	"sensorsTemperature1": {
+		"message": "Θερμοκρασία 1 - °C"
+	},
+	"sensorsTemperature2": {
+		"message": "Θερμοκρασία 2 - °C"
+	},
+	"sensorsTemperature3": {
+		"message": "Θερμοκρασία 3 - °C"
+	},
+	"sensorsTemperature4": {
+		"message": "Θερμοκρασία 4 - °C"
+	},
+	"sensorsTemperature5": {
+		"message": "Θερμοκρασία 5 - °C"
+	},
+	"sensorsTemperature6": {
+		"message": "Θερμοκρασία 6 - °C"
+	},
+	"sensorsTemperature7": {
+		"message": "Θερμοκρασία 7 - °C"
+	},
+	"sensorsTemperatureValue": {
+		"message": "τιμή:"
+	},
+	"getRunningOS": {
+		"message": "Λειτουργία - Λειτουργικό σύστημα: <strong>"
+	},
+	"getConfiguratorVersion": {
+		"message": "ρυθμιστής: <strong>"
+	},
+	"loadedReleaseInfo": {
+		"message": "Φορτώθηκαν πληροφορίες έκδοσης από το GitHub."
+	},
+	"newVersionAvailable": {
+		"message": "Διαθέσιμη νέα έκδοση!"
+	},
+	"ReceiveTime": {
+		"message": "Χρόνος λήψης: "
+	},
+	"SendTime": {
+		"message": "Χρόνος αποστολής: "
+	},
+	"ErrorWritingFile": {
+		"message": "<span style=\"color: red\">Σφάλμα κατά την εγγραφή του αρχείου</span>"
+	},
+	"FileSaved": {
+		"message": "Το αρχείο αποθηκεύτηκε"
+	},
+	"selectedTarget": {
+		"message": "επιλεγμένος στόχος = "
+	},
+	"toggledRCs": {
+		"message": "εναλλαγή RCs"
+	},
+	"noFirmwareSelectedToLoad": {
+		"message": "<b>Δεν επιλέχθηκε κανένα firmware για φόρτωση</b>"
+	},
+	"selectValidSerialPort": {
+		"message": "<span style=\"color: red\">Επιλέξτε έγκυρη σειριακή θύρα</span>'"
+	},
+	"writePermissionsForFile": {
+		"message": "Δεν έχετε <span style=\"color: red\">δικαιώματα εγγραφής</span> για αυτό το αρχείο"
+	},
+	"automaticTargetSelect": {
+		"message": "Προσπάθεια αυτόματης επιλογής στόχου"
+	},
+	"notAWAYPOINT": {
+		"message": "Η προηγούμενη επιλογή δεν ήταν WAYPOINT!"
+	},
+	"startGettingSafehomePoints": {
+		"message": "Έναρξη λήψης των σημείων Safehome"
+	},
+	"endGettingSafehomePoints": {
+		"message": "Τέλος λήψης των σημείων Safehome"
+	},
+	"startSendingSafehomePoints": {
+		"message": "Έναρξη αποστολής των σημείων Safehome"
+	},
+	"endSendingSafehomePoints": {
+		"message": "Τέλος αποστολής των σημείων Safehome"
+	},
+	"startGetPoint": {
+		"message": "Έναρξη λήψης σημείου"
+	},
+	"startSendPoint": {
+		"message": "Έναρξη αποστολής σημείου"
+	},
+	"errorReadingFileXml2jsNotFound": {
+		"message": "<span style=\"color: red\">Σφάλμα κατά την ανάγνωση του αρχείου (xml2js δεν βρέθηκε)</span>'"
+	},
+	"errorReadingFile": {
+		"message": "<span style=\"color: red\">Σφάλμα κατά την ανάγνωση του αρχείου</span>"
+	},
+	"errorParsingFile": {
+		"message": "<span style=\"color: red\">Σφάλμα κατά την ανάλυση του αρχείου</span>"
+	},
+	"loadedSuccessfully": {
+		"message": " φορτώθηκε με επιτυχία!"
+	},
+	"errorWritingFileXml2jsNotFound": {
+		"message": "<span style=\"color: red\">Σφάλμα κατά την εγγραφή του αρχείου (xml2js δεν βρέθηκε)</span>"
+	},
+	"savedSuccessfully": {
+		"message": " αποθηκεύτηκε με επιτυχία!"
+	},
+	"endGetPoint": {
+		"message": "Τέλος λήψης σημείου"
+	},
+	"endSendPoint": {
+		"message": "Τέλος αποστολής σημείου"
+	},
+	"osdSettingsSaved": {
+		"message": "Οι ρυθμίσεις OSD αποθηκεύτηκαν"
+	},
+	"failedToOpenSerialPort": {
+		"message": "<span style=\"color: red\">Αποτυχία</span> ανοίγματος σειριακής θύρας"
+	},
+	"failedToFlash": {
+		"message": "<span style=\"color: red\">Αποτυχία</span> φλασαρίσματος"
+	},
+	"targetPrefetchsuccessful": {
+		"message": "Επιτυχής προφόρτωση στόχου: "
+	},
+	"targetPrefetchFail": {
+		"message": "Δεν είναι δυνατή η προφόρτωση του στόχου: "
+	},
+	"targetPrefetchFailDFU": {
+		"message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Ο ελεγκτής πτήσης βρίσκεται σε DFU"
+	},
+	"targetPrefetchFailOld": {
+		"message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Το INAV Firmware είναι πολύ παλιό"
+	},
+	"targetPrefetchFailNonINAV": {
+		"message": "Δεν είναι δυνατή η προφόρτωση του στόχου: Το Firmware δεν είναι του INAV"
+	},
+	"targetPrefetchFailNoPort": {
+		"message": "Δεν είναι δυνατή η προφόρτωση του στόχου: καμία θύρα"
+	},
+	"timerOutputs": {
+		"message": "Έξοδοι timer"
+		}
+    "ezTuneFilterHz": {
+        "message": "Φίλτρο Hz"
+    },
+    "ezTuneAxisRatio": {
+        "message": "Αναλογία άξονα"
+    },
+    "ezTuneResponse": {
+        "message": "Αντίδραση"
+    },
+    "ezTuneDamping": {
+        "message": "Απόσβεση"
+    },
+    "ezTuneStability": {
+        "message": "Σταθερότητα"
+    },
+    "ezTuneAggressiveness": {
+        "message": "Επιθετικότητα"
+    },
+    "ezTuneRate": {
+        "message": "Rate"
+    },
+    "ezTuneExpo": {
+        "message": "Expo"
+    },
+    "ezTuneFilterHzTips": {
+        "message": "Αυτό ορίζει τη βασική συχνότητα αποκοπής για όλα τα φίλτρα γυροσκόπιου και D-term INAV. Οι υψηλότερες τιμές θα έχουν ως αποτέλεσμα μικρότερη καθυστέρηση φίλτρου και καλύτερη σταθεροποίηση, αλλά περισσότερος θόρυβος θα περάσει από τα φίλτρα και οι κινητήρες θα ζεσταθούν, το UAV μπορεί να έχει ταλαντώσεις και να μην είναι ικανό για πτήση. Ο στόχος σας είναι να αυξήσετε αυτήν την τιμή όσο το δυνατόν ψηλότερα πριν εμφανιστούν τυχόν αρνητικές επιπτώσεις. Οι αρνητικές επιδράσεις περιλαμβάνουν: θερμούς κινητήρες, θορυβώδεις ταλαντώσεις, ταχείες αναταράξεις του σκαφους, αύξηση ύψους του σκαφους απο μόνο του. Τα συνήθη σημεία εκκίνησης για το 'Φίλτρο Hz' είναι: <strong>προπέλες 3 ιντσών</strong>: 90, <strong>προπέλες 5 ιντσών</strong>: 110, <strong>προπέλες 7 ιντσών</strong>: 90, <strong>προπέλες 10 ιντσών</strong>: 75, <strong>προπέλες 12 ιντσών</strong>: 60. Χρησιμοποιήστε το Blackbox και κοινή λογική για να βρείτε μια τιμή που ταιριάζει περισσότερο στο UAV σας."
+    },
+    "ezTuneAxisRatioTips": {
+        "message": "Περιγράφει την κατανομή βάρους/ροπής αδράνειας του UAV σας. Όσο μεγαλύτερο είναι το πλαίσιο (περισσότερη μάζα στον άξονα εμπρός-πίσω), μεγαλύτερη αναλογία άξονα απαιτείται. Το Τέλειο Χ πλαίσιο έχει αναλογία 100. Τα περισσότερα σύγχρονα πλαίσια θα πρέπει να χωρούν κάπου μεταξύ 110 και 130. Η προεπιλογή 110 είναι ένα καλό σημείο εκκίνησης."
+    },
+    "ezTuneResponseTips": {
+        "message": "Αυτή η ρύθμιση καθορίζει πόσο γρήγορα θα αντιδράσει το σκάφος στις κινήσεις των μοχλών και στο γυροσκόπιο. Οι υψηλότερες τιμές θα οδηγήσουν σε ταχύτερη αντίδραση, αλλά και σε περισσότερες υπερβάσεις και ταλαντώσεις. Εάν το το σκάφος σας είναι νωθρό ή έχει αργή μια ταλάντευση, αυξήστε την Απόκριση. Εάν έχει ζεστούς κινητήρες, ακούγεται να ταλαντώνεται, υπερβαίνει ή είναι πολύ νευρικό, μειώστε την Απόκριση. Τα περισσότερα σύγχρονα τετρακόπτερα θα πετούν καλύτερα με Απόκριση κάτω από 80. Θα πρέπει να συντονιστεί μαζί με την Απόσβεση. Είναι ένα ισοδύναμο όρου P."
+    },
+    "ezTuneDampingTips": {
+        "message": "Περιγράφει τις αντοχές μιας δύναμης που αντιτίθεται σε οποιαδήποτε αλλαγή ταχύτητας περιστροφής. Μειώνει την επιτάχυνση roll και pitch και προκαλεί ομαλότερη και πιο σταθερή πτήση. Το καθήκον σας κατά τη διάρκεια του συντονισμού είναι να μάθετε πόσο μπορείτε να το αυξήσετε πριν εμφανιστούν αρνητικά συμπτώματα: θερμοί κινητήρες, ηχητικές ταλαντώσεις, υπέρβαση. Τα περισσότερα σύγχρονα tetrak;optera θα πρέπει να δέχονται «Απόσβεση» μέχρι 150-180. Είναι ισοδύναμο όρου D."
+    },
+	"ezTuneStabilityTips": {
+		"message": "Ορίζει τη δύναμη μακροπρόθεσμης σταθεροποίησης. Τα περισσότερα σύγχρονα τετρακόπτερα θα πρέπει να αντέχουν την 'Απόσβεση' ακόμα και μέχρι το 120-130. Συνήθως δεν χρειάζεται καθόλου ρύθμιση. Εάν το σκάφος πάσχει από έντονο propwash κατά την κατακόρυφη κατάβαση, η μείωση της 'Απόσβεσης' μπορεί να βοηθήσει. Είναι ισοδύναμο με τον όρο I."
+	},
+	"ezTuneAggressivenessTips": {
+		"message": "Ορίζει πόσο γρήγορα θα αντιδρά το σκάφος σας σε γρήγορες κινήσεις των μοχλών. Η υψηλότερη 'Επιθετικότητα' οδηγεί σε πιο απότομες/γρήγορες κινήσεις. Δεν επηρεάζει τη σταθεροποίηση, μόνο την αίσθηση των μοχλών. Είναι ισοδύναμο με τον όρο FF."
+	},
+	"ezTuneRateTips": {
+		"message": "Ορίζει πόσο γρήγορα θα περιστρέφεται το σκάφος σας γύρω από τους άξονες roll, pitch και yaw. Το υψηλότερο 'Rate' οδηγεί σε ταχύτερη περιστροφή. Η τιμή 0 είναι ισοδύναμη με 300dps, το 100 είναι ισοδύναμο με 600dps, το 200 είναι ισοδύναμο με 900dps."
+	},
+	"ezTuneExpoTips": {
+		"message": "Ορίζει το expo της εισόδου της τηλεκατεύθυνσης. Χαμηλές τιμές οδηγούν σε πιο ευαίσθητους μοχλούς στο κέντρο. Οι υψηλές τιμές οδηγούν σε λιγότερο ευαίσθητο κέντρο και πιο γρήγορη ανταπόκριση στο τέλος του μοχλού. Η τιμή 0 είναι ισοδύναμη με το 0 expo, το 100 είναι ισοδύναμο με 0.7 expo, το 200 είναι ισοδύναμο με 1.0 expo."
+	},
+	"ezTunePidPreview": {
+		"message": "Προεπισκόπηση PID"
+	},
+	"ezTuneRatePreview": {
+		"message": "Προεπισκόπηση Ρυθμίσεων"
+	},
+	"ezTuneRatePreviewAxis" : {
+		"message": "Άξονας"
+	},
+	"ezTuneRatePreviewRate" : {
+		"message": "Rate"
+	},
+	"ezTuneRatePreviewExpo" : {
+		"message": "Expo"
+	},
+	"ezTuneEnabledTips": {
+		"message": "Όταν είναι ενεργοποιημένο, το <strong>Ez Tune</strong> θα αντικαταστήσει πολλές ρυθμίσεις του INAV για να απλοποιήσει τη διαδικασία συντονισμού. Αντί να ορίσετε κάθε PID και φίλτρο ρύθμισης ανεξάρτητα, θα έχετε να εργαστείτε με 7 ρυθμιστικά. Το Ez Tune θα προσαρμόσει αυτόματα όλες τις άλλες ρυθμίσεις για να αντιστοιχούν στις ανάγκες σας. Το Ez Tune είναι ένα εξαιρετικό σημείο εκκίνησης για νέους χρήστες και ένας γρήγορος τρόπος για γρήγορη ρύθμιση ενός νέου σκάφους. Δεν συνιστάται η χρήση του Ez Tune σε προηγμένες κατασκευές, καθώς θα αντικαταστήσει όλες τις ρυθμίσεις σας και δεν θα μπορείτε να κάνετε λεπτομερή ρύθμιση του σκάφους σας. Όταν το Ez Tune είναι ενεργοποιημένο, οι ρυθμίσεις από την καρτέλα <strong>Ρύθμιση PID</strong> θα αντικατασταθούν από το Ez Tune."
+	},
+	"ezTuneDisclaimer": {
+		"message": "<strong>Αποποίηση ευθύνης:</strong> Το Ez Tune είναι μια πειραματική λειτουργία. Δεν είναι εγγυημένο ότι θα λειτουργήσει σε όλα τα σκάφη. Δεν είναι εγγυημένο ότι θα λειτουργήσει με όλους τους τύπους πλαισίου. Δεν είναι εγγυημένο ότι θα λειτουργήσει με όλες τις προπέλες. Όλοι οι υπολογισμοί και το αποτέλεσμα της ρύθμισης μπορεί να αλλάξουν σε μελλοντικές εκδόσεις του INAV. Σας ενθαρρύνουμε παρόλα αυτά να το δοκιμάσετε και να μοιραστείτε την εμπειρία σας στο Discord του INAV στο κανάλι <strong>#ez-tune</strong>"
+	},
+	"ezTuneNote": {
+		"message": "<strong>Σημαντικό</strong> Το Ez Tune είναι ενεργοποιημένο. Όλες οι ρυθμίσεις σε αυτήν την καρτέλα έχουν οριστεί και ελέγχονται από το Ez Tune. Για να χρησιμοποιήσετε την καρτέλα Ρύθμιση PID πρέπει να απενεργοποιήσετε το Ez Tune. Για να το κάνετε αυτό, καταργήστε το επιλογή <strong>Ενεργοποιημένο</strong> στην καρτέλα Ez Tune."
+	}
