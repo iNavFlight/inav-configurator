@@ -171,8 +171,8 @@ helper.defaultsDialog = (function () {
                 value: 80
             },
             /*
-                * TPA
-                */
+            TPA
+            */
             {
                 key: "tpa_rate",
                 value: 20
@@ -197,7 +197,20 @@ helper.defaultsDialog = (function () {
             {
                 key: "ez_filter_hz",
                 value: 90
-            }
+            },
+            // GPS / Barometer weight
+            {
+                key: "inav_w_z_baro_p",
+                value: 0.370
+            },
+            {
+                key: "inav_w_z_gps_p",
+                value: 0.220
+            },
+            {
+                key: "inav_w_z_gps_v",
+                value: 0.200
+            },
         ]
     },
     {
@@ -381,8 +394,8 @@ helper.defaultsDialog = (function () {
                 value: 80
             },
             /*
-             * TPA
-             */
+            TPA
+            */
             {
                 key: "tpa_rate",
                 value: 20
@@ -407,7 +420,20 @@ helper.defaultsDialog = (function () {
             {
                 key: "ez_filter_hz",
                 value: 110
-            }
+            },
+            // GPS / Barometer weight
+            {
+                key: "inav_w_z_baro_p",
+                value: 0.370
+            },
+            {
+                key: "inav_w_z_gps_p",
+                value: 0.220
+            },
+            {
+                key: "inav_w_z_gps_v",
+                value: 0.200
+            },
         ]
     },
     {
@@ -573,8 +599,8 @@ helper.defaultsDialog = (function () {
                 value: 80
             },
             /*
-             * TPA
-             */
+            TPA
+            */
             {
                 key: "tpa_rate",
                 value: 20
@@ -599,7 +625,20 @@ helper.defaultsDialog = (function () {
             {
                 key: "ez_filter_hz",
                 value: 90
-            }
+            },
+            // GPS / Barometer weight
+            {
+                key: "inav_w_z_baro_p",
+                value: 0.370
+            },
+            {
+                key: "inav_w_z_gps_p",
+                value: 0.220
+            },
+            {
+                key: "inav_w_z_gps_v",
+                value: 0.200
+            },
         ]
     },
     {
@@ -809,6 +848,19 @@ helper.defaultsDialog = (function () {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
             },
+            // GPS / Barometer weight
+            {
+                key: "inav_w_z_baro_p",
+                value: 0.380
+            },
+            {
+                key: "inav_w_z_gps_p",
+                value: 0.210
+            },
+            {
+                key: "inav_w_z_gps_v",
+                value: 0.100
+            },
         ],
     },
     {
@@ -1017,6 +1069,19 @@ helper.defaultsDialog = (function () {
             {
                 key: "nav_fw_launch_climb_angle",
                 value: 25
+            },
+            // GPS / Barometer weight
+            {
+                key: "inav_w_z_baro_p",
+                value: 0.380
+            },
+            {
+                key: "inav_w_z_gps_p",
+                value: 0.210
+            },
+            {
+                key: "inav_w_z_gps_v",
+                value: 0.100
             },
         ],
     },
