@@ -5424,7 +5424,7 @@
 		"message": "Ταχύτητα αέρα"
 	},
 	"sensorAirspeedShort": {
-		"message": "Ταχ_α.",
+		"message": "Ταχ_α."
 	},
 	"sensorBatteryVoltage": {
 		"message": "Τάση μπαταρίας"
@@ -5642,7 +5642,7 @@
 	},
 	"timerOutputs": {
 		"message": "Έξοδοι timer"
-		}
+	},
     "ezTuneFilterHz": {
         "message": "Φίλτρο Hz"
     },
@@ -5715,3 +5715,4 @@
 	"ezTuneNote": {
 		"message": "<strong>Σημαντικό</strong> Το Ez Tune είναι ενεργοποιημένο. Όλες οι ρυθμίσεις σε αυτήν την καρτέλα έχουν οριστεί και ελέγχονται από το Ez Tune. Για να χρησιμοποιήσετε την καρτέλα Ρύθμιση PID πρέπει να απενεργοποιήσετε το Ez Tune. Για να το κάνετε αυτό, καταργήστε το επιλογή <strong>Ενεργοποιημένο</strong> στην καρτέλα Ez Tune."
 	}
+}
