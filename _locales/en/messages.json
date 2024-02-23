@@ -14,6 +14,9 @@
     "options_showProfileParameters": {
         "message": "Highlight parameters that change when switching battery or control profiles"
     },
+    "options_cliAutocomplete": {
+        "message": "Advanced CLI AutoComplete"
+    },
     "options_unit_type": {
         "message": "Set how the units render on the configurator only"
     },
@@ -1302,6 +1305,9 @@
     "portsFunction_MSP_DISPLAYPORT": {
         "message": "MSP DisplayPort"
     },
+    "portsFunction_SBUS_OUTPUT": {
+        "message": "SBus Output"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
@@ -2220,7 +2226,7 @@
         "message": "Blackbox configuration"
     },
     "blackboxButtonSave": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "serialLogging": {
         "message": "Outboard serial logging device"
@@ -3590,6 +3596,12 @@
     "osdAlarmGFORCE_AXIS_MAX_HELP": {
         "message": "The axes g force elements will start blinking when greater than this value"
     },
+    "osdAlarmADSB_MAX_DISTANCE_WARNING": {
+        "message": "Distance in meters of ADSB aircraft that is displayed"
+    },
+    "osdAlarmADSB_MAX_DISTANCE_ALERT": {
+        "message": "Distance inside which ADSB data flashes for proximity warning"
+    },
     "osd_current_alarm": {
         "message": "Current (A)"
     },
@@ -3628,6 +3640,12 @@
     },
     "osd_rssi_dbm_alarm": {
         "message": "CRSF RSSI dBm Alarm"
+    },
+    "osd_adsb_distance_warning": {
+        "message": "ADSB distance warning"
+    },
+    "osd_adsb_distance_alert": {
+        "message": "ADSB distance alert"
     },
     "osd_rssi_dbm_alarm_HELP": {
         "message": "RSSI indicator blinks below this value. Range: [-130,0]. Zero disables this alarm."
@@ -4295,8 +4313,8 @@
     "missionMultiAddNewMission": {
         "message": "Add New Mission"
     },
-    "missionLevelEarthDEMModel": {
-        "message": "Use Sea Level Earth DEM Model: "
+    "missionEllipsoidEarthDEMModel": {
+        "message": "Use Ellipsoid instead of SL DEM: "
     },
     "SafehomeLegend": {
         "message": "Legend : "
@@ -4452,7 +4470,7 @@
         "message": "Confirm"
     },
     "mixerButtonSaveAndReboot": {
-        "message": "Save and reboot"
+        "message": "Save and Reboot"
     },
     "mixerApplyDescription": {
         "message": "This action overrides all current mixer settings and replaces them with default values. There is no 'Undo' option!"

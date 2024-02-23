@@ -114,6 +114,7 @@ SYM.FLIGHT_DIST_REMAINING = 0x167;
 SYM.GROUND_COURSE = 0xDC;
 SYM.ALERT = 0xDD;
 SYM.CROSS_TRACK_ERROR = 0xFC;
+SYM.ADSB = 0xFD;
 SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
 SYM.ODOMETER = 0X168;
 SYM.PILOT_LOGO_SML_L = 0x1D5;
@@ -480,6 +481,8 @@ OSD.initData = function () {
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
             baro_temp_alarm_max: null,
+            adsb_distance_warning: null,
+            adsb_distance_alert: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
@@ -780,6 +783,24 @@ OSD.constants = {
             from_display: function(osd_data, value) { return value * 10 },
             min: -55,
             max: 125
+        },
+        {
+            name: 'ADSB_MAX_DISTANCE_WARNING',
+            field: 'adsb_distance_warning',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
+        },
+        {
+            name: 'ADSB_MAX_DISTANCE_ALERT',
+            field: 'adsb_distance_alert',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
         },
     ],
 
@@ -1655,6 +1676,18 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
                 },
                 {
+                    name: 'ADSB_WARNING_MESSAGE',
+                    id: 147,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                },
+                {
+                    name: 'ADSB_INFO',
+                    id: 148,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '2',
+                },
+                {
                     name: 'CROSS TRACK ERROR',
                     id: 141,
                     min_version: '6.0.0',
@@ -2264,6 +2297,8 @@ OSD.msp = {
         result.push16(OSD.data.alarms.imu_temp_alarm_max);
         result.push16(OSD.data.alarms.baro_temp_alarm_min);
         result.push16(OSD.data.alarms.baro_temp_alarm_max);
+        result.push16(OSD.data.alarms.adsb_distance_warning);
+        result.push16(OSD.data.alarms.adsb_distance_alert);
         return result;
     },
 
@@ -2283,6 +2318,8 @@ OSD.msp = {
         OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
+        OSD.data.alarms.adsb_distance_warning = alarms.read16();
+        OSD.data.alarms.adsb_distance_alert = alarms.read16();
     },
 
     encodePreferences: function() {
@@ -2689,7 +2726,7 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().size() > 0) {
+        if (groupContainer.find('.display-fields').children().length > 0) {
             $tmpl.parent().append(groupContainer);
         }
     }

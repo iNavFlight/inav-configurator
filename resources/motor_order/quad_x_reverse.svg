@@ -8,10 +8,9 @@
    version="1.1"
    id="svg52"
    sodipodi:docname="quad_x_reverse.svg"
-   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -25,14 +24,14 @@
      inkscape:document-units="pt"
      showgrid="false"
      inkscape:zoom="1.1269514"
-     inkscape:cx="-5.3240981"
-     inkscape:cy="231.15459"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:cx="-4.8804234"
+     inkscape:cy="231.1546"
+     inkscape:window-width="1850"
+     inkscape:window-height="1016"
+     inkscape:window-x="1990"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg52" />
+     inkscape:current-layer="g862" />
   <defs
      id="defs19">
     <g
@@ -89,62 +88,18 @@
        style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 188,160 c 0,-15.46484 -12.53516,-28 -28,-28 -15.46484,0 -28,12.53516 -28,28 0,15.46484 12.53516,28 28,28 15.46484,0 28,-12.53516 28,-28 M 179.80078,140.19922 177.78516,157 m 2.01562,-16.80078 h 16.80078"
        id="path23" />
-    <g
-       style="fill:#000000;fill-opacity:1"
-       id="g27">
-      <use
-         xlink:href="#glyph0-1"
-         x="153"
-         y="167"
-         id="use25"
-         width="100%"
-         height="100%" />
-    </g>
     <path
        style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 188,40 c 0,-15.464844 -12.53516,-28 -28,-28 -15.46484,0 -28,12.535156 -28,28 0,15.464844 12.53516,28 28,28 15.46484,0 28,-12.535156 28,-28 M 179.80078,59.800781 177.78516,43 m 2.01562,16.800781 h 16.80078"
        id="path29" />
-    <g
-       style="fill:#000000;fill-opacity:1"
-       id="g33">
-      <use
-         xlink:href="#glyph0-2"
-         x="153"
-         y="47"
-         id="use31"
-         width="100%"
-         height="100%" />
-    </g>
     <path
        style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 68,160 c 0,-15.46484 -12.535156,-28 -28,-28 -15.464844,0 -28,12.53516 -28,28 0,15.46484 12.535156,28 28,28 15.464844,0 28,-12.53516 28,-28 M 20.199219,140.19922 22.214844,157 M 20.199219,140.19922 H 3.398438"
        id="path35" />
-    <g
-       style="fill:#000000;fill-opacity:1"
-       id="g39">
-      <use
-         xlink:href="#glyph0-3"
-         x="33"
-         y="167"
-         id="use37"
-         width="100%"
-         height="100%" />
-    </g>
     <path
        style="fill:none;stroke:#37a8db;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="M 68,40 C 68,24.535156 55.464844,12 40,12 24.535156,12 12,24.535156 12,40 12,55.464844 24.535156,68 40,68 55.464844,68 68,55.464844 68,40 M 20.199219,59.800781 22.214844,43 M 20.199219,59.800781 H 3.398438"
        id="path41" />
-    <g
-       style="fill:#000000;fill-opacity:1"
-       id="g45">
-      <use
-         xlink:href="#glyph0-4"
-         x="33"
-         y="47"
-         id="use43"
-         width="100%"
-         height="100%" />
-    </g>
     <path
        style="fill:none;stroke:#fa0500;stroke-width:12;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:10;stroke-opacity:1"
        d="m 100,80 v 40"
