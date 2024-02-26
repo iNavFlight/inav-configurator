@@ -66,3 +66,5 @@ var MotorMixRule = function (throttle, roll, pitch, yaw) {
 
     return self;
 };
+
+module.exports = MotorMixRule;

@@ -1,7 +1,11 @@
 'use strict'
 
+const  { ConnectionType, Connection } = require('./connection')
 const dgram = require('node:dgram');
 const socket = dgram.createSocket('udp4');
+
+const { GUI } = require('./../gui');
+const i18n = require('./../localization');
 
 const STANDARD_UDP_PORT = 5761;
 class ConnectionUdp extends Connection {
@@ -13,6 +17,7 @@ class ConnectionUdp extends Connection {
         this._connectionPort =  0;
         this._onReceiveListeners = [];
         this._onErrorListener = [];
+        super._type = ConnectionType.UDP;
     }
 
     connectImplementation(address, options, callback) {     
@@ -27,7 +32,7 @@ class ConnectionUdp extends Connection {
 
         try {
             socket.bind(this._connectionPort, () => {
-                GUI.log(localization.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
+                GUI.log(i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
                 if (callback) {
                     callback({
                         bitrate: 115200,
@@ -116,3 +121,5 @@ class ConnectionUdp extends Connection {
         this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 }
+
+module.exports = ConnectionUdp;

@@ -199,7 +199,7 @@ TABS.sensors.initialize = function (callback) {
 
     GUI.load(path.join(__dirname, "tabs/sensors.html"), function load_html() {
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // disable graphs for sensors that are missing
         var checkboxes = $('.tab-sensors .info .checkboxes input');
@@ -218,7 +218,7 @@ TABS.sensors.initialize = function (callback) {
             checkboxes.eq(6).prop('disabled', true);
         }
 
-        $('.tab-sensors .info .checkboxes input').change(function () {
+        $('.tab-sensors .info .checkboxes input').on('change', function () {
             var enable = $(this).prop('checked');
             var index = $(this).parent().index();
 
@@ -254,7 +254,7 @@ TABS.sensors.initialize = function (callback) {
                 checkboxes.push($(this).prop('checked'));
             });
 
-            $('.tab-sensors .rate select:first').change();
+            $('.tab-sensors .rate select:first').trigger('change');
 
             store.set('graphs_enabled', checkboxes);
         });
@@ -263,10 +263,10 @@ TABS.sensors.initialize = function (callback) {
             if (result.graphs_enabled) {
                 var checkboxes = $('.tab-sensors .info .checkboxes input');
                 for (var i = 0; i < result.graphs_enabled.length; i++) {
-                    checkboxes.eq(i).not(':disabled').prop('checked', result.graphs_enabled[i]).change();
+                    checkboxes.eq(i).not(':disabled').prop('checked', result.graphs_enabled[i]).trigger('change');
                 }
             } else {
-                $('.tab-sensors .info input:lt(4):not(:disabled)').prop('checked', true).change();
+                $('.tab-sensors .info input:lt(4):not(:disabled)').prop('checked', true).trigger('change');
             }
         });
 
@@ -372,14 +372,14 @@ TABS.sensors.initialize = function (callback) {
             $('.tab-sensors select[name="debug_refresh_rate"]').val(sensor_settings.rates.debug);
 
             // start polling data by triggering refresh rate change event
-            $('.tab-sensors .rate select:first').change();
+            $('.tab-sensors .rate select:first').trigger('change');
         } else {
             // start polling immediatly (as there is no configuration saved in the storage)
-            $('.tab-sensors .rate select:first').change();
+            $('.tab-sensors .rate select:first').trigger('change');
         }
         
 
-        $('.tab-sensors .rate select, .tab-sensors .scale select').change(function () {
+        $('.tab-sensors .rate select, .tab-sensors .scale select').on('change', function () {
             // if any of the select fields change value, all of the select values are grabbed
             // and timers are re-initialized with the new settings
             var rates = {
@@ -591,7 +591,7 @@ TABS.sensors.initialize = function (callback) {
             }
         });
 
-        $("a.debug-trace").click(function () {
+        $("a.debug-trace").on('click', function () {
             var windowWidth = 500;
             var windowHeight = 510;
 

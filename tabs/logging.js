@@ -30,12 +30,12 @@ TABS.logging.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // UI hooks
-        $('a.log_file').click(prepare_file);
+        $('a.log_file').on('click', prepare_file);
 
-        $('a.logging').click(function () {
+        $('a.logging').on('click', function () {
             if (GUI.connected_to) {
                 if (readyToWrite) {
                     var clicks = $(this).data('clicks');
@@ -83,24 +83,24 @@ TABS.logging.initialize = function (callback) {
                             }, 1000);
 
                             $('.speed').prop('disabled', true);
-                            $(this).text(localization.getMessage('loggingStop'));
+                            $(this).text(i18n.getMessage('loggingStop'));
                             $(this).data("clicks", !clicks);
                         } else {
-                            GUI.log(localization.getMessage('loggingErrorOneProperty'));
+                            GUI.log(i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
                         helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
                         helper.mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
-                        $(this).text(localization.getMessage('loggingStart'));
+                        $(this).text(i18n.getMessage('loggingStart'));
                         $(this).data("clicks", !clicks);
                     }
                 } else {
-                    GUI.log(localization.getMessage('loggingErrorLogFile'));
+                    GUI.log(i18n.getMessage('loggingErrorLogFile'));
                 }
             } else {
-                GUI.log(localization.getMessage('loggingErrorNotConnected'));
+                GUI.log(i18n.getMessage('loggingErrorNotConnected'));
             }
         });
 
@@ -241,6 +241,10 @@ TABS.logging.initialize = function (callback) {
             store.set('logging_file_ready', readyToWrite);
                           
         });
+    }
+
+    function millitime() {
+        return new Date().getTime();
     }
 };
 

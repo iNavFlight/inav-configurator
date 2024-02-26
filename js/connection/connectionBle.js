@@ -1,5 +1,10 @@
 'use strict'
 
+const { GUI } = require('./../gui');
+
+const  { ConnectionType, Connection } = require('./connection');
+const i18n = require('./../localization');
+
 // BLE 20 bytes buffer
 const BLE_WRITE_BUFFER_LENGTH = 20;
 
@@ -48,6 +53,7 @@ class ConnectionBle extends Connection {
         this._reconnects = 0;
         this._handleOnCharateristicValueChanged = false;
         this._handleDisconnect = false;
+        super._type = ConnectionType.BLE;
     }
 
     get deviceDescription() {
@@ -59,7 +65,7 @@ class ConnectionBle extends Connection {
         await this.openDevice()
             .then(() => {
                 this.addOnReceiveErrorListener(error => {
-                    GUI.log(localization.getMessage('connectionBleInterrupted'));
+                    GUI.log(i18n.getMessage('connectionBleInterrupted'));
                     this.abort();
                 });
 
@@ -71,7 +77,7 @@ class ConnectionBle extends Connection {
                     });
                 }
             }).catch(error => {
-                GUI.log(localization.getMessage('connectionBleError', [error]));
+                GUI.log(i18n.getMessage('connectionBleError', [error]));
                 if (callback) {
                     callback(false);
                 }
@@ -119,7 +125,7 @@ class ConnectionBle extends Connection {
         return device.gatt.connect()
             .then(server => {
                 console.log("Connect to: " + device.name);
-                GUI.log(localization.getMessage('connectionConnected', [device.name]));
+                GUI.log(i18n.getMessage('connectionConnected', [device.name]));
                 return server.getPrimaryServices();
             }).then(services => {
                 let connectedService = services.find(service => {
@@ -131,7 +137,7 @@ class ConnectionBle extends Connection {
                     throw new Error("Unsupported device (service UUID mismatch).");
                 }
 
-                GUI.log(localization.getMessage('connectionBleType', [this._deviceDescription.name]));
+                GUI.log(i18n.getMessage('connectionBleType', [this._deviceDescription.name]));
                 return connectedService.getCharacteristics();
             }).then(characteristics => {
                 characteristics.forEach(characteristic => {
@@ -259,3 +265,5 @@ class ConnectionBle extends Connection {
         return ids;
     }
 }
+
+module.exports = ConnectionBle;

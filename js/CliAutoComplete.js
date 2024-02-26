@@ -552,3 +552,5 @@ CliAutoComplete._initTextcomplete = function() {
         }),
     ]);
 };
+
+module.exports = CliAutoComplete;

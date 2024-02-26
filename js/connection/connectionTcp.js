@@ -2,6 +2,10 @@
 
 const net = require('net')
 
+const { GUI } = require('./../gui');
+const  { ConnectionType, Connection } = require('./connection')
+const i18n = require('./../localization');
+
 const STANDARD_TCP_PORT = 5761;
 
 class ConnectionTcp extends Connection {
@@ -14,6 +18,7 @@ class ConnectionTcp extends Connection {
         this.connectionPort =  0;
         this._onReceiveListeners = [];
         this._onErrorListener = [];
+        super._type = ConnectionType.TCP;
     }
 
     connectImplementation(address, options, callback) {     
@@ -23,13 +28,13 @@ class ConnectionTcp extends Connection {
             this._connectionPort = parseInt(addr[1])
         } else {
             this._connectionIP = address[0];
-            this._connectionPort = STANDARD_PORT;
+            this._connectionPort = STANDARD_TCP_PORT;
         } 
 
         try {
             this._socket = net.connect({ host: this._connectionIP, port: this._connectionPort }, () => {
                 this._socket.setNoDelay(true);
-                GUI.log(localization.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
+                GUI.log(i18n.getMessage('connectionConnected', ["tcp://" + this._connectionIP + ":" + this._connectionPort]));
                 
                 if (callback) {
                     callback({
@@ -117,3 +122,5 @@ class ConnectionTcp extends Connection {
         this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 }
+
+module.exports = ConnectionTcp;

@@ -134,7 +134,7 @@ TABS.pid_tuning.initialize = function (callback) {
             $("#note-wrapper").remove();
         }
 
-       localization.localize();;
+       i18n.localize();;
 
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
@@ -155,7 +155,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('#resetPIDs').on('click', function() {
 
-            if (confirm(localization.getMessage('confirm_reset_pid'))) {
+            if (confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
                 updateActivatedTab();
             }
@@ -163,14 +163,14 @@ TABS.pid_tuning.initialize = function (callback) {
 
         $('#resetDefaults').on('click', function() {
 
-            if (confirm(localization.getMessage('confirm_select_defaults'))) {
+            if (confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
-                        GUI.log(localization.getMessage('configurationEepromSaved'));
+                        GUI.log(i18n.getMessage('configurationEepromSaved'));
     
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                                GUI.log(localization.getMessage('deviceRebooting'));
+                                GUI.log(i18n.getMessage('deviceRebooting'));
                                 GUI.handleReconnect();
                             });
                         });
@@ -191,7 +191,7 @@ TABS.pid_tuning.initialize = function (callback) {
             $theOtherPids.addClass("is-hidden");
             $showAdvancedPids.prop('checked', false);
         }
-        $showAdvancedPids.change();
+        $showAdvancedPids.trigger('change');
         
 
         $showAdvancedPids.on('change', function() {
@@ -270,18 +270,18 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // UI Hooks
 
-        $('a.refresh').click(function () {
+        $('a.refresh').on('click', function () {
             $("#content-watermark").remove();
             $(".tab-pid_tuning").remove();
 
             GUI.tab_switch_cleanup(function () {
-                GUI.log(localization.getMessage('pidTuningDataRefreshed'));
+                GUI.log(i18n.getMessage('pidTuningDataRefreshed'));
                 TABS.pid_tuning.initialize();
             });
         });
 
         // update == save.
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             form_to_pid_and_rc();
 
             function send_rc_tuning_changes() {
@@ -310,7 +310,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('pidTuningEepromSaved'));
+                    GUI.log(i18n.getMessage('pidTuningEepromSaved'));
                 });
             }
 

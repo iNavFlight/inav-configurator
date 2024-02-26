@@ -18,7 +18,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             GUI.simpleBind();
 
             // translate to user-selected language
-           localization.localize();;
+           i18n.localize();;
 
             // for some odd reason chrome 38+ changes scroll according to the touched select element
             // i am guessing this is a bug, since this wasn't happening on 37
@@ -26,7 +26,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
             // set stage 2 failsafe procedure
-            $('input[type="radio"].procedure').change(function () {
+            $('input[type="radio"].procedure').on('change', function () {
                 var element = $(this),
                     checked = element.is(':checked'),
                     id = element.attr('id');
@@ -53,27 +53,27 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 case 0:
                     let element = $('input[id="land"]');
                     element.prop('checked', true);
-                    element.change();
+                    element.trigger('change');
                     break;
                 case 1:
                     element = $('input[id="drop"]');
                     element.prop('checked', true);
-                    element.change();
+                    element.trigger('change');
                     break;
                 case 2:
                     element = $('input[id="rth"]');
                     element.prop('checked', true);
-                    element.change();
+                    element.trigger('change');
                     break;
                 case 3:
                     element = $('input[id="nothing"]');
                     element.prop('checked', true);
-                    element.change();
+                    element.trigger('change');
                     break;
             }
 
             // Adjust Minimum Distance values when checkbox is checked/unchecked
-            $('#failsafe_use_minimum_distance').change(function() {
+            $('#failsafe_use_minimum_distance').on('change', function () {
                 if ($(this).is(':checked')) {
                     // No default distance added due to conversions
                     $('#failsafe_min_distance_elements').show();
@@ -97,7 +97,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
                 $('#failsafe_min_distance_procedure_elements').hide();
             }
 
-            $('a.save').click(function () {
+            $('a.save').on('click', function () {
                 if ($('input[id="land"]').is(':checked')) {
                     FAILSAFE_CONFIG.failsafe_procedure = 0;
                 } else if ($('input[id="drop"]').is(':checked')) {
@@ -130,7 +130,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
@@ -138,7 +138,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_failsafe a'));
     }
 };

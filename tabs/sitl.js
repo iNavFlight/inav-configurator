@@ -1,4 +1,11 @@
 'use strict'
+const path = require('path');
+
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+const { Ser2TCP, SITLProcess } = require('./../js/sitl');
+const Store = require('electron-store');
+const store = new Store();
 
 const localhost = "127.0.0.1"
 
@@ -68,14 +75,14 @@ TABS.sitl.initialize = (callback) => {
         GUI.active_tab = 'sitl';
     }
 
-    GUI.load(path.join(__dirname, "tabs/sitl.html"), function () {
-        localization.localize();
+    GUI.load(path.join(__dirname, "sitl.html"), function () {
+        i18n.localize();
     
     var os = GUI.operating_system;
     if (os != 'Windows' && os != 'Linux') {
 
         $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${localization.getMessage('sitlOSNotSupported')}</h2>`);
+        $('.content_wrapper').append(`<h2>${i18n.getMessage('sitlOSNotSupported')}</h2>`);
         
         GUI.content_ready(callback);
         return;
@@ -111,8 +118,12 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
     }
 
-    $('#sitlLog').val(SITL_LOG);
-    $('#sitlLog').animate({scrollTop: $('#sitlLog').scrollHeight}, "fast");
+    var $sitlLog = $('#sitlLog');
+    $sitlLog.val(SITL_LOG);
+    if ($sitlLog) {
+        $sitlLog.val(SITL_LOG);
+        $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+    }
 
     profiles = stdProfiles.slice(0);
     var sitlProfiles = store.get('sitlProfiles', false);
@@ -229,20 +240,20 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
         Ser2TCP.stop();
         SITLProcess.stop();
-        appendLog(localization.getMessage('sitlStopped'));
+        appendLog(i18n.getMessage('sitlStopped'));
     });
 
-    profileSaveBtn_e.on('click', () => {
+    profileSaveBtn_e.on('click', function () {
         saveProfiles();
     });
 
-    profileNewBtn_e.on('click', () => {
-        var name = prompt(localization.getMessage('sitlNewProfile'), localization.getMessage('sitlEnterName'));
+    profileNewBtn_e.on('click', function () {
+        var name = prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName'));
         if (!name)
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(localization.getMessage('sitlProfileExists'))
+            alert(i18n.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -270,10 +281,10 @@ TABS.sitl.initialize = (callback) => {
         saveProfiles();
     });
 
-    profileDeleteBtn_e.on('click', () => {
+    profileDeleteBtn_e.on('click', function () {
 
         if (currentProfile.isStdProfile) {
-            alert(localization.getMessage('sitlStdProfileCantDeleted'));
+            alert(i18n.getMessage('sitlStdProfileCantDeleted'));
             return;
         }
 
@@ -374,7 +385,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(localization.getMessage('sitlStdProfileCantOverwritten'));
+            alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];
@@ -498,8 +509,11 @@ TABS.sitl.initialize = (callback) => {
 
     function appendLog(message){
         SITL_LOG += message;
-        $('#sitlLog').val(SITL_LOG);
-        $('#sitlLog').animate({scrollTop: $('#sitlLog')[0].scrollHeight}, "fast");
+        var $sitlLog = $('#sitlLog');
+        if ($sitlLog) {
+            $sitlLog.val(SITL_LOG);
+            $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+        }
     }
 
     GUI.content_ready(callback);

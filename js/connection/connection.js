@@ -1,5 +1,7 @@
 'use strict';
 
+const { GUI } = require('./../gui');
+
 const ConnectionType = {
     Serial: 0,
     TCP:    1,
@@ -20,6 +22,7 @@ class Connection {
         this._outputBuffer   = [];
         this._onReceiveListeners      = [];
         this._onReceiveErrorListeners = [];
+        this._type = null;
         
         if (this.constructor === Connection) {
             throw new TypeError("Abstract class, cannot be instanced.");
@@ -59,40 +62,8 @@ class Connection {
     }
 
     get type() {
-        switch (this.constructor.name) {
-            case ConnectionSerial.name:
-                return ConnectionType.Serial;
-            case ConnectionTcp.name:
-                return ConnectionType.TCP;
-            case ConnectionUdp.name:
-                return ConnectionType.UDP;
-            case ConnectionBle.name:
-                return ConnectionType.BLE;       
-        }
+        return this._type;
     }
-
-    static create(type) {
-        if (Connection.instance && (Connection.instance.type == type || Connection.instance.connectionId)){
-            return Connection.instance;
-        }
-
-        switch (type) {
-            case ConnectionType.BLE:
-                Connection.instance = new ConnectionBle();
-                break;
-            case ConnectionType.TCP:
-                Connection.instance = new ConnectionTcp();
-                break;
-            case ConnectionType.UDP:
-                Connection.instance = new ConnectionUdp();
-                break;
-            default:
-            case ConnectionType.Serial:
-                Connection.instance = new ConnectionSerial();
-                break;
-        }
-        return Connection.instance;
-    };
 
     connectImplementation(path, options, callback) {
         throw new TypeError("Abstract method");
@@ -289,3 +260,5 @@ class Connection {
         }
     }
 }
+
+module.exports = { ConnectionType, Connection};

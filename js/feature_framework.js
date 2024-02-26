@@ -1,8 +1,6 @@
 /*global mspHelper,FEATURES,bit_clear,bit_set*/
 'use strict';
 
-var helper = helper || {};
-
 /*
 Helper to work with FEATURES via MSP
 
@@ -23,7 +21,7 @@ helper.features.execute(function () {
 });
 
 */
-helper.features = (function() {
+var features = (function() {
 
     let publicScope = {},
         privateScope = {};
@@ -85,3 +83,5 @@ helper.features = (function() {
 
     return publicScope;
 })();
+
+module.exports = features;

@@ -73,7 +73,7 @@ TABS.receiver.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         let $receiverMode = $('#receiver_type'),
             $serialWrapper = $('#serialrx_provider-wrapper');
@@ -93,7 +93,7 @@ TABS.receiver.initialize = function (callback) {
         $("#serialrx_provider").empty().append(serialRxProviders);
         $('#serialrx_provider').val(selectedRxProvider);
 
-        $receiverMode.change(function () {
+        $receiverMode.on('change', function () {
             if ($(this).find("option:selected").text() == "SERIAL") {
                 $serialWrapper.show();
                 $receiverMode.parent().removeClass("no-bottom-border");
@@ -120,10 +120,10 @@ TABS.receiver.initialize = function (callback) {
 
         // generate bars
         var bar_names = [
-                localization.getMessage('controlAxisRoll'),
-                localization.getMessage('controlAxisPitch'),
-                localization.getMessage('controlAxisYaw'),
-                localization.getMessage('controlAxisThrottle')
+                i18n.getMessage('controlAxisRoll'),
+                i18n.getMessage('controlAxisPitch'),
+                i18n.getMessage('controlAxisYaw'),
+                i18n.getMessage('controlAxisThrottle')
             ],
             bar_container = $('.tab-receiver .bars');
 
@@ -132,7 +132,7 @@ TABS.receiver.initialize = function (callback) {
             if (i < bar_names.length) {
                 name = bar_names[i];
             } else {
-                name = localization.getMessage("radioChannelShort") + (i + 1);
+                name = i18n.getMessage("radioChannelShort") + (i + 1);
             }
 
             bar_container.append('\
@@ -216,7 +216,7 @@ TABS.receiver.initialize = function (callback) {
 
         // handle helper
         $('select[name="rcmap_helper"]').val(0); // go out of bounds
-        $('select[name="rcmap_helper"]').change(function () {
+        $('select[name="rcmap_helper"]').on('change', function () {
             $rcMap.val($(this).val());
         });
 
@@ -279,7 +279,7 @@ TABS.receiver.initialize = function (callback) {
             }, 0);
         }).trigger('input');
 
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             // catch RC_tuning changes
             RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
             RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
@@ -323,11 +323,11 @@ TABS.receiver.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('receiverEepromSaved'));
+                    GUI.log(i18n.getMessage('receiverEepromSaved'));
 
                     GUI.tab_switch_cleanup(function () {
                         MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                            GUI.log(localization.getMessage('deviceRebooting'));
+                            GUI.log(i18n.getMessage('deviceRebooting'));
                             GUI.handleReconnect($('.tab_receiver a'));
                         });
                     });
@@ -337,7 +337,7 @@ TABS.receiver.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, save_rc_map);
         });
 
-        $("a.sticks").click(function () {
+        $("a.sticks").on('click', function () {
             var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=720,menubar=no,contextIsolation=no,nodeIntegration=yes");
             
             mspWin.window.setRawRx = function (channels) {

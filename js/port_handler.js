@@ -1,6 +1,10 @@
 'use strict';
 
-const { ipcRenderer } = require('electron');
+const Store = require('electron-store');
+const store = new Store();
+
+const { GUI } = require('./../js/gui');
+const ConnectionSerial = require('./connection/connectionSerial');
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
@@ -50,7 +54,7 @@ PortHandler.check = function () {
             if (GUI.connected_to) {
                 for (var i = 0; i < removed_ports.length; i++) {
                     if (removed_ports[i] == GUI.connected_to) {
-                        $('div#port-picker a.connect').click();
+                        $('div#port-picker a.connect').trigger( "click" );
                     }
                 }
             }
@@ -99,7 +103,7 @@ PortHandler.check = function () {
                 }
 
                 if (store.get('wireless_mode_enabled', false)) {
-                    $('#wireless-mode').prop('checked', true).change();
+                    $('#wireless-mode').prop('checked', true).trigger('change');
                 }
 
             }
@@ -292,3 +296,5 @@ PortHandler.flush_callbacks = function () {
 
     return killed;
 };
+
+module.exports = { usbDevices, PortHandler };

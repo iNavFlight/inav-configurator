@@ -44,7 +44,7 @@ TABS.modes.initialize = function (callback) {
         }
 
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // generate table from the supplied AUX names and AUX data
         for (var i = 0; i < AUX_CONFIG.length; i++) {
@@ -65,7 +65,7 @@ TABS.modes.initialize = function (callback) {
         }
 
         // UI Hooks
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             // catch the input changes
             var main_needle = 0,
                 needle = 0;
@@ -87,7 +87,7 @@ TABS.modes.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('auxiliaryEepromSaved'));
+                    GUI.log(i18n.getMessage('auxiliaryEepromSaved'));
                 });
             }
 

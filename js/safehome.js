@@ -1,8 +1,7 @@
 /*global $*/
 'use strict';
 
-
-let Safehome = function (number, enabled, lat, lon) {
+var Safehome = function (number, enabled, lat, lon) {
 
     var self = {};
 
@@ -59,3 +58,5 @@ let Safehome = function (number, enabled, lat, lon) {
 
     return self;
 };
+
+module.exports = Safehome;

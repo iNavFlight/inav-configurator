@@ -1,5 +1,9 @@
 'use strict'
 
+const { GUI } = require('./../gui');
+
+const { ConnectionType, Connection } = require('./connection')
+const { SerialPort } = require('serialport');
 const { SerialPortStream } = require('@serialport/stream');
 const { autoDetect } = require('@serialport/bindings-cpp')
 const binding = autoDetect();
@@ -11,6 +15,7 @@ class ConnectionSerial extends Connection {
         this._errorListeners = [];
         this._onReceiveListeners = [];
         this._onErrorListener = [];
+        super._type = ConnectionType.Serial;
     }
 
     connectImplementation(path, options, callback) {                       
@@ -115,3 +120,5 @@ class ConnectionSerial extends Connection {
         });
     }
 }
+
+module.exports = ConnectionSerial;

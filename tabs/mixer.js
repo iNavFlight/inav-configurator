@@ -50,7 +50,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -59,7 +59,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_mixer a'));
     }
 
@@ -128,7 +128,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function renderOutputMapping() {
         let outputMap = OUTPUT_MAPPING.getOutputTable(
-            MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER,
+            MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
             MOTOR_RULES.getNumberOfConfiguredMotors(),
             SERVO_RULES.getUsedServoIndexes()
         );
@@ -150,15 +150,15 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $(this).css("color", "");
         });
 
-        if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
+        if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
             if (outputMap != null && currentMixerPreset.hasOwnProperty('imageOutputsNumbers')) {
                 let outputPad = 1;
                 let outputArea = null;
                 let inputBoxes = null;
                 let surfaces = {
-                    aileronSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT_STABILIZED_ROLL),
-                    elevatorSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT_STABILIZED_PITCH),
-                    rudderSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT_STABILIZED_YAW),
+                    aileronSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_ROLL),
+                    elevatorSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_PITCH),
+                    rudderSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_YAW),
                 };
                 let motors = [];
                 let servoRules = SERVO_RULES;
@@ -174,11 +174,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             let divID = "servoPreview" + omIndex[1];
                             
                             switch (parseInt(servo.getInput())) {
-                                case INPUT_STABILIZED_PITCH:
-                                case STABILIZED_PITCH_POSITIVE:
-                                case STABILIZED_PITCH_NEGATIVE:
-                                case INPUT_RC_PITCH:
-                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaces.elevatorSet);
+                                case INPUT.STABILIZED_PITCH:
+                                case STABILIZED.PITCH_POSITIVE:
+                                case STABILIZED.PITCH_NEGATIVE:
+                                case INPUT.RC_PITCH:
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT.STABILIZED_PITCH, surfaces.elevatorSet);
                                     if (outputArea != null) {
                                         mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
 
@@ -198,11 +198,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                         surfaces.elevatorSet--;
                                     }
                                     break;
-                                case INPUT_STABILIZED_ROLL:
-                                case STABILIZED_ROLL_POSITIVE:
-                                case STABILIZED_ROLL_NEGATIVE:
-                                case INPUT_RC_ROLL:
-                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaces.aileronSet);
+                                case INPUT.STABILIZED_ROLL:
+                                case STABILIZED.ROLL_POSITIVE:
+                                case STABILIZED.ROLL_NEGATIVE:
+                                case INPUT.RC_ROLL:
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT.STABILIZED_ROLL, surfaces.aileronSet);
                                     if (outputArea != null) {
                                         mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
 
@@ -222,11 +222,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                         surfaces.aileronSet--;
                                     }
                                     break;
-                                case INPUT_STABILIZED_YAW:
-                                case STABILIZED_YAW_POSITIVE:
-                                case STABILIZED_YAW_NEGATIVE:
-                                case INPUT_RC_YAW:
-                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaces.rudderSet);
+                                case INPUT.STABILIZED_YAW:
+                                case STABILIZED.YAW_POSITIVE:
+                                case STABILIZED.YAW_NEGATIVE:
+                                case INPUT.RC_YAW:
+                                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT.STABILIZED_YAW, surfaces.rudderSet);
                                     if (outputArea != null) {
                                         mixerPreview.append('<div id="' + divID + '" class="outputImageNumber">S' + outputPad + '</div>');
 
@@ -256,7 +256,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 if (motors.length > 0) {
                     mixerPreview.append('<div id="motorsPreview" class="outputImageNumber isMotor">S' + motors.join('/') + '</div>');
 
-                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_THROTTLE, 0);
+                    outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT.STABILIZED_THROTTLE, 0);
                     if (outputArea != null) {
                         $("#motorsPreview").css("top", outputArea.top + "px");
                         $("#motorsPreview").css("left", outputArea.left + "px");
@@ -276,21 +276,21 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         
         for (let area of outputImageAreas) {
             if (area.input == input) {
-                if ( input === INPUT_STABILIZED_THROTTLE
+                if ( input === INPUT.STABILIZED_THROTTLE
                     || (surfacesSet > 0 && 
-                            ((input === INPUT_STABILIZED_YAW && surfacesSet !== lastYaw) 
-                            || (input === INPUT_STABILIZED_ROLL && surfacesSet !== lastRoll) 
-                            || (input === INPUT_STABILIZED_PITCH && surfacesSet !== lastPitch))
+                            ((input === INPUT.STABILIZED_YAW && surfacesSet !== lastYaw) 
+                            || (input === INPUT.STABILIZED_ROLL && surfacesSet !== lastRoll) 
+                            || (input === INPUT.STABILIZED_PITCH && surfacesSet !== lastPitch))
                         )
                 ) {
                     returnArea = area;
                 }
 
-                if (input === INPUT_STABILIZED_ROLL) {
+                if (input === INPUT.STABILIZED_ROLL) {
                     lastRoll = surfacesSet-1;
-                } else if (input === INPUT_STABILIZED_PITCH) {
+                } else if (input === INPUT.STABILIZED_PITCH) {
                     lastPitch = surfacesSet-1;
-                } else if (input === INPUT_STABILIZED_YAW) {
+                } else if (input === INPUT.STABILIZED_YAW) {
                     lastYaw = surfacesSet-1;
                 }
 
@@ -356,25 +356,25 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     $row.find(".mix-rule-input").children('option[value="14"]').remove();
                 }
 
-                $row.find(".mix-rule-input").val(servoRule.getInput()).change(function () {
+                $row.find(".mix-rule-input").val(servoRule.getInput()).on('change', function () {
                     servoRule.setInput($(this).val());
                     updateFixedValueVisibility($row, $(this));
 
                     renderOutputMapping();
                 });
 
-                $row.find(".mix-rule-servo").val(servoRule.getTarget()).change(function () {
+                $row.find(".mix-rule-servo").val(servoRule.getTarget()).on('change', function () {
                     servoRule.setTarget($(this).val());
                 });
 
-                $row.find(".mix-rule-rate").val(servoRule.getRate()).change(function () {
+                $row.find(".mix-rule-rate").val(servoRule.getRate()).on('change', function () {
                     servoRule.setRate($(this).val());
                     $row.find(".mix-rule-fixed-value").val(mapServoWeightToFixedValue($(this).val()));
                 });
 
                 $row.find(".mix-rule-fixed-value").val(mapServoWeightToFixedValue($row.find(".mix-rule-rate").val()));
 
-                $row.find(".mix-rule-speed").val(servoRule.getSpeed()).change(function () {
+                $row.find(".mix-rule-speed").val(servoRule.getSpeed()).on('change', function () {
                     servoRule.setSpeed($(this).val());
                 });
 
@@ -388,7 +388,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         rate_inputs.attr("min", -1000);
         rate_inputs.attr("max", 1000);
 
-       localization.localize();;
+       i18n.localize();;
     }
 
     function updateFixedValueVisibility(row, $mixRuleInput) {
@@ -506,15 +506,15 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     }
                 }
                 updateThrottle();
-                $throttleInput.change(updateThrottle);
+                $throttleInput.on('change', updateThrottle);
 
-                $row.find('.mix-rule-roll').val(rule.getRoll()).change(function () {
+                $row.find('.mix-rule-roll').val(rule.getRoll()).on('change', function () {
                     rule.setRoll($(this).val());
                 });
-                $row.find('.mix-rule-pitch').val(rule.getPitch()).change(function () {
+                $row.find('.mix-rule-pitch').val(rule.getPitch()).on('change', function () {
                     rule.setPitch($(this).val());
                 });
-                $row.find('.mix-rule-yaw').val(rule.getYaw()).change(function () {
+                $row.find('.mix-rule-yaw').val(rule.getYaw()).on('change', function () {
                     rule.setYaw($(this).val());
                 });
                 $row.find("[data-role='role-motor-delete']").attr("data-index", i);
@@ -522,7 +522,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         }
         labelMotorNumbers();
-       localization.localize();;
+       i18n.localize();;
     }
 
     function saveAndReboot() {
@@ -569,7 +569,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             closeButton: 'title',
             animation: false,
             attach: $wizardButton,
-            title: localization.getMessage("mixerWizardModalTitle"),
+            title: i18n.getMessage("mixerWizardModalTitle"),
             content: $('#mixerWizardContent')
         });
 
@@ -591,9 +591,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             return (errorCount == 0);
         }
 
-        $(".wizard-motor-select").change(validateMixerWizard);
+        $(".wizard-motor-select").on('change', validateMixerWizard);
 
-        $("#wizard-execute-button").click(function () {
+        $("#wizard-execute-button").on('click', function () {
 
             // Validate mixer settings
             if (!validateMixerWizard()) {
@@ -633,24 +633,24 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         const updateMotorDirection = function () {
             let motorDirectionCheckbox = $("#motor_direction_inverted");
-            const isReversed = motorDirectionCheckbox.is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+            const isReversed = motorDirectionCheckbox.is(":checked") && (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
 
-            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+            if (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
                 if (isReversed) {
-                    motorDirectionCheckbox.parent().find("label span").html(localization.getMessage("motor_direction_isInverted"));
+                    motorDirectionCheckbox.parent().find("label span").html(i18n.getMessage("motor_direction_isInverted"));
                 } else {
-                    motorDirectionCheckbox.parent().find("label span").html(localization.getMessage("motor_direction_inverted"));
+                    motorDirectionCheckbox.parent().find("label span").html(i18n.getMessage("motor_direction_inverted"));
                 }
             }
 
             renderServoOutputImage();
         };
 
-        $("#motor_direction_inverted").change(updateMotorDirection);
+        $("#motor_direction_inverted").on('change', updateMotorDirection);
 
         $platformSelect.find("*").remove();
 
@@ -661,20 +661,20 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         }
 
-        $platformSelect.change(function () {
+        $platformSelect.on('change', function () {
             MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
 
             var $platformSelectParent = $platformSelect.parent('.select');
 
             fillMixerPreset();
-            $mixerPreset.change();
+            $mixerPreset.trigger('change');
         });
 
         currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
-        $platformSelect.val(MIXER_CONFIG.platformType).change();
+        $platformSelect.val(MIXER_CONFIG.platformType).trigger('change');
 
-        $mixerPreset.change(function () {
+        $mixerPreset.on('change', function () {
             const presetId = parseInt($mixerPreset.val(), 10);
             currentMixerPreset = helper.mixer.getById(presetId);
 
@@ -686,13 +686,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $wizardButton.parent().addClass("is-hidden");
             }
 
-            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
+            if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
                 $("#needToUpdateMixerMessage").removeClass("is-hidden");
             } else {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
 
-            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+            if (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
                 $('#motor_direction_inverted').parent().removeClass("is-hidden");
                 $('#platform-type').parent('.select').removeClass('no-bottom-border');
             } else {
@@ -700,7 +700,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
-            if (!updateEzTuneTabVisibility(false)) {
+            if (!GUI.updateEzTuneTabVisibility(false)) {
                 EZ_TUNE.enabled = 0;
                 mspHelper.saveEzTune();
             }
@@ -713,9 +713,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         if (MIXER_CONFIG.appliedMixerPreset > -1) {
             loadedMixerPresetID = MIXER_CONFIG.appliedMixerPreset;
             $("#needToUpdateMixerMessage").addClass("is-hidden");
-            $mixerPreset.val(MIXER_CONFIG.appliedMixerPreset).change();
+            $mixerPreset.val(MIXER_CONFIG.appliedMixerPreset).trigger('change');
         } else {
-            $mixerPreset.change();
+            $mixerPreset.trigger('change');
         }
 
         modal = new jBox('Modal', {
@@ -724,11 +724,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             closeButton: 'title',
             animation: false,
             attach: $('#load-and-apply-mixer-button'),
-            title: localization.getMessage("mixerApplyModalTitle"),
+            title: i18n.getMessage("mixerApplyModalTitle"),
             content: $('#mixerApplyContent')
         });
 
-        $('#execute-button').click(function () {
+        $('#execute-button').on('click', function () {
             loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
@@ -740,8 +740,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             saveAndReboot();
         });
 
-        $('#load-mixer-button').click(function () {
-            if (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE) {
+        $('#load-mixer-button').on('click', function () {
+            if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
             loadedMixerPresetID = currentMixerPreset.id;
@@ -754,12 +754,12 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             updateRefreshButtonStatus();
         });
 
-        $('#refresh-mixer-button').click(function () {
+        $('#refresh-mixer-button').on('click', function () {
             currentMixerPreset = helper.mixer.getById(loadedMixerPresetID);
             MIXER_CONFIG.platformType = currentMixerPreset.platform;
             currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
-            $platformSelect.val(MIXER_CONFIG.platformType).change();
-            $mixerPreset.val(loadedMixerPresetID).change();
+            $platformSelect.val(MIXER_CONFIG.platformType).trigger('change');
+            $mixerPreset.val(loadedMixerPresetID).trigger('change');
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
@@ -781,7 +781,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             renderOutputMapping();
         });
 
-        $("[data-role='role-servo-add']").click(function () {
+        $("[data-role='role-servo-add']").on('click', function () {
             if (SERVO_RULES.hasFreeSlots()) {
                 SERVO_RULES.put(new ServoMixRule(SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
@@ -789,7 +789,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         });
 
-        $("[data-role='role-motor-add']").click(function () {
+        $("[data-role='role-motor-add']").on('click', function () {
             if (MOTOR_RULES.hasFreeSlots()) {
                 MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
@@ -797,11 +797,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
         });
 
-        $("[data-role='role-logic-conditions-open']").click(function () {
+        $("[data-role='role-logic-conditions-open']").on('click', function () {
             LOGIC_CONDITIONS.open();
         });
 
-        $('#save-button').click(saveAndReboot);
+        $('#save-button').on('click', saveAndReboot);
 
         renderServoMixRules();
         renderMotorMixRules();
@@ -812,7 +812,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
-       localization.localize();;
+       i18n.localize();;
 
         helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
 
@@ -821,8 +821,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function updateRefreshButtonStatus() {
         if (
-            (currentMixerPreset.id != loadedMixerPresetID && helper.mixer.getById(loadedMixerPresetID).platform == PLATFORM_AIRPLANE) ||
-            (currentMixerPreset.id == loadedMixerPresetID && currentMixerPreset.platform == PLATFORM_AIRPLANE)
+            (currentMixerPreset.id != loadedMixerPresetID && helper.mixer.getById(loadedMixerPresetID).platform == PLATFORM.AIRPLANE) ||
+            (currentMixerPreset.id == loadedMixerPresetID && currentMixerPreset.platform == PLATFORM.AIRPLANE)
            ) {
             $("#refresh-mixer-button").parent().removeClass("is-hidden");
         } else {

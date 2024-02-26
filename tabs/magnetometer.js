@@ -125,7 +125,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -133,7 +133,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function reinitialize() {
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_magnetometer a'));
     }
 
@@ -291,7 +291,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function process_html() {
 
-       localization.localize();;
+       i18n.localize();;
 
         // initialize 3D
         self.initialize3D();
@@ -336,15 +336,15 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
 
-        self.pageElements.orientation_board_roll.change(function () {
+        self.pageElements.orientation_board_roll.on('change', function () {
             updateBoardRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_pitch.change(function () {
+        self.pageElements.orientation_board_pitch.on('change', function () {
             updateBoardPitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_yaw.change(function () {
+        self.pageElements.orientation_board_yaw.on('change', function () {
             updateBoardYawAxis(clamp(this, -180, 360));
         });
 
@@ -405,7 +405,7 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         const elementToShow = $("#element_to_show");
-        elementToShow.change(function () {
+        elementToShow.on('change', function () {
             const value = parseInt($(this).val());
             self.showMagnetometer = (value == 0);
             self.render3D();
@@ -415,7 +415,7 @@ TABS.magnetometer.initialize = function (callback) {
             return Math.min(Math.max(parseInt($(input).val()), min), max);
         }
 
-        self.pageElements.orientation_mag_e.change(function () {
+        self.pageElements.orientation_mag_e.on('change', function () {
             SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
             const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
@@ -426,22 +426,22 @@ TABS.magnetometer.initialize = function (callback) {
             presetUpdated(degrees);
         });
 
-        self.pageElements.orientation_mag_roll.change(function () {
+        self.pageElements.orientation_mag_roll.on('change', function () {
             disableSavePreset();
             updateRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_pitch.change(function () {
+        self.pageElements.orientation_mag_pitch.on('change', function () {
             disableSavePreset();
             updatePitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_yaw.change(function () {
+        self.pageElements.orientation_mag_yaw.on('change', function () {
             disableSavePreset();
             updateYawAxis(clamp(this, -180, 360));
         });
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             saveChainer.execute()
         });
 
@@ -517,9 +517,9 @@ TABS.magnetometer.initialize = function (callback) {
             }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
-	            self.roll_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
-	            self.pitch_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
-                self.heading_e.text(localization.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
+	            self.roll_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
+	            self.pitch_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
+                self.heading_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
                 self.render3D();
             });
         }
@@ -572,7 +572,7 @@ TABS.magnetometer.initialize3D = function () {
     if (useWebGlRenderer) {
         if (MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + localization.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
             model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;

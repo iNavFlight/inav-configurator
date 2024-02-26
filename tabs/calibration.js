@@ -67,7 +67,7 @@ TABS.calibration.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -76,7 +76,7 @@ TABS.calibration.initialize = function (callback) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_calibration a'));
     }
 
@@ -161,7 +161,7 @@ TABS.calibration.initialize = function (callback) {
             }).open();
 
             MSP.send_message(MSPCodes.MSP_ACC_CALIBRATION, false, false, function () {
-                GUI.log(localization.getMessage('initialSetupAccelCalibStarted'));
+                GUI.log(i18n.getMessage('initialSetupAccelCalibStarted'));
             });
 
             helper.timeout.add('acc_calibration_timeout', function () {
@@ -169,20 +169,20 @@ TABS.calibration.initialize = function (callback) {
 
                 modalProcessing.close();
                 MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, checkFinishAccCalibrate);
-                GUI.log(localization.getMessage('initialSetupAccelCalibEnded'));
+                GUI.log(i18n.getMessage('initialSetupAccelCalibEnded'));
             }, 2000);
         }
     }
 
     function setupCalibrationButton(callback) {
         if (FC.getAccelerometerCalibrated()) {
-            $('#calibrate-start-button').html(localization.getMessage("AccResetBtn"));
-            $('#calibrate-start-button').prop("title", localization.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').html(i18n.getMessage("AccResetBtn"));
+            $('#calibrate-start-button').prop("title", i18n.getMessage("AccResetBtn"));
             $('#calibrate-start-button').removeClass("calibrate");
             $('#calibrate-start-button').addClass("resetCalibration");
         } else {
-            $('#calibrate-start-button').html(localization.getMessage("AccBtn"));
-            $('#calibrate-start-button').prop("title", localization.getMessage("AccBtn"));
+            $('#calibrate-start-button').html(i18n.getMessage("AccBtn"));
+            $('#calibrate-start-button').prop("title", i18n.getMessage("AccBtn"));
             $('#calibrate-start-button').addClass("calibrate");
             $('#calibrate-start-button').removeClass("resetCalibration");
         }
@@ -228,7 +228,7 @@ TABS.calibration.initialize = function (callback) {
 
         $('#mag_btn').on('click', function () {
             MSP.send_message(MSPCodes.MSP_MAG_CALIBRATION, false, false, function () {
-                GUI.log(localization.getMessage('initialSetupMagCalibStarted'));
+                GUI.log(i18n.getMessage('initialSetupMagCalibStarted'));
             });
 
             var button = $(this);
@@ -252,7 +252,7 @@ TABS.calibration.initialize = function (callback) {
                         $(button).removeClass('disabled');
 
                         modalProcessing.close();
-                        GUI.log(localization.getMessage('initialSetupMagCalibEnded'));
+                        GUI.log(i18n.getMessage('initialSetupMagCalibEnded'));
                         
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                         helper.interval.remove('compass_calibration_interval');
@@ -270,7 +270,7 @@ TABS.calibration.initialize = function (callback) {
 
         $('#opflow_btn').on('click', function () {
             MSP.send_message(MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION, false, false, function () {
-                GUI.log(localization.getMessage('initialSetupOpflowCalibStarted'));
+                GUI.log(i18n.getMessage('initialSetupOpflowCalibStarted'));
             });
 
             var button = $(this);
@@ -294,24 +294,24 @@ TABS.calibration.initialize = function (callback) {
                     $(button).removeClass('disabled');
 
                     modalProcessing.close();
-                    GUI.log(localization.getMessage('initialSetupOpflowCalibEnded'));
+                    GUI.log(i18n.getMessage('initialSetupOpflowCalibEnded'));
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
                     helper.interval.remove('opflow_calibration_interval');
                 }
             }, 1000);
         });
 
-        $('#modal-start-button').click(function () {
+        $('#modal-start-button').on('click', function () {
             modalStart.close();
             TABS.calibration.model.next();
         });
 
-        $('#modal-stop-button').click(function () {
+        $('#modal-stop-button').on('click', function () {
             modalStop.close();
         });
 
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         setupCalibrationButton();
         $('#calibrate-start-button').on('click', actionCalibrateButton);

@@ -132,7 +132,7 @@ TABS.adjustments.initialize = function (callback) {
 
         var enableElement = $(newAdjustment).find('.enable');
         $(enableElement).data('adjustmentElement', newAdjustment);
-        $(enableElement).change(function() {
+        $(enableElement).on('change', function () {
             var adjustmentElement = $(this).data('adjustmentElement');
             if ($(this).prop("checked")) {
                 $(adjustmentElement).find(':input').prop("disabled", false);
@@ -153,7 +153,7 @@ TABS.adjustments.initialize = function (callback) {
         });
 
         var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end);
-        $(enableElement).prop("checked", isEnabled).change();
+        $(enableElement).prop("checked", isEnabled).trigger('change');
 
         return newAdjustment;
     }
@@ -169,10 +169,10 @@ TABS.adjustments.initialize = function (callback) {
         }
 
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // UI Hooks
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
 
             // update internal data structures based on current UI elements
             var requiredAdjustmentRangeCount = ADJUSTMENT_RANGES.length;
@@ -222,7 +222,7 @@ TABS.adjustments.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('adjustmentsEepromSaved'));
+                    GUI.log(i18n.getMessage('adjustmentsEepromSaved'));
                 });
             }
 

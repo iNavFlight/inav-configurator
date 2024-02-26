@@ -1,8 +1,13 @@
 'use strict';
 
-var helper = helper || {};
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const CONFIGURATOR = require('./data_storage');
+const MSP = require('./msp');
+const MSPCodes = require('./msp/MSPCodes');
+const mspQueue = require('./serial_queue');
 
-helper.periodicStatusUpdater = (function () {
+ var periodicStatusUpdater = (function () {
 
     var publicScope = {},
         privateScope = {};
@@ -50,16 +55,16 @@ helper.periodicStatusUpdater = (function () {
                 'background-image': 'url("./images/icons/cf_icon_failsafe_grey.svg")'
             });
 
-        if (ANALOG != undefined) {
+        if (FC.ANALOG != undefined) {
             var nbCells;
 
-            nbCells = ANALOG.cell_count;
-            var min = MISC.vbatmincellvoltage * nbCells;
-            var max = MISC.vbatmaxcellvoltage * nbCells;
-            var warn = MISC.vbatwarningcellvoltage * nbCells;
+            nbCells = FC.ANALOG.cell_count;
+            var min = FC.MISC.vbatmincellvoltage * nbCells;
+            var max = FC.MISC.vbatmaxcellvoltage * nbCells;
+            var warn = FC.MISC.vbatwarningcellvoltage * nbCells;
 
             $(".battery-status").css({
-                width: ANALOG.battery_percentage + "%",
+                width: FC.ANALOG.battery_percentage + "%",
                 display: 'inline-block'
             });
         
@@ -73,13 +78,13 @@ helper.periodicStatusUpdater = (function () {
                 });
             }
 
-            if (((ANALOG.use_capacity_thresholds && ANALOG.battery_remaining_capacity <= MISC.battery_capacity_warning - MISC.battery_capacity_critical) || (!ANALOG.use_capacity_thresholds && ANALOG.voltage < warn)) || ANALOG.voltage < min) {
+            if (((FC.ANALOG.use_capacity_thresholds && FC.ANALOG.battery_remaining_capacity <= FC.MISC.battery_capacity_warning - FC.MISC.battery_capacity_critical) || (!FC.ANALOG.use_capacity_thresholds && FC.ANALOG.voltage < warn)) || FC.ANALOG.voltage < min) {
                 $(".battery-status").css('background-color', '#D42133');
             } else {
                 $(".battery-status").css('background-color', '#59AA29');
             }
 
-            $(".battery-legend").text(ANALOG.voltage + " V");
+            $(".battery-legend").text(FC.ANALOG.voltage + " V");
         }
 
         $('#quad-status_wrapper').show();
@@ -97,7 +102,7 @@ helper.periodicStatusUpdater = (function () {
 
         if (GUI.active_tab != 'cli') {
 
-            if (helper.mspQueue.shouldDropStatus()) {
+            if (mspQueue.shouldDropStatus()) {
                 return;
             }
 
@@ -112,3 +117,5 @@ helper.periodicStatusUpdater = (function () {
 
     return publicScope;
 })();
+
+module.exports = periodicStatusUpdater;

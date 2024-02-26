@@ -49,11 +49,11 @@ TABS.programming.initialize = function (callback, scrollPosition) {
 
         helper.tabs.init($('.tab-programming'));
 
-       localization.localize();;
+       i18n.localize();;
 
-        $('#save-button').click(function () {
+        $('#save-button').on('click', function () {
             saveChainer.execute();
-            GUI.log(localization.getMessage('programmingEepromSaved'));
+            GUI.log(i18n.getMessage('programmingEepromSaved'));
         });
 
         helper.mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {

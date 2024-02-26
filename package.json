@@ -1,9 +1,9 @@
 {
   "name": "inav-configurator",
-  "description": "INAV Configurator",
+  "productName": "INAV Configurator",
+  "description": "Configurator for the open source flight controller software INAV.",
   "version": "8.0.0",
-  "main": "main.js",
-  "default_locale": "en",
+  "main": "js/main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -11,18 +11,11 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
-  "window": {
-    "title": "INAV Configurator",
-    "icon": "images/inav_icon_128.png",
-    "toolbar": true,
-    "width": 1024,
-    "height": 800
-  },
   "repository": {
     "type": "git",
     "url": "github.com/iNavFlight/inav-configurator"
   },
-  "author": "iNavFlight",
+  "author": "The INAV open source project",
   "license": "GPL-3.0",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
@@ -32,6 +25,8 @@
     "usb": "^2.11.0",
     "promise-map-series": "^0.3.0",
     "serialport": "^12.0.0",
+    "semver": "^7.6.0",
+    "three": "0.139.0",
     "inflection": "1.12.0",
     "fs": "0.0.1-security",
     "jquery": "3.7.1",
@@ -42,7 +37,9 @@
     "openlayers": "^4.6.5",
     "plotly": "^1.0.6",
     "temp": "^0.8.3",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "i18next": "^23.8.3",
+    "i18next-xhr-backend": "^3.2.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",
@@ -50,7 +47,6 @@
     "@electron-forge/maker-rpm": "^7.2.0",
     "@electron-forge/maker-squirrel": "^7.2.0",
     "@electron-forge/maker-zip": "^7.2.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "electron": "28.1.4"
   }
 }

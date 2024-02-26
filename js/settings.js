@@ -1,12 +1,27 @@
 'use strict';
 
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 var Settings = (function () {
     let self = {};
 
     self.fillSelectOption = function(s, ii) {
         var name = (s.setting.table ? s.setting.table.values[ii] : null);
         if (name) {
-            var localizedName = localization.getMessage(name);
+            var localizedName = i18n.getMessage(name);
             if (localizedName) {
                 name = localizedName;
             }
@@ -123,7 +138,7 @@ var Settings = (function () {
 
                 input.data('setting-info', s.setting);
                 if (input.data('live')) {
-                    input.change(function() {
+                    input.on('change', function () {
                         self.saveInput(input);
                     });
                 }

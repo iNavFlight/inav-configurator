@@ -2,10 +2,6 @@
 
 'use strict';
 
-function checkChromeRuntimeError() {
-    return false;
-}
-
 function constrain(input, min, max) {
 
     if (input < min) {
@@ -58,3 +54,5 @@ function scaleRangeInt(x, srcMin, srcMax, destMin, destMax) {
     let b = srcMax - srcMin;
     return Math.round((a / b) + destMin);
 }
+
+module.exports = { constrain, zeroPad, generateFilename, scaleRangeInt };

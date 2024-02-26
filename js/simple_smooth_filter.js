@@ -1,8 +1,7 @@
 'use strict';
 
-var classes = classes || {};
 
-classes.SimpleSmoothFilter = function (initialValue, smoothingFactor) {
+var SimpleSmoothFilter = function (initialValue, smoothingFactor) {
 
     var self = {};
 
@@ -29,3 +28,5 @@ classes.SimpleSmoothFilter = function (initialValue, smoothingFactor) {
 
     return self;
 };
+
+module.exports = SimpleSmoothFilter;

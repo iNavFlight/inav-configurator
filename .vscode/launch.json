@@ -11,7 +11,8 @@
         },
         "args": ["--inspect"],
         "env": {
-          "NODE_ENV": "development"
+          "NODE_ENV": "development",
+          "NODE_PATH": "${workspaceFolder}/js/"
         },
         "cwd": "${workspaceFolder}",
         "console": "integratedTerminal"
@@ -25,7 +26,7 @@
         "windows": {
           "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
         },
-        "args" : ["."],
+        "args" : [".", "--trace-warnings"],
         "outputCapture": "std"
       }
     ]

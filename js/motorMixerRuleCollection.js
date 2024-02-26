@@ -72,3 +72,5 @@ var MotorMixerRuleCollection = function () {
 
     return self;
 };
+
+module.exports = MotorMixerRuleCollection;

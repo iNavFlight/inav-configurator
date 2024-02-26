@@ -1,6 +1,6 @@
 'use strict';
 
-let SafehomeCollection = function () {
+var SafehomeCollection = function () {
 
     let self = {},
         data = [],
@@ -128,3 +128,5 @@ let SafehomeCollection = function () {
 
     return self;
 };
+
+module.exports = SafehomeCollection;

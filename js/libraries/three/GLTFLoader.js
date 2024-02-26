@@ -1,5 +1,6 @@
 ( function () {
 
+	
 	class GLTFLoader extends THREE.Loader {
 
 		constructor( manager ) {

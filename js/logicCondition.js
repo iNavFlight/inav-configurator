@@ -164,7 +164,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
             /*
              * Bind events
              */
-            $t.change(self.onOperatorTypeChange);
+            $t.on('change', self.onOperatorTypeChange);
 
         }
     }
@@ -306,7 +306,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
         $t.append('</optgroup>');
 
-        $t.change(self.onOperatorChange);
+        $t.on('change', self.onOperatorChange);
 
         self.renderOperand(0);
         self.renderOperand(1);

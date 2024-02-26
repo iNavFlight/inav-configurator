@@ -35,3 +35,5 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
 
     return defaultName;  
 }
+
+module.exports = { isPeripheralSelected, adjustBoxNameIfPeripheralWithModeID };

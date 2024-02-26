@@ -1,6 +1,6 @@
 'use strict';
 
-let ProgrammingPidCollection = function () {
+var ProgrammingPidCollection = function () {
 
     let self = {},
         data = [],
@@ -56,3 +56,5 @@ let ProgrammingPidCollection = function () {
 
     return self;
 };
+
+module.exports = ProgrammingPidCollection;

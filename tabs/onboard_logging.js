@@ -54,7 +54,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reboot() {
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -62,14 +62,14 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reinitialize() {
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_onboard_logging a'));
     }
 
     function load_html() {
         GUI.load(path.join(__dirname, "tabs/onboard_logging.html"), function() {
             // translate to user-selected language
-           localization.localize();;
+           i18n.localize();;
 
             var
                 dataflashPresent = DATAFLASH.totalSize > 0,
@@ -90,24 +90,24 @@ TABS.onboard_logging.initialize = function (callback) {
 
             if (dataflashPresent) {
                 // UI hooks
-                $('.tab-onboard_logging a.erase-flash').click(ask_to_erase_flash);
+                $('.tab-onboard_logging a.erase-flash').on('click', ask_to_erase_flash);
 
-                $('.tab-onboard_logging a.erase-flash-confirm').click(flash_erase);
-                $('.tab-onboard_logging a.erase-flash-cancel').click(flash_erase_cancel);
+                $('.tab-onboard_logging a.erase-flash-confirm').on('click', flash_erase);
+                $('.tab-onboard_logging a.erase-flash-cancel').on('click', flash_erase_cancel);
 
-                $('.tab-onboard_logging a.save-flash').click(flash_save_begin);
-                $('.tab-onboard_logging a.save-flash-cancel').click(flash_save_cancel);
-                $('.tab-onboard_logging a.save-flash-dismiss').click(dismiss_saving_dialog);
+                $('.tab-onboard_logging a.save-flash').on('click', flash_save_begin);
+                $('.tab-onboard_logging a.save-flash-cancel').on('click', flash_save_cancel);
+                $('.tab-onboard_logging a.save-flash-dismiss').on('click', dismiss_saving_dialog);
             }
 
-            $('.save-blackbox-feature').click(function () {
+            $('.save-blackbox-feature').on('click', function () {
                 helper.features.reset();
                 helper.features.fromUI($('.require-blackbox-unsupported'));
                 helper.features.execute(save_to_eeprom);
             });
 
             if (BLACKBOX.supported) {
-                $(".tab-onboard_logging a.save-settings").click(function() {
+                $(".tab-onboard_logging a.save-settings").on('click', function () {
                     var rate = $(".blackboxRate select").val().split('/');
 
                     BLACKBOX.blackboxRateNum = parseInt(rate[0], 10);
@@ -135,7 +135,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 label.attr("for",FIELD_ID)
 
                 const span = $('<span></span>');
-                span.html(localization.getMessage(FIELD_ID))
+                span.html(i18n.getMessage(FIELD_ID))
                 label.append(span);
 
                 const checkbox = $('<div class="checkbox"></div>')

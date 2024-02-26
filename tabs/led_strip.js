@@ -54,7 +54,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     function process_html() {
 
-       localization.localize();;
+       i18n.localize();;
 
         // Build Grid
         var theHTML = [];
@@ -64,12 +64,12 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         }
         $('.mainGrid').html(theHTML.join(''));
 
-        $('.tempOutput').click(function() {
+        $('.tempOutput').on('click', function () {
             $(this).select();
         });
 
         // Clear button
-        $('.funcClear').click(function() {
+        $('.funcClear').on('click', function () {
             $('.gPoint').each(function() {
                 if ($(this).is('.ui-selected')) {
                     removeFunctionsAndDirections(this);
@@ -82,7 +82,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         });
 
         // Clear All button
-        $('.funcClearAll').click(function() {
+        $('.funcClearAll').on('click', function () {
             $('.gPoint').each(function() {
                 removeFunctionsAndDirections(this);
             });
@@ -244,13 +244,13 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
             }
         });
 
-        $('.funcWire').click(function() {
+        $('.funcWire').on('click', function () {
             $(this).toggleClass('btnOn');
             TABS.led_strip.wireMode = $(this).hasClass('btnOn');
             $('.mainGrid').toggleClass('gridWire');
         });
 
-        $('.funcWireClearSelect').click(function() {
+        $('.funcWireClearSelect').on('click', function () {
             $('.ui-selected').each(function() {
                 var thisWire = $(this).find('.wire');
                 if (thisWire.html() != '') {
@@ -260,7 +260,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
             });
         });
 
-        $('.funcWireClear').click(function() {
+        $('.funcWireClear').on('click', function () {
             $('.gPoint .wire').html('');
             updateBulkCmd();
         });
@@ -353,7 +353,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
                         if (feature_o.is(':checked') != newVal) {
                             feature_o.prop('checked', newVal);
-                            feature_o.change();
+                            feature_o.trigger('change');
                         }
                     });
 
@@ -450,7 +450,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
         }
 
         // UI: check-box toggle
-        $('.checkbox').change(function(e) {
+        $('.checkbox').on('change', function(e) {
             if (e.originalEvent) {
                 // user-triggered event
                 var that = $(this).find('input');
@@ -466,11 +466,11 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
                             if (ret) {
                                 if (letter == 'b' && cbn.is(':checked')) {
                                     cbn.prop('checked', false);
-                                    cbn.change();
+                                    cbn.trigger('change');
                                     toggleSwitch(cbn, 'n');
                                 } else if (letter == 'n' && cbb.is(':checked')) {
                                     cbb.prop('checked', false);
-                                    cbb.change();
+                                    cbb.trigger('change');
                                     toggleSwitch(cbb, 'b');
                                 }
                             }
@@ -524,7 +524,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
         });
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
 
             mspHelper.sendLedStripConfig(send_led_strip_colors);
 
@@ -538,7 +538,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function() {
-                    GUI.log(localization.getMessage('ledStripEepromSaved'));
+                    GUI.log(i18n.getMessage('ledStripEepromSaved'));
                 });
             }
 
@@ -861,7 +861,7 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
     function unselectOverlay(func, overlay) {
         $('input.function-' + overlay).prop('checked', false);
-        $('input.function-' + overlay).change();
+        $('input.function-' + overlay).trigger('change');
         $('.ui-selected').each(function() {
             if (func == '' || $(this).is('.function-' + func)) {
                 $(this).removeClass('function-' + overlay);

@@ -1,4 +1,4 @@
-/*global helper,MSP,MSPChainerClass,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
+/*global helper,MSP,MSPChainerClass,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM.MULTIROTOR,PLATFORM.TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
 
 TABS.outputs = {
@@ -55,7 +55,7 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
-        GUI.log(localization.getMessage('eeprom_saved_ok'));
+        GUI.log(i18n.getMessage('eeprom_saved_ok'));
         MOTOR_RULES.cleanup();
     });
 
@@ -103,14 +103,14 @@ TABS.outputs.initialize = function (callback) {
             if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
                 $('.hide-for-shot').hide();
                 if ($idlePercent.val() > 7.0) {
-                    $idleInfoBox.html(localization.getMessage('throttleIdleDigitalInfo'));
+                    $idleInfoBox.html(i18n.getMessage('throttleIdleDigitalInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
             } else {
                 $('.hide-for-shot').show();
                 if ($idlePercent.val() > 10.0) {
-                    $idleInfoBox.html(localization.getMessage('throttleIdleAnalogInfo'));
+                    $idleInfoBox.html(i18n.getMessage('throttleIdleAnalogInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
@@ -128,11 +128,11 @@ TABS.outputs.initialize = function (callback) {
 
         $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
 
-        $escProtocol.change(function () {
+        $escProtocol.on('change', function () {
             ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
         });
 
-        $idlePercent.change(handleIdleMessageBox);
+        $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
 
         $("#esc-protocols").show();
@@ -152,7 +152,7 @@ TABS.outputs.initialize = function (callback) {
         }
 
         $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
-        $servoRate.change(function () {
+        $servoRate.on('change', function () {
             ADVANCED_CONFIG.servoPwmRate = $(this).val();
         });
 
@@ -173,12 +173,12 @@ TABS.outputs.initialize = function (callback) {
                 $reversibleMotorBox.hide();
             }
         }
-        $reversibleMotorCheckbox.change(showHideReversibleMotorInfo);
+        $reversibleMotorCheckbox.on('change', showHideReversibleMotorInfo);
         showHideReversibleMotorInfo();
 
         let $motorStopCheckbox = $('#feature-4');
         function showHideMotorStopWarning() {
-            const platformNeedsMotorStop = [PLATFORM_AIRPLANE, PLATFORM_ROVER, PLATFORM_BOAT].includes(MIXER_CONFIG.platformType);
+            const platformNeedsMotorStop = [PLATFORM.AIRPLANE, PLATFORM.ROVER, PLATFORM.BOAT].includes(MIXER_CONFIG.platformType);
             const motorStopEnabled = $motorStopCheckbox.is(':checked');
             if (platformNeedsMotorStop && motorStopEnabled || !platformNeedsMotorStop && !motorStopEnabled) {
                 $motorStopWarningBox.hide();
@@ -186,7 +186,7 @@ TABS.outputs.initialize = function (callback) {
                 $motorStopWarningBox.show();
             }
         }
-        $motorStopCheckbox.change(showHideMotorStopWarning);
+        $motorStopCheckbox.on('change', showHideMotorStopWarning);
         showHideMotorStopWarning();
 
         $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
@@ -237,7 +237,7 @@ TABS.outputs.initialize = function (callback) {
         if (MIXER_CONFIG.appliedMixerPreset == -1) return;
 
         const isMotorInverted = self.motorDirectionInverted;
-        const isReversed = isMotorInverted && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+        const isReversed = isMotorInverted && (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
         const path = './resources/motor_order/'
             + helper.mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
@@ -293,7 +293,7 @@ TABS.outputs.initialize = function (callback) {
             let output,
                 outputString;
 
-            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+            if (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
                 output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
             } else {
                 output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
@@ -362,26 +362,26 @@ TABS.outputs.initialize = function (callback) {
         }
 
         // UI hooks for dynamically generated elements
-        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').change(function () {
+        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').on('change', function () {
             if ($('div.live input').is(':checked')) {
                 // apply small delay as there seems to be some funky update business going wrong
                 helper.timeout.add('servos_update', servos_update, 10);
             }
         });
 
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             helper.features.reset();
             helper.features.fromUI($('.tab-motors'));
             helper.features.execute(servos_update);
         });
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             saveChainer.setExitPoint(function () {
                 //noinspection JSUnresolvedVariable
-                GUI.log(localization.getMessage('configurationEepromSaved'));
+                GUI.log(i18n.getMessage('configurationEepromSaved'));
 
                 GUI.tab_switch_cleanup(function () {
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                        GUI.log(localization.getMessage('deviceRebooting'));
+                        GUI.log(i18n.getMessage('deviceRebooting'));
                         GUI.handleReconnect($('.tab_outputs a'));
                     });
                 });
@@ -583,7 +583,7 @@ TABS.outputs.initialize = function (callback) {
             $('div.sliders input:not(:last):first').trigger('input');
         });
 
-        $motorsEnableTestMode.change(function () {
+        $motorsEnableTestMode.on('change', function () {
             if ($(this).is(':checked')) {
                 $slidersInput.slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);
 
@@ -650,7 +650,7 @@ TABS.outputs.initialize = function (callback) {
             }
         }
 
-        $motorsEnableTestMode.change();
+        $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
 
@@ -717,7 +717,7 @@ TABS.outputs.initialize = function (callback) {
 
             if (previousArmState != self.armed) {
                 console.log('arm state change detected');
-                $motorsEnableTestMode.change();
+                $motorsEnableTestMode.trigger('change');
             }
         }
 
@@ -726,7 +726,7 @@ TABS.outputs.initialize = function (callback) {
     }
 
     function finalize() {
-       localization.localize();;
+       i18n.localize();;
         GUI.content_ready(callback);
     }
 

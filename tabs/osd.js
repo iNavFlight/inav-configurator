@@ -1953,27 +1953,27 @@ OSD.constants = {
                     preview: 'TEX   0'
                 },
                 {
-                    name: 'STABILIZED_RC_EXPO',
+                    name: 'STABILIZED.RC_EXPO',
                     id: 64,
                     preview: 'EXP  20'
                 },
                 {
-                    name: 'STABILIZED_RC_YAW_EXPO',
+                    name: 'STABILIZED.RC_YAW_EXPO',
                     id: 65,
                     preview: 'YEX  20'
                 },
                 {
-                    name: 'STABILIZED_PITCH_RATE',
+                    name: 'STABILIZED.PITCH_RATE',
                     id: 67,
                     preview: 'SPR  20'
                 },
                 {
-                    name: 'STABILIZED_ROLL_RATE',
+                    name: 'STABILIZED.ROLL_RATE',
                     id: 68,
                     preview: 'SRR  20'
                 },
                 {
-                    name: 'STABILIZED_YAW_RATE',
+                    name: 'STABILIZED.YAW_RATE',
                     id: 69,
                     preview: 'SYR  20'
                 },
@@ -2509,7 +2509,7 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
-        $('input.' + item_id + '.position').val(position).change();
+        $('input.' + item_id + '.position').val(position).trigger('change');
     }
 };
 
@@ -2573,7 +2573,7 @@ OSD.GUI.updateVideoMode = function() {
         }
     }
 
-    $videoTypes.change(function () {
+    $videoTypes.on('change', function () {
         OSD.data.preferences.video_system = $(this).find(':selected').data('type');
         OSD.updateDisplaySize();
         OSD.GUI.saveConfig();
@@ -2590,7 +2590,7 @@ OSD.GUI.updateUnits = function() {
         if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
             continue;
         }
-        var name = localization.getMessage(unitType.name);
+        var name = i18n.getMessage(unitType.name);
         var $option = $('<option>' + name + '</option>');
         $option.attr('value', name);
         $option.data('type', unitType.value);
@@ -2603,7 +2603,7 @@ OSD.GUI.updateUnits = function() {
         var unitType = OSD.constants.UNIT_TYPES[OSD.data.preferences.units];
         var tip;
         if (unitType.tip) {
-            tip = localization.getMessage(unitType.tip);
+            tip = i18n.getMessage(unitType.tip);
         }
         if (tip) {
             $unitTip.attr('title', tip);
@@ -2613,7 +2613,7 @@ OSD.GUI.updateUnits = function() {
         }
     }
     updateUnitHelp();
-    $unitMode.change(function (e) {
+    $unitMode.on('change', function (e) {
         var selected = $(this).find(':selected');
         OSD.data.preferences.units = selected.data('type');
         globalSettings.osdUnits = OSD.data.preferences.units;
@@ -2644,9 +2644,9 @@ OSD.GUI.updateFields = function() {
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
         groupContainer.attr('id', group.name);
         var groupTitleContainer = groupContainer.find('.spacer_box_title');
-        var groupTitle = localization.getMessage(group.name);
+        var groupTitle = i18n.getMessage(group.name);
         groupTitleContainer.text(groupTitle);
-        var groupHelp = localization.getMessage(group.name + '_HELP');
+        var groupHelp = i18n.getMessage(group.name + '_HELP');
         if (groupHelp) {
             $('<div class="helpicon cf_tip"></div>')
                 .css('margin-top', '1px')
@@ -2670,7 +2670,7 @@ OSD.GUI.updateFields = function() {
             var $field = $('<div class="display-field field-' + item.id + '"/>');
             var name = item.name;
             var nameKey = 'osdElement_' + name;
-            var nameMessage = localization.getMessage(nameKey);
+            var nameMessage = i18n.getMessage(nameKey);
             if (nameMessage) {
                 name = nameMessage;
             } else {
@@ -2680,7 +2680,7 @@ OSD.GUI.updateFields = function() {
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
-            var help = localization.getMessage(nameKey + '_HELP');
+            var help = i18n.getMessage(nameKey + '_HELP');
             if (help) {
                 $('<div class="helpicon cf_tip"></div>')
                     .css('margin-top', '1px')
@@ -2700,7 +2700,7 @@ OSD.GUI.updateFields = function() {
                 $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
                     .data('item', item)
                     .attr('checked', itemData.isVisible)
-                    .change(function () {
+                    .on('change', function () {
                         var item = $(this).data('item');
                         var itemData = OSD.data.items[item.id];
                         var $position = $(this).parent().find('.position.' + item.name);
@@ -2729,7 +2729,7 @@ OSD.GUI.updateFields = function() {
                     $('<input type="number" class="' + item.id + ' position"></input>')
                         .data('item', item)
                         .val(itemData.position)
-                        .change($.debounce(250, function (e) {
+                        .on('change', $.debounce(250, function (e) {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
@@ -3067,7 +3067,7 @@ OSD.GUI.updatePreviews = function() {
         $img.find('img').css('pointer-events', 'none');
         if (item && item.positionable !== false) {
             var nameKey = 'osdElement_' + item.name;
-            var nameMessage = localization.getMessage(nameKey);
+            var nameMessage = i18n.getMessage(nameKey);
 
             if (!nameMessage) {
                 nameMessage = inflection.titleize(item.name);
@@ -3097,7 +3097,7 @@ OSD.GUI.updateAll = function() {
     if (OSD.data.layout_count > 1) {
         layouts.empty();
         for (var ii = 0; ii < OSD.data.layout_count; ii++) {
-            var name = ii > 0 ? localization.getMessage('osdLayoutAlternative', [ii]) : localization.getMessage('osdLayoutDefault');
+            var name = ii > 0 ? i18n.getMessage('osdLayoutAlternative', [ii]) : i18n.getMessage('osdLayoutDefault');
             var opt = $('<option/>').val(ii).text(name).appendTo(layouts);
         }
         layouts.val(OSD.data.selected_layout);
@@ -3156,7 +3156,7 @@ TABS.osd.initialize = function (callback) {
 
     GUI.load(path.join(__dirname, "tabs/osd.html"), Settings.processHtml(function () {
         // translate to user-selected language
-       localization.localize();
+       i18n.localize();
 
         // Open modal window
         OSD.GUI.jbox = new jBox('Modal', {
@@ -3171,11 +3171,11 @@ TABS.osd.initialize = function (callback) {
             content: $('#fontmanagercontent')
         });
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log(localization.getMessage('osdSettingsSaved'));
+                GUI.log(i18n.getMessage('osdSettingsSaved'));
                 var oldText = $(this).text();
                 $(this).html("Saved");
                 setTimeout(function () {
@@ -3259,7 +3259,7 @@ TABS.osd.initialize = function (callback) {
         FONT.initData();
 
         var $fontPicker = $('.fontbuttons button');
-        $fontPicker.click(function (e) {
+        $fontPicker.on('click', function () {
             if (!$(this).data('font-file')) {
                 return;
             }
@@ -3282,13 +3282,13 @@ TABS.osd.initialize = function (callback) {
         }
 
         if (typeof previous_font_button == "undefined") {
-            $fontPicker.first().click();
+            $fontPicker.first().trigger( "click" );
         } else {
-            previous_font_button.click();
+            previous_font_button.trigger( "click" );
         }
         
 
-        $('button.load_font_file').click(function () {
+        $('button.load_font_file').on('click', function () {
             $fontPicker.removeClass('active');
             FONT.openFontFile().then(function () {
                 FONT.preview($preview);
@@ -3297,16 +3297,16 @@ TABS.osd.initialize = function (callback) {
         });
 
         // font upload
-        $('a.flash_font').click(function () {
+        $('a.flash_font').on('click', function () {
             if (!GUI.connect_lock) { // button disabled while flashing is in progress
                 var progressLabel = $('.progressLabel');
                 var progressBar = $('.progress');
-                var uploading = localization.getMessage('uploadingCharacters');
+                var uploading = i18n.getMessage('uploadingCharacters');
                 progressLabel.text(uploading);
                 var progressCallback = function(done, total, percentage) {
                     progressBar.val(percentage);
                     if (done == total) {
-                        progressLabel.text(localization.getMessage('uploadedCharacters'), [total]);
+                        progressLabel.text(i18n.getMessage('uploadedCharacters'), [total]);
                     } else {
                         progressLabel.text(uploading + ' (' + done + '/' + total + ')');
                     }

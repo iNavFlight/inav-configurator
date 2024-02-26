@@ -60,12 +60,12 @@ TABS.gps.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                 //noinspection JSUnresolvedVariable
-                GUI.log(localization.getMessage('deviceRebooting'));
+                GUI.log(i18n.getMessage('deviceRebooting'));
                 GUI.handleReconnect($('.tab_gps a'));
             });
         });
@@ -85,7 +85,7 @@ TABS.gps.initialize = function (callback) {
     let vehiclesCursorInitialized = false;
 
     function process_html() {
-       localization.localize();;
+       i18n.localize();;
 
         var features = FC.getFeatures();
 
@@ -100,19 +100,19 @@ TABS.gps.initialize = function (callback) {
             gps_protocol_e.append('<option value="' + i + '">' + gpsProtocols[i] + '</option>');
         }
 
-        gps_protocol_e.change(function () {
+        gps_protocol_e.on('change', function () {
             MISC.gps_type = parseInt($(this).val());
         });
 
         gps_protocol_e.val(MISC.gps_type);
-        gps_protocol_e.change();
+        gps_protocol_e.trigger('change');
 
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
         for (let i = 0; i < gpsSbas.length; i++) {
             gps_ubx_sbas_e.append('<option value="' + i + '">' + gpsSbas[i] + '</option>');
         }
 
-        gps_ubx_sbas_e.change(function () {
+        gps_ubx_sbas_e.on('change', function () {
             MISC.gps_ubx_sbas = parseInt($(this).val());
         });
 
@@ -140,7 +140,7 @@ TABS.gps.initialize = function (callback) {
             mapLayer = new ol.source.OSM();
         }
 
-        $("#center_button").click(function () {
+        $("#center_button").on('click', function () {
             let lat = GPS_DATA.lat / 10000000;
             let lon = GPS_DATA.lon / 10000000;
             let center = ol.proj.fromLonLat([lon, lat]);
@@ -208,11 +208,11 @@ TABS.gps.initialize = function (callback) {
             let lat = GPS_DATA.lat / 10000000;
             let lon = GPS_DATA.lon / 10000000;
 
-            let gpsFixType = localization.getMessage('gpsFixNone');
+            let gpsFixType = i18n.getMessage('gpsFixNone');
             if (GPS_DATA.fix >= 2) {
-                gpsFixType = localization.getMessage('gpsFix3D');
+                gpsFixType = i18n.getMessage('gpsFix3D');
             } else if (GPS_DATA.fix >= 1) {
-                gpsFixType = localization.getMessage('gpsFix2D');
+                gpsFixType = i18n.getMessage('gpsFix2D');
             }
 
             $('.GPS_info td.fix').html(gpsFixType);

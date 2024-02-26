@@ -122,7 +122,7 @@ TABS.ports.initialize = function (callback) {
     );
 
     for (var i = 0; i < portFunctionRules.length; i++) {
-        portFunctionRules[i].displayName = localization.getMessage('portsFunction_' + portFunctionRules[i].name);
+        portFunctionRules[i].displayName = i18n.getMessage('portsFunction_' + portFunctionRules[i].name);
     }
 
     var mspBaudRates = [
@@ -279,7 +279,7 @@ TABS.ports.initialize = function (callback) {
                         if (select_e.length == 0) {
                             functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
                             select_e = functions_e.find(selectElementSelector);
-                            var disabledText = localization.getMessage('portsTelemetryDisabled');
+                            var disabledText = i18n.getMessage('portsTelemetryDisabled');
                             select_e.append('<option value="">' + disabledText + '</option>');
                         }
                         select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
@@ -297,11 +297,11 @@ TABS.ports.initialize = function (callback) {
 
     function on_tab_loaded_handler() {
 
-       localization.localize();;
+       i18n.localize();;
 
         update_ui();
 
-        $('a.save').click(on_save_handler);
+        $('a.save').on('click', on_save_handler);
 
         GUI.content_ready(callback);
     }
@@ -354,7 +354,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_saved_handler() {
-            GUI.log(localization.getMessage('configurationEepromSaved'));
+            GUI.log(i18n.getMessage('configurationEepromSaved'));
 
             GUI.tab_switch_cleanup(function() {
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, on_reboot_success_handler);
@@ -362,7 +362,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_reboot_success_handler() {
-            GUI.log(localization.getMessage('deviceRebooting'));
+            GUI.log(i18n.getMessage('deviceRebooting'));
             GUI.handleReconnect($('.tab_ports a'));
         }
     }

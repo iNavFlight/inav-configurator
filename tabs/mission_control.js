@@ -133,7 +133,7 @@ TABS.mission_control.initialize = function (callback) {
             $('#missionMap, #missionControls').hide();
             $('#notLoadMap').show();
         }
-        localization.localize();
+        i18n.localize();
 
         function get_raw_gps_data() {
             MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, get_comp_gps_data);
@@ -488,21 +488,21 @@ TABS.mission_control.initialize = function (callback) {
 
                 $row.find(".safehome-number").text(safehome.getNumber()+1);
 
-                $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).change(function () {
+                $row.find(".safehome-enabled-value").prop('checked',safehome.isUsed()).on('change', function () {
                     safehome.setEnabled((($(this).prop('checked')) ? 1 : 0));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
 
-                $row.find(".safehome-lon").val(safehome.getLonMap()).change(function () {
+                $row.find(".safehome-lon").val(safehome.getLonMap()).on('change', function () {
                     safehome.setLon(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
                     renderSafehomesOnMap();
                 });
 
-                $row.find(".safehome-lat").val(safehome.getLatMap()).change(function () {
+                $row.find(".safehome-lat").val(safehome.getLatMap()).on('change', function () {
                     safehome.setLat(Math.round(Number($(this).val()) * 10000000));
                     SAFEHOMES.updateSafehome(safehome);
                     cleanSafehomeLayers();
@@ -513,7 +513,7 @@ TABS.mission_control.initialize = function (callback) {
             }
         }
         GUI.switchery();
-       localization.localize();;
+       i18n.localize();;
     }
 
 
@@ -649,13 +649,13 @@ TABS.mission_control.initialize = function (callback) {
          * Process home table UI
          */
 
-        $(".home-lat").val(HOME.getLatMap()).change(function () {
+        $(".home-lat").val(HOME.getLatMap()).on('change', function () {
             HOME.setLat(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
         });
 
-        $(".home-lon").val(HOME.getLonMap()).change(function () {
+        $(".home-lon").val(HOME.getLonMap()).on('change', function () {
             HOME.setLon(Math.round(Number($(this).val()) * 10000000));
             cleanHomeLayers();
             renderHomeOnMap();
@@ -908,7 +908,7 @@ TABS.mission_control.initialize = function (callback) {
                 MMCount ++;
             }
         });
-        $('#multimissionOptionList').val(MMCount).change();
+        $('#multimissionOptionList').val(MMCount).trigger('change');
     }
 
     function deleteMultimission() {
@@ -951,7 +951,7 @@ TABS.mission_control.initialize = function (callback) {
     function fileLoadMultiMissionCheck() {
         if (singleMissionActive()) {
             return true;
-        } else if (confirm(localization.getMessage('confirm_overwrite_multimission_file_load_option'))) {
+        } else if (confirm(i18n.getMessage('confirm_overwrite_multimission_file_load_option'))) {
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -1296,7 +1296,7 @@ TABS.mission_control.initialize = function (callback) {
 
             GUI.fillSelect($row.find(".waypointOptions-action"), waypointOptions, waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()]));
 
-            $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).change(function () {
+            $row.find(".waypointOptions-action").val(waypointOptions.indexOf(MWNP.WPTYPE.REV[element.getAction()])).on('change', function () {
                 element.setAction(MWNP.WPTYPE[waypointOptions[$(this).val()]]);
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
@@ -1315,31 +1315,31 @@ TABS.mission_control.initialize = function (callback) {
 
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
 
-            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).change(function () {
+            $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
                     if ($(this).val() >= 360 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(-1);
-                      alert(localization.getMessage('MissionPlannerHeadSettingsCheck'));
+                      alert(i18n.getMessage('MissionPlannerHeadSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "RTH") {
                     if ($(this).val() != 0 && $(this).val() != 1)
                     {
                       $(this).val(0);
-                      alert(localization.getMessage('MissionPlannerRTHSettingsCheck'));
+                      alert(i18n.getMessage('MissionPlannerRTHSettingsCheck'));
                     }
                 }
                 else if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
                     if ($(this).val() > mission.getNonAttachedList().length || $(this).val() < 1)
                     {
                       $(this).val(1);
-                      alert(localization.getMessage('MissionPlannerJumpSettingsCheck'));
+                      alert(i18n.getMessage('MissionPlannerJumpSettingsCheck'));
                     }
                     else if (mission.getPoiList().length != 0 && mission.getPoiList()) {
                         if (mission.getPoiList().includes(mission.convertJumpNumberToWaypoint(Number($(this).val())-1))) {
                             $(this).val(1);
-                            alert(localization.getMessage('MissionPlannerJump3SettingsCheck'));
+                            alert(i18n.getMessage('MissionPlannerJump3SettingsCheck'));
                         }
                     }
                 }
@@ -1349,12 +1349,12 @@ TABS.mission_control.initialize = function (callback) {
                 redrawLayer();
             });
 
-            $row.find(".waypointOptions-p2").val(element.getP2()).change(function () {
+            $row.find(".waypointOptions-p2").val(element.getP2()).on('change', function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "JUMP") {
                     if ($(this).val() > 10 || ($(this).val() < 0 && $(this).val() != -1))
                     {
                       $(this).val(0);
-                      alert(localization.getMessage('MissionPlannerJump2SettingsCheck'));
+                      alert(i18n.getMessage('MissionPlannerJump2SettingsCheck'));
                     }
                 }
                 element.setP2(Number($(this).val()));
@@ -1367,7 +1367,7 @@ TABS.mission_control.initialize = function (callback) {
 
         });
         GUI.switchery();
-        localization.localize();;
+        i18n.localize();;
         return waypoint;
     }
 
@@ -1802,7 +1802,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                 } catch (e) {
                     console.log(e);
-                    GUI.log(localization.getMessage('notAWAYPOINT'));
+                    GUI.log(i18n.getMessage('notAWAYPOINT'));
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
@@ -2042,7 +2042,7 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         // Callback for Waypoint edition
         /////////////////////////////////////////////
-        $('#pointType').change(function () {
+        $('#pointType').on('change', function () {
             if (selectedMarker) {
                 selectedMarker.setAction(Number($('#pointType').val()));
                 if ([MWNP.WPTYPE.SET_POI,MWNP.WPTYPE.POSHOLD_TIME,MWNP.WPTYPE.LAND].includes(selectedMarker.getAction())) {
@@ -2237,7 +2237,7 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
-        $("[data-role='waypointOptions-add']").click(function () {
+        $("[data-role='waypointOptions-add']").on('click', function () {
             if (selectedMarker) {
                 mission.addAttachedFromWaypoint(selectedMarker);
                 renderWaypointOptionsTable(selectedMarker);
@@ -2272,13 +2272,13 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromSafehomeButton').on('click', function () {
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startGettingSafehomePoints'));
+            GUI.log(i18n.getMessage('startGettingSafehomePoints'));
             mspHelper.loadSafehomes();
             setTimeout(function(){
                 renderSafehomesTable();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
-                GUI.log(localization.getMessage('endGettingSafehomePoints'));
+                GUI.log(i18n.getMessage('endGettingSafehomePoints'));
                 $('#loadEepromSafehomeButton').removeClass('disabled');
             }, 500);
 
@@ -2286,11 +2286,11 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#saveEepromSafehomeButton').on('click', function() {
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startSendingSafehomePoints'));
+            GUI.log(i18n.getMessage('startSendingSafehomePoints'));
             mspHelper.saveSafehomes();
             setTimeout(function(){
                 mspHelper.saveToEeprom();
-                GUI.log(localization.getMessage('endSendingSafehomePoints'));
+                GUI.log(i18n.getMessage('endSendingSafehomePoints'));
                 $('#saveEepromSafehomeButton').removeClass('disabled');
             }, 500);
         });
@@ -2366,7 +2366,7 @@ TABS.mission_control.initialize = function (callback) {
         });
 
         $('#updateMultimissionButton').on('click', function () {
-            $('#multimissionOptionList').val('0').change();
+            $('#multimissionOptionList').val('0').trigger('change');
         });
 
         $('#cancelMultimission').on('click', function () {
@@ -2381,7 +2381,7 @@ TABS.mission_control.initialize = function (callback) {
         // Callback for Remove buttons
         /////////////////////////////////////////////
         $('#removeAllPoints').on('click', function () {
-            if (markers.length && confirm(localization.getMessage('confirm_delete_all_points'))) {
+            if (markers.length && confirm(i18n.getMessage('confirm_delete_all_points'))) {
                 if (removeAllMultiMissionCheck()) {
                     removeAllWaypoints();
                     updateMultimissionState();
@@ -2394,10 +2394,10 @@ TABS.mission_control.initialize = function (callback) {
         $('#removePoint').on('click', function () {
             if (selectedMarker) {
                 if (mission.isJumpTargetAttached(selectedMarker)) {
-                    alert(localization.getMessage('MissionPlannerJumpTargetRemoval'));
+                    alert(i18n.getMessage('MissionPlannerJumpTargetRemoval'));
                 }
                 else if (mission.getAttachedFromWaypoint(selectedMarker) && mission.getAttachedFromWaypoint(selectedMarker).length != 0) {
-                    if (confirm(localization.getMessage('confirm_delete_point_with_options'))) {
+                    if (confirm(i18n.getMessage('confirm_delete_point_with_options'))) {
                         mission.getAttachedFromWaypoint(selectedMarker).forEach(function (element) {
                             mission.dropWaypoint(element);
                             mission.update(singleMissionActive());
@@ -2428,7 +2428,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#loadFileMissionButton').on('click', function () {
             if (!fileLoadMultiMissionCheck()) return;
 
-            if (markers.length && !confirm(localization.getMessage('confirm_delete_all_points'))) return;
+            if (markers.length && !confirm(i18n.getMessage('confirm_delete_all_points'))) return;
             var options = {
                 filters: [ { name: "Mission file", extensions: ['mission'] } ]
             };
@@ -2457,39 +2457,39 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(localization.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startGetPoint'));
+            GUI.log(i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(false);
         });
 
         $('#saveMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                alert(localization.getMessage('no_waypoints_to_save'));
+                alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startSendPoint'));
+            GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(false);
         });
 
         $('#loadEepromMissionButton').on('click', function () {
             let message = multimissionCount ? 'confirm_overwrite_multimission_file_load_option' : 'confirm_delete_all_points';
-            if ((markers.length || multimissionCount) && !confirm(localization.getMessage(message))) return;
+            if ((markers.length || multimissionCount) && !confirm(i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startGetPoint'));
+            GUI.log(i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(true);
         });
 
         $('#saveEepromMissionButton').on('click', function () {
             if (mission.isEmpty()) {
-                alert(localization.getMessage('no_waypoints_to_save'));
+                alert(i18n.getMessage('no_waypoints_to_save'));
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log(localization.getMessage('startSendPoint'));
+            GUI.log(i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
         });
 
@@ -2529,17 +2529,17 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     function loadMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log(localization.getMessage('errorReadingFileXml2jsNotFound'));
+        if (!window.xml2js) return GUI.log(i18n.getMessage('errorReadingFileXml2jsNotFound'));
 
         fs.readFile(filename, (err, data) => {
             if (err) {
-                GUI.log(localization.getMessage('errorReadingFile'));
+                GUI.log(i18n.getMessage('errorReadingFile'));
                 return console.error(err);
             }
 
             window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
-                    GUI.log(localization.getMessage('errorParsingFile'));
+                    GUI.log(i18n.getMessage('errorParsingFile'));
                     return console.error(err);
                 }
 
@@ -2627,7 +2627,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
 
                 if (missionEndFlagCount > 1) {
-                    if (multimissionCount && !confirm(localization.getMessage('confirm_multimission_file_load'))) {
+                    if (multimissionCount && !confirm(i18n.getMessage('confirm_multimission_file_load'))) {
                         mission.flush();
                         return;
                     } else {
@@ -2671,7 +2671,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
-                GUI.log(sFilename + localization.getMessage('loadedSuccessfully'));
+                GUI.log(sFilename + i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
         });
@@ -2679,7 +2679,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function saveMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log(localization.getMessage('errorWritingFileXml2jsNotFound'));
+        if (!window.xml2js) return GUI.log(i18n.getMessage('errorWritingFileXml2jsNotFound'));
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
@@ -2728,11 +2728,11 @@ TABS.mission_control.initialize = function (callback) {
         xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {
             if (err) {
-                GUI.log(localization.getMessage('ErrorWritingFile'));
+                GUI.log(i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
             let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename + localization.getMessage('savedSuccessfully'));
+            GUI.log(sFilename + i18n.getMessage('savedSuccessfully'));
             updateFilename(sFilename);
         });
     }
@@ -2750,15 +2750,15 @@ TABS.mission_control.initialize = function (callback) {
 
         function getWaypointData() {
             mspHelper.loadWaypoints(function() {
-                GUI.log(localization.getMessage('endGetPoint'));
+                GUI.log(i18n.getMessage('endGetPoint'));
                 if (loadEeprom) {
-                    GUI.log(localization.getMessage('eeprom_load_ok'));
+                    GUI.log(i18n.getMessage('eeprom_load_ok'));
                     $('#loadEepromMissionButton').removeClass('disabled');
                 } else {
                     $('#loadMissionButton').removeClass('disabled');
                 }
                 if (!MISSION_PLANNER.getCountBusyPoints()) {
-                    alert(localization.getMessage('no_waypoints_to_load'));
+                    alert(i18n.getMessage('no_waypoints_to_load'));
                     return;
                 }
                 mission.reinit();
@@ -2792,10 +2792,10 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANNER.copy(mission);
         MISSION_PLANNER.update(false, true, true);
         mspHelper.saveWaypoints(function() {
-            GUI.log(localization.getMessage('endSendPoint'));
+            GUI.log(i18n.getMessage('endSendPoint'));
             if (saveEeprom) {
                 $('#saveEepromMissionButton').removeClass('disabled');
-                GUI.log(localization.getMessage('eeprom_saved_ok'));
+                GUI.log(i18n.getMessage('eeprom_saved_ok'));
                 MSP.send_message(MSPCodes.MSP_WP_MISSION_SAVE, [0], false, setMissionIndex);
             } else {
                 $('#saveMissionButton').removeClass('disabled');
@@ -2815,7 +2815,7 @@ TABS.mission_control.initialize = function (callback) {
             let activeIndex = singleMissionActive() ? 1 : $('#activeNissionIndex').text();
             mspHelper.setSetting("nav_wp_multi_mission_index", activeIndex, function () {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('multimission_active_index_saved_eeprom'));
+                    GUI.log(i18n.getMessage('multimission_active_index_saved_eeprom'));
                 });
             });
         }
@@ -2828,7 +2828,7 @@ TABS.mission_control.initialize = function (callback) {
                 availableWPs = availableWPs - multimission.get().length;
             }
             $('#availablePoints').text(availableWPs + '/' + mission.getMaxWaypoints());
-            $('#missionValid').html(mission.getValidMission() ? localization.getMessage('armingCheckPass') : localization.getMessage('armingCheckFail'));
+            $('#missionValid').html(mission.getValidMission() ? i18n.getMessage('armingCheckPass') : i18n.getMessage('armingCheckFail'));
         }
     }
 
@@ -2854,7 +2854,7 @@ TABS.mission_control.initialize = function (callback) {
         if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
-                    alert(localization.getMessage('MissionPlannerAltitudeChangeReset'));
+                    alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     altitude = settings.alt + 100 * elevation;
@@ -2865,7 +2865,7 @@ TABS.mission_control.initialize = function (callback) {
             let elevationAtHome = HOME.getAlt();
             if ((checkAltitude / 100 + elevationAtHome) < elevation) {
                 if (resetAltitude) {
-                    alert(localization.getMessage('MissionPlannerAltitudeChangeReset'));
+                    alert(i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
                     let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());

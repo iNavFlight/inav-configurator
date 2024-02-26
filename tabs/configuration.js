@@ -49,7 +49,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -58,7 +58,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_configuration a'));
     }
 
@@ -80,11 +80,11 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 feature_tip_html = '';
 
             if (features[i].showNameInTip) {
-                tips.push(localization.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
+                tips.push(i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
             }
 
             if (features[i].haveTip) {
-                tips.push(localization.getMessage("feature" + features[i].name + "Tip"));
+                tips.push(i18n.getMessage("feature" + features[i].name + "Tip"));
             }
 
             if (tips.length > 0) {
@@ -111,7 +111,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         helper.features.updateUI($('.tab-configuration'), FEATURES);
 
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // VTX
         var config_vtx = $('.config-vtx');
@@ -121,7 +121,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             vtx_band.empty();
             var vtx_no_band_note = $('#vtx_no_band');
             if (VTX_CONFIG.band < VTX.BAND_MIN || VTX_CONFIG.band > VTX.BAND_MAX) {
-                var noBandName = localization.getMessage("configurationNoBand");
+                var noBandName = i18n.getMessage("configurationNoBand");
                 $('<option value="0">' + noBandName + '</option>').appendTo(vtx_band);
                 vtx_no_band_note.show();
             } else {
@@ -135,7 +135,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
                 option.appendTo(vtx_band);
             }
-            vtx_band.change(function () {
+            vtx_band.on('change', function () {
                 VTX_CONFIG.band = parseInt($(this).val());
             });
 
@@ -148,7 +148,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
                 option.appendTo(vtx_channel);
             }
-            vtx_channel.change(function () {
+            vtx_channel.on('change', function () {
                 VTX_CONFIG.channel = parseInt($(this).val());
             });
 
@@ -163,14 +163,14 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
                 option.appendTo(vtx_power);
             }
-            vtx_power.change(function () {
+            vtx_power.on('change', function () {
                 VTX_CONFIG.power = parseInt($(this).val());
             });
 
             var vtx_low_power_disarm = $('#vtx_low_power_disarm');
             vtx_low_power_disarm.empty();
             for (var ii = VTX.LOW_POWER_DISARM_MIN; ii <= VTX.LOW_POWER_DISARM_MAX; ii++) {
-                var name = localization.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
+                var name = i18n.getMessage("configurationVTXLowPowerDisarmValue_" + ii);
                 if (!name) {
                     name = ii;
                 }
@@ -180,7 +180,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 }
                 option.appendTo(vtx_low_power_disarm);
             }
-            vtx_low_power_disarm.change(function () {
+            vtx_low_power_disarm.on('change', function () {
                 VTX_CONFIG.low_power_disarm = parseInt($(this).val());
             });
 
@@ -226,7 +226,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         let $i2cSpeed = $('#i2c_speed'),
             $i2cSpeedInfo = $('#i2c_speed-info');
 
-        $i2cSpeed.change(function () {
+        $i2cSpeed.on('change', function () {
             let $this = $(this),
                 value = $this.children("option:selected").text();
 
@@ -236,7 +236,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $i2cSpeedInfo.addClass('info-box');
                 $i2cSpeedInfo.removeClass('warning-box');
 
-                $i2cSpeedInfo.html(localization.getMessage('i2cSpeedSuggested800khz'));
+                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedSuggested800khz'));
                 $i2cSpeedInfo.show();
 
             } else if (value == "800KHZ") {
@@ -248,15 +248,15 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 $i2cSpeedInfo.removeClass('ok-box');
                 $i2cSpeedInfo.removeClass('info-box');
                 $i2cSpeedInfo.addClass('warning-box');
-                $i2cSpeedInfo.html(localization.getMessage('i2cSpeedTooLow'));
+                $i2cSpeedInfo.html(i18n.getMessage('i2cSpeedTooLow'));
                 $i2cSpeedInfo.show();
             }
 
         });
 
-        $i2cSpeed.change();
+        $i2cSpeed.trigger('change');
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
             //MISC.mag_declination = parseFloat($('#mag_declination').val());
 

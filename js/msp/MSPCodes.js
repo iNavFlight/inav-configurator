@@ -249,3 +249,5 @@ var MSPCodes = {
 
     MSP2_ADSB_VEHICLE_LIST:             0x2090,
 };
+
+module.exports = MSPCodes;

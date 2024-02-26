@@ -138,7 +138,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         //add value to autodetect channel
         let channelOption = channelOptionTemplate.clone();
-        channelOption.text(localization.getMessage('auxiliaryAutoChannelSelect'));
+        channelOption.text(i18n.getMessage('auxiliaryAutoChannelSelect'));
         channelOption.val(-1);
         channelList.append(channelOption);
 
@@ -195,7 +195,7 @@ TABS.auxiliary.initialize = function (callback) {
 
         $(rangeElement).find('.deleteRange').data('rangeElement', rangeElement);
 
-        $(rangeElement).find('a.deleteRange').click(function () {
+        $(rangeElement).find('a.deleteRange').on('click', function () {
             var rangeElement = $(this).data('rangeElement');
             modeElement.removeClass('inRange');
             rangeElement.remove();
@@ -268,7 +268,7 @@ TABS.auxiliary.initialize = function (callback) {
             return auxChannelIndexCandidates[0];
         }
 
-        $('a.addRange').click(function () {
+        $('a.addRange').on('click', function () {
             var modeElement = $(this).data('modeElement');
 
             var firstUnusedChannel = findFirstUnusedChannel(modeElement);
@@ -277,10 +277,10 @@ TABS.auxiliary.initialize = function (callback) {
         });
 
         // translate to user-selected language
-       localization.localize();;
+       i18n.localize();;
 
         // UI Hooks
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
 
             // update internal data structures based on current UI elements
 
@@ -330,7 +330,7 @@ TABS.auxiliary.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(localization.getMessage('auxiliaryEepromSaved'));
+                    GUI.log(i18n.getMessage('auxiliaryEepromSaved'));
                 });
             }
         });
@@ -487,13 +487,13 @@ TABS.auxiliary.initialize = function (callback) {
         let hideUnusedModes = false;
         let hideUnusedModesStore =  store.get('hideUnusedModes', false);
         $("input#switch-toggle-unused")
-            .change(function() {
+            .on('change', function () {
                 hideUnusedModes = $(this).prop("checked");
                 store.set('hideUnusedModes', hideUnusedModes);
                 update_ui();
             })
             .prop("checked", !!hideUnusedModesStore)
-            .change();
+            .trigger('change');
         
         // update ui instantly on first load
         update_ui();

@@ -480,3 +480,6 @@ let WaypointCollection = function () {
 
     return self;
 };
+
+module.exports = WaypointCollection;
+

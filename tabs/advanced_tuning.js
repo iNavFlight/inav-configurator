@@ -35,7 +35,7 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         GUI.simpleBind();
 
-       localization.localize();;
+       i18n.localize();;
         
         // Set up required field warnings
         $('#launchIdleThr').keyup(function() {
@@ -50,7 +50,7 @@ TABS.advanced_tuning.initialize = function (callback) {
             TABS.advanced_tuning.checkRequirements_LinearDescent();
         });
 
-        $('#rthUseLinearDescent').change(function() {
+        $('#rthUseLinearDescent').on('change', function () {
             TABS.advanced_tuning.checkRequirements_LinearDescent();
         });
 
@@ -58,7 +58,7 @@ TABS.advanced_tuning.initialize = function (callback) {
         TABS.advanced_tuning.checkRequirements_IdleThrottle();
         TABS.advanced_tuning.checkRequirements_LinearDescent();
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             Settings.saveInputs().then(function () {
                 var self = this;
                 MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
@@ -77,7 +77,7 @@ TABS.advanced_tuning.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
@@ -85,7 +85,7 @@ TABS.advanced_tuning.initialize = function (callback) {
 
     function reinitialize() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_advanced_tuning a'));
     }
 };

@@ -1,7 +1,7 @@
 /*global bit_check*/
 'use strict';
 
-let OutputMappingCollection = function () {
+var OutputMappingCollection = function () {
     let self = {},
         data = [],
         timerOverrides = {};
@@ -177,3 +177,5 @@ let OutputMappingCollection = function () {
 
     return self;
 }
+
+module.exports = OutputMappingCollection;

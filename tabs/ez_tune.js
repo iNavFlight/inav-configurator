@@ -34,14 +34,14 @@ TABS.ez_tune.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(localization.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
         });
     }
 
     function reinitialize() {
-        GUI.log(localization.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_ez_tune a'));
     }
 
@@ -101,7 +101,7 @@ TABS.ez_tune.initialize = function (callback) {
     }
 
     function process_html() {
-       localization.localize();;
+       i18n.localize();;
 
         helper.tabs.init($('.tab-ez_tune'));
         helper.features.updateUI($('.tab-ez_tune'), FEATURES);
