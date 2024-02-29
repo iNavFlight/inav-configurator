@@ -1283,8 +1283,6 @@ TABS.mission_control.initialize = function (callback) {
         } else {
             $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
         }
-
-
     }
 
     function paintLine(pos1, pos2, pos2ID, color='#1497f1', lineDash=0, lineText="", selection=true, arrow=false) {
@@ -3130,7 +3128,13 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#saveSettings').on('click', function () {
             let oldSafeRadiusSH = settings.safeRadiusSH;
-            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()), fwApproachAlt: Number($('#MPdefaultFwApproachAlt').val()), fwLandAlt: Number($('#MPdefaultLandAlt').val()), fwApproachLength: settings.fwApproachLength, maxDistSH: settings.maxDistSH, fwLoiterRadius: settings.fwLoiterRadius, bingDemModel: settings.bingDemModel};
+
+            // update only default settings
+            settings.alt = Number($('#MPdefaultPointAlt').val());
+            settings.speed = Number($('#MPdefaultPointSpeed').val());
+            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
+            settings.fwApproachAlt = Number($('#MPdefaultFwApproachAlt').val());
+            settings.fwLandAlt = Number($('#MPdefaultLandAlt').val());
 
             saveSettings();
 
