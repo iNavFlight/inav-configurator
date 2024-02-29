@@ -468,7 +468,7 @@ TABS.mission_control.initialize = function (callback) {
     function loadSettings() {
         chrome.storage.local.get('missionPlannerSettings', function (result) {
             if (result.missionPlannerSettings) {
-                if (result.missionPlannerSettings.fwApproachLength == undefined && settings.fwApproachLength) {
+                if (!result.missionPlannerSettings.fwApproachLength && settings.fwApproachLength) {
                     result.missionPlannerSettings.fwApproachLength = settings.fwApproachLength;
                     result.missionPlannerSettings.maxDistSH = settings.maxDistSH;
                     result.missionPlannerSettings.fwLoiterRadius = settings.fwLoiterRadius;
