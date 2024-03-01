@@ -29,3 +29,12 @@
     color:#fff;
     font-weight: bold;
 }
+
+.programming-spacer-row, .programming-spacer-row td {
+    background-color: #fff !important;
+    height: 3px;
+}
+
+.first-programming-spacer-row td {
+    border-bottom: #828885 solid 1px;
+}
