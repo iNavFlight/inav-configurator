@@ -126,6 +126,7 @@ TABS.ports.initialize = function (callback) {
     }
 
     var mspBaudRates = [
+        '4800',
         '9600',
         '19200',
         '38400',
@@ -349,6 +350,7 @@ TABS.ports.initialize = function (callback) {
                 peripherals_baudrate: $(portConfiguration_e).find('.peripherals_baudrate').val(),
                 identifier: oldSerialPort.identifier
             };
+            console.log(serialPort);
             SERIAL_CONFIG.ports.push(serialPort);
         });
 
