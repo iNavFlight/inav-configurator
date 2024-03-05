@@ -9,6 +9,32 @@ TABS.gps.initialize = function (callback) {
         googleAnalytics.sendAppView('GPS');
     }
 
+    // mavlink ADSB_EMITTER_TYPE
+    const ADSB_VEHICLE_TYPE = {
+        0: 'adsb_14.png', // ADSB_EMITTER_TYPE_NO_INFO
+        1: 'adsb_1.png', // ADSB_EMITTER_TYPE_LIGHT
+        2: 'adsb_1.png', // ADSB_EMITTER_TYPE_SMALL
+        3: 'adsb_2.png', // ADSB_EMITTER_TYPE_LARGE
+        4: 'adsb_14.png', // ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE
+        5: 'adsb_5.png', // ADSB_EMITTER_TYPE_HEAVY
+        6: 'adsb_14.png', // ADSB_EMITTER_TYPE_HIGHLY_MANUV
+        7: 'adsb_13.png', // ADSB_EMITTER_TYPE_ROTOCRAFT
+        8: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSIGNED
+        9: 'adsb_6.png', // ADSB_EMITTER_TYPE_GLIDER
+        10: 'adsb_7.png', // ADSB_EMITTER_TYPE_LIGHTER_AIR
+        11: 'adsb_15.png', // ADSB_EMITTER_TYPE_PARACHUTE
+        12: 'adsb_1.png', // ADSB_EMITTER_TYPE_ULTRA_LIGHT
+        13: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSIGNED2
+        14: 'adsb_8.png', // ADSB_EMITTER_TYPE_UAV
+        15: 'adsb_14.png', // ADSB_EMITTER_TYPE_SPACE
+        16: 'adsb_14.png', // ADSB_EMITTER_TYPE_UNASSGINED3
+        17: 'adsb_9.png', // ADSB_EMITTER_TYPE_EMERGENCY_SURFACE
+        18: 'adsb_10.png', // ADSB_EMITTER_TYPE_SERVICE_SURFACE
+        19: 'adsb_12.png', // ADSB_EMITTER_TYPE_POINT_OBSTACLE
+    };
+
+
+
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
@@ -57,6 +83,10 @@ TABS.gps.initialize = function (callback) {
     let mapHandler;
     let iconGeometry;
     let iconFeature;
+
+    let vehicleVectorSource;
+    let vehiclesCursorInitialized = false;
+
 
     function process_html() {
         localize();
@@ -129,6 +159,36 @@ TABS.gps.initialize = function (callback) {
                 })
             ],
             view: mapView
+        });
+
+        TABS.gps.toolboxAdsbVehicle = new jBox('Mouse', {
+            position: {
+                x: "right",
+                y: "bottom"
+            },
+            offset: {
+                x: -5,
+                y: 20,
+            },
+        });
+
+        mapHandler.on('pointermove', function(evt) {
+            var feature = mapHandler.forEachFeatureAtPixel(mapHandler.getEventPixel(evt.originalEvent), function(feature, layer) {
+                return feature;
+            });
+
+            if (feature) {
+                TABS.gps.toolboxAdsbVehicle.setContent(
+                    `icao: <strong>` + feature.get('name') + `</strong><br />`
+                    + `lat: <strong>`+ (feature.get('data').lat / 10000000) + `</strong><br />`
+                    + `lon: <strong>`+ (feature.get('data').lon / 10000000) + `</strong><br />`
+                    + `ASL: <strong>`+ (feature.get('data').altCM ) / 100 + `m</strong><br />`
+                    + `heading: <strong>`+ feature.get('data').headingDegrees + `°</strong><br />`
+                    + `type: <strong>`+ feature.get('data').emitterType + `</strong>`
+                ).open();
+            }else{
+                TABS.gps.toolboxAdsbVehicle.close();
+            }
         });
 
         let center = ol.proj.fromLonLat([0, 0]);
@@ -221,6 +281,66 @@ TABS.gps.initialize = function (callback) {
                 iconGeometry.setCoordinates(center);
 
             }
+
+            if (semver.gte(CONFIG.flightControllerVersion, "7.1.0")) {
+                MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, function () {
+                    //ADSB vehicles
+
+                    if (vehiclesCursorInitialized) {
+                        vehicleVectorSource.clear();
+                    }
+
+                    for (let key in ADSB_VEHICLES.vehicles) {
+                        let vehicle = ADSB_VEHICLES.vehicles[key];
+
+                        if (!vehiclesCursorInitialized) {
+                            vehiclesCursorInitialized = true;
+
+                            vehicleVectorSource = new ol.source.Vector({});
+
+                            let vehicleLayer = new ol.layer.Vector({
+                                source: vehicleVectorSource
+                            });
+
+                            mapHandler.addLayer(vehicleLayer);
+                        }
+
+                        if (vehicle.lat > 0 && vehicle.lon > 0 && vehicle.ttl > 0) {
+                            let vehicleIconStyle = new ol.style.Style({
+                                image: new ol.style.Icon(({
+                                    opacity: 1,
+                                    rotation: vehicle.headingDegrees * (Math.PI / 180),
+                                    scale: 0.8,
+                                    anchor: [0.5, 0.5],
+                                    src: '../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType],
+                                })),
+                                text: new ol.style.Text(({
+                                    text: vehicle.callsign,
+                                    textAlign: 'center',
+                                    textBaseline: "bottom",
+                                    offsetY: +40,
+                                    padding: [2, 2, 2, 2],
+                                    backgroundFill: '#444444',
+                                    fill: new ol.style.Fill({color: '#ffffff'}),
+                                })),
+                            });
+
+
+                            let iconGeometry = new ol.geom.Point(ol.proj.fromLonLat([vehicle.lon / 10000000, vehicle.lat / 10000000]));
+                            let iconFeature = new ol.Feature({
+                                geometry: iconGeometry,
+                                name: vehicle.callsign,
+                                type: 'adsb',
+                                data: vehicle,
+                            });
+
+                            iconFeature.setStyle(vehicleIconStyle);
+                            vehicleVectorSource.addFeature(iconFeature);
+                        }
+                    }
+                });
+            }
+
         }
 
         /*
@@ -271,4 +391,7 @@ TABS.gps.initialize = function (callback) {
 
 TABS.gps.cleanup = function (callback) {
     if (callback) callback();
+    if(TABS.gps.toolboxAdsbVehicle){
+        TABS.gps.toolboxAdsbVehicle.close();
+    }
 };

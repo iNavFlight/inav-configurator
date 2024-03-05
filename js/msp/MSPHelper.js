@@ -187,6 +187,35 @@ var mspHelper = (function (gui) {
                 GPS_DATA.eph = data.getUint16(16, true);
                 GPS_DATA.epv = data.getUint16(18, true);
                 break;
+            case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
+                var byteOffsetCounter = 0;
+                ADSB_VEHICLES.vehicles = [];
+                ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
+                ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
+
+                for(i = 0; i < ADSB_VEHICLES.vehiclesCount; i++){
+
+                    var vehicle = {callSignByteArray: [], callsign: "", icao: 0, lat: 0, lon: 0, alt: 0, heading: 0, ttl: 0, tslc: 0, emitterType: 0};
+
+                    for(ii = 0; ii < ADSB_VEHICLES.callsignLength; ii++){
+                        vehicle.callSignByteArray.push(data.getUint8(byteOffsetCounter++));
+                    }
+
+                    vehicle.callsign = (String.fromCharCode(...vehicle.callSignByteArray)).replace(/[^\x20-\x7E]/g, '');
+                    vehicle.icao = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lat = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lon = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.altCM = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.headingDegrees = data.getUint16(byteOffsetCounter, true); byteOffsetCounter += 2;
+                    vehicle.tslc = data.getUint8(byteOffsetCounter++);
+                    vehicle.emitterType = data.getUint8(byteOffsetCounter++);
+                    vehicle.ttl = data.getUint8(byteOffsetCounter++);
+
+                    ADSB_VEHICLES.vehicles.push(vehicle);
+                }
+
+                break;
+
             case MSPCodes.MSP_ATTITUDE:
                 SENSOR_DATA.kinematics[0] = data.getInt16(0, true) / 10.0; // x
                 SENSOR_DATA.kinematics[1] = data.getInt16(2, true) / 10.0; // y

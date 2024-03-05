@@ -1,7 +1,7 @@
 {
   "name": "inav-configurator",
   "description": "INAV Configurator",
-  "version": "7.0.1",
+  "version": "8.0.0",
   "main": "main.html",
   "default_locale": "en",
   "scripts": {
@@ -32,7 +32,8 @@
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "inflection": "1.12.0",
-    "jquery": "2.1.4",
+    "jquery": "3.7.1",
+    "jquery-textcomplete": "^1.8.5",
     "jquery-ui-npm": "1.12.0",
     "marked": "^0.3.17",
     "minimist": "^1.2.8",
