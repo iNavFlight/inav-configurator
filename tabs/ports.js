@@ -350,7 +350,6 @@ TABS.ports.initialize = function (callback) {
                 peripherals_baudrate: $(portConfiguration_e).find('.peripherals_baudrate').val(),
                 identifier: oldSerialPort.identifier
             };
-            console.log(serialPort);
             SERIAL_CONFIG.ports.push(serialPort);
         });
 
