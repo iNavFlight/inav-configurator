@@ -576,7 +576,7 @@ function release_deb(arch) {
                 architecture: getLinuxPackageArch('deb', arch),
                 maintainer: metadata.author,
                 description: metadata.description,
-                preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${metadata.name}`],
+                preinst: [`rm -rfv ${LINUX_INSTALL_DIR}/${metadata.name}`],
                 postinst: [
                     `chown root:root ${LINUX_INSTALL_DIR}`,
                     `chown -R root:root ${LINUX_INSTALL_DIR}/${metadata.name}`,
@@ -589,6 +589,7 @@ function release_deb(arch) {
                 _out: appsDir,
                 _copyright: 'assets/linux/copyright',
                 _clean: true,
+                _verbose: true
         }));
     }
 }
@@ -599,18 +600,6 @@ function post_release_deb(arch) {
             done();
             return null;
         }
-        if ((arch === 'linux32') || (arch === 'linux64')) {
-            var rename = require("gulp-rename");
-            const metadata = require('./package.json');
-            const renameFrom = path.join(appsDir, metadata.name + '_' + metadata.version + '_' + getLinuxPackageArch('.deb', arch) + '.deb');
-            const renameTo = path.join(appsDir, get_release_filename_base(arch) + '_' + metadata.version + '.deb');
-            // Rename .deb build to common naming
-            console.log(`Renaming .deb installer ${renameFrom} to ${renameTo}`);
-            return gulp.src(renameFrom)
-                    .pipe(rename(renameTo))
-                    .pipe(gulp.dest("."));
-        }
-
         return done();
     }
 }

@@ -1,0 +1,183 @@
+on: pull_request
+  
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup environment
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      run: |
+        # This is the hash of the commit for the PR
+        # when the action is triggered by PR, empty otherwise
+        COMMIT_ID=${{ github.event.pull_request.head.sha }}
+        # This is the hash of the commit when triggered by push
+        # but the hash of refs/pull/<n>/merge, which is different
+        # from the hash of the latest commit in the PR, that's
+        # why we try github.event.pull_request.head.sha first
+        COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+        BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+        VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+        echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+        echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+        echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 21
+        check-latest: true
+        cache: 'npm'
+    - name: Install linux packages
+      run: sudo apt-get update && sudo apt-get install wine devscripts sbuild rpm
+    #- name: Download node.js
+    #  run: curl -o /tmp/node.tar.xz https://nodejs.org/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz && sudo tar --strip-components=1 -xJvf /tmp/node.tar.xz -C /usr/local
+    - name: Install deps
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: npm install
+        timeout_minutes: 10
+    - name: Create apps folder
+      run: mkdir -p apps
+    - name: build linux64
+      id: build1
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        timeout_minutes: 20
+        command: node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js clean && node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js build
+      #continue-on-error: true
+    - name: linux64 release
+      id: release1
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        timeout_minutes: 20
+        command: node --trace-deprecation --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js release --platform=linux64 --installer
+      #continue-on-error: true
+ 
+    - name: Upload deb
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Linux64 deb
+        path: apps/*.deb
+    - name: Upload rpm
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Linux64 rpm
+        path: apps/*.rpm
+    - name: Upload linux binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Linux64 tar.gz
+        path: apps/*.tar.gz
+ 
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup environment
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      run: |
+        # This is the hash of the commit for the PR
+        # when the action is triggered by PR, empty otherwise
+        COMMIT_ID=${{ github.event.pull_request.head.sha }}
+        # This is the hash of the commit when triggered by push
+        # but the hash of refs/pull/<n>/merge, which is different
+        # from the hash of the latest commit in the PR, that's
+        # why we try github.event.pull_request.head.sha first
+        COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+        BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+        VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+        echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+        echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 21
+        check-latest: true
+        cache: 'npm'
+    - name: Install  packages
+      run: brew install nodejs
+    #- name: Download node.js
+    #  run: curl -o /tmp/node.pkg https://nodejs.org/dist/v20.10.0/node-v20.10.0.pkg && sudo installer -pkg /tmp/node.pkg -target /
+    - name: Install deps
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: npm install
+        timeout_minutes: 10
+    - name: Create apps folder
+      run: mkdir -p apps
+    - name: build macos release
+      run: node --trace-deprecation ./node_modules/gulp/bin/gulp.js release --platform=osx64
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{env.BUILD_NAME}} MacOSX zip
+        path: apps/*.zip
+    
+  build-win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install linux utils
+      run: choco install --force -y awk grep sed
+    - name: Setup environment
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      run: |
+        # This is the hash of the commit for the PR
+        # when the action is triggered by PR, empty otherwise
+        COMMIT_ID=${{ github.event.pull_request.head.sha }}
+        # This is the hash of the commit when triggered by push
+        # but the hash of refs/pull/<n>/merge, which is different
+        # from the hash of the latest commit in the PR, that's
+        # why we try github.event.pull_request.head.sha first
+        COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+        BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+        VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+        echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+        echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+        echo "BUILD_NAME=inav-configurator-${VERSION}-${BUILD_SUFFIX}" >> $GITHUB_ENV
+      shell: bash
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 21
+        check-latest: true
+        cache: 'npm'
+    - name: Install deps
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        retry_on: error
+        command: npm install
+        timeout_minutes: 10
+    - name: build win64 release
+      run: node --trace-deprecation ./node_modules/gulp/bin/gulp.js release --platform=win64 --installer
+    - name: Upload msi
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Windows 64 msi
+        path: apps/*.msi
+    - name: Upload exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Windows 64 exe
+        path: apps/*.exe
+    - name: Upload zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_NAME }} Windows 64 zip
+        path: apps/*.zip
+        compression-level: 0
+ 
+ 
+ 
+ 
