@@ -3387,7 +3387,7 @@ TABS.mission_control.initialize = function (callback) {
                     'landheading2': approach.getLandHeading2(),
                     'sealevel-ref': approach.getIsSeaLevelRef() ? 'true' : 'false'
                 }};
-                data.fw_approach.push(item);
+                data.fwapproach.push(item);
             }
             approachIdx++;
         }
