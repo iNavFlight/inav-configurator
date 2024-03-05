@@ -126,6 +126,7 @@ TABS.ports.initialize = function (callback) {
     }
 
     var mspBaudRates = [
+        '4800',
         '9600',
         '19200',
         '38400',
