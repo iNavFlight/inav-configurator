@@ -544,58 +544,7 @@ TABS.magnetometer.initialize = function (callback) {
 
         helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
-    /*
-    function acc_alignments(changed) {
-        // Corrections needed relative to current settings
-        var corrections = {
-            up: {
-                same: {
-                      dn: [0,0,0],
-                      up: [180,0,0]
-                      }
-
-             },
-             same: {
-                 up: {
-                     dn: [0,0,90],
-                     up: [180,0,270],
-                 },
-                 dn: {
-                     dn: [0,0,270],
-                     up: [180, 0, 90]
-                 }
-
-            },
-            dn: {
-                same: {
-                      dn: [0,0,180],
-                      up: [180,0,180]
-                      }
-             },
-        };
-
-        console.log("axischanged: " + changed);
-
-        console.log("board alignment:");
-        if ( corrections[changed[0]][changed[1]][changed[2]] ) {
-            console.log(corrections[changed[0]][changed[1]][changed[2]]);
-            return (corrections[changed[0]][changed[1]][changed[2]]);
-        } else {
-            return([ -1, -1, -1 ]);
-        }
-    }
-
-    function valChanged(oldVal, newVal) {
-        if (newVal - oldVal > 0.18) {
-            return "up";
-        } else if (oldVal - newVal > 0.18) {
-            return "dn";
-        } else {
-            return "same";
-        }
-    }
-    */
-
+   
 
     function rad2degrees(radians) {
         return Math.round(radians * (180/Math.PI)) % 360;
@@ -607,49 +556,58 @@ TABS.magnetometer.initialize = function (callback) {
         let magADC = map1 = SENSOR_DATA.magnetometer.map((x) => x * 1090);
         
         // The gain and scale are done by inav in compass.c right after the values are read, 
-        // probably before they are sent via MSP.
-        // console.log("SENSOR_DATA.magnetometer * 1090: " + magADC.toString());
-        // Raw values range from about -800 to about +800, peaking at +1.2. The scale should be about half the
-        // difference or 0.7?
-        // the difference between max and min axis is typically about 1
-
-        // From INAV:
-        // mag.magADC[axis] = (mag.magADC[axis] - compassConfig()->magZero.raw[axis]) * 1024 / compassConfig()->magGain[axis];
-        // SENSOR_DATA.magnetometer is straight from INAV EXCEPT DIVIDED BY 1090 SINCE THE SCALING FACTOR IS UNKNOWN!
-        // The calibration values seem to be raw
-
-
-        // magADC[0] = (magADC[0] - CALIBRATION_DATA.magZero['X']) * 1024 / CALIBRATION_DATA.magGain['X'] * 1024;
-        // magADC[1] = (magADC[1] - CALIBRATION_DATA.magZero['Y']) * 1024 / CALIBRATION_DATA.magGain['Y'] * 1024;
-        // magADC[0] = (magADC[0] - ( CALIBRATION_DATA.magZero['X'] / 1024) ) / (CALIBRATION_DATA.magGain['X']);
-        // magADC[1] = (magADC[1] - ( CALIBRATION_DATA.magZero['Y'] / 1024) ) / (CALIBRATION_DATA.magGain['Y']);
-
-        // This makes X range from 0.5 to 2.5. Y ranges from -0.5 to -1
-        // magADC[0] = (magADC[0] - CALIBRATION_DATA.magZero['X']) / (CALIBRATION_DATA.magGain['X']);
-        // magADC[1] = (magADC[1] - CALIBRATION_DATA.magZero['Y']) / (CALIBRATION_DATA.magGain['Y']);
-
-        // console.log("magZero:");
-        // console.log(CALIBRATION_DATA.magZero);
-        // console.log( (magADC[0] - CALIBRATION_DATA.magZero['X']) );
-        // console.log("magGain:");
-        // console.log(CALIBRATION_DATA.magGain);
-        // console.log(magADC);
-
-        let magRemap = [ magADC[0], magADC[1], magADC[2] ];
-        // let magRemap = [ magADC[0], magADC[2], magADC[1] ];
-        // let magRemap = [ magADC[1], magADC[0], magADC[2] ];
-        // let magRemap = [ magADC[1], magADC[2], magADC[0] ];
-        // let magRemap = [ magADC[2], magADC[0], magADC[1] ];
-        // let magRemap = [ magADC[2], magADC[1], magADC[0] ];
-        
-        let magHeading = rad2degrees ( Math.atan2(-1 * magRemap[1], magRemap[0]) );
-        // let magHeading = Math.atan2(magADC[1], magADC[0]);
-        // console.log("magADC: " + magADC.toString());
-        // console.log("magHeading (radians): " + magHeading.toString());
+       
+        let magHeading = rad2degrees ( Math.atan2(-1 * magADC[1], magADC[0]) );
         console.log("magHeading (degrees): " + magHeading.toString());
         return magHeading;
     }
 
+    function accComputeYaw(changed, upside) {
+        // Is upside down just -1 X the upside up value?
+        var corrections = {
+            'up': {
+                 0: {
+                    45: -90, // Confirmed
+                    135: 0,  // Double check
+                    180: 0,  // Double check
+                    315: 90  // Confirmed
+                },
+                22: {
+                    22: -45,
+                    338: 45
+                },
+                45: {
+                    0: 0,   // Confirmed
+                    45: -45,
+                    90: -90,
+                    270: 90 // May be upside down
+                },
+                315: {
+                    0: 180, // Confirmed
+                    90: -90,
+                    270: 90
+                 },
+                338: {
+                  22: -135, // aka 225
+                  338: 135
+                }
+            },
+            'down': {
+                0: {
+                  45: -90 // 90?
+                },
+                45: {
+                    0: -90 // Double check
+                }
+            }
+        };
+        if (typeof corrections[upside][changed[0]][changed[1]] != 'undefined') {
+            console.log(corrections[upside][changed[0]][changed[1]]);
+            return (corrections[upside][changed[0]][changed[1]]);
+        } else {
+            return(-1);
+        }
+    }
 
     function accAutoAlignReadFlat() {
 
@@ -669,16 +627,8 @@ TABS.magnetometer.initialize = function (callback) {
             return;
         }
 
-        /*
-        self.acc_flat_xyz = new Array(Math.asin(acc_g_flat[0] / A), Math.asin(acc_g_flat[1] / A), Math.atan2(acc_g_flat[1] , acc_g_flat[0]));
-        console.log("flat_xyz: " +  
-                rad2degrees(self.acc_flat_xyz[0]) + ", " + 
-                rad2degrees(self.acc_flat_xyz[1]) + ", " +
-                rad2degrees(self.acc_flat_xyz[2])
-        );
-        */
 
-        // Seems to work better upside down.
+
         let roll = ( Math.atan2(acc_g_flat[1], acc_g_flat[2]) * 180/Math.PI ) % 360;
         let pitch = ( Math.atan2(-1 * acc_g_flat[0], Math.sqrt(acc_g_flat[1] ** 2 + acc_g_flat[2] ** 2)) * 180/Math.PI ) % 360;
         self.acc_flat_xyz = new Array(pitch, roll, 0);
@@ -695,85 +645,111 @@ TABS.magnetometer.initialize = function (callback) {
         }).open();
     }
 
-    /*
-    function smoothHeading() {
-        // values = [...values].sort((a, b) => a - b);
-        // let currentHeading = Math.atan2(SENSOR_DATA.magnetometer[1], SENSOR_DATA.magnetometer[0] ) * 180 / Math.PI;
-        let currentHeading = -1 * (Math.atan2(SENSOR_DATA.magnetometer[0], SENSOR_DATA.magnetometer[1]) * 180) / Math.PI;
-        if (typeof this.recentHeading === 'undefined') {
-            this.recentHeading = 0;
-        } else {
-            this.recentHeading = (this.recentHeading + currentHeading) / 2;
+
+
+    function accAutoAlignRead45() {
+        var changed = [0, 0, 0];
+        let raw_changed = [0, 0, 0];
+        var acc_align;
+        var i;
+
+        let acc_g_45 = [...SENSOR_DATA.accelerometer];
+
+        let roll = Math.atan2(acc_g_45[1], acc_g_45[2]) * 180/Math.PI;
+        let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
+        let acc_45_xyz = new Array(pitch, roll, 0);
+
+        for (i = 0; i < acc_g_45.length; i++) {
+            self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
+            raw_changed[i] = self.acc_flat_xyz[i] - acc_45_xyz[i];
         }
-        console.log(this.recentHeading);
-    }
-    */
+        console.log("raw_changed: " + raw_changed);
 
-
-    /*
-    function headingSettled(next_step) {
-        var heading = SENSOR_DATA.kinematics[2];
-        var i = 0;
-
-        // Skip if there is no compass.
-        if (SENSOR_DATA.magnetometer[0] === 0 && SENSOR_DATA.magnetometer[2] === 0) {
-            next_step();
-           return;
+ 
+        // Check for 45° mounting (25.5mm boards)
+        let corner_raised = false;
+        if (
+               Math.abs(raw_changed[0]) > 13 &&  Math.abs(raw_changed[0]) < 30 &&
+               Math.abs(raw_changed[1]) > 13 &&  Math.abs(raw_changed[1]) < 30
+        ) {
+            corner_raised = true;
         }
 
-        modal = new jBox('Modal', {
-            width: 460,
-            height: 360,
-            animation: false,
-            closeOnClick: false,
-            content: 'Waiting for compass to settle ...'
-        }).open();
-
-        var intervalId = setInterval(function() {
-            console.log("i: " + i + " heading: " + heading + " , sensor: " + SENSOR_DATA.kinematics[2]);
-            if( (i++ > 0) && SENSOR_DATA.kinematics[2] == heading ) {
-                clearInterval(intervalId);
-                modal.close();
-                next_step();
+        for (i = 0; i < acc_g_45.length; i++) {
+            if (corner_raised) {
+                changed[i] = ( 360 + Math.round(raw_changed[i] / 22) * 22 ) % 360;
+            } else {
+                changed[i] = ( 360 + Math.round(raw_changed[i] / 45) * 45 ) % 360;
             }
-            heading = SENSOR_DATA.kinematics[2];
-        }, 1000);
-    }
-    */
-
-    function accComputeYaw(changed) {
-        var corrections = {
-             0: {
-                45: -90,
-                135: 0,
-                180: 0,
-                315: 90
-            },
-            45: {
-                0: 0,
-                45: -45,
-                90: 270,
-                270: 90
-             },
-            315: {
-                0: 180,
-                90: 270,
-                270: 90
-             }
-        };
-        if (typeof corrections[changed[0]][changed[1]] != 'undefined') {
-            console.log(corrections[changed[0]][changed[1]]);
-            return (corrections[changed[0]][changed[1]]);
-        } else {
-            return(-1);
         }
+
+        // var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
+        // var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
+
+        /*
+            Get the actual down direction.
+            Get which edge or corner was lifted.
+            Define front as the edge or corner that was lifted.
+            Define the absolute orientation as that which has the correct part down and the correct part front.
+            Apply sensor orientation on the board.
+            Rotate the current settings according to the needed correction matrix.
+            
+            
+            OR
+            
+            Get the rotation needed so that pitch and roll are near zero.
+            Define front as the edge or corner that was lifted.
+            Define the relative orientation (correction needed) as that which has the correct part down and the correct part front. (Relative to current settings).
+            Rotate the current settings according to the needed correction matrix.
+            
+        */
+
+      	// console.log(axis);
+       	// planet.position.applyQuaternion(quaternion);
+        
+        let upside = 'up';
+        // If the board is reading as upside down, fix that.
+        if ( roll > 120 ) {
+            // self.acc_flat_xyz[1] = (self.acc_flat_xyz[1] + 180) % 360;
+            upside = 'down';
+        }
+    
+        console.log("changed:");
+        console.log(changed);
+        console.log("upside: " + upside);
+    
+        acc_yaw = accComputeYaw(changed, upside);
+        self.acc_flat_xyz[2] = acc_yaw;
+    
+    
+        // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
+        // The acc readings are relative to the current settings. :(
+        // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
+        let newPitch = ( self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45) ) % 360;
+        let newRoll  = ( self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45) ) % 360;
+        let newYaw   = ( self.boardAlignmentConfig.saved_yaw   + acc_yaw ) % 360;
+    
+        updateBoardPitchAxis(newPitch % 360 );
+        updateBoardRollAxis (newRoll  % 360 );
+        updateBoardYawAxis(newYaw % 360);
+    
+    
+        const quaternion = new THREE.Quaternion();
+        // const axis = new THREE.Vector3(self.acc_flat_xyz).normalize();
+        const axis = new THREE.Vector3(...SENSOR_DATA.accelerometer).normalize();
+    
+        console.debug("axis: " + axis);
+        quaternion.setFromAxisAngle(axis, 0.05);
+    
+        $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
     }
+
 
 
     // Ray TODO - account for how the sensor is mounted to the board? SENSOR_ALIGNMENT.align_acc, SENSOR_ALIGNMENT.align_mag
     // #define IMU_MPU6500_ALIGN        CW90_DEG
 
-    function accAutoAlignRead45() {
+    function OLDaccAutoAlignRead45() {
         var changed = [0, 0, 0];
         var acc_align;
         var i;
@@ -784,35 +760,40 @@ TABS.magnetometer.initialize = function (callback) {
         let pitch = Math.atan2(-1 * acc_g_45[0], Math.sqrt(acc_g_45[1] ** 2 + acc_g_45[2] ** 2)) * 180/Math.PI;
         let acc_45_xyz = new Array(pitch, roll, 0);
 
-        /*
-        console.log("45_xyz: " +
-                rad2degrees(acc_45_xyz[0]) + ", " +
-                rad2degrees(acc_45_xyz[1]) + ", " +
-                rad2degrees(acc_45_xyz[2])
-        );
-        */
-
         for (i = 0; i < acc_g_45.length; i++) {
             self.acc_flat_xyz[i] = Math.round( self.acc_flat_xyz[i] / 45 ) * 45;
             // acc_45_xyz[i] = rad2degrees(acc_45_xyz[i]);
             changed[i] = ( 360 + Math.round((self.acc_flat_xyz[i] - acc_45_xyz[i]) / 45) * 45 ) % 360;
         }
+
+
+
+        let upside = 'up';
+        // If the board is reading as upside down, fix that.
+        if ( roll > 120 ) {
+            // self.acc_flat_xyz[1] = (self.acc_flat_xyz[1] + 180) % 360;
+            upside = 'down';
+        }
+
         console.log("changed:");
         console.log(changed);
+        console.log("upside: " + upside);
 
-        acc_yaw = accComputeYaw(changed);
+        acc_yaw = accComputeYaw(changed, upside);
         self.acc_flat_xyz[2] = acc_yaw;
 
-        $("#modal-acc-align-setting").text(self.acc_flat_xyz.toString());
 
         // Ray TODO rotate based on current board alignment (board) and new board alignment (compass)
         // Alternatively, set alignments to 0,0,0, save and reboot, then finish the wizard.
-        let newPitch = self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45);
-        let newRoll  = self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45);
-        let newYaw   = self.boardAlignmentConfig.saved_yaw   + acc_yaw;
+        let newPitch = ( self.boardAlignmentConfig.saved_pitch + (Math.round(self.acc_flat_xyz[0] / 45) * 45) ) % 360;
+        let newRoll  = ( self.boardAlignmentConfig.saved_roll  + (Math.round(self.acc_flat_xyz[1] / 45) * 45) ) % 360;
+        let newYaw   = ( self.boardAlignmentConfig.saved_yaw   + acc_yaw ) % 360;
+
         updateBoardPitchAxis(newPitch % 360 );
         updateBoardRollAxis (newRoll  % 360 );
         updateBoardYawAxis(newYaw % 360);
+
+        $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
     }
 
     function accAutoAlignCompass() {
@@ -832,7 +813,7 @@ TABS.magnetometer.initialize = function (callback) {
             var rollCurrent90 = Math.round(self.mag_saved_roll / 90) * 90;
             // let newRoll = (rollCurrent90 - 180) % 360;
             updateRollAxis( (rollCurrent90 - 180) % 360 );
-            correction_needed = correction_needed + 180;
+            // ? correction_needed = correction_needed + 180;
         }
         // If both headings are accurate along a 45° offset, use that. Otherwise round to nearest 90°
         if ( (Math.abs(this.heading_flat % 45) < 15) && Math.abs(correction_needed % 45) < 15 ) {
