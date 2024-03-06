@@ -322,6 +322,7 @@ function onOpen(openInfo) {
         chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
 
         CONFIGURATOR.connection.addOnReceiveListener(read_serial);
+        CONFIGURATOR.connection.addOnReceiveListener(helper.ltmDecoder.read);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
