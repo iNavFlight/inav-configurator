@@ -1,5 +1,7 @@
 'use strict';
 
+const { parseBooleans } = require('xml2js/lib/processors');
+
 ////////////////////////////////////
 //
 // global Parameters definition
