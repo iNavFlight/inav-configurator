@@ -154,7 +154,7 @@ helper.ltmDecoder = (function () {
                 privateScope.receiverIndex = 0;
                 privateScope.serialBuffer = [];
                 privateScope.protocolState = LTM_STATE_MSGTYPE;
-                console.log('privateScope.protocolState: LTM_STATE_MSGTYPE', 'will expext frame ' + privateScope.frameType, 'expected length: ' + privateScope.frameLength);
+                console.log('protocolState: LTM_STATE_MSGTYPE', 'will expext frame ' + privateScope.frameType, 'expected length: ' + privateScope.frameLength);
             }
             return;
       
@@ -167,6 +167,20 @@ helper.ltmDecoder = (function () {
                 /*
                 * If YES, check checksum and execute data processing
                 */
+
+                let checksum = 0;
+                for (let i = 0; i < privateScope.serialBuffer.length; i++) {
+                    checksum ^= privateScope.serialBuffer[i];
+                }
+
+                if (checksum != data) {
+                    console.log('LTM checksum error, frame type: ' + privateScope.frameType + ' rejected');
+                    privateScope.protocolState = LTM_STATE_IDLE;
+                    privateScope.serialBuffer = [];
+                    privateScope.receiverIndex = 0;
+                    return;
+                }
+
                 if (privateScope.frameType == 'A') {
                     TELEMETRY.pitch = privateScope.readInt(0);
                     TELEMETRY.roll = privateScope.readInt(2);
