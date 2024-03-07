@@ -326,7 +326,9 @@ function onOpen(openInfo) {
 
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
-            if (!CONFIGURATOR.connectionValid) {
+
+            //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
+            if (!CONFIGURATOR.connectionValid && !helper.ltmDecoder.isReceiving()) {
                 GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
                 helper.mspQueue.flush();
@@ -337,6 +339,13 @@ function onOpen(openInfo) {
                 $('div.connect_controls a').click(); // disconnect
             }
         }, 10000);
+
+        //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+        helper.interval.add('ltm-connection-check', function () {
+            if (helper.ltmDecoder.isReceiving()) {
+                helper.groundstation.activate($('#main-wrapper'));
+            }
+        }, 1000);
 
         FC.resetState();
 

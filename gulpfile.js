@@ -55,6 +55,7 @@ sources.css = [
     './node_modules/openlayers/dist/ol.css',
     './src/css/logic.css',
     './src/css/defaults_dialog.css',
+    './src/css/groundstation.css',
 ];
 
 sources.js = [
@@ -141,6 +142,7 @@ sources.js = [
     './js/CliAutoComplete.js',
     './node_modules/jquery-textcomplete/dist/jquery.textcomplete.js',
     './js/ltmDecoder.js',
+    './js/groundstation.js'
 ];
 
 sources.receiverCss = [
