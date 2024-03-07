@@ -129,6 +129,11 @@ $(document).ready(function () {
     });
 
     $('div.connect_controls a.connect').click(function () {
+
+        if (helper.groundstation.isActivated()) {
+            helper.groundstation.deactivate();
+        }
+
         if (GUI.connect_lock != true) { // GUI control overrides the user control
 
             var clicks = $(this).data('clicks');
