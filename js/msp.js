@@ -78,6 +78,8 @@ var MSP = {
     last_received_timestamp:   null,
     analog_last_received_timestamp: null,
 
+    lastFrameReceivedMs: 0,
+
     read: function (readInfo) {
         var data = new Uint8Array(readInfo.data);
 
@@ -236,6 +238,7 @@ var MSP = {
         if (this.message_checksum == expected_checksum) {
             // message received, process
             mspHelper.processData(this);
+            this.lastFrameReceivedMs = Date.now();
         } else {
             console.log('code: ' + this.code + ' - crc failed');
             this.packet_error++;
@@ -378,6 +381,12 @@ var MSP = {
         this.packet_error = 0; // reset CRC packet error counter for next session
 
         this.callbacks_cleanup();
+    },
+    isReceiving: function () {
+        return Date.now() - this.lastFrameReceivedMs < 5000;
+    },
+    wasEverReceiving: function () {
+        return this.lastFrameReceivedMs > 0;
     }
 };
 
