@@ -135,8 +135,8 @@ $(document).ready(function () {
                 } else {
                     win.height = result.windowSize.height;
                     win.width = result.windowSize.width;
-                    win.x = result.windowSize.x;
-                    win.y = result.windowSize.y;
+                    win.x = Math.max(result.windowSize.x, window.screen.availLeft);
+                    win.y = Math.max(result.windowSize.y, window.screen.availTop);
                 }
             }
         });
