@@ -25,7 +25,7 @@ let globalSettings = {
     unitType: null,
     // Used to convert units within the UI
     osdUnits: null,
-    // Map  
+    // Map
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
@@ -44,7 +44,7 @@ $(document).ready(function () {
         if (!result.unit_type) {
             result.unit_type = UnitType.none;
         }
-        globalSettings.unitType = result.unit_type;        
+        globalSettings.unitType = result.unit_type;
     });
     chrome.storage.local.get('map_provider_type', function (result) {
         if (typeof result.map_provider_type === 'undefined') {
@@ -79,19 +79,19 @@ $(document).ready(function () {
         updateProfilesHighlightColours();
     });
     chrome.storage.local.get('cli_autocomplete', function (result) {
-        if (typeof result.cliAutocomplete === 'undefined') {
+        if (typeof result.cli_autocomplete === 'undefined') {
             result.cli_autocomplete = 1;
         }
         globalSettings.cliAutocomplete = result.cli_autocomplete;
         CliAutoComplete.setEnabled(globalSettings.cliAutocomplete);
     });
 
-	
+
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
     if (!CONFIGURATOR.connectionValid) {
         globalSettings.osdUnits = null;
     }
-    
+
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
     GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
@@ -130,14 +130,14 @@ $(document).ready(function () {
         //Get saved size and position
         chrome.storage.local.get('windowSize', function (result) {
             if (result.windowSize) {
-                if (result.windowSize.height <= window.screen.availHeight)
-                   win.height = result.windowSize.height;
-                if (result.windowSize.width <= window.screen.availWidth)
-                   win.width = result.windowSize.width;
-                if (result.windowSize.x >= window.screen.availLeft)
-                   win.x = result.windowSize.x;
-                if (result.windowSize.y >= window.screen.availTop)
-                    win.y = result.windowSize.y;
+                if (result.windowSize.height >= window.screen.availHeight && result.windowSize.width >= window.screen.availWidth) {
+                    win.maximize();
+                } else {
+                    win.height = result.windowSize.height;
+                    win.width = result.windowSize.width;
+                    win.x = Math.max(result.windowSize.x, window.screen.availLeft);
+                    win.y = Math.max(result.windowSize.y, window.screen.availTop);
+                }
             }
         });
 
@@ -176,7 +176,7 @@ $(document).ready(function () {
     var ui_tabs = $('#tabs > ul');
     $('a', ui_tabs).click(function () {
 
-        if ($(this).parent().hasClass("tab_help")) {            
+        if ($(this).parent().hasClass("tab_help")) {
             return;
         }
 
@@ -375,9 +375,9 @@ $(document).ready(function () {
                     updateProfilesHighlightColours();
 
                     // Horrible way to reload the tab
-                    const activeTab = $('#tabs li.active'); 
-                    activeTab.removeClass('active');  
-                    activeTab.find('a').click(); 
+                    const activeTab = $('#tabs li.active');
+                    activeTab.removeClass('active');
+                    activeTab.find('a').click();
                 });
                 $('div.cli_autocomplete input').change(function () {
                     globalSettings.cliAutocomplete = $(this).is(':checked');
@@ -393,10 +393,10 @@ $(document).ready(function () {
                 $('#map-provider-type').val(globalSettings.mapProviderType);
                 $('#map-api-key').val(globalSettings.mapApiKey);
                 $('#proxyurl').val(globalSettings.proxyURL);
-                $('#proxylayer').val(globalSettings.proxyLayer);   
+                $('#proxylayer').val(globalSettings.proxyLayer);
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
                 $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
-                
+
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
                 $('#ui-unit-type').change(function () {
@@ -412,9 +412,9 @@ $(document).ready(function () {
                     }
 
                     // Horrible way to reload the tab
-                    const activeTab = $('#tabs li.active'); 
-                    activeTab.removeClass('active');  
-                    activeTab.find('a').click();            
+                    const activeTab = $('#tabs li.active');
+                    activeTab.removeClass('active');
+                    activeTab.find('a').click();
                 });
                 $('#map-provider-type').change(function () {
                     chrome.storage.local.set({
@@ -606,7 +606,7 @@ function get_osd_settings() {
     if (globalSettings.osdUnits !== undefined && globalSettings.osdUnits !==  null) {
         return;
     }
-    
+
     MSP.promise(MSPCodes.MSP2_INAV_OSD_PREFERENCES).then(function (resp) {
         var prefs = resp.data;
         prefs.readU8();
@@ -733,7 +733,7 @@ function updateFirmwareVersion() {
         });
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
-        
+
         globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
 }
