@@ -3421,6 +3421,11 @@ var mspHelper = (function (gui) {
 
     self.encodeSetting = function (name, value) {
         return this._getSetting(name).then(function (setting) {
+            
+            if (!setting) {
+                throw 'Invalid setting';
+            }
+            
             if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
@@ -3469,6 +3474,9 @@ var mspHelper = (function (gui) {
     self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+        }).catch(error =>  {
+            console.log("Invalid setting: " + name);
+            return new Promise(callback);
         });
     };
 
