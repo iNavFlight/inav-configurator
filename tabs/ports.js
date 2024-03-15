@@ -230,6 +230,7 @@ TABS.ports.initialize = function (callback) {
 
             port_configuration_e.data('serialPort', serialPort);
 
+            //Append only port different than USB VCP
             if (serialPort.identifier != 20) {
 
                 port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
@@ -292,18 +293,9 @@ TABS.ports.initialize = function (callback) {
                         }
                     }
                 }
-            } else {
-                //On USB VCP port only MSP is allowed, modify the template to reflect this
-                port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
-                port_configuration_e.find('.softSerialWarning').css("display", "none");
-                port_configuration_e.find('.functionsCell-data').html("MSP");
-                port_configuration_e.find('.functionsCell-telemetry').html("");
-                port_configuration_e.find('.functionsCell-rx').html("");
-                port_configuration_e.find('.functionsCell-peripherals').html("");
-                port_configuration_e.find('.functionsCell-sensors').html("");
-            }
+                ports_e.find('tbody').append(port_configuration_e);
 
-            ports_e.find('tbody').append(port_configuration_e);
+            }            
         }
     }
 
