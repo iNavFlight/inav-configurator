@@ -10,6 +10,9 @@ helper.groundstation = (function () {
     privateScope.activated = false;
     privateScope.$viewport = null;
     privateScope.$gsViewport = null;
+    privateScope.mapHandler = null;
+    privateScope.mapLayer = null;
+    privateScope.mapView = null;
 
     publicScope.isActivated = function () {
         return privateScope.activated;
@@ -33,9 +36,47 @@ helper.groundstation = (function () {
         privateScope.$gsViewport = $viewport.find('#view-groundstation');
         privateScope.$gsViewport.show();
 
+        setTimeout(privateScope.initMap, 200);
+
         privateScope.activated = true;
         GUI.log(chrome.i18n.getMessage('gsActivated'));
     }
+
+    privateScope.initMap = function () {
+
+        //initialte layers
+        if (globalSettings.mapProviderType == 'bing') {
+            privateScope.mapLayer = new ol.source.BingMaps({
+                key: globalSettings.mapApiKey,
+                imagerySet: 'AerialWithLabels',
+                maxZoom: 19
+            });
+        } else if (globalSettings.mapProviderType == 'mapproxy') {
+            privateScope.mapLayer = new ol.source.TileWMS({
+                url: globalSettings.proxyURL,
+                params: { 'LAYERS': globalSettings.proxyLayer }
+            })
+        } else {
+            privateScope.mapLayer = new ol.source.OSM();
+        }
+        
+        //initiate view
+        privateScope.mapView = new ol.View({
+            center: ol.proj.fromLonLat([0, 0]),
+            zoom: 3
+        });
+
+        //initiate map handler
+        privateScope.mapHandler = new ol.Map({
+            target: document.getElementById('groundstation-map'),
+            layers: [
+                new ol.layer.Tile({
+                    source: privateScope.mapLayer
+                })
+            ],
+            view: privateScope.mapView
+        });
+    };
 
     publicScope.deactivate = function () {
 
