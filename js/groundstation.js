@@ -14,6 +14,8 @@ helper.groundstation = (function () {
     privateScope.mapLayer = null;
     privateScope.mapView = null;
 
+    privateScope.mapInitiated = false;
+
     publicScope.isActivated = function () {
         return privateScope.activated;
     };
@@ -35,6 +37,7 @@ helper.groundstation = (function () {
 
         privateScope.$gsViewport = $viewport.find('#view-groundstation');
         privateScope.$gsViewport.show();
+        privateScope.mapInitiated = false;
 
         setTimeout(privateScope.initMap, 200);
 
@@ -101,7 +104,21 @@ helper.groundstation = (function () {
     }
 
     privateScope.updateGui = function () {
-        console.log('updateGui');
+
+        let telemetry = helper.ltmDecoder.get();
+
+        if (telemetry.gpsFix) {
+            let position = ol.proj.fromLonLat([telemetry.longitude / 10000000, telemetry.latitude / 10000000]);
+            privateScope.mapView.setCenter(position);
+
+            //On first initiation, set zoom to 15
+            if (!privateScope.mapInitiated) {
+                privateScope.mapView.setZoom(17);
+                privateScope.mapInitiated = true;
+            }
+
+        }
+
     };
 
     return publicScope;
