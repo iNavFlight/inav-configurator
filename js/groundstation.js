@@ -157,6 +157,8 @@ helper.groundstation = (function () {
 
             //Update position of cursor
             privateScope.cursorPosition.setCoordinates(position);
+            //Update orientation of cursor
+            privateScope.cursorStyle.getImage().setRotation((telemetry.heading / 360.0) * 6.28318);
 
         }
 
