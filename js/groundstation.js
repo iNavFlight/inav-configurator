@@ -13,6 +13,12 @@ helper.groundstation = (function () {
     privateScope.mapHandler = null;
     privateScope.mapLayer = null;
     privateScope.mapView = null;
+    
+    privateScope.cursorStyle = null;
+    privateScope.cursorPosition = null;
+    privateScope.cursorFeature = null;
+    privateScope.cursorVector = null;
+    privateScope.cursorLayer = null;
 
     privateScope.mapInitiated = false;
 
@@ -108,14 +114,49 @@ helper.groundstation = (function () {
         let telemetry = helper.ltmDecoder.get();
 
         if (telemetry.gpsFix) {
-            let position = ol.proj.fromLonLat([telemetry.longitude / 10000000, telemetry.latitude / 10000000]);
-            privateScope.mapView.setCenter(position);
+
+            let lat = telemetry.latitude / 10000000;
+            let lon = telemetry.longitude / 10000000;
 
             //On first initiation, set zoom to 15
             if (!privateScope.mapInitiated) {
+
+                //Place UAV on the map
+                privateScope.cursorStyle = new ol.style.Style({
+                    image: new ol.style.Icon(({
+                        anchor: [0.5, 0.5],
+                        opacity: 1,
+                        scale: 0.6,
+                        src: '../images/icons/icon_mission_airplane.png'
+                    }))
+                });
+                privateScope.cursorPosition = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
+
+                privateScope.cursorFeature = new ol.Feature({
+                    geometry: privateScope.cursorPosition
+                });
+
+                privateScope.cursorFeature.setStyle(privateScope.cursorStyle);
+
+                privateScope.cursorVector = new ol.source.Vector({
+                    features: [privateScope.cursorFeature]
+                });
+                privateScope.cursorLayer = new ol.layer.Vector({
+                    source: privateScope.cursorVector
+                });
+
+                privateScope.mapHandler.addLayer(privateScope.cursorLayer);
+
                 privateScope.mapView.setZoom(17);
                 privateScope.mapInitiated = true;
             }
+
+            //Update map center
+            let position = ol.proj.fromLonLat([lon, lat]);
+            privateScope.mapView.setCenter(position);
+
+            //Update position of cursor
+            privateScope.cursorPosition.setCoordinates(position);
 
         }
 
