@@ -1,7 +1,5 @@
 'use strict';
 
-const { parseBooleans } = require('xml2js/lib/processors');
-
 ////////////////////////////////////
 //
 // global Parameters definition
@@ -3681,6 +3679,13 @@ TABS.mission_control.initialize = function (callback) {
             }
         }
     }
+
+    function parseBooleans (str) {
+        if (/^(?:true|false)$/i.test(str)) {
+          str = str.toLowerCase() === 'true';
+        }
+        return str;
+      };
 };
 
 TABS.mission_control.isBitSet = function(bits, testBit) {
