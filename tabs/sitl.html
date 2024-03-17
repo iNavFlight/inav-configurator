@@ -88,13 +88,13 @@
             </div>
             <div class="config-section gui_box grey">
                 <div class="gui_box_titlebar">
-                    <div class="spacer_box_title" data-i18n="sitlSerialToTCP"></div>
-                    <div class="helpicon cf_tip" data-i18n_title="sitlSer2TcpHelp"></div>
+                    <div class="spacer_box_title" data-i18n="serialReceiver"></div>
+                    <div class="helpicon cf_tip" data-i18n_title="sitlSerialReceiverHelp"></div>
                 </div>
                 <div class="spacer_box">
                     <div class="checkbox">
-                        <input type="checkbox" id="serialTcpEnable" class="toggle" data-live="true">
-                        <label for="serialTcpEnable"><span data-i18n="sitlSerialTcpEnable"></span></label>
+                        <input type="checkbox" id="serialReceiverEnable" class="toggle" data-live="true">
+                        <label for="serialReceiverEnable"><span data-i18n="sitlSerialReceiverEnable"></span></label>
                     </div>
                     <span id="serialTcpOptions"> 
                         <div class="select">
@@ -102,32 +102,31 @@
                             <label for="sitlSerialPort"> <span data-i18n="sitlSerialPort"></span></label>
                         </div>
                         <div class="select">
-                            <select id="serialTCPPort">
-                                <option value="5760">5760 (UART1)</option>
-                                <option value="5761">5761 (UART2)</option>
-                                <option value="5762">5762 (UART3)</option>
-                                <option value="5763">5763 (UART4)</option>
-                                <option value="5764">5764 (UART5)</option>
-                                <option value="5765">5765 (UART6)</option>
-                                <option value="5766">5766 (UART7)</option>
-                                <option value="5767">5767 (UART8)</option>
+                            <select id="sitlSerialUART">
+                                <option value="1">UART1</option>
+                                <option value="2">UART2</option>
+                                <option value="3">UART3</option>
+                                <option value="4">UART4</option>
+                                <option value="5">UART5</option>
+                                <option value="6">UART6</option>
+                                <option value="7">UART7</option>
+                                <option value="8">UART8</option>
                             </select>
-                            <label for="serialTCPPort"> <span data-i18n="sitlSerialTCPPort"></span></label>
+                            <label for="sitlSerialUART"> <span data-i18n="sitlSerialUART"></span></label>
                         </div>
                         <div class="select">
                             <select id="serialProtocoll"></select>
                             <label for="serialProtocoll"> <span data-i18n="sitlSerialProtocoll"></span></label>
                         </div>
                         <div class="number">
-                            <input type="number" id="sitlBaud" class="sitlBaud" data-setting-multiplier="1" step="1" min="1" max="256000" />
+                            <input type="number" id="sitlBaud" class="sitlBaud" data-setting-multiplier="1" step="1" min="1" max="921600" />
                             <label for="sitlBaud" class="sitlNumber"><span data-i18n="configurationGPSBaudrate"></span></label>
                         </div>
                         <div class="select">
                             <select id="serialStopbits">
-                                <option value="None">0</option>
-                                <option value="One">1</option>
-                                <option value="OnePointFive">1.5</option>
-                                <option value="Two">2</option>
+                                <option value="None">None</option>
+                                <option value="One">One</option>
+                                <option value="Two">Two</option>
                             </select>
                             <label for="serialStopbits"> <span data-i18n="sitlSerialStopbits"></span></label>
                         </div>
@@ -135,9 +134,7 @@
                             <select id="serialParity">
                                 <option value="None">None</option>
                                 <option value="Even">Even</option>
-                                <option value="Mark">Mark</option>
                                 <option value="Odd">Odd</option>
-                                <option value="Space">Space</option>
                             </select>
                             <label for="serialParity"> <span data-i18n="sitlSerialParity"></span></label>
                         </div>
