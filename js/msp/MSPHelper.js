@@ -1333,9 +1333,10 @@ var mspHelper = (function (gui) {
                 NAV_POSHOLD.maxClimbRate = data.getUint16(3, true);
                 NAV_POSHOLD.maxManualSpeed = data.getUint16(5, true);
                 NAV_POSHOLD.maxManualClimbRate = data.getUint16(7, true);
-                NAV_POSHOLD.maxBankAngle = data.getUint8(9);
-                NAV_POSHOLD.useThrottleMidForAlthold = data.getUint8(10);
-                NAV_POSHOLD.hoverThrottle = data.getUint16(11, true);
+                NAV_POSHOLD.maxBankAngleRoll = data.getUint8(9);
+                NAV_POSHOLD.maxBankAnglePitch = data.getUint8(10);
+                NAV_POSHOLD.useThrottleMidForAlthold = data.getUint8(11);
+                NAV_POSHOLD.hoverThrottle = data.getUint16(12, true);
                 break;
 
             case MSPCodes.MSP_SET_NAV_POSHOLD:
@@ -2025,7 +2026,8 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(NAV_POSHOLD.maxManualClimbRate));
                 buffer.push(highByte(NAV_POSHOLD.maxManualClimbRate));
 
-                buffer.push(NAV_POSHOLD.maxBankAngle);
+                buffer.push(NAV_POSHOLD.maxBankAngleRoll);
+                buffer.push(NAV_POSHOLD.maxBankAnglePitch);
                 buffer.push(NAV_POSHOLD.useThrottleMidForAlthold);
 
                 buffer.push(lowByte(NAV_POSHOLD.hoverThrottle));
