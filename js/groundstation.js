@@ -118,7 +118,7 @@ helper.groundstation = (function () {
 
         let telemetry = helper.ltmDecoder.get();
 
-        if (telemetry.gpsFix) {
+        if (telemetry.gpsFix && telemetry.gpsFix > 1) {
 
             let lat = telemetry.latitude / 10000000;
             let lon = telemetry.longitude / 10000000;
@@ -165,8 +165,29 @@ helper.groundstation = (function () {
             privateScope.cursorPosition.setCoordinates(position);
             //Update orientation of cursor
             privateScope.cursorStyle.getImage().setRotation((telemetry.heading / 360.0) * 6.28318);
+
+
+
+            //Update text
+            privateScope.$viewport.find("#gs-telemetry-latitude").html(lat);
+            privateScope.$viewport.find("#gs-telemetry-longitude").html(lon);
         }
 
+        privateScope.$viewport.find("#gs-telemetry-altitude").html(telemetry.altitude / 100.0 + 'm');
+        privateScope.$viewport.find("#gs-telemetry-voltage").html(telemetry.voltage / 100.0 + 'V');
+        privateScope.$viewport.find("#gs-telemetry-sats").html(telemetry.gpsSats);
+        privateScope.$viewport.find("#gs-telemetry-speed").html(telemetry.groundSpeed * 100 + 'm/s');
+
+        let fixText = '';
+        if (telemetry.gpsFix == 3) {
+            fixText = '3D';
+        } else if (telemetry.gpsFix == 2) {
+            fixText = '2D';
+        } else {
+            fixText = 'No fix';
+        }
+
+        privateScope.$viewport.find("#gs-telemetry-fix").html(fixText);
     };
 
     return publicScope;

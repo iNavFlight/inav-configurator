@@ -5609,5 +5609,32 @@
     },
     "gsDeactivated": {
         "message": "Ground station mode deactivated"
+    },
+    "gsTelemetry": {
+        "message": "Telemetry"
+    },
+    "gsTelemetryLatitude": {
+        "message": "Latitude"
+    },
+    "gsTelemetryLongitude": {
+        "message": "Longitude"
+    },
+    "gsTelemetryAltitude": {
+        "message": "Altitude"
+    },
+    "gsTelemetryAltitudeShort": {
+        "message": "Alt"
+    },
+    "gsTelemetryVoltageShort": {
+        "message": "Vbat"
+    },
+    "gsTelemetrySats": {
+        "message": "Sats"
+    },
+    "gsTelemetryFix": {
+        "message": "Fix"
+    },
+    "gsTelemetrySpeed": {
+        "message": "Speed"
     }
 }
