@@ -9,7 +9,22 @@
     z-index: 2001;
 }
 
-.defaults-dialog__content {
+.defaults-dialog__bottom_buttons {
+    position: absolute;
+    bottom: 1em;
+    width: 500px;
+}
+
+.defaults-dialog__bottom_buttons .btn {
+    float: right;
+    margin-left: 2em;
+}
+
+.defaults-dialog__bottom_buttons  {
+    font-size: 14pt !important;
+}
+
+.defaults-dialog__content, .defaults-dialog__wizard {
     background-color: #efefef;
     border-radius: 2px;
     z-index: 2002;
