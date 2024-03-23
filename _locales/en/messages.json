@@ -5603,5 +5603,38 @@
     },
     "ezTuneNote": {
         "message": "<strong>Important</strong> Ez Tune is enabled. All settings on this tab are set and controlled by the Ez Tune. To use PID Tuning tab you have to disable Ez Tune. To do it, uncheck the <strong>Enabled</strong> checkbox on the Ez Tune tab."
+    },
+    "gsActivated": {
+        "message": "Ground station mode activated"
+    },
+    "gsDeactivated": {
+        "message": "Ground station mode deactivated"
+    },
+    "gsTelemetry": {
+        "message": "Telemetry"
+    },
+    "gsTelemetryLatitude": {
+        "message": "Latitude"
+    },
+    "gsTelemetryLongitude": {
+        "message": "Longitude"
+    },
+    "gsTelemetryAltitude": {
+        "message": "Altitude"
+    },
+    "gsTelemetryAltitudeShort": {
+        "message": "Alt"
+    },
+    "gsTelemetryVoltageShort": {
+        "message": "Vbat"
+    },
+    "gsTelemetrySats": {
+        "message": "Sats"
+    },
+    "gsTelemetryFix": {
+        "message": "Fix"
+    },
+    "gsTelemetrySpeed": {
+        "message": "Speed"
     }
 }

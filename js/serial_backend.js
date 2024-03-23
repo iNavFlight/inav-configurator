@@ -129,6 +129,11 @@ $(document).ready(function () {
     });
 
     $('div.connect_controls a.connect').click(function () {
+
+        if (helper.groundstation.isActivated()) {
+            helper.groundstation.deactivate();
+        }
+
         if (GUI.connect_lock != true) { // GUI control overrides the user control
 
             var clicks = $(this).data('clicks');
@@ -322,10 +327,13 @@ function onOpen(openInfo) {
         chrome.storage.local.set({wireless_mode_enabled: $('#wireless-mode').is(":checked")});
 
         CONFIGURATOR.connection.addOnReceiveListener(read_serial);
+        CONFIGURATOR.connection.addOnReceiveListener(helper.ltmDecoder.read);
 
         // disconnect after 10 seconds with error if we don't get IDENT data
         helper.timeout.add('connecting', function () {
-            if (!CONFIGURATOR.connectionValid) {
+
+            //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
+            if (!CONFIGURATOR.connectionValid && !helper.ltmDecoder.isReceiving()) {
                 GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
                 helper.mspQueue.flush();
@@ -336,6 +344,13 @@ function onOpen(openInfo) {
                 $('div.connect_controls a').click(); // disconnect
             }
         }, 10000);
+
+        //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+        helper.interval.add('ltm-connection-check', function () {
+            if (helper.ltmDecoder.isReceiving()) {
+                helper.groundstation.activate($('#main-wrapper'));
+            }
+        }, 1000);
 
         FC.resetState();
 
