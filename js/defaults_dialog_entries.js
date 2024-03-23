@@ -2,22 +2,8 @@ var helper = helper || {};
 
 helper.defaultsDialogData = [
     {
-        "title": 'Test',
-        "id": 17,
-        "notRecommended": false,
-        "reboot": true,
-        "mixerToApply": 3,
-        "wizardPages": ['receiver', 'outputs', 'gps', 'filters', 'pids'],
-        "settings": [
-            {
-                key: "model_preview_type",
-                value: 3
-            }
-        ]
-    },
-    {
-        "title": 'Mini Quad with 3"-7" propellers',
-        "id": 2,
+        "title": 'Mini Quad with 3" propellers',
+        "id": 6,
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
@@ -43,55 +29,43 @@ helper.defaultsDialogData = [
                 value: "DSHOT300"
             },
             /*
-            Filtering
+            Ez Tune setup
             */
             {
-                key: "gyro_main_lpf_hz",
-                value: 110
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "dterm_lpf_hz",
-                value: 110
-            },
-            {
-                key: "dterm_lpf_type",
-                value: "PT3"
-            },
-            {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
+                key: "ez_enabled",
                 value: "ON"
             },
             {
-                key: "dynamic_gyro_notch_q",
-                value: 250
+                key: "ez_filter_hz",
+                value: 90
             },
             {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 120
+                key: "ez_axis_ratio",
+                value: 116
             },
             {
-                key: "setpoint_kalman_enabled",
-                value: "ON"
+                key: "ez_response",
+                value: 71
             },
             {
-                key: "setpoint_kalman_q",
-                value: 200
+                key: "ez_damping",
+                value: 103
             },
             {
-                key: "smith_predictor_delay",   // Enable Smith Predictor 
-                value: 1.5
+                key: "ez_stability",
+                value: 105
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 100
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
             },
             /*
             Mechanics
@@ -110,11 +84,11 @@ helper.defaultsDialogData = [
             },
             {
                 key: "d_boost_min",
-                value: 0.8
+                value: 1.0
             },
             {
                 key: "d_boost_max",
-                value: 1.2
+                value: 1.0
             },
             {
                 key: "antigravity_gain",
@@ -125,62 +99,144 @@ helper.defaultsDialogData = [
                 value: 5
             },
             /*
-            Rates
-            */
+                * TPA
+                */
             {
-                key: "rc_yaw_expo",
-                value: 75
+                key: "tpa_rate",
+                value: 20
             },
             {
-                key: "rc_expo",
-                value: 75
+                key: "tpa_breakpoint",
+                value: 1200
             },
             {
-                key: "roll_rate",
-                value: 70
+                key: "platform_type",
+                value: "MULTIROTOR"
             },
             {
-                key: "pitch_rate",
-                value: 70
+                key: "applied_defaults",
+                value: 6
             },
             {
-                key: "yaw_rate",
-                value: 60
+                key: "failsafe_procedure",
+                value: "DROP"
+            }
+        ]
+    },
+    {
+        "title": 'Mini Quad with 5" propellers',
+        "id": 2,
+        "notRecommended": false,
+        "reboot": true,
+        "mixerToApply": 3,
+        "settings": [
+            {
+                key: "model_preview_type",
+                value: 3
             },
             /*
-            PIDs
+            System
             */
             {
-                key: "mc_p_pitch",
-                value: 44
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
             },
             {
-                key: "mc_i_pitch",
-                value: 75
+                key: "looptime",
+                value: 500
             },
             {
-                key: "mc_d_pitch",
-                value: 25
+                key: "motor_pwm_protocol",
+                value: "DSHOT300"
+            },
+            /*
+            Ez Tune setup
+            */
+            {
+                key: "ez_enabled",
+                value: "ON"
             },
             {
-                key: "mc_p_roll",
-                value: 40
+                key: "ez_filter_hz",
+                value: 110
             },
             {
-                key: "mc_i_roll",
-                value: 60
+                key: "ez_axis_ratio",
+                value: 110
             },
             {
-                key: "mc_d_roll",
-                value: 23
+                key: "ez_response",
+                value: 92
             },
             {
-                key: "mc_p_yaw",
-                value: 35
+                key: "ez_damping",
+                value: 108
             },
             {
-                key: "mc_i_yaw",
+                key: "ez_stability",
+                value: 110
+            },
+            {
+                key: "ez_aggressiveness",
                 value: 80
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
+            },
+            /*
+            Dynamic gyro LPF
+            */
+            {
+                key: "gyro_use_dyn_lpf",
+                value: "ON"
+            },
+            {
+                key: "gyro_dyn_lpf_min_hz",
+                value: 85
+            },
+            {
+                key: "gyro_dyn_lpf_max_hz",
+                value: 300
+            },
+            {
+                key: "gyro_dyn_lpf_curve_expo",
+                value: 3
+            },
+            /*
+            Mechanics
+            */
+            {
+                key: "airmode_type",
+                value: "THROTTLE_THRESHOLD"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
+                key: "mc_iterm_relax",
+                value: "RP"
+            },
+            {
+                key: "d_boost_min",
+                value: 1.0
+            },
+            {
+                key: "d_boost_max",
+                value: 1.0
+            },
+            {
+                key: "antigravity_gain",
+                value: 2
+            },
+            {
+                key: "antigravity_accelerator",
+                value: 5
             },
             /*
              * TPA
@@ -200,6 +256,127 @@ helper.defaultsDialogData = [
             {
                 key: "applied_defaults",
                 value: 2
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
+            }
+        ]
+    },
+    {
+        "title": 'Mini Quad with 7" propellers',
+        "id": 5,
+        "notRecommended": false,
+        "reboot": true,
+        "mixerToApply": 3,
+        "settings": [
+            {
+                key: "model_preview_type",
+                value: 3
+            },
+            /*
+            System
+            */
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "looptime",
+                value: 500
+            },
+            {
+                key: "motor_pwm_protocol",
+                value: "DSHOT300"
+            },
+            /*
+            Ez Tune setup
+            */
+            {
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
+                value: 90
+            },
+            {
+                key: "ez_axis_ratio",
+                value: 110
+            },
+            {
+                key: "ez_response",
+                value: 101
+            },
+            {
+                key: "ez_damping",
+                value: 115
+            },
+            {
+                key: "ez_stability",
+                value: 100
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 100
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
+            },
+            /*
+            Mechanics
+            */
+            {
+                key: "airmode_type",
+                value: "THROTTLE_THRESHOLD"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
+                key: "mc_iterm_relax",
+                value: "RPY"
+            },
+            {
+                key: "d_boost_min",
+                value: 0.8
+            },
+            {
+                key: "d_boost_max",
+                value: 1.2
+            },
+            {
+                key: "antigravity_gain",
+                value: 2
+            },
+            {
+                key: "antigravity_accelerator",
+                value: 5
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 20
+            },
+            {
+                key: "tpa_breakpoint",
+                value: 1200
+            },
+            {
+                key: "platform_type",
+                value: "MULTIROTOR"
+            },
+            {
+                key: "applied_defaults",
+                value: 5
             },
             {
                 key: "failsafe_procedure",
@@ -267,6 +444,10 @@ helper.defaultsDialogData = [
                 value: "STANDARD"
             },
             {
+                key: "ahrs_inertia_comp_method",
+                value: "ADAPTIVE"
+            },
+            {
                 key: "throttle_idle",
                 value: 5.0
             },
@@ -292,19 +473,23 @@ helper.defaultsDialogData = [
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 25
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 8
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 55
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.5
+                value: 0.4
             },
             {
                 key: "max_angle_inclination_rll",
@@ -348,7 +533,7 @@ helper.defaultsDialogData = [
             },
             {
                 key: "fw_p_yaw",
-                value: 20
+                value: 50
             },
             {
                 key: "fw_i_yaw",
@@ -356,19 +541,11 @@ helper.defaultsDialogData = [
             },
             {
                 key: "fw_d_yaw",
-                value: 0
+                value: 20
             },
             {
                 key: "fw_ff_yaw",
-                value: 100
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 9
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 5
+                value: 255
             },
             {
                 key: "airmode_type",
@@ -391,25 +568,35 @@ helper.defaultsDialogData = [
                 value: 5000
             },
             {
-                key: "failsafe_mission",
-                value: "ON"
+                key: "nav_wp_radius",
+                value: 800
             },
             {
-                key: "nav_wp_radius",
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 45
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "nav_fw_launch_climb_angle",
+                value: 25
+            },
+        ],
     },
     {
         "title": 'Airplane without a Tail (Wing, Delta, etc)',
         "notRecommended": false,
-        "id": 3,
+        "id": 4,
         "reboot": true,
         "mixerToApply": 8,
         "settings": [
@@ -423,7 +610,7 @@ helper.defaultsDialogData = [
             },
             {
                 key: "applied_defaults",
-                value: 3
+                value: 4
             },
             {
                 key: "gyro_hardware_lpf",
@@ -466,6 +653,10 @@ helper.defaultsDialogData = [
                 value: "STANDARD"
             },
             {
+                key: "ahrs_inertia_comp_method",
+                value: "ADAPTIVE"
+            },
+            {
                 key: "throttle_idle",
                 value: 5.0
             },
@@ -491,19 +682,23 @@ helper.defaultsDialogData = [
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 35
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 10
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 70
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.2
+                value: 0.3
             },
             {
                 key: "max_angle_inclination_rll",
@@ -562,14 +757,6 @@ helper.defaultsDialogData = [
                 value: 100
             },
             {
-                key: "imu_acc_ignore_rate",
-                value: 9
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 5
-            },
-            {
                 key: "airmode_type",
                 value: "STICK_CENTER_ONCE"
             },
@@ -590,20 +777,30 @@ helper.defaultsDialogData = [
                 value: 5000
             },
             {
-                key: "failsafe_mission",
-                value: "ON"
+                key: "nav_wp_radius",
+                value: 1000
             },
             {
-                key: "nav_wp_radius",
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 75
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "nav_fw_launch_climb_angle",
+                value: 25
+            },
+        ],
     },
     {
         "title": 'Rovers & Boats',
@@ -645,8 +842,8 @@ helper.defaultsDialogData = [
                 value: "ROVER"
             },
             {
-                key: "nav_wp_safe_distance",
-                value: 50000
+                key: "nav_wp_max_safe_distance",
+                value: 500
             },
             {
                 key: "nav_fw_loiter_radius",

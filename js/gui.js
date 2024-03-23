@@ -14,6 +14,7 @@ var GUI_control = function () {
         'landing',
         'firmware_flasher',
         'mission_control',
+        'sitl',
         'help'
     ];
     this.defaultAllowedTabsWhenConnected = [
@@ -40,7 +41,8 @@ var GUI_control = function () {
         'advanced_tuning',
         'mission_control',
         'mixer',
-        'programming'
+        'programming',
+        'ez_tune'
     ];
     this.allowedTabs = this.defaultAllowedTabsWhenDisconnected;
 
@@ -51,6 +53,17 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("Linux") != -1)   this.operating_system = "Linux";
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
+
+    this.colorTable = [
+        "#8ecae6",
+        "#2a9d8f",
+        "#e9c46a",
+        "#f4a261",
+        "#e76f51",
+        "#ef476f",
+        "#ffc300"
+    ];
+
 };
 
 // message = string
@@ -202,14 +215,61 @@ GUI_control.prototype.content_ready = function (callback) {
 };
 
 GUI_control.prototype.updateStatusBar = function() {
+
+    var armingFlags = {
+        'ARMED':(1 << 2),
+        //'WAS_EVER_ARMED':(1 << 3),
+        'SIMULATOR_MODE':(1 << 4),
+        'ARMING_DISABLED_FAILSAFE_SYSTEM':(1 << 7),
+        'ARMING_DISABLED_NOT_LEVEL':(1 << 8),
+        'ARMING_DISABLED_SENSORS_CALIBRATING':(1 << 9),
+        'ARMING_DISABLED_SYSTEM_OVERLOADED':(1 << 10),
+        'ARMING_DISABLED_NAVIGATION_UNSAFE':(1 << 11),
+        'ARMING_DISABLED_COMPASS_NOT_CALIBRATED':(1 << 12),
+        'ARMING_DISABLED_ACCELEROMETER_NOT_CALIBRATED':(1 << 13),
+        'ARMING_DISABLED_ARM_SWITCH':(1 << 14),
+        'ARMING_DISABLED_HARDWARE_FAILURE':(1 << 15),
+        'ARMING_DISABLED_BOXFAILSAFE':(1 << 16),
+        'ARMING_DISABLED_BOXKILLSWITCH':(1 << 17),
+        'ARMING_DISABLED_RC_LINK':(1 << 18),
+        'ARMING_DISABLED_THROTTLE':(1 << 19),
+        'ARMING_DISABLED_CLI':(1 << 20),
+        'ARMING_DISABLED_CMS_MENU':(1 << 21),
+        'ARMING_DISABLED_OSD_MENU':(1 << 22),
+        'ARMING_DISABLED_ROLLPITCH_NOT_CENTERED':(1 << 23),
+        'ARMING_DISABLED_SERVO_AUTOTRIM':(1 << 24),
+        'ARMING_DISABLED_OOM':(1 << 25),
+        'ARMING_DISABLED_INVALID_SETTING':(1 << 26),
+        'ARMING_DISABLED_PWM_OUTPUT_ERROR':(1 << 27),
+        'ARMING_DISABLED_NO_PREARM':(1 << 28),
+        'ARMING_DISABLED_DSHOT_BEEPER':(1 << 29),
+        'ARMING_DISABLED_LANDING_DETECTED':(1 << 30),
+    };
+
+    var activeArmFlags =  [];
+    for(var i=0;i<32;i++) {
+        var checkBit = (1 << i);
+        if(Object.values(armingFlags).includes(checkBit) && (checkBit & CONFIG.armingFlags)) {
+            activeArmFlags.push(Object.keys(armingFlags)[Object.values(armingFlags).indexOf(checkBit)]);
+        }
+    }
+
     $('span.i2c-error').text(CONFIG.i2cError);
     $('span.cycle-time').text(CONFIG.cycleTime);
     $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+    $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
-GUI_control.prototype.updateProfileChange = function() {
+GUI_control.prototype.updateProfileChange = function(refresh) {
+    $('#mixerprofilechange').val(CONFIG.mixer_profile);
     $('#profilechange').val(CONFIG.profile);
     $('#batteryprofilechange').val(CONFIG.battery_profile);
+    if (refresh) {
+        GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
+        GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
+        GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
+        updateActivatedTab();
+    }
 };
 
 GUI_control.prototype.fillSelect = function ($element, values, currentValue, unit) {
@@ -279,11 +339,27 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
                     $t.append('<option value="' + i + '">' + i + '</option>');
                 }
             } else if (operandMetadata.type == "dictionary") {
-                for (let k in operandMetadata.values) {
-                    if (operandMetadata.values.hasOwnProperty(k)) {
-                        $t.append('<option value="' + k + '">' + operandMetadata.values[k] + '</option>');
+                let operandValues = [];
+
+                for (let j in operandMetadata.values) {
+                    if (operandMetadata.values.hasOwnProperty(j)) {
+                        operandValues[parseInt(j,10)] = {
+                            id: parseInt(j, 10),
+                            name: operandMetadata.values[j],
+                        };
                     }
                 }
+
+                operandValues.sort((a, b) => {
+                    let ovAN = a.name.toLowerCase(),
+                        ovBN = b.name.toLowerCase();
+
+                    return (ovAN < ovBN) ? -1 : 1;
+                });
+                
+                operandValues.forEach( val => {
+                    $t.append('<option value="' + val.id + '">' + val.name + '</option>');
+                });
             }
 
             $t.val(value);
@@ -300,20 +376,117 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
  * @param  {function} onChange
  * @param  {boolean} withAlways
  */
-GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways) {
+GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
     let $select = $container.append('<select class="mix-rule-condition">').find("select"),
         lcCount = logicConditions.getCount();
+        option  = "";
 
     if (withAlways) {
         $select.append('<option value="-1">Always</option>')
     }
     for (let i = 0; i < lcCount ; i++) {
-        $select.append('<option value="' + i + '">Logic Condition ' + i + ' </option>');
+        if (!onlyEnabled || i === current || (logicConditions.isEnabled(i))) {
+            option = '<option';
+
+            if (i === current && !logicConditions.isEnabled(i)) {
+                option+= ' class="lc_disabled"';
+            }
+            
+            option+= ' value="' + i + '">Logic Condition ' + i + ' </option>';
+
+            $select.append(option);
+        }
     }
 
     $select.val(current).change(onChange);
 }
+
+GUI_control.prototype.sliderize = function ($input, value, min, max) {
+    let scaledMax;
+    let scaledMin;
+    let scalingThreshold;
+
+    if ($input.data('normal-max')) {
+        scaledMax = max * 2;
+        scalingThreshold = Math.round(scaledMax * 0.8);
+        scaledMin = min *2;
+    } else {
+        scaledMax = max;
+        scaledMin = min;
+        scalingThreshold = scaledMax;
+    }
+
+    let $range = $('<input type="range" min="' + scaledMin + '" max="' + scaledMax + '" value="' + value + '"/>');
+    if ($input.data('step')) {
+        $range.attr('step', $input.data('step'));
+    }
+    $range.css({
+        'display': 'block',
+        'flex-grow': 100,
+        'margin-left': '1em',
+        'margin-right': '1em',
+    });
+    
+    $input.attr('min', min);
+    $input.attr('max', max);
+    $input.val(parseInt(value));
+    $input.css({
+        'width': 'auto',
+        'min-width': '75px',
+    });
+    
+    $input.parent().css({
+        'display': 'flex',
+        'width': '100%'
+    });
+    $range.insertAfter($input);
+
+    $input.parent().find('.helpicon').css({
+        'top': '5px',
+        'left': '-10px'
+    });
+
+    /*
+     * Update slider to input
+     */
+    $range.on('input', function() {
+        let val = $(this).val();
+        let normalMax = parseInt($input.data('normal-max'));
+
+        if (normalMax) {
+            if (val <= scalingThreshold) {
+                val = scaleRangeInt(val, scaledMin, scalingThreshold, min, normalMax);
+            } else {
+                val = scaleRangeInt(val, scalingThreshold + 1, scaledMax, normalMax + 1, max);
+            }
+        }
+
+        $input.val(val);
+        $input.trigger('updated');
+    });
+
+    $input.on('change', function() {
+
+        let val = $(this).val();
+        let newVal;
+        let normalMax = parseInt($input.data('normal-max'));
+        if (normalMax) {
+            if (val <= normalMax) {
+                newVal = scaleRangeInt(val, min, normalMax, scaledMin, scalingThreshold);
+            } else {
+                newVal = scaleRangeInt(val, normalMax + 1, max, scalingThreshold + 1, scaledMax);
+            }
+        } else {
+            newVal = val;
+        }
+
+        $range.val(newVal);
+        $input.trigger('updated');
+    });
+
+    $input.trigger('change');
+};
 
 // initialize object into GUI variable
 var GUI = new GUI_control();

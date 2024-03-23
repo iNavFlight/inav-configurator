@@ -27,8 +27,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.loadMotors,
         mspHelper.loadServoMixRules,
         mspHelper.loadMotorMixRules,
-        mspHelper.loadOutputMapping,
-        mspHelper.loadLogicConditions
+        mspHelper.loadOutputMappingExt,
+        mspHelper.loadTimerOutputModes,
+        mspHelper.loadLogicConditions,
+        mspHelper.loadEzTune,
     ]);
     loadChainer.setExitPoint(loadHtml);
     loadChainer.execute();
@@ -37,6 +39,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         mspHelper.saveMixerConfig,
         mspHelper.sendServoMixer,
         mspHelper.sendMotorMixer,
+        mspHelper.sendTimerOutputModes,
         saveSettings,
         mspHelper.saveToEeprom
     ]);
@@ -72,13 +75,55 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $outputRow.append('<th data-i18n="mappingTableOutput"></th>');
         $functionRow.append('<th data-i18n="mappingTableFunction"></th>');
-
+        
         for (let i = 1; i <= outputCount; i++) {
-            $outputRow.append('<td>S' + i + '</td>');
+
+            let timerId = OUTPUT_MAPPING.getTimerId(i - 1);
+            let color = OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+
+            $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (Timer ' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
         }
 
         $outputRow.find('td').css('width', 100 / (outputCount + 1) + '%');
+
+    }
+
+    function updateTimerOverride() {
+        let timers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for(let i =0; i < timers.length;++i) {
+            let timerId = timers[i];
+            $select = $('#timer-output-' + timerId);
+            if(!$select) {
+                continue;
+            }
+            OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
+        }
+    }
+
+    function renderTimerOverride() {
+        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+            $container = $('#timerOutputsList'), timers = {};
+
+
+        let usedTimers = OUTPUT_MAPPING.getUsedTimerIds();
+
+        for (t of usedTimers) {
+            var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
+            $container.append(
+                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + OUTPUT_MAPPING.getTimerColor(t) + '">' +
+                            '<select id="timer-output-' + t + '">' +
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
+                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
+                            '</select>' +
+                            '<label for="timer-output-' + t + '">' +
+                                '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
+                            '</label>' +
+                        '</div>'
+            );
+        }
 
     }
 
@@ -126,10 +171,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                             motors.push(outputPad);
                         } else {
                             let servo = servoRules.getServoMixRuleFromTarget(omIndex[1]);
+                            if (servo == null) {continue;}
                             let divID = "servoPreview" + omIndex[1];
-
+                            
                             switch (parseInt(servo.getInput())) {
                                 case INPUT_STABILIZED_PITCH:
+                                case STABILIZED_PITCH_POSITIVE:
+                                case STABILIZED_PITCH_NEGATIVE:
                                 case INPUT_RC_PITCH:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_PITCH, surfaces.elevatorSet);
                                     if (outputArea != null) {
@@ -152,6 +200,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_ROLL:
+                                case STABILIZED_ROLL_POSITIVE:
+                                case STABILIZED_ROLL_NEGATIVE:
                                 case INPUT_RC_ROLL:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_ROLL, surfaces.aileronSet);
                                     if (outputArea != null) {
@@ -174,6 +224,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                                     }
                                     break;
                                 case INPUT_STABILIZED_YAW:
+                                case STABILIZED_YAW_POSITIVE:
+                                case STABILIZED_YAW_NEGATIVE:
                                 case INPUT_RC_YAW:
                                     outputArea = getOutputImageArea(currentMixerPreset.imageOutputsNumbers, INPUT_STABILIZED_YAW, surfaces.rudderSet);
                                     if (outputArea != null) {
@@ -295,6 +347,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                     function () {
                         servoRule.setConditionId($(this).val());
                     },
+                    true,
                     true
                 );
 
@@ -345,7 +398,6 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         const $fixedValueCalcInput = row.find(".mix-rule-fixed-value");
         if (FC.getServoMixInputNames()[$mixRuleInput.val()] === 'MAX') {
             $fixedValueCalcInput.show();
-            row.find(".mix-rule-speed").prop('disabled', true);
         } else {
             $fixedValueCalcInput.hide();
             row.find(".mix-rule-speed").prop('disabled', false);
@@ -369,6 +421,45 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         return (parseInt(weight) + 100) * 1000 / 200 + 1000;
     }
 
+
+    function labelMotorNumbers() {
+
+        let index = 0;
+        var rules
+
+        if (currentMixerPreset.id == loadedMixerPresetID) {
+            rules = MOTOR_RULES.get();
+        } else {
+            rules = currentMixerPreset.motorMixer;
+        }
+
+        for (const i in rules) {
+            if (rules.hasOwnProperty(i)) {
+                const rule = rules[i];
+                index++;
+
+                if (currentMixerPreset.image != 'quad_x') {
+                    $("#motorNumber"+index).css("visibility", "hidden");
+                    continue;
+                }
+
+                let top_px = 30;
+                let left_px = 28;
+                if (rule.getRoll() < -0.5) {
+                  left_px = $("#motor-mixer-preview-img").width() - 42;
+                }
+
+                if (rule.getPitch() > 0.5) {
+                  top_px = $("#motor-mixer-preview-img").height() - 42;
+                }
+                $("#motorNumber"+index).css("left", left_px + "px");
+                $("#motorNumber"+index).css("top", top_px + "px");
+                $("#motorNumber"+index).css("visibility", "visible");
+            }
+        }
+    }
+
+
     function renderMotorMixRules() {
 
         /*
@@ -385,7 +476,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $motorMixTableBody.append('\
                     <tr>\
                     <td><span class="mix-rule-motor"></span></td>\
-                    <td><input type="number" class="mix-rule-throttle" step="0.001" min="0" max="1" /></td>\
+                    <td>\
+                        <input type="number" class="mix-rule-throttle" step="0.001" min="-2" max="2" />\
+                        <div class="throttle-warning-text" data-i18n="mixerThrottleWarning" ></div>\
+                    </td>\
                     <td><input type="number" class="mix-rule-roll" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-pitch" step="0.001" min="-2" max="2" /></td>\
                     <td><input type="number" class="mix-rule-yaw" step="0.001" min="-2" max="2" /></td>\
@@ -396,9 +490,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 const $row = $motorMixTableBody.find('tr:last');
 
                 $row.find('.mix-rule-motor').html(index);
-                $row.find('.mix-rule-throttle').val(rule.getThrottle()).change(function () {
-                    rule.setThrottle($(this).val());
-                });
+                const $throttleInput = $row.find('.mix-rule-throttle').val(rule.getThrottle());
+                const $warningBox = $row.find('.throttle-warning-text');
+    
+                // Function to update throttle and show/hide warning box
+                function updateThrottle() {
+                    rule.setThrottle($throttleInput.val());
+                    // Change color if value exceeds 1
+                    if (parseFloat($throttleInput.val()) > 1 || parseFloat($throttleInput.val()) < 0) {
+                        $throttleInput.css('background-color', 'orange');
+                        // Show warning box
+                        $warningBox.show();
+                    } else {
+                        $throttleInput.css('background-color', ''); // Reset to default
+                        // Hide warning box
+                        $warningBox.hide();
+                    }
+                }
+                updateThrottle();
+                $throttleInput.change(updateThrottle);
+
                 $row.find('.mix-rule-roll').val(rule.getRoll()).change(function () {
                     rule.setRoll($(this).val());
                 });
@@ -412,6 +523,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
         }
+        labelMotorNumbers();
         localize();
     }
 
@@ -430,6 +542,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         SERVO_RULES.inflate();
         MOTOR_RULES.cleanup();
         MOTOR_RULES.inflate();
+
+        updateTimerOverride();
+
         saveChainer.execute();
     }
 
@@ -516,7 +631,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                         r.getYaw()
                     )
                 );
-                
+
             }
 
             renderMotorMixRules();
@@ -525,17 +640,26 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             motorWizardModal.close();
         });
 
-        const drawImage = function () {
-            const isReversed = $("#motor_direction_inverted").is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+        const updateMotorDirection = function () {
+            let motorDirectionCheckbox = $("#motor_direction_inverted");
+            const isReversed = motorDirectionCheckbox.is(":checked") && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
 
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                if (isReversed) {
+                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_isInverted"));
+                } else {
+                    motorDirectionCheckbox.parent().find("label span").html(chrome.i18n.getMessage("motor_direction_inverted"));
+                }
+            }
+
             renderServoOutputImage();
         };
 
-        $("#motor_direction_inverted").change(drawImage);
+        $("#motor_direction_inverted").change(updateMotorDirection);
 
         $platformSelect.find("*").remove();
 
@@ -585,9 +709,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $('#platform-type').parent('.select').addClass('no-bottom-border');
             }
 
-            updateRefreshButtonStatus();
+            if (!updateEzTuneTabVisibility(false)) {
+                EZ_TUNE.enabled = 0;
+                mspHelper.saveEzTune();
+            }
 
-            drawImage();
+            updateRefreshButtonStatus();
+            labelMotorNumbers();
+            updateMotorDirection();
         });
 
         if (MIXER_CONFIG.appliedMixerPreset > -1) {
@@ -612,6 +741,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             loadedMixerPresetID = currentMixerPreset.id;
             helper.mixer.loadServoRules(currentMixerPreset);
             helper.mixer.loadMotorRules(currentMixerPreset);
+            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
@@ -687,6 +817,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         renderOutputTable();
         renderOutputMapping();
+        renderTimerOverride();
 
         LOGIC_CONDITIONS.init($('#logic-wrapper'));
 

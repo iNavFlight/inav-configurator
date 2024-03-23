@@ -24,12 +24,16 @@ let globalSettings = {
     // Used to depict how the units are displayed within the UI
     unitType: null,
     // Used to convert units within the UI
-    osdUnits: null,    
+    osdUnits: null,
+    // Map  
     mapProviderType: null,
     mapApiKey: null,
     proxyURL: null,
     proxyLayer: null,
+    // Show colours for profiles
     showProfileParameters: null,
+    // tree target for documents
+    docsTreeLocation: 'master',
 };
 
 $(document).ready(function () {
@@ -74,6 +78,14 @@ $(document).ready(function () {
         // Update CSS on to show highlighing or not
         updateProfilesHighlightColours();
     });
+    chrome.storage.local.get('cli_autocomplete', function (result) {
+        if (typeof result.cliAutocomplete === 'undefined') {
+            result.cli_autocomplete = 1;
+        }
+        globalSettings.cliAutocomplete = result.cli_autocomplete;
+        CliAutoComplete.setEnabled(globalSettings.cliAutocomplete);
+    });
+
 	
     // Resets the OSD units used by the unit coversion when the FC is disconnected.
     if (!CONFIGURATOR.connectionValid) {
@@ -81,9 +93,9 @@ $(document).ready(function () {
     }
     
     // alternative - window.navigator.appVersion.match(/Chrome\/([0-9.]*)/)[1];
-    GUI.log('Running - OS: <strong>' + GUI.operating_system + '</strong>, ' +
+    GUI.log(chrome.i18n.getMessage('getRunningOS') + GUI.operating_system + '</strong>, ' +
         'Chrome: <strong>' + window.navigator.appVersion.replace(/.*Chrome\/([0-9.]*).*/, "$1") + '</strong>, ' +
-        'Configurator: <strong>' + chrome.runtime.getManifest().version + '</strong>');
+        chrome.i18n.getMessage('getConfiguratorVersion') + chrome.runtime.getManifest().version + '</strong>');
 
     $('#status-bar .version').text(chrome.runtime.getManifest().version);
     $('#logo .version').text(chrome.runtime.getManifest().version);
@@ -118,10 +130,14 @@ $(document).ready(function () {
         //Get saved size and position
         chrome.storage.local.get('windowSize', function (result) {
             if (result.windowSize) {
-                win.height = result.windowSize.height;
-                win.width = result.windowSize.width;
-                win.x = result.windowSize.x;
-                win.y = result.windowSize.y;
+                if (result.windowSize.height <= window.screen.availHeight)
+                   win.height = result.windowSize.height;
+                if (result.windowSize.width <= window.screen.availWidth)
+                   win.width = result.windowSize.width;
+                if (result.windowSize.x >= window.screen.availLeft)
+                   win.x = result.windowSize.x;
+                if (result.windowSize.y >= window.screen.availTop)
+                    win.y = result.windowSize.y;
             }
         });
 
@@ -219,6 +235,9 @@ $(document).ready(function () {
                     case 'firmware_flasher':
                         TABS.firmware_flasher.initialize(content_ready);
                         break;
+                    case 'sitl':
+                        TABS.sitl.initialize(content_ready);
+                        break;
                     case 'auxiliary':
                         TABS.auxiliary.initialize(content_ready);
                         break;
@@ -294,6 +313,9 @@ $(document).ready(function () {
                     case 'cli':
                         TABS.cli.initialize(content_ready);
                         break;
+                    case 'ez_tune':
+                        TABS.ez_tune.initialize(content_ready);
+                        break;
 
                     default:
                         console.log('Tab not found:' + tab);
@@ -357,6 +379,15 @@ $(document).ready(function () {
                     activeTab.removeClass('active');  
                     activeTab.find('a').click(); 
                 });
+                $('div.cli_autocomplete input').change(function () {
+                    globalSettings.cliAutocomplete = $(this).is(':checked');
+                    chrome.storage.local.set({
+                        'cli_autocomplete': globalSettings.cliAutocomplete
+                    });
+
+                    CliAutoComplete.setEnabled($(this).is(':checked'));
+                });
+
 
                 $('#ui-unit-type').val(globalSettings.unitType);
                 $('#map-provider-type').val(globalSettings.mapProviderType);
@@ -364,6 +395,7 @@ $(document).ready(function () {
                 $('#proxyurl').val(globalSettings.proxyURL);
                 $('#proxylayer').val(globalSettings.proxyLayer);   
                 $('#showProfileParameters').prop('checked', globalSettings.showProfileParameters);
+                $('#cliAutocomplete').prop('checked', globalSettings.cliAutocomplete);
                 
                 // Set the value of the unit type
                 // none, OSD, imperial, metric
@@ -407,6 +439,9 @@ $(document).ready(function () {
                         'proxylayer': $(this).val()
                     });
                     globalSettings.proxyLayer = $(this).val();
+                });
+                $('#demoModeReset').on('click', () => {
+                    SITLProcess.deleteEepromFile('demo.bin');
                 });
                 function close_and_cleanup(e) {
                     if (e.type == 'click' && !$.contains($('div#options-window')[0], e.target) || e.type == 'keyup' && e.keyCode == 27) {
@@ -530,9 +565,22 @@ $(document).ready(function () {
 
         state = true;
     }
-    $(this).text(state ? 'Hide Log' : 'Show Log');
+        $(this).html(state ? chrome.i18n.getMessage("mainHideLog") : chrome.i18n.getMessage("mainShowLog"));
     $(this).data('state', state);
 
+    });
+
+    var mixerprofile_e = $('#mixerprofilechange');
+
+    mixerprofile_e.change(function () {
+        var mixerprofile = parseInt($(this).val());
+        MSP.send_message(MSPCodes.MSP2_INAV_SELECT_MIXER_PROFILE, [mixerprofile], false, function () {
+            GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [mixerprofile + 1]));
+            MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.handleReconnect();
+            });
+        });
     });
 
     var profile_e = $('#profilechange');
@@ -541,7 +589,6 @@ $(document).ready(function () {
         var profile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function () {
             GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [profile + 1]));
-            updateActivatedTab();
         });
     });
 
@@ -551,7 +598,6 @@ $(document).ready(function () {
         var batteryprofile = parseInt($(this).val());
         MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [batteryprofile], false, function () {
             GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1]));
-            updateActivatedTab();
         });
     });
 });
@@ -649,6 +695,21 @@ String.prototype.format = function () {
     });
 };
 
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 function updateActivatedTab() {
     var activeTab = $('#tabs > ul li.active');
     activeTab.removeClass('active');
@@ -657,8 +718,47 @@ function updateActivatedTab() {
 
 function updateFirmwareVersion() {
     if (CONFIGURATOR.connectionValid) {
-        $('#logo .firmware_version').text(CONFIG.flightControllerVersion);
+        $('#logo .firmware_version').text(CONFIG.flightControllerVersion + " [" + CONFIG.target + "]");
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/' + CONFIG.flightControllerVersion + '/docs/';
+
+        // If this is a master branch firmware, this will find a 404 as there is no tag tree. So default to master for docs.
+        $.ajax({
+            url : globalSettings.docsTreeLocation + 'Settings.md',
+            method: "HEAD",
+            statusCode: {
+                404: function() {
+                    globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
+                }
+            }
+        });
     } else {
         $('#logo .firmware_version').text(chrome.i18n.getMessage('fcNotConnected'));
+        
+        globalSettings.docsTreeLocation = 'https://github.com/iNavFlight/inav/blob/master/docs/';
     }
+}
+
+function updateEzTuneTabVisibility(loadMixerConfig) {
+    let useEzTune = true;
+    if (CONFIGURATOR.connectionValid) {
+        if (loadMixerConfig) {
+            mspHelper.loadMixerConfig(function() {
+                if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                    $('.tab_ez_tune').removeClass("is-hidden");
+                } else {
+                    $('.tab_ez_tune').addClass("is-hidden");
+                    useEzTune = false;
+                }
+            });
+        } else {
+            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
+                $('.tab_ez_tune').removeClass("is-hidden");
+            } else {
+                $('.tab_ez_tune').addClass("is-hidden");
+                useEzTune = false;
+            }
+        }
+    }
+
+    return useEzTune;
 }

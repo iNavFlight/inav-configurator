@@ -119,3 +119,13 @@
     line-height: 27px;
     border-radius: 20px;
 }
+
+
+.motorNumber {
+    position: absolute;
+    font-size: 1.4em;
+}
+
+.mixer-preview-image-numbers {
+    width: fit-content;
+}

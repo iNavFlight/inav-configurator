@@ -2,11 +2,17 @@
 
 TABS.ports = {};
 
+var portFunctionRules;
+
 TABS.ports.initialize = function (callback) {
 
-    var functionRules = [
+    /*  ** portFunctionRules Notes **
+        Do not set a defaultBaud for functions in the telemetry group. 
+        These should default to AUTO, which is handled in the onchange function. The baud rate is then set by the firmware.
+    */
+    portFunctionRules = [
          {name: 'MSP',                  groups: ['data', 'msp'], maxPorts: 2},
-         {name: 'GPS',                  groups: ['sensors'], maxPorts: 1},
+         {name: 'GPS',                  groups: ['sensors'], maxPorts: 1, defaultBaud: 115200},
          {name: 'TELEMETRY_FRSKY',      groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1},
          {name: 'TELEMETRY_HOTT',       groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1},
          {name: 'TELEMETRY_SMARTPORT',  groups: ['telemetry'], maxPorts: 1},
@@ -15,7 +21,7 @@ TABS.ports.initialize = function (callback) {
          {name: 'BLACKBOX',             groups: ['peripherals'], sharableWith: ['msp'], notSharableWith: ['telemetry'], maxPorts: 1}
     ];
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'TELEMETRY_MAVLINK',
         groups: ['telemetry'],
         sharableWith: ['msp'],
@@ -26,7 +32,7 @@ TABS.ports.initialize = function (callback) {
     /*
      * Support for FlySky iBus Telemetry
      */
-    functionRules.push({
+    portFunctionRules.push({
         name: 'TELEMETRY_IBUS',
         groups: ['telemetry'],
         sharableWith: ['msp'],
@@ -34,85 +40,89 @@ TABS.ports.initialize = function (callback) {
         maxPorts: 1
     });
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'RANGEFINDER',
         groups: ['sensors'],
         maxPorts: 1 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'GSM_SMS',
         groups: ['telemetry'],
         maxPorts: 1 }
     );
 
     // support configure RunCam Device
-    functionRules.push({
+    portFunctionRules.push({
         name: 'RUNCAM_DEVICE_CONTROL',
         groups: ['peripherals'],
         maxPorts: 1 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'TBS_SMARTAUDIO',
         groups: ['peripherals'],
         maxPorts: 1 }
     );
-    functionRules.push({
+    portFunctionRules.push({
         name: 'IRC_TRAMP',
         groups: ['peripherals'],
         maxPorts: 1 }
     );
-    functionRules.push({
+    portFunctionRules.push({
         name: 'VTX_FFPV',
         groups: ['peripherals'],
         maxPorts: 1 }
-    ); 
+    );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'OPFLOW',
         groups: ['sensors'],
         maxPorts: 1 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'ESC',
         groups: ['peripherals'],
-        maxPorts: 1 }
+        maxPorts: 1,
+        defaultBaud: 115200 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'FRSKY_OSD',
         groups: ['peripherals'],
-        maxPorts: 1 }
+        maxPorts: 1,
+        defaultBaud: 250000 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'DJI_FPV',
         groups: ['peripherals'],
-        maxPorts: 1 }
+        maxPorts: 1,
+        defaultBaud: 115200 }
     );
 
-    functionRules.push({
-        name: 'HDZERO_VTX',
+    portFunctionRules.push({
+        name: 'MSP_DISPLAYPORT',
         groups: ['peripherals'],
         maxPorts: 1 }
     );
 
-    functionRules.push({
+    portFunctionRules.push({
         name: 'SMARTPORT_MASTER',
         groups: ['peripherals'],
-        maxPorts: 1 }
+        maxPorts: 1,
+        defaultBaud: 57600 }
     );
-
-    functionRules.push({
-        name: 'IMU2',
+    portFunctionRules.push({
+        name: 'SBUS_OUTPUT',
         groups: ['peripherals'],
-        maxPorts: 1 }
+        maxPorts: 1,
+        defaultBaud: 115200 }
     );
 
-    for (var i = 0; i < functionRules.length; i++) {
-        functionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + functionRules[i].name);
+    for (var i = 0; i < portFunctionRules.length; i++) {
+        portFunctionRules[i].displayName = chrome.i18n.getMessage('portsFunction_' + portFunctionRules[i].name);
     }
 
     var mspBaudRates = [
@@ -128,7 +138,8 @@ TABS.ports.initialize = function (callback) {
         '19200',
         '38400',
         '57600',
-        '115200'
+        '115200',
+        '230400'
     ];
 
     var telemetryBaudRates_post1_6_3 = [
@@ -143,7 +154,7 @@ TABS.ports.initialize = function (callback) {
         '115200'
     ];
 
-    var blackboxBaudRates = [
+    var peripheralsBaudRates = [
         '19200',
         '38400',
         '57600',
@@ -205,9 +216,9 @@ TABS.ports.initialize = function (callback) {
             $elements.append('<option value="' + telemetryBaudRates_post1_6_3[i] + '">' + telemetryBaudRates_post1_6_3[i] + '</option>');
         }
 
-        $elements = $('select.blackbox_baudrate');
-        for (i = 0; i < blackboxBaudRates.length; i++) {
-            $elements.append('<option value="' + blackboxBaudRates[i] + '">' + blackboxBaudRates[i] + '</option>');
+        $elements = $('select.peripherals_baudrate');
+        for (i = 0; i < peripheralsBaudRates.length; i++) {
+            $elements.append('<option value="' + peripheralsBaudRates[i] + '">' + peripheralsBaudRates[i] + '</option>');
         }
 
         var ports_e = $('.tab-ports .ports');
@@ -219,62 +230,72 @@ TABS.ports.initialize = function (callback) {
 
             port_configuration_e.data('serialPort', serialPort);
 
-            port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
-            port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
-            port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
-            port_configuration_e.find('select.blackbox_baudrate').val(serialPort.blackbox_baudrate);
+            //Append only port different than USB VCP
+            if (serialPort.identifier != 20) {
 
-            port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+                port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
+                port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
+                port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
+                port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
-            port_configuration_e.data('index', portIndex);
-            port_configuration_e.data('port', serialPort);
+                port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+                if (serialPort.identifier >= 30) {
+                    port_configuration_e.find('.softSerialWarning').css("display", "inline")
+                } else {
+                    port_configuration_e.find('.softSerialWarning').css("display", "none")
+                }
 
+                port_configuration_e.data('index', portIndex);
+                port_configuration_e.data('port', serialPort);
 
-            for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                var column = columns[columnIndex];
+                for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                    var column = columns[columnIndex];
 
-                var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
+                    var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
+                    let functions_e_id = "portFunc-" + column + "-" + portIndex;
+                    functions_e.attr("id", functions_e_id);
 
-                for (i = 0; i < functionRules.length; i++) {
-                    var functionRule = functionRules[i];
-                    var functionName = functionRule.name;
+                    for (i = 0; i < portFunctionRules.length; i++) {
+                        var functionRule = portFunctionRules[i];
+                        var functionName = functionRule.name;
 
-                    if (functionRule.groups.indexOf(column) == -1) {
-                        continue;
-                    }
-
-                    var select_e;
-                    if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
-                        var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                        functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
-
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            var checkbox_e = functions_e.find('#' + checkboxId);
-                            checkbox_e.prop("checked", true);
+                        if (functionRule.groups.indexOf(column) == -1) {
+                            continue;
                         }
 
-                    } else {
+                        var select_e;
+                        if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
+                            var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
+                            functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
 
-                        var selectElementName = 'function-' + column;
-                        var selectElementSelector = 'select[name=' + selectElementName + ']';
-                        select_e = functions_e.find(selectElementSelector);
+                            if (serialPort.functions.indexOf(functionName) >= 0) {
+                                var checkbox_e = functions_e.find('#' + checkboxId);
+                                checkbox_e.prop("checked", true);
+                            }
 
-                        if (select_e.size() == 0) {
-                            functions_e.prepend('<span class="function"><select name="' + selectElementName + '" /></span>');
+                        } else {
+
+                            var selectElementName = 'function-' + column;
+                            var selectElementSelector = 'select[name=' + selectElementName + ']';
                             select_e = functions_e.find(selectElementSelector);
-                            var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
-                            select_e.append('<option value="">' + disabledText + '</option>');
-                        }
-                        select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
+                            
+                            if (select_e.length == 0) {
+                                functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
+                                select_e = functions_e.find(selectElementSelector);
+                                var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
+                                select_e.append('<option value="">' + disabledText + '</option>');
+                            }
+                            select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
 
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            select_e.val(functionName);
+                            if (serialPort.functions.indexOf(functionName) >= 0) {
+                                select_e.val(functionName);
+                            }
                         }
                     }
                 }
-            }
+                ports_e.find('tbody').append(port_configuration_e);
 
-            ports_e.find('tbody').append(port_configuration_e);
+            }            
         }
     }
 
@@ -291,14 +312,18 @@ TABS.ports.initialize = function (callback) {
 
    function on_save_handler() {
 
-        // update configuration based on current ui state
-        SERIAL_CONFIG.ports = [];
+        //Clear ports of any previous for serials different than USB VCP
+        SERIAL_CONFIG.ports = SERIAL_CONFIG.ports.filter(item => item.identifier == 20)
 
         $('.tab-ports .portConfiguration').each(function () {
 
             var portConfiguration_e = this;
 
             var oldSerialPort = $(this).data('serialPort');
+
+            if (oldSerialPort.identifier == 20) {
+                return;
+            }
 
             var functions = $(portConfiguration_e).find('input:checkbox:checked').map(function() {
                 return this.value;
@@ -328,14 +353,14 @@ TABS.ports.initialize = function (callback) {
                 msp_baudrate: $(portConfiguration_e).find('.msp_baudrate').val(),
                 telemetry_baudrate: $(portConfiguration_e).find('.telemetry_baudrate').val(),
                 sensors_baudrate: $(portConfiguration_e).find('.sensors_baudrate').val(),
-                blackbox_baudrate: $(portConfiguration_e).find('.blackbox_baudrate').val(),
+                peripherals_baudrate: $(portConfiguration_e).find('.peripherals_baudrate').val(),
                 identifier: oldSerialPort.identifier
             };
             SERIAL_CONFIG.ports.push(serialPort);
         });
 
         MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
-        
+
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
         }
@@ -354,6 +379,23 @@ TABS.ports.initialize = function (callback) {
         }
     }
 };
+
+function updateDefaultBaud(baudSelect, column) {
+    let section = $("#" + baudSelect);
+    let portName = section.find('.function-' + column).val();
+    let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
+
+    for (i = 0; i < portFunctionRules.length; i++) {
+        if (portFunctionRules[i].name === portName) {
+            if (typeof portFunctionRules[i].defaultBaud !== 'undefined') {
+                baudRate = portFunctionRules[i].defaultBaud;
+            }
+            break;
+        }
+    }
+
+    section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
+}
 
 TABS.ports.cleanup = function (callback) {
     if (callback) callback();

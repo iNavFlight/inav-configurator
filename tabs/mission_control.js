@@ -22,6 +22,14 @@ MWNP.WPTYPE = {
     LAND:               8
 };
 
+MWNP.P3 = {
+    ALT_TYPE:       0,  // Altitude (alt) : Relative (to home altitude) (0) or Absolute (AMSL) (1).
+    USER_ACTION_1:  1,  // WP Action 1
+    USER_ACTION_2:  2,  // WP Action 2
+    USER_ACTION_3:  3,  // WP Action 3
+    USER_ACTION_4:  4,  // WP Action 4
+}
+
 // Reverse WayPoint type dictionary
 function swap(dict) {
     let rev_dict = {};
@@ -33,16 +41,16 @@ function swap(dict) {
 
 MWNP.WPTYPE.REV = swap(MWNP.WPTYPE);
 
-// Dictionary of Parameter1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
+// Dictionary of Parameter 1,2,3 definition depending on type of action selected (refer to MWNP.WPTYPE)
 var dictOfLabelParameterPoint = {
-    1:    {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'},
-    2:    {parameter1: '', parameter2: '', parameter3: ''},
-    3:    {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: 'Sea level Ref'},
-    4:    {parameter1: 'Force land (non zero)', parameter2: '', parameter3: ''},
-    5:    {parameter1: '', parameter2: '', parameter3: ''},
-    6:    {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
-    7:    {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
-    8:    {parameter1: '', parameter2: '', parameter3: 'Sea level Ref'}
+    1:  {parameter1: 'Speed (cm/s)', parameter2: '', parameter3: 'Sea level Ref'},
+    2:  {parameter1: '', parameter2: '', parameter3: ''},
+    3:  {parameter1: 'Wait time (s)', parameter2: 'Speed (cm/s)', parameter3: 'Sea level Ref'},
+    4:  {parameter1: 'Force land (non zero)', parameter2: '', parameter3: ''},
+    5:  {parameter1: '', parameter2: '', parameter3: ''},
+    6:  {parameter1: 'Target WP number', parameter2: 'Number of repeat (-1: infinite)', parameter3: ''},
+    7:  {parameter1: 'Heading (deg)', parameter2: '', parameter3: ''},
+    8:  {parameter1: '', parameter2: '', parameter3: 'Sea level Ref'}
 };
 
 var waypointOptions = ['JUMP','SET_HEAD','RTH'];
@@ -152,7 +160,6 @@ TABS.mission_control.initialize = function (callback) {
               if (!cursorInitialized) {
                   cursorInitialized = true;
 
-
                   /////////////////////////////////////
                   //create layer for current position
                   curPosStyle = new ol.style.Style({
@@ -206,7 +213,6 @@ TABS.mission_control.initialize = function (callback) {
                       source: rthVector
                   });
 
-
                   //////////////////////////////
                   //create layer for bread crumbs
                   breadCrumbLS = new ol.geom.LineString([ol.proj.fromLonLat([lon, lat]), ol.proj.fromLonLat([lon, lat])]);
@@ -232,7 +238,6 @@ TABS.mission_control.initialize = function (callback) {
                     source: breadCrumbSource
                   });
 
-
                   /////////////////////////////
                   //create layer for heading, alt, groundspeed
                   textGeom = new ol.geom.Point([0,0]);
@@ -252,7 +257,6 @@ TABS.mission_control.initialize = function (callback) {
                     })
                   });
 
-
                   textFeature = new ol.Feature({
                     geometry: textGeom
                   });
@@ -271,7 +275,6 @@ TABS.mission_control.initialize = function (callback) {
                   map.addLayer(breadCrumbVector);
                   map.addLayer(currentPositionLayer);
                   map.addControl(textVector);
-
               }
 
               let gpsPos = ol.proj.fromLonLat([lon, lat]);
@@ -297,7 +300,6 @@ TABS.mission_control.initialize = function (callback) {
                               'm\nSpeed: ' + GPS_DATA.speed + 'cm/s\n' +
                               'Dist: ' + GPS_DATA.distanceToHome + 'm');
 
-
               //update RTH every 5th GPS update since it really shouldn't change
               if(rthUpdateInterval >= 5)
               {
@@ -312,7 +314,7 @@ TABS.mission_control.initialize = function (callback) {
           }
         }
 
-               /*
+        /*
          * enable data pulling if not offline
          * Refreshing data at 5Hz...  Could slow this down if we have performance issues
          */
@@ -362,23 +364,14 @@ TABS.mission_control.initialize = function (callback) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //      define & init parameters for default Settings
     //////////////////////////////////////////////////////////////////////////////////////////////
-    var vMaxDistSH = 0;
-    var settings = {};
+    var settings = {speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : 0, bingDemModel : false};
+
     if (CONFIGURATOR.connectionValid) {
         mspHelper.getSetting("safehome_max_distance").then(function (s) {
             if (s) {
-                vMaxDistSH = Number(s.value)/100;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
-            }
-            else {
-                vMaxDistSH = 0;
-                settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
+                settings.maxDistSH = Number(s.value)/100;
             }
         });
-    }
-    else {
-        vMaxDistSH = 0;
-        settings = { speed: 0, alt: 5000, safeRadiusSH : 50, maxDistSH : vMaxDistSH};
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -418,7 +411,7 @@ TABS.mission_control.initialize = function (callback) {
         $('#pointAlt').val('');
         $('#pointP1').val('');
         $('#pointP2').val('');
-        $('#pointP3').val('');
+        $('#pointP3Alt').val('');
         $('#missionDistance').text(0);
         $('#MPeditPoint').fadeOut(300);
     }
@@ -677,6 +670,7 @@ TABS.mission_control.initialize = function (callback) {
 
         if (globalSettings.mapProviderType == 'bing') {
             $('#elevationEarthModelclass').fadeIn(300);
+            changeSwitchery($('#elevationEarthModel'), settings.bingDemModel);
         } else {
             $('#elevationEarthModelclass').fadeOut(300);
         }
@@ -734,7 +728,6 @@ TABS.mission_control.initialize = function (callback) {
             })),
         });
     }
-
 
     function updateHome() {
         renderHomeTable();
@@ -982,7 +975,6 @@ TABS.mission_control.initialize = function (callback) {
         }
     }
 
-
     /////////////////////////////////////////////
     //
     // Manage Waypoint
@@ -998,7 +990,6 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function addWaypointMarker(waypoint, isEdit=false) {
-
         let coord = ol.proj.fromLonLat([waypoint.getLonMap(), waypoint.getLatMap()]);
         var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(coord),
@@ -1054,7 +1045,6 @@ TABS.mission_control.initialize = function (callback) {
             }))
         });
     }
-
 
     function repaintLine4Waypoints(mission) {
         let oldPos,
@@ -1206,7 +1196,6 @@ TABS.mission_control.initialize = function (callback) {
             source: vectorSource
         });
 
-
         vectorLayer.kind = "line";
         vectorLayer.selection = selection;
         vectorLayer.number = pos2ID;
@@ -1261,7 +1250,6 @@ TABS.mission_control.initialize = function (callback) {
         repaintLine4Waypoints(mission);
     }
 
-
     function renderWaypointOptionsTable(waypoint) {
         /*
          * Process Waypoint Options table UI
@@ -1275,8 +1263,8 @@ TABS.mission_control.initialize = function (callback) {
                     </div>\
                 </td> \
                 <td><span class="waypointOptions-number"/></td>\
-                <td><select class="waypointOptions-action"></select></td> \
-                <td><input type="number" class="waypointOptions-p1"/></td>\
+                <td><select class="waypointOptions-action"></select></td>\
+                <td><input type="number" class="waypointOptions-p1" /></td>\
                 <td><input type="number" class="waypointOptions-p2" /></td>\
                 </tr>\
             ');
@@ -1286,9 +1274,11 @@ TABS.mission_control.initialize = function (callback) {
             for (var i = 1; i <= 3; i++) {
                 if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
                     $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
+                    $row.find(".waypointOptions-p"+String(i)).prop("title", dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)]);
                 }
                 else {
                     $row.find(".waypointOptions-p"+String(i)).prop("disabled", true);
+                    $row.find(".waypointOptions-p"+String(i)).prop("title", "");
                 }
             }
 
@@ -1299,9 +1289,11 @@ TABS.mission_control.initialize = function (callback) {
                 for (var i = 1; i <= 3; i++) {
                     if (dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)] != '') {
                         $row.find(".waypointOptions-p"+String(i)).prop("disabled", false);
+                        $row.find(".waypointOptions-p"+String(i)).prop("title", dictOfLabelParameterPoint[element.getAction()]['parameter'+String(i)]);
                     }
                     else {
                         $row.find(".waypointOptions-p"+String(i)).prop("disabled", true);
+                        $row.find(".waypointOptions-p"+String(i)).prop("title", "");
                     }
                 }
                 mission.updateWaypoint(element);
@@ -1310,7 +1302,6 @@ TABS.mission_control.initialize = function (callback) {
             });
 
             $row.find(".waypointOptions-number").text(element.getAttachedNumber()+1);
-
 
             $row.find(".waypointOptions-p1").val((MWNP.WPTYPE.REV[element.getAction()] == "JUMP" ? element.getP1()+1 : element.getP1())).change(function () {
                 if (MWNP.WPTYPE.REV[element.getAction()] == "SET_HEAD") {
@@ -1462,7 +1453,6 @@ TABS.mission_control.initialize = function (callback) {
         };
         ol.inherits(app.PlannerSettingsControl, ol.control.Control);
 
-
         /**
          * @constructor
          * @extends {ol.control.Control}
@@ -1543,7 +1533,7 @@ TABS.mission_control.initialize = function (callback) {
          // * @param {Object=} opt_options Control options.
          // */
         app.PlannerMultiMissionControl = function (opt_options) {
-            
+
             var options = opt_options || {};
             var button = document.createElement('button');
 
@@ -1799,7 +1789,7 @@ TABS.mission_control.initialize = function (callback) {
                     clearEditForm();
                 } catch (e) {
                     console.log(e);
-                    GUI.log("Previous selection was not a WAYPOINT!");
+                    GUI.log(chrome.i18n.getMessage('notAWAYPOINT'));
                 }
             }
             selectedFeature = map.forEachFeatureAtPixel(evt.pixel,
@@ -1818,13 +1808,21 @@ TABS.mission_control.initialize = function (callback) {
 
                 selectedFeature.setStyle(getWaypointIcon(selectedMarker, true));
 
+                let P3Value = selectedMarker.getP3();
+
+                changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_1));
+                changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_2));
+                changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_3));
+                changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.USER_ACTION_4));
+
                 var altitudeMeters = app.ConvertCentimetersToMeters(selectedMarker.getAlt());
 
                 if (tempSelectedMarkerIndex == null || tempSelectedMarkerIndex != selectedMarker.getLayerNumber()) {
                     (async () => {
                         const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                         $('#elevationValueAtWP').text(elevationAtWP);
-                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
+                        const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, P3Value);
                         selectedMarker.setAlt(returnAltitude);
                         plotElevation();
                     })()
@@ -1840,7 +1838,7 @@ TABS.mission_control.initialize = function (callback) {
                 // Change SpeedValue to Parameter1, 2, 3
                 $('#pointP1').val(selectedMarker.getP1());
                 $('#pointP2').val(selectedMarker.getP2());
-                changeSwitchery($('#pointP3'), selectedMarker.getP3() == 1);
+
 
                 // Selection box update depending on choice of type of waypoint
                 for (var j in dictOfLabelParameterPoint[selectedMarker.getAction()]) {
@@ -1853,6 +1851,7 @@ TABS.mission_control.initialize = function (callback) {
                 selectedMarker = renderWaypointOptionsTable(selectedMarker);
                 $('#EditPointNumber').text("Edit point "+String(selectedMarker.getLayerNumber()+1));
                 $('#MPeditPoint').fadeIn(300);
+                $('#pointP3UserActionClass').fadeIn();
                 redrawLayer();
             }
             else if (selectedFeature && tempMarker.kind == "line" && tempMarker.selection && !disableMarkerEdit) {
@@ -1861,7 +1860,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
 
                         mission.insertWaypoint(tempWp, tempMarker.number);
                         mission.update(singleMissionActive());
@@ -1896,7 +1895,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (homeMarkers.length && HOME.getAlt() != "N/A") {
                     (async () => {
                         const elevationAtWP = await tempWp.getElevation(globalSettings);
-                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, 0));
+                        tempWp.setAlt(checkAltElevSanity(false, settings.alt, elevationAtWP, false));
 
                         mission.put(tempWp);
                         mission.update(singleMissionActive());
@@ -2104,28 +2103,39 @@ TABS.mission_control.initialize = function (callback) {
             }
         });
 
-        $('#pointP3').on('change', function (event) {
-            if (disableMarkerEdit) {
-                changeSwitchery($('#pointP3'), selectedMarker.getP3() == 1);
-            }
-
+        $('#pointP3Alt').on('change', function (event) {
             if (selectedMarker) {
-                const P3Value = selectedMarker.getP3();
-                selectedMarker.setP3( $('#pointP3').prop("checked") ? 1.0 : 0.0);
+                P3Value = selectedMarker.getP3();
+
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#pointP3Alt'), TABS.mission_control.isBitSet(P3Value, MWNP.P3.ALT_TYPE));
+                }
+
+                P3Value = TABS.mission_control.setBit(P3Value, MWNP.P3.ALT_TYPE, $('#pointP3Alt').prop("checked"));
                 (async () => {
                     const elevationAtWP = await selectedMarker.getElevation(globalSettings);
                     $('#elevationValueAtWP').text(elevationAtWP);
                     var altitude = Number($('#pointAlt').val());
+
                     if (P3Value != selectedMarker.getP3()) {
-                        if ($('#pointP3').prop("checked")) {
-                            if (altitude < 0) {
-                                altitude = settings.alt;
-                            }
-                            selectedMarker.setAlt(altitude + elevationAtWP * 100);
+                        selectedMarker.setP3(P3Value);
+
+                        let groundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                        if (isNaN(groundClearance)) {
+                            groundClearance = settings.alt; // use default altitude if no current ground clearance
+                        }
+
+                        if ($('#pointP3Alt').prop("checked")) {
+                            selectedMarker.setAlt(groundClearance + elevationAtWP * 100);
                         } else {
-                            selectedMarker.setAlt(altitude - Number(elevationAtWP) * 100);
+                            let elevationAtHome = HOME.getAlt();
+                            if (isNaN(elevationAtHome)) {
+                                elevationAtHome = elevationAtWP;
+                            }
+                            selectedMarker.setAlt(groundClearance + 100 * (elevationAtWP - elevationAtHome));
                         }
                     }
+
                     const returnAltitude = checkAltElevSanity(false, selectedMarker.getAlt(), elevationAtWP, selectedMarker.getP3());
                     selectedMarker.setAlt(returnAltitude);
                     $('#pointAlt').val(selectedMarker.getAlt());
@@ -2137,6 +2147,66 @@ TABS.mission_control.initialize = function (callback) {
                     redrawLayer();
                     plotElevation();
                 })()
+            }
+        });
+
+        $('#pointP3UserAction1').on('change', function(event){
+            if (selectedMarker) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#pointP3UserAction1'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1));
+                }
+
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_1, $('#pointP3UserAction1').prop("checked"));
+                selectedMarker.setP3(P3Value);
+
+                mission.updateWaypoint(selectedMarker);
+                mission.update(singleMissionActive());
+                redrawLayer();
+            }
+        });
+
+        $('#pointP3UserAction2').on('change', function(event){
+            if (selectedMarker) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#pointP3UserAction2'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2));
+                }
+
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_2, $('#pointP3UserAction2').prop("checked"));
+                selectedMarker.setP3(P3Value);
+
+                mission.updateWaypoint(selectedMarker);
+                mission.update(singleMissionActive());
+                redrawLayer();
+            }
+        });
+
+        $('#pointP3UserAction3').on('change', function(event){
+            if (selectedMarker) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#pointP3UserAction3'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3));
+                }
+
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_3, $('#pointP3UserAction3').prop("checked"));
+                selectedMarker.setP3(P3Value);
+
+                mission.updateWaypoint(selectedMarker);
+                mission.update(singleMissionActive());
+                redrawLayer();
+            }
+        });
+
+        $('#pointP3UserAction4').on('change', function(event){
+            if (selectedMarker) {
+                if (disableMarkerEdit) {
+                    changeSwitchery($('#pointP3UserAction4'), TABS.mission_control.isBitSet(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4));
+                }
+
+                P3Value = TABS.mission_control.setBit(selectedMarker.getP3(), MWNP.P3.USER_ACTION_4, $('#pointP3UserAction4').prop("checked"));
+                selectedMarker.setP3(P3Value);
+
+                mission.updateWaypoint(selectedMarker);
+                mission.update(singleMissionActive());
+                redrawLayer();
             }
         });
 
@@ -2189,25 +2259,25 @@ TABS.mission_control.initialize = function (callback) {
 
         $('#loadEepromSafehomeButton').on('click', function () {
             $(this).addClass('disabled');
-            GUI.log('Start of getting Safehome points');
+            GUI.log(chrome.i18n.getMessage('startGettingSafehomePoints'));
             mspHelper.loadSafehomes();
             setTimeout(function(){
                 renderSafehomesTable();
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
-                GUI.log('End of getting Safehome points');
+                GUI.log(chrome.i18n.getMessage('endGettingSafehomePoints'));
                 $('#loadEepromSafehomeButton').removeClass('disabled');
             }, 500);
 
         });
 
-        $('#saveEepromSafehomeButton').on('click', function () {
+        $('#saveEepromSafehomeButton').on('click', function() {
             $(this).addClass('disabled');
-            GUI.log('Start of sending Safehome points');
+            GUI.log(chrome.i18n.getMessage('startSendingSafehomePoints'));
             mspHelper.saveSafehomes();
             setTimeout(function(){
                 mspHelper.saveToEeprom();
-                GUI.log('End of sending Safehome points');
+                GUI.log(chrome.i18n.getMessage('endSendingSafehomePoints'));
                 $('#saveEepromSafehomeButton').removeClass('disabled');
             }, 500);
         });
@@ -2248,6 +2318,9 @@ TABS.mission_control.initialize = function (callback) {
                     redrawLayer();
                     plotElevation();
                 })()
+
+                settings.bingDemModel = $('#elevationEarthModel').prop("checked") ? true : false;
+                saveSettings();
             }
         });
 
@@ -2344,7 +2417,7 @@ TABS.mission_control.initialize = function (callback) {
 
             if (markers.length && !confirm(chrome.i18n.getMessage('confirm_delete_all_points'))) return;
             nwdialog.setContext(document);
-            nwdialog.openFileDialog(function(result) {
+            nwdialog.openFileDialog('.mission', function(result) {
                 loadMissionFile(result);
             })
         });
@@ -2361,7 +2434,7 @@ TABS.mission_control.initialize = function (callback) {
             if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log('Start get point');
+            GUI.log(chrome.i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(false);
         });
 
@@ -2371,7 +2444,7 @@ TABS.mission_control.initialize = function (callback) {
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log('Start send point');
+            GUI.log(chrome.i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(false);
         });
 
@@ -2380,7 +2453,7 @@ TABS.mission_control.initialize = function (callback) {
             if ((markers.length || multimissionCount) && !confirm(chrome.i18n.getMessage(message))) return;
             removeAllWaypoints();
             $(this).addClass('disabled');
-            GUI.log('Start get point');
+            GUI.log(chrome.i18n.getMessage('startGetPoint'));
             getWaypointsFromFC(true);
         });
 
@@ -2390,7 +2463,7 @@ TABS.mission_control.initialize = function (callback) {
                 return;
             }
             $(this).addClass('disabled');
-            GUI.log('Start send point');
+            GUI.log(chrome.i18n.getMessage('startSendPoint'));
             sendWaypointsToFC(true);
         });
 
@@ -2399,13 +2472,19 @@ TABS.mission_control.initialize = function (callback) {
         /////////////////////////////////////////////
         $('#saveSettings').on('click', function () {
             let oldSafeRadiusSH = settings.safeRadiusSH;
-            settings = { speed: Number($('#MPdefaultPointSpeed').val()), alt: Number($('#MPdefaultPointAlt').val()), safeRadiusSH: Number($('#MPdefaultSafeRangeSH').val()), maxDistSH : vMaxDistSH};
+
+            settings.speed = Number($('#MPdefaultPointSpeed').val());
+            settings.alt = Number($('#MPdefaultPointAlt').val());
+            settings.safeRadiusSH = Number($('#MPdefaultSafeRangeSH').val());
+
             saveSettings();
+
             if (settings.safeRadiusSH != oldSafeRadiusSH  && $('#showHideSafehomeButton').is(":visible")) {
                 cleanSafehomeLayers();
                 renderSafehomesOnMap();
                 $('#SafeHomeSafeDistance').text(settings.safeRadiusSH);
             }
+
             closeSettingsPanel();
         });
 
@@ -2417,7 +2496,6 @@ TABS.mission_control.initialize = function (callback) {
         updateTotalInfo();
     }
 
-
     /////////////////////////////////////////////
     //
     // Load/Save MWP File Toolbox
@@ -2425,17 +2503,17 @@ TABS.mission_control.initialize = function (callback) {
     /////////////////////////////////////////////
     function loadMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log('<span style="color: red">Error reading file (xml2js not found)</span>');
+        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorReadingFileXml2jsNotFound'));
 
         fs.readFile(filename, (err, data) => {
             if (err) {
-                GUI.log('<span style="color: red">Error reading file</span>');
+                GUI.log(chrome.i18n.getMessage('errorReadingFile'));
                 return console.error(err);
             }
 
             window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
-                    GUI.log('<span style="color: red">Error parsing file</span>');
+                    GUI.log(chrome.i18n.getMessage('errorParsingFile'));
                     return console.error(err);
                 }
 
@@ -2567,7 +2645,7 @@ TABS.mission_control.initialize = function (callback) {
                 }
                 updateTotalInfo();
                 let sFilename = String(filename.split('\\').pop().split('/').pop());
-                GUI.log(sFilename+' has been loaded successfully !');
+                GUI.log(sFilename + chrome.i18n.getMessage('loadedSuccessfully'));
                 updateFilename(sFilename);
             });
         });
@@ -2575,7 +2653,7 @@ TABS.mission_control.initialize = function (callback) {
 
     function saveMissionFile(filename) {
         const fs = require('fs');
-        if (!window.xml2js) return GUI.log('<span style="color: red">Error writing file (xml2js not found)</span>');
+        if (!window.xml2js) return GUI.log(chrome.i18n.getMessage('errorWritingFileXml2jsNotFound'));
 
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
@@ -2624,17 +2702,16 @@ TABS.mission_control.initialize = function (callback) {
         xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {
             if (err) {
-                GUI.log('<span style="color: red">Error writing file</span>');
+                GUI.log(chrome.i18n.getMessage('ErrorWritingFile'));
                 return console.error(err);
             }
             let sFilename = String(filename.split('\\').pop().split('/').pop());
-            GUI.log(sFilename+' has been saved successfully !');
+            GUI.log(sFilename + chrome.i18n.getMessage('savedSuccessfully'));
             updateFilename(sFilename);
         });
     }
 
     /////////////////////////////////////////////
-    //
     // Load/Save FC mission Toolbox
     // mission = configurator store, WP number indexed from 0, MISSION_PLANNER = FC NVM store, WP number indexed from 1
     /////////////////////////////////////////////
@@ -2647,7 +2724,7 @@ TABS.mission_control.initialize = function (callback) {
 
         function getWaypointData() {
             mspHelper.loadWaypoints(function() {
-                GUI.log('End get point');
+                GUI.log(chrome.i18n.getMessage('endGetPoint'));
                 if (loadEeprom) {
                     GUI.log(chrome.i18n.getMessage('eeprom_load_ok'));
                     $('#loadEepromMissionButton').removeClass('disabled');
@@ -2689,7 +2766,7 @@ TABS.mission_control.initialize = function (callback) {
         MISSION_PLANNER.copy(mission);
         MISSION_PLANNER.update(false, true, true);
         mspHelper.saveWaypoints(function() {
-            GUI.log('End send point');
+            GUI.log(chrome.i18n.getMessage('endSendPoint'));
             if (saveEeprom) {
                 $('#saveEepromMissionButton').removeClass('disabled');
                 GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
@@ -2735,17 +2812,20 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function changeSwitchery(element, checked) {
-      if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
-        element.parent().find('.switcherymid').trigger('click');
-      }
+        if ( ( element.is(':checked') && checked == false ) || ( !element.is(':checked') && checked == true ) ) {
+            element.parent().find('.switcherymid').trigger('click');
+        }
     }
 
     /* resetAltitude = true : For selected WPs only. Changes WP Altitude value back to previous value if setting below ground level.
-     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting */
-    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, P3Datum) {
+     ^ resetAltitude = false : changes WP Altitude to value required to give ground clearance = default Altitude setting
+     ^ AbsAltCheck : check value for whether or not to use absolute altitude. This can be the P3 bitset or excplicitly set to true or false */
+    function checkAltElevSanity(resetAltitude, checkAltitude, elevation, AbsAltCheck) {
         let groundClearance = "NO HOME";
         let altitude = checkAltitude;
-        if (P3Datum) {
+        AbsAltCheck = (typeof AbsAltCheck == "boolean") ? AbsAltCheck : TABS.mission_control.isBitSet(AbsAltCheck, MWNP.P3.ALT_TYPE);
+
+        if (AbsAltCheck) {
             if (checkAltitude < 100 * elevation) {
                 if (resetAltitude) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
@@ -2762,7 +2842,11 @@ TABS.mission_control.initialize = function (callback) {
                     alert(chrome.i18n.getMessage('MissionPlannerAltitudeChangeReset'));
                     altitude = selectedMarker.getAlt();
                 } else {
-                    altitude = settings.alt + 100 * (elevation - elevationAtHome);
+                    let currentGroundClearance = 100 * Number($('#groundClearanceValueAtWP').text());
+                    if (isNaN(currentGroundClearance) || selectedMarker == null) {
+                        currentGroundClearance = settings.alt;  // use default altitude if no current ground clearance
+                    }
+                    altitude = currentGroundClearance + 100 * (elevation - elevationAtHome);
                 }
             }
             groundClearance = altitude / 100 + (elevationAtHome - elevation);
@@ -2868,8 +2952,17 @@ TABS.mission_control.initialize = function (callback) {
             }
         }
     }
-
 };
+
+TABS.mission_control.isBitSet = function(bits, testBit) {
+    let isTrue = ((bits & (1 << testBit)) != 0);
+
+    return isTrue;
+}
+
+TABS.mission_control.setBit = function(bits, bit, value) {
+    return value ? bits |= (1 << bit) : bits &= ~(1 << bit);
+}
 
 // window.addEventListener("error", handleError, true);
 

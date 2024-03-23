@@ -29,6 +29,7 @@ var CONFIG,
     MOTOR_DATA,
     SERVO_DATA,
     GPS_DATA,
+    ADSB_VEHICLES,
     MISSION_PLANNER,
     ANALOG,
     ARMING_CONFIG,
@@ -64,7 +65,8 @@ var CONFIG,
     SAFEHOMES,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
-    FEATURES;
+    FEATURES,
+    RATE_DYNAMICS;
 
 var FC = {
     restartRequired: false,
@@ -92,8 +94,7 @@ var FC = {
             gpsHwStatus: 0,
             rangeHwStatus: 0,
             speedHwStatus: 0,
-            flowHwStatus: 0,
-            imu2HwStatus: 0
+            flowHwStatus: 0
         };
 
         SENSOR_CONFIG = {
@@ -118,8 +119,9 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
-            profile: 0,
-            battery_profile: 0,
+            mixer_profile: -1,
+            profile: -1,
+            battery_profile: -1,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
             armingFlags: 0,
@@ -196,6 +198,7 @@ var FC = {
         MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,
+            motorStopOnLow: false,
             platformType: -1,
             hasFlaps: false,
             appliedMixerPreset: -1,
@@ -247,6 +250,12 @@ var FC = {
             errors: 0,
             timeouts: 0,
             packetCount: 0
+        };
+
+        ADSB_VEHICLES = {
+            vehiclesCount: 0,
+            callsignLength: 0,
+            vehicles: []
         };
 
         MISSION_PLANNER = new WaypointCollection();
@@ -541,6 +550,27 @@ var FC = {
         SETTINGS = {};
 
         SAFEHOMES = new SafehomeCollection();
+
+        RATE_DYNAMICS = {
+            sensitivityCenter: null,
+            sensitivityEnd: null,
+            correctionCenter: null,
+            correctionEnd: null,
+            weightCenter: null, 
+            weightEnd: null
+        };
+
+        EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null
+        };
     },
     getOutputUsages: function() {
         return {
@@ -555,7 +585,6 @@ var FC = {
     getFeatures: function () {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
@@ -594,13 +623,10 @@ var FC = {
     },
     getGpsProtocols: function () {
         return [
-            'NMEA',
             'UBLOX',
-            'I2C-NAV',
-            'DJI NAZA',
             'UBLOX7',
-            'MTK',
-            'MSP'
+            'MSP',
+            'FAKE'
         ];
     },
     getGpsBaudRates: function () {
@@ -619,6 +645,7 @@ var FC = {
             'North American WAAS',
             'Japanese MSAS',
             'Indian GAGAN',
+            'SouthPAN (AU/NZ)',
             'Disabled'
         ];
     },
@@ -767,6 +794,24 @@ var FC = {
 
         return retVal;
     },
+    getAccelerometerCalibrated: function () {
+        var calibrated = true;
+        var flagNames = FC.getArmingFlags();
+
+        if (CALIBRATION_DATA.accGain.X === 4096 && CALIBRATION_DATA.accGain.Y === 4096 && CALIBRATION_DATA.accGain.Z === 4096 && 
+            CALIBRATION_DATA.accZero.X === 0 && CALIBRATION_DATA.accZero.Y === 0 && CALIBRATION_DATA.accZero.Z === 0
+           ) {
+            calibrated = false;
+        }
+
+        if ((calibrated) && flagNames.hasOwnProperty(13)) {
+            if (bit_check(CONFIG.armingFlags, 13)) {
+                calibrated = false;
+            }
+        }
+
+        return calibrated;
+    },
     getUserControlMode: function () {
         return [
             "Attitude",
@@ -865,6 +910,7 @@ var FC = {
             'GVAR 5',               // 35
             'GVAR 6',               // 36
             'GVAR 7',               // 37
+            'Mixer Transition',     // 38
         ];
     },
     getServoMixInputName: function (input) {
@@ -892,19 +938,19 @@ var FC = {
                 output: "boolean"
             },
             1: {
-                name: "Equal",
+                name: "Equal (A = B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
-                name: "Greater Than",
+                name: "Greater Than (A > B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
-                name: "Lower Than",
+                name: "Lower Than (A < B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
@@ -1162,6 +1208,48 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            48: {
+                name: "Delay",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            49: {
+                name: "Timer",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            50: {
+                name: "Delta (|A| >= B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            51: {
+                name: "Approx Equals (A ~ B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },   
+            54: {
+                name: "Mag calibration",
+                operandType: "Set Flight Parameter",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1208,24 +1296,24 @@ var FC = {
                     20: "Is Controlling Position",
                     21: "Is Emergency Landing",
                     22: "Is RTH",
-                    23: "Is WP",
-                    24: "Is Landing",
-                    25: "Is Failsafe",
-                    26: "Stabilized Roll",
-                    27: "Stabilized Pitch",
-                    28: "Stabilized Yaw",
-                    29: "Current Waypoint Index",
-                    30: "Current Waypoint Action",
-                    31: "3D home distance [m]",
-                    32: "CRSF LQ",
-                    33: "CRSF SNR",
-                    34: "GPS Valid Fix",
-                    35: "Loiter Radius [cm]",
-                    36: "Active Profile",
-                    37: "Battery cells",
-                    38: "AGL status [0/1]",
-                    39: "AGL [cm]",
-                    40: "Rangefinder [cm]",
+                    23: "Is Landing",
+                    24: "Is Failsafe",
+                    25: "Stabilized Roll",
+                    26: "Stabilized Pitch",
+                    27: "Stabilized Yaw",
+                    28: "3D home distance [m]",
+                    29: "CRSF LQ",
+                    30: "CRSF SNR",
+                    31: "GPS Valid Fix",
+                    32: "Loiter Radius [cm]",
+                    33: "Active PIDProfile",
+                    34: "Battery cells",
+                    35: "AGL status [0/1]",
+                    36: "AGL [cm]",
+                    37: "Rangefinder [cm]",
+                    38: "Active MixerProfile",
+                    39: "MixerTransition Active",
+                    40: "Yaw [deg]"
                 }
             },
             3: {
@@ -1243,13 +1331,18 @@ var FC = {
                     7: "Horizon",
                     8: "Air",
                     9: "USER 1",
-                    10: "USER 2"
+                    10: "USER 2",
+                    11: "Course Hold",
+                    12: "USER 3",
+                    13: "USER 4",
+                    14: "Acro",
+                    15: "Waypoint Mission",
                 }
             },
             4: {
                 name: "Logic Condition",
                 type: "range",
-                range: [0, 31],
+                range: [0, (LOGIC_CONDITIONS.getMaxLogicConditionCount()-1)],
                 default: 0
             },
             5: {
@@ -1263,7 +1356,28 @@ var FC = {
                 type: "range",
                 range: [0, 3],
                 default: 0
-            }
+            },
+            7: {
+                name: "Waypoints",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "Is WP",
+                    1: "Current Waypoint Index",
+                    2: "Current Waypoint Action",
+                    3: "Next Waypoint Action",
+                    4: "Distance to next Waypoint [m]",
+                    5: "Distance from last Waypoint [m]",
+                    6: "Current WP has User Action 1",
+                    7: "Current WP has User Action 2",
+                    8: "Current WP has User Action 3",
+                    9: "Current WP has User Action 4",
+                    10: "Next WP has User Action 1",
+                    11: "Next WP has User Action 2",
+                    12: "Next WP has User Action 3",
+                    13: "Next WP has User Action 4",
+                }
+            },
         }
     },
     getBatteryProfileParameters: function () {
@@ -1282,7 +1396,6 @@ var FC = {
             'throttle_idle',
             'turtle_mode_power_factor',
             'failsafe_throttle',
-            'fw_min_throttle_down_pitch',
             'nav_mc_hover_thr',
             'nav_fw_cruise_thr',
             'nav_fw_min_thr',
@@ -1339,11 +1452,8 @@ var FC = {
             'max_angle_inclination_pit',
             'dterm_lpf_hz',
             'dterm_lpf_type',
-            'dterm_lpf2_hz',
-            'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
-            'fw_loiter_direction',
             'fw_reference_airspeed',
             'fw_turn_assist_yaw_gain',
             'fw_turn_assist_pitch_gain',

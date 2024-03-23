@@ -32,6 +32,12 @@ const INPUT_STABILIZED_ROLL = 0,
     INPUT_GIMBAL_PITCH = 12,
     INPUT_GIMBAL_ROLL = 13,
     INPUT_FEATURE_FLAPS = 14;
+    STABILIZED_ROLL_POSITIVE = 23;
+    STABILIZED_ROLL_NEGATIVE = 24;
+    STABILIZED_PITCH_POSITIVE = 25;
+    STABILIZED_PITCH_NEGATIVE = 26;
+    STABILIZED_YAW_POSITIVE = 27;
+    STABILIZED_YAW_NEGATIVE = 28;
 
 const
     PLATFORM_MULTIROTOR     = 0,
@@ -344,6 +350,7 @@ const mixerList = [
         enabled: true,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -367,6 +374,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.1),
             new MotorMixRule(1.0, 0.0, 0.0, -0.1)
@@ -393,6 +401,7 @@ const mixerList = [
         enabled: true,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -421,6 +430,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
@@ -450,6 +460,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
@@ -480,6 +491,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         hasFlaps: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.3),
@@ -510,6 +522,7 @@ const mixerList = [
         enabled: true,
         legacy: false,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -536,6 +549,7 @@ const mixerList = [
         legacy: false,
         platform: PLATFORM_AIRPLANE,
         hasFlaps: true,
+        motorStopOnLow: true,
         motorMixer: [
             new MotorMixRule(1.0, 0.0, 0.0, 0.0),
         ],
@@ -562,6 +576,7 @@ const mixerList = [
         enabled: false,
         legacy: true,
         platform: PLATFORM_AIRPLANE,
+        motorStopOnLow: true,
         motorMixer: [],
         servoMixer: []
     }, // 24

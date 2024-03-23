@@ -42,8 +42,9 @@ function generateFilename(prefix, suffix) {
 
     if (CONFIG) {
         if (CONFIG.flightControllerIdentifier) {
-            filename = CONFIG.flightControllerIdentifier + '_' + filename;
+            filename = CONFIG.flightControllerIdentifier + '_' + CONFIG.flightControllerVersion + "_" + filename;
         }
+         
         if (CONFIG.name && CONFIG.name.trim() !== '') {
             filename = filename + '_' + CONFIG.name.trim().replace(' ', '_');
         }
