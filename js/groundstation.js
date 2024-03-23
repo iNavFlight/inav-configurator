@@ -13,12 +13,17 @@ helper.groundstation = (function () {
     privateScope.mapHandler = null;
     privateScope.mapLayer = null;
     privateScope.mapView = null;
-    
+
     privateScope.cursorStyle = null;
     privateScope.cursorPosition = null;
     privateScope.cursorFeature = null;
     privateScope.cursorVector = null;
     privateScope.cursorLayer = null;
+
+    privateScope.textGeometry = null;
+    privateScope.textFeature = null;
+    privateScope.textVector = null;
+    privateScope.textSource = null;
 
     privateScope.mapInitiated = false;
 
@@ -45,7 +50,7 @@ helper.groundstation = (function () {
         privateScope.$gsViewport.show();
         privateScope.mapInitiated = false;
 
-        setTimeout(privateScope.initMap, 200);
+        setTimeout(privateScope.initMap, 100);
 
         privateScope.activated = true;
         GUI.log(chrome.i18n.getMessage('gsActivated'));
@@ -68,7 +73,7 @@ helper.groundstation = (function () {
         } else {
             privateScope.mapLayer = new ol.source.OSM();
         }
-        
+
         //initiate view
         privateScope.mapView = new ol.View({
             center: ol.proj.fromLonLat([0, 0]),
@@ -148,6 +153,7 @@ helper.groundstation = (function () {
                 privateScope.mapHandler.addLayer(privateScope.cursorLayer);
 
                 privateScope.mapView.setZoom(17);
+
                 privateScope.mapInitiated = true;
             }
 
@@ -159,7 +165,6 @@ helper.groundstation = (function () {
             privateScope.cursorPosition.setCoordinates(position);
             //Update orientation of cursor
             privateScope.cursorStyle.getImage().setRotation((telemetry.heading / 360.0) * 6.28318);
-
         }
 
     };
