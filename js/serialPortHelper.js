@@ -11,96 +11,102 @@ helper.serialPortHelper = (function () {
 
     // This is a list of all the rules for the serial ports as well as their names
     privateScope.rules = [
-        { name: 'MSP', groups: ['data', 'msp'], maxPorts: 2 },
-        { name: 'GPS', groups: ['sensors'], maxPorts: 1, defaultBaud: 115200 },
-        { name: 'TELEMETRY_FRSKY', groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1 },
-        { name: 'TELEMETRY_HOTT', groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1 },
-        { name: 'TELEMETRY_SMARTPORT', groups: ['telemetry'], maxPorts: 1 },
-        { name: 'TELEMETRY_LTM', groups: ['telemetry'], sharableWith: ['msp'], notSharableWith: ['blackbox'], maxPorts: 1 },
-        { name: 'RX_SERIAL', groups: ['rx'], maxPorts: 1 },
-        { name: 'BLACKBOX', groups: ['peripherals'], sharableWith: ['msp'], notSharableWith: ['telemetry'], maxPorts: 1 },
+        {
+            name: 'MSP',
+            groups: ['data']
+        },
+        {
+            name: 'GPS',
+            groups: ['sensors'],
+            defaultBaud: 115200
+        },
+        {
+            name: 'TELEMETRY_FRSKY',
+            groups: ['telemetry']
+        },
+        {
+            name: 'TELEMETRY_HOTT',
+            groups: ['telemetry']
+        },
+        {
+            name: 'TELEMETRY_SMARTPORT',
+            groups: ['telemetry']
+        },
+        {
+            name: 'TELEMETRY_LTM',
+            groups: ['telemetry']
+        },
+        {
+            name: 'RX_SERIAL',
+            groups: ['rx']
+        },
+        {
+            name: 'BLACKBOX',
+            groups: ['peripherals']
+        },
         {
             name: 'TELEMETRY_MAVLINK',
             groups: ['telemetry'],
-            sharableWith: ['msp'],
-            notSharableWith: ['blackbox'],
-            maxPorts: 1
         },
         {
             name: 'TELEMETRY_IBUS',
             groups: ['telemetry'],
-            sharableWith: ['msp'],
-            notSharableWith: ['blackbox'],
-            maxPorts: 1
         },
         {
             name: 'RANGEFINDER',
             groups: ['sensors'],
-            maxPorts: 1
         },
         {
             name: 'GSM_SMS',
             groups: ['telemetry'],
-            maxPorts: 1
         },
         {
             name: 'RUNCAM_DEVICE_CONTROL',
             groups: ['peripherals'],
-            maxPorts: 1
         },
         {
             name: 'TBS_SMARTAUDIO',
             groups: ['peripherals'],
-            maxPorts: 1
         },
         {
             name: 'IRC_TRAMP',
             groups: ['peripherals'],
-            maxPorts: 1
         },
         {
             name: 'VTX_FFPV',
             groups: ['peripherals'],
-            maxPorts: 1
         },
         {
             name: 'ESC',
             groups: ['peripherals'],
-            maxPorts: 1,
             defaultBaud: 115200
         },
         {
             name: 'OPFLOW',
             groups: ['sensors'],
-            maxPorts: 1
         },
         {
             name: 'FRSKY_OSD',
             groups: ['peripherals'],
-            maxPorts: 1,
             defaultBaud: 250000
         },
         {
             name: 'DJI_FPV',
             groups: ['peripherals'],
-            maxPorts: 1,
             defaultBaud: 115200
         },
         {
             name: 'MSP_DISPLAYPORT',
             groups: ['peripherals'],
-            maxPorts: 1
         },
         {
             name: 'SMARTPORT_MASTER',
             groups: ['peripherals'],
-            maxPorts: 1,
             defaultBaud: 57600
         },
         {
             name: 'SBUS_OUTPUT',
             groups: ['peripherals'],
-            maxPorts: 1,
             defaultBaud: 115200
         }
     ];
