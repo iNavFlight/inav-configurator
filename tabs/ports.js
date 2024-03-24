@@ -133,6 +133,10 @@ TABS.ports.initialize = function (callback) {
         if ($cT.is('input[type="checkbox"]') && !$cT.is(':checked')) {
             return;
         }
+        //if type select then process only if selected
+        if ($cT.is('select') && !functionName) {
+            return;
+        }
 
         if (rule && rule.isUnique) {
             let $selects = $cT.closest('tr').find('.function-select');
