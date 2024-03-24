@@ -206,15 +206,10 @@ function updateDefaultBaud(baudSelect, column) {
     let portName = section.find('.function-' + column).val();
     let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
 
-    let rules = helper.serialPortHelper.getRules();
+    let rule = helper.serialPortHelper.getRuleByName(portName);
 
-    for (i = 0; i < rules.length; i++) {
-        if (rules[i].name === portName) {
-            if (typeof rules[i].defaultBaud !== 'undefined') {
-                baudRate = rules[i].defaultBaud;
-            }
-            break;
-        }
+    if (rule && typeof rule.defaultBaud !== 'undefined') {
+        baudRate = rule.defaultBaud;
     }
 
     section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);

@@ -18,7 +18,8 @@ helper.serialPortHelper = (function () {
         {
             name: 'GPS',
             groups: ['sensors'],
-            defaultBaud: 115200
+            defaultBaud: 115200,
+            isUnique: true
         },
         {
             name: 'TELEMETRY_FRSKY',
@@ -38,7 +39,8 @@ helper.serialPortHelper = (function () {
         },
         {
             name: 'RX_SERIAL',
-            groups: ['rx']
+            groups: ['rx'],
+            isUnique: true
         },
         {
             name: 'BLACKBOX',
@@ -55,6 +57,7 @@ helper.serialPortHelper = (function () {
         {
             name: 'RANGEFINDER',
             groups: ['sensors'],
+            isUnique: true
         },
         {
             name: 'GSM_SMS',
@@ -67,37 +70,45 @@ helper.serialPortHelper = (function () {
         {
             name: 'TBS_SMARTAUDIO',
             groups: ['peripherals'],
+            isUnique: true
         },
         {
             name: 'IRC_TRAMP',
             groups: ['peripherals'],
+            isUnique: true
         },
         {
             name: 'VTX_FFPV',
             groups: ['peripherals'],
+            isUnique: true
         },
         {
             name: 'ESC',
             groups: ['peripherals'],
-            defaultBaud: 115200
+            defaultBaud: 115200,
+            isUnique: true
         },
         {
             name: 'OPFLOW',
             groups: ['sensors'],
+            isUnique: true
         },
         {
             name: 'FRSKY_OSD',
             groups: ['peripherals'],
-            defaultBaud: 250000
+            defaultBaud: 250000,
+            isUnique: true
         },
         {
             name: 'DJI_FPV',
             groups: ['peripherals'],
-            defaultBaud: 115200
+            defaultBaud: 115200,
+            isUnique: true
         },
         {
             name: 'MSP_DISPLAYPORT',
             groups: ['peripherals'],
+            isUnique: true
         },
         {
             name: 'SMARTPORT_MASTER',
