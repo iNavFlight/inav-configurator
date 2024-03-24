@@ -133,6 +133,20 @@ helper.serialPortHelper = (function () {
         'MSP_DISPLAYPORT': 25,
     };
 
+    privateScope.identifierToName = {
+        0: 'UART1',
+        1: 'UART2',
+        2: 'UART3',
+        3: 'UART4',
+        4: 'UART5',
+        5: 'UART6',
+        6: 'UART7',
+        7: 'UART8',
+        20: 'USB VCP',
+        30: 'SOFTSERIAL1',
+        31: 'SOFTSERIAL2'
+     };
+
     privateScope.generateNames = function () {
         if (privateScope.namesGenerated) {
             return;
@@ -185,6 +199,10 @@ helper.serialPortHelper = (function () {
             }
         }
         return functions;
+    };
+
+    publicScope.getPortName = function (identifier) {
+        return privateScope.identifierToName[identifier];
     };
 
     return publicScope;

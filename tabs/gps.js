@@ -33,12 +33,11 @@ TABS.gps.initialize = function (callback) {
         19: 'adsb_12.png', // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
 
-
-
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
         mspHelper.loadFeatures,
+        mspHelper.loadSerialPorts,
         mspHelper.loadMiscV2
     ];
 
@@ -50,6 +49,7 @@ TABS.gps.initialize = function (callback) {
 
     var saveChain = [
         mspHelper.saveMiscV2,
+        mspHelper.saveSerialPorts,
         saveSettings,
         mspHelper.saveToEeprom
     ];

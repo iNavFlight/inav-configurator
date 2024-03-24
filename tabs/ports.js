@@ -57,20 +57,6 @@ TABS.ports.initialize = function (callback) {
 
         $(".tab-ports").addClass("supported");
 
-        var portIdentifierToNameMapping = {
-           0: 'UART1',
-           1: 'UART2',
-           2: 'UART3',
-           3: 'UART4',
-           4: 'UART5',
-           5: 'UART6',
-           6: 'UART7',
-           7: 'UART8',
-           20: 'USB VCP',
-           30: 'SOFTSERIAL1',
-           31: 'SOFTSERIAL2'
-        };
-
         var i,
             $elements;
 
@@ -111,7 +97,7 @@ TABS.ports.initialize = function (callback) {
                 port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
                 port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
-                port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+                port_configuration_e.find('.identifier').text(helper.serialPortHelper.getPortName(serialPort.identifier));
                 if (serialPort.identifier >= 30) {
                     port_configuration_e.find('.softSerialWarning').css("display", "inline")
                 } else {
