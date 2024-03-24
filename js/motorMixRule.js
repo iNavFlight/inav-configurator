@@ -1,5 +1,6 @@
-/*global $,constrain*/
 'use strict';
+
+const { constrain } = require('./helpers')
 
 var MotorMixRule = function (throttle, roll, pitch, yaw) {
 

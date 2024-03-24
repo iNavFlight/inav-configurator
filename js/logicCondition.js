@@ -1,5 +1,7 @@
-/*global $,FC*/
 'use strict';
+
+const FC = require('./fc');
+const { GUI } = require('./../js/gui');
 
 let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
@@ -316,3 +318,5 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
     return self;
 };
+
+module.exports = LogicCondition;

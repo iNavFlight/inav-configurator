@@ -1,5 +1,12 @@
 'use strict';
 
+const mapSeries = require('promise-map-series')
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const { globalSettings, UnitType } = require('./globalSettings');
+
 function padZeros(val, length) {
     let str = val.toString();
 
@@ -638,3 +645,5 @@ var Settings = (function () {
 
     return self;
 })();
+
+module.exports = Settings;

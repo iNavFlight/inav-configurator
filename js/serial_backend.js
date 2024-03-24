@@ -23,6 +23,8 @@ const defaultsDialog = require('./defaults_dialog');
 const { SITLProcess } = require('./sitl');
 const update = require('./globalUpdates.js');
 const BitHelper = require('./bitHelper.js');
+const BOARD = require('./boards.js')
+const jBox = require('./libraries/jBox/jBox.min.js')
 
 var SerialBackend = (function () {
 
@@ -147,7 +149,7 @@ var SerialBackend = (function () {
         GUI.updateManualPortVisibility();
 
         publicScope.$portOverride.on('change', function () {
-            store.set('portOverride', privateScope.$portOverride.val());
+            store.set('portOverride', publicScope.$portOverride.val());
         });
 
         publicScope.$portOverride.val(store.get('portOverride', ''));
@@ -480,7 +482,7 @@ var SerialBackend = (function () {
         $('#dataflash_wrapper_global').hide();
         $('#quad-status_wrapper').hide();
 
-        updateFirmwareVersion();
+        //updateFirmwareVersion();
     }
 
     publicScope.read_serial = function (info) {

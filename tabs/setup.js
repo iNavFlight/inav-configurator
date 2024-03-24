@@ -47,7 +47,7 @@ TABS.setup.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         if (!FC.isMotorOutputEnabled()) {
             GUI.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("logPwmOutputDisabled") + "</strong></span>");

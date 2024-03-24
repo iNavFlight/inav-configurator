@@ -1,6 +1,16 @@
 /*global chrome */
 'use strict';
 
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const i18n = require('./../js/localization');
+
 TABS.calibration = {};
 
 TABS.calibration.model = (function () {
@@ -16,7 +26,7 @@ TABS.calibration.model = (function () {
         } else {
             var count = 0;
             for (var i = 0; i < 6; i++) {
-                if (CALIBRATION_DATA.acc['Pos' + i] === 1) {
+                if (FC.CALIBRATION_DATA.acc['Pos' + i] === 1) {
                     count++;
                 }
             }
@@ -81,14 +91,14 @@ TABS.calibration.initialize = function (callback) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "tabs/calibration.html"), processHtml);
+        GUI.load(path.join(__dirname, "calibration.html"), processHtml);
     }
 
     function updateCalibrationSteps() {
         for (var i = 0; i < 6; i++) {
             var $element = $('[data-step="' + (i + 1) + '"]');
 
-            if (CALIBRATION_DATA.acc['Pos' + i] === 0) {
+            if (FC.CALIBRATION_DATA.acc['Pos' + i] === 0) {
                 $element.removeClass('finished').removeClass('active');
             } else {
                 $element.addClass("finished").removeClass('active');
@@ -99,12 +109,12 @@ TABS.calibration.initialize = function (callback) {
     function updateSensorData() {
         var pos = ['X', 'Y', 'Z'];
         pos.forEach(function (item) {
-            $('[name=accGain' + item + ']').val(CALIBRATION_DATA.accGain[item]);
-            $('[name=accZero' + item + ']').val(CALIBRATION_DATA.accZero[item]);
-            $('[name=Mag' + item + ']').val(CALIBRATION_DATA.magZero[item]);
-            $('[name=MagGain' + item + ']').val(CALIBRATION_DATA.magGain[item]);
+            $('[name=accGain' + item + ']').val(FC.CALIBRATION_DATA.accGain[item]);
+            $('[name=accZero' + item + ']').val(FC.CALIBRATION_DATA.accZero[item]);
+            $('[name=Mag' + item + ']').val(FC.CALIBRATION_DATA.magZero[item]);
+            $('[name=MagGain' + item + ']').val(FC.CALIBRATION_DATA.magGain[item]);
         });
-        $('[name=OpflowScale]').val(CALIBRATION_DATA.opflow.Scale);
+        $('[name=OpflowScale]').val(FC.CALIBRATION_DATA.opflow.Scale);
         updateCalibrationSteps();
     }
 
@@ -128,8 +138,8 @@ TABS.calibration.initialize = function (callback) {
 
         if (TABS.calibration.model.getStep() === null) {
             for (var i = 0; i < 6; i++) {
-                if (CALIBRATION_DATA.acc['Pos' + i] === 1) {
-                    CALIBRATION_DATA.acc['Pos' + i] = 0;
+                if (FC.CALIBRATION_DATA.acc['Pos' + i] === 1) {
+                    FC.CALIBRATION_DATA.acc['Pos' + i] = 0;
                 }
             }
             updateCalibrationSteps();
@@ -203,8 +213,8 @@ TABS.calibration.initialize = function (callback) {
     function resetAccCalibration() {
         var pos = ['X', 'Y', 'Z'];
         pos.forEach(function (item) {
-            CALIBRATION_DATA.accGain[item] = 4096;
-            CALIBRATION_DATA.accZero[item] = 0;
+            FC.CALIBRATION_DATA.accGain[item] = 4096;
+            FC.CALIBRATION_DATA.accZero[item] = 0;
         });
 
         saveChainer.execute();
@@ -212,16 +222,16 @@ TABS.calibration.initialize = function (callback) {
 
     function processHtml() {
         $('#calibrateButtonSave').on('click', function () {
-            CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
+            FC.CALIBRATION_DATA.opflow.Scale = parseFloat($('[name=OpflowScale]').val());
             saveChainer.execute();
         });
 
-        if (SENSOR_CONFIG.magnetometer === 0) {
+        if (FC.SENSOR_CONFIG.magnetometer === 0) {
             //Comment for test
             $('#mag_btn, #mag-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }
 
-        if (SENSOR_CONFIG.opflow === 0) {
+        if (FC.SENSOR_CONFIG.opflow === 0) {
             //Comment for test
             $('#opflow_btn, #opflow-calibrated-data').css('pointer-events', 'none').css('opacity', '0.4');
         }

@@ -2,7 +2,6 @@
 
 const CONFIGURATOR = require('./data_storage');
 const Switchery = require('./libraries/switchery/switchery')
-const jBox = require('./libraries/jbox/jBox.min.js')
 const MSP = require('./msp');
 const FC = require('./fc');
 const interval = require('./intervals');

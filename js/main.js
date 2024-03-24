@@ -11,7 +11,6 @@ const usbBootloaderIds =  [
   { vendorId: 11836, productId: 57105}
 ];
 
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -22,7 +21,7 @@ let bluetoothDeviceChooser = null;
 let btDeviceList = null;
 let selectBluetoothCallback = null;
 
-// In Eletrcon the bluetooth device chooser didn't exist, so we have to buid our own
+// In Eletrcon the bluetooth device chooser didn't exist, so we have to build our own
 function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
     parent: mainWindow,

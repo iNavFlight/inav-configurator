@@ -218,19 +218,19 @@ $(function() {
                             TABS.modes.initialize(content_ready);
                             break;
                         case 'gps':
-                            require('./../tabs');
+                            require('./../tabs/gps.js');
                             TABS.gps.initialize(content_ready);
                             break;
                         case 'magnetometer':
-                            require('./../tabs');
+                            require('./../tabs/magnetometer.js');
                             TABS.magnetometer.initialize(content_ready);
                             break;
                         case 'mission_control':
-                            require('./../tabs');
+                            require('./../tabs/mission_control.js');
                             TABS.mission_control.initialize(content_ready);
                             break;
                         case 'mixer':
-                            require('./../tabs');
+                            require('./../tabs/mixer.js');
                             TABS.mixer.initialize(content_ready);
                             break;
                         case 'outputs':

@@ -1,5 +1,18 @@
-/*global $,helper,mspHelper,MSP,GUI,SERVO_RULES,MOTOR_RULES,MIXER_CONFIG,LOGIC_CONDITIONS,TABS,ServoMixRule*/
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const i18n = require('./../js/localization');
+const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model');
+const Settings = require('./../js/settings');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const jBox = require('../js/libraries/jBox/jBox.min.js')
 
 TABS.mixer = {};
 
@@ -64,11 +77,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "tabs/mixer.html"), Settings.processHtml(processHtml));
+        GUI.load(path.join(__dirname, "mixer.html"), Settings.processHtml(processHtml));
     }
 
     function renderOutputTable() {
-        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+        let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
             $outputRow = $('#output-row'),
             $functionRow = $('#function-row');
 
@@ -77,8 +90,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         
         for (let i = 1; i <= outputCount; i++) {
 
-            let timerId = OUTPUT_MAPPING.getTimerId(i - 1);
-            let color = OUTPUT_MAPPING.getOutputTimerColor(i - 1);
+            let timerId = FC.OUTPUT_MAPPING.getTimerId(i - 1);
+            let color = FC.OUTPUT_MAPPING.getOutputTimerColor(i - 1);
 
             $outputRow.append('<td style="background-color: ' + color + '">S' + i + ' (Timer ' + (timerId + 1) + ')</td>');
             $functionRow.append('<td id="function-' + i +'">-</td>');
@@ -89,7 +102,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function updateTimerOverride() {
-        let timers = OUTPUT_MAPPING.getUsedTimerIds();
+        let timers = FC.OUTPUT_MAPPING.getUsedTimerIds();
 
         for(let i =0; i < timers.length;++i) {
             let timerId = timers[i];
@@ -97,25 +110,25 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             if(!$select) {
                 continue;
             }
-            OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
+            FC.OUTPUT_MAPPING.setTimerOverride(timerId, $select.val());
         }
     }
 
     function renderTimerOverride() {
-        let outputCount = OUTPUT_MAPPING.getOutputCount(),
+        let outputCount = FC.OUTPUT_MAPPING.getOutputCount(),
             $container = $('#timerOutputsList'), timers = {};
 
 
-        let usedTimers = OUTPUT_MAPPING.getUsedTimerIds();
+        let usedTimers = FC.OUTPUT_MAPPING.getUsedTimerIds();
 
         for (let t of usedTimers) {
-            var usageMode = OUTPUT_MAPPING.getTimerOverride(t);
+            var usageMode = FC.OUTPUT_MAPPING.getTimerOverride(t);
             $container.append(
-                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + OUTPUT_MAPPING.getTimerColor(t) + '">' +
+                        '<div class="select" style="padding: 5px; margin: 1px; background-color: ' + FC.OUTPUT_MAPPING.getTimerColor(t) + '">' +
                             '<select id="timer-output-' + t + '">' +
-                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
-                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
-                                '<option value=' + OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_AUTO ? ' selected' : '')+ '>AUTO</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_MOTORS ? ' selected' : '')+ '>MOTORS</option>'+
+                                '<option value=' + FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS + '' + (usageMode == FC.OUTPUT_MAPPING.TIMER_OUTPUT_MODE_SERVOS ? ' selected' : '')+ '>SERVOS</option>'+
                             '</select>' +
                             '<label for="timer-output-' + t + '">' +
                                 '<span> Timer ' + (parseInt(t) + 1) + '</span>' +
@@ -127,13 +140,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function renderOutputMapping() {
-        let outputMap = OUTPUT_MAPPING.getOutputTable(
-            MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
-            MOTOR_RULES.getNumberOfConfiguredMotors(),
-            SERVO_RULES.getUsedServoIndexes()
+        let outputMap = FC.OUTPUT_MAPPING.getOutputTable(
+            FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER,
+            FC.MOTOR_RULES.getNumberOfConfiguredMotors(),
+            FC.SERVO_RULES.getUsedServoIndexes()
         );
 
-        for (let i = 1; i <= OUTPUT_MAPPING.getOutputCount(); i++) {
+        for (let i = 1; i <= FC.OUTPUT_MAPPING.getOutputCount(); i++) {
             $('#function-' + i).html(outputMap[i - 1]);
         }
 
@@ -150,18 +163,18 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $(this).css("color", "");
         });
 
-        if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
+        if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
             if (outputMap != null && currentMixerPreset.hasOwnProperty('imageOutputsNumbers')) {
                 let outputPad = 1;
                 let outputArea = null;
                 let inputBoxes = null;
                 let surfaces = {
-                    aileronSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_ROLL),
-                    elevatorSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_PITCH),
-                    rudderSet: helper.mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_YAW),
+                    aileronSet: mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_ROLL),
+                    elevatorSet: mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_PITCH),
+                    rudderSet: mixer.countSurfaceType(currentMixerPreset, INPUT.STABILIZED_YAW),
                 };
                 let motors = [];
-                let servoRules = SERVO_RULES;
+                let servoRules = FC.SERVO_RULES;
 
                 for (let omIndex of outputMap) {
                     if (omIndex != '-') {
@@ -319,7 +332,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         /*
          * Process servo mix table UI
          */
-        let rules = SERVO_RULES.get();
+        let rules = FC.SERVO_RULES.get();
         $servoMixTableBody.find("*").remove();
         for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
@@ -341,7 +354,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 GUI.renderLogicConditionSelect(
                     $row.find('.mixer-table__condition'), 
-                    LOGIC_CONDITIONS, 
+                    FC.LOGIC_CONDITIONS, 
                     servoRule.getConditionId(), 
                     function () {
                         servoRule.setConditionId($(this).val());
@@ -352,7 +365,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 GUI.fillSelect($row.find(".mix-rule-input"), FC.getServoMixInputNames(), servoRule.getInput());
 
-                if (!MIXER_CONFIG.hasFlaps) {
+                if (!FC.MIXER_CONFIG.hasFlaps) {
                     $row.find(".mix-rule-input").children('option[value="14"]').remove();
                 }
 
@@ -404,7 +417,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         // Show the Fixed Value column if at least one servo has the "MAX" input assigned
         const $fixedValueCol = $("#servo-mix-table").find(".mixer-fixed-value-col");
-        const rules = SERVO_RULES.get();
+        const rules = FC.SERVO_RULES.get();
         for (let servoRuleIndex in rules) {
             if (rules.hasOwnProperty(servoRuleIndex)) {
                 if (FC.getServoMixInputNames()[rules[servoRuleIndex].getInput()] === 'MAX') {
@@ -427,7 +440,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         var rules;
 
         if (currentMixerPreset.id == loadedMixerPresetID) {
-            rules = MOTOR_RULES.get();
+            rules = FC.MOTOR_RULES.get();
         } else {
             rules = currentMixerPreset.motorMixer;
         }
@@ -463,7 +476,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         /*
          * Process motor mix table UI
          */
-        var rules = MOTOR_RULES.get();
+        var rules = FC.MOTOR_RULES.get();
         $motorMixTableBody.find("*").remove();
         let index = 0;
         for (const i in rules) {
@@ -529,10 +542,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         /*
          * Send mixer rules
          */
-        SERVO_RULES.cleanup();
-        SERVO_RULES.inflate();
-        MOTOR_RULES.cleanup();
-        MOTOR_RULES.inflate();
+        FC.SERVO_RULES.cleanup();
+        FC.SERVO_RULES.inflate();
+        FC.MOTOR_RULES.cleanup();
+        FC.MOTOR_RULES.inflate();
 
         updateTimerOverride();
 
@@ -547,7 +560,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         $motorMixTableBody = $motorMixTable.find('tbody');
 
         function fillMixerPreset() {
-            let mixers = helper.mixer.getByPlatform(MIXER_CONFIG.platformType);
+            let mixers = mixer.getByPlatform(FC.MIXER_CONFIG.platformType);
 
             $mixerPreset.find("*").remove();
             for (let i in mixers) {
@@ -559,7 +572,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         }
 
         let $platformSelect = $('#platform-type'),
-            platforms = helper.platform.getList(),
+            platforms = platform.getList(),
             $mixerPreset = $('#mixer-preset'),
             $wizardButton = $("#mixer-wizard");
 
@@ -600,7 +613,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 return;
             }
 
-            MOTOR_RULES.flush();
+            FC.MOTOR_RULES.flush();
 
             for (let i = 0; i < 4; i++) {
                 const $selects = $(".wizard-motor-select");
@@ -614,7 +627,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
                 const r = currentMixerPreset.motorMixer[rule];
 
-                MOTOR_RULES.put(
+                FC.MOTOR_RULES.put(
                     new MotorMixRule(
                         r.getThrottle(),
                         r.getRoll(),
@@ -633,13 +646,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         const updateMotorDirection = function () {
             let motorDirectionCheckbox = $("#motor_direction_inverted");
-            const isReversed = motorDirectionCheckbox.is(":checked") && (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
+            const isReversed = motorDirectionCheckbox.is(":checked") && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
             const path = './resources/motor_order/'
                 + currentMixerPreset.image + (isReversed ? "_reverse" : "") + '.svg';
             $('.mixerPreview img').attr('src', path);
 
-            if (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
+            if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
                 if (isReversed) {
                     motorDirectionCheckbox.parent().find("label span").html(i18n.getMessage("motor_direction_isInverted"));
                 } else {
@@ -662,8 +675,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         }
 
         $platformSelect.on('change', function () {
-            MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
-            currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
+            FC.MIXER_CONFIG.platformType = parseInt($platformSelect.val(), 10);
+            currentPlatform = platform.getById(FC.MIXER_CONFIG.platformType);
 
             var $platformSelectParent = $platformSelect.parent('.select');
 
@@ -671,14 +684,14 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             $mixerPreset.trigger('change');
         });
 
-        currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
-        $platformSelect.val(MIXER_CONFIG.platformType).trigger('change');
+        currentPlatform = platform.getById(FC.MIXER_CONFIG.platformType);
+        $platformSelect.val(FC.MIXER_CONFIG.platformType).trigger('change');
 
         $mixerPreset.on('change', function () {
             const presetId = parseInt($mixerPreset.val(), 10);
-            currentMixerPreset = helper.mixer.getById(presetId);
+            currentMixerPreset = mixer.getById(presetId);
 
-            MIXER_CONFIG.appliedMixerPreset = presetId;
+            FC.MIXER_CONFIG.appliedMixerPreset = presetId;
 
             if (currentMixerPreset.id == 3) {
                 $wizardButton.parent().removeClass("is-hidden");
@@ -686,13 +699,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $wizardButton.parent().addClass("is-hidden");
             }
 
-            if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
+            if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE && currentMixerPreset.id != loadedMixerPresetID) {
                 $("#needToUpdateMixerMessage").removeClass("is-hidden");
             } else {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
 
-            if (MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
+            if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
                 $('#motor_direction_inverted').parent().removeClass("is-hidden");
                 $('#platform-type').parent('.select').removeClass('no-bottom-border');
             } else {
@@ -701,7 +714,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             }
 
             if (!GUI.updateEzTuneTabVisibility(false)) {
-                EZ_TUNE.enabled = 0;
+                FC.EZ_TUNE.enabled = 0;
                 mspHelper.saveEzTune();
             }
 
@@ -710,10 +723,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
             updateMotorDirection();
         });
 
-        if (MIXER_CONFIG.appliedMixerPreset > -1) {
-            loadedMixerPresetID = MIXER_CONFIG.appliedMixerPreset;
+        if (FC.MIXER_CONFIG.appliedMixerPreset > -1) {
+            loadedMixerPresetID = FC.MIXER_CONFIG.appliedMixerPreset;
             $("#needToUpdateMixerMessage").addClass("is-hidden");
-            $mixerPreset.val(MIXER_CONFIG.appliedMixerPreset).trigger('change');
+            $mixerPreset.val(FC.MIXER_CONFIG.appliedMixerPreset).trigger('change');
         } else {
             $mixerPreset.trigger('change');
         }
@@ -730,9 +743,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $('#execute-button').on('click', function () {
             loadedMixerPresetID = currentMixerPreset.id;
-            helper.mixer.loadServoRules(currentMixerPreset);
-            helper.mixer.loadMotorRules(currentMixerPreset);
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            mixer.loadServoRules(currentMixerPreset);
+            mixer.loadMotorRules(currentMixerPreset);
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
@@ -741,13 +754,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#load-mixer-button').on('click', function () {
-            if (MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
+            if (FC.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
             loadedMixerPresetID = currentMixerPreset.id;
-            helper.mixer.loadServoRules(currentMixerPreset);
-            helper.mixer.loadMotorRules(currentMixerPreset);
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            mixer.loadServoRules(currentMixerPreset);
+            mixer.loadMotorRules(currentMixerPreset);
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
             renderOutputMapping();
@@ -755,10 +768,10 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $('#refresh-mixer-button').on('click', function () {
-            currentMixerPreset = helper.mixer.getById(loadedMixerPresetID);
-            MIXER_CONFIG.platformType = currentMixerPreset.platform;
-            currentPlatform = helper.platform.getById(MIXER_CONFIG.platformType);
-            $platformSelect.val(MIXER_CONFIG.platformType).trigger('change');
+            currentMixerPreset = mixer.getById(loadedMixerPresetID);
+            FC.MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            currentPlatform = platform.getById(FC.MIXER_CONFIG.platformType);
+            $platformSelect.val(FC.MIXER_CONFIG.platformType).trigger('change');
             $mixerPreset.val(loadedMixerPresetID).trigger('change');
             renderServoMixRules();
             renderMotorMixRules();
@@ -766,13 +779,13 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $servoMixTableBody.on('click', "[data-role='role-servo-delete']", function (event) {
-            SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
+            FC.SERVO_RULES.drop($(event.currentTarget).attr("data-index"));
             renderServoMixRules();
             renderOutputMapping();
         });
 
         $motorMixTableBody.on('click', "[data-role='role-motor-delete']", function (event) {
-            MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
+            FC.MOTOR_RULES.drop($(event.currentTarget).attr("data-index"));
             renderMotorMixRules();
             renderOutputMapping();
         });
@@ -782,23 +795,23 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         });
 
         $("[data-role='role-servo-add']").on('click', function () {
-            if (SERVO_RULES.hasFreeSlots()) {
-                SERVO_RULES.put(new ServoMixRule(SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
+            if (FC.SERVO_RULES.hasFreeSlots()) {
+                FC.SERVO_RULES.put(new ServoMixRule(FC.SERVO_RULES.getNextUnusedIndex(), 0, 100, 0));
                 renderServoMixRules();
                 renderOutputMapping();
             }
         });
 
         $("[data-role='role-motor-add']").on('click', function () {
-            if (MOTOR_RULES.hasFreeSlots()) {
-                MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
+            if (FC.MOTOR_RULES.hasFreeSlots()) {
+                FC.MOTOR_RULES.put(new MotorMixRule(1, 0, 0, 0));
                 renderMotorMixRules();
                 renderOutputMapping();
             }
         });
 
         $("[data-role='role-logic-conditions-open']").on('click', function () {
-            LOGIC_CONDITIONS.open();
+            FC.LOGIC_CONDITIONS.open();
         });
 
         $('#save-button').on('click', saveAndReboot);
@@ -810,11 +823,11 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         renderOutputMapping();
         renderTimerOverride();
 
-        LOGIC_CONDITIONS.init($('#logic-wrapper'));
+        FC.LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
        i18n.localize();;
 
-        helper.mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
+        mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
 
         GUI.content_ready(callback);
     }
@@ -835,7 +848,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     }
 
     function onStatusPullDone() {
-        LOGIC_CONDITIONS.update(LOGIC_CONDITIONS_STATUS);
+        FC.LOGIC_CONDITIONS.update(FC.LOGIC_CONDITIONS_STATUS);
     }
 
 };

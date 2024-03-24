@@ -18,14 +18,6 @@ everything, the hardware is not working, or you have any other _support_ problem
 * [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [INAV Official on Telegram](https://t.me/INAVFlight)
 
-## INAV Configurator starts minimized, what should I do?
-
-You have to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
-
-[https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
-
-Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script that will do the cleaning. (thank you, James Cherrill)
-
 ## Installation
 
 Depending on the target operating system, _INAV Configurator_ is distributed as a  _standalone_ application or Chrome App.
@@ -78,17 +70,6 @@ sudo mv inav-configurator.desktop /usr/share/applications/
    * (5.0.0+) chrome_crashpad_handler `chmod +x /opt/inav/inav-configurator/chrome_crashpad_handler`
 11. Run the INAV Configurator app from the unpacked folder `/opt/inav/inav-configurator/inav-configurator`
 
-#### Notes
-
-On some Linux distros, you may be missing `libatomic` and/or `NW.JS` (especially `libnode.so`) dependencies. If so, please install `libatomic` using your distro's package manager, e.g:
-
-* Arch Linux: `sudo pacman -S --needed libatomic_ops`
-* Debian / Ubuntu: `sudo apt install libatomic1`
-* Fedora: `sudo dnf install libatomic`
-
-1. Don't forget to add your user to the dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
-2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
-
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
@@ -121,7 +102,7 @@ To be able to open Inspector, set envorinment variable `NODE_ENV` to `develpomen
 
 ``` NODE_ENV=development npm start ```
 
-Or use vscode and start a debug session `Electron Main` (Just hit F5!)
+Or use vscode and start a debug session `Debug Configurator` (Just hit F5!)
 
 ## Different map providers
 

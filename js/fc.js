@@ -10,6 +10,7 @@ const ProgrammingPidStatus = require('./programmingPidStatus');
 const WaypointCollection = require('./waypointCollection');
 const OutputMappingCollection = require('./outputMapping');
 const SafehomeCollection = require('./safehomeCollection');
+const { PLATFORM } = require('./model.js')
 const VTX = require('./vtx');
 const BitHelper = require('./bitHelper');
 
@@ -813,14 +814,14 @@ var FC = {
         var calibrated = true;
         var flagNames = FC.getArmingFlags();
 
-        if (CALIBRATION_DATA.accGain.X === 4096 && CALIBRATION_DATA.accGain.Y === 4096 && CALIBRATION_DATA.accGain.Z === 4096 && 
-            CALIBRATION_DATA.accZero.X === 0 && CALIBRATION_DATA.accZero.Y === 0 && CALIBRATION_DATA.accZero.Z === 0
+        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 && 
+            this.CALIBRATION_DATA.accZero.X === 0 && this.CALIBRATION_DATA.accZero.Y === 0 && this.CALIBRATION_DATA.accZero.Z === 0
            ) {
             calibrated = false;
         }
 
         if ((calibrated) && flagNames.hasOwnProperty(13)) {
-            if (BitHelper.bit_check(CONFIG.armingFlags, 13)) {
+            if (BitHelper.bit_check(this.CONFIG.armingFlags, 13)) {
                 calibrated = false;
             }
         }

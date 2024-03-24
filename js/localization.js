@@ -1,6 +1,6 @@
 'use strict';
 
-// From Betaflight
+// Thanks to Betaflight :)
 
 window.$ = window.jQuery =  require('jquery');
 const { app } = require('@electron/remote');
@@ -47,7 +47,7 @@ i18n.init = function (callback) {
 }
 
 i18n.parseInputFile = function (data) {
-        // Remove the $n interpolate of Chrome $1, $2, ... -> {{1}}, {{2}}, ...
+    // Remove the $n interpolate of Chrome $1, $2, ... -> {{1}}, {{2}}, ...
     const REGEXP_CHROME = /\$([1-9])/g;
     const dataChrome = data.replace(REGEXP_CHROME, '{{$1}}');
 

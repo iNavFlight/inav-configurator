@@ -9,6 +9,10 @@ const MSP = require('./../msp');
 const MSPCodes = require('./MSPCodes');
 const FC = require('./../fc');
 const mspQueue = require('./../serial_queue');
+const ServoMixRule = require('./../servoMixRule');
+const MotorMixRule = require('./../motorMixRule');
+const LogicCondition = require('./../logicCondition');
+const BitHelper = require('../bitHelper');
 
 var mspHelper = (function () {
     var self = {};
@@ -178,7 +182,7 @@ var mspHelper = (function () {
             case MSPCodes.MSP_RC:
                 FC.RC.active_channels = dataHandler.message_length_expected / 2;
 
-                for (let i = 0; i < RC.active_channels; i++) {
+                for (let i = 0; i < FC.RC.active_channels; i++) {
                     FC.RC.channels[i] = data.getUint16((i * 2), true);
                 }
                 break;
@@ -1698,29 +1702,29 @@ var mspHelper = (function () {
         switch (code) {
 
             case MSPCodes.MSP_SET_FEATURE:
-                buffer.push(specificByte(FC.FEATURESS, 0));
-                buffer.push(specificByte(FC.FEATURESS, 1));
-                buffer.push(specificByte(FC.FEATURESS, 2));
-                buffer.push(specificByte(FC.FEATURESS, 3));
+                buffer.push(BitHelper.specificByte(FC.FEATURESS, 0));
+                buffer.push(BitHelper.specificByte(FC.FEATURESS, 1));
+                buffer.push(BitHelper.specificByte(FC.FEATURESS, 2));
+                buffer.push(BitHelper.specificByte(FC.FEATURESS, 3));
                 break;
 
             case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.roll, 0));
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.roll, 1));
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.pitch, 0));
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.pitch, 1));
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.yaw, 0));
-                buffer.push(specificByte(FC.BOARD_ALIGNMENT.yaw, 1));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.roll, 0));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.roll, 1));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.pitch, 0));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.pitch, 1));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.yaw, 0));
+                buffer.push(BitHelper.specificByte(FC.BOARD_ALIGNMENT.yaw, 1));
                 break;
 
             case MSPCodes.MSP_SET_CURRENT_METER_CONFIG:
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.scale, 0));
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.scale, 1));
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.offset, 0));
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.offset, 1));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.scale, 0));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.scale, 1));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.offset, 0));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.offset, 1));
                 buffer.push(FC.CURRENT_METER_CONFIG.type);
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.capacity, 0));
-                buffer.push(specificByte(FC.CURRENT_METER_CONFIG.capacity, 1));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.capacity, 0));
+                buffer.push(BitHelper.specificByte(FC.CURRENT_METER_CONFIG.capacity, 1));
                 break;
 
             case MSPCodes.MSP_SET_VTX_CONFIG:
@@ -1752,8 +1756,8 @@ var mspHelper = (function () {
                 buffer.push(FC.RC_tuning.dynamic_THR_PID);
                 buffer.push(Math.round(FC.RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(FC.RC_tuning.throttle_EXPO * 100));
-                buffer.push(lowByte(FC.RC_tuning.dynamic_THR_breakpoint));
-                buffer.push(highByte(FC.RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(BitHelper.lowByte(FC.RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(BitHelper.highByte(FC.RC_tuning.dynamic_THR_breakpoint));
                 buffer.push(Math.round(FC.RC_tuning.RC_YAW_EXPO * 100));
                 break;
             case MSPCodes.MSPV2_INAV_SET_RATE_PROFILE:
@@ -1761,8 +1765,8 @@ var mspHelper = (function () {
                 buffer.push(Math.round(FC.RC_tuning.throttle_MID * 100));
                 buffer.push(Math.round(FC.RC_tuning.throttle_EXPO * 100));
                 buffer.push(FC.RC_tuning.dynamic_THR_PID);
-                buffer.push(lowByte(FC.RC_tuning.dynamic_THR_breakpoint));
-                buffer.push(highByte(FC.RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(BitHelper.lowByte(FC.RC_tuning.dynamic_THR_breakpoint));
+                buffer.push(BitHelper.highByte(FC.RC_tuning.dynamic_THR_breakpoint));
 
                 // stabilized
                 buffer.push(Math.round(FC.RC_tuning.RC_EXPO * 100));
@@ -1785,119 +1789,119 @@ var mspHelper = (function () {
                 }
                 break;
             case MSPCodes.MSP_SET_ACC_TRIM:
-                buffer.push(lowByte(FC.CONFIG.accelerometerTrims[0]));
-                buffer.push(highByte(FC.CONFIG.accelerometerTrims[0]));
-                buffer.push(lowByte(FC.CONFIG.accelerometerTrims[1]));
-                buffer.push(highByte(FC.CONFIG.accelerometerTrims[1]));
+                buffer.push(BitHelper.lowByte(FC.CONFIG.accelerometerTrims[0]));
+                buffer.push(BitHelper.highByte(FC.CONFIG.accelerometerTrims[0]));
+                buffer.push(BitHelper.lowByte(FC.CONFIG.accelerometerTrims[1]));
+                buffer.push(BitHelper.highByte(FC.CONFIG.accelerometerTrims[1]));
                 break;
             case MSPCodes.MSP_SET_ARMING_CONFIG:
                 buffer.push(FC.ARMING_CONFIG.auto_disarm_delay);
                 buffer.push(FC.ARMING_CONFIG.disarm_kill_switch);
                 break;
             case MSPCodes.MSP_SET_LOOP_TIME:
-                buffer.push(lowByte(FC.FC_CONFIG.loopTime));
-                buffer.push(highByte(FC.FC_CONFIG.loopTime));
+                buffer.push(BitHelper.lowByte(FC.FC_CONFIG.loopTime));
+                buffer.push(BitHelper.highByte(FC.FC_CONFIG.loopTime));
                 break;
             case MSPCodes.MSP_SET_MISC:
-                buffer.push(lowByte(FC.MISC.midrc));
-                buffer.push(highByte(FC.MISC.midrc));
-                buffer.push(lowByte(FC.MISC.minthrottle));
-                buffer.push(highByte(FC.MISC.minthrottle));
-                buffer.push(lowByte(FC.MISC.maxthrottle));
-                buffer.push(highByte(FC.MISC.maxthrottle));
-                buffer.push(lowByte(FC.MISC.mincommand));
-                buffer.push(highByte(FC.MISC.mincommand));
-                buffer.push(lowByte(FC.MISC.failsafe_throttle));
-                buffer.push(highByte(FC.MISC.failsafe_throttle));
+                buffer.push(BitHelper.lowByte(FC.MISC.midrc));
+                buffer.push(BitHelper.highByte(FC.MISC.midrc));
+                buffer.push(BitHelper.lowByte(FC.MISC.minthrottle));
+                buffer.push(BitHelper.highByte(FC.MISC.minthrottle));
+                buffer.push(BitHelper.lowByte(FC.MISC.maxthrottle));
+                buffer.push(BitHelper.highByte(FC.MISC.maxthrottle));
+                buffer.push(BitHelper.lowByte(FC.MISC.mincommand));
+                buffer.push(BitHelper.highByte(FC.MISC.mincommand));
+                buffer.push(BitHelper.lowByte(FC.MISC.failsafe_throttle));
+                buffer.push(BitHelper.highByte(FC.MISC.failsafe_throttle));
                 buffer.push(FC.MISC.gps_type);
                 buffer.push(FC.MISC.sensors_baudrate);
                 buffer.push(FC.MISC.gps_ubx_sbas);
                 buffer.push(FC.MISC.multiwiicurrentoutput);
                 buffer.push(FC.MISC.rssi_channel);
                 buffer.push(FC.MISC.placeholder2);
-                buffer.push(lowByte(Math.round(FC.MISC.mag_declination * 10)));
-                buffer.push(highByte(Math.round(FC.MISC.mag_declination * 10)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.mag_declination * 10)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.mag_declination * 10)));
                 buffer.push(FC.MISC.vbatscale);
                 buffer.push(Math.round(FC.MISC.vbatmincellvoltage * 10));
                 buffer.push(Math.round(FC.MISC.vbatmaxcellvoltage * 10));
                 buffer.push(Math.round(FC.MISC.vbatwarningcellvoltage * 10));
                 break;
             case MSPCodes.MSPV2_INAV_SET_MISC:
-                buffer.push(lowByte(FC.MISC.midrc));
-                buffer.push(highByte(FC.MISC.midrc));
-                buffer.push(lowByte(FC.MISC.minthrottle));
-                buffer.push(highByte(FC.MISC.minthrottle));
-                buffer.push(lowByte(FC.MISC.maxthrottle));
-                buffer.push(highByte(FC.MISC.maxthrottle));
-                buffer.push(lowByte(FC.MISC.mincommand));
-                buffer.push(highByte(FC.MISC.mincommand));
-                buffer.push(lowByte(FC.MISC.failsafe_throttle));
-                buffer.push(highByte(FC.MISC.failsafe_throttle));
+                buffer.push(BitHelper.lowByte(FC.MISC.midrc));
+                buffer.push(BitHelper.highByte(FC.MISC.midrc));
+                buffer.push(BitHelper.lowByte(FC.MISC.minthrottle));
+                buffer.push(BitHelper.highByte(FC.MISC.minthrottle));
+                buffer.push(BitHelper.lowByte(FC.MISC.maxthrottle));
+                buffer.push(BitHelper.highByte(FC.MISC.maxthrottle));
+                buffer.push(BitHelper.lowByte(FC.MISC.mincommand));
+                buffer.push(BitHelper.highByte(FC.MISC.mincommand));
+                buffer.push(BitHelper.lowByte(FC.MISC.failsafe_throttle));
+                buffer.push(BitHelper.highByte(FC.MISC.failsafe_throttle));
                 buffer.push(FC.MISC.gps_type);
                 buffer.push(FC.MISC.sensors_baudrate);
                 buffer.push(FC.MISC.gps_ubx_sbas);
                 buffer.push(FC.MISC.rssi_channel);
-                buffer.push(lowByte(Math.round(FC.MISC.mag_declination * 10)));
-                buffer.push(highByte(Math.round(FC.MISC.mag_declination * 10)));
-                buffer.push(lowByte(FC.MISC.vbatscale));
-                buffer.push(highByte(FC.MISC.vbatscale));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.mag_declination * 10)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.mag_declination * 10)));
+                buffer.push(BitHelper.lowByte(FC.MISC.vbatscale));
+                buffer.push(BitHelper.highByte(FC.MISC.vbatscale));
                 buffer.push(FC.MISC.voltage_source);
                 buffer.push(FC.MISC.battery_cells);
-                buffer.push(lowByte(Math.round(FC.MISC.vbatdetectcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.MISC.vbatdetectcellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.MISC.vbatmincellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.MISC.vbatmincellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.MISC.vbatmaxcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.MISC.vbatmaxcellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.MISC.vbatwarningcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.MISC.vbatwarningcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.vbatdetectcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.vbatdetectcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.vbatmincellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.vbatmincellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.vbatmaxcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.vbatmaxcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.MISC.vbatwarningcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.MISC.vbatwarningcellvoltage * 100)));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.MISC.battery_capacity, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.MISC.battery_capacity, byte_index));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.MISC.battery_capacity_warning, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.MISC.battery_capacity_warning, byte_index));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.MISC.battery_capacity_critical, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.MISC.battery_capacity_critical, byte_index));
                 buffer.push((FC.MISC.battery_capacity_unit == 'mAh') ? 0 : 1);
                 break;
             case MSPCodes.MSPV2_INAV_SET_BATTERY_CONFIG:
-                buffer.push(lowByte(FC.BATTERY_CONFIG.vbatscale));
-                buffer.push(highByte(FC.BATTERY_CONFIG.vbatscale));
+                buffer.push(BitHelper.lowByte(FC.BATTERY_CONFIG.vbatscale));
+                buffer.push(BitHelper.highByte(FC.BATTERY_CONFIG.vbatscale));
                 buffer.push(FC.BATTERY_CONFIG.voltage_source);
                 buffer.push(FC.BATTERY_CONFIG.battery_cells);
-                buffer.push(lowByte(Math.round(FC.BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.BATTERY_CONFIG.vbatmincellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.BATTERY_CONFIG.vbatmincellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
-                buffer.push(lowByte(Math.round(FC.BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
-                buffer.push(highByte(Math.round(FC.BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
-                buffer.push(lowByte(FC.BATTERY_CONFIG.current_offset));
-                buffer.push(highByte(FC.BATTERY_CONFIG.current_offset));
-                buffer.push(lowByte(FC.BATTERY_CONFIG.current_scale));
-                buffer.push(highByte(FC.BATTERY_CONFIG.current_scale));
+                buffer.push(BitHelper.lowByte(Math.round(FC.BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.BATTERY_CONFIG.vbatdetectcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.BATTERY_CONFIG.vbatmincellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.BATTERY_CONFIG.vbatmincellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.BATTERY_CONFIG.vbatmaxcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
+                buffer.push(BitHelper.highByte(Math.round(FC.BATTERY_CONFIG.vbatwarningcellvoltage * 100)));
+                buffer.push(BitHelper.lowByte(FC.BATTERY_CONFIG.current_offset));
+                buffer.push(BitHelper.highByte(FC.BATTERY_CONFIG.current_offset));
+                buffer.push(BitHelper.lowByte(FC.BATTERY_CONFIG.current_scale));
+                buffer.push(BitHelper.highByte(FC.BATTERY_CONFIG.current_scale));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.BATTERY_CONFIG.capacity, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.BATTERY_CONFIG.capacity, byte_index));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.BATTERY_CONFIG.capacity_warning, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.BATTERY_CONFIG.capacity_warning, byte_index));
                 for (let byte_index = 0; byte_index < 4; ++byte_index)
-                    buffer.push(specificByte(FC.BATTERY_CONFIG.capacity_critical, byte_index));
+                    buffer.push(BitHelper.specificByte(FC.BATTERY_CONFIG.capacity_critical, byte_index));
                 buffer.push(FC.BATTERY_CONFIG.capacity_unit);
                 break;
 
             case MSPCodes.MSP_SET_RX_CONFIG:
                 buffer.push(FC.RX_CONFIG.serialrx_provider);
-                buffer.push(lowByte(FC.RX_CONFIG.maxcheck));
-                buffer.push(highByte(FC.RX_CONFIG.maxcheck));
-                buffer.push(lowByte(FC.RX_CONFIG.midrc));
-                buffer.push(highByte(FC.RX_CONFIG.midrc));
-                buffer.push(lowByte(FC.RX_CONFIG.mincheck));
-                buffer.push(highByte(FC.RX_CONFIG.mincheck));
+                buffer.push(BitHelper.lowByte(FC.RX_CONFIG.maxcheck));
+                buffer.push(BitHelper.highByte(FC.RX_CONFIG.maxcheck));
+                buffer.push(BitHelper.lowByte(FC.RX_CONFIG.midrc));
+                buffer.push(BitHelper.highByte(FC.RX_CONFIG.midrc));
+                buffer.push(BitHelper.lowByte(FC.RX_CONFIG.mincheck));
+                buffer.push(BitHelper.highByte(FC.RX_CONFIG.mincheck));
                 buffer.push(FC.RX_CONFIG.spektrum_sat_bind);
-                buffer.push(lowByte(FC.RX_CONFIG.rx_min_usec));
-                buffer.push(highByte(FC.RX_CONFIG.rx_min_usec));
-                buffer.push(lowByte(FC.RX_CONFIG.rx_max_usec));
-                buffer.push(highByte(FC.RX_CONFIG.rx_max_usec));
+                buffer.push(BitHelper.lowByte(FC.RX_CONFIG.rx_min_usec));
+                buffer.push(BitHelper.highByte(FC.RX_CONFIG.rx_min_usec));
+                buffer.push(BitHelper.lowByte(FC.RX_CONFIG.rx_max_usec));
+                buffer.push(BitHelper.highByte(FC.RX_CONFIG.rx_max_usec));
                 buffer.push(0); // 4 null bytes for betaflight compatibility
                 buffer.push(0);
                 buffer.push(0);
@@ -1915,23 +1919,23 @@ var mspHelper = (function () {
             case MSPCodes.MSP_SET_FAILSAFE_CONFIG:
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_delay);
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_off_delay);
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_throttle));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_throttle));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_throttle));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_throttle));
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_kill_switch);
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_throttle_low_delay));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_throttle_low_delay));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_throttle_low_delay));
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_procedure);
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_recovery_delay);
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_fw_roll_angle));
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
-                buffer.push(lowByte(FC.FAILSAFE_CONFIG.failsafe_min_distance));
-                buffer.push(highByte(FC.FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_fw_roll_angle));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_fw_pitch_angle));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_fw_yaw_rate));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_stick_motion_threshold));
+                buffer.push(BitHelper.lowByte(FC.FAILSAFE_CONFIG.failsafe_min_distance));
+                buffer.push(BitHelper.highByte(FC.FAILSAFE_CONFIG.failsafe_min_distance));
                 buffer.push(FC.FAILSAFE_CONFIG.failsafe_min_distance_procedure);
                 break;
 
@@ -1952,10 +1956,10 @@ var mspHelper = (function () {
                     buffer.push(serialPort.identifier);
 
                     var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
-                    buffer.push(specificByte(functionMask, 0));
-                    buffer.push(specificByte(functionMask, 1));
-                    buffer.push(specificByte(functionMask, 2));
-                    buffer.push(specificByte(functionMask, 3));
+                    buffer.push(BitHelper.specificByte(functionMask, 0));
+                    buffer.push(BitHelper.specificByte(functionMask, 1));
+                    buffer.push(BitHelper.specificByte(functionMask, 2));
+                    buffer.push(BitHelper.specificByte(functionMask, 3));
 
                     var BAUD_RATES = mspHelper.BAUD_RATES_post1_6_3;
                     buffer.push(BAUD_RATES.indexOf(serialPort.msp_baudrate));
@@ -1966,20 +1970,20 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP_SET_3D:
-                buffer.push(lowByte(FC.REVERSIBLE_MOTORS.deadband_low));
-                buffer.push(highByte(FC.REVERSIBLE_MOTORS.deadband_low));
-                buffer.push(lowByte(FC.REVERSIBLE_MOTORS.deadband_high));
-                buffer.push(highByte(FC.REVERSIBLE_MOTORS.deadband_high));
-                buffer.push(lowByte(FC.REVERSIBLE_MOTORS.neutral));
-                buffer.push(highByte(FC.REVERSIBLE_MOTORS.neutral));
+                buffer.push(BitHelper.lowByte(FC.REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(BitHelper.highByte(FC.REVERSIBLE_MOTORS.deadband_low));
+                buffer.push(BitHelper.lowByte(FC.REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(BitHelper.highByte(FC.REVERSIBLE_MOTORS.deadband_high));
+                buffer.push(BitHelper.lowByte(FC.REVERSIBLE_MOTORS.neutral));
+                buffer.push(BitHelper.highByte(FC.REVERSIBLE_MOTORS.neutral));
                 break;
 
             case MSPCodes.MSP_SET_RC_DEADBAND:
                 buffer.push(FC.RC_deadband.deadband);
                 buffer.push(FC.RC_deadband.yaw_deadband);
                 buffer.push(FC.RC_deadband.alt_hold_deadband);
-                buffer.push(lowByte(FC.REVERSIBLE_MOTORS.deadband_throttle));
-                buffer.push(highByte(FC.REVERSIBLE_MOTORS.deadband_throttle));
+                buffer.push(BitHelper.lowByte(FC.REVERSIBLE_MOTORS.deadband_throttle));
+                buffer.push(BitHelper.highByte(FC.REVERSIBLE_MOTORS.deadband_throttle));
                 break;
 
             case MSPCodes.MSP_SET_SENSOR_ALIGNMENT:
@@ -1995,11 +1999,11 @@ var mspHelper = (function () {
                 buffer.push(FC.ADVANCED_CONFIG.useUnsyncedPwm);
                 buffer.push(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
-                buffer.push(lowByte(FC.ADVANCED_CONFIG.motorPwmRate));
-                buffer.push(highByte(FC.ADVANCED_CONFIG.motorPwmRate));
+                buffer.push(BitHelper.lowByte(FC.ADVANCED_CONFIG.motorPwmRate));
+                buffer.push(BitHelper.highByte(FC.ADVANCED_CONFIG.motorPwmRate));
 
-                buffer.push(lowByte(FC.ADVANCED_CONFIG.servoPwmRate));
-                buffer.push(highByte(FC.ADVANCED_CONFIG.servoPwmRate));
+                buffer.push(BitHelper.lowByte(FC.ADVANCED_CONFIG.servoPwmRate));
+                buffer.push(BitHelper.highByte(FC.ADVANCED_CONFIG.servoPwmRate));
 
                 buffer.push(FC.ADVANCED_CONFIG.gyroSync);
                 break;
@@ -2007,17 +2011,17 @@ var mspHelper = (function () {
             case MSPCodes.MSP_SET_INAV_PID:
                 buffer.push(FC.INAV_PID_CONFIG.asynchronousMode);
 
-                buffer.push(lowByte(FC.INAV_PID_CONFIG.accelerometerTaskFrequency));
-                buffer.push(highByte(FC.INAV_PID_CONFIG.accelerometerTaskFrequency));
+                buffer.push(BitHelper.lowByte(FC.INAV_PID_CONFIG.accelerometerTaskFrequency));
+                buffer.push(BitHelper.highByte(FC.INAV_PID_CONFIG.accelerometerTaskFrequency));
 
-                buffer.push(lowByte(FC.INAV_PID_CONFIG.attitudeTaskFrequency));
-                buffer.push(highByte(FC.INAV_PID_CONFIG.attitudeTaskFrequency));
+                buffer.push(BitHelper.lowByte(FC.INAV_PID_CONFIG.attitudeTaskFrequency));
+                buffer.push(BitHelper.highByte(FC.INAV_PID_CONFIG.attitudeTaskFrequency));
 
                 buffer.push(FC.INAV_PID_CONFIG.magHoldRateLimit);
                 buffer.push(FC.INAV_PID_CONFIG.magHoldErrorLpfFrequency);
 
-                buffer.push(lowByte(FC.INAV_PID_CONFIG.yawJumpPreventionLimit));
-                buffer.push(highByte(FC.INAV_PID_CONFIG.yawJumpPreventionLimit));
+                buffer.push(BitHelper.lowByte(FC.INAV_PID_CONFIG.yawJumpPreventionLimit));
+                buffer.push(BitHelper.highByte(FC.INAV_PID_CONFIG.yawJumpPreventionLimit));
 
                 buffer.push(FC.INAV_PID_CONFIG.gyroscopeLpf);
                 buffer.push(FC.INAV_PID_CONFIG.accSoftLpfHz);
@@ -2031,91 +2035,91 @@ var mspHelper = (function () {
             case MSPCodes.MSP_SET_NAV_POSHOLD:
                 buffer.push(FC.NAV_POSHOLD.userControlMode);
 
-                buffer.push(lowByte(FC.NAV_POSHOLD.maxSpeed));
-                buffer.push(highByte(FC.NAV_POSHOLD.maxSpeed));
+                buffer.push(BitHelper.lowByte(FC.NAV_POSHOLD.maxSpeed));
+                buffer.push(BitHelper.highByte(FC.NAV_POSHOLD.maxSpeed));
 
-                buffer.push(lowByte(FC.NAV_POSHOLD.maxClimbRate));
-                buffer.push(highByte(FC.NAV_POSHOLD.maxClimbRate));
+                buffer.push(BitHelper.lowByte(FC.NAV_POSHOLD.maxClimbRate));
+                buffer.push(BitHelper.highByte(FC.NAV_POSHOLD.maxClimbRate));
 
-                buffer.push(lowByte(FC.NAV_POSHOLD.maxManualSpeed));
-                buffer.push(highByte(FC.NAV_POSHOLD.maxManualSpeed));
+                buffer.push(BitHelper.lowByte(FC.NAV_POSHOLD.maxManualSpeed));
+                buffer.push(BitHelper.highByte(FC.NAV_POSHOLD.maxManualSpeed));
 
-                buffer.push(lowByte(FC.NAV_POSHOLD.maxManualClimbRate));
-                buffer.push(highByte(FC.NAV_POSHOLD.maxManualClimbRate));
+                buffer.push(BitHelper.lowByte(FC.NAV_POSHOLD.maxManualClimbRate));
+                buffer.push(BitHelper.highByte(FC.NAV_POSHOLD.maxManualClimbRate));
 
                 buffer.push(FC.NAV_POSHOLD.maxBankAngle);
                 buffer.push(FC.NAV_POSHOLD.useThrottleMidForAlthold);
 
-                buffer.push(lowByte(FC.NAV_POSHOLD.hoverThrottle));
-                buffer.push(highByte(FC.NAV_POSHOLD.hoverThrottle));
+                buffer.push(BitHelper.lowByte(FC.NAV_POSHOLD.hoverThrottle));
+                buffer.push(BitHelper.highByte(FC.NAV_POSHOLD.hoverThrottle));
                 break;
 
             case MSPCodes.MSP_SET_CALIBRATION_DATA:
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accZero.X));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accZero.X));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accZero.X));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accZero.X));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accZero.Y));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accZero.Y));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accZero.Y));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accZero.Y));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accZero.Z));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accZero.Z));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accZero.Z));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accZero.Z));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accGain.X));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accGain.X));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accGain.X));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accGain.X));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accGain.Y));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accGain.Y));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accGain.Y));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accGain.Y));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.accGain.Z));
-                buffer.push(highByte(FC.CALIBRATION_DATA.accGain.Z));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.accGain.Z));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.accGain.Z));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magZero.X));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magZero.X));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magZero.X));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magZero.X));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magZero.Y));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magZero.Y));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magZero.Y));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magZero.Y));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magZero.Z));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magZero.Z));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magZero.Z));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magZero.Z));
 
-                buffer.push(lowByte(Math.round(FC.CALIBRATION_DATA.opflow.Scale * 256)));
-                buffer.push(highByte(Math.round(FC.CALIBRATION_DATA.opflow.Scale * 256)));
+                buffer.push(BitHelper.lowByte(Math.round(FC.CALIBRATION_DATA.opflow.Scale * 256)));
+                buffer.push(BitHelper.highByte(Math.round(FC.CALIBRATION_DATA.opflow.Scale * 256)));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magGain.X));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magGain.X));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magGain.X));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magGain.X));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magGain.Y));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magGain.Y));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magGain.Y));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magGain.Y));
 
-                buffer.push(lowByte(FC.CALIBRATION_DATA.magGain.Z));
-                buffer.push(highByte(FC.CALIBRATION_DATA.magGain.Z));
+                buffer.push(BitHelper.lowByte(FC.CALIBRATION_DATA.magGain.Z));
+                buffer.push(BitHelper.highByte(FC.CALIBRATION_DATA.magGain.Z));
 
                 break;
 
             case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
-                buffer.push(lowByte(FC.POSITION_ESTIMATOR.w_z_baro_p * 100));
-                buffer.push(highByte(FC.POSITION_ESTIMATOR.w_z_baro_p * 100));
+                buffer.push(BitHelper.lowByte(FC.POSITION_ESTIMATOR.w_z_baro_p * 100));
+                buffer.push(BitHelper.highByte(FC.POSITION_ESTIMATOR.w_z_baro_p * 100));
 
-                buffer.push(lowByte(FC.POSITION_ESTIMATOR.w_z_gps_p * 100));
-                buffer.push(highByte(FC.POSITION_ESTIMATOR.w_z_gps_p * 100));
+                buffer.push(BitHelper.lowByte(FC.POSITION_ESTIMATOR.w_z_gps_p * 100));
+                buffer.push(BitHelper.highByte(FC.POSITION_ESTIMATOR.w_z_gps_p * 100));
 
-                buffer.push(lowByte(FC.POSITION_ESTIMATOR.w_z_gps_v * 100));
-                buffer.push(highByte(FC.POSITION_ESTIMATOR.w_z_gps_v * 100));
+                buffer.push(BitHelper.lowByte(FC.POSITION_ESTIMATOR.w_z_gps_v * 100));
+                buffer.push(BitHelper.highByte(FC.POSITION_ESTIMATOR.w_z_gps_v * 100));
 
-                buffer.push(lowByte(FC.POSITION_ESTIMATOR.w_xy_gps_p * 100));
-                buffer.push(highByte(FC.POSITION_ESTIMATOR.w_xy_gps_p * 100));
+                buffer.push(BitHelper.lowByte(FC.POSITION_ESTIMATOR.w_xy_gps_p * 100));
+                buffer.push(BitHelper.highByte(FC.POSITION_ESTIMATOR.w_xy_gps_p * 100));
 
-                buffer.push(lowByte(FC.POSITION_ESTIMATOR.w_xy_gps_v * 100));
-                buffer.push(highByte(FC.POSITION_ESTIMATOR.w_xy_gps_v * 100));
+                buffer.push(BitHelper.lowByte(FC.POSITION_ESTIMATOR.w_xy_gps_v * 100));
+                buffer.push(BitHelper.highByte(FC.POSITION_ESTIMATOR.w_xy_gps_v * 100));
 
                 buffer.push(FC.POSITION_ESTIMATOR.gps_min_sats);
                 buffer.push(FC.POSITION_ESTIMATOR.use_gps_velned);
                 break;
 
             case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.minRthDistance));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.minRthDistance));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.minRthDistance));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.minRthDistance));
 
                 buffer.push(FC.RTH_AND_LAND_CONFIG.rthClimbFirst);
                 buffer.push(FC.RTH_AND_LAND_CONFIG.rthClimbIgnoreEmergency);
@@ -2123,112 +2127,112 @@ var mspHelper = (function () {
                 buffer.push(FC.RTH_AND_LAND_CONFIG.rthAllowLanding);
                 buffer.push(FC.RTH_AND_LAND_CONFIG.rthAltControlMode);
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.rthAbortThreshold));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.rthAbortThreshold));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.rthAbortThreshold));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.rthAbortThreshold));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.rthAltitude));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.rthAltitude));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.rthAltitude));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.rthAltitude));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.landMinAltVspd));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.landMinAltVspd));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.landMinAltVspd));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.landMinAltVspd));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.landMaxAltVspd));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.landMaxAltVspd));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.landMaxAltVspd));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.landMaxAltVspd));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMinAlt));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.landSlowdownMaxAlt));
 
-                buffer.push(lowByte(FC.RTH_AND_LAND_CONFIG.emergencyDescentRate));
-                buffer.push(highByte(FC.RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                buffer.push(BitHelper.lowByte(FC.RTH_AND_LAND_CONFIG.emergencyDescentRate));
+                buffer.push(BitHelper.highByte(FC.RTH_AND_LAND_CONFIG.emergencyDescentRate));
                 break;
 
             case MSPCodes.MSP_SET_FW_CONFIG:
 
-                buffer.push(lowByte(FC.FW_CONFIG.cruiseThrottle));
-                buffer.push(highByte(FC.FW_CONFIG.cruiseThrottle));
+                buffer.push(BitHelper.lowByte(FC.FW_CONFIG.cruiseThrottle));
+                buffer.push(BitHelper.highByte(FC.FW_CONFIG.cruiseThrottle));
 
-                buffer.push(lowByte(FC.FW_CONFIG.minThrottle));
-                buffer.push(highByte(FC.FW_CONFIG.minThrottle));
+                buffer.push(BitHelper.lowByte(FC.FW_CONFIG.minThrottle));
+                buffer.push(BitHelper.highByte(FC.FW_CONFIG.minThrottle));
 
-                buffer.push(lowByte(FC.FW_CONFIG.maxThrottle));
-                buffer.push(highByte(FC.FW_CONFIG.maxThrottle));
+                buffer.push(BitHelper.lowByte(FC.FW_CONFIG.maxThrottle));
+                buffer.push(BitHelper.highByte(FC.FW_CONFIG.maxThrottle));
 
                 buffer.push(FC.FW_CONFIG.maxBankAngle);
                 buffer.push(FC.FW_CONFIG.maxClimbAngle);
                 buffer.push(FC.FW_CONFIG.maxDiveAngle);
                 buffer.push(FC.FW_CONFIG.pitchToThrottle);
 
-                buffer.push(lowByte(FC.FW_CONFIG.loiterRadius));
-                buffer.push(highByte(FC.FW_CONFIG.loiterRadius));
+                buffer.push(BitHelper.lowByte(FC.FW_CONFIG.loiterRadius));
+                buffer.push(BitHelper.highByte(FC.FW_CONFIG.loiterRadius));
 
                 break;
 
             case MSPCodes.MSP_SET_FILTER_CONFIG:
                 buffer.push(FC.FILTER_CONFIG.gyroSoftLpfHz);
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.dtermLpfHz));
-                buffer.push(highByte(FC.FILTER_CONFIG.dtermLpfHz));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.dtermLpfHz));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.dtermLpfHz));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.yawLpfHz));
-                buffer.push(highByte(FC.FILTER_CONFIG.yawLpfHz));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.yawLpfHz));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.yawLpfHz));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.gyroNotchHz1));
-                buffer.push(highByte(FC.FILTER_CONFIG.gyroNotchHz1));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.gyroNotchHz1));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.gyroNotchHz1));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.gyroNotchCutoff1));
-                buffer.push(highByte(FC.FILTER_CONFIG.gyroNotchCutoff1));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.gyroNotchCutoff1));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.gyroNotchCutoff1));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.dtermNotchHz));
-                buffer.push(highByte(FC.FILTER_CONFIG.dtermNotchHz));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.dtermNotchHz));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.dtermNotchHz));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.dtermNotchCutoff));
-                buffer.push(highByte(FC.FILTER_CONFIG.dtermNotchCutoff));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.dtermNotchCutoff));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.dtermNotchCutoff));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.gyroNotchHz2));
-                buffer.push(highByte(FC.FILTER_CONFIG.gyroNotchHz2));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.gyroNotchHz2));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.gyroNotchHz2));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.gyroNotchCutoff2));
-                buffer.push(highByte(FC.FILTER_CONFIG.gyroNotchCutoff2));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.gyroNotchCutoff2));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.gyroNotchCutoff2));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.accNotchHz));
-                buffer.push(highByte(FC.FILTER_CONFIG.accNotchHz));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.accNotchHz));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.accNotchHz));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.accNotchCutoff));
-                buffer.push(highByte(FC.FILTER_CONFIG.accNotchCutoff));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.accNotchCutoff));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.accNotchCutoff));
 
-                buffer.push(lowByte(FC.FILTER_CONFIG.gyroStage2LowpassHz));
-                buffer.push(highByte(FC.FILTER_CONFIG.gyroStage2LowpassHz));
+                buffer.push(BitHelper.lowByte(FC.FILTER_CONFIG.gyroStage2LowpassHz));
+                buffer.push(BitHelper.highByte(FC.FILTER_CONFIG.gyroStage2LowpassHz));
 
                 break;
 
             case MSPCodes.MSP_SET_PID_ADVANCED:
-                buffer.push(lowByte(FC.PID_ADVANCED.rollPitchItermIgnoreRate));
-                buffer.push(highByte(FC.PID_ADVANCED.rollPitchItermIgnoreRate));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.rollPitchItermIgnoreRate));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.rollPitchItermIgnoreRate));
 
-                buffer.push(lowByte(FC.PID_ADVANCED.yawItermIgnoreRate));
-                buffer.push(highByte(FC.PID_ADVANCED.yawItermIgnoreRate));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.yawItermIgnoreRate));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.yawItermIgnoreRate));
 
-                buffer.push(lowByte(FC.PID_ADVANCED.yawPLimit));
-                buffer.push(highByte(FC.PID_ADVANCED.yawPLimit));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.yawPLimit));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.yawPLimit));
 
                 buffer.push(0); //BF: currentProfile->pidProfile.deltaMethod
                 buffer.push(0); //BF: currentProfile->pidProfile.vbatPidCompensation
                 buffer.push(0); //BF: currentProfile->pidProfile.setpointRelaxRatio
 
                 buffer.push(FC.PID_ADVANCED.dtermSetpointWeight);
-                buffer.push(lowByte(FC.PID_ADVANCED.pidSumLimit));
-                buffer.push(highByte(FC.PID_ADVANCED.pidSumLimit));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.pidSumLimit));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.pidSumLimit));
 
                 buffer.push(0); //BF: currentProfile->pidProfile.itermThrottleGain
 
-                buffer.push(lowByte(FC.PID_ADVANCED.axisAccelerationLimitRollPitch));
-                buffer.push(highByte(FC.PID_ADVANCED.axisAccelerationLimitRollPitch));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.axisAccelerationLimitRollPitch));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.axisAccelerationLimitRollPitch));
 
-                buffer.push(lowByte(FC.PID_ADVANCED.axisAccelerationLimitYaw));
-                buffer.push(highByte(FC.PID_ADVANCED.axisAccelerationLimitYaw));
+                buffer.push(BitHelper.lowByte(FC.PID_ADVANCED.axisAccelerationLimitYaw));
+                buffer.push(BitHelper.highByte(FC.PID_ADVANCED.axisAccelerationLimitYaw));
                 break;
 
             case MSPCodes.MSP_SET_SENSOR_CONFIG:
@@ -2255,28 +2259,28 @@ var mspHelper = (function () {
                 buffer.push(FC.MIXER_CONFIG.motorStopOnLow);
                 buffer.push(FC.MIXER_CONFIG.platformType);
                 buffer.push(FC.MIXER_CONFIG.hasFlaps);
-                buffer.push(lowByte(FC.MIXER_CONFIG.appliedMixerPreset));
-                buffer.push(highByte(FC.MIXER_CONFIG.appliedMixerPreset));
+                buffer.push(BitHelper.lowByte(FC.MIXER_CONFIG.appliedMixerPreset));
+                buffer.push(BitHelper.highByte(FC.MIXER_CONFIG.appliedMixerPreset));
                 buffer.push(0); //Filler byte to match expect payload length
                 buffer.push(0); //Filler byte to match expect payload length
                 break;
 
             case MSPCodes.MSP2_INAV_SET_MC_BRAKING:
-                buffer.push(lowByte(FC.BRAKING_CONFIG.speedThreshold));
-                buffer.push(highByte(FC.BRAKING_CONFIG.speedThreshold));
-                buffer.push(lowByte(FC.BRAKING_CONFIG.disengageSpeed));
-                buffer.push(highByte(FC.BRAKING_CONFIG.disengageSpeed));
-                buffer.push(lowByte(FC.BRAKING_CONFIG.timeout));
-                buffer.push(highByte(FC.BRAKING_CONFIG.timeout));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.speedThreshold));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.speedThreshold));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.disengageSpeed));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.disengageSpeed));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.timeout));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.timeout));
 
                 buffer.push(FC.BRAKING_CONFIG.boostFactor);
 
-                buffer.push(lowByte(FC.BRAKING_CONFIG.boostTimeout));
-                buffer.push(highByte(FC.BRAKING_CONFIG.boostTimeout));
-                buffer.push(lowByte(FC.BRAKING_CONFIG.boostSpeedThreshold));
-                buffer.push(highByte(FC.BRAKING_CONFIG.boostSpeedThreshold));
-                buffer.push(lowByte(FC.BRAKING_CONFIG.boostDisengageSpeed));
-                buffer.push(highByte(FC.BRAKING_CONFIG.boostDisengageSpeed));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.boostTimeout));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.boostTimeout));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.boostSpeedThreshold));
+                buffer.push(BitHelper.lowByte(FC.BRAKING_CONFIG.boostDisengageSpeed));
+                buffer.push(BitHelper.highByte(FC.BRAKING_CONFIG.boostDisengageSpeed));
 
                 buffer.push(FC.BRAKING_CONFIG.bankAngle);
                 break;
@@ -2293,8 +2297,8 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
 
                 buffer.push(FC.EZ_TUNE.enabled);
-                buffer.push(lowByte(FC.EZ_TUNE.filterHz));
-                buffer.push(highByte(FC.EZ_TUNE.filterHz));
+                buffer.push(BitHelper.lowByte(FC.EZ_TUNE.filterHz));
+                buffer.push(BitHelper.highByte(FC.EZ_TUNE.filterHz));
                 buffer.push(FC.EZ_TUNE.axisRatio);
                 buffer.push(FC.EZ_TUNE.response);
                 buffer.push(FC.EZ_TUNE.damping);
@@ -2322,8 +2326,8 @@ var mspHelper = (function () {
         var buffer = [];
 
         for (var i = 0; i < channels.length; i++) {
-            buffer.push(specificByte(channels[i], 0));
-            buffer.push(specificByte(channels[i], 1));
+            buffer.push(BitHelper.specificByte(channels[i], 0));
+            buffer.push(BitHelper.specificByte(channels[i], 1));
         }
 
         MSP.send_message(MSPCodes.MSP_SET_RAW_RC, buffer, false);
@@ -2334,10 +2338,10 @@ var mspHelper = (function () {
         var messageId = MSPCodes.MSP_SET_BLACKBOX_CONFIG;
         buffer.push(FC.BLACKBOX.blackboxDevice & 0xFF);
         messageId = MSPCodes.MSP2_SET_BLACKBOX_CONFIG;
-        buffer.push(lowByte(FC.BLACKBOX.blackboxRateNum));
-        buffer.push(highByte(FC.BLACKBOX.blackboxRateNum));
-        buffer.push(lowByte(FC.BLACKBOX.blackboxRateDenom));
-        buffer.push(highByte(FC.BLACKBOX.blackboxRateDenom));
+        buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateNum));
+        buffer.push(BitHelper.highByte(FC.BLACKBOX.blackboxRateNum));
+        buffer.push(BitHelper.lowByte(FC.BLACKBOX.blackboxRateDenom));
+        buffer.push(BitHelper.highByte(FC.BLACKBOX.blackboxRateDenom));
         buffer.push32(FC.BLACKBOX.blackboxIncludeFlags);
         //noinspection JSUnusedLocalSymbols
         MSP.send_message(messageId, buffer, false, function (response) {
@@ -2366,16 +2370,16 @@ var mspHelper = (function () {
 
             buffer.push(servoIndex);
 
-            buffer.push(lowByte(servoConfiguration.min));
-            buffer.push(highByte(servoConfiguration.min));
+            buffer.push(BitHelper.lowByte(servoConfiguration.min));
+            buffer.push(BitHelper.highByte(servoConfiguration.min));
 
-            buffer.push(lowByte(servoConfiguration.max));
-            buffer.push(highByte(servoConfiguration.max));
+            buffer.push(BitHelper.lowByte(servoConfiguration.max));
+            buffer.push(BitHelper.highByte(servoConfiguration.max));
 
-            buffer.push(lowByte(servoConfiguration.middle));
-            buffer.push(highByte(servoConfiguration.middle));
+            buffer.push(BitHelper.lowByte(servoConfiguration.middle));
+            buffer.push(BitHelper.highByte(servoConfiguration.middle));
 
-            buffer.push(lowByte(servoConfiguration.rate));
+            buffer.push(BitHelper.lowByte(servoConfiguration.rate));
 
             buffer.push(0);
             buffer.push(0);
@@ -2423,8 +2427,8 @@ var mspHelper = (function () {
             buffer.push(servoIndex);
             buffer.push(servoRule.getTarget());
             buffer.push(servoRule.getInput());
-            buffer.push(lowByte(servoRule.getRate()));
-            buffer.push(highByte(servoRule.getRate()));
+            buffer.push(BitHelper.lowByte(servoRule.getRate()));
+            buffer.push(BitHelper.highByte(servoRule.getRate()));
             buffer.push(servoRule.getSpeed());
             buffer.push(servoRule.getConditionId());
 
@@ -2460,17 +2464,17 @@ var mspHelper = (function () {
 
                 buffer.push(servoIndex);
 
-                buffer.push(lowByte(rule.getThrottleForMsp()));
-                buffer.push(highByte(rule.getThrottleForMsp()));
+                buffer.push(BitHelper.lowByte(rule.getThrottleForMsp()));
+                buffer.push(BitHelper.highByte(rule.getThrottleForMsp()));
 
-                buffer.push(lowByte(rule.getRollForMsp()));
-                buffer.push(highByte(rule.getRollForMsp()));
+                buffer.push(BitHelper.lowByte(rule.getRollForMsp()));
+                buffer.push(BitHelper.highByte(rule.getRollForMsp()));
 
-                buffer.push(lowByte(rule.getPitchForMsp()));
-                buffer.push(highByte(rule.getPitchForMsp()));
+                buffer.push(BitHelper.lowByte(rule.getPitchForMsp()));
+                buffer.push(BitHelper.highByte(rule.getPitchForMsp()));
 
-                buffer.push(lowByte(rule.getYawForMsp()));
-                buffer.push(highByte(rule.getYawForMsp()));
+                buffer.push(BitHelper.lowByte(rule.getYawForMsp()));
+                buffer.push(BitHelper.highByte(rule.getYawForMsp()));
 
                 // prepare for next iteration
                 servoIndex++;
@@ -2526,15 +2530,15 @@ var mspHelper = (function () {
             buffer.push(condition.getActivatorId());
             buffer.push(condition.getOperation());
             buffer.push(condition.getOperandAType());
-            buffer.push(specificByte(condition.getOperandAValue(), 0));
-            buffer.push(specificByte(condition.getOperandAValue(), 1));
-            buffer.push(specificByte(condition.getOperandAValue(), 2));
-            buffer.push(specificByte(condition.getOperandAValue(), 3));
+            buffer.push(BitHelper.specificByte(condition.getOperandAValue(), 0));
+            buffer.push(BitHelper.specificByte(condition.getOperandAValue(), 1));
+            buffer.push(BitHelper.specificByte(condition.getOperandAValue(), 2));
+            buffer.push(BitHelper.specificByte(condition.getOperandAValue(), 3));
             buffer.push(condition.getOperandBType());
-            buffer.push(specificByte(condition.getOperandBValue(), 0));
-            buffer.push(specificByte(condition.getOperandBValue(), 1));
-            buffer.push(specificByte(condition.getOperandBValue(), 2));
-            buffer.push(specificByte(condition.getOperandBValue(), 3));
+            buffer.push(BitHelper.specificByte(condition.getOperandBValue(), 0));
+            buffer.push(BitHelper.specificByte(condition.getOperandBValue(), 1));
+            buffer.push(BitHelper.specificByte(condition.getOperandBValue(), 2));
+            buffer.push(BitHelper.specificByte(condition.getOperandBValue(), 3));
             buffer.push(condition.getFlags());
 
             // prepare for next iteration
@@ -2571,23 +2575,23 @@ var mspHelper = (function () {
             buffer.push(pidIndex);
             buffer.push(pid.getEnabled());
             buffer.push(pid.getSetpointType());
-            buffer.push(specificByte(pid.getSetpointValue(), 0));
-            buffer.push(specificByte(pid.getSetpointValue(), 1));
-            buffer.push(specificByte(pid.getSetpointValue(), 2));
-            buffer.push(specificByte(pid.getSetpointValue(), 3));
+            buffer.push(BitHelper.specificByte(pid.getSetpointValue(), 0));
+            buffer.push(BitHelper.specificByte(pid.getSetpointValue(), 1));
+            buffer.push(BitHelper.specificByte(pid.getSetpointValue(), 2));
+            buffer.push(BitHelper.specificByte(pid.getSetpointValue(), 3));
             buffer.push(pid.getMeasurementType());
-            buffer.push(specificByte(pid.getMeasurementValue(), 0));
-            buffer.push(specificByte(pid.getMeasurementValue(), 1));
-            buffer.push(specificByte(pid.getMeasurementValue(), 2));
-            buffer.push(specificByte(pid.getMeasurementValue(), 3));
-            buffer.push(specificByte(pid.getGainP(), 0));
-            buffer.push(specificByte(pid.getGainP(), 1));
-            buffer.push(specificByte(pid.getGainI(), 0));
-            buffer.push(specificByte(pid.getGainI(), 1));
-            buffer.push(specificByte(pid.getGainD(), 0));
-            buffer.push(specificByte(pid.getGainD(), 1));
-            buffer.push(specificByte(pid.getGainFF(), 0));
-            buffer.push(specificByte(pid.getGainFF(), 1));
+            buffer.push(BitHelper.specificByte(pid.getMeasurementValue(), 0));
+            buffer.push(BitHelper.specificByte(pid.getMeasurementValue(), 1));
+            buffer.push(BitHelper.specificByte(pid.getMeasurementValue(), 2));
+            buffer.push(BitHelper.specificByte(pid.getMeasurementValue(), 3));
+            buffer.push(BitHelper.specificByte(pid.getGainP(), 0));
+            buffer.push(BitHelper.specificByte(pid.getGainP(), 1));
+            buffer.push(BitHelper.specificByte(pid.getGainI(), 0));
+            buffer.push(BitHelper.specificByte(pid.getGainI(), 1));
+            buffer.push(BitHelper.specificByte(pid.getGainD(), 0));
+            buffer.push(BitHelper.specificByte(pid.getGainD(), 1));
+            buffer.push(BitHelper.specificByte(pid.getGainFF(), 0));
+            buffer.push(BitHelper.specificByte(pid.getGainFF(), 1));
 
             // prepare for next iteration
             pidIndex++;
@@ -2643,8 +2647,8 @@ var mspHelper = (function () {
 
         // For API > 2.0.0 we support requesting payload size - request 4KiB and let firmware decide what actual size to send
         if (FC.CONFIG.apiVersion && semver.gte(FC.CONFIG.apiVersion, "2.0.0")) {
-            buffer.push(lowByte(4096));
-            buffer.push(highByte(4096));
+            buffer.push(BitHelper.lowByte(4096));
+            buffer.push(BitHelper.highByte(4096));
         }
 
         MSP.send_message(MSPCodes.MSP_DATAFLASH_READ, buffer, false, function (response) {
@@ -2681,8 +2685,8 @@ var mspHelper = (function () {
             var buffer = [];
             buffer.push(rxFailIndex);
             buffer.push(rxFail.mode);
-            buffer.push(lowByte(rxFail.value));
-            buffer.push(highByte(rxFail.value));
+            buffer.push(BitHelper.lowByte(rxFail.value));
+            buffer.push(BitHelper.highByte(rxFail.value));
 
             // prepare for next iteration
             rxFailIndex++;
@@ -2772,8 +2776,8 @@ var mspHelper = (function () {
             for (var colorIndex = 0; colorIndex < FC.LED_COLORS.length; colorIndex++) {
                 var color = FC.LED_COLORS[colorIndex];
 
-                buffer.push(specificByte(color.h, 0));
-                buffer.push(specificByte(color.h, 1));
+                buffer.push(BitHelper.specificByte(color.h, 0));
+                buffer.push(BitHelper.specificByte(color.h, 1));
                 buffer.push(color.s);
                 buffer.push(color.v);
             }
@@ -2857,11 +2861,11 @@ var mspHelper = (function () {
 
             extra |= (0 << 2); // parameters
 
-            buffer.push(specificByte(mask, 0));
-            buffer.push(specificByte(mask, 1));
-            buffer.push(specificByte(mask, 2));
-            buffer.push(specificByte(mask, 3));
-            buffer.push(specificByte(extra, 0));
+            buffer.push(BitHelper.specificByte(mask, 0));
+            buffer.push(BitHelper.specificByte(mask, 1));
+            buffer.push(BitHelper.specificByte(mask, 2));
+            buffer.push(BitHelper.specificByte(mask, 3));
+            buffer.push(BitHelper.specificByte(extra, 0));
 
             // prepare for next iteration
             ledIndex++;
