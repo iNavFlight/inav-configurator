@@ -87,6 +87,7 @@ sources.js = [
     './js/simple_smooth_filter.js',
     './js/walking_average_filter.js',
     './js/gui.js',
+    './js/serialPortHelper.js',
     './js/msp/MSPCodes.js',
     './js/msp/MSPHelper.js',
     './js/msp/MSPchainer.js',

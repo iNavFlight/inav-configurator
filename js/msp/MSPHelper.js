@@ -20,33 +20,6 @@ var mspHelper = (function (gui) {
         '921600'
     ];
 
-    self.SERIAL_PORT_FUNCTIONS = {
-        'MSP': 0,
-        'GPS': 1,
-        'TELEMETRY_FRSKY': 2,
-        'TELEMETRY_HOTT': 3,
-        'TELEMETRY_LTM': 4, // LTM replaced MSP
-        'TELEMETRY_SMARTPORT': 5,
-        'RX_SERIAL': 6,
-        'BLACKBOX': 7,
-        'TELEMETRY_MAVLINK': 8,
-        'TELEMETRY_IBUS': 9,
-        'RUNCAM_DEVICE_CONTROL': 10,
-        'TBS_SMARTAUDIO': 11,
-        'IRC_TRAMP': 12,
-        'OPFLOW': 14,
-        'LOG': 15,
-        'RANGEFINDER': 16,
-        'VTX_FFPV': 17,
-        'ESC': 18,
-        'GSM_SMS': 19,
-        'FRSKY_OSD': 20,
-        'DJI_FPV': 21,
-        'SBUS_OUTPUT': 22,
-        'SMARTPORT_MASTER': 23,
-        'MSP_DISPLAYPORT': 25,
-    };
-
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
     // the newline at the end, so we keep the pending message here until we find a
     // '\0', then print it. Messages sent by MSP_DEBUGMSG are guaranteed to
@@ -849,7 +822,7 @@ var mspHelper = (function (gui) {
 
                     var serialPort = {
                         identifier: data.getUint8(offset),
-                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint32(offset + 1, true)),
+                        functions: helper.serialPortHelper.maskToFunctions(data.getUint32(offset + 1, true)),
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
@@ -1933,7 +1906,7 @@ var mspHelper = (function (gui) {
 
                     buffer.push(serialPort.identifier);
 
-                    var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
+                    var functionMask = helper.serialPortHelper.functionsToMask(serialPort.functions);
                     buffer.push(specificByte(functionMask, 0));
                     buffer.push(specificByte(functionMask, 1));
                     buffer.push(specificByte(functionMask, 2));
@@ -2674,35 +2647,6 @@ var mspHelper = (function (gui) {
             }
             MSP.send_message(MSPCodes.MSP_SET_RXFAIL_CONFIG, buffer, false, nextFunction);
         }
-    };
-
-    /**
-     * @return {number}
-     */
-    self.SERIAL_PORT_FUNCTIONSToMask = function (functions) {
-        var mask = 0;
-        for (var index = 0; index < functions.length; index++) {
-            var key = functions[index];
-            var bitIndex = mspHelper.SERIAL_PORT_FUNCTIONS[key];
-            if (bitIndex >= 0) {
-                mask = bit_set(mask, bitIndex);
-            }
-        }
-        return mask;
-    };
-
-    self.serialPortFunctionMaskToFunctions = function (functionMask) {
-        var functions = [];
-
-        var keys = Object.keys(mspHelper.SERIAL_PORT_FUNCTIONS);
-        for (var index = 0; index < keys.length; index++) {
-            var key = keys[index];
-            var bit = mspHelper.SERIAL_PORT_FUNCTIONS[key];
-            if (bit_check(functionMask, bit)) {
-                functions.push(key);
-            }
-        }
-        return functions;
     };
 
     self.sendServoMixRules = function (onCompleteCallback) {
