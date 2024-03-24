@@ -1747,8 +1747,33 @@ OSD.constants = {
                     name: 'MAP_REFERENCE',
                     id: 99,
                     preview: FONT.symbol(SYM.DIRECTION) + '\nN',
-                },
+                }
             ],
+        },
+        {
+            name: 'osdGroupHud',
+            items: [
+                {
+                    name: 'HOMING',
+                    id: 144,
+                    positionable: false
+                },
+                {
+                    name: 'HOMEPOINT',
+                    id: 145,
+                    positionable: false
+                },
+                {
+                    name: 'INAV_RADAR',
+                    id: 146,
+                    positionable: false
+                },
+                {
+                    name: 'WAYPOINTS',
+                    id: 147,
+                    positionable: false
+                }
+            ]
         },
         {
             name: 'osdGroupVTX',
