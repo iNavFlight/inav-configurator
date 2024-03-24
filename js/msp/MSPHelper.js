@@ -3539,6 +3539,13 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
     };
 
+    self.loadSerialPorts = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, callback);
+    };
+
+    self.saveSerialPorts = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, callback);
+    };
 
     return self;
 })(GUI);

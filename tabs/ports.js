@@ -170,15 +170,9 @@ TABS.ports.initialize = function (callback) {
         googleAnalytics.sendAppView('Ports');
     }
 
-    load_configuration_from_fc();
-
-    function load_configuration_from_fc() {
-        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, on_configuration_loaded_handler);
-
-        function on_configuration_loaded_handler() {
-            GUI.load("./tabs/ports.html", on_tab_loaded_handler);
-        }
-    }
+    mspHelper.loadSerialPorts(function () {
+        GUI.load("./tabs/ports.html", on_tab_loaded_handler)
+    });
 
     function update_ui() {
 
@@ -359,7 +353,7 @@ TABS.ports.initialize = function (callback) {
             SERIAL_CONFIG.ports.push(serialPort);
         });
 
-        MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, save_to_eeprom);
+        mspHelper.saveSerialPorts(save_to_eeprom);
 
         function save_to_eeprom() {
             MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, on_saved_handler);
