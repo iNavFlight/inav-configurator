@@ -101,7 +101,7 @@ TABS.ports.initialize = function (callback) {
                             select_e = functions_e.find(selectElementSelector);
                             
                             if (select_e.length == 0) {
-                                functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
+                                functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="function-select ' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
                                 select_e = functions_e.find(selectElementSelector);
                                 var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
                                 select_e.append('<option value="">' + disabledText + '</option>');
@@ -118,6 +118,48 @@ TABS.ports.initialize = function (callback) {
 
             }            
         }
+
+        $('table.ports tbody').on('change', 'select', onSwitchChange);
+        $('table.ports tbody').on('change', 'input', onSwitchChange);
+    }
+
+    function onSwitchChange(e) {
+        let $cT  = $(e.currentTarget);
+
+        let functionName = $cT.val();
+        let rule = helper.serialPortHelper.getRuleByName($cT.val());
+
+        //if type is checkbox then process only if selected
+        if ($cT.is('input[type="checkbox"]') && !$cT.is(':checked')) {
+            return;
+        }
+        //if type select then process only if selected
+        if ($cT.is('select') && !functionName) {
+            return;
+        }
+
+        if (rule && rule.isUnique) {
+            let $selects = $cT.closest('tr').find('.function-select');
+            $selects.each(function (index, element) {
+
+                let $element = $(element);
+
+                if ($element.val() != functionName) {
+                    $element.val('');
+                }
+            });
+
+            let $checkboxes = $cT.closest('tr').find('input[type="checkbox"]');
+            $checkboxes.each(function (index, element) {
+                let $element = $(element);
+
+                if ($element.val() != functionName) {
+                    $element.prop('checked', false);
+                    $element.trigger('change');
+                }
+            });
+        }
+
     }
 
     function on_tab_loaded_handler() {
@@ -206,15 +248,10 @@ function updateDefaultBaud(baudSelect, column) {
     let portName = section.find('.function-' + column).val();
     let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
 
-    let rules = helper.serialPortHelper.getRules();
+    let rule = helper.serialPortHelper.getRuleByName(portName);
 
-    for (i = 0; i < rules.length; i++) {
-        if (rules[i].name === portName) {
-            if (typeof rules[i].defaultBaud !== 'undefined') {
-                baudRate = rules[i].defaultBaud;
-            }
-            break;
-        }
+    if (rule && typeof rule.defaultBaud !== 'undefined') {
+        baudRate = rule.defaultBaud;
     }
 
     section.find("." + column + "_baudrate").children('[value=' + baudRate + ']').prop('selected', true);
