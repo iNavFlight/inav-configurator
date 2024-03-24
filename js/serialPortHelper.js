@@ -145,7 +145,44 @@ helper.serialPortHelper = (function () {
         20: 'USB VCP',
         30: 'SOFTSERIAL1',
         31: 'SOFTSERIAL2'
-     };
+    };
+
+    privateScope.bauds = {
+        'SENSOR': [
+            '9600',
+            '19200',
+            '38400',
+            '57600',
+            '115200',
+            '230400'
+        ],
+        'MSP': [
+            '9600',
+            '19200',
+            '38400',
+            '57600',
+            '115200'
+        ],
+        'TELEMETRY': [
+            'AUTO',
+            '1200',
+            '2400',
+            '4800',
+            '9600',
+            '19200',
+            '38400',
+            '57600',
+            '115200'
+        ],
+        'PERIPHERAL': [
+            '19200',
+            '38400',
+            '57600',
+            '115200',
+            '230400',
+            '250000'
+        ]
+    };
 
     privateScope.generateNames = function () {
         if (privateScope.namesGenerated) {
@@ -164,6 +201,16 @@ helper.serialPortHelper = (function () {
 
         return privateScope.rules;
     };
+
+    publicScope.getRuleByName = function (name) {
+        for (var i = 0; i < privateScope.rules.length; i++) {
+            if (privateScope.rules[i].name === name) {
+                return privateScope.rules[i];
+            }
+        }
+
+        return null;
+    }
 
     /**
      * 
@@ -203,6 +250,54 @@ helper.serialPortHelper = (function () {
 
     publicScope.getPortName = function (identifier) {
         return privateScope.identifierToName[identifier];
+    };
+
+    publicScope.getPortIdentifiersForFunction = function (functionName) {
+        let identifiers = [];
+
+        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
+            let config = SERIAL_CONFIG.ports[index];
+            if (config.functions.indexOf(functionName) != -1) {
+                identifiers.push(config.identifier);
+            }
+        }
+
+        return identifiers;
+    }
+
+    publicScope.getPortList = function () {
+
+        let list = [];
+
+        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
+            let config = SERIAL_CONFIG.ports[index];
+
+            //exclude USB VCP port
+            if (config.identifier == 20) {
+                continue;
+            }
+
+            let port = {
+                identifier: config.identifier,
+                displayName: privateScope.identifierToName[config.identifier]
+            };
+            list.push(port);
+        }
+        return list;
+    };
+
+    publicScope.getBauds = function (functionName) {
+        return privateScope.bauds[functionName];
+    };
+
+    publicScope.getPortByIdentifier = function (identifier) {
+        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
+            let config = SERIAL_CONFIG.ports[index];
+            if (config.identifier == identifier) {
+                return config;
+            }
+        }
+        return null;
     };
 
     return publicScope;

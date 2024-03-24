@@ -4,44 +4,6 @@ TABS.ports = {};
 
 TABS.ports.initialize = function (callback) {
 
-    var mspBaudRates = [
-        '9600',
-        '19200',
-        '38400',
-        '57600',
-        '115200'
-    ];
-
-    var gpsBaudRates = [
-        '9600',
-        '19200',
-        '38400',
-        '57600',
-        '115200',
-        '230400'
-    ];
-
-    var telemetryBaudRates_post1_6_3 = [
-        'AUTO',
-        '1200',
-        '2400',
-        '4800',
-        '9600',
-        '19200',
-        '38400',
-        '57600',
-        '115200'
-    ];
-
-    var peripheralsBaudRates = [
-        '19200',
-        '38400',
-        '57600',
-        '115200',
-        '230400',
-        '250000'
-    ];
-
     var columns = ['data', 'logging', 'sensors', 'telemetry', 'rx', 'peripherals'];
 
     if (GUI.active_tab != 'ports') {
@@ -61,23 +23,23 @@ TABS.ports.initialize = function (callback) {
             $elements;
 
         $elements = $('select.sensors_baudrate');
-        for (i = 0; i < gpsBaudRates.length; i++) {
-            $elements.append('<option value="' + gpsBaudRates[i] + '">' + gpsBaudRates[i] + '</option>');
+        for (i = 0; i < helper.serialPortHelper.getBauds('SENSOR').length; i++) {
+            $elements.append('<option value="' + helper.serialPortHelper.getBauds('SENSOR')[i] + '">' + helper.serialPortHelper.getBauds('SENSOR')[i] + '</option>');
         }
 
         $elements = $('select.msp_baudrate');
-        for (i = 0; i < mspBaudRates.length; i++) {
-            $elements.append('<option value="' + mspBaudRates[i] + '">' + mspBaudRates[i] + '</option>');
+        for (i = 0; i < helper.serialPortHelper.getBauds('MSP').length; i++) {
+            $elements.append('<option value="' + helper.serialPortHelper.getBauds('MSP')[i] + '">' + helper.serialPortHelper.getBauds('MSP')[i] + '</option>');
         }
 
         $elements = $('select.telemetry_baudrate');
-        for (i = 0; i < telemetryBaudRates_post1_6_3.length; i++) {
-            $elements.append('<option value="' + telemetryBaudRates_post1_6_3[i] + '">' + telemetryBaudRates_post1_6_3[i] + '</option>');
+        for (i = 0; i < helper.serialPortHelper.getBauds('TELEMETRY').length; i++) {
+            $elements.append('<option value="' + helper.serialPortHelper.getBauds('TELEMETRY')[i] + '">' + helper.serialPortHelper.getBauds('TELEMETRY')[i] + '</option>');
         }
 
         $elements = $('select.peripherals_baudrate');
-        for (i = 0; i < peripheralsBaudRates.length; i++) {
-            $elements.append('<option value="' + peripheralsBaudRates[i] + '">' + peripheralsBaudRates[i] + '</option>');
+        for (i = 0; i < helper.serialPortHelper.getBauds('PERIPHERAL').length; i++) {
+            $elements.append('<option value="' + helper.serialPortHelper.getBauds('PERIPHERAL')[i] + '">' + helper.serialPortHelper.getBauds('PERIPHERAL')[i] + '</option>');
         }
 
         var ports_e = $('.tab-ports .ports');

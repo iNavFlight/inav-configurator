@@ -95,6 +95,42 @@ TABS.gps.initialize = function (callback) {
 
         helper.features.updateUI($('.tab-gps'), FEATURES);
 
+        //Generate serial port options
+        let $port = $('#gps_port');
+        let $baud = $('#gps_baud');
+
+        let ports = helper.serialPortHelper.getPortIdentifiersForFunction('GPS');
+
+        let currentPort = null;
+
+        if (ports.length == 1) {
+            currentPort = ports[0];
+        }
+
+        let availablePorts = helper.serialPortHelper.getPortList();
+
+        //Generate port select
+        $port.append('<option value="-1">NONE</option>');
+        for (let i = 0; i < availablePorts.length; i++) {
+            let port = availablePorts[i];
+            $port.append('<option value="' + port.identifier + '">' + port.displayName + '</option>');
+        }
+
+        //Generate baud select
+        helper.serialPortHelper.getBauds('SENSOR').forEach(function (baud) {
+            $baud.append('<option value="' + baud + '">' + baud + '</option>');
+        });
+
+        //Select defaults
+        if (currentPort !== null) {
+            $port.val(currentPort);
+            let portConfig = helper.serialPortHelper.getPortByIdentifier(currentPort);
+            $baud.val(portConfig.sensors_baudrate);
+        } else {
+            $port.val(-1);
+            $baud.val(helper.serialPortHelper.getRuleByName('GPS').defaultBaud);
+        }
+
         // generate GPS
         var gpsProtocols = FC.getGpsProtocols();
         var gpsSbas = FC.getGpsSbasProviders();
