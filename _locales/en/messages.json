@@ -2058,6 +2058,12 @@
     "gpsSignalStr": {
         "message": "Signal Strength"
     },
+    "gpsPort": {
+        "message": "Serial Port"
+    },
+    "gpsBaud": {
+        "message": "Baud Rate"
+    },
     "magnetometerHead": {
         "message": "Alignment tool"
     },

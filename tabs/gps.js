@@ -33,12 +33,11 @@ TABS.gps.initialize = function (callback) {
         19: 'adsb_12.png', // ADSB_EMITTER_TYPE_POINT_OBSTACLE
     };
 
-
-
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
         mspHelper.loadFeatures,
+        mspHelper.loadSerialPorts,
         mspHelper.loadMiscV2
     ];
 
@@ -50,6 +49,7 @@ TABS.gps.initialize = function (callback) {
 
     var saveChain = [
         mspHelper.saveMiscV2,
+        mspHelper.saveSerialPorts,
         saveSettings,
         mspHelper.saveToEeprom
     ];
@@ -94,6 +94,42 @@ TABS.gps.initialize = function (callback) {
         var features = FC.getFeatures();
 
         helper.features.updateUI($('.tab-gps'), FEATURES);
+
+        //Generate serial port options
+        let $port = $('#gps_port');
+        let $baud = $('#gps_baud');
+
+        let ports = helper.serialPortHelper.getPortIdentifiersForFunction('GPS');
+
+        let currentPort = null;
+
+        if (ports.length == 1) {
+            currentPort = ports[0];
+        }
+
+        let availablePorts = helper.serialPortHelper.getPortList();
+
+        //Generate port select
+        $port.append('<option value="-1">NONE</option>');
+        for (let i = 0; i < availablePorts.length; i++) {
+            let port = availablePorts[i];
+            $port.append('<option value="' + port.identifier + '">' + port.displayName + '</option>');
+        }
+
+        //Generate baud select
+        helper.serialPortHelper.getBauds('SENSOR').forEach(function (baud) {
+            $baud.append('<option value="' + baud + '">' + baud + '</option>');
+        });
+
+        //Select defaults
+        if (currentPort !== null) {
+            $port.val(currentPort);
+            let portConfig = helper.serialPortHelper.getPortByIdentifier(currentPort);
+            $baud.val(portConfig.sensors_baudrate);
+        } else {
+            $port.val(-1);
+            $baud.val(helper.serialPortHelper.getRuleByName('GPS').defaultBaud);
+        }
 
         // generate GPS
         var gpsProtocols = FC.getGpsProtocols();
@@ -376,6 +412,8 @@ TABS.gps.initialize = function (callback) {
                     googleAnalytics.sendEvent('Setting', 'Feature', featureName);
                 }
             }
+
+            helper.serialPortHelper.set($port.val(), 'GPS', $baud.val());
 
             helper.features.reset();
             helper.features.fromUI($('.tab-gps'));
