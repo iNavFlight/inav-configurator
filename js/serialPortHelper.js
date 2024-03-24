@@ -300,5 +300,33 @@ helper.serialPortHelper = (function () {
         return null;
     };
 
+    publicScope.clearByFunction = function (functionName) {
+        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
+            let config = SERIAL_CONFIG.ports[index];
+            if (config.functions.indexOf(functionName) != -1) {
+                config.functions = [];
+            }
+        }
+    };
+
+    publicScope.set = function(port, functionName, baudrate) {
+
+        publicScope.clearByFunction(functionName);
+
+        let config = publicScope.getPortByIdentifier(port);
+        if (config) {
+
+            config.functions = [functionName];
+
+            //set baudrate
+            //TODO add next entries as we progress
+            if (functionName == 'MSP') {
+                config.msp_baudrate = baudrate;
+            } else if (functionName == 'GPS') {
+                config.sensors_baudrate = baudrate;
+            }
+        }
+    }
+
     return publicScope;
 })();

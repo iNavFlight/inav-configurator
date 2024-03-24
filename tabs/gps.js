@@ -413,6 +413,8 @@ TABS.gps.initialize = function (callback) {
                 }
             }
 
+            helper.serialPortHelper.set($port.val(), 'GPS', $baud.val());
+
             helper.features.reset();
             helper.features.fromUI($('.tab-gps'));
             helper.features.execute(function () {
