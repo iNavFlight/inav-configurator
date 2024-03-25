@@ -174,6 +174,8 @@ helper.serialPortHelper = (function () {
             '230400'
         ],
         'MSP': [
+            '2400',
+            '4800',            
             '9600',
             '19200',
             '38400',
