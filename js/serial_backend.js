@@ -159,8 +159,13 @@ var SerialBackend = (function () {
             GUI.updateManualPortVisibility();
         });
 
-        $('div.connect_controls a.connect').on('click', function () {
-            if (GUI.connect_lock != true) { // GUI control overrides the user control
+    $('div.connect_controls a.connect').click(function () {
+
+        if (helper.groundstation.isActivated()) {
+            helper.groundstation.deactivate();
+        }
+
+        if (GUI.connect_lock != true) { // GUI control overrides the user control
 
                 var clicks = $(this).data('clicks');
                 var selected_baud = parseInt(privateScope.$baud.val());
@@ -354,23 +359,31 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
-            CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
+        CONFIGURATOR.connection.addOnReceiveListener(read_serial);
+        CONFIGURATOR.connection.addOnReceiveListener(helper.ltmDecoder.read);
 
-            /*
-            // disconnect after 10 seconds with error if we don't get IDENT data
-            timeout.add('connecting', function () {
-                if (!CONFIGURATOR.connectionValid) {
-                    GUI.log(i18n.getMessage('noConfigurationReceived'));
+        // disconnect after 10 seconds with error if we don't get IDENT data
+        helper.timeout.add('connecting', function () {
+
+            //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
+            if (!CONFIGURATOR.connectionValid && !helper.ltmDecoder.isReceiving()) {
+                GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
 
                     mspQueue.flush();
                     mspQueue.freeHardLock();
                     mspQueue.freeSoftLock();
                     CONFIGURATOR.connection.emptyOutputBuffer();
 
-                    $('div.connect_controls a').trigger( "click" ); // disconnect
-                }
-            }, 10000);
-            */
+                $('div.connect_controls a').click(); // disconnect
+            }
+        }, 10000);
+
+        //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+        helper.interval.add('ltm-connection-check', function () {
+            if (helper.ltmDecoder.isReceiving()) {
+                helper.groundstation.activate($('#main-wrapper'));
+            }
+        }, 1000);
 
             FC.resetState();
 

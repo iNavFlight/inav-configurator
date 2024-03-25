@@ -231,48 +231,50 @@ TABS.ports.initialize = function (callback) {
 
             port_configuration_e.data('serialPort', serialPort);
 
-            port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
-            port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
-            port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
-            port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
+            //Append only port different than USB VCP
+            if (serialPort.identifier != 20) {
 
-            port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
-            if (serialPort.identifier >= 30) {
-                port_configuration_e.find('.softSerialWarning').css("display", "inline")
-            } else {
-                port_configuration_e.find('.softSerialWarning').css("display", "none")
-            }
+                port_configuration_e.find('select.msp_baudrate').val(serialPort.msp_baudrate);
+                port_configuration_e.find('select.telemetry_baudrate').val(serialPort.telemetry_baudrate);
+                port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
+                port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
-            port_configuration_e.data('index', portIndex);
-            port_configuration_e.data('port', serialPort);
+                port_configuration_e.find('.identifier').text(portIdentifierToNameMapping[serialPort.identifier]);
+                if (serialPort.identifier >= 30) {
+                    port_configuration_e.find('.softSerialWarning').css("display", "inline")
+                } else {
+                    port_configuration_e.find('.softSerialWarning').css("display", "none")
+                }
 
+                port_configuration_e.data('index', portIndex);
+                port_configuration_e.data('port', serialPort);
 
-            for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                var column = columns[columnIndex];
+                for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                    var column = columns[columnIndex];
 
-                var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
-                let functions_e_id = "portFunc-" + column + "-" + portIndex;
-                functions_e.attr("id", functions_e_id);
+                    var functions_e = $(port_configuration_e).find('.functionsCell-' + column);
+                    let functions_e_id = "portFunc-" + column + "-" + portIndex;
+                    functions_e.attr("id", functions_e_id);
 
                 for (let i = 0; i < portFunctionRules.length; i++) {
                     var functionRule = portFunctionRules[i];
                     var functionName = functionRule.name;
 
-                    if (functionRule.groups.indexOf(column) == -1) {
-                        continue;
-                    }
-
-                    var select_e;
-                    if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
-                        var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
-                        functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
-
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            var checkbox_e = functions_e.find('#' + checkboxId);
-                            checkbox_e.prop("checked", true);
+                        if (functionRule.groups.indexOf(column) == -1) {
+                            continue;
                         }
 
-                    } else {
+                        var select_e;
+                        if (column !== 'telemetry' && column !== 'peripherals' && column !== 'sensors') {
+                            var checkboxId = 'functionCheckbox-' + portIndex + '-' + columnIndex + '-' + i;
+                            functions_e.prepend('<span class="function"><input type="checkbox" class="togglemedium" id="' + checkboxId + '" value="' + functionName + '" /><label for="' + checkboxId + '"> ' + functionRule.displayName + '</label></span>');
+
+                            if (serialPort.functions.indexOf(functionName) >= 0) {
+                                var checkbox_e = functions_e.find('#' + checkboxId);
+                                checkbox_e.prop("checked", true);
+                            }
+
+                        } else {
 
                         var selectElementName = 'function-' + column;
                         var selectElementSelector = 'select[name=' + selectElementName + ']';
@@ -286,14 +288,15 @@ TABS.ports.initialize = function (callback) {
                         }
                         select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
 
-                        if (serialPort.functions.indexOf(functionName) >= 0) {
-                            select_e.val(functionName);
+                            if (serialPort.functions.indexOf(functionName) >= 0) {
+                                select_e.val(functionName);
+                            }
                         }
                     }
                 }
-            }
+                ports_e.find('tbody').append(port_configuration_e);
 
-            ports_e.find('tbody').append(port_configuration_e);
+            }            
         }
     }
 
@@ -310,14 +313,18 @@ TABS.ports.initialize = function (callback) {
 
    function on_save_handler() {
 
-        // update configuration based on current ui state
-        SERIAL_CONFIG.ports = [];
+        //Clear ports of any previous for serials different than USB VCP
+        SERIAL_CONFIG.ports = SERIAL_CONFIG.ports.filter(item => item.identifier == 20)
 
         $('.tab-ports .portConfiguration').each(function () {
 
             var portConfiguration_e = this;
 
             var oldSerialPort = $(this).data('serialPort');
+
+            if (oldSerialPort.identifier == 20) {
+                return;
+            }
 
             var functions = $(portConfiguration_e).find('input:checkbox:checked').map(function() {
                 return this.value;
