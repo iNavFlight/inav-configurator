@@ -284,10 +284,6 @@ var mspHelper = (function (gui) {
                     PIDs[i][3] = data.getUint8(needle + 3);
                 }
                 break;
-            case MSPCodes.MSP_ARMING_CONFIG:
-                ARMING_CONFIG.auto_disarm_delay = data.getUint8(0);
-                ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
-                break;
             case MSPCodes.MSP_LOOP_TIME:
                 FC_CONFIG.loopTime = data.getInt16(0, true);
                 break;
@@ -1403,9 +1399,6 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_LOOP_TIME:
                 console.log('Looptime saved');
                 break;
-            case MSPCodes.MSP_SET_ARMING_CONFIG:
-                console.log('Arming config saved');
-                break;
             case MSPCodes.MSP_SET_RESET_CURR_PID:
                 console.log('Current PID profile reset');
                 break;
@@ -1744,10 +1737,6 @@ var mspHelper = (function (gui) {
                 buffer.push(highByte(CONFIG.accelerometerTrims[0]));
                 buffer.push(lowByte(CONFIG.accelerometerTrims[1]));
                 buffer.push(highByte(CONFIG.accelerometerTrims[1]));
-                break;
-            case MSPCodes.MSP_SET_ARMING_CONFIG:
-                buffer.push(ARMING_CONFIG.auto_disarm_delay);
-                buffer.push(ARMING_CONFIG.disarm_kill_switch);
                 break;
             case MSPCodes.MSP_SET_LOOP_TIME:
                 buffer.push(lowByte(FC_CONFIG.loopTime));
@@ -2938,10 +2927,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
-    self.loadArmingConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, callback);
-    };
-
     self.loadRxConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, callback);
     };
@@ -3048,10 +3033,6 @@ var mspHelper = (function (gui) {
 
     self.saveAccTrim = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, callback);
-    };
-
-    self.saveArmingConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, callback);
     };
 
     self.saveRxConfig = function (callback) {
