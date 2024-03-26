@@ -32,7 +32,6 @@ var CONFIG,
     ADSB_VEHICLES,
     MISSION_PLANNER,
     ANALOG,
-    ARMING_CONFIG,
     FC_CONFIG,
     MISC,
     REVERSIBLE_MOTORS,
@@ -273,11 +272,6 @@ var FC = {
             use_capacity_thresholds: false,
             battery_remaining_capacity: 0,
             battery_flags: 0
-        };
-
-        ARMING_CONFIG = {
-            auto_disarm_delay: 0,
-            disarm_kill_switch: 0
         };
 
         FC_CONFIG = {

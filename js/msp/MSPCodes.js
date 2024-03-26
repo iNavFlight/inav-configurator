@@ -50,8 +50,6 @@ var MSPCodes = {
     MSP_CF_SERIAL_CONFIG:       54,
     MSP_SET_CF_SERIAL_CONFIG:   55,
     MSP_SONAR:                  58,
-    MSP_ARMING_CONFIG:          61,
-    MSP_SET_ARMING_CONFIG:      62,
     MSP_DATAFLASH_SUMMARY:      70,
     MSP_DATAFLASH_READ:         71,
     MSP_DATAFLASH_ERASE:        72,
