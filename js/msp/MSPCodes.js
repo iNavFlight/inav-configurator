@@ -29,8 +29,6 @@ var MSPCodes = {
     MSP_SET_FW_CONFIG:          24,
 
     // MSP commands for Cleanflight original features
-    MSP_CHANNEL_FORWARDING:     32,
-    MSP_SET_CHANNEL_FORWARDING: 33,
     MSP_MODE_RANGES:            34,
     MSP_SET_MODE_RANGE:         35,
     MSP_FEATURE:                36,

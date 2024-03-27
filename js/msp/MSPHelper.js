@@ -804,10 +804,6 @@ var mspHelper = (function (gui) {
 
                 break;
 
-            case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
-                console.log('Channel forwarding saved');
-                break;
-
             case MSPCodes.MSP2_CF_SERIAL_CONFIG:
                 SERIAL_CONFIG.ports = [];
                 var bytesPerPort = 1 + 4 + 4;
@@ -871,17 +867,6 @@ var mspHelper = (function (gui) {
                         auxSwitchChannelIndex: data.getUint8(offset++)
                     };
                     ADJUSTMENT_RANGES.push(adjustmentRange);
-                }
-                break;
-
-            case MSPCodes.MSP_CHANNEL_FORWARDING:
-                for (i = 0; i < data.byteLength && i < SERVO_CONFIG.length; i++) {
-                    var channelIndex = data.getUint8(i);
-                    if (channelIndex < 255) {
-                        SERVO_CONFIG[i].indexOfChannelToForward = channelIndex;
-                    } else {
-                        SERVO_CONFIG[i].indexOfChannelToForward = undefined;
-                    }
                 }
                 break;
 
@@ -1877,16 +1862,6 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FAILSAFE_CONFIG.failsafe_min_distance));
                 buffer.push(highByte(FAILSAFE_CONFIG.failsafe_min_distance));
                 buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
-                break;
-
-            case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
-                for (i = 0; i < SERVO_CONFIG.length; i++) {
-                    var out = SERVO_CONFIG[i].indexOfChannelToForward;
-                    if (out == undefined) {
-                        out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-                    }
-                    buffer.push(out);
-                }
                 break;
 
             case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
