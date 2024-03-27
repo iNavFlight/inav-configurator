@@ -606,7 +606,7 @@ function release_deb(arch) {
                     `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${metadata.name}/${metadata.name}.desktop`,
                 ],
                 prerm: [`xdg-desktop-menu uninstall ${metadata.name}.desktop`],
-                depends: ['libgconf-2-4', 'libatomic1'],
+                depends: ['libatomic1'],
                 changelog: [],
                 _target: `${LINUX_INSTALL_DIR}/${metadata.name}`,
                 _out: appsDir,
