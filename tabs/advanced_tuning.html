@@ -286,10 +286,12 @@
                             <label for="max-bank-angle"><span data-i18n="posholdMaxBankAngle"></span></label>
                             <div for="max-bank-angle" class="helpicon cf_tip" data-i18n_title="posholdMaxBankAngleHelp"></div>
                         </div>
-                        <div class="checkbox">
-                            <input type="checkbox" class="toggle update_preview" id="use-mid-throttle" data-setting="nav_use_midthr_for_althold" data-live="true" />
-                            <label for="use-mid-throttle"><span data-i18n="posholdHoverMidThrottle"></span></label>
+
+                        <div class="select">
+                            <select id="nav-mc-althold-throttle" data-setting="nav_mc_althold_throttle"></select>
+                            <label for="nav-mc-althold-throttle"><span data-i18n="navmcAltholdThrottle"></span></label>
                         </div>
+
                         <div class="number">
                             <input id="hover-throttle" type="number" data-unit="us" data-setting="nav_mc_hover_thr" data-setting-multiplier="1" step="1" min="1000" max="2000" />
                             <label for="hover-throttle"><span data-i18n="posholdHoverThrottle"></span></label>

@@ -2993,8 +2993,8 @@
     "posholdHoverThrottle": {
         "message": "Hover throttle"
     },
-    "posholdHoverMidThrottle": {
-        "message": "Use mid. throttle for ALTHOLD"
+    "navmcAltholdThrottle": {
+        "message": "Stick position for althold hover"
     },
     "mcWpSlowdown": {
         "message": "Slow down when approaching waypoint"
