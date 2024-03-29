@@ -18,8 +18,6 @@ var MSPCodes = {
     MSP_CALIBRATION_DATA:       14,
     MSP_SET_CALIBRATION_DATA:   15,
 
-    MSP_POSITION_ESTIMATION_CONFIG: 16,
-    MSP_SET_POSITION_ESTIMATION_CONFIG: 17,
     MSP_WP_MISSION_LOAD: 18,
     MSP_WP_MISSION_SAVE: 19,
     MSP_WP_GETINFO: 20,
@@ -29,8 +27,6 @@ var MSPCodes = {
     MSP_SET_FW_CONFIG:          24,
 
     // MSP commands for Cleanflight original features
-    MSP_CHANNEL_FORWARDING:     32,
-    MSP_SET_CHANNEL_FORWARDING: 33,
     MSP_MODE_RANGES:            34,
     MSP_SET_MODE_RANGE:         35,
     MSP_FEATURE:                36,
@@ -57,13 +53,9 @@ var MSPCodes = {
     MSP_SET_LOOP_TIME:          74,
     MSP_FAILSAFE_CONFIG:        75,
     MSP_SET_FAILSAFE_CONFIG:    76,
-    MSP_RXFAIL_CONFIG:          77,
-    MSP_SET_RXFAIL_CONFIG:      78,
     MSP_SDCARD_SUMMARY:         79,
     MSP_BLACKBOX_CONFIG:        80,
     MSP_SET_BLACKBOX_CONFIG:    81,
-    MSP_OSD_CONFIG:             84,
-    MSP_SET_OSD_CONFIG:         85,
     MSP_OSD_CHAR_READ:          86,
     MSP_OSD_CHAR_WRITE:         87,
     MSP_VTX_CONFIG:             88,
