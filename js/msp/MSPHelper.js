@@ -438,21 +438,6 @@ var mspHelper = (function (gui) {
                     AUX_CONFIG_IDS.push(data.getUint8(i));
                 }
                 break;
-            case MSPCodes.MSP_SERVO_MIX_RULES:
-                SERVO_RULES.flush();
-                if (data.byteLength % 8 === 0) {
-                    for (i = 0; i < data.byteLength; i += 8) {
-                        SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt16(i + 2, true),
-                            data.getInt8(i + 4)
-                        ));
-                    }
-                }
-                SERVO_RULES.cleanup();
-
-                break;
             case MSPCodes.MSP2_INAV_SERVO_MIXER:
                 SERVO_RULES.flush();
                 if (data.byteLength % 6 === 0) {
@@ -469,9 +454,6 @@ var mspHelper = (function (gui) {
                 SERVO_RULES.cleanup();
                 break;
 
-            case MSPCodes.MSP_SET_SERVO_MIX_RULE:
-                console.log("Servo mix saved");
-                break;
             case MSPCodes.MSP2_INAV_SET_SERVO_MIXER:
                 console.log("Servo mix saved");
                 break;

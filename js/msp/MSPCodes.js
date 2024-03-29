@@ -120,9 +120,6 @@ var MSPCodes = {
 
     // MSP_BIND:               240,
 
-    MSP_SERVO_MIX_RULES:    241,
-    MSP_SET_SERVO_MIX_RULE: 242,
-
     MSP_RTC:                246,
     MSP_SET_RTC:            247,
 
