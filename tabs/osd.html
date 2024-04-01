@@ -326,7 +326,17 @@
                         </label>
                     </div>
                 </div>
-                <div class="gui_box grey pan-servo-container"> 
+
+
+                <div class="gui_box grey custom-element-container">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="osd_custom_element_settings"></div>
+                    </div>
+                    <div class="spacer_box settings" id="osdCustomElements"></div>
+                </div>
+
+
+                <div class="gui_box grey pan-servo-container">
                     <div class="gui_box_titlebar">
                         <div for="osd_pan_servo_settings" class="helpicon cf_tip" data-i18n_title="osd_pan_servo_settings_HELP"></div>
                         <div class="spacer_box_title" data-i18n="osd_pan_servo_settings"></div>
@@ -433,6 +443,12 @@
                 </div>
                 <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0;">
                     <a class="flash_font active" data-i18n="osd_font_upload"></a>
+                </div>
+            </div>
+            <div id="fonttypeselectorcontent" style="display:none; width:712px;">
+                <div class="font-picker" style="margin-bottom: 10px;">
+                    <h1 class="tab_title">Font:</h1>
+                    <div class="content_wrapper font-preview"></div>
                 </div>
             </div>
             <div class="clear-both"></div>
