@@ -291,11 +291,6 @@ var FC = {
             battery_flags: 0
         };
 
-        this.ARMING_CONFIG = {
-            auto_disarm_delay: 0,
-            disarm_kill_switch: 0
-        };
-
         this.FC_CONFIG = {
             loopTime: 0
         };
@@ -587,6 +582,15 @@ var FC = {
             rate: null,
             expo: null
         };
+
+
+        FW_APPROACH = new FwApproachCollection();
+
+        OSD_CUSTOM_ELEMENTS = {
+           settings: {customElementsCount: 0, customElementTextSize: 0},
+           items: [],
+        };
+
     },
     getOutputUsages: function() {
         return {
@@ -1329,7 +1333,8 @@ var FC = {
                     37: "Rangefinder [cm]",
                     38: "Active MixerProfile",
                     39: "MixerTransition Active",
-                    40: "Yaw [deg]"
+                    40: "Yaw [deg]",
+                    41: "FW Land State"
                 }
             },
             3: {

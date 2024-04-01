@@ -87,6 +87,7 @@ sources.js = [
     './js/simple_smooth_filter.js',
     './js/walking_average_filter.js',
     './js/gui.js',
+    './js/serialPortHelper.js',
     './js/msp/MSPCodes.js',
     './js/msp/MSPHelper.js',
     './js/msp/MSPchainer.js',
@@ -141,6 +142,8 @@ sources.js = [
     './js/sitl.js',
     './js/CliAutoComplete.js',
     './node_modules/jquery-textcomplete/dist/jquery.textcomplete.js',
+    './js/fwApproach.js',
+    './js/fwApproachCollection.js',
     './js/ltmDecoder.js',
     './js/groundstation.js'
 ];
@@ -409,18 +412,39 @@ gulp.task('release-osx64', function(done) {
         archive.directory(src, 'INAV Configurator.app');
         output.on('close', function() {
             if (getArguments().notarize) {
-                console.log('Notarizing DMG file: ' + zipFilename);
-                const notarizeArgs = ['macapptool', '-v', '1', 'notarize'];
+                console.log('Notarizing ZIP file: ' + zipFilename);
+                const notarizeArgs = ['xcrun', 'notarytool', 'submit'];
+                notarizeArgs.push(zipFilename);
                 const notarizationUsername = getArguments()['notarization-username'];
                 if (notarizationUsername) {
-                    notarizeArgs.push('-u', notarizationUsername)
+                    notarizeArgs.push('--apple-id', notarizationUsername)
+                } else {
+                    throw new Error('Missing notarization username');
                 }
                 const notarizationPassword = getArguments()['notarization-password'];
                 if (notarizationPassword) {
-                    notarizeArgs.push('-p', notarizationPassword)
+                    notarizeArgs.push('--password', notarizationPassword)
+                } else {
+                    throw new Error('Missing notarization password');
                 }
-                notarizeArgs.push(zipFilename)
+                const notarizationTeamId = getArguments()['notarization-team-id'];
+                if (notarizationTeamId) {
+                    notarizeArgs.push('--team-id', notarizationTeamId)
+                } else {
+                    throw new Error('Missing notarization Team ID');
+                }
+                notarizeArgs.push('--wait');
+
+                const notarizationWebhook = getArguments()['notarization-webhook'];
+                if (notarizationWebhook) {
+                    notarizeArgs.push('--webhook', notarizationWebhook);
+                }
                 execSync.apply(this, notarizeArgs);
+
+                console.log('Stapling ZIP file: ' + zipFilename);
+                const stapleArgs = ['macapptool', '-v', '1', 'staple'];
+                stapleArgs.push(zipFilename)
+                execSync.apply(this, stapleArgs);
             }
             done();
         });
@@ -586,7 +610,7 @@ function release_deb(arch) {
                     `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${metadata.name}/${metadata.name}.desktop`,
                 ],
                 prerm: [`xdg-desktop-menu uninstall ${metadata.name}.desktop`],
-                depends: ['libgconf-2-4', 'libatomic1'],
+                depends: ['libatomic1'],
                 changelog: [],
                 _target: `${LINUX_INSTALL_DIR}/${metadata.name}`,
                 _out: appsDir,

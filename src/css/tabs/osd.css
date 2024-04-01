@@ -720,3 +720,17 @@ button {
 .tab-osd .unit_wrapper {
     vertical-align: top;
 }
+
+.osdCustomElement_main_table {
+    width: 100%;
+    table-layout: fixed;
+    max-width: 400px;
+}
+
+.osdCustomElement_main_table td{
+    max-width: 80px;
+}
+
+.osdCustomElement_main_table select, .osdCustomElement_main_table input{
+    width: 100% !important;
+}

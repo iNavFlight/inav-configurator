@@ -46,7 +46,6 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.loadMotorMixRules,
         mspHelper.loadServoMixRules,
         mspHelper.loadMixerConfig,
-        mspHelper.loadServoMixRules,
         mspHelper.loadServoConfiguration,
         mspHelper.loadOutputMapping,
         mspHelper.loadRcData,
