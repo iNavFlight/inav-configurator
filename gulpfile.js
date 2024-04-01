@@ -55,6 +55,7 @@ sources.css = [
     './node_modules/openlayers/dist/ol.css',
     './src/css/logic.css',
     './src/css/defaults_dialog.css',
+    './src/css/groundstation.css',
 ];
 
 sources.js = [
@@ -86,6 +87,7 @@ sources.js = [
     './js/simple_smooth_filter.js',
     './js/walking_average_filter.js',
     './js/gui.js',
+    './js/serialPortHelper.js',
     './js/msp/MSPCodes.js',
     './js/msp/MSPHelper.js',
     './js/msp/MSPchainer.js',
@@ -141,7 +143,9 @@ sources.js = [
     './js/CliAutoComplete.js',
     './node_modules/jquery-textcomplete/dist/jquery.textcomplete.js',
     './js/fwApproach.js',
-    './js/fwApproachCollection.js'
+    './js/fwApproachCollection.js',
+    './js/ltmDecoder.js',
+    './js/groundstation.js'
 ];
 
 sources.receiverCss = [

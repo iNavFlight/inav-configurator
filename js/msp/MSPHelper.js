@@ -20,33 +20,6 @@ var mspHelper = (function (gui) {
         '921600'
     ];
 
-    self.SERIAL_PORT_FUNCTIONS = {
-        'MSP': 0,
-        'GPS': 1,
-        'TELEMETRY_FRSKY': 2,
-        'TELEMETRY_HOTT': 3,
-        'TELEMETRY_LTM': 4, // LTM replaced MSP
-        'TELEMETRY_SMARTPORT': 5,
-        'RX_SERIAL': 6,
-        'BLACKBOX': 7,
-        'TELEMETRY_MAVLINK': 8,
-        'TELEMETRY_IBUS': 9,
-        'RUNCAM_DEVICE_CONTROL': 10,
-        'TBS_SMARTAUDIO': 11,
-        'IRC_TRAMP': 12,
-        'OPFLOW': 14,
-        'LOG': 15,
-        'RANGEFINDER': 16,
-        'VTX_FFPV': 17,
-        'ESC': 18,
-        'GSM_SMS': 19,
-        'FRSKY_OSD': 20,
-        'DJI_FPV': 21,
-        'SBUS_OUTPUT': 22,
-        'SMARTPORT_MASTER': 23,
-        'MSP_DISPLAYPORT': 25,
-    };
-
     // Required for MSP_DEBUGMSG because console.log() doesn't allow omitting
     // the newline at the end, so we keep the pending message here until we find a
     // '\0', then print it. Messages sent by MSP_DEBUGMSG are guaranteed to
@@ -187,6 +160,35 @@ var mspHelper = (function (gui) {
                 GPS_DATA.eph = data.getUint16(16, true);
                 GPS_DATA.epv = data.getUint16(18, true);
                 break;
+            case MSPCodes.MSP2_ADSB_VEHICLE_LIST:
+                var byteOffsetCounter = 0;
+                ADSB_VEHICLES.vehicles = [];
+                ADSB_VEHICLES.vehiclesCount = data.getUint8(byteOffsetCounter++);
+                ADSB_VEHICLES.callsignLength = data.getUint8(byteOffsetCounter++);
+
+                for(i = 0; i < ADSB_VEHICLES.vehiclesCount; i++){
+
+                    var vehicle = {callSignByteArray: [], callsign: "", icao: 0, lat: 0, lon: 0, alt: 0, heading: 0, ttl: 0, tslc: 0, emitterType: 0};
+
+                    for(ii = 0; ii < ADSB_VEHICLES.callsignLength; ii++){
+                        vehicle.callSignByteArray.push(data.getUint8(byteOffsetCounter++));
+                    }
+
+                    vehicle.callsign = (String.fromCharCode(...vehicle.callSignByteArray)).replace(/[^\x20-\x7E]/g, '');
+                    vehicle.icao = data.getUint32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lat = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.lon = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.altCM = data.getInt32(byteOffsetCounter, true); byteOffsetCounter += 4;
+                    vehicle.headingDegrees = data.getUint16(byteOffsetCounter, true); byteOffsetCounter += 2;
+                    vehicle.tslc = data.getUint8(byteOffsetCounter++);
+                    vehicle.emitterType = data.getUint8(byteOffsetCounter++);
+                    vehicle.ttl = data.getUint8(byteOffsetCounter++);
+
+                    ADSB_VEHICLES.vehicles.push(vehicle);
+                }
+
+                break;
+
             case MSPCodes.MSP_ATTITUDE:
                 SENSOR_DATA.kinematics[0] = data.getInt16(0, true) / 10.0; // x
                 SENSOR_DATA.kinematics[1] = data.getInt16(2, true) / 10.0; // y
@@ -281,10 +283,6 @@ var mspHelper = (function (gui) {
                     PIDs[i][2] = data.getUint8(needle + 2);
                     PIDs[i][3] = data.getUint8(needle + 3);
                 }
-                break;
-            case MSPCodes.MSP_ARMING_CONFIG:
-                ARMING_CONFIG.auto_disarm_delay = data.getUint8(0);
-                ARMING_CONFIG.disarm_kill_switch = data.getUint8(1);
                 break;
             case MSPCodes.MSP_LOOP_TIME:
                 FC_CONFIG.loopTime = data.getInt16(0, true);
@@ -806,10 +804,6 @@ var mspHelper = (function (gui) {
 
                 break;
 
-            case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
-                console.log('Channel forwarding saved');
-                break;
-
             case MSPCodes.MSP2_CF_SERIAL_CONFIG:
                 SERIAL_CONFIG.ports = [];
                 var bytesPerPort = 1 + 4 + 4;
@@ -820,7 +814,7 @@ var mspHelper = (function (gui) {
 
                     var serialPort = {
                         identifier: data.getUint8(offset),
-                        functions: mspHelper.serialPortFunctionMaskToFunctions(data.getUint32(offset + 1, true)),
+                        functions: helper.serialPortHelper.maskToFunctions(data.getUint32(offset + 1, true)),
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
@@ -873,17 +867,6 @@ var mspHelper = (function (gui) {
                         auxSwitchChannelIndex: data.getUint8(offset++)
                     };
                     ADJUSTMENT_RANGES.push(adjustmentRange);
-                }
-                break;
-
-            case MSPCodes.MSP_CHANNEL_FORWARDING:
-                for (i = 0; i < data.byteLength && i < SERVO_CONFIG.length; i++) {
-                    var channelIndex = data.getUint8(i);
-                    if (channelIndex < 255) {
-                        SERVO_CONFIG[i].indexOfChannelToForward = channelIndex;
-                    } else {
-                        SERVO_CONFIG[i].indexOfChannelToForward = undefined;
-                    }
                 }
                 break;
 
@@ -942,21 +925,6 @@ var mspHelper = (function (gui) {
                 offset += 2;
                 FAILSAFE_CONFIG.failsafe_min_distance_procedure = data.getUint8(offset);
                 offset++;
-                break;
-
-            case MSPCodes.MSP_RXFAIL_CONFIG:
-                //noinspection JSUndeclaredVariable
-                RXFAIL_CONFIG = []; // empty the array as new data is coming in
-
-                var channelCount = data.byteLength / 3;
-
-                for (i = 0; offset < data.byteLength && i < channelCount; i++, offset++) {
-                    var rxfailChannel = {
-                        mode: data.getUint8(offset++),
-                        value: data.getUint16(offset++, true)
-                    };
-                    RXFAIL_CONFIG.push(rxfailChannel);
-                }
                 break;
 
 
@@ -1343,20 +1311,6 @@ var mspHelper = (function (gui) {
                 console.log('Calibration data saved');
                 break;
 
-            case MSPCodes.MSP_POSITION_ESTIMATION_CONFIG:
-                POSITION_ESTIMATOR.w_z_baro_p = data.getUint16(0, true) / 100;
-                POSITION_ESTIMATOR.w_z_gps_p = data.getUint16(2, true) / 100;
-                POSITION_ESTIMATOR.w_z_gps_v = data.getUint16(4, true) / 100;
-                POSITION_ESTIMATOR.w_xy_gps_p = data.getUint16(6, true) / 100;
-                POSITION_ESTIMATOR.w_xy_gps_v = data.getUint16(8, true) / 100;
-                POSITION_ESTIMATOR.gps_min_sats = data.getUint8(10);
-                POSITION_ESTIMATOR.use_gps_velned = data.getUint8(11);
-                break;
-
-            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
-                console.log('POSITION_ESTIMATOR saved');
-                break;
-
             case MSPCodes.MSP_RTH_AND_LAND_CONFIG:
                 RTH_AND_LAND_CONFIG.minRthDistance = data.getUint16(0, true);
                 RTH_AND_LAND_CONFIG.rthClimbFirst = data.getUint8(2);
@@ -1401,9 +1355,6 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_LOOP_TIME:
                 console.log('Looptime saved');
                 break;
-            case MSPCodes.MSP_SET_ARMING_CONFIG:
-                console.log('Arming config saved');
-                break;
             case MSPCodes.MSP_SET_RESET_CURR_PID:
                 console.log('Current PID profile reset');
                 break;
@@ -1419,16 +1370,8 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SET_RX_CONFIG:
                 console.log('Rx config saved');
                 break;
-            case MSPCodes.MSP_SET_RXFAIL_CONFIG:
-                console.log('Rxfail config saved');
-                break;
             case MSPCodes.MSP_SET_FAILSAFE_CONFIG:
                 console.log('Failsafe config saved');
-                break;
-            case MSPCodes.MSP_OSD_CONFIG:
-                break;
-            case MSPCodes.MSP_SET_OSD_CONFIG:
-                console.log('OSD config set');
                 break;
             case MSPCodes.MSP_OSD_CHAR_READ:
                 break;
@@ -1814,10 +1757,6 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(CONFIG.accelerometerTrims[1]));
                 buffer.push(highByte(CONFIG.accelerometerTrims[1]));
                 break;
-            case MSPCodes.MSP_SET_ARMING_CONFIG:
-                buffer.push(ARMING_CONFIG.auto_disarm_delay);
-                buffer.push(ARMING_CONFIG.disarm_kill_switch);
-                break;
             case MSPCodes.MSP_SET_LOOP_TIME:
                 buffer.push(lowByte(FC_CONFIG.loopTime));
                 buffer.push(highByte(FC_CONFIG.loopTime));
@@ -1959,23 +1898,13 @@ var mspHelper = (function (gui) {
                 buffer.push(FAILSAFE_CONFIG.failsafe_min_distance_procedure);
                 break;
 
-            case MSPCodes.MSP_SET_CHANNEL_FORWARDING:
-                for (i = 0; i < SERVO_CONFIG.length; i++) {
-                    var out = SERVO_CONFIG[i].indexOfChannelToForward;
-                    if (out == undefined) {
-                        out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-                    }
-                    buffer.push(out);
-                }
-                break;
-
             case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
                 for (i = 0; i < SERIAL_CONFIG.ports.length; i++) {
                     var serialPort = SERIAL_CONFIG.ports[i];
 
                     buffer.push(serialPort.identifier);
 
-                    var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
+                    var functionMask = helper.serialPortHelper.functionsToMask(serialPort.functions);
                     buffer.push(specificByte(functionMask, 0));
                     buffer.push(specificByte(functionMask, 1));
                     buffer.push(specificByte(functionMask, 2));
@@ -2115,26 +2044,6 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(CALIBRATION_DATA.magGain.Z));
                 buffer.push(highByte(CALIBRATION_DATA.magGain.Z));
 
-                break;
-
-            case MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG:
-                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_baro_p * 100));
-                buffer.push(highByte(POSITION_ESTIMATOR.w_z_baro_p * 100));
-
-                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_p * 100));
-                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_p * 100));
-
-                buffer.push(lowByte(POSITION_ESTIMATOR.w_z_gps_v * 100));
-                buffer.push(highByte(POSITION_ESTIMATOR.w_z_gps_v * 100));
-
-                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_p * 100));
-                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_p * 100));
-
-                buffer.push(lowByte(POSITION_ESTIMATOR.w_xy_gps_v * 100));
-                buffer.push(highByte(POSITION_ESTIMATOR.w_xy_gps_v * 100));
-
-                buffer.push(POSITION_ESTIMATOR.gps_min_sats);
-                buffer.push(POSITION_ESTIMATOR.use_gps_velned);
                 break;
 
             case MSPCodes.MSP_SET_RTH_AND_LAND_CONFIG:
@@ -2691,66 +2600,6 @@ var mspHelper = (function (gui) {
         });
     };
 
-    self.sendRxFailConfig = function (onCompleteCallback) {
-        var nextFunction = send_next_rxfail_config;
-
-        var rxFailIndex = 0;
-
-        if (RXFAIL_CONFIG.length == 0) {
-            onCompleteCallback();
-        } else {
-            send_next_rxfail_config();
-        }
-
-        function send_next_rxfail_config() {
-
-            var rxFail = RXFAIL_CONFIG[rxFailIndex];
-
-            var buffer = [];
-            buffer.push(rxFailIndex);
-            buffer.push(rxFail.mode);
-            buffer.push(lowByte(rxFail.value));
-            buffer.push(highByte(rxFail.value));
-
-            // prepare for next iteration
-            rxFailIndex++;
-            if (rxFailIndex == RXFAIL_CONFIG.length) {
-                nextFunction = onCompleteCallback;
-
-            }
-            MSP.send_message(MSPCodes.MSP_SET_RXFAIL_CONFIG, buffer, false, nextFunction);
-        }
-    };
-
-    /**
-     * @return {number}
-     */
-    self.SERIAL_PORT_FUNCTIONSToMask = function (functions) {
-        var mask = 0;
-        for (var index = 0; index < functions.length; index++) {
-            var key = functions[index];
-            var bitIndex = mspHelper.SERIAL_PORT_FUNCTIONS[key];
-            if (bitIndex >= 0) {
-                mask = bit_set(mask, bitIndex);
-            }
-        }
-        return mask;
-    };
-
-    self.serialPortFunctionMaskToFunctions = function (functionMask) {
-        var functions = [];
-
-        var keys = Object.keys(mspHelper.SERIAL_PORT_FUNCTIONS);
-        for (var index = 0; index < keys.length; index++) {
-            var key = keys[index];
-            var bit = mspHelper.SERIAL_PORT_FUNCTIONS[key];
-            if (bit_check(functionMask, bit)) {
-                functions.push(key);
-            }
-        }
-        return functions;
-    };
-
     self.sendServoMixRules = function (onCompleteCallback) {
         // TODO implement
         onCompleteCallback();
@@ -3040,10 +2889,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSPV2_BATTERY_CONFIG, false, false, callback);
     };
 
-    self.loadArmingConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_ARMING_CONFIG, false, false, callback);
-    };
-
     self.loadRxConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_RX_CONFIG, false, false, callback);
     };
@@ -3152,10 +2997,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP_SET_ACC_TRIM, mspHelper.crunch(MSPCodes.MSP_SET_ACC_TRIM), false, callback);
     };
 
-    self.saveArmingConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_ARMING_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_ARMING_CONFIG), false, callback);
-    };
-
     self.saveRxConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_RX_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_RX_CONFIG), false, callback);
     };
@@ -3170,14 +3011,6 @@ var mspHelper = (function (gui) {
 
     self.saveNavPosholdConfig = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_NAV_POSHOLD, mspHelper.crunch(MSPCodes.MSP_SET_NAV_POSHOLD), false, callback);
-    };
-
-    self.loadPositionEstimationConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_POSITION_ESTIMATION_CONFIG, false, false, callback);
-    };
-
-    self.savePositionEstimationConfig = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_POSITION_ESTIMATION_CONFIG), false, callback);
     };
 
     self.loadCalibrationData = function (callback) {
@@ -3614,6 +3447,13 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_PROGRAMMING_PID_STATUS, false, false, callback);
     };
 
+    self.loadSerialPorts = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, callback);
+    };
+
+    self.saveSerialPorts = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG, mspHelper.crunch(MSPCodes.MSP2_SET_CF_SERIAL_CONFIG), false, callback);
+    };
 
     return self;
 })(GUI);

@@ -14,7 +14,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     var loadChain = [
         mspHelper.loadFeatures,
-        mspHelper.loadArmingConfig,
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
         mspHelper.loadVTXConfig,
@@ -31,7 +30,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     var saveChain = [
         mspHelper.saveAccTrim,
-        mspHelper.saveArmingConfig,
         mspHelper.saveAdvancedConfig,
         mspHelper.saveVTXConfig,
         mspHelper.saveCurrentMeterConfig,
@@ -257,8 +255,6 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('a.save').click(function () {
             //UPDATE: moved to GPS tab and hidden
             //MISC.mag_declination = parseFloat($('#mag_declination').val());
-
-            ARMING_CONFIG.auto_disarm_delay = parseInt($('input[name="autodisarmdelay"]').val());
 
             MISC.battery_cells = parseInt($('#cells').val());
             MISC.voltage_source = parseInt($('#voltagesource').val());

@@ -306,7 +306,7 @@ TABS.setup.initialize3D = function () {
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 
-        self.render3D();
+        this.render3D();
     };
 
     $(window).on('resize', this.resize3D);
