@@ -14,7 +14,6 @@ TABS.pid_tuning.initialize = function (callback) {
 
     var loadChain = [
         mspHelper.loadPidData,
-        mspHelper.loadINAVPidConfig,
         mspHelper.loadFilterConfig,
         mspHelper.loadRateDynamics,
         mspHelper.loadEzTune
@@ -316,11 +315,7 @@ TABS.pid_tuning.initialize = function (callback) {
             EZ_TUNE.expo = $('#ez_tune_expo').val();
 
             function send_rc_tuning_changes() {
-                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
-            }
-
-            function saveINAVPidConfig() {
-                MSP.send_message(MSPCodes.MSP_SET_INAV_PID, mspHelper.crunch(MSPCodes.MSP_SET_INAV_PID), false, saveFilterConfig);
+                MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveFilterConfig);
             }
 
             function saveFilterConfig() {
