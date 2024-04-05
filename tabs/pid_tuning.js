@@ -9,6 +9,9 @@ TABS.pid_tuning.initialize = function (callback) {
 
     var loadChainer = new MSPChainerClass();
 
+    let EZ_TUNE_PID_RP_DEFAULT = [40, 75, 23, 100];
+    let EZ_TUNE_PID_YAW_DEFAULT = [45, 80, 0, 100];
+
     var loadChain = [
         mspHelper.loadPidNames,
         mspHelper.loadPidData,
@@ -104,38 +107,91 @@ TABS.pid_tuning.initialize = function (callback) {
         RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
 
     }
-    function hideUnusedPids(sensors_detected) {
-      $('.tab-pid_tuning table.pid_tuning').hide();
-      $('#pid_main').show();
-
-      if (have_sensor(sensors_detected, 'acc')) {
-        $('#pid_accel').show();
-      }
-      if (have_sensor(sensors_detected, 'baro')) {
-        $('#pid_baro').show();
-      }
-      if (have_sensor(sensors_detected, 'mag')) {
-        $('#pid_mag').show();
-      }
-      if (bit_check(FEATURES, 7)) {
-        $('#pid_gps').show();
-      }
-      if (have_sensor(sensors_detected, 'sonar')) {
-        $('#pid_baro').show();
-      }
+    
+    function getYawPidScale(input) {
+        const normalized = (input - 100) * 0.01;
+    
+        return 1.0 + (normalized * 0.5); 
     }
+
+    function scaleRange(x, srcMin, srcMax, destMin, destMax) {
+        let a = (destMax - destMin) * (x - srcMin);
+        let b = srcMax - srcMin;
+        return ((a / b) + destMin);
+    }
+
+    function updatePreview() {
+
+        let axisRatio = $('#ez_tune_axis_ratio').val() / 100;
+        let response = $('#ez_tune_response').val();
+        let damping = $('#ez_tune_damping').val();
+        let stability = $('#ez_tune_stability').val();
+        let aggressiveness = $('#ez_tune_aggressiveness').val();
+        let rate = $('#ez_tune_rate').val();
+        let expo = $('#ez_tune_expo').val();
+
+        $('#preview-roll-p').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[0] * response / 100));
+        $('#preview-roll-i').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[1] * stability / 100));
+        $('#preview-roll-d').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[2] * damping / 100));
+        $('#preview-roll-ff').html(Math.floor(EZ_TUNE_PID_RP_DEFAULT[3] * aggressiveness / 100));
+
+        $('#preview-pitch-p').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[0] * response / 100));
+        $('#preview-pitch-i').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[1] * stability / 100));
+        $('#preview-pitch-d').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[2] * damping / 100));
+        $('#preview-pitch-ff').html(Math.floor(axisRatio * EZ_TUNE_PID_RP_DEFAULT[3] * aggressiveness / 100));
+
+        $('#preview-yaw-p').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[0] * getYawPidScale(response)));
+        $('#preview-yaw-i').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[1] * getYawPidScale(stability)));
+        $('#preview-yaw-d').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[2] * getYawPidScale(damping)));
+        $('#preview-yaw-ff').html(Math.floor(EZ_TUNE_PID_YAW_DEFAULT[3] * getYawPidScale(aggressiveness)));
+
+        $('#preview-roll-rate').html(Math.floor(scaleRange(rate, 0, 200, 30, 90)) * 10 + " dps");
+        $('#preview-pitch-rate').html(Math.floor(scaleRange(rate, 0, 200, 30, 90)) * 10 + " dps");
+        $('#preview-yaw-rate').html((Math.floor(scaleRange(rate, 0, 200, 30, 90)) - 10) * 10 + " dps");
+
+        $('#preview-roll-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
+        $('#preview-pitch-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
+        $('#preview-yaw-expo').html(Math.floor(scaleRange(expo, 0, 200, 40, 100)) + "%");
+
+    }
+
     function process_html() {
         // translate to user-selected language
-
-        if (EZ_TUNE.enabled) {
-            $("#tuning-wrapper").remove();
-            $("#tuning-footer").remove();
-            $('#note-wrapper').show();
-        } else {
-            $("#note-wrapper").remove();
-        }
-
         localize();
+
+        $('#ez_tune_enabled').on('change', function () {
+            if ($(this).is(":checked")) {
+                EZ_TUNE.enabled = 1;
+            } else {
+                EZ_TUNE.enabled = 0;
+            }
+
+            if (EZ_TUNE.enabled) {
+                $('.for-ez-tune').show();
+                $('.not-for-ez-tune').hide();
+            } else {
+                $('.for-ez-tune').hide();
+                $('.not-for-ez-tune').show();
+            }
+        });
+
+        $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled).trigger('change');
+
+        GUI.sliderize($('#ez_tune_filter_hz'), EZ_TUNE.filterHz, 10, 300);
+        GUI.sliderize($('#ez_tune_axis_ratio'), EZ_TUNE.axisRatio, 25, 175);
+        GUI.sliderize($('#ez_tune_response'), EZ_TUNE.response, 0, 200);
+        GUI.sliderize($('#ez_tune_damping'), EZ_TUNE.damping, 0, 200);
+        GUI.sliderize($('#ez_tune_stability'), EZ_TUNE.stability, 0, 200);
+        GUI.sliderize($('#ez_tune_aggressiveness'), EZ_TUNE.aggressiveness, 0, 200);
+
+        GUI.sliderize($('#ez_tune_rate'), EZ_TUNE.rate, 0, 200);
+        GUI.sliderize($('#ez_tune_expo'), EZ_TUNE.expo, 0, 200);
+
+        $('.ez-element').on('updated', function () {
+            updatePreview();
+        });
+
+        updatePreview();
 
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
@@ -248,6 +304,21 @@ TABS.pid_tuning.initialize = function (callback) {
         $('a.update').click(function () {
             form_to_pid_and_rc();
 
+            if ($("#ez_tune_enabled").is(":checked")) {
+                EZ_TUNE.enabled = 1;
+            } else {
+                EZ_TUNE.enabled = 0;
+            }
+
+            EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
+            EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
+            EZ_TUNE.response = $('#ez_tune_response').val();
+            EZ_TUNE.damping = $('#ez_tune_damping').val();
+            EZ_TUNE.stability = $('#ez_tune_stability').val();
+            EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
+            EZ_TUNE.rate = $('#ez_tune_rate').val();
+            EZ_TUNE.expo = $('#ez_tune_expo').val();
+
             function send_rc_tuning_changes() {
                 MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveINAVPidConfig);
             }
@@ -265,7 +336,11 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveRateDynamics() {
-                mspHelper.saveRateDynamics(saveSettings);
+                mspHelper.saveRateDynamics(saveEzTune);
+            }
+
+            function saveEzTune() {
+                mspHelper.saveEzTune(saveSettings)
             }
 
             function saveSettings() {
