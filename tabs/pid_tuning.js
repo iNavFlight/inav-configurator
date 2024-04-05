@@ -16,7 +16,6 @@ TABS.pid_tuning.initialize = function (callback) {
         mspHelper.loadPidData,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadFilterConfig,
-        mspHelper.loadFeatures,
         mspHelper.loadRateDynamics,
         mspHelper.loadEzTune
     ];
@@ -192,7 +191,6 @@ TABS.pid_tuning.initialize = function (callback) {
         updatePreview();
 
         helper.tabs.init($('.tab-pid_tuning'));
-        helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
 
         $('.action-resetPIDs').on('click', function() {
 
@@ -347,11 +345,7 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            helper.features.reset();
-            helper.features.fromUI($('.tab-pid_tuning'));
-            helper.features.execute(function () {
-                mspHelper.savePidData(send_rc_tuning_changes);    
-            });
+            send_rc_tuning_changes();
         });
 
         $('#gyro_use_dyn_lpf').on('change', function () {
