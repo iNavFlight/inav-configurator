@@ -47,7 +47,7 @@ TABS.pid_tuning.initialize = function (callback) {
                 $this.find('td:first').text(pidNames[bankPosition]);
 
                 $this.find('input').each(function (index) {
-                $(this).val(PIDs[bankPosition][index]);
+                    $(this).val(PIDs[bankPosition][index]);
                 });
             }
         });
@@ -140,21 +140,7 @@ TABS.pid_tuning.initialize = function (callback) {
         helper.tabs.init($('.tab-pid_tuning'));
         helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
 
-        hideUnusedPids(CONFIG.activeSensors);
-
-        $('#showAllPids').on('click', function(){
-          if($(this).text() == "Show all PIDs") {
-            $('.tab-pid_tuning table.pid_tuning').show();
-            $(this).text('Hide unused PIDs');
-            $('.show').addClass('unusedPIDsHidden');
-          } else {
-            hideUnusedPids(CONFIG.activeSensors);
-            $(this).text('Show all PIDs');
-            $('.show').removeClass('unusedPIDsHidden');
-          }
-        });
-
-        $('#resetPIDs').on('click', function() {
+        $('.action-resetPIDs').on('click', function() {
 
             if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
@@ -162,7 +148,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-        $('#resetDefaults').on('click', function() {
+        $('.action-resetDefaults').on('click', function() {
 
             if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
@@ -181,30 +167,6 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         pid_and_rc_to_form();
-
-        let $theOtherPids = $('#the-other-pids');
-        let $showAdvancedPids = $('#show-advanced-pids');
-
-        chrome.storage.local.get('showOtherPids', function (result) {
-            if (result.showOtherPids) {
-                $theOtherPids.removeClass("is-hidden");
-                $showAdvancedPids.prop('checked', true);
-            } else {
-                $theOtherPids.addClass("is-hidden");
-                $showAdvancedPids.prop('checked', false);
-            }
-            $showAdvancedPids.change();
-        });
-
-        $showAdvancedPids.on('change', function() {
-            if ($showAdvancedPids.is(':checked')) {
-                $theOtherPids.removeClass("is-hidden");
-                chrome.storage.local.set({ showOtherPids: true });
-            } else {
-                $theOtherPids.addClass("is-hidden");
-                chrome.storage.local.set({ showOtherPids: false });
-            }
-        });
 
         $(".pid-slider-row [name='value-slider']").on('input', function () {
             let val = $(this).val();

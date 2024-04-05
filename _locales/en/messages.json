@@ -1311,6 +1311,12 @@
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
+    "pidTuning_PIDmain": {
+        "message": "Main PID gains"
+    },
+    "pidTuning_PIDother": {
+        "message": "Additional PID gains"
+    },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
     },

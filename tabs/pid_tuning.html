@@ -10,24 +10,21 @@
     </div>
     <div id="tuning-wrapper" class="content_wrapper">
         <div class="tab_title subtab__header">
-            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDgains"></span>
+            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDmain"></span>
+            <span class="subtab__header_label" for="subtab-pid-other" data-i18n="pidTuning_PIDother"></span>
             <span class="subtab__header_label" for="subtab-rates" data-i18n="pidTuning_RatesAndExpo"></span>
             <span class="subtab__header_label" for="subtab-filters" data-i18n="pidTuning_Filters"></span>
             <span class="subtab__header_label" for="subtab-mechanics" data-i18n="pidTuning_Mechanics"></span>
         </div>
         <div id="subtab-pid" class="subtab__content subtab__content--current">
             <div class="cf_column right" style="margin-top: -6px;">
-                <div class="default_btn show">
-                    <a href="#" id="showAllPids" data-i18n="pidTuning_ShowAllPIDs"></a>
-                </div> 
                 <div class="default_btn resetbt">
-                    <a href="#" id="resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
+                    <a href="#" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
                 </div>
                 <div class="default_btn resetbt">
-                    <a href="#" id="resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
+                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
                 </div>
             </div>
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_PIDgains"></div>
             <div class="clear-both"></div>
 
             <div class="cf_column" id="pid-sliders">
@@ -115,13 +112,20 @@
 
                 </div>
             </div>
+        </div>
 
-            <div class="toolbox" style="margin-bottom: 1em;">
-                <input type="checkbox" id="show-advanced-pids" class="toggle" />
-                <label data-i18n="showAdvancedPIDs" for="show-advanced-pids"></label>
+        <div id="subtab-pid-other" class="subtab__content">
+            <div class="cf_column right" style="margin-top: -6px;">
+                <div class="default_btn resetbt">
+                    <a href="#" id="resetDefaults" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
+                </div>
+                <div class="default_btn resetbt">
+                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
+                </div>
             </div>
+            <div class="clear-both"></div>
 
-            <div class="cf_column pid-section is-hidden" id="the-other-pids">
+            <div class="cf_column pid-section" id="the-other-pids">
                 <div class="gui_box grey">
                     <table class="pid_titlebar">
                         <tr>
