@@ -13,7 +13,6 @@ TABS.pid_tuning.initialize = function (callback) {
     let EZ_TUNE_PID_YAW_DEFAULT = [45, 80, 0, 100];
 
     var loadChain = [
-        mspHelper.loadPidNames,
         mspHelper.loadPidData,
         mspHelper.loadINAVPidConfig,
         mspHelper.loadPidAdvanced,
