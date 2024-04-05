@@ -335,7 +335,7 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            send_rc_tuning_changes();
+            mspHelper.savePidData(send_rc_tuning_changes); 
         });
 
         $('#gyro_use_dyn_lpf').on('change', function () {
