@@ -128,7 +128,6 @@ sources.js = [
     './js/serial_queue.js',
     './js/msp_balanced_interval.js',
     './tabs/advanced_tuning.js',
-    './tabs/ez_tune.js',
     './js/peripherals.js',
     './js/appUpdater.js',
     './js/feature_framework.js',
