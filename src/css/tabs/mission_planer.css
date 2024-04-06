@@ -236,10 +236,17 @@
     margin-bottom: 5px;
     margin-left: 5px;
 }
+
 .tab-mission-control .point-label {
     width: 80px;
     display: inline-block;
 }
+
+.tab-mission-control .point-label-safehome {
+    width: 120px;
+    display: inline-block;
+}
+
 .tab-mission-control .point-radio input{
     width: 25px;
     padding-left: 3px;
@@ -511,16 +518,12 @@
 
 .tab-mission-control .fill{
     border:none;
-    border-bottom:5px dotted #88CC3E;
     display:inline-block;
     width:20px;
 }
 
 .tab-mission-control .textLegend{
     margin:2px;
-}
-.tab-mission-control .valueLegend{
-    float:right;
 }
 
 .tab-mission-control .userActionContainer {

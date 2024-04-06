@@ -63,7 +63,7 @@ var mspHelper = (function (gui) {
 
                 CONFIG.armingFlags = data.getUint32(offset, true);
                 offset += 4;
-                
+
                 //As there are 8 bytes for mspBoxModeFlags (number of bytes is actually variable)
                 //read mixer profile as the last byte in the the message
                 profile_byte = data.getUint8(dataHandler.message_length_expected - 1);
@@ -1425,6 +1425,9 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE:
                 console.log('Battery profile selected');
                 break;
+            case MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS:
+                console.log('OSD custom elements preferences saved');
+                break;
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 OUTPUT_MAPPING.flush();
                 for (i = 0; i < data.byteLength; ++i)
@@ -1492,16 +1495,36 @@ var mspHelper = (function (gui) {
                 }
                 break;
             case MSPCodes.MSP2_INAV_SAFEHOME:
-                SAFEHOMES.put(new Safehome(
+                let safehome = new Safehome(
                     data.getUint8(0),
                     data.getUint8(1),
                     data.getInt32(2, true),
-                    data.getInt32(6, true)
-                ));
+                    data.getInt32(6, true),
+                );
+                if (safehome.getEnabled()) {
+                    SAFEHOMES.put(safehome);
+                }
+
                 break;
             case MSPCodes.MSP2_INAV_SET_SAFEHOME:
                 console.log('Safehome points saved');
                 break;
+
+            case MSPCodes.MSP2_INAV_FW_APPROACH:
+                FW_APPROACH.put(new FwApproach(
+                    data.getUint8(0),
+                    data.getInt32(1, true),
+                    data.getInt32(5, true),
+                    data.getUint8(9, true),
+                    data.getInt16(10, true),
+                    data.getInt16(12, true),
+                    data.getUint8(14, true),
+                ));                
+                break;
+            
+                case MSPCodes.MSP2_INAV_SET_FW_APPROACH:
+                    console.log('FW Approach saved');
+                    break;
 
             case MSPCodes.MSP2_INAV_RATE_DYNAMICS:
                 RATE_DYNAMICS.sensitivityCenter = data.getUint8(0);
@@ -1530,6 +1553,54 @@ var mspHelper = (function (gui) {
 
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
                 console.log('EzTune settings saved');
+                break;
+
+            case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS:
+                OSD_CUSTOM_ELEMENTS.items = [];
+
+                var index = 0;
+
+                if(data.byteLength == 0){
+                    OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
+                    OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    return;
+                }
+
+                OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(index++);
+                OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(index++);
+
+                for (i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
+                    var customElement = {
+                        customElementItems: [],
+                        customElementVisibility: {type: 0, value: 0},
+                        customElementText: [],
+                    };
+
+                    for (let ii = 0; ii < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; ii++){
+                        var customElementPart = {type: 0,  value: 0,};
+                        customElementPart.type = data.getUint8(index++);
+                        customElementPart.value = data.getUint16(index, true);
+                        index += 2;
+                        customElement.customElementItems.push(customElementPart);
+                    }
+
+                    customElement.customElementVisibility.type = data.getUint8(index++);
+                    customElement.customElementVisibility.value = data.getUint16(index, true);
+                    index += 2;
+
+                    for (let ii = 0; ii < OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; ii++){
+                        var char = data.getUint8(index++);
+                        if(char === 0){
+                            index += (OSD_CUSTOM_ELEMENTS.settings.customElementTextSize - 1) - ii;
+                            break;
+                        }
+                        customElement.customElementText[ii] = char;
+                    }
+
+                    customElement.customElementText = String.fromCharCode(...customElement.customElementText);
+
+                    OSD_CUSTOM_ELEMENTS.items.push(customElement)
+                }
                 break;
 
             default:
@@ -2442,6 +2513,10 @@ var mspHelper = (function (gui) {
         }
     };
 
+    self.loadOsdCustomElements = function (callback) {
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS, false, false, callback);
+    }
+
     self.sendModeRanges = function (onCompleteCallback) {
         var nextFunction = send_next_mode_range;
 
@@ -2759,7 +2834,7 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
-    self.sendTimerOutputModes = function(onCompleteCallback) {
+    self.sendTimerOutputModes = function(callback) {
         var nextFunction = send_next_output_mode;
         var idIndex = 0;
 
@@ -2784,7 +2859,7 @@ var mspHelper = (function (gui) {
             // prepare for next iteration
             idIndex++;
             if (idIndex == overrideIds.length) {
-                nextFunction = onCompleteCallback;
+                nextFunction = callback;
 
             }
             MSP.send_message(MSPCodes.MSP2_INAV_SET_TIMER_OUTPUT_MODE, buffer, false, nextFunction);
@@ -3017,6 +3092,37 @@ var mspHelper = (function (gui) {
         };
     };
 
+    self.loadFwApproach = function (callback) {
+        FW_APPROACH.flush();
+        let id = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
+
+        function nextFwApproach() {
+            id++;
+            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, callback);
+            }
+        };
+    };
+
+    self.saveFwApproach = function (callback) {
+        let id = 0;
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+
+        function nextFwApproach() {
+            id++;
+            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+            }
+            else {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, callback);
+            }
+        };
+    };
+
     self._getSetting = function (name) {
         if (SETTINGS[name]) {
             return Promise.resolve(SETTINGS[name]);
@@ -3132,10 +3238,9 @@ var mspHelper = (function (gui) {
         return this._getSetting(name).then(function (setting) {
             
             if (!setting) {
-                console.log("Setting invalid: " + name);
-                return null;
+                throw 'Invalid setting';
             }
-
+            
             if (setting.table && !Number.isInteger(value)) {
                 var found = false;
                 for (var ii = 0; ii < setting.table.values.length; ii++) {
@@ -3183,11 +3288,10 @@ var mspHelper = (function (gui) {
 
     self.setSetting = function (name, value, callback) {
         this.encodeSetting(name, value).then(function (data) {
-            if (data) {
-                return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
-            } else {
-                return Promise.resolve().then(callback);
-            }
+            return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
+        }).catch(error =>  {
+            console.log("Invalid setting: " + name);
+            return new Promise(callback);
         });
     };
 

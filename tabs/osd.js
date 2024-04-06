@@ -341,7 +341,7 @@ FONT.preview = function ($el) {
     $el.empty();
     for (var i = 1; i <= SYM.LAST_CHAR; i++) {
         var url = FONT.data.character_image_urls[i];
-        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img> ');
+        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + ' (' + i.toString(10) + ') "></img> ');
     }
 };
 
@@ -1865,7 +1865,28 @@ OSD.constants = {
                     id: 116,
                     positionable: true,
                     preview: 'G3:30126'
-                }
+                },
+                {
+                    name: 'CUSTOM ELEMENT 1',
+                    id: 147,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_1",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 2',
+                    id: 148,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_2",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 3',
+                    id: 149,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_3",
+                },
             ]
         },
         {
@@ -2158,6 +2179,11 @@ OSD.reload = function(callback) {
             });
         });
     });
+
+    if(semver.gte(CONFIG.flightControllerVersion, '7.1.0'))
+    {
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
+    }
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -3397,8 +3423,264 @@ TABS.osd.initialize = function (callback) {
             usePitot = (SENSOR_CONFIG.pitot != 0);
             GUI.content_ready(callback);
         });
+
+        if(semver.gte(CONFIG.flightControllerVersion, '7.1.0')) {
+            mspHelper.loadOsdCustomElements(createCustomElements);
+        }
     }));
 };
+
+function createCustomElements(){
+    if(OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
+        $('.custom-element-container').remove();
+        return;
+    }
+
+    var customElementsContainer = $('#osdCustomElements');
+
+    for(var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
+        var label = $('<label>');
+
+        var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
+        var customElementRowType = $('<tr>').data('row', i);
+        var customElementRowValue = $('<tr>').data('row', i);
+        var customElementLabel = $('<tr>');
+
+        for(var ii = 0; ii < 3; ii++){
+
+            var select = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
+                        <option value="0">none</option>
+                        <option data-value="text" value="1">Text</option>
+                        <option data-value="ico" value="2">Icon Static</option>
+                        <option data-value="ico_gv" value="3">Icon Global Variable</option>
+                        <option data-value="gv" value="4">Global Variable 00000</option>
+                        <option data-value="gv" value="5">Global Variable 000.00</option>
+                        <option data-value="gv" value="6">Global Variable 000</option>
+                        <option data-value="gv" value="7">Global Variable 0.0</option>
+                        `);
+
+            customElementRowType.append($('<td>').append(select));
+            customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
+                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
+            ).append(
+                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()
+            ).append(
+                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()
+            ).append(
+                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+            ));
+
+            select.change(function(){
+                var dataValue = $(this).find(':selected').data('value');
+                var valueBlock = $('.' + $(this).data('valueCellClass'))
+                valueBlock.find('.value').hide();
+                valueBlock.find('.' + dataValue).show();
+            });
+        }
+
+        var selectVisibility = $('<select>').addClass('osdCustomElement-' + i + '-visibility-type').data('valueCellClass', 'osdCustomElement-' + i + '-visibility-value').html(`
+            <option value="0">always</option>
+            <option data-value="gv" value="1">Global Variable</option>
+            <option data-value="lc" value="2">Logic Condition</option>
+        `);
+        customElementRowType.append($('<td>').append(selectVisibility));
+        customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-visibility-value').append(
+            $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+        ).append(
+            $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
+        ));
+
+        selectVisibility.change(function(){
+            var dataValue = $(this).find(':selected').data('value');
+            var valueBlock = $('.' + $(this).data('valueCellClass'))
+            valueBlock.find('.value').hide();
+            valueBlock.find('.' + dataValue).show();
+        });
+
+        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(chrome.i18n.getMessage("custom_element") + ' ' + (i + 1))));
+
+        customElementTable.append(customElementRowType).append(customElementRowValue).append(customElementLabel);
+        label.append(customElementTable);
+        customElementsContainer.append(label);
+    }
+
+    fillCustomElementsValues();
+    customElementsInitCallback();
+}
+
+function fillCustomElementsValues() {
+    for (var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        for (var ii = 0; ii < 3; ii++) {
+            $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
+
+            var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
+            switch (OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type){
+                case 1:
+                    valueCell.find('.text').val(OSD_CUSTOM_ELEMENTS.items[i].customElementText).trigger('change');
+                    break;
+                case 2:
+                    valueCell.find('.ico').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 3:
+                    valueCell.find('.ico_gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    valueCell.find('.gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    break;
+            }
+        }
+
+        $('.osdCustomElement-' + i + '-visibility-type').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type).trigger('change');
+        var valueVisibilityCell = $('.osdCustomElement-' + i + '-visibility-value');
+        switch (OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type){
+            case 1:
+                valueVisibilityCell.find('.gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
+                break;
+            case 2:
+                valueVisibilityCell.find('.lc').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
+                break;
+        }
+
+        customElementNormaliseRow(i);
+        customElementDisableNonValidOptionsRow(i);
+    }
+}
+
+function customElementsInitCallback() {
+
+    var callback = function(){
+        var row = $(this).closest('tr').data('row');
+
+        customElementNormaliseRow(row);
+        customElementDisableNonValidOptionsRow(row);
+
+        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row));
+    };
+
+    var customElements = $('#osdCustomElements')
+    customElements.find('input, select').change(callback);
+    customElements.find('input').keyup(callback);
+}
+
+function customElementNormaliseRow(row){
+    for(var i = 0; i < 3; i++){
+        var elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+        var valueCell = $('.' + elementType.data('valueCellClass'));
+
+        switch (parseInt(elementType.val())){
+            case 1:
+                valueCell.find('.text').val(valueCell.find('.text').val().toUpperCase());
+                valueCell.find('.text').val(valueCell.find('.text').val().replace(/[^A-Z0-9!.\* ]/g, ""));
+                break;
+            case 2:
+                valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val(valueCell.find('.ico').val() < 1 ? 1 : valueCell.find('.ico').val());
+        }
+    }
+}
+
+function customElementDisableNonValidOptionsRow(row){
+
+    var selectedTextIndex = false;
+    for(let i = 0; i < 3; i++){
+        let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+
+        if(parseInt(elementType.val()) === 1)
+        {
+            selectedTextIndex = i;
+            break;
+        }
+    }
+
+    for(let i = 0; i < 3; i++){
+        let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+        if(i !== selectedTextIndex && selectedTextIndex !== false){
+            elementType.find('option[value="1"]').attr('disabled', 'disabled');
+        }else{
+            elementType.find('option[value="1"]').removeAttr('disabled');
+        }
+    }
+}
+
+function customElementGetDataForRow(row){
+
+    var data = [];
+    data.push8(row);
+
+    var text = "";
+
+    for(var ii = 0; ii < 3; ii++){
+        var elementType = $('.osdCustomElement-' + row + '-part-' + ii + '-type');
+        var valueCell = $('.' + elementType.data('valueCellClass'));
+        var partValue = 0;
+
+        switch (parseInt(elementType.val())){
+            case 1:
+                text = valueCell.find('.text').val();
+                break;
+            case 2:
+                partValue = parseInt(valueCell.find('.ico').val());
+                break;
+            case 3:
+                partValue = parseInt(valueCell.find('.ico_gv').find(':selected').val());
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                partValue = parseInt(valueCell.find('.gv').find(':selected').val());
+                break;
+        }
+
+        data.push8(parseInt(elementType.val()));
+        data.push16(partValue);
+    }
+
+    var elementVisibilityType = $('.osdCustomElement-' + row + '-visibility-type');
+    var valueVisibilityCell = $('.' + elementVisibilityType.data('valueCellClass'));
+    var visibilityValue = null;
+    switch (parseInt(elementVisibilityType.val())){
+        case 1:
+            visibilityValue = parseInt(valueVisibilityCell.find('.gv').find(':selected').val());
+            break;
+        case 2:
+            visibilityValue = parseInt(valueVisibilityCell.find('.lc').find(':selected').val());
+            break;
+    }
+
+    data.push8(parseInt(elementVisibilityType.val()));
+    data.push16(visibilityValue);
+
+    for(var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; i++){
+        if(i < text.length){
+            data.push8(text.charCodeAt(i))
+        }else{
+            data.push8(0);
+        }
+    }
+
+    return data;
+}
+
+function getGVoptions(){
+    var result = '';
+    for(var i = 0; i < 8; i++){
+        result += `<option value="` + i + `">GV `+i+`</option>`;
+    }
+    return result;
+}
+
+function getLCoptions(){
+    var result = '';
+    for(var i = 0; i < 64; i++){
+        result += `<option value="` + i + `">LC `+i+`</option>`;
+    }
+    return result;
+}
+
 
 function refreshOSDSwitchIndicators() {
     let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
@@ -3421,7 +3703,7 @@ function refreshOSDSwitchIndicators() {
     }
 
     OSD.GUI.updatePreviews();
-};
+}
 
 function updatePilotAndCraftNames() {
     let foundPilotName = ($('#pilot_name').val() == undefined);

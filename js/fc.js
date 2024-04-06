@@ -65,7 +65,10 @@ var CONFIG,
     BOARD_ALIGNMENT,
     CURRENT_METER_CONFIG,
     FEATURES,
-    RATE_DYNAMICS;
+    RATE_DYNAMICS,
+    FW_APPROACH,
+    OSD_CUSTOM_ELEMENTS;
+
 
 var FC = {
     restartRequired: false,
@@ -565,6 +568,15 @@ var FC = {
             rate: null,
             expo: null
         };
+
+
+        FW_APPROACH = new FwApproachCollection();
+
+        OSD_CUSTOM_ELEMENTS = {
+           settings: {customElementsCount: 0, customElementTextSize: 0},
+           items: [],
+        };
+
     },
     getOutputUsages: function() {
         return {
@@ -1307,7 +1319,8 @@ var FC = {
                     37: "Rangefinder [cm]",
                     38: "Active MixerProfile",
                     39: "MixerTransition Active",
-                    40: "Yaw [deg]"
+                    40: "Yaw [deg]",
+                    41: "FW Land State"
                 }
             },
             3: {

@@ -61,6 +61,8 @@ var Settings = (function () {
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
+                    } else if (input.attr('type') == 'radio') {
+                        input.prop( 'checked', s.value == input.attr('value') );
                     } else {
                         input.empty();
                         let option = null;
@@ -515,6 +517,10 @@ var Settings = (function () {
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;
+            } else if (input.attr('type') == 'radio') {
+                if (input.prop('checked')) {
+                    value = parseInt(input.val());
+                }
             } else {
                 value = parseInt(input.val());
             }
