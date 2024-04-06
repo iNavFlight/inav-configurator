@@ -434,10 +434,6 @@ helper.defaultsDialog = (function () {
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -643,10 +639,6 @@ helper.defaultsDialog = (function () {
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -830,10 +822,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "gyro_main_lpf_hz",
                 value: 10
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
             },
             {
                 key: "motor_pwm_protocol",
