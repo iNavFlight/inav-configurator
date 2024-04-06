@@ -110,7 +110,6 @@ var MSPCodes = {
     MSP_SET_WP:             209,
     MSP_SELECT_SETTING:     210,
     MSP_SET_HEAD:           211,
-    MSP_SET_SERVO_CONFIGURATION: 212,
     MSP_SET_MOTOR:          214,
     MSP_SET_3D:             217,
     MSP_SET_RC_DEADBAND:    218,
@@ -241,5 +240,8 @@ var MSPCodes = {
 
     MSP2_INAV_CUSTOM_OSD_ELEMENTS:      0x2100,
     MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS:  0x2101,
+
+    MSP2_INAV_SERVO_CONFIG:             0x2200,
+    MSP2_INAV_SET_SERVO_CONFIG:         0x2201,
 
 };
