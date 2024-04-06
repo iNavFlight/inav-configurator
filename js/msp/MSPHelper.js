@@ -438,21 +438,6 @@ var mspHelper = (function (gui) {
                     AUX_CONFIG_IDS.push(data.getUint8(i));
                 }
                 break;
-            case MSPCodes.MSP_SERVO_MIX_RULES:
-                SERVO_RULES.flush();
-                if (data.byteLength % 8 === 0) {
-                    for (i = 0; i < data.byteLength; i += 8) {
-                        SERVO_RULES.put(new ServoMixRule(
-                            data.getInt8(i),
-                            data.getInt8(i + 1),
-                            data.getInt16(i + 2, true),
-                            data.getInt8(i + 4)
-                        ));
-                    }
-                }
-                SERVO_RULES.cleanup();
-
-                break;
             case MSPCodes.MSP2_INAV_SERVO_MIXER:
                 SERVO_RULES.flush();
                 if (data.byteLength % 6 === 0) {
@@ -469,9 +454,6 @@ var mspHelper = (function (gui) {
                 SERVO_RULES.cleanup();
                 break;
 
-            case MSPCodes.MSP_SET_SERVO_MIX_RULE:
-                console.log("Servo mix saved");
-                break;
             case MSPCodes.MSP2_INAV_SET_SERVO_MIXER:
                 console.log("Servo mix saved");
                 break;
@@ -588,20 +570,18 @@ var mspHelper = (function (gui) {
                 console.log("motor mixer saved");
                 break;
 
-            case MSPCodes.MSP_SERVO_CONFIGURATIONS:
+            case MSPCodes.MSP2_INAV_SERVO_CONFIG:
                 //noinspection JSUndeclaredVariable
                 SERVO_CONFIG = []; // empty the array as new data is coming in
 
-                if (data.byteLength % 14 == 0) {
-                    for (i = 0; i < data.byteLength; i += 14) {
+                if (data.byteLength % 7 == 0) {
+                    for (i = 0; i < data.byteLength; i += 7) {
                         var arr = {
                             'min': data.getInt16(i + 0, true),
                             'max': data.getInt16(i + 2, true),
                             'middle': data.getInt16(i + 4, true),
                             'rate': data.getInt8(i + 6),
-                            'indexOfChannelToForward': data.getInt8(i + 9)
                         };
-                        data.getUint32(i + 10); // Skip 4 bytes that used to be reversed Sources
                         SERVO_CONFIG.push(arr);
                     }
                 }
@@ -646,7 +626,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_SELECT_SETTING:
                 console.log('Profile selected');
                 break;
-            case MSPCodes.MSP_SET_SERVO_CONFIGURATION:
+            case MSPCodes.MSP2_INAV_SET_SERVO_CONFIG:
                 console.log('Servo Configuration saved');
                 break;
             case MSPCodes.MSP_RTC:
@@ -2235,7 +2215,6 @@ var mspHelper = (function (gui) {
                 buffer.push(EZ_TUNE.aggressiveness);
                 buffer.push(EZ_TUNE.rate);
                 buffer.push(EZ_TUNE.expo);
-                console.log(buffer);
                 break;
 
 
@@ -2310,27 +2289,12 @@ var mspHelper = (function (gui) {
 
             buffer.push(lowByte(servoConfiguration.rate));
 
-            buffer.push(0);
-            buffer.push(0);
-
-            var out = servoConfiguration.indexOfChannelToForward;
-            if (out == undefined) {
-                out = 255; // Cleanflight defines "CHANNEL_FORWARDING_DISABLED" as "(uint8_t)0xFF"
-            }
-            buffer.push(out);
-
-            //Mock 4 bytes of servoConfiguration.reversedInputSources
-            buffer.push(0);
-            buffer.push(0);
-            buffer.push(0);
-            buffer.push(0);
-
             // prepare for next iteration
             servoIndex++;
             if (servoIndex == SERVO_CONFIG.length) {
                 nextFunction = onCompleteCallback;
             }
-            MSP.send_message(MSPCodes.MSP_SET_SERVO_CONFIGURATION, buffer, false, nextFunction);
+            MSP.send_message(MSPCodes.MSP2_INAV_SET_SERVO_CONFIG, buffer, false, nextFunction);
         }
     };
 
@@ -3334,7 +3298,7 @@ var mspHelper = (function (gui) {
     };
 
     self.loadServoConfiguration = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SERVO_CONFIGURATIONS, false, false, callback);
+        MSP.send_message(MSPCodes.MSP2_INAV_SERVO_CONFIG, false, false, callback);
     };
 
     self.loadServoMixRules = function (callback) {

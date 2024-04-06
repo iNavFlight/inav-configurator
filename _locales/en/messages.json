@@ -4850,12 +4850,6 @@
     "itermRelaxHelp": {
         "message": "Defines Iterm relaxation algorithm activation. PR mean it's active on Roll and Pitch axis. PRY is active also on Yaw."
     },
-    "gyro_main_lpf_type": {
-        "message": "Gyro LPF type"
-    },
-    "gyro_main_lpf_type_help": {
-        "message": "BIQUAD offers better noise attenuation for a price of higher delay. PT1 has lower attenuation but offers lower delay."
-    },
     "dterm_lpf_type": {
         "message": "D-term LPF type"
     },
