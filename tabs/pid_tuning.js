@@ -15,7 +15,8 @@ TABS.pid_tuning.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadPidData,
         mspHelper.loadRateDynamics,
-        mspHelper.loadEzTune
+        mspHelper.loadEzTune,
+        mspHelper.loadMixerConfig,
     ];
     loadChain.push(mspHelper.loadRateProfileData);
 
@@ -169,6 +170,10 @@ TABS.pid_tuning.initialize = function (callback) {
                 $('.not-for-ez-tune').show();
             }
         });
+
+        if (!FC.isMultirotor()) {
+            $('#ez-tune-switch').hide();
+        }
 
         $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled).trigger('change');
 
