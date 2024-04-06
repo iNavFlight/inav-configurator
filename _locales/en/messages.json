@@ -96,7 +96,7 @@
         "message": "Ports"
     },
     "tabPidTuning": {
-        "message": "PID tuning"
+        "message": "Tuning"
     },
     "tabReceiver": {
         "message": "Receiver"
@@ -1311,6 +1311,12 @@
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
+    "pidTuning_PIDmain": {
+        "message": "Main PID gains"
+    },
+    "pidTuning_PIDother": {
+        "message": "Additional PID gains"
+    },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
     },
@@ -1549,7 +1555,7 @@
         "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
     },
     "pidTuning_fwLevelTrimMechanics": {
-        "message": "Fixed Wing Level Trim"
+        "message": "Fixed Wing mechanics"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Level Trim [deg]"
