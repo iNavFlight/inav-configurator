@@ -1555,7 +1555,7 @@
         "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
     },
     "pidTuning_fwLevelTrimMechanics": {
-        "message": "Fixed Wing Level Trim"
+        "message": "Fixed Wing mechanics"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Level Trim [deg]"
