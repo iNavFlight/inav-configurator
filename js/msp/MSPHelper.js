@@ -204,12 +204,6 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSPV2_INAV_AIR_SPEED:
                 SENSOR_DATA.air_speed = data.getInt32(0, true);
                 break;
-            case MSPCodes.MSP_ANALOG:
-                ANALOG.voltage = data.getUint8(0) / 10.0;
-                ANALOG.mAhdrawn = data.getUint16(1, true);
-                ANALOG.rssi = data.getUint16(3, true); // 0-1023
-                ANALOG.amperage = data.getInt16(5, true) / 100; // A
-                break;
             case MSPCodes.MSPV2_INAV_ANALOG:
                 let tmp = data.getUint8(offset++);
                 ANALOG.battery_full_when_plugged_in = (tmp & 1 ? true : false);
@@ -2887,10 +2881,6 @@ var mspHelper = (function (gui) {
 
     self.loadAccTrim = function (callback) {
         MSP.send_message(MSPCodes.MSP_ACC_TRIM, false, false, callback);
-    };
-
-    self.loadAnalog = function (callback) {
-        MSP.send_message(MSPCodes.MSP_ANALOG, false, false, callback);
     };
 
     self.saveToEeprom = function saveToEeprom(callback) {

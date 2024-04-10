@@ -80,7 +80,6 @@ var MSPCodes = {
     MSP_COMP_GPS:           107,
     MSP_ATTITUDE:           108,
     MSP_ALTITUDE:           109,
-    MSP_ANALOG:             110,
     MSP_RC_TUNING:          111,
     MSP_PID:                112,
     MSP_ACTIVEBOXES:        113,
