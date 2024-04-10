@@ -17,7 +17,7 @@ TABS.receiver.initialize = function (callback) {
     var loadChainer = new MSPChainerClass();
 
     var loadChain = [
-        mspHelper.loadMisc,
+        mspHelper.loadMiscV2,
         mspHelper.loadRcData,
         mspHelper.loadRcMap,
         mspHelper.loadRxConfig,
@@ -317,7 +317,7 @@ TABS.receiver.initialize = function (callback) {
             }
 
             function save_misc() {
-                MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, save_rc_configs);
+                MSP.send_message(MSPCodes.MSPV2_INAV_SET_MISC, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_MISC), false, save_rc_configs);
             }
 
             function save_rc_configs() {
