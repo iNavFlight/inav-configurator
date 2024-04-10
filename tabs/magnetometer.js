@@ -600,7 +600,7 @@ TABS.magnetometer.initialize3D = function () {
         var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch-180), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( self.boardAlignmentConfig.pitch), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
 /*
