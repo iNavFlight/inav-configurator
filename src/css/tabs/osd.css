@@ -738,9 +738,7 @@ button {
 .settings .btn a{
     margin-top: 0;
     margin-bottom: 0;
-    background-color: #37a8db;
     border-radius: 3px;
-    border: 1px solid #3394b5;
     color: #fff;
     font-family: 'open_sansbold', Arial, serif;
     font-size: 12px;
@@ -750,6 +748,17 @@ button {
     padding: 0 9px;
     line-height: 22px;
 }
+
+.settings .btn_blue a{
+    background-color: #37a8db;
+    border: 1px solid #3394b5;
+}
+
+.settings .btn_danger a{
+    background-color: #e2a2a2;
+    border: 1px solid #e58383;
+}
+
 
 .settings .btn a:hover {
     background-color: #3394b5;

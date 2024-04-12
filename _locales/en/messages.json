@@ -4847,6 +4847,9 @@
     "paste": {
         "message": "Paste"
     },
+    "clear": {
+        "message": "Clear"
+    },
     "active": {
         "message": "Active"
     },
@@ -5645,6 +5648,9 @@
     },
     "osdLayoutPasteFromClipboard": {
         "message": "Layout has been restored from clipboard"
+    },
+    "osdClearLayout": {
+        "message": "Layout has been cleared"
     },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
