@@ -1677,13 +1677,13 @@ OSD.constants = {
                 },
                 {
                     name: 'ADSB_WARNING_MESSAGE',
-                    id: 147,
+                    id: 150,
                     min_version: '7.1.0',
                     preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
                 },
                 {
                     name: 'ADSB_INFO',
-                    id: 148,
+                    id: 151,
                     min_version: '7.1.0',
                     preview: FONT.symbol(SYM.ADSB) + '2',
                 },
