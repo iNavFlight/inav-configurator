@@ -1374,6 +1374,27 @@
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
     },
+    "pidTuning_Rates_Stabilized": {
+        "message": "Stabilized Rates"
+    },
+    "pidTuning_Rates_Roll": {
+        "message": "Roll (°/s)"
+    },
+    "pidTuning_Rates_Pitch": {
+        "message": "Pitch (°/s)"
+    },
+    "pidTuning_Rates_Yaw": {
+        "message": "Yaw (°/s)"
+    },
+    "pidTuning_Expo_Stabilized": {
+        "message": "Stabilized Expo"
+    },
+    "pidTuning_Expo_RollPitch": {
+        "message": "Roll & Pitch (%)"
+    },
+    "pidTuning_Expo_Yaw": {
+        "message": "Yaw (%)"
+    },
     "pidTuning_RateDynamics": {
         "message": "Rate Dynamics"
     },

@@ -15,10 +15,10 @@ TABS.pid_tuning.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadPidData,
         mspHelper.loadRateDynamics,
+        mspHelper.loadRateProfileData,
         mspHelper.loadEzTune,
         mspHelper.loadMixerConfig,
     ];
-    loadChain.push(mspHelper.loadRateProfileData);
 
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
@@ -83,9 +83,12 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         // catch RC_tuning changes
-        RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
-        RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
-        RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
+        RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
+        RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
+        RC_tuning.yaw_rate = parseFloat($('#rate_yaw_rate').val());
+
+        RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
+        RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
 
         RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
         RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
@@ -190,6 +193,14 @@ TABS.pid_tuning.initialize = function (callback) {
         $('.ez-element').on('updated', function () {
             updatePreview();
         });
+
+        //Slider rates
+        GUI.sliderize($('#rate_roll_rate'), RC_tuning.roll_rate, 40, 1000);
+        GUI.sliderize($('#rate_pitch_rate'), RC_tuning.pitch_rate, 40, 1000);
+        GUI.sliderize($('#rate_yaw_rate'), RC_tuning.yaw_rate, 40, 1000);
+
+        GUI.sliderize($('#rate_rollpitch_expo'), RC_tuning.RC_EXPO * 100, 0, 100);
+        GUI.sliderize($('#rate_yaw_expo'), RC_tuning.RC_YAW_EXPO * 100, 0, 100);
 
         updatePreview();
 
