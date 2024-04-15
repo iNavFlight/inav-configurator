@@ -287,30 +287,7 @@ var mspHelper = (function (gui) {
             case MSPCodes.MSP_LOOP_TIME:
                 FC_CONFIG.loopTime = data.getInt16(0, true);
                 break;
-            case MSPCodes.MSP_MISC: // 22 bytes
-                MISC.midrc = data.getInt16(offset, true);
-                offset += 2;
-                MISC.minthrottle = data.getUint16(offset, true); // 0-2000
-                offset += 2;
-                MISC.maxthrottle = data.getUint16(offset, true); // 0-2000
-                offset += 2;
-                MISC.mincommand = data.getUint16(offset, true); // 0-2000
-                offset += 2;
-                MISC.failsafe_throttle = data.getUint16(offset, true); // 1000-2000
-                offset += 2;
-                MISC.gps_type = data.getUint8(offset++);
-                MISC.sensors_baudrate = data.getUint8(offset++);
-                MISC.gps_ubx_sbas = data.getInt8(offset++);
-                MISC.multiwiicurrentoutput = data.getUint8(offset++);
-                MISC.rssi_channel = data.getUint8(offset++);
-                MISC.placeholder2 = data.getUint8(offset++);
-                MISC.mag_declination = data.getInt16(offset, 1) / 10; // -18000-18000
-                offset += 2;
-                MISC.vbatscale = data.getUint8(offset++); // 10-200
-                MISC.vbatmincellvoltage = data.getUint8(offset++) / 10; // 10-50
-                MISC.vbatmaxcellvoltage = data.getUint8(offset++) / 10; // 10-50
-                MISC.vbatwarningcellvoltage = data.getUint8(offset++) / 10; // 10-50
-                break;
+            
             case MSPCodes.MSPV2_INAV_MISC:
                 MISC.midrc = data.getInt16(offset, true);
                 offset += 2;
@@ -616,9 +593,6 @@ var mspHelper = (function (gui) {
                 break;
             case MSPCodes.MSP2_INAV_OPFLOW_CALIBRATION:
                 console.log('Optic flow calibration executed');
-                break;
-            case MSPCodes.MSP_SET_MISC:
-                console.log('MISC Configuration saved');
                 break;
             case MSPCodes.MSP_RESET_CONF:
                 console.log('Settings Reset');
@@ -1741,30 +1715,6 @@ var mspHelper = (function (gui) {
                 buffer.push(lowByte(FC_CONFIG.loopTime));
                 buffer.push(highByte(FC_CONFIG.loopTime));
                 break;
-            case MSPCodes.MSP_SET_MISC:
-                buffer.push(lowByte(MISC.midrc));
-                buffer.push(highByte(MISC.midrc));
-                buffer.push(lowByte(MISC.minthrottle));
-                buffer.push(highByte(MISC.minthrottle));
-                buffer.push(lowByte(MISC.maxthrottle));
-                buffer.push(highByte(MISC.maxthrottle));
-                buffer.push(lowByte(MISC.mincommand));
-                buffer.push(highByte(MISC.mincommand));
-                buffer.push(lowByte(MISC.failsafe_throttle));
-                buffer.push(highByte(MISC.failsafe_throttle));
-                buffer.push(MISC.gps_type);
-                buffer.push(MISC.sensors_baudrate);
-                buffer.push(MISC.gps_ubx_sbas);
-                buffer.push(MISC.multiwiicurrentoutput);
-                buffer.push(MISC.rssi_channel);
-                buffer.push(MISC.placeholder2);
-                buffer.push(lowByte(Math.round(MISC.mag_declination * 10)));
-                buffer.push(highByte(Math.round(MISC.mag_declination * 10)));
-                buffer.push(MISC.vbatscale);
-                buffer.push(Math.round(MISC.vbatmincellvoltage * 10));
-                buffer.push(Math.round(MISC.vbatmaxcellvoltage * 10));
-                buffer.push(Math.round(MISC.vbatwarningcellvoltage * 10));
-                break;
             case MSPCodes.MSPV2_INAV_SET_MISC:
                 buffer.push(lowByte(MISC.midrc));
                 buffer.push(highByte(MISC.midrc));
@@ -2796,10 +2746,6 @@ var mspHelper = (function (gui) {
         MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false, callback);
     };
 
-    self.loadMisc = function (callback) {
-        MSP.send_message(MSPCodes.MSP_MISC, false, false, callback);
-    };
-
     self.loadMiscV2 = function (callback) {
         MSP.send_message(MSPCodes.MSPV2_INAV_MISC, false, false, callback);
     };
@@ -2935,10 +2881,6 @@ var mspHelper = (function (gui) {
 
     self.saveBoardAlignment = function (callback) {
         MSP.send_message(MSPCodes.MSP_SET_BOARD_ALIGNMENT, mspHelper.crunch(MSPCodes.MSP_SET_BOARD_ALIGNMENT), false, callback);
-    };
-
-    self.saveMisc = function (callback) {
-        MSP.send_message(MSPCodes.MSP_SET_MISC, mspHelper.crunch(MSPCodes.MSP_SET_MISC), false, callback);
     };
 
     self.saveMiscV2 = function (callback) {
