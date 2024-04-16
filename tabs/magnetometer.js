@@ -804,13 +804,15 @@ TABS.magnetometer.initialize = function (callback) {
         updateBoardYawAxis(newYaw % 360);
     
     
+        /*
         const quaternion = new THREE.Quaternion();
         // const axis = new THREE.Vector3(self.acc_flat_xyz).normalize();
         const axis = new THREE.Vector3(...SENSOR_DATA.accelerometer).normalize();
     
         console.debug("axis: " + axis);
         quaternion.setFromAxisAngle(axis, 0.05);
-    
+        */
+
         $("#modal-acc-align-setting").text(newPitch + ", " + newRoll + ", " + newYaw);
     }
 
@@ -868,10 +870,9 @@ TABS.magnetometer.initialize = function (callback) {
 
     function accAutoAlignCompass() {
         let heading_change = (SENSOR_DATA.kinematics[2] - this.heading_flat + 360) % 360;
-        // let correction_needed = (450 - SENSOR_DATA.kinematics[2]) % 360;
-        let correction_needed = (90 - SENSOR_DATA.kinematics[2]);
+        let yaw_correction_needed = (90 - SENSOR_DATA.kinematics[2]);
+        let roll_correction_needed = 0;
 
-        // let heading_change = Math.round(heading_change / 90) * 90;
 
         var heading_change = (FC.SENSOR_DATA.kinematics[2] - heading_flat + 360) % 360;
         correction_needed = (450 - FC.SENSOR_DATA.kinematics[2]) % 360;
@@ -884,26 +885,45 @@ TABS.magnetometer.initialize = function (callback) {
         // If a 90 degree turn caused a 270 degree change, it's upside down.
         if (heading_change > 180) {
             console.log("mag upside down");
-            var rollCurrent90 = Math.round(self.mag_saved_roll / 90) * 90;
-            // let newRoll = (rollCurrent90 - 180) % 360;
-            updateRollAxis( (rollCurrent90 - 180) % 360 );
-            // ? correction_needed = correction_needed + 180;
+            roll_correction_needed = 180;
+            // ? yaw_correction_needed = correction_needed + 180;
         }
-        // If both headings are accurate along a 45° offset, use that. Otherwise round to nearest 90°
+        // Tinywhoop - If both headings are accurate along a 45° offset, use that. Otherwise round to nearest 90°
         if ( (Math.abs(this.heading_flat % 45) < 15) && Math.abs(correction_needed % 45) < 15 ) {
-            correction_needed = ( Math.round(correction_needed / 45) * 45 ) % 360;
+            yaw_correction_needed = ( Math.round(correction_needed / 45) * 45 ) % 360;
         } else {
-            correction_needed = ( Math.round(correction_needed / 90) * 90 ) % 360;
+            yaw_correction_needed = ( Math.round(correction_needed / 90) * 90 ) % 360;
         }
 
         console.log("heading_flat: " + this.heading_flat + ", change: " + heading_change + ", correction: " + correction_needed % 360);
-        // let newYaw = (self.mag_saved_yaw + correction_needed) % 360;
-        updateYawAxis( (self.mag_saved_yaw + correction_needed) % 360 );
+
+
+       // Adjust for what the NEW rotation of the FC will be
+
+        var magAdjustment = new THREE.Euler(-THREE.Math.degToRad(self.mag_saved_pitch),
+                THREE.Math.degToRad(-180 - yaw_correction_needed), THREE.Math.degToRad(roll_corection_needed), 'YXZ');
+        var matrixMag = (new THREE.Matrix4()).makeRotationFromEuler(magAdjustment);
+
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.acc_flat_xyz[0] ),
+                THREE.Math.degToRad( -self.acc_flat_xyz[2] ),
+                THREE.Math.degToRad( -self.acc_flat_xyz[1] ), 'YXZ');
+        var matrixBoard = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
+        // Ray TODO use the inverse of the board rotation. 
+        madAdjustment.premultiply(matrixBoard);
+
+
+
+
+        var rollCurrent90 = Math.round(self.mag_saved_roll / 90) * 90;
+        updateRollAxis( (rollCurrent90 - roll_correction_needed) % 360 );
+
+        updateYawAxis( (self.mag_saved_yaw + yaw_correction_needed) % 360 );
         updatePitchAxis(self.mag_saved_pitch);
 
         $("#modal-compass-align-setting").text(
                 self.alignmentConfig.roll + ", " + self.mag_saved_pitch + ", " + self.alignmentConfig.yaw
         );
+
         modal = new jBox('Modal', {
             width: 460,
             height: 360,
@@ -1041,6 +1061,8 @@ TABS.magnetometer.initialize3D = function () {
         var boardRotation = new THREE.Euler( THREE.MathUtils.degToRad( self.boardAlignmentConfig.pitch), THREE.MathUtils.degToRad( -self.boardAlignmentConfig.yaw ), THREE.MathUtils.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
+
+        // Ray TODO this may be pretty much what I need to do.
 /*
         if ( self.isSavePreset ) {
           matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation 
