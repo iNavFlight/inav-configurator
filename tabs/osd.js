@@ -138,6 +138,8 @@ var video_type = null;
 var isGuidesChecked = false;
 var FONT = FONT || {};
 
+var layout_clipboard = {layout: [], filled: false};
+
 var FONT = FONT || {};
 FONT.initData = function () {
     if (FONT.data) {
@@ -3106,6 +3108,9 @@ OSD.GUI.updateAll = function() {
         return;
     }
     var layouts = $('.osd_layouts');
+    var copy = $('.osd_copy');
+    var paste = $('.osd_paste').hide();
+    var clear = $('.osd_clear');
     if (OSD.data.layout_count > 1) {
         layouts.empty();
         for (var ii = 0; ii < OSD.data.layout_count; ii++) {
@@ -3121,9 +3126,63 @@ OSD.GUI.updateAll = function() {
             OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
             OSD.GUI.updatePreviews();
         });
+
+        copy.on('click', function() {
+            if(OSD.data.selected_layout >= 0 && OSD.data.selected_layout < OSD.data.layout_count){
+                layout_clipboard = {layout: JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout])), filled: true};
+                paste.show();
+                GUI.log(chrome.i18n.getMessage('osdLayoutInsertedIntoClipboard'));
+            }
+        });
+
+        paste.on('click', function() {
+            if(layout_clipboard.filled == true){
+
+                var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
+                OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
+                layouts.trigger('change');
+                OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+                    if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
+                        OSD.saveItem({id: index});
+                    }
+                });
+                GUI.log(chrome.i18n.getMessage('osdLayoutPasteFromClipboard'));
+            }
+        });
+
+        clear.on('click', function() {
+            var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
+
+            var clearedLayout = [];
+            oldLayout.forEach(function(item, index){
+                var itemCopy = JSON.parse(JSON.stringify(item));
+                itemCopy.isVisible = false;
+                clearedLayout[index] = itemCopy;
+            })
+
+            OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
+            layouts.trigger('change');
+            OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+                if(oldLayout[index].isVisible === true){
+                    OSD.saveItem({id: index});
+                }
+            });
+            GUI.log(chrome.i18n.getMessage('osdClearLayout'));
+        });
+
+
     } else {
         layouts.hide();
         layouts.off('change');
+
+        copy.hide();
+        copy.off('change');
+
+        paste.hide();
+        paste.off('change');
+
+        clear.hide();
+        clear.off('change');
     }
 
     $('.osd_search').on('input', function() {
