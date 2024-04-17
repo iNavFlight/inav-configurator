@@ -5703,6 +5703,12 @@
     "ezTuneExpo": {
         "message": "Expo"
     },
+    "ezTuneSnappiness": {
+        "message": "Snappiness"
+    },
+    "ezTuneSnappinessTips": {
+        "message": "Helps to have a snappy stick feeling. Whenever you do a fast stick movement, high Snappiness will accelerate the drone response. Both when you start and stop the manouver. Try different values to find the one that suits you best."
+    },
     "ezTuneFilterHzTips": {
         "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
     },
