@@ -4841,6 +4841,15 @@
     "save": {
         "message": "Save"
     },
+    "copy": {
+        "message": "Copy"
+    },
+    "paste": {
+        "message": "Paste"
+    },
+    "clear": {
+        "message": "Clear"
+    },
     "active": {
         "message": "Active"
     },
@@ -5633,6 +5642,15 @@
     },
     "osdSettingsSaved": {
         "message": "OSD settings saved"
+    },
+    "osdLayoutInsertedIntoClipboard": {
+        "message": "Layout has been saved to clipboard"
+    },
+    "osdLayoutPasteFromClipboard": {
+        "message": "Layout has been restored from clipboard"
+    },
+    "osdClearLayout": {
+        "message": "Layout has been cleared"
     },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
