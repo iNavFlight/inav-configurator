@@ -2162,7 +2162,7 @@
         "message": "Save Settings"
     },
     "cliMscBtn": {
-        "message": "MSC"
+        "message": "Blackbox (MSC)"
     },
     "cliDiffAllBtn": {
         "message": "Diff All"
