@@ -508,30 +508,27 @@
                         <input id="heading_hold_rate_limit" class="controlProfileHighlightActive rate-tpa_input" data-setting="heading_hold_rate_limit" type="number" data-presentation="range" />
                     </div>
                     <div class="clear-both"></div>
-                </div>               
+                </div>       
             </div>
 
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
-            <div class="clear-both"></div>
-            <div class="cf_column">
-                <table class="settings-table settings-table--inav">
-                    <tbody>
-                        <tr>
-                            <th data-i18n="pidTuning_MaxRollAngle"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="maxRollInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_rll" data-unit="decideg-lrg" /></div>
-                                <div for="maxRollInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxRollAngleHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_MaxPitchAngle"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="maxPitchInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
-                                <div for="maxPitchInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxPitchAngleHelp"></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_Limits"></div>
+
+            <div class="pid-sliders-axis" data-axis="roll">
+                <h3 data-i18n="pidTuning_Max_Inclination_Angle"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Max_Roll"></span>
+                    <div class="number no-border">
+                        <input id="max_angle_inclination_rll" class="controlProfileHighlightActive rate-tpa_input" data-setting="max_angle_inclination_rll" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>   
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Max_Pitch"></span>
+                    <div class="number no-border">
+                        <input id="max_angle_inclination_pit" class="controlProfileHighlightActive rate-tpa_input" data-setting="max_angle_inclination_pit" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>       
             </div>
 
             <div class="clear-both"></div>

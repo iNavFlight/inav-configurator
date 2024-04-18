@@ -1311,8 +1311,20 @@
     "pidTuning_Other": {
         "message": "Other"
     },
+    "pidTuning_Limits": {
+        "message": "Limits"
+    },
     "pidTuning_HeadingHold_Rate": {
         "message": "Heading Hold Rate (°/s)"
+    },
+    "pidTuning_Max_Inclination_Angle": {
+        "message": "Max Inclination Angle"
+    },
+    "pidTuning_Max_Roll": {
+        "message": "Roll (°/10)"
+    },
+    "pidTuning_Max_Pitch": {
+        "message": "Pitch (°/10)"
     },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
