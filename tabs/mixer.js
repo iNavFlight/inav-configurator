@@ -446,13 +446,19 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
         }
 
         if (currentMixerPreset.image != 'quad_x') {
-            return;
+            for (let i = 1; i < 5; i++) {
+                $("#motorNumber"+i).css("visibility", "hidden");
+            }
         }
 
         for (const i in rules) {
             if (rules.hasOwnProperty(i)) {
                 const rule = rules[i];
                 index++;
+
+                if (currentMixerPreset.image != 'quad_x') {
+                    continue;
+                }
 
                 let top_px = 30;
                 let left_px = 28;

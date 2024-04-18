@@ -62,16 +62,6 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
 
-    this.colorTable = [
-        "#8ecae6",
-        "#2a9d8f",
-        "#e9c46a",
-        "#f4a261",
-        "#e76f51",
-        "#ef476f",
-        "#ffc300"
-    ];
-
 };
 
 // message = string

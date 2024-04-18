@@ -12,6 +12,8 @@ const mspQueue = require('./serial_queue');
     var publicScope = {},
         privateScope = {};
 
+    var stoppped = false;
+
     /**
      *
      * @param {number=} baudSpeed
@@ -100,20 +102,26 @@ const mspQueue = require('./serial_queue');
             display: 'inline-block'
         });
 
-        if (GUI.active_tab != 'cli') {
+        if (!stoppped && GUI.active_tab != 'cli') {
 
             if (mspQueue.shouldDropStatus()) {
                 return;
             }
 
+            
             MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
             MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_ANALOG, false, false);
+            
 
             privateScope.updateView();
         }
     };
+
+    publicScope.stop = function() {
+        stoppped = true;
+    }
 
     return publicScope;
 })();

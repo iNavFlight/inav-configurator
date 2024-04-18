@@ -12,6 +12,8 @@ const { GUI } = require('./../gui');
 const interval = require('./../intervals');
 const { usbDevices, PortHandler } = require('./../port_handler');
 const ConnectionSerial = require('./../connection/connectionSerial');
+const STM32DFU = require('./stm32usbdfu');
+const i18n = require('./../localization');
 
 var STM32_protocol = function () {
     this.baud;

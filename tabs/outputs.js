@@ -288,11 +288,6 @@ TABS.outputs.initialize = function (callback) {
 
             let $currentRow = $servoConfigTable.find('tr:last');
 
-            //This routine is pre 2.0 only
-            if (FC.SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
-                $currentRow.find('td.channel input').eq(FC.SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
-            }
-
             // adding select box and generating options
             $currentRow.find('td.rate').append(
                 '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(FC.SERVO_CONFIG[obj].rate) + '" />'
@@ -339,8 +334,6 @@ TABS.outputs.initialize = function (callback) {
                 if (channelIndex == -1) {
                     channelIndex = undefined;
                 }
-
-                FC.SERVO_CONFIG[info.obj].indexOfChannelToForward = channelIndex;
 
                 FC.SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
                 FC.SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());

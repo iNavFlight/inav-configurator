@@ -1,36 +1,186 @@
 <!--suppress ALL -->
 <div id="content-watermark"></div>
 <div class="tab-pid_tuning toolbar_fixed_bottom">
-    <div id="note-wrapper" class="content_wrapper">
-        <div class="note spacebottom">
-            <div class="note_spacer">
-                <p i18n="ezTuneNote"></p>
-            </div>
-        </div>
-    </div>
     <div id="tuning-wrapper" class="content_wrapper">
         <div class="tab_title subtab__header">
-            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDgains"></span>
+            <span class="subtab__header_label subtab__header_label--current" for="subtab-pid" data-i18n="pidTuning_PIDmain"></span>
+            <span class="subtab__header_label" for="subtab-pid-other" data-i18n="pidTuning_PIDother"></span>
             <span class="subtab__header_label" for="subtab-rates" data-i18n="pidTuning_RatesAndExpo"></span>
             <span class="subtab__header_label" for="subtab-filters" data-i18n="pidTuning_Filters"></span>
             <span class="subtab__header_label" for="subtab-mechanics" data-i18n="pidTuning_Mechanics"></span>
         </div>
         <div id="subtab-pid" class="subtab__content subtab__content--current">
             <div class="cf_column right" style="margin-top: -6px;">
-                <div class="default_btn show">
-                    <a href="#" id="showAllPids" data-i18n="pidTuning_ShowAllPIDs"></a>
-                </div> 
                 <div class="default_btn resetbt">
-                    <a href="#" id="resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
+                    <a href="#" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
                 </div>
                 <div class="default_btn resetbt">
-                    <a href="#" id="resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
+                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
                 </div>
             </div>
-            <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_PIDgains"></div>
             <div class="clear-both"></div>
 
-            <div class="cf_column" id="pid-sliders">
+            <div id="" class="cf_column">
+                <div class="pid-sliders-axis" style="background-color: #2a9d8f;">
+                    <div style="padding: 1em;" data-i18n="ezTuneEnabledTips"></div>
+                    <div class="pid-switch-row">
+                        <span data-i18n="configurationFeatureEnabled" class="bold label"></span>
+                        <div class="checkbox no-border">
+                            <input id="ez_tune_enabled" type="checkbox" class="ez-element toggle" />
+                        </div>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+
+            </div>
+
+            <div class="for-ez-tune">
+                <div style="display: flex;">
+
+                    <div>
+                        <div class="pid-sliders-axis" data-axis="roll">
+                            <div style="padding: 1em;" data-i18n="ezTuneFilterHzTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneFilterHz" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_filter_hz" type="number" class="ez-element" />
+                                </div>
+                            </div>
+                            <div class="clear-both"></div>
+                        </div>
+        
+                        <div class="pid-sliders-axis" data-axis="pitch">
+                            <div style="padding: 1em;" data-i18n="ezTuneAxisRatioTips"></div>
+                            <div class="pid-slider-row">
+        
+                                <span data-i18n="ezTuneAxisRatio" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_axis_ratio" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                            <div style="padding: 1em;" data-i18n="ezTuneResponseTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneResponse" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_response" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                            <div style="padding: 1em;" data-i18n="ezTuneDampingTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneDamping" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_damping" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                            <div style="padding: 1em;" data-i18n="ezTuneStabilityTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneStability" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_stability" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                            <div style="padding: 1em;" data-i18n="ezTuneAggressivenessTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneAggressiveness" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_aggressiveness" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                        </div>
+        
+                        <div class="pid-sliders-axis" data-axis="yaw">
+                            <div style="padding: 1em;" data-i18n="ezTuneRateTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneRate" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_rate" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+        
+                            <div style="padding: 1em;" data-i18n="ezTuneExpoTips"></div>
+                            <div class="pid-slider-row">
+                                <span data-i18n="ezTuneExpo" class="bold"></span>
+                                <div class="number no-border">
+                                    <input id="ez_tune_expo" type="number" class="ez-element" />
+                                </div>
+                                <div class="clear-both"></div>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+                    <div class="ez-tune-preview">
+                        <h2 data-i18n="ezTunePidPreview"></h2>
+                        <table>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>P</th>
+                                <th>I</th>
+                                <th>D</th>
+                                <th>FF</th>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisRoll"></th>
+                                <td id="preview-roll-p"></td>
+                                <td id="preview-roll-i"></td>
+                                <td id="preview-roll-d"></td>
+                                <td id="preview-roll-ff"></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisPitch"></th>
+                                <td id="preview-pitch-p"></td>
+                                <td id="preview-pitch-i"></td>
+                                <td id="preview-pitch-d"></td>
+                                <td id="preview-pitch-ff"></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisYaw"></th>
+                                <td id="preview-yaw-p"></td>
+                                <td id="preview-yaw-i"></td>
+                                <td id="preview-yaw-d"></td>
+                                <td id="preview-yaw-ff"></td>
+                            </tr>
+                        </table>
+                        <h2 data-i18n="ezTuneRatePreview"></h2>
+                        <table>
+                            <tr>
+                                <th data-i18n="ezTuneRatePreviewAxis"></th>
+                                <th data-i18n="ezTuneRatePreviewRate"></th>
+                                <th data-i18n="ezTuneRatePreviewExpo"></th>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisRoll"></th>
+                                <td id="preview-roll-rate"></td>
+                                <td id="preview-roll-expo"></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisPitch"></th>
+                                <td id="preview-pitch-rate"></td>
+                                <td id="preview-pitch-expo"></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="axisYaw"></th>
+                                <td id="preview-yaw-rate"></td>
+                                <td id="preview-yaw-expo"></td>
+                            </tr>
+                        </table>
+                    </div>
+        
+                </div>
+            </div>
+
+            <div class="cf_column not-for-ez-tune" id="pid-sliders">
                 <div class="pid-sliders-axis" data-axis="roll">
                     <h3 data-i18n="axisRoll"></h3>
                     <div class="pid-slider-row">
@@ -115,13 +265,20 @@
 
                 </div>
             </div>
+        </div>
 
-            <div class="toolbox" style="margin-bottom: 1em;">
-                <input type="checkbox" id="show-advanced-pids" class="toggle" />
-                <label data-i18n="showAdvancedPIDs" for="show-advanced-pids"></label>
+        <div id="subtab-pid-other" class="subtab__content">
+            <div class="cf_column right" style="margin-top: -6px;">
+                <div class="default_btn resetbt">
+                    <a href="#" id="resetDefaults" class="action-resetDefaults" data-i18n="pidTuning_SelectNewDefaults"></a>
+                </div>
+                <div class="default_btn resetbt">
+                    <a href="#" class="action-resetPIDs" data-i18n="pidTuning_ResetPIDController"></a>
+                </div>
             </div>
+            <div class="clear-both"></div>
 
-            <div class="cf_column pid-section is-hidden" id="the-other-pids">
+            <div class="cf_column pid-section" id="the-other-pids">
                 <div class="gui_box grey">
                     <table class="pid_titlebar">
                         <tr>
@@ -274,31 +431,31 @@
             <div class="cf_column">
                 <table class="settings-table settings-table--inav">
                     <tbody>
-                        <tr>
+                        <tr class="not-for-ez-tune">
                             <th class="roll" data-i18n="pidTuning_RollRate"></th>
                             <td class="roll">
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="roll_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="not-for-ez-tune">
                             <th class="pitch" data-i18n="pidTuning_PitchRate"></th>
                             <td class="pitch">
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="pitch_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="not-for-ez-tune">
                             <th class="yaw" data-i18n="pidTuning_YawRate"></th>
                             <td class="yaw">
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="yaw_rate" data-unit="decadegps" /></div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="not-for-ez-tune">
                             <th data-i18n="pidTuning_RollAndPitchExpo"></th>
                             <td>
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="rc_expo" data-unit="percent" /></div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="not-for-ez-tune">
                             <th data-i18n="pidTuning_YawExpo"></th>
                             <td>
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="rc_yaw_expo" data-unit="percent" /></div>
@@ -415,10 +572,10 @@
         </div>
 
         <div id="subtab-filters" class="subtab__content">
-            <div class="tab_subtitle" data-i18n="pidTuning_mainFilters" style="margin-top: 1em;"></div>
-            <div class="clear-both"></div>
-            <div class="cf_column">
-                <table class="settings-table settings-table--filtering">
+            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_mainFilters" style="margin-top: 1em;"></div>
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="cf_column not-for-ez-tune">
+                <table class="settings-table settings-table--filtering not-for-ez-tune">
                     <tbody>
                         <tr>
                             <th data-i18n="pidTuning_gyro_use_dyn_lpf" style="height: 24px;"></th>
@@ -469,10 +626,10 @@
                 </table>
             </div>
             
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_advancedFilters" style="margin-top: 1em;"></div>
-            <div class="clear-both"></div>
-            <div class="cf_column">
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_advancedFilters" style="margin-top: 1em;"></div>
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="cf_column not-for-ez-tune">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
@@ -514,9 +671,9 @@
                 </table>
             </div>
 
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_dtermFilters" style="margin-top: 1em;"></div>
-            <div class="cf_column">
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_dtermFilters" style="margin-top: 1em;"></div>
+            <div class="cf_column not-for-ez-tune">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
@@ -557,9 +714,9 @@
         </div>
 
         <div id="subtab-mechanics" class="subtab__content">
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_ITermMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column">
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_ITermMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column not-for-ez-tune">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
@@ -589,22 +746,13 @@
                                 <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="antigravity_cutoff_lpf_hz" /></div>
                             </td>
                         </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_itermBankAngleFreeze"></th>
-                            <td>
-                                <div class="pidTuning_number">
-                                    <input id="fwYawItermFreeze" type="number" class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
-                                    <div for="fwYawItermFreeze" class="helpicon cf_tip" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></div>
-                                </div>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="clear-both"></div>
-            <div class="tab_subtitle" data-i18n="pidTuning_dTermMechanics" style="margin-top: 1em;"></div>
-            <div class="cf_column">
+            <div class="clear-both not-for-ez-tune"></div>
+            <div class="tab_subtitle not-for-ez-tune" data-i18n="pidTuning_dTermMechanics" style="margin-top: 1em;"></div>
+            <div class="cf_column not-for-ez-tune">
                 <table class="settings-table settings-table--filtering">
                     <tbody>
                         <tr>
@@ -682,6 +830,15 @@
                             <td>
                                 <div class="pidTuning_number"><input id="fwLevelTrim" class="rate-tpa_input" data-setting="fw_level_pitch_trim" data-unit="deg" /></div>
                                 <div for="fwLevelTrim" class="helpicon cf_tip" data-i18n_title="pidTuning_fw_level_pitch_trim_help"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="pidTuning_itermBankAngleFreeze"></th>
+                            <td>
+                                <div class="pidTuning_number">
+                                    <input id="fwYawItermFreeze" type="number" class="rate-tpa_input" data-setting="fw_yaw_iterm_freeze_bank_angle" data-presentation="range" />
+                                    <div for="fwYawItermFreeze" class="helpicon cf_tip" data-i18n_title="pidTuning_itermBankAngleFreezeHelp"></div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
