@@ -500,6 +500,17 @@
                 
             </div>
 
+            <div class="pid-sliders-axis only-for-multirotor" data-axis="3">
+                <h3 data-i18n="pidTuning_Other"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_HeadingHold_Rate"></span>
+                    <div class="number no-border">
+                        <input id="heading_hold_rate_limit" class="controlProfileHighlightActive rate-tpa_input" data-setting="heading_hold_rate_limit" type="number" data-presentation="range" />
+                    </div>
+                    <div class="clear-both"></div>
+                </div>               
+            </div>
+
             <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
             <div class="clear-both"></div>
             <div class="cf_column">
@@ -517,13 +528,6 @@
                             <td>
                                 <div class="pidTuning_number"><input id="maxPitchInclination" type="number" class="rate-tpa_input" data-setting="max_angle_inclination_pit" data-unit="decideg-lrg" /></div>
                                 <div for="maxPitchInclination" class="helpicon cf_tip" data-i18n_title="pidTuning_MaxPitchAngleHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th data-i18n="pidTuning_magHoldYawRate"></th>
-                            <td>
-                                <div class="pidTuning_number"><input id="headingHoldRate" type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
-                                <div for="headingHoldRate" class="helpicon cf_tip" data-i18n_title="pidTuning_MagHoldYawRateHelp"></div>
                             </td>
                         </tr>
                     </tbody>

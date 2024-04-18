@@ -167,6 +167,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         if (!FC.isMultirotor()) {
             $('#ez-tune-switch').hide();
+            $('.only-for-multirotor').hide();
         }
 
         if (FC.isMultirotor()) {

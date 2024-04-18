@@ -1308,6 +1308,12 @@
     "portsFunction_SBUS_OUTPUT": {
         "message": "SBus Output"
     },
+    "pidTuning_Other": {
+        "message": "Other"
+    },
+    "pidTuning_HeadingHold_Rate": {
+        "message": "Heading Hold Rate (°/s)"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
