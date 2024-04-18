@@ -1,5 +1,6 @@
-/*global $, MotorMixRule*/
 'use strict';
+
+const MotorMixRule = require('./motorMixRule');
 
 var MotorMixerRuleCollection = function () {
 

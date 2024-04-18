@@ -10,9 +10,11 @@ const ProgrammingPidStatus = require('./programmingPidStatus');
 const WaypointCollection = require('./waypointCollection');
 const OutputMappingCollection = require('./outputMapping');
 const SafehomeCollection = require('./safehomeCollection');
+const FwApproachCollection = require('./fwApproachCollection.js')
 const { PLATFORM } = require('./model.js')
 const VTX = require('./vtx');
 const BitHelper = require('./bitHelper');
+
 
 var FC = {
     // define all the global variables that are uses to hold FC state
@@ -584,9 +586,9 @@ var FC = {
         };
 
 
-        FW_APPROACH = new FwApproachCollection();
+        this.FW_APPROACH = new FwApproachCollection();
 
-        OSD_CUSTOM_ELEMENTS = {
+        this.OSD_CUSTOM_ELEMENTS = {
            settings: {customElementsCount: 0, customElementTextSize: 0},
            items: [],
         };
@@ -1363,7 +1365,7 @@ var FC = {
             4: {
                 name: "Logic Condition",
                 type: "range",
-                range: [0, (LOGIC_CONDITIONS.getMaxLogicConditionCount()-1)],
+                range: [0, (this.LOGIC_CONDITIONS.getMaxLogicConditionCount()-1)],
                 default: 0
             },
             5: {

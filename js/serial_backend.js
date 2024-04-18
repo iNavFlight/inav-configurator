@@ -23,8 +23,10 @@ const defaultsDialog = require('./defaults_dialog');
 const { SITLProcess } = require('./sitl');
 const update = require('./globalUpdates.js');
 const BitHelper = require('./bitHelper.js');
-const BOARD = require('./boards.js')
-const jBox = require('./libraries/jBox/jBox.min.js')
+const BOARD = require('./boards.js');
+const jBox = require('./libraries/jBox/jBox.min.js');
+const groundstation = require('./groundstation.js');
+const ltmDecoder = require('./ltmDecoder.js');
 
 var SerialBackend = (function () {
 
@@ -161,8 +163,8 @@ var SerialBackend = (function () {
 
     $('div.connect_controls a.connect').click(function () {
 
-        if (helper.groundstation.isActivated()) {
-            helper.groundstation.deactivate();
+        if (groundstation.isActivated()) {
+            groundstation.deactivate();
         }
 
         if (GUI.connect_lock != true) { // GUI control overrides the user control
@@ -359,31 +361,31 @@ var SerialBackend = (function () {
             store.set('last_used_bps', CONFIGURATOR.connection.bitrate);
             store.set('wireless_mode_enabled', $('#wireless-mode').is(":checked"));
 
-        CONFIGURATOR.connection.addOnReceiveListener(read_serial);
-        CONFIGURATOR.connection.addOnReceiveListener(helper.ltmDecoder.read);
+            CONFIGURATOR.connection.addOnReceiveListener(publicScope.read_serial);
+            CONFIGURATOR.connection.addOnReceiveListener(ltmDecoder.read);
 
-        // disconnect after 10 seconds with error if we don't get IDENT data
-        helper.timeout.add('connecting', function () {
+            // disconnect after 10 seconds with error if we don't get IDENT data
+            timeout.add('connecting', function () {
 
-            //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
-            if (!CONFIGURATOR.connectionValid && !helper.ltmDecoder.isReceiving()) {
-                GUI.log(chrome.i18n.getMessage('noConfigurationReceived'));
+                //As we add LTM listener, we need to invalidate connection only when both protocols are not listening!
+                if (!CONFIGURATOR.connectionValid && !ltmDecoder.isReceiving()) {
+                    GUI.log(i18n.getMessage('noConfigurationReceived'));
 
-                    mspQueue.flush();
-                    mspQueue.freeHardLock();
-                    mspQueue.freeSoftLock();
-                    CONFIGURATOR.connection.emptyOutputBuffer();
+                        mspQueue.flush();
+                        mspQueue.freeHardLock();
+                        mspQueue.freeSoftLock();
+                        CONFIGURATOR.connection.emptyOutputBuffer();
 
-                $('div.connect_controls a').click(); // disconnect
-            }
-        }, 10000);
+                    $('div.connect_controls a').click(); // disconnect
+                }
+            }, 10000);
 
-        //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
-        helper.interval.add('ltm-connection-check', function () {
-            if (helper.ltmDecoder.isReceiving()) {
-                helper.groundstation.activate($('#main-wrapper'));
-            }
-        }, 1000);
+            //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
+            interval.add('ltm-connection-check', function () {
+                if (ltmDecoder.isReceiving()) {
+                    groundstation.activate($('#main-wrapper'));
+                }
+            }, 1000);
 
             FC.resetState();
 
@@ -592,7 +594,7 @@ var SerialBackend = (function () {
         switch(sensor_code) {
             case 'acc':
             case 'gyro':
-                return BitHelper.check(sensors_detected, 0);
+                return BitHelper.bit_check(sensors_detected, 0);
             case 'baro':
                 return BitHelper.bit_check(sensors_detected, 1);
             case 'mag':

@@ -86,6 +86,17 @@ var MSP = {
 
     lastFrameReceivedMs: 0,
 
+    processData: null,
+
+    init() {
+        mspQueue.setPutCallback(this.putCallback);
+        mspQueue.setremoveCallback(this.removeCallback);
+    },
+
+    setProcessData(cb) {
+        this.processData = cb;
+    },
+
     read: function (readInfo) {
         var data = new Uint8Array(readInfo.data);
 
@@ -243,7 +254,7 @@ var MSP = {
     _dispatch_message(expected_checksum) {
         if (this.message_checksum == expected_checksum) {
             // message received, process
-            mspHelper.processData(this);
+            this.processData(this);
             this.lastFrameReceivedMs = Date.now();
         } else {
             console.log('code: ' + this.code + ' - crc failed');
@@ -396,8 +407,4 @@ var MSP = {
     }
 };
 
-MSP.SDCARD_STATE_NOT_PRESENT = 0;
-MSP.SDCARD_STATE_FATAL       = 1;
-MSP.SDCARD_STATE_CARD_INIT   = 2;
-MSP.SDCARD_STATE_FS_INIT     = 3;
-MSP.SDCARD_STATE_READY       = 4;
+module.exports = MSP;

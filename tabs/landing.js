@@ -12,13 +12,6 @@ landing.initialize = function (callback) {
     }
     GUI.load(path.join(__dirname, "landing.html"), function () {
         i18n.localize();
-
-        /*
-        $('.tab-landing a').on('click', function () {
-            googleAnalytics.sendEvent('ExternalUrls', 'Click', $(this).prop('href'));
-        });
-        */
-
         GUI.content_ready(callback);
     });
 
@@ -29,4 +22,3 @@ landing.cleanup = function (callback) {
 };
 
 TABS.landing = landing;
-module.exports = landing;

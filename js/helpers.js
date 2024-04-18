@@ -1,4 +1,3 @@
-/*global $*/
 
 'use strict';
 
@@ -102,3 +101,5 @@ function calculate_new_cooridatnes(coord, bearing, distance)
         lon: rad2Deg(lonNew),
     }
 }
+
+module.exports = { constrain, zeroPad, generateFilename, scaleRangeInt, distanceOnLine, wrap_360, rad2Deg, calculate_new_cooridatnes }

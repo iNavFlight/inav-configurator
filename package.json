@@ -35,11 +35,11 @@
     "marked": "^11.2.0",
     "minimist": "^1.2.0",
     "openlayers": "^4.6.5",
-    "plotly": "^1.0.6",
     "temp": "^0.8.3",
     "xml2js": "^0.4.19",
     "i18next": "^23.8.3",
-    "i18next-xhr-backend": "^3.2.2"
+    "i18next-xhr-backend": "^3.2.2",
+    "wnumb": "^1.2.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",

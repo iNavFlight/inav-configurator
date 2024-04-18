@@ -1,4 +1,3 @@
-/*global $, SERVO_DATA, PID_names, ADJUSTMENT_RANGES, RXFAIL_CONFIG, SERVO_CONFIG,CONFIG*/
 'use strict';
 
 const semver = require('semver');
@@ -8,11 +7,17 @@ const { GUI } = require('./../gui');
 const MSP = require('./../msp');
 const MSPCodes = require('./MSPCodes');
 const FC = require('./../fc');
+const VTX = require('./../vtx');
 const mspQueue = require('./../serial_queue');
 const ServoMixRule = require('./../servoMixRule');
 const MotorMixRule = require('./../motorMixRule');
 const LogicCondition = require('./../logicCondition');
 const BitHelper = require('../bitHelper');
+const serialPortHelper = require('./../serialPortHelper');
+const ProgrammingPid = require('./../programmingPid');
+const Safehome = require('./../safehome');
+const { FwApproach } = require('./../fwApproach');
+const Waypoint = require('./../waypoint');
 
 var mspHelper = (function () {
     var self = {};
@@ -836,7 +841,7 @@ var mspHelper = (function () {
 
                     var serialPort = {
                         identifier: data.getUint8(offset),
-                        functions: helper.serialPortHelper.maskToFunctions(data.getUint32(offset + 1, true)),
+                        functions: serialPortHelper.maskToFunctions(data.getUint32(offset + 1, true)),
                         msp_baudrate: BAUD_RATES[data.getUint8(offset + 5)],
                         sensors_baudrate: BAUD_RATES[data.getUint8(offset + 6)],
                         telemetry_baudrate: BAUD_RATES[data.getUint8(offset + 7)],
@@ -1530,19 +1535,19 @@ var mspHelper = (function () {
 
             case MSPCodes.MSP2_INAV_TEMPERATURES:
                 for (let i = 0; i < 8; ++i) {
-                    temp_decidegrees = data.getInt16(i * 2, true);
+                    let temp_decidegrees = data.getInt16(i * 2, true);
                     FC.SENSOR_DATA.temperature[i] = temp_decidegrees / 10; // °C
                 }
                 break;
             case MSPCodes.MSP2_INAV_SAFEHOME:
-                FC.SAFEHOMES.put(new Safehome(
+                var safeHome = new Safehome(
                     data.getUint8(0),
                     data.getUint8(1),
                     data.getInt32(2, true),
                     data.getInt32(6, true),
                 );
-                if (safehome.getEnabled()) {
-                    SAFEHOMES.put(safehome);
+                if (safeHome.getEnabled()) {
+                    FC.SAFEHOMES.put(safeHome);
                 }
 
                 break;
@@ -1551,7 +1556,7 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_FW_APPROACH:
-                FW_APPROACH.put(new FwApproach(
+                FC.FW_APPROACH.put(new FwApproach(
                     data.getUint8(0),
                     data.getInt32(1, true),
                     data.getInt32(5, true),
@@ -1596,27 +1601,27 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS:
-                OSD_CUSTOM_ELEMENTS.items = [];
+                FC.OSD_CUSTOM_ELEMENTS .items = [];
 
                 var index = 0;
 
                 if(data.byteLength == 0){
-                    OSD_CUSTOM_ELEMENTS.settings.customElementsCount = 0;
-                    OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = 0;
+                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = 0;
+                    FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = 0;
                     return;
                 }
 
-                OSD_CUSTOM_ELEMENTS.settings.customElementsCount = data.getUint8(index++);
-                OSD_CUSTOM_ELEMENTS.settings.customElementTextSize = data.getUint8(index++);
+                FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount = data.getUint8(index++);
+                FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize = data.getUint8(index++);
 
-                for (i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
+                for (i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; i++){
                     var customElement = {
                         customElementItems: [],
                         customElementVisibility: {type: 0, value: 0},
                         customElementText: [],
                     };
 
-                    for (let ii = 0; ii < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; ii++){
+                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementsCount; ii++){
                         var customElementPart = {type: 0,  value: 0,};
                         customElementPart.type = data.getUint8(index++);
                         customElementPart.value = data.getUint16(index, true);
@@ -1628,10 +1633,10 @@ var mspHelper = (function () {
                     customElement.customElementVisibility.value = data.getUint16(index, true);
                     index += 2;
 
-                    for (let ii = 0; ii < OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; ii++){
+                    for (let ii = 0; ii < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; ii++){
                         var char = data.getUint8(index++);
                         if(char === 0){
-                            index += (OSD_CUSTOM_ELEMENTS.settings.customElementTextSize - 1) - ii;
+                            index += (FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize - 1) - ii;
                             break;
                         }
                         customElement.customElementText[ii] = char;
@@ -1639,7 +1644,7 @@ var mspHelper = (function () {
 
                     customElement.customElementText = String.fromCharCode(...customElement.customElementText);
 
-                    OSD_CUSTOM_ELEMENTS.items.push(customElement)
+                    FC.OSD_CUSTOM_ELEMENTS .items.push(customElement)
                 }
                 break;
 
@@ -1687,10 +1692,10 @@ var mspHelper = (function () {
         switch (code) {
 
             case MSPCodes.MSP_SET_FEATURE:
-                buffer.push(BitHelper.specificByte(FC.FEATURESS, 0));
-                buffer.push(BitHelper.specificByte(FC.FEATURESS, 1));
-                buffer.push(BitHelper.specificByte(FC.FEATURESS, 2));
-                buffer.push(BitHelper.specificByte(FC.FEATURESS, 3));
+                buffer.push(BitHelper.specificByte(FC.FEATURES, 0));
+                buffer.push(BitHelper.specificByte(FC.FEATURES, 1));
+                buffer.push(BitHelper.specificByte(FC.FEATURES, 2));
+                buffer.push(BitHelper.specificByte(FC.FEATURES, 3));
                 break;
 
             case MSPCodes.MSP_SET_BOARD_ALIGNMENT:
@@ -1926,7 +1931,7 @@ var mspHelper = (function () {
 
                     buffer.push(serialPort.identifier);
 
-                    var functionMask = mspHelper.SERIAL_PORT_FUNCTIONSToMask(serialPort.functions);
+                    var functionMask = serialPortHelper.functionsToMask(serialPort.functions);
                     buffer.push(BitHelper.specificByte(functionMask, 0));
                     buffer.push(BitHelper.specificByte(functionMask, 1));
                     buffer.push(BitHelper.specificByte(functionMask, 2));
@@ -2874,7 +2879,7 @@ var mspHelper = (function () {
         MSP.send_message(MSPCodes.MSP2_INAV_TIMER_OUTPUT_MODE, false, false, callback);
     }
 
-    self.sendTimerOutputModes = function(callback) {
+    self.sendTimerOutputModes = function(onCompleteCallback) {
         var nextFunction = send_next_output_mode;
         var idIndex = 0;
 
@@ -3131,13 +3136,13 @@ var mspHelper = (function () {
     };
 
     self.loadFwApproach = function (callback) {
-        FW_APPROACH.flush();
+        FC.FW_APPROACH.flush();
         let id = 0;
         MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
 
         function nextFwApproach() {
             id++;
-            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
+            if (id < FC.FW_APPROACH.getMaxFwApproachCount() - 1) {
                 MSP.send_message(MSPCodes.MSP2_INAV_FW_APPROACH, [id], false, nextFwApproach);
             }
             else {
@@ -3148,15 +3153,15 @@ var mspHelper = (function () {
 
     self.saveFwApproach = function (callback) {
         let id = 0;
-        MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+        MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FC.FW_APPROACH.extractBuffer(id), false, nextFwApproach);
 
         function nextFwApproach() {
             id++;
-            if (id < FW_APPROACH.getMaxFwApproachCount() - 1) {
-                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, nextFwApproach);
+            if (id < FC.FW_APPROACH.getMaxFwApproachCount() - 1) {
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FC.FW_APPROACH.extractBuffer(id), false, nextFwApproach);
             }
             else {
-                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FW_APPROACH.extractBuffer(id), false, callback);
+                MSP.send_message(MSPCodes.MSP2_INAV_SET_FW_APPROACH, FC.FW_APPROACH.extractBuffer(id), false, callback);
             }
         };
     };
@@ -3329,7 +3334,7 @@ var mspHelper = (function () {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
         }).catch(error =>  {
             console.log("Invalid setting: " + name);
-            return new Promise(callback);
+            return Promise.resolve().then(callback);
         });
     };
 

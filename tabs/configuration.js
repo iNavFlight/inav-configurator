@@ -1,5 +1,18 @@
-/*global chrome,GUI,FC_CONFIG,$,mspHelper,googleAnalytics,ADVANCED_CONFIG,VTX_CONFIG,CONFIG,MSPChainerClass,BOARD_ALIGNMENT,TABS,MISC*/
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const interval = require('./../js/intervals');
+const VTX = require('./../js/vtx');
+const i18n = require('./../js/localization');
+const Settings = require('./../js/settings');
+const features = require('./../js/feature_framework');
 
 TABS.configuration = {};
 
@@ -61,7 +74,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/configuration.html"), Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "configuration.html"), Settings.processHtml(process_html));
     }
 
     function process_html() {
@@ -69,20 +82,20 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         let i;
 
         // generate features
-        var features = FC.getFeatures();
+        var fcFeatures = FC.getFeatures();
 
         var features_e = $('.features');
-        for (let i = 0; i < features.length; i++) {
+        for (let i = 0; i < fcFeatures.length; i++) {
             var row_e,
                 tips = [],
                 feature_tip_html = '';
 
-            if (features[i].showNameInTip) {
-                tips.push(i18n.getMessage("manualEnablingTemplate").replace("{name}", features[i].name));
+            if (fcFeatures[i].showNameInTip) {
+                tips.push(i18n.getMessage("manualEnablingTemplate").replace("{name}", fcFeatures[i].name));
             }
 
-            if (features[i].haveTip) {
-                tips.push(i18n.getMessage("feature" + features[i].name + "Tip"));
+            if (fcFeatures[i].haveTip) {
+                tips.push(i18n.getMessage("feature" + fcFeatures[i].name + "Tip"));
             }
 
             if (tips.length > 0) {
@@ -90,35 +103,35 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             }
 
             row_e = $('<div class="checkbox">' +
-                '<input type="checkbox" data-bit="' + features[i].bit + '" class="feature toggle" name="' + features[i].name + '" title="' + features[i].name + '"' +
-                ' id="feature-' + features[i].bit + '" ' +
+                '<input type="checkbox" data-bit="' + fcFeatures[i].bit + '" class="feature toggle" name="' + fcFeatures[i].name + '" title="' + fcFeatures[i].name + '"' +
+                ' id="feature-' + fcFeatures[i].bit + '" ' +
                 '>' +
-                '<label for="feature-' + features[i].bit + '">' +
-                '<span data-i18n="feature' + features[i].name + '"></span>' +
+                '<label for="feature-' + fcFeatures[i].bit + '">' +
+                '<span data-i18n="feature' + fcFeatures[i].name + '"></span>' +
                 '</label>' +
                 feature_tip_html +
                 '</div>');
 
             features_e.each(function () {
-                if ($(this).hasClass(features[i].group)) {
+                if ($(this).hasClass(fcFeatures[i].group)) {
                     $(this).after(row_e);
                 }
             });
         }
 
-        helper.features.updateUI($('.tab-configuration'), FEATURES);
+        features.updateUI($('.tab-configuration'), FC.FEATURES);
 
         // translate to user-selected language
        i18n.localize();;
 
         // VTX
         var config_vtx = $('.config-vtx');
-        if (VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
+        if (FC.VTX_CONFIG.device_type != VTX.DEV_UNKNOWN) {
 
             var vtx_band = $('#vtx_band');
             vtx_band.empty();
             var vtx_no_band_note = $('#vtx_no_band');
-            if (VTX_CONFIG.band < VTX.BAND_MIN || VTX_CONFIG.band > VTX.BAND_MAX) {
+            if (FC.VTX_CONFIG.band < VTX.BAND_MIN || FC.VTX_CONFIG.band > VTX.BAND_MAX) {
                 var noBandName = i18n.getMessage("configurationNoBand");
                 $('<option value="0">' + noBandName + '</option>').appendTo(vtx_band);
                 vtx_no_band_note.show();
@@ -128,41 +141,41 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             for (var ii = 0; ii < VTX.BANDS.length; ii++) {
                 var band_name = VTX.BANDS[ii].name;
                 var option = $('<option value="' + VTX.BANDS[ii].code + '">' + band_name + '</option>');
-                if (VTX.BANDS[ii].code == VTX_CONFIG.band) {
+                if (VTX.BANDS[ii].code == FC.VTX_CONFIG.band) {
                     option.prop('selected', true);
                 }
                 option.appendTo(vtx_band);
             }
             vtx_band.on('change', function () {
-                VTX_CONFIG.band = parseInt($(this).val());
+                FC.VTX_CONFIG.band = parseInt($(this).val());
             });
 
             var vtx_channel = $('#vtx_channel');
             vtx_channel.empty();
             for (var ii = VTX.CHANNEL_MIN; ii <= VTX.CHANNEL_MAX; ii++) {
                 var option = $('<option value="' + ii + '">' + ii + '</option>');
-                if (ii == VTX_CONFIG.channel) {
+                if (ii == FC.VTX_CONFIG.channel) {
                     option.prop('selected', true);
                 }
                 option.appendTo(vtx_channel);
             }
             vtx_channel.on('change', function () {
-                VTX_CONFIG.channel = parseInt($(this).val());
+                FC.VTX_CONFIG.channel = parseInt($(this).val());
             });
 
             var vtx_power = $('#vtx_power');
             vtx_power.empty();
-            var minPower = VTX.getMinPower(VTX_CONFIG.device_type);
-            var maxPower = VTX.getMaxPower(VTX_CONFIG.device_type);
+            var minPower = VTX.getMinPower(FC.VTX_CONFIG.device_type);
+            var maxPower = VTX.getMaxPower(FC.VTX_CONFIG.device_type);
             for (var ii = minPower; ii <= maxPower; ii++) {
                 var option = $('<option value="' + ii + '">' + ii + '</option>');
-                if (ii == VTX_CONFIG.power) {
+                if (ii == FC.VTX_CONFIG.power) {
                     option.prop('selected', true);
                 }
                 option.appendTo(vtx_power);
             }
             vtx_power.on('change', function () {
-                VTX_CONFIG.power = parseInt($(this).val());
+                FC.FC.VTX_CONFIG.power = parseInt($(this).val());
             });
 
             var vtx_low_power_disarm = $('#vtx_low_power_disarm');
@@ -173,13 +186,13 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                     name = ii;
                 }
                 var option = $('<option value="' + ii + '">' + name + '</option>');
-                if (ii == VTX_CONFIG.low_power_disarm) {
+                if (ii == FC.VTX_CONFIG.low_power_disarm) {
                     option.prop('selected', true);
                 }
                 option.appendTo(vtx_low_power_disarm);
             }
             vtx_low_power_disarm.on('change', function () {
-                VTX_CONFIG.low_power_disarm = parseInt($(this).val());
+                FC.VTX_CONFIG.low_power_disarm = parseInt($(this).val());
             });
 
             config_vtx.show();
@@ -194,32 +207,32 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#content').scrollTop((scrollPosition) ? scrollPosition : 0);
 
         // fill board alignment
-        $('input[name="board_align_yaw"]').val((BOARD_ALIGNMENT.yaw / 10.0).toFixed(1));
+        $('input[name="board_align_yaw"]').val((FC.BOARD_ALIGNMENT.yaw / 10.0).toFixed(1));
 
         // fill magnetometer
         //UPDATE: moved to GPS tab and hidden
-        //$('#mag_declination').val(MISC.mag_declination);
+        //$('#mag_declination').val(FC.MISC.mag_declination);
 
         // fill battery voltage
-        $('#voltagesource').val(MISC.voltage_source);
-        $('#cells').val(MISC.battery_cells);
-        $('#celldetectvoltage').val(MISC.vbatdetectcellvoltage);
-        $('#mincellvoltage').val(MISC.vbatmincellvoltage);
-        $('#maxcellvoltage').val(MISC.vbatmaxcellvoltage);
-        $('#warningcellvoltage').val(MISC.vbatwarningcellvoltage);
-        $('#voltagescale').val(MISC.vbatscale);
+        $('#voltagesource').val(FC.MISC.voltage_source);
+        $('#cells').val(FC.MISC.battery_cells);
+        $('#celldetectvoltage').val(FC.MISC.vbatdetectcellvoltage);
+        $('#mincellvoltage').val(FC.MISC.vbatmincellvoltage);
+        $('#maxcellvoltage').val(FC.MISC.vbatmaxcellvoltage);
+        $('#warningcellvoltage').val(FC.MISC.vbatwarningcellvoltage);
+        $('#voltagescale').val(FC.MISC.vbatscale);
 
         // fill current
-        $('#currentscale').val(CURRENT_METER_CONFIG.scale);
-        $('#currentoffset').val(CURRENT_METER_CONFIG.offset / 10);
+        $('#currentscale').val(FC.CURRENT_METER_CONFIG.scale);
+        $('#currentoffset').val(FC.CURRENT_METER_CONFIG.offset / 10);
 
         // fill battery capacity
-        $('#battery_capacity').val(MISC.battery_capacity);
-        let batCapWarn = Math.round(MISC.battery_capacity_warning * 100 / MISC.battery_capacity);
+        $('#battery_capacity').val(FC.MISC.battery_capacity);
+        let batCapWarn = Math.round(FC.MISC.battery_capacity_warning * 100 / FC.MISC.battery_capacity);
         $('#battery_capacity_warning').val(isNaN(batCapWarn) ? "" : batCapWarn);
-        let batCapWarnCrit = Math.round(MISC.battery_capacity_critical * 100 / MISC.battery_capacity);
+        let batCapWarnCrit = Math.round(FC.MISC.battery_capacity_critical * 100 / FC.MISC.battery_capacity);
         $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
-        $('#battery_capacity_unit').val(MISC.battery_capacity_unit);
+        $('#battery_capacity_unit').val(FC.MISC.battery_capacity_unit);
 
         let $i2cSpeed = $('#i2c_speed'),
             $i2cSpeedInfo = $('#i2c_speed-info');
@@ -256,33 +269,32 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
         $('a.save').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
-            //MISC.mag_declination = parseFloat($('#mag_declination').val());
+            //FC.MISC.mag_declination = parseFloat($('#mag_declination').val());
 
-            MISC.battery_cells = parseInt($('#cells').val());
-            MISC.voltage_source = parseInt($('#voltagesource').val());
-            MISC.vbatdetectcellvoltage = parseFloat($('#celldetectvoltage').val());
-            MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
-            MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
-            MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
-            MISC.vbatscale = parseInt($('#voltagescale').val());
+            FC.MISC.battery_cells = parseInt($('#cells').val());
+            FC.MISC.voltage_source = parseInt($('#voltagesource').val());
+            FC.MISC.vbatdetectcellvoltage = parseFloat($('#celldetectvoltage').val());
+            FC.MISC.vbatmincellvoltage = parseFloat($('#mincellvoltage').val());
+            FC.MISC.vbatmaxcellvoltage = parseFloat($('#maxcellvoltage').val());
+            FC.MISC.vbatwarningcellvoltage = parseFloat($('#warningcellvoltage').val());
+            FC.MISC.vbatscale = parseInt($('#voltagescale').val());
 
-            MISC.battery_capacity = parseInt($('#battery_capacity').val());
-            MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * MISC.battery_capacity / 100);
-            MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * MISC.battery_capacity / 100);
-            MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
+            FC.MISC.battery_capacity = parseInt($('#battery_capacity').val());
+            FC.MISC.battery_capacity_warning = parseInt($('#battery_capacity_warning').val() * FC.MISC.battery_capacity / 100);
+            FC.MISC.battery_capacity_critical = parseInt($('#battery_capacity_critical').val() * FC.MISC.battery_capacity / 100);
+            FC.MISC.battery_capacity_unit = $('#battery_capacity_unit').val();
 
-            helper.features.reset();
-            helper.features.fromUI($('.tab-configuration'));
-            helper.features.execute(function () {
-                CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
-                CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+            features.reset();
+            features.fromUI($('.tab-configuration'));
+            features.execute(function () {
+                FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
+                FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
                 saveChainer.execute();
             });
         });
-
-        helper.interval.add('config_load_analog', function () {
-            $('#batteryvoltage').val([ANALOG.voltage.toFixed(2)]);
-            $('#batterycurrent').val([ANALOG.amperage.toFixed(2)]);
+        interval.add('config_load_analog', function () {
+            $('#batteryvoltage').val([FC.ANALOG.voltage.toFixed(2)]);
+            $('#batterycurrent').val([FC.ANALOG.amperage.toFixed(2)]);
         }, 100, true); // 10 fps
 
         GUI.content_ready(callback);

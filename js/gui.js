@@ -6,6 +6,7 @@ const MSP = require('./msp');
 const FC = require('./fc');
 const interval = require('./intervals');
 const mspBalancedInterval = require('./msp_balanced_interval');
+const { scaleRangeInt } = require('./helpers');
 const i18n = require('./localization');
 
 var TABS = {}; // filled by individual tab js file
@@ -275,7 +276,7 @@ GUI_control.prototype.updateProfileChange = function(refresh) {
         GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
         GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
         GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
-        updateActivatedTab();
+        GUI.updateActivatedTab();
     }
 };
 

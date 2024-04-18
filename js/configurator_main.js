@@ -1,7 +1,9 @@
 window.$ = window.jQuery =  require('jquery'), 
-                            require('jquery-ui-dist/jquery-ui'), 
+                            require('jquery-ui-dist/jquery-ui'),
                             require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators.js');
+                            require('./libraries/jquery.flightindicators.js'),
+                            require('./libraries/jquery.nouislider.all.min.js'),
+                            require('./libraries/jquery.ba-throttle-debounce.js');
 
 const { app } = require('@electron/remote');
 const d3 = require('./libraries/d3.min.js');
@@ -16,9 +18,13 @@ const { PLATFORM } = require('./model.js')
 const i18n = require('./localization');
 const SerialBackend = require('./serial_backend');
 const MSP = require('./msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
 const mspHelper = require('./msp/MSPHelper.js');
 const update = require('./globalUpdates.js');
-
+const appUpdater = require('./appUpdater.js');
+const CliAutoComplete = require('./CliAutoComplete.js');
+const { SITLProcess } = require('./sitl');
+;
 process.on('uncaughtException', function (error) {   
     if (process.env.NODE_ENV !== 'development') {
         GUI.log(i18n.getMessage('unexpectedError', error));
@@ -33,7 +39,6 @@ process.on('uncaughtException', function (error) {
 
 // Set how the units render on the configurator only
 $(function() {
-    
     i18n.init( () => {
         i18n.localize();
 
@@ -66,6 +71,12 @@ $(function() {
             return useEzTune;
         };
 
+        GUI.updateActivatedTab = function() {
+            var activeTab = $('#tabs > ul li.active');
+            activeTab.removeClass('active');
+            $('a', activeTab).trigger('click');
+        }
+
         globalSettings.unitType = store.get('unit_type', UnitType.none);
         globalSettings.mapProviderType = store.get('map_provider_type', 'osm'); 
         globalSettings.mapApiKey = store.get('map_api_key', '');
@@ -74,10 +85,10 @@ $(function() {
         globalSettings.showProfileParameters = store.get('show_profile_parameters', 1);
         updateProfilesHighlightColours();
 
-        if (store.get('cli_autocomplete', true)) {
-            globalSettings.cliAutocomplete = true;
-            //CliAutoComplete.setEnabled(true);
-        };
+        var cliAutocomplete = store.get('cli_autocomplete', true);
+        globalSettings.cliAutocomplete = cliAutocomplete;
+        CliAutoComplete.setEnabled(cliAutocomplete);
+        
 
         // Resets the OSD units used by the unit coversion when the FC is disconnected.
         if (!CONFIGURATOR.connectionValid) {
@@ -97,8 +108,8 @@ $(function() {
             $("#showlog").trigger('click');
         }
 
-        if (store.get('update_notify', true)) { 34
-            //appUpdater.checkRelease(app.getVersion());
+        if (store.get('update_notify', true)) { 
+            appUpdater.checkRelease(app.getVersion());
         }
 
         // log library versions in console to make version tracking easier

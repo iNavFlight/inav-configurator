@@ -1,7 +1,24 @@
-/*global $*/
 'use strict';
 
 const inflection = require( 'inflection' );
+const path = require('path');
+const semver = require('semver');
+const mapSeries = require('promise-map-series');
+const { dialog } = require("@electron/remote");
+const Store = require('electron-store');
+const store = new Store();
+
+const FC = require('./../js/fc');
+const { GUI, TABS } = require('./../js/gui');
+const MSP = require('./../js/msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./../js/msp/MSPHelper');
+const Settings = require('./../js/settings');
+const { globalSettings } = require('./../js/globalSettings');
+const { PortHandler } = require('./../js/port_handler');
+const i18n = require('./../js/localization');
+const jBox = require('./../js/libraries/jBox/jBox.min.js');
+
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -2130,7 +2147,7 @@ OSD.is_item_displayed = function(item, group) {
     if (typeof group.enabled === 'function' && group.enabled() === false) {
         return false;
     }
-    if (item.min_version && !semver.gte(CONFIG.flightControllerVersion, item.min_version)) {
+    if (item.min_version && !semver.gte(FC.CONFIG.flightControllerVersion, item.min_version)) {
         return false;
     }
     if (typeof item.enabled === 'function' && item.enabled() === false) {
@@ -2157,7 +2174,7 @@ OSD.reload = function(callback) {
     };
 
     MSP.promise(MSPCodes.MSP2_CF_SERIAL_CONFIG).then(function (resp) {
-        $.each(SERIAL_CONFIG.ports, function(index, port){
+        $.each(FC.SERIAL_CONFIG.ports, function(index, port){
             if(port.functions.includes('DJI_FPV')) {
                 OSD.data.isDjiHdFpv = true;
             }
@@ -2194,7 +2211,7 @@ OSD.reload = function(callback) {
         });
     });
 
-    if(semver.gte(CONFIG.flightControllerVersion, '7.1.0'))
+    if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
     {
         MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
     }
@@ -2613,7 +2630,7 @@ OSD.GUI.updateUnits = function() {
 
     for (var i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
         var unitType = OSD.constants.UNIT_TYPES[i];
-        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
+        if (unitType.min_version && semver.lt(FC.CONFIG.flightControllerVersion, unitType.min_version)) {
             continue;
         }
         var name = i18n.getMessage(unitType.name);
@@ -3180,7 +3197,7 @@ TABS.osd.initialize = function (callback) {
         GUI.active_tab = 'osd';
     }
 
-    GUI.load(path.join(__dirname, "tabs/osd.html"), Settings.processHtml(function () {
+    GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
         // translate to user-selected language
        i18n.localize();
 
@@ -3360,14 +3377,14 @@ TABS.osd.initialize = function (callback) {
 
         // Update RX data for Crossfire detection
         mspHelper.loadRxConfig(function() {
-            useCRSFRx = (RX_CONFIG.serialrx_provider == 6);
+            useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
         });
 
         // Get status of ESC Telemetry
         useESCTelemetry = false;
         MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
-            for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
-                var serialPort = SERIAL_CONFIG.ports[portIndex];
+            for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+                var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
                 if (serialPort.functions.indexOf("ESC") >= 0) {
                     useESCTelemetry = true;
                     break;
@@ -3378,26 +3395,26 @@ TABS.osd.initialize = function (callback) {
         // Update SENSOR_CONFIG, used to detect
         // OSD_AIR_SPEED
         mspHelper.loadSensorConfig(function () {
-            useBaro  = (SENSOR_CONFIG.barometer != 0);
-            usePitot = (SENSOR_CONFIG.pitot != 0);
+            useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
+            usePitot = (FC.SENSOR_CONFIG.pitot != 0);
             GUI.content_ready(callback);
         });
 
-        if(semver.gte(CONFIG.flightControllerVersion, '7.1.0')) {
+        if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
             mspHelper.loadOsdCustomElements(createCustomElements);
         }
     }));
 };
 
 function createCustomElements(){
-    if(OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
+    if(FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
         $('.custom-element-container').remove();
         return;
     }
 
     var customElementsContainer = $('#osdCustomElements');
 
-    for(var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
         var label = $('<label>');
 
         var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
@@ -3420,7 +3437,7 @@ function createCustomElements(){
 
             customElementRowType.append($('<td>').append(select));
             customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
-                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
+                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
             ).append(
                 $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()
             ).append(
@@ -3456,7 +3473,7 @@ function createCustomElements(){
             valueBlock.find('.' + dataValue).show();
         });
 
-        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(chrome.i18n.getMessage("custom_element") + ' ' + (i + 1))));
+        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
 
         customElementTable.append(customElementRowType).append(customElementRowValue).append(customElementLabel);
         label.append(customElementTable);
@@ -3468,38 +3485,38 @@ function createCustomElements(){
 }
 
 function fillCustomElementsValues() {
-    for (var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+    for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
         for (var ii = 0; ii < 3; ii++) {
-            $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
+            $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
 
             var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
-            switch (OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type){
+            switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].type){
                 case 1:
-                    valueCell.find('.text').val(OSD_CUSTOM_ELEMENTS.items[i].customElementText).trigger('change');
+                    valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementText).trigger('change');
                     break;
                 case 2:
-                    valueCell.find('.ico').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 3:
-                    valueCell.find('.ico_gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
                     break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
-                    valueCell.find('.gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].value).trigger('change');
+                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
                     break;
             }
         }
 
-        $('.osdCustomElement-' + i + '-visibility-type').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type).trigger('change');
+        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type).trigger('change');
         var valueVisibilityCell = $('.osdCustomElement-' + i + '-visibility-value');
-        switch (OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.type){
+        switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type){
             case 1:
-                valueVisibilityCell.find('.gv').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
                 break;
             case 2:
-                valueVisibilityCell.find('.lc').val(OSD_CUSTOM_ELEMENTS.items[i].customElementVisibility.value).trigger('change');
+                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
                 break;
         }
 
@@ -3613,7 +3630,7 @@ function customElementGetDataForRow(row){
     data.push8(parseInt(elementVisibilityType.val()));
     data.push16(visibilityValue);
 
-    for(var i = 0; i < OSD_CUSTOM_ELEMENTS.settings.customElementTextSize; i++){
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; i++){
         if(i < text.length){
             data.push8(text.charCodeAt(i))
         }else{
@@ -3716,7 +3733,7 @@ function updatePanServoPreview() {
     }
 
     // Update the panServoOutput select to be visibly easier to use
-    let servoRules = SERVO_RULES;
+    let servoRules = FC.SERVO_RULES;
     $('#panServoOutput option').each(function() {
         let servoIndex = $(this).val();
 

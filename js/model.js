@@ -787,13 +787,13 @@ const platformList = [
         return retVal;
     };
 
-    publicScope.loadServoRules = function (mixer) {
-        SERVO_RULES.flush();
+    publicScope.loadServoRules = function (FC, mixer) {
+        FC.SERVO_RULES.flush();
 
         for (const i in mixer.servoMixer) {
             if (mixer.servoMixer.hasOwnProperty(i)) {
                 const r = mixer.servoMixer[i];
-                SERVO_RULES.put(
+                FC.SERVO_RULES.put(
                     new ServoMixRule(
                         r.getTarget(),
                         r.getInput(),
@@ -805,13 +805,13 @@ const platformList = [
         }
     }
 
-    publicScope.loadMotorRules = function (mixer) {
-        MOTOR_RULES.flush();
+    publicScope.loadMotorRules = function (FC, mixer) {
+        FC.MOTOR_RULES.flush();
 
         for (const i in mixer.motorMixer) {
             if (mixer.motorMixer.hasOwnProperty(i)) {
                 const r = mixer.motorMixer[i];
-                MOTOR_RULES.put(
+                FC.MOTOR_RULES.put(
                     new MotorMixRule(
                         r.getThrottle(),
                         r.getRoll(),

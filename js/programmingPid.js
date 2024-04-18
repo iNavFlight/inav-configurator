@@ -1,5 +1,7 @@
-/*global $,FC*/
 'use strict';
+
+const FC = require('./fc');
+const { GUI } = require('./gui');
 
 let ProgrammingPid = function (enabled, setpointType, setpointValue, measurementType, measurementValue, gainP, gainI, gainD, gainFF) {
     let self = {};

@@ -1,5 +1,17 @@
 'use strict';
-/*global chrome,GUI,BOARD_ALIGNMENT,TABS,helper,$*/
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const MSP = require('./../js/msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./../js/msp/MSPHelper');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue');
+const FC = require('./../js/fc');
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+const { mixer } = require('./../js/model');
 
 TABS.magnetometer = {};
 
@@ -35,9 +47,9 @@ TABS.magnetometer.initialize = function (callback) {
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
         function (callback) {
-            self.boardAlignmentConfig.pitch = Math.round(BOARD_ALIGNMENT.pitch / 10);
-            self.boardAlignmentConfig.roll = Math.round(BOARD_ALIGNMENT.roll / 10);
-            self.boardAlignmentConfig.yaw = Math.round(BOARD_ALIGNMENT.yaw / 10);
+            self.boardAlignmentConfig.pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
+            self.boardAlignmentConfig.roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
+            self.boardAlignmentConfig.yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
             callback();
         },
         mspHelper.loadSensorAlignment,
@@ -78,16 +90,16 @@ TABS.magnetometer.initialize = function (callback) {
 
     var saveChain = [
         function (callback) {
-            BOARD_ALIGNMENT.pitch = self.boardAlignmentConfig.pitch * 10;
-            BOARD_ALIGNMENT.roll = self.boardAlignmentConfig.roll * 10;
-            BOARD_ALIGNMENT.yaw = self.boardAlignmentConfig.yaw * 10;
+            FC.BOARD_ALIGNMENT.pitch = self.boardAlignmentConfig.pitch * 10;
+            FC.BOARD_ALIGNMENT.roll = self.boardAlignmentConfig.roll * 10;
+            FC.BOARD_ALIGNMENT.yaw = self.boardAlignmentConfig.yaw * 10;
             callback();
         },
         mspHelper.saveBoardAlignment,
         // Magnetometer alignment
         function (callback) {
             let orientation_mag_e = $('select.magalign');
-            SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
+            FC.SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
             callback();
         },
         mspHelper.saveSensorAlignment,
@@ -138,7 +150,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/magnetometer.html"), process_html);
+        GUI.load(path.join(__dirname, "magnetometer.html"), process_html);
     }
 
     function generateRange(min, max, step) {
@@ -214,7 +226,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateMagOrientationWithPreset() {
         if (self.isSavePreset) {
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         }
     }
@@ -320,12 +332,12 @@ TABS.magnetometer.initialize = function (callback) {
         for (let i = 0; i < alignments.length; i++) {
             self.pageElements.orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
-        self.pageElements.orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
+        self.pageElements.orientation_mag_e.val(FC.SENSOR_ALIGNMENT.align_mag);
 
         if (areAnglesZero()) {
             //If using a preset, checking if custom values are equal to 0
             //Update the slider, but don't save the value until they will be not modified.
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         }
         else {
@@ -416,13 +428,13 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
         self.pageElements.orientation_mag_e.on('change', function () {
-            SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            FC.SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         });
 
         self.pageElements.orientation_mag_e.on('mousedown', function () {
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         });
 
@@ -512,19 +524,19 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         function get_fast_data() {
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 return;
             }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
-	            self.roll_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
-	            self.pitch_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
-                self.heading_e.text(i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
+	            self.roll_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[0]]));
+	            self.pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
+                self.heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
             });
         }
 
-        helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
+        mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
         GUI.content_ready(callback);
     }
@@ -570,12 +582,12 @@ TABS.magnetometer.initialize3D = function () {
 
     // load the model including materials
     if (useWebGlRenderer) {
-        if (MIXER_CONFIG.appliedMixerPreset === -1) {
+        if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
             GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
-            model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+            model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
         }
     }
     else {
@@ -622,7 +634,7 @@ TABS.magnetometer.initialize3D = function () {
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 
-        this.render3D();
+        self.render3D();
     };
 
     $(window).on('resize', this.resize3D);

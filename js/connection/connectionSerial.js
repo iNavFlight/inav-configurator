@@ -77,7 +77,7 @@ class ConnectionSerial extends Connection {
                 if (error) {
                     result = 1;
                     sent = 0;
-                    console.log("Serial wrire error: " + error)
+                    console.log("Serial write error: " + error)
                 }
                 if (callback) {
                     callback({

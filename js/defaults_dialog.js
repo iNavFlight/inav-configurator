@@ -1,9 +1,15 @@
-/*global mspHelper,$,GUI,MSP,chrome*/
 'use strict';
 
+const { GUI } = require('./../js/gui');
+const FC = require('./fc.js');
+const MSP = require('./msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
 const mspHelper = require('./msp/MSPHelper');
+const MSPChainerClass = require('./msp/MSPchainer.js');
 const features = require('./feature_framework');
-const { mixer } = require('./model')
+const { mixer } = require('./model');
+const jBox = require('./libraries/jBox/jBox.min.js');
+const i18n = require('./localization.js');
 
 var savingDefaultsModal;
 
@@ -997,18 +1003,18 @@ var defaultsDialog = (function () {
         if (selectedDefaultPreset.mixerToApply) {
             let currentMixerPreset = mixer.getById(selectedDefaultPreset.mixerToApply);
 
-            mixer.loadServoRules(currentMixerPreset);
-            mixer.loadMotorRules(currentMixerPreset);
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
             
-            MIXER_CONFIG.platformType = currentMixerPreset.platform;
-            MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
-            MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            FC.MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            FC.MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+            FC.MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
-            SERVO_RULES.cleanup();
-            SERVO_RULES.inflate();
-            MOTOR_RULES.cleanup();
-            MOTOR_RULES.inflate();
+            FC.SERVO_RULES.cleanup();
+            FC.SERVO_RULES.inflate();
+            FC.MOTOR_RULES.cleanup();
+            FC.MOTOR_RULES.inflate();
             
             chain = chain.concat([
                 mspHelper.saveMixerConfig,

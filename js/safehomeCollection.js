@@ -1,5 +1,7 @@
 'use strict';
 
+const BitHelper = require('./bitHelper');
+
 var SafehomeCollection = function () {
 
     let self = {},
@@ -67,14 +69,14 @@ var SafehomeCollection = function () {
         if (safehomeId < self.safehomeCount()) {    
             buffer.push(safehome.getNumber());    // sbufReadU8(src);    // number
             buffer.push(1);    
-            buffer.push(specificByte(safehome.getLat(), 0));    // sbufReadU32(src);      // lat
-            buffer.push(specificByte(safehome.getLat(), 1));
-            buffer.push(specificByte(safehome.getLat(), 2));
-            buffer.push(specificByte(safehome.getLat(), 3));
-            buffer.push(specificByte(safehome.getLon(), 0));    // sbufReadU32(src);      // lon
-            buffer.push(specificByte(safehome.getLon(), 1));
-            buffer.push(specificByte(safehome.getLon(), 2));
-            buffer.push(specificByte(safehome.getLon(), 3));
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 0));    // sbufReadU32(src);      // lat
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 1));
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 2));
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 3));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 0));    // sbufReadU32(src);      // lon
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 1));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 2));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 3));
         } else {
             buffer = Array(10).fill(0);
             buffer[0] = safehomeId;

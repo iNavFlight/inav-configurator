@@ -1,5 +1,6 @@
-/*global ServoMixRule*/
 'use strict';
+
+const ServoMixRule = require('./servoMixRule');
 
 var ServoMixerRuleCollection = function () {
 

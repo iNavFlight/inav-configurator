@@ -1,5 +1,11 @@
 'use strict';
 
+const semver = require('semver');
+
+const { GUI } = require('./gui');
+const jBox = require('./libraries/jBox/jBox.min.js');
+const i18n = require('./localization');
+
 var appUpdater = appUpdater || {};
 
 appUpdater.checkRelease = function (currVersion) {
@@ -34,3 +40,5 @@ appUpdater.checkRelease = function (currVersion) {
         modalStart.close();
     });
 };
+
+module.exports = appUpdater;

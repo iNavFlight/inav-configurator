@@ -1,7 +1,19 @@
 'use strict';
 
+const path = require('path');
+const { dialog } = require("@electron/remote");
 
-/*global chrome,GUI,TABS,$*/
+const MSP = require('./../js/msp');
+const mspQueue =  require('./../js/serial_queue');
+const { GUI, TABS } = require('./../js/gui');
+const CONFIGURATOR = require('./../js/data_storage');
+var timeout = require('./../js/timeouts');
+const i18n = require('./../js/localization');
+const { globalSettings } = require('./../js/globalSettings');
+const CliAutoComplete = require('./../js/CliAutoComplete');
+const { ConnectionType } = require('./../js/connection/connection');
+const jBox = require('./../js/libraries/jBox/jBox.min.js');
+
 TABS.cli = {
     lineDelayMs: 50,
     profileSwitchDelayMs: 100,
@@ -81,7 +93,7 @@ TABS.cli.initialize = function (callback) {
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
-    helper.mspQueue.flush();
+    mspQueue.flush();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";
@@ -103,7 +115,7 @@ TABS.cli.initialize = function (callback) {
         return outputArray.reduce((p, line, index) => 
             p.then((delay) => 
                 new Promise((resolve) => {
-                    helper.timeout.add('CLI_send_slowly', () => {
+                    timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
                         if (line.toLowerCase().startsWith('profile')) {
                             processingDelay = TABS.cli.profileSwitchDelayMs;
@@ -121,7 +133,7 @@ TABS.cli.initialize = function (callback) {
         );
     }
 
-    GUI.load(path.join(__dirname, "tabs/cli.html"), function () {
+    GUI.load(path.join(__dirname, "cli.html"), function () {
         // translate to user-selected language
        i18n.localize();
 
@@ -235,7 +247,7 @@ TABS.cli.initialize = function (callback) {
                             isolateScroll: false,
                             title: i18n.getMessage("cliConfirmSnippetDialogTitle"),
                             content: $('#snippetpreviewcontent'),
-                            onCreated: () => $("#snippetpreviewcontent a.confirm").on('click', function () executeSnippet()),
+                            onCreated: () => $("#snippetpreviewcontent a.confirm").on('click', executeSnippet),
                         });
                     }
                     previewArea.val(result);
@@ -260,7 +272,7 @@ TABS.cli.initialize = function (callback) {
 
         // Tab key detection must be on keydown,
         // `keypress`/`keyup` happens too late, as `textarea` will have already lost focus.
-        textarea.keydown(function (event) {
+        textarea.on('keydown', function (event) {
             const tabKeyCode = 9;
             if (event.which == tabKeyCode) {
                 // prevent default tabbing behaviour
@@ -281,7 +293,7 @@ TABS.cli.initialize = function (callback) {
             }
         });
 
-        textarea.keypress(function (event) {
+        textarea.on('keypress', function (event) {
             const enterKeyCode = 13;
             if (event.which == enterKeyCode) {
                 event.preventDefault(); // prevent the adding of new line
@@ -304,7 +316,7 @@ TABS.cli.initialize = function (callback) {
             }
         });
 
-        textarea.keyup(function (event) {
+        textarea.on('keyup', function (event) {
             var keyUp = {38: true},
                 keyDown = {40: true};
 
@@ -324,7 +336,7 @@ TABS.cli.initialize = function (callback) {
         // give input element user focus
         textarea.focus();
 
-        helper.timeout.add('enter_cli', function enter_cli() {
+        timeout.add('enter_cli', function enter_cli() {
             // Enter CLI mode
             var bufferOut = new ArrayBuffer(1);
             var bufView = new Uint8Array(bufferOut);
@@ -341,7 +353,7 @@ TABS.cli.initialize = function (callback) {
         if (CONFIGURATOR.connection.type == ConnectionType.BLE) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
             if (delay > 0) {    
-                helper.timeout.add('cli_delay', () =>  {
+                timeout.add('cli_delay', () =>  {
                     self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
                     self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
                 }, 400);
@@ -523,7 +535,7 @@ TABS.cli.cleanup = function (callback) {
         // (another approach is however much more complicated):
         // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
         // we could probably implement this someday
-        helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
+        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;

@@ -21,7 +21,7 @@ let bluetoothDeviceChooser = null;
 let btDeviceList = null;
 let selectBluetoothCallback = null;
 
-// In Eletrcon the bluetooth device chooser didn't exist, so we have to build our own
+// In Electron the bluetooth device chooser didn't exist, so we have to build our own
 function createDeviceChooser() {
   bluetoothDeviceChooser = new BrowserWindow({
     parent: mainWindow,
@@ -69,7 +69,6 @@ app.on('ready', () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false
     },
   });
 
@@ -124,7 +123,7 @@ app.on('ready', () => {
     if (details.deviceType === 'usb' && details.origin === 'file://') {     
         return true;
     }
-  })
+  });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     return {
@@ -140,7 +139,6 @@ app.on('ready', () => {
   require("@electron/remote/main").enable(mainWindow.webContents);
   mainWindow.removeMenu();
   mainWindow.setMinimumSize(800, 600);
-
   mainWindow.loadFile('./index.html');
   
   mainWindowState.manage(mainWindow);

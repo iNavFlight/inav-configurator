@@ -1,5 +1,25 @@
-/*global $,MSPChainerClass,mspHelper,MSPCodes,GUI,chrome,MSP,TABS,Settings,helper,ol*/
 'use strict';
+
+const path = require('path')
+const ol = require('openlayers')
+const semver = require('semver');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const mspBalancedInterval = require('./../js/msp_balanced_interval.js');
+const mspQueue = require('./../js/serial_queue.js');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const i18n = require('./../js/localization');
+const Settings = require('./../js/settings');
+const serialPortHelper = require('./../js/serialPortHelper');
+const features = require('./../js/feature_framework');
+const { globalSettings } = require('./../js/globalSettings');
+const jBox = require('./../js/libraries/jBox/jBox.min.js');
+const SerialBackend = require('../js/serial_backend');
+
 
 TABS.gps = {};
 TABS.gps.initialize = function (callback) {
@@ -74,7 +94,7 @@ TABS.gps.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/gps.html"), Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "gps.html"), Settings.processHtml(process_html));
     }
 
     let cursorInitialized = false;
@@ -89,15 +109,15 @@ TABS.gps.initialize = function (callback) {
     function process_html() {
        i18n.localize();;
 
-        var features = FC.getFeatures();
+        var fcFeatures = FC.getFeatures();
 
-        helper.features.updateUI($('.tab-gps'), FEATURES);
+        features.updateUI($('.tab-gps'), FC.FEATURES);
 
         //Generate serial port options
         let $port = $('#gps_port');
         let $baud = $('#gps_baud');
 
-        let ports = helper.serialPortHelper.getPortIdentifiersForFunction('GPS');
+        let ports = serialPortHelper.getPortIdentifiersForFunction('GPS');
 
         let currentPort = null;
 
@@ -105,7 +125,7 @@ TABS.gps.initialize = function (callback) {
             currentPort = ports[0];
         }
 
-        let availablePorts = helper.serialPortHelper.getPortList();
+        let availablePorts = serialPortHelper.getPortList();
 
         //Generate port select
         $port.append('<option value="-1">NONE</option>');
@@ -115,18 +135,18 @@ TABS.gps.initialize = function (callback) {
         }
 
         //Generate baud select
-        helper.serialPortHelper.getBauds('SENSOR').forEach(function (baud) {
+        serialPortHelper.getBauds('SENSOR').forEach(function (baud) {
             $baud.append('<option value="' + baud + '">' + baud + '</option>');
         });
 
         //Select defaults
         if (currentPort !== null) {
             $port.val(currentPort);
-            let portConfig = helper.serialPortHelper.getPortByIdentifier(currentPort);
+            let portConfig = serialPortHelper.getPortByIdentifier(currentPort);
             $baud.val(portConfig.sensors_baudrate);
         } else {
             $port.val(-1);
-            $baud.val(helper.serialPortHelper.getRuleByName('GPS').defaultBaud);
+            $baud.val(serialPortHelper.getRuleByName('GPS').defaultBaud);
         }
 
         // generate GPS
@@ -139,10 +159,10 @@ TABS.gps.initialize = function (callback) {
         }
 
         gps_protocol_e.on('change', function () {
-            MISC.gps_type = parseInt($(this).val());
+            FC.MISC.gps_type = parseInt($(this).val());
         });
 
-        gps_protocol_e.val(MISC.gps_type);
+        gps_protocol_e.val(FC.MISC.gps_type);
         gps_protocol_e.trigger('change');
 
         var gps_ubx_sbas_e = $('#gps_ubx_sbas');
@@ -151,10 +171,10 @@ TABS.gps.initialize = function (callback) {
         }
 
         gps_ubx_sbas_e.on('change', function () {
-            MISC.gps_ubx_sbas = parseInt($(this).val());
+            FC.MISC.gps_ubx_sbas = parseInt($(this).val());
         });
 
-        gps_ubx_sbas_e.val(MISC.gps_ubx_sbas);
+        gps_ubx_sbas_e.val(FC.MISC.gps_ubx_sbas);
 
         let mapView = new ol.View({
             center: ol.proj.fromLonLat([0, 0]),
@@ -179,8 +199,8 @@ TABS.gps.initialize = function (callback) {
         }
 
         $("#center_button").on('click', function () {
-            let lat = GPS_DATA.lat / 10000000;
-            let lon = GPS_DATA.lon / 10000000;
+            let lat = FC.GPS_DATA.lat / 10000000;
+            let lon = FC.GPS_DATA.lon / 10000000;
             let center = ol.proj.fromLonLat([lon, lat]);
             mapView.setCenter(center);
         });
@@ -243,39 +263,39 @@ TABS.gps.initialize = function (callback) {
 
         function update_ui() {
 
-            let lat = GPS_DATA.lat / 10000000;
-            let lon = GPS_DATA.lon / 10000000;
+            let lat = FC.GPS_DATA.lat / 10000000;
+            let lon = FC.GPS_DATA.lon / 10000000;
 
             let gpsFixType = i18n.getMessage('gpsFixNone');
-            if (GPS_DATA.fix >= 2) {
+            if (FC.GPS_DATA.fix >= 2) {
                 gpsFixType = i18n.getMessage('gpsFix3D');
-            } else if (GPS_DATA.fix >= 1) {
+            } else if (FC.GPS_DATA.fix >= 1) {
                 gpsFixType = i18n.getMessage('gpsFix2D');
             }
 
             $('.GPS_info td.fix').html(gpsFixType);
-            $('.GPS_info td.alt').text(GPS_DATA.alt + ' m');
+            $('.GPS_info td.alt').text(FC.GPS_DATA.alt + ' m');
             $('.GPS_info td.lat').text(lat.toFixed(4) + ' deg');
             $('.GPS_info td.lon').text(lon.toFixed(4) + ' deg');
-            $('.GPS_info td.speed').text(GPS_DATA.speed + ' cm/s');
-            $('.GPS_info td.sats').text(GPS_DATA.numSat);
-            $('.GPS_info td.distToHome').text(GPS_DATA.distanceToHome + ' m');
+            $('.GPS_info td.speed').text(FC.GPS_DATA.speed + ' cm/s');
+            $('.GPS_info td.sats').text(FC.GPS_DATA.numSat);
+            $('.GPS_info td.distToHome').text(FC.GPS_DATA.distanceToHome + ' m');
 
             let gpsRate = 0;
-            if (GPS_DATA.messageDt > 0) {
-                gpsRate = 1000 / GPS_DATA.messageDt;
+            if (FC.GPS_DATA.messageDt > 0) {
+                gpsRate = 1000 / FC.GPS_DATA.messageDt;
             }
 
-            $('.GPS_stat td.messages').text(GPS_DATA.packetCount);
+            $('.GPS_stat td.messages').text(FC.GPS_DATA.packetCount);
             $('.GPS_stat td.rate').text(gpsRate.toFixed(1) + ' Hz');
-            $('.GPS_stat td.errors').text(GPS_DATA.errors);
-            $('.GPS_stat td.timeouts').text(GPS_DATA.timeouts);
-            $('.GPS_stat td.eph').text((GPS_DATA.eph / 100).toFixed(2) + ' m');
-            $('.GPS_stat td.epv').text((GPS_DATA.epv / 100).toFixed(2) + ' m');
-            $('.GPS_stat td.hdop').text((GPS_DATA.hdop / 100).toFixed(2));
+            $('.GPS_stat td.errors').text(FC.GPS_DATA.errors);
+            $('.GPS_stat td.timeouts').text(FC.GPS_DATA.timeouts);
+            $('.GPS_stat td.eph').text((FC.GPS_DATA.eph / 100).toFixed(2) + ' m');
+            $('.GPS_stat td.epv').text((FC.GPS_DATA.epv / 100).toFixed(2) + ' m');
+            $('.GPS_stat td.hdop').text((FC.GPS_DATA.hdop / 100).toFixed(2));
 
             //Update map
-            if (GPS_DATA.fix >= 2) {
+            if (FC.GPS_DATA.fix >= 2) {
 
                 let center = ol.proj.fromLonLat([lon, lat]);
 
@@ -316,7 +336,7 @@ TABS.gps.initialize = function (callback) {
 
             }
 
-            if (semver.gte(CONFIG.flightControllerVersion, "7.1.0")) {
+            if (semver.gte(FC.CONFIG.flightControllerVersion, "7.1.0")) {
                 MSP.send_message(MSPCodes.MSP2_ADSB_VEHICLE_LIST, false, false, function () {
                     //ADSB vehicles
 
@@ -324,8 +344,8 @@ TABS.gps.initialize = function (callback) {
                         vehicleVectorSource.clear();
                     }
 
-                    for (let key in ADSB_VEHICLES.vehicles) {
-                        let vehicle = ADSB_VEHICLES.vehicles[key];
+                    for (let key in FC.ADSB_VEHICLES.vehicles) {
+                        let vehicle = FC.ADSB_VEHICLES.vehicles[key];
 
                         if (!vehiclesCursorInitialized) {
                             vehiclesCursorInitialized = true;
@@ -380,14 +400,14 @@ TABS.gps.initialize = function (callback) {
          * enable data pulling
          * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
          */
-        helper.mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
+        mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
-            if (!have_sensor(CONFIG.activeSensors, 'gps')) {
+            if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
                 update_ui();
                 return;
             }
 
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 return;
             }
 
@@ -396,25 +416,10 @@ TABS.gps.initialize = function (callback) {
 
 
         $('a.save').on('click', function () {
-            if (FC.isFeatureEnabled('GPS', features)) {
-                googleAnalytics.sendEvent('Setting', 'GpsProtocol', gpsProtocols[MISC.gps_type]);
-                googleAnalytics.sendEvent('Setting', 'GpsSbas', gpsSbas[MISC.gps_ubx_sbas]);
-            }
-
-            googleAnalytics.sendEvent('Setting', 'GPSEnabled', FC.isFeatureEnabled('GPS', features) ? "true" : "false");
-
-            for (var i = 0; i < features.length; i++) {
-                var featureName = features[i].name;
-                if (FC.isFeatureEnabled(featureName, features)) {
-                    googleAnalytics.sendEvent('Setting', 'Feature', featureName);
-                }
-            }
-
-            helper.serialPortHelper.set($port.val(), 'GPS', $baud.val());
-
-            helper.features.reset();
-            helper.features.fromUI($('.tab-gps'));
-            helper.features.execute(function () {
+            serialPortHelper.set($port.val(), 'GPS', $baud.val());
+            features.reset();
+            features.fromUI($('.tab-gps'));
+            features.execute(function () {
                 saveChainer.execute();
             });
         });

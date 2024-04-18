@@ -1,5 +1,22 @@
-/*global chrome,helper,mspHelper*/
 'use strict';
+
+const path = require('path');
+const Store = require('electron-store');
+const store = new Store()
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const features = require('./../js/feature_framework');
+const tabs = require('./../js/tabs');
+const FC = require('./../js/fc');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
+const { scaleRangeInt } = require('./../js/helpers');
+const SerialBackend = require('./../js/serial_backend');
+const BitHelper = require('./../js/bitHelper');
 
 TABS.pid_tuning = {
 
@@ -30,12 +47,12 @@ TABS.pid_tuning.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/pid_tuning.html"), Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {
 
-        // Fill in the data from PIDs array
+        // Fill in the data from FC.PIDs array
         var pidNames = FC.getPidNames();
 
         $('[data-pid-bank-position]').each(function () {
@@ -46,22 +63,22 @@ TABS.pid_tuning.initialize = function (callback) {
                 $this.find('td:first').text(pidNames[bankPosition]);
 
                 $this.find('input').each(function (index) {
-                $(this).val(PIDs[bankPosition][index]);
+                $(this).val(FC.PIDs[bankPosition][index]);
                 });
             }
         });
 
-        // Fill in data from RC_tuning object
-        $('#rate-roll').val(RC_tuning.roll_rate);
-        $('#rate-pitch').val(RC_tuning.pitch_rate);
-        $('#rate-yaw').val(RC_tuning.yaw_rate);
+        // Fill in data from FC.RC_tuning object
+        $('#rate-roll').val(FC.RC_tuning.roll_rate);
+        $('#rate-pitch').val(FC.RC_tuning.pitch_rate);
+        $('#rate-yaw').val(FC.RC_tuning.yaw_rate);
 
-        $('#rate-manual-roll').val(RC_tuning.manual_roll_rate);
-        $('#rate-manual-pitch').val(RC_tuning.manual_pitch_rate);
-        $('#rate-manual-yaw').val(RC_tuning.manual_yaw_rate);
+        $('#rate-manual-roll').val(FC.RC_tuning.manual_roll_rate);
+        $('#rate-manual-pitch').val(FC.RC_tuning.manual_pitch_rate);
+        $('#rate-manual-yaw').val(FC.RC_tuning.manual_yaw_rate);
 
-        $('#tpa').val(RC_tuning.dynamic_THR_PID);
-        $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
+        $('#tpa').val(FC.RC_tuning.dynamic_THR_PID);
+        $('#tpa-breakpoint').val(FC.RC_tuning.dynamic_THR_breakpoint);
     }
 
     function form_to_pid_and_rc() {
@@ -75,58 +92,58 @@ TABS.pid_tuning.initialize = function (callback) {
                 return;
             }
 
-            if (PIDs[bankPosition]) {
+            if (FC.PIDs[bankPosition]) {
                 $this.find('input').each(function (index) {
-                    PIDs[bankPosition][index] = parseFloat($(this).val());
+                    FC.PIDs[bankPosition][index] = parseFloat($(this).val());
                 });
             }
         });
 
-        // catch RC_tuning changes
-        RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
-        RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
-        RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
+        // catch FC.RC_tuning changes
+        FC.RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
+        FC.RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
+        FC.RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
 
-        RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
-        RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
+        FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
+        FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
 
-        RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
-        RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
-        RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
+        FC.RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
+        FC.RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
+        FC.RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
 
         // Rate Dynamics
-        RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
-        RATE_DYNAMICS.sensitivityEnd = parseInt($('#rate_dynamics_end_sensitivity').val());
-        RATE_DYNAMICS.correctionCenter = parseInt($('#rate_dynamics_center_correction').val());
-        RATE_DYNAMICS.correctionEnd = parseInt($('#rate_dynamics_end_correction').val());
-        RATE_DYNAMICS.weightCenter = parseInt($('#rate_dynamics_center_weight').val());
-        RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
+        FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
+        FC.RATE_DYNAMICS.sensitivityEnd = parseInt($('#rate_dynamics_end_sensitivity').val());
+        FC.RATE_DYNAMICS.correctionCenter = parseInt($('#rate_dynamics_center_correction').val());
+        FC.RATE_DYNAMICS.correctionEnd = parseInt($('#rate_dynamics_end_correction').val());
+        FC.RATE_DYNAMICS.weightCenter = parseInt($('#rate_dynamics_center_weight').val());
+        FC.RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
 
     }
     function hideUnusedPids(sensors_detected) {
       $('.tab-pid_tuning table.pid_tuning').hide();
       $('#pid_main').show();
 
-      if (have_sensor(sensors_detected, 'acc')) {
+      if (SerialBackend.have_sensor(sensors_detected, 'acc')) {
         $('#pid_accel').show();
       }
-      if (have_sensor(sensors_detected, 'baro')) {
+      if (SerialBackend.have_sensor(sensors_detected, 'baro')) {
         $('#pid_baro').show();
       }
-      if (have_sensor(sensors_detected, 'mag')) {
+      if (SerialBackend.have_sensor(sensors_detected, 'mag')) {
         $('#pid_mag').show();
       }
-      if (bit_check(FEATURES, 7)) {
+      if (BitHelper.bit_check(FC.FEATURES, 7)) {
         $('#pid_gps').show();
       }
-      if (have_sensor(sensors_detected, 'sonar')) {
+      if (SerialBackend.have_sensor(sensors_detected, 'sonar')) {
         $('#pid_baro').show();
       }
     }
     function process_html() {
         // translate to user-selected language
 
-        if (EZ_TUNE.enabled) {
+        if (FC.EZ_TUNE.enabled) {
             $("#tuning-wrapper").remove();
             $("#tuning-footer").remove();
             $('#note-wrapper').show();
@@ -136,10 +153,10 @@ TABS.pid_tuning.initialize = function (callback) {
 
        i18n.localize();;
 
-        helper.tabs.init($('.tab-pid_tuning'));
-        helper.features.updateUI($('.tab-pid_tuning'), FEATURES);
+        tabs.init($('.tab-pid_tuning'));
+        features.updateUI($('.tab-pid_tuning'), FC.FEATURES);
 
-        hideUnusedPids(CONFIG.activeSensors);
+        hideUnusedPids(FC.CONFIG.activeSensors);
 
         $('#showAllPids').on('click', function(){
           if($(this).text() == "Show all PIDs") {
@@ -147,7 +164,7 @@ TABS.pid_tuning.initialize = function (callback) {
             $(this).text('Hide unused PIDs');
             $('.show').addClass('unusedPIDsHidden');
           } else {
-            hideUnusedPids(CONFIG.activeSensors);
+            hideUnusedPids(FC.CONFIG.activeSensors);
             $(this).text('Show all PIDs');
             $('.show').removeClass('unusedPIDsHidden');
           }
@@ -157,7 +174,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             if (confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
-                updateActivatedTab();
+                GUI.updateActivatedTab();
             }
         });
 
@@ -215,7 +232,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             $(this).parent().find('input[name="value-input"]').val(val);
-            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
+            FC.PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
         });
 
         $(".pid-slider-row [name='value-input']").on('change', function () {
@@ -230,7 +247,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             $(this).parent().find('input[name="value-slider"]').val(newVal);
-            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
+            FC.PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
         });
 
         let axis = 0;
@@ -243,21 +260,21 @@ TABS.pid_tuning.initialize = function (callback) {
                 let $this = $(this);
                 $this.data('axis', axis);
                 $this.data('bank', bank);
-                $this.find('input[name="value-input"]').val(PIDs[axis][bank]).trigger('change');
+                $this.find('input[name="value-input"]').val(FC.PIDs[axis][bank]).trigger('change');
                 bank++;
             });
         
             axis++;
         });
 
-        GUI.sliderize($('#rate_dynamics_center_sensitivity'), RATE_DYNAMICS.sensitivityCenter, 25, 175);
-        GUI.sliderize($('#rate_dynamics_end_sensitivity'), RATE_DYNAMICS.sensitivityEnd, 25, 175);
+        GUI.sliderize($('#rate_dynamics_center_sensitivity'), FC.RATE_DYNAMICS.sensitivityCenter, 25, 175);
+        GUI.sliderize($('#rate_dynamics_end_sensitivity'), FC.RATE_DYNAMICS.sensitivityEnd, 25, 175);
 
-        GUI.sliderize($('#rate_dynamics_center_correction'), RATE_DYNAMICS.correctionCenter, 10, 95);
-        GUI.sliderize($('#rate_dynamics_end_correction'), RATE_DYNAMICS.correctionEnd, 10, 95);
+        GUI.sliderize($('#rate_dynamics_center_correction'), FC.RATE_DYNAMICS.correctionCenter, 10, 95);
+        GUI.sliderize($('#rate_dynamics_end_correction'), FC.RATE_DYNAMICS.correctionEnd, 10, 95);
 
-        GUI.sliderize($('#rate_dynamics_center_weight'), RATE_DYNAMICS.weightCenter, 0, 95);
-        GUI.sliderize($('#rate_dynamics_end_weight'), RATE_DYNAMICS.weightEnd, 0, 95);
+        GUI.sliderize($('#rate_dynamics_center_weight'), FC.RATE_DYNAMICS.weightCenter, 0, 95);
+        GUI.sliderize($('#rate_dynamics_end_weight'), FC.RATE_DYNAMICS.weightEnd, 0, 95);
 
         if (!FC.isRpyFfComponentUsed()) {
             $('.rpy_ff').prop('disabled', 'disabled');
@@ -314,9 +331,9 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
 
-            helper.features.reset();
-            helper.features.fromUI($('.tab-pid_tuning'));
-            helper.features.execute(function () {
+            features.reset();
+            features.fromUI($('.tab-pid_tuning'));
+            features.execute(function () {
                 mspHelper.savePidData(send_rc_tuning_changes);    
             });
         });

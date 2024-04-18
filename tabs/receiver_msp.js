@@ -1,7 +1,6 @@
 "use strict";
 
 window.$ = window.jQuery = require('jquery');
-//const { i18n } = require('.js/i18n.js');
 
 var
     CHANNEL_MIN_VALUE = 1000,
@@ -121,19 +120,19 @@ function localizeAxisNames() {
         var 
             gimbal = gimbalElems.get(gimbalIndex);
         
-       // $(".gimbal-label-vert", gimbal).text(i18n.getMessage("controlAxis" + gimbals[gimbalIndex][0]));
-       // $(".gimbal-label-horz", gimbal).text(i18n.getMessage("controlAxis" + gimbals[gimbalIndex][1]));
+        $(".gimbal-label-vert", gimbal).text(gimbals[gimbalIndex][0]);
+        $(".gimbal-label-horz", gimbal).text(gimbals[gimbalIndex][1]);
     }
     
     for (var sliderIndex = 0; sliderIndex < 8; sliderIndex++) {
-       // $(".slider-label", sliderElems.get(sliderIndex)).text(i18n.getMessage("radioChannelShort") + (sliderIndex + 5));
+       $(".slider-label", sliderElems.get(sliderIndex)).text("CH " + (sliderIndex + 5));
     }
 }
 
-$(document).ready(function() {
+$(function() {
     $("a.button-enable").on('click', function () {
         
-        
+       
         var shrinkHeight = $(".warning").height();
         
         $(".warning").slideUp("short", function() {

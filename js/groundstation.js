@@ -1,8 +1,14 @@
 'use strict';
 
-var helper = helper || {};
+const ol = require('openlayers');
 
-helper.groundstation = (function () {
+const { GUI } = require('./gui');
+const ltmDecoder = require('./ltmDecoder');
+const interval = require('./intervals');
+const { globalSettings } = require('./globalSettings');
+const i18n = require('./localization');
+
+const groundstation = (function () {
 
     let publicScope = {},
         privateScope = {};
@@ -37,14 +43,15 @@ helper.groundstation = (function () {
             return;
         }
 
-        helper.interval.add('gsUpdateGui', privateScope.updateGui, 200);
+        interval.add('gsUpdateGui', privateScope.updateGui, 200);
 
         privateScope.$viewport = $viewport;
 
         privateScope.$viewport.find(".tab_container").hide();
         privateScope.$viewport.find('#content').hide();
         privateScope.$viewport.find('#status-bar').hide();
-        privateScope.$viewport.find('#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
+        privateScope.$viewport.find('#connectbutton a.connect_state').text(i18n.getMessage('disconnect'));
+        privateScope.$viewport.find('#connectbutton a.connect').addClass('active');
 
         privateScope.$gsViewport = $viewport.find('#view-groundstation');
         privateScope.$gsViewport.show();
@@ -53,7 +60,7 @@ helper.groundstation = (function () {
         setTimeout(privateScope.initMap, 100);
 
         privateScope.activated = true;
-        GUI.log(chrome.i18n.getMessage('gsActivated'));
+        GUI.log(i18n.getMessage('gsActivated'));
     }
 
     privateScope.initMap = function () {
@@ -98,7 +105,7 @@ helper.groundstation = (function () {
             return;
         }
 
-        helper.interval.remove('gsUpdateGui');
+        interval.remove('gsUpdateGui');
 
         if (privateScope.$viewport !== null) {
             privateScope.$viewport.find(".tab_container").show();
@@ -111,12 +118,12 @@ helper.groundstation = (function () {
         }
 
         privateScope.activated = false;
-        GUI.log(chrome.i18n.getMessage('gsDeactivated'));
+        GUI.log(i18n.getMessage('gsDeactivated'));
     }
 
     privateScope.updateGui = function () {
 
-        let telemetry = helper.ltmDecoder.get();
+        let telemetry = ltmDecoder.get();
 
         if (telemetry.gpsFix && telemetry.gpsFix > 1) {
 
@@ -192,3 +199,5 @@ helper.groundstation = (function () {
 
     return publicScope;
 })();
+
+module.exports = groundstation;

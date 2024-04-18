@@ -1,5 +1,15 @@
 'use strict';
 
+const path = require('path');
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
+
 TABS.failsafe = {};
 
 TABS.failsafe.initialize = function (callback, scrollPosition) {
@@ -14,7 +24,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/failsafe.html"), Settings.processHtml(function() {
+        GUI.load(path.join(__dirname, "failsafe.html"), Settings.processHtml(function() {
             GUI.simpleBind();
 
             // translate to user-selected language
@@ -48,25 +58,25 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             });
 
             // switch (MSPHelper.getSetting('failsafe_procedure')) {  // Use once #7734 is merged
-            switch (FAILSAFE_CONFIG.failsafe_procedure) {
+            switch (FC.FAILSAFE_CONFIG.failsafe_procedure) {
                 default:
                 case 0:
-                    let element = $('input[id="land"]');
+                    var element = $('input[id="land"]');
                     element.prop('checked', true);
                     element.trigger('change');
                     break;
                 case 1:
-                    element = $('input[id="drop"]');
+                    var element = $('input[id="drop"]');
                     element.prop('checked', true);
                     element.trigger('change');
                     break;
                 case 2:
-                    element = $('input[id="rth"]');
+                    var element = $('input[id="rth"]');
                     element.prop('checked', true);
                     element.trigger('change');
                     break;
                 case 3:
-                    element = $('input[id="nothing"]');
+                    var element = $('input[id="nothing"]');
                     element.prop('checked', true);
                     element.trigger('change');
                     break;
@@ -99,13 +109,13 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
 
             $('a.save').on('click', function () {
                 if ($('input[id="land"]').is(':checked')) {
-                    FAILSAFE_CONFIG.failsafe_procedure = 0;
+                    FC.FAILSAFE_CONFIG.failsafe_procedure = 0;
                 } else if ($('input[id="drop"]').is(':checked')) {
-                    FAILSAFE_CONFIG.failsafe_procedure = 1;
+                    FC.FAILSAFE_CONFIG.failsafe_procedure = 1;
                 } else if ($('input[id="rth"]').is(':checked')) {
-                    FAILSAFE_CONFIG.failsafe_procedure = 2;
+                    FC.FAILSAFE_CONFIG.failsafe_procedure = 2;
                 } else if ($('input[id="nothing"]').is(':checked')) {
-                    FAILSAFE_CONFIG.failsafe_procedure = 3;
+                    FC.FAILSAFE_CONFIG.failsafe_procedure = 3;
                 }
         
                 MSP.send_message(MSPCodes.MSP_SET_FAILSAFE_CONFIG, mspHelper.crunch(MSPCodes.MSP_SET_FAILSAFE_CONFIG), false, savePhaseTwo);
@@ -122,7 +132,7 @@ TABS.failsafe.initialize = function (callback, scrollPosition) {
             var self = this;
             MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
             setTimeout(function () {
-                $(self).html(oldText);
+                $(self).html('');
             }, 2000);
             reboot();
         });

@@ -1,5 +1,17 @@
-/*global chrome,helper,mspHelper*/
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
+const tabs = require('./../js/tabs');
+const features = require('./../js/feature_framework');
 
 TABS.ez_tune = {
 
@@ -50,7 +62,7 @@ TABS.ez_tune.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/ez_tune.html"), Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "ez_tune.html"), Settings.processHtml(process_html));
     }
 
     function getYawPidScale(input) {
@@ -103,20 +115,20 @@ TABS.ez_tune.initialize = function (callback) {
     function process_html() {
        i18n.localize();;
 
-        helper.tabs.init($('.tab-ez_tune'));
-        helper.features.updateUI($('.tab-ez_tune'), FEATURES);
+        tabs.init($('.tab-ez_tune'));
+        features.updateUI($('.tab-ez_tune'), FC.FEATURES);
 
-        $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled);
+        $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled);
 
-        GUI.sliderize($('#ez_tune_filter_hz'), EZ_TUNE.filterHz, 10, 300);
-        GUI.sliderize($('#ez_tune_axis_ratio'), EZ_TUNE.axisRatio, 25, 175);
-        GUI.sliderize($('#ez_tune_response'), EZ_TUNE.response, 0, 200);
-        GUI.sliderize($('#ez_tune_damping'), EZ_TUNE.damping, 0, 200);
-        GUI.sliderize($('#ez_tune_stability'), EZ_TUNE.stability, 0, 200);
-        GUI.sliderize($('#ez_tune_aggressiveness'), EZ_TUNE.aggressiveness, 0, 200);
+        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 10, 300);
+        GUI.sliderize($('#ez_tune_axis_ratio'), FC.EZ_TUNE.axisRatio, 25, 175);
+        GUI.sliderize($('#ez_tune_response'), FC.EZ_TUNE.response, 0, 200);
+        GUI.sliderize($('#ez_tune_damping'), FC.EZ_TUNE.damping, 0, 200);
+        GUI.sliderize($('#ez_tune_stability'), FC.EZ_TUNE.stability, 0, 200);
+        GUI.sliderize($('#ez_tune_aggressiveness'), FC.EZ_TUNE.aggressiveness, 0, 200);
 
-        GUI.sliderize($('#ez_tune_rate'), EZ_TUNE.rate, 0, 200);
-        GUI.sliderize($('#ez_tune_expo'), EZ_TUNE.expo, 0, 200);
+        GUI.sliderize($('#ez_tune_rate'), FC.EZ_TUNE.rate, 0, 200);
+        GUI.sliderize($('#ez_tune_expo'), FC.EZ_TUNE.expo, 0, 200);
 
 
         $('.ez-element').on('updated', function () {
@@ -132,19 +144,19 @@ TABS.ez_tune.initialize = function (callback) {
         $('a.update').on('click', function () {
 
             if ($("#ez_tune_enabled").is(":checked")) {
-                EZ_TUNE.enabled = 1;
+                FC.EZ_TUNE.enabled = 1;
             } else {
-                EZ_TUNE.enabled = 0;
+                FC.EZ_TUNE.enabled = 0;
             }
 
-            EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
-            EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
-            EZ_TUNE.response = $('#ez_tune_response').val();
-            EZ_TUNE.damping = $('#ez_tune_damping').val();
-            EZ_TUNE.stability = $('#ez_tune_stability').val();
-            EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
-            EZ_TUNE.rate = $('#ez_tune_rate').val();
-            EZ_TUNE.expo = $('#ez_tune_expo').val();
+            FC.EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
+            FC.EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
+            FC.EZ_TUNE.response = $('#ez_tune_response').val();
+            FC.EZ_TUNE.damping = $('#ez_tune_damping').val();
+            FC.EZ_TUNE.stability = $('#ez_tune_stability').val();
+            FC.EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
+            FC.EZ_TUNE.rate = $('#ez_tune_rate').val();
+            FC.EZ_TUNE.expo = $('#ez_tune_expo').val();
 
             saveChainer.execute();
         });

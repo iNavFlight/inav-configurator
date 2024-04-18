@@ -220,7 +220,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         if (self.getEnabled()) {
             GUI.renderLogicConditionSelect(
                 $e, 
-                LOGIC_CONDITIONS,
+                FC.LOGIC_CONDITIONS,
                 self.getActivatorId, 
                 self.onActivatorChange,
                 true,

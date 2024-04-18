@@ -1,5 +1,14 @@
 'use strict';
 
+const path = require('path');
+
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
+
 TABS.advanced_tuning = {};
 
 TABS.advanced_tuning.initialize = function (callback) {
@@ -11,7 +20,7 @@ TABS.advanced_tuning.initialize = function (callback) {
     loadHtml();
 
     function loadHtml() {
-        GUI.load(path.join(__dirname, "tabs/advanced_tuning.html"), Settings.processHtml(function () {
+        GUI.load(path.join(__dirname, "advanced_tuning.html"), Settings.processHtml(function () {
 
         if (FC.isAirplane()) {
             $('.airplaneTuning').show();
@@ -35,18 +44,18 @@ TABS.advanced_tuning.initialize = function (callback) {
 
         GUI.simpleBind();
 
-       i18n.localize();;
+        i18n.localize();;
         
         // Set up required field warnings
-        $('#launchIdleThr').keyup(function() {
+        $('#launchIdleThr').on('keyup', () => {
             TABS.advanced_tuning.checkRequirements_IdleThrottle();
         });
 
-        $('#launchIdleDelay').keyup(function() {
+        $('#launchIdleDelay').on('keyup', () => {
             TABS.advanced_tuning.checkRequirements_IdleThrottle();
         });
 
-        $('#rthHomeAltitude').keyup(function() {
+        $('#rthHomeAltitude').on('keyup', () => {
             TABS.advanced_tuning.checkRequirements_LinearDescent();
         });
 

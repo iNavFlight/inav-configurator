@@ -12,7 +12,7 @@ const i18n = require('./../js/localization');
 const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model');
 const Settings = require('./../js/settings');
 const mspBalancedInterval = require('./../js/msp_balanced_interval');
-const jBox = require('../js/libraries/jBox/jBox.min.js')
+const jBox = require('../js/libraries/jBox/jBox.min.js');
 
 TABS.mixer = {};
 
@@ -735,8 +735,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         $('#execute-button').on('click', function () {
             loadedMixerPresetID = currentMixerPreset.id;
-            mixer.loadServoRules(currentMixerPreset);
-            mixer.loadMotorRules(currentMixerPreset);
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
             FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
@@ -750,8 +750,8 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
                 $("#needToUpdateMixerMessage").addClass("is-hidden");
             }
             loadedMixerPresetID = currentMixerPreset.id;
-            mixer.loadServoRules(currentMixerPreset);
-            mixer.loadMotorRules(currentMixerPreset);
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
             FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
             renderServoMixRules();
             renderMotorMixRules();
@@ -826,7 +826,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
     function updateRefreshButtonStatus() {
         if (
-            (currentMixerPreset.id != loadedMixerPresetID && helper.mixer.getById(loadedMixerPresetID).platform == PLATFORM.AIRPLANE) ||
+            (currentMixerPreset.id != loadedMixerPresetID && mixer.getById(loadedMixerPresetID).platform == PLATFORM.AIRPLANE) ||
             (currentMixerPreset.id == loadedMixerPresetID && currentMixerPreset.platform == PLATFORM.AIRPLANE)
            ) {
             $("#refresh-mixer-button").parent().removeClass("is-hidden");

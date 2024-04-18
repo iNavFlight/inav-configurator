@@ -67,7 +67,6 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 ```
 10. Make the following files executable:
    * inav-configurator `chmod +x /opt/inav/inav-configurator/inav-configurator`
-   * (5.0.0+) chrome_crashpad_handler `chmod +x /opt/inav/inav-configurator/chrome_crashpad_handler`
 11. Run the INAV Configurator app from the unpacked folder `/opt/inav/inav-configurator/inav-configurator`
 
 ### Mac
@@ -83,7 +82,7 @@ For local development, the **node.js** build system is used.
 
 1. Install node.js
 1. From the project folder run `npm install`
-1. To build the JS and CSS files and start the configurator:
+1. To build the  and start the configurator:
     - Run `npm start`.
 
 To build the App run `npm run make` to build for your platform.
@@ -94,7 +93,7 @@ Options:
 See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
 
 Example (note the double -- ):
-``` npm start -- --arch="ia32 ```
+``` npm run make -- --arch="x64" ```
 
 ### Running with debug | Inspector
 

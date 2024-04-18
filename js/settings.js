@@ -6,6 +6,7 @@ const mspHelper = require('./../js/msp/MSPHelper');
 const { GUI } = require('./gui');
 const FC = require('./fc');
 const { globalSettings, UnitType } = require('./globalSettings');
+const i18n = require('./localization');
 
 function padZeros(val, length) {
     let str = val.toString();

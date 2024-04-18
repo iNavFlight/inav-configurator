@@ -66,8 +66,8 @@ class ConnectionTcp extends Connection {
         });
 
         this._socket.on('error', (error) => {
-            GUI.log("TCP error: " + error);
-            console.log("TCP error: " + error);
+            GUI.log(error);
+            console.log(error);
             
             if (this._socket) {
                 this.abort();

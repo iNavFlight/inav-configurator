@@ -1,4 +1,3 @@
-/*global $*/
 'use strict';
 
 var Safehome = function (number, enabled, lat, lon) {

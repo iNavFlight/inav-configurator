@@ -40,8 +40,6 @@ var ProgrammingPidCollection = function () {
                 self.get()[k].render(k, $table);
             }
         }
-
-        GUI.switchery();
     };
 
     self.update = function(statuses) {

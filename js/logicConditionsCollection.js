@@ -46,8 +46,6 @@ var LogicConditionsCollection = function () {
                 self.get()[k].render(k, $table);
             }
         }
-
-        GUI.switchery();
     };
 
     self.onSave = function () {

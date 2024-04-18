@@ -1,4 +1,3 @@
-/*global bit_check*/
 'use strict';
 
 var OutputMappingCollection = function () {

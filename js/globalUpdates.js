@@ -3,7 +3,6 @@
 const CONFIGURATOR = require('./data_storage');
 const FC = require('./fc');
 const { globalSettings } = require('./globalSettings');
-const mspHelper = require('./msp/MSPHelper.js');
 const i18n = require('./localization');
 
 var update = {

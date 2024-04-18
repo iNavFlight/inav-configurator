@@ -1,6 +1,18 @@
-/*global chrome*/
-
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const mspQueue = require('./../js/serial_queue');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const CONFIGURATOR = require('./../js/data_storage');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
 
 TABS.receiver = {
     rateChartHeight: 117
@@ -29,7 +41,7 @@ TABS.receiver.initialize = function (callback) {
     loadChainer.execute();
 
     function load_html() {
-        GUI.load(path.join(__dirname, "tabs/receiver.html"), Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "receiver.html"), Settings.processHtml(process_html));
     }
 
     function saveSettings(onComplete) {
@@ -106,17 +118,17 @@ TABS.receiver.initialize = function (callback) {
         $receiverMode.trigger("change");
 
         // fill in data from RC_tuning
-        $('.tunings .throttle input[name="mid"]').val(RC_tuning.throttle_MID.toFixed(2));
-        $('.tunings .throttle input[name="expo"]').val(RC_tuning.throttle_EXPO.toFixed(2));
+        $('.tunings .throttle input[name="mid"]').val(FC.RC_tuning.throttle_MID.toFixed(2));
+        $('.tunings .throttle input[name="expo"]').val(FC.RC_tuning.throttle_EXPO.toFixed(2));
 
-        $('.tunings .rate input[name="expo"]').val(RC_tuning.RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="yaw_expo"]').val(RC_tuning.RC_YAW_EXPO.toFixed(2));
+        $('.tunings .rate input[name="expo"]').val(FC.RC_tuning.RC_EXPO.toFixed(2));
+        $('.tunings .yaw_rate input[name="yaw_expo"]').val(FC.RC_tuning.RC_YAW_EXPO.toFixed(2));
 
-        $('.tunings .rate input[name="manual_expo"]').val(RC_tuning.manual_RC_EXPO.toFixed(2));
-        $('.tunings .yaw_rate input[name="manual_yaw_expo"]').val(RC_tuning.manual_RC_YAW_EXPO.toFixed(2));
+        $('.tunings .rate input[name="manual_expo"]').val(FC.RC_tuning.manual_RC_EXPO.toFixed(2));
+        $('.tunings .yaw_rate input[name="manual_yaw_expo"]').val(FC.RC_tuning.manual_RC_YAW_EXPO.toFixed(2));
 
-        $('.deadband input[name="yaw_deadband"]').val(RC_deadband.yaw_deadband);
-        $('.deadband input[name="deadband"]').val(RC_deadband.deadband);
+        $('.deadband input[name="yaw_deadband"]').val(FC.RC_deadband.yaw_deadband);
+        $('.deadband input[name="deadband"]').val(FC.RC_deadband.deadband);
 
         // generate bars
         var bar_names = [
@@ -127,7 +139,7 @@ TABS.receiver.initialize = function (callback) {
             ],
             bar_container = $('.tab-receiver .bars');
 
-        for (var i = 0; i < RC.active_channels; i++) {
+        for (var i = 0; i < FC.RC.active_channels; i++) {
             var name;
             if (i < bar_names.length) {
                 name = bar_names[i];
@@ -181,8 +193,8 @@ TABS.receiver.initialize = function (callback) {
 
         // handle rcmap & rssi aux channel
         var strBuffer = [], rcMapLetters = FC.getRcMapLetters();
-        for (var i = 0; i < RC_MAP.length; i++) {
-            strBuffer[RC_MAP[i]] = rcMapLetters[i];
+        for (var i = 0; i < FC.RC_MAP.length; i++) {
+            strBuffer[FC.RC_MAP[i]] = rcMapLetters[i];
         }
 
         // reconstruct
@@ -223,11 +235,11 @@ TABS.receiver.initialize = function (callback) {
         // rssi
         var rssi_channel_e = $('select[name="rssi_channel"]');
         rssi_channel_e.append('<option value="0">Disabled</option>');
-        for (var i = 5; i < RC.active_channels + 1; i++) {
+        for (var i = 5; i < FC.RC.active_channels + 1; i++) {
             rssi_channel_e.append('<option value="' + i + '">CH' + i + '</option>');
         }
 
-        $('select[name="rssi_channel"]').val(MISC.rssi_channel);
+        $('select[name="rssi_channel"]').val(FC.MISC.rssi_channel);
 
         var rateHeight = TABS.receiver.rateChartHeight;
 
@@ -281,29 +293,29 @@ TABS.receiver.initialize = function (callback) {
 
         $('a.update').on('click', function () {
             // catch RC_tuning changes
-            RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
-            RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
+            FC.RC_tuning.throttle_MID = parseFloat($('.tunings .throttle input[name="mid"]').val());
+            FC.RC_tuning.throttle_EXPO = parseFloat($('.tunings .throttle input[name="expo"]').val());
 
-            RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
-            RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
+            FC.RC_tuning.RC_EXPO = parseFloat($('.tunings .rate input[name="expo"]').val());
+            FC.RC_tuning.RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="yaw_expo"]').val());
 
-            RC_tuning.manual_RC_EXPO = parseFloat($('.tunings .rate input[name="manual_expo"]').val());
-            RC_tuning.manual_RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="manual_yaw_expo"]').val());
+            FC.RC_tuning.manual_RC_EXPO = parseFloat($('.tunings .rate input[name="manual_expo"]').val());
+            FC.RC_tuning.manual_RC_YAW_EXPO = parseFloat($('.tunings .yaw_rate input[name="manual_yaw_expo"]').val());
 
-            RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
-            RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
+            FC.RC_deadband.yaw_deadband = parseInt($('.deadband input[name="yaw_deadband"]').val());
+            FC.RC_deadband.deadband = parseInt($('.deadband input[name="deadband"]').val());
 
             // catch rc map
             var rcMapValue = $('input[name="rcmap"]').val();
             var strBuffer = rcMapValue.split('');
 
 
-            for (var i = 0; i < RC_MAP.length; i++) {
-                RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
+            for (var i = 0; i < FC.RC_MAP.length; i++) {
+                FC.RC_MAP[i] = strBuffer.indexOf(FC.getRcMapLetters()[i]);
             }
 
             // catch rssi aux
-            MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());
+            FC.MISC.rssi_channel = parseInt($('select[name="rssi_channel"]').val());
 
             function save_rc_map() {
                 MSP.send_message(MSPCodes.MSP_SET_RX_MAP, mspHelper.crunch(MSPCodes.MSP_SET_RX_MAP), false, save_misc);
@@ -338,7 +350,7 @@ TABS.receiver.initialize = function (callback) {
         });
 
         $("a.sticks").on('click', function () {
-            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=720,menubar=no,contextIsolation=no,nodeIntegration=yes");
+            var mspWin = window.open("tabs/receiver_msp.html", "receiver_msp", "width=420,height=760,menubar=no,contextIsolation=no,nodeIntegration=yes");
             
             mspWin.window.setRawRx = function (channels) {
                 if (CONFIGURATOR.connectionValid && GUI.active_tab != 'cli') {
@@ -362,7 +374,7 @@ TABS.receiver.initialize = function (callback) {
             /*
              * Throttling
              */
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 update_ui();
                 return;
             }
@@ -374,14 +386,14 @@ TABS.receiver.initialize = function (callback) {
             var i;
 
             // update bars with latest data
-            for (let i = 0; i < RC.active_channels; i++) {
-                meter_fill_array[i].css('width', ((RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
-                meter_label_array[i].text(RC.channels[i]);
+            for (let i = 0; i < FC.RC.active_channels; i++) {
+                meter_fill_array[i].css('width', ((FC.RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
+                meter_label_array[i].text(FC.RC.channels[i]);
             }
 
         }
 
-        helper.mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
+        mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
 
         GUI.content_ready(callback);
     }

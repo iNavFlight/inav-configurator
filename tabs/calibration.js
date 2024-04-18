@@ -1,4 +1,3 @@
-/*global chrome */
 'use strict';
 
 const path = require('path');
@@ -9,7 +8,10 @@ const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
+const timeout = require('./../js/timeouts');
+const interval = require('./../js/intervals.js');
 const i18n = require('./../js/localization');
+const jBox = require('./../js/libraries/jBox/jBox.min.js');
 
 TABS.calibration = {};
 
@@ -174,7 +176,7 @@ TABS.calibration.initialize = function (callback) {
                 GUI.log(i18n.getMessage('initialSetupAccelCalibStarted'));
             });
 
-            helper.timeout.add('acc_calibration_timeout', function () {
+            timeout.add('acc_calibration_timeout', function () {
                 $button.removeClass('disabled');
 
                 modalProcessing.close();
@@ -255,7 +257,7 @@ TABS.calibration.initialize = function (callback) {
             }).open();
 
             var countdown = 30;
-            helper.interval.add('compass_calibration_interval', function () {
+            interval.add('compass_calibration_interval', function () {
                 countdown--;
                 if (countdown === 0) {
                     setTimeout(function () {
@@ -265,7 +267,7 @@ TABS.calibration.initialize = function (callback) {
                         GUI.log(i18n.getMessage('initialSetupMagCalibEnded'));
                         
                         MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-                        helper.interval.remove('compass_calibration_interval');
+                        interval.remove('compass_calibration_interval');
 
                         //Cleanup
                        //delete modalProcessing;
@@ -297,7 +299,7 @@ TABS.calibration.initialize = function (callback) {
             }).open();
 
             var countdown = 30;
-            helper.interval.add('opflow_calibration_interval', function () {
+            interval.add('opflow_calibration_interval', function () {
                 countdown--;
                 $('#modal-opflow-countdown').text(countdown);
                 if (countdown === 0) {
@@ -306,7 +308,7 @@ TABS.calibration.initialize = function (callback) {
                     modalProcessing.close();
                     GUI.log(i18n.getMessage('initialSetupOpflowCalibEnded'));
                     MSP.send_message(MSPCodes.MSP_CALIBRATION_DATA, false, false, updateSensorData);
-                    helper.interval.remove('opflow_calibration_interval');
+                    interval.remove('opflow_calibration_interval');
                 }
             }, 1000);
         });
@@ -321,7 +323,7 @@ TABS.calibration.initialize = function (callback) {
         });
 
         // translate to user-selected language
-       i18n.localize();;
+       i18n.localize();
 
         setupCalibrationButton();
         $('#calibrate-start-button').on('click', actionCalibrateButton);

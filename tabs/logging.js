@@ -1,5 +1,21 @@
 'use strict';
 
+const path = require('path');
+const { dialog } = require("@electron/remote");
+const Store = require('electron-store');
+const store = new Store();
+
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const CONFIGURATOR = require('./../js/data_storage');
+const interval = require('./../js/intervals');
+const i18n = require('./../js/localization');
+const { zeroPad } = require('./../js/helpers');
+
+
 TABS.logging = {};
 TABS.logging.initialize = function (callback) {
     var self = this;
@@ -22,7 +38,7 @@ TABS.logging.initialize = function (callback) {
         }
 
         var load_html = function () {
-            GUI.load(path.join(__dirname, "tabs/logging.html"), process_html);
+            GUI.load(path.join(__dirname, "logging.html"), process_html);
         }
 
         MSP.send_message(MSPCodes.MSP_RC, false, false, get_motor_data);
@@ -30,7 +46,7 @@ TABS.logging.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-       i18n.localize();;
+        i18n.localize();;
 
         // UI hooks
         $('a.log_file').on('click', prepare_file);
@@ -67,9 +83,9 @@ TABS.logging.initialize = function (callback) {
                                 }
                             }
 
-                            helper.interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
+                            interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
                             const fs = require('fs');
-                            helper.interval.add('write_data', function write_data() {
+                            interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
 
                                     fs.writeFileSync(loggingFileName, log_buffer.join('\n') + '\n', {
@@ -89,8 +105,8 @@ TABS.logging.initialize = function (callback) {
                             GUI.log(i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
-                        helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
-                        helper.mspBalancedInterval.flush();
+                        interval.killAll(['global_data_refresh', 'msp-load-update']);
+                        mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
                         $(this).text(i18n.getMessage('loggingStart'));
@@ -149,17 +165,17 @@ TABS.logging.initialize = function (callback) {
                     head += ',' + 'rssi';
                     break;
                 case 'MSP_RC':
-                    for (var chan = 0; chan < RC.active_channels; chan++) {
+                    for (var chan = 0; chan < FC.RC.active_channels; chan++) {
                         head += ',' + 'RC' + chan;
                     }
                     break;
                 case 'MSP_MOTOR':
-                    for (var motor = 0; motor < MOTOR_DATA.length; motor++) {
+                    for (var motor = 0; motor < FC.MOTOR_DATA.length; motor++) {
                         head += ',' + 'Motor' + motor;
                     }
                     break;
                 case 'MSP_DEBUG':
-                    for (var debug = 0; debug < SENSOR_DATA.debug.length; debug++) {
+                    for (var debug = 0; debug < FC.SENSOR_DATA.debug.length; debug++) {
                         head += ',' + 'Debug' + debug;
                     }
                     break;
@@ -174,43 +190,43 @@ TABS.logging.initialize = function (callback) {
         for (var i = 0; i < requested_properties.length; i++) {
             switch (requested_properties[i]) {
                 case 'MSP_RAW_IMU':
-                    sample += ',' + SENSOR_DATA.gyroscope;
-                    sample += ',' + SENSOR_DATA.accelerometer;
-                    sample += ',' + SENSOR_DATA.magnetometer;
+                    sample += ',' + FC.SENSOR_DATA.gyroscope;
+                    sample += ',' + FC.SENSOR_DATA.accelerometer;
+                    sample += ',' + FC.SENSOR_DATA.magnetometer;
                     break;
                 case 'MSP_ATTITUDE':
-                    sample += ',' + SENSOR_DATA.kinematics[0];
-                    sample += ',' + SENSOR_DATA.kinematics[1];
-                    sample += ',' + SENSOR_DATA.kinematics[2];
+                    sample += ',' + FC.SENSOR_DATA.kinematics[0];
+                    sample += ',' + FC.SENSOR_DATA.kinematics[1];
+                    sample += ',' + FC.SENSOR_DATA.kinematics[2];
                     break;
                 case 'MSP_ALTITUDE':
-                    sample += ',' + SENSOR_DATA.altitude;
+                    sample += ',' + FC.SENSOR_DATA.altitude;
                     break;
                 case 'MSP_RAW_GPS':
-                    sample += ',' + GPS_DATA.fix;
-                    sample += ',' + GPS_DATA.numSat;
-                    sample += ',' + (GPS_DATA.lat / 10000000);
-                    sample += ',' + (GPS_DATA.lon / 10000000);
-                    sample += ',' + GPS_DATA.alt;
-                    sample += ',' + GPS_DATA.speed;
-                    sample += ',' + GPS_DATA.ground_course;
+                    sample += ',' + FC.GPS_DATA.fix;
+                    sample += ',' + FC.GPS_DATA.numSat;
+                    sample += ',' + (FC.GPS_DATA.lat / 10000000);
+                    sample += ',' + (FC.GPS_DATA.lon / 10000000);
+                    sample += ',' + FC.GPS_DATA.alt;
+                    sample += ',' + FC.GPS_DATA.speed;
+                    sample += ',' + FC.GPS_DATA.ground_course;
                     break;
                 case 'MSP_ANALOG':
-                    sample += ',' + ANALOG.voltage;
-                    sample += ',' + ANALOG.amperage;
-                    sample += ',' + ANALOG.mAhdrawn;
-                    sample += ',' + ANALOG.rssi;
+                    sample += ',' + FC.ANALOG.voltage;
+                    sample += ',' + FC.ANALOG.amperage;
+                    sample += ',' + FC.ANALOG.mAhdrawn;
+                    sample += ',' + FC.ANALOG.rssi;
                     break;
                 case 'MSP_RC':
-                    for (var chan = 0; chan < RC.active_channels; chan++) {
-                        sample += ',' + RC.channels[chan];
+                    for (var chan = 0; chan < FC.RC.active_channels; chan++) {
+                        sample += ',' + FC.RC.channels[chan];
                     }
                     break;
                 case 'MSP_MOTOR':
-                    sample += ',' + MOTOR_DATA;
+                    sample += ',' + FC.MOTOR_DATA;
                     break;
                 case 'MSP_DEBUG':
-                    sample += ',' + SENSOR_DATA.debug;
+                    sample += ',' + FC.SENSOR_DATA.debug;
                     break;
             }
         }

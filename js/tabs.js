@@ -17,7 +17,7 @@
     self.init = function ($dom) {
         $container = $dom;
 
-        $container.find(".subtab__header_label").on('click',(onHeaderClick);
+        $container.find(".subtab__header_label").on('click', onHeaderClick);
     };
 
     return self;
