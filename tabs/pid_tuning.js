@@ -51,15 +51,6 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-        // Fill in data from RC_tuning object
-        $('#rate-roll').val(RC_tuning.roll_rate);
-        $('#rate-pitch').val(RC_tuning.pitch_rate);
-        $('#rate-yaw').val(RC_tuning.yaw_rate);
-
-        $('#rate-manual-roll').val(RC_tuning.manual_roll_rate);
-        $('#rate-manual-pitch').val(RC_tuning.manual_pitch_rate);
-        $('#rate-manual-yaw').val(RC_tuning.manual_yaw_rate);
-
         $('#tpa').val(RC_tuning.dynamic_THR_PID);
         $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
     }
@@ -93,9 +84,9 @@ TABS.pid_tuning.initialize = function (callback) {
         RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
         RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
 
-        RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
-        RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
-        RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
+        RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
+        RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
+        RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
 
         // Rate Dynamics
         RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
@@ -178,6 +169,10 @@ TABS.pid_tuning.initialize = function (callback) {
             $('#ez-tune-switch').hide();
         }
 
+        if (FC.isMultirotor()) {
+            $('.not-for-multirotor').hide();
+        }
+
         $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled).trigger('change');
 
         GUI.sliderize($('#ez_tune_filter_hz'), EZ_TUNE.filterHz, 10, 300);
@@ -201,6 +196,10 @@ TABS.pid_tuning.initialize = function (callback) {
 
         GUI.sliderize($('#rate_rollpitch_expo'), RC_tuning.RC_EXPO * 100, 0, 100);
         GUI.sliderize($('#rate_yaw_expo'), RC_tuning.RC_YAW_EXPO * 100, 0, 100);
+
+        GUI.sliderize($('#rate_manual_roll'), RC_tuning.manual_roll_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_pitch'), RC_tuning.manual_pitch_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_yaw'), RC_tuning.manual_yaw_rate, 0, 100);
 
         updatePreview();
 

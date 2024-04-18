@@ -474,6 +474,31 @@
                 </div>
             </div>
 
+            <div class="pid-sliders-axis not-for-multirotor" data-axis="yaw">
+                <h3 data-i18n="pidTuning_Manual_Rates"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Roll"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_roll" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Pitch"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_pitch" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Manual_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="rate_manual_yaw" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                
+            </div>
 
             <div class="tab_subtitle" style="margin-top: 1em;" data-i18n="pidTuning_RatesAndExpo"></div>
             <div class="clear-both"></div>
@@ -499,24 +524,6 @@
                             <td>
                                 <div class="pidTuning_number"><input id="headingHoldRate" type="number" class="rate-tpa_input" data-setting="heading_hold_rate_limit" data-unit="degps" /></div>
                                 <div for="headingHoldRate" class="helpicon cf_tip" data-i18n_title="pidTuning_MagHoldYawRateHelp"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="roll" data-i18n="pidTuning_ManualRollRate"></th>
-                            <td class="roll">
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="manual_roll_rate" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="pitch" data-i18n="pidTuning_ManualPitchRate"></th>
-                            <td class="pitch">
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="manual_pitch_rate" data-unit="percent" /></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="yaw" data-i18n="pidTuning_ManualYawRate"></th>
-                            <td class="yaw">
-                                <div class="pidTuning_number"><input type="number" class="rate-tpa_input" data-setting="manual_yaw_rate" data-unit="percent" /></div>
                             </td>
                         </tr>
                     </tbody>

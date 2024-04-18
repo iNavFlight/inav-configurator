@@ -1596,6 +1596,18 @@
     "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
     },
+    "pidTuning_Manual_Rates": {
+        "message": "Manual Rates"
+    },
+    "pidTuning_Manual_Roll": {
+        "message": "Roll (%)"
+    },
+    "pidTuning_Manual_Pitch": {
+        "message": "Pitch (%)"
+    },
+    "pidTuning_Manual_Yaw": {
+        "message": "Yaw (%)"
+    },
     "pidTuning_gyro_use_dyn_lpf": {
         "message": "Dynamic gyro LPF"
     },
