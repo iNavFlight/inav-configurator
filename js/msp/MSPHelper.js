@@ -1542,6 +1542,7 @@ var mspHelper = (function () {
                 FC.EZ_TUNE.aggressiveness = data.getUint8(7);
                 FC.EZ_TUNE.rate = data.getUint8(8);
                 FC.EZ_TUNE.expo = data.getUint8(9);
+                FC.EZ_TUNE.snappiness = data.getUint8(10);
                 break;
 
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
@@ -2177,8 +2178,8 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
 
                 buffer.push(FC.EZ_TUNE.enabled);
-                buffer.push(BitHelper.lowByte(FC.EZ_TUNE.filterHz));
-                buffer.push(BitHelper.highByte(FC.EZ_TUNE.filterHz));
+                buffer.push(lowByte(FC.EZ_TUNE.filterHz));
+                buffer.push(highByte(FC.EZ_TUNE.filterHz));
                 buffer.push(FC.EZ_TUNE.axisRatio);
                 buffer.push(FC.EZ_TUNE.response);
                 buffer.push(FC.EZ_TUNE.damping);
@@ -2186,6 +2187,7 @@ var mspHelper = (function () {
                 buffer.push(FC.EZ_TUNE.aggressiveness);
                 buffer.push(FC.EZ_TUNE.rate);
                 buffer.push(FC.EZ_TUNE.expo);
+                buffer.push(FC.EZ_TUNE.snappiness);
                 break;
 
 

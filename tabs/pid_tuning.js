@@ -203,6 +203,8 @@ TABS.pid_tuning.initialize = function (callback) {
         GUI.sliderize($('#ez_tune_rate'), FC.EZ_TUNE.rate, 0, 200);
         GUI.sliderize($('#ez_tune_expo'), FC.EZ_TUNE.expo, 0, 200);
 
+        GUI.sliderize($('#ez_tune_snappiness'), FC.EZ_TUNE.snappiness, 0, 100);
+
         $('.ez-element').on('updated', function () {
             updatePreview();
         });
@@ -333,6 +335,7 @@ TABS.pid_tuning.initialize = function (callback) {
             FC.EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
             FC.EZ_TUNE.rate = $('#ez_tune_rate').val();
             FC.EZ_TUNE.expo = $('#ez_tune_expo').val();
+            FC.EZ_TUNE.snappiness = $('#ez_tune_snappiness').val();
 
             function send_rc_tuning_changes() {
                 MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveRateDynamics);
