@@ -1515,6 +1515,7 @@ var mspHelper = (function (gui) {
                 EZ_TUNE.aggressiveness = data.getUint8(7);
                 EZ_TUNE.rate = data.getUint8(8);
                 EZ_TUNE.expo = data.getUint8(9);
+                EZ_TUNE.snappiness = data.getUint8(10);
                 break;
 
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
@@ -2159,6 +2160,7 @@ var mspHelper = (function (gui) {
                 buffer.push(EZ_TUNE.aggressiveness);
                 buffer.push(EZ_TUNE.rate);
                 buffer.push(EZ_TUNE.expo);
+                buffer.push(EZ_TUNE.snappiness);
                 break;
 
 

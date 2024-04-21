@@ -566,7 +566,8 @@ var FC = {
             stability: null,
             aggressiveness: null,
             rate: null,
-            expo: null
+            expo: null,
+            snappiness: null,
         };
 
 
