@@ -5,18 +5,18 @@ const path = require('path');
 const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
-const mspBalancedInterval = require('./../js/msp_balanced_interval.js');
-const mspQueue = require('./../js/serial_queue.js')
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue')
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const i18n = require('./../js/localization');
 const BitHelper = require('../js/bitHelper');
-const Settings = require('./../js/settings.js');
-const features = require('./../js/feature_framework.js');
+const Settings = require('./../js/settings');
+const features = require('./../js/feature_framework');
 const { mixer, PLATFORM } = require('./../js/model');
-const timeout = require('./../js/timeouts.js')
-const interval = require('./../js/intervals.js');
+const timeout = require('./../js/timeouts')
+const interval = require('./../js/intervals');
 
 TABS.outputs = {
     allowTestMode: false,

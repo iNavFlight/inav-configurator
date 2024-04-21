@@ -120,7 +120,7 @@ TABS.sitl.initialize = (callback) => {
 
     var $sitlLog = $('#sitlLog');
     $sitlLog.val(SITL_LOG);
-    if ($sitlLog) {
+    if ($sitlLog && $sitlLog.length == 1) {
         $sitlLog.val(SITL_LOG);
         $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
     }
@@ -510,7 +510,7 @@ TABS.sitl.initialize = (callback) => {
     function appendLog(message){
         SITL_LOG += message;
         var $sitlLog = $('#sitlLog');
-        if ($sitlLog) {
+        if ($sitlLog && $sitlLog.length == 1) {
             $sitlLog.val(SITL_LOG);
             $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
         }

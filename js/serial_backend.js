@@ -21,12 +21,12 @@ const timeout = require('./timeouts');
 const mspBalancedInterval = require('./msp_balanced_interval'); 
 const defaultsDialog = require('./defaults_dialog');
 const { SITLProcess } = require('./sitl');
-const update = require('./globalUpdates.js');
-const BitHelper = require('./bitHelper.js');
-const BOARD = require('./boards.js');
-const jBox = require('./libraries/jBox/jBox.min.js');
-const groundstation = require('./groundstation.js');
-const ltmDecoder = require('./ltmDecoder.js');
+const update = require('./globalUpdates');
+const BitHelper = require('./bitHelper');
+const BOARD = require('./boards');
+const jBox = require('./libraries/jBox/jBox.min');
+const groundstation = require('./groundstation');
+const ltmDecoder = require('./ltmDecoder');
 
 var SerialBackend = (function () {
 

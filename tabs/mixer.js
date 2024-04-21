@@ -12,7 +12,7 @@ const i18n = require('./../js/localization');
 const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model');
 const Settings = require('./../js/settings');
 const mspBalancedInterval = require('./../js/msp_balanced_interval');
-const jBox = require('../js/libraries/jBox/jBox.min.js');
+const jBox = require('../js/libraries/jBox/jBox.min');
 
 TABS.mixer = {};
 

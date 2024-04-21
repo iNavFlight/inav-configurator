@@ -9,9 +9,9 @@ const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const timeout = require('./../js/timeouts');
-const interval = require('./../js/intervals.js');
+const interval = require('./../js/intervals');
 const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min.js');
+const jBox = require('./../js/libraries/jBox/jBox.min');
 
 TABS.calibration = {};
 

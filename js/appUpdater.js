@@ -3,7 +3,7 @@
 const semver = require('semver');
 
 const { GUI } = require('./gui');
-const jBox = require('./libraries/jBox/jBox.min.js');
+const jBox = require('./libraries/jBox/jBox.min');
 const i18n = require('./localization');
 
 var appUpdater = appUpdater || {};

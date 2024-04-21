@@ -10,8 +10,8 @@ const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval.js');
-const mspQueue = require('./../js/serial_queue.js');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
@@ -24,9 +24,9 @@ const Safehome = require('./../js/safehome');
 const SafehomeCollection = require('./../js/safehomeCollection');
 const { ApproachDirection, FwApproach } = require('./../js/fwApproach');
 const FwApproachCollection = require('./../js/fwApproachCollection');
-const SerialBackend = require('./../js/serial_backend.js');
+const SerialBackend = require('./../js/serial_backend');
 const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
-const Plotly = require('./../js/libraries/plotly-latest.min.js');
+const Plotly = require('./../js/libraries/plotly-latest.min');
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -68,7 +68,6 @@ TABS.mission_control.initialize = function (callback) {
     var textGeom;
     let isOffline = false;
     let selectedSafehome;
-    let rthUpdateInterval = 0;
     let $safehomeContentBox;
     let $waypointOptionsTableBody;
     let settings = {speed: 0, alt: 5000, safeRadiusSH: 50, fwApproachAlt: 60, fwLandAlt: 5, maxDistSH: 0, fwApproachLength: 0, fwLoiterRadius: 0, bingDemModel: false};
@@ -326,18 +325,6 @@ TABS.mission_control.initialize = function (callback) {
                               '\nAlt: ' + FC.SENSOR_DATA.altitude +
                               'm\nSpeed: ' + FC.GPS_DATA.speed + 'cm/s\n' +
                               'Dist: ' + FC.GPS_DATA.distanceToHome + 'm');
-
-              //update RTH every 5th GPS update since it really shouldn't change
-              if(rthUpdateInterval >= 5)
-              {
-                FC.MISSION_PLANNER.bufferPoint.number = -1; //needed to get point 0 which id RTH
-                MSP.send_message(MSPCodes.MSP_WP, mspHelper.crunch(MSPCodes.MSP_WP), false, function rth_update() {
-                    var coord = ol.proj.fromLonLat([FC.MISSION_PLANNER.bufferPoint.lon, FC.MISSION_PLANNER.bufferPoint.lat]);
-                    rthGeo.setCoordinates(coord);
-                  });
-                rthUpdateInterval = 0;
-              }
-              rthUpdateInterval++;
           }
         }
 
@@ -1276,7 +1263,11 @@ TABS.mission_control.initialize = function (callback) {
         if (disableMarkerEdit) {
             $('#missionDistance').text('N/A');
         } else {
-            $('#missionDistance').text(lengthMission[lengthMission.length -1] != -1 ? lengthMission[lengthMission.length -1].toFixed(1) : 'infinite');
+            if (lengthMission.length >= 1) {
+                $('#missionDistance').text(lengthMission[lengthMission.length -1].toFixed(1));
+            } else {
+                $('#missionDistance').text('infinite');
+            }
         }
     }
 

@@ -1,16 +1,16 @@
 'use strict';
 
 const { GUI } = require('./../js/gui');
-const FC = require('./fc.js');
+const FC = require('./fc');
 const MSP = require('./msp');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const mspHelper = require('./msp/MSPHelper');
-const MSPChainerClass = require('./msp/MSPchainer.js');
+const MSPChainerClass = require('./msp/MSPchainer');
 const features = require('./feature_framework');
-const periodicStatusUpdater = require('./periodicStatusUpdater.js');
+const periodicStatusUpdater = require('./periodicStatusUpdater');
 const { mixer } = require('./model');
-const jBox = require('./libraries/jBox/jBox.min.js');
-const i18n = require('./localization.js');
+const jBox = require('./libraries/jBox/jBox.min');
+const i18n = require('./localization');
 
 var savingDefaultsModal;
 

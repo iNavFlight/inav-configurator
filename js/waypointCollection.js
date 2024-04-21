@@ -421,7 +421,7 @@ let WaypointCollection = function () {
     self.getElevation = async function(globalSettings) {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
         let lengthMission = self.getDistance(true);
-        let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
+        let totalMissionDistance = lengthMission.length >= 1 ? lengthMission[lengthMission.length -1].toFixed(1) : 0;
         let samples;
         let sampleMaxNum;
         let sampleDistance;

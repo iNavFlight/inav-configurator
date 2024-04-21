@@ -8,8 +8,8 @@ const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval.js');
-const mspQueue = require('./../js/serial_queue.js');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const i18n = require('./../js/localization');
@@ -17,7 +17,7 @@ const Settings = require('./../js/settings');
 const serialPortHelper = require('./../js/serialPortHelper');
 const features = require('./../js/feature_framework');
 const { globalSettings } = require('./../js/globalSettings');
-const jBox = require('./../js/libraries/jBox/jBox.min.js');
+const jBox = require('./../js/libraries/jBox/jBox.min');
 const SerialBackend = require('../js/serial_backend');
 
 
@@ -307,7 +307,7 @@ TABS.gps.initialize = function (callback) {
                             anchor: [0.5, 1],
                             opacity: 1,
                             scale: 0.5,
-                            src: '../../images/icons/cf_icon_position.png'
+                            src: path.join(__dirname, './../images/icons/cf_icon_position.png')
                         }))
                     });
 
@@ -366,7 +366,7 @@ TABS.gps.initialize = function (callback) {
                                     rotation: vehicle.headingDegrees * (Math.PI / 180),
                                     scale: 0.8,
                                     anchor: [0.5, 0.5],
-                                    src: '../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType],
+                                    src: path.join(__dirname, './../resources/adsb/' + ADSB_VEHICLE_TYPE[vehicle.emitterType]),
                                 })),
                                 text: new ol.style.Text(({
                                     text: vehicle.callsign,

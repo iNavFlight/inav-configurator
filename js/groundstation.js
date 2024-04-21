@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const ol = require('openlayers');
 
 const { GUI } = require('./gui');
@@ -139,7 +140,7 @@ const groundstation = (function () {
                         anchor: [0.5, 0.5],
                         opacity: 1,
                         scale: 0.6,
-                        src: '../images/icons/icon_mission_airplane.png'
+                        src: path.join(__dirname, './../images/icons/icon_mission_airplane.png')
                     }))
                 });
                 privateScope.cursorPosition = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));

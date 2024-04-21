@@ -12,7 +12,7 @@ const i18n = require('./../js/localization');
 const { globalSettings } = require('./../js/globalSettings');
 const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
-const jBox = require('./../js/libraries/jBox/jBox.min.js');
+const jBox = require('./../js/libraries/jBox/jBox.min');
 
 TABS.cli = {
     lineDelayMs: 50,

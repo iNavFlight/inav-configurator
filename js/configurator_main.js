@@ -1,12 +1,12 @@
 window.$ = window.jQuery =  require('jquery'), 
                             require('jquery-ui-dist/jquery-ui'),
                             require('jquery-textcomplete'),
-                            require('./libraries/jquery.flightindicators.js'),
-                            require('./libraries/jquery.nouislider.all.min.js'),
-                            require('./libraries/jquery.ba-throttle-debounce.js');
+                            require('./libraries/jquery.flightindicators'),
+                            require('./libraries/jquery.nouislider.all.min'),
+                            require('./libraries/jquery.ba-throttle-debounce');
 
 const { app } = require('@electron/remote');
-const d3 = require('./libraries/d3.min.js');
+const d3 = require('./libraries/d3.min');
 const Store = require('electron-store');
 const store = new Store();
 
@@ -14,15 +14,15 @@ const { GUI, TABS } = require('./gui');
 const CONFIGURATOR = require('./data_storage');
 const FC = require('./fc');
 const { globalSettings, UnitType } = require('./globalSettings');
-const { PLATFORM } = require('./model.js')
+const { PLATFORM } = require('./model')
 const i18n = require('./localization');
 const SerialBackend = require('./serial_backend');
 const MSP = require('./msp');
 const MSPCodes = require('./../js/msp/MSPCodes');
-const mspHelper = require('./msp/MSPHelper.js');
-const update = require('./globalUpdates.js');
-const appUpdater = require('./appUpdater.js');
-const CliAutoComplete = require('./CliAutoComplete.js');
+const mspHelper = require('./msp/MSPHelper');
+const update = require('./globalUpdates');
+const appUpdater = require('./appUpdater');
+const CliAutoComplete = require('./CliAutoComplete');
 const { SITLProcess } = require('./sitl');
 ;
 process.on('uncaughtException', function (error) {   
@@ -229,19 +229,19 @@ $(function() {
                             TABS.modes.initialize(content_ready);
                             break;
                         case 'gps':
-                            require('./../tabs/gps.js');
+                            require('./../tabs/gps');
                             TABS.gps.initialize(content_ready);
                             break;
                         case 'magnetometer':
-                            require('./../tabs/magnetometer.js');
+                            require('./../tabs/magnetometer');
                             TABS.magnetometer.initialize(content_ready);
                             break;
                         case 'mission_control':
-                            require('./../tabs/mission_control.js');
+                            require('./../tabs/mission_control');
                             TABS.mission_control.initialize(content_ready);
                             break;
                         case 'mixer':
-                            require('./../tabs/mixer.js');
+                            require('./../tabs/mixer');
                             TABS.mixer.initialize(content_ready);
                             break;
                         case 'outputs':

@@ -25,25 +25,25 @@ Depending on the target operating system, _INAV Configurator_ is distributed as 
 ### Windows
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for Windows platform (win32 or win64 is present)
-1. Extract ZIP archive
-1. Run the INAV Configurator app from the unpacked folder
-1. Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
+2. Download Configurator for Windows platform (win32 or win64 is present)
+3. Install
+    * Extract ZIP archive and run the INAV Configurator app from the unpacked folder
+    * OR just use the setup program `INAV Configurator.msi`
+
+4.  Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
 
 ### Linux
-
-### Outdated, TODO: Update for Electron
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
 2. Download Configurator for Linux platform (linux32 and linux64 are present)
    *  **.rpm** is the Fedora installation file. Just download and install using `sudo dnf localinstall /path/to/INAV-Configurator_linux64-x.y.z-x86_64.rpm` or open it with a package manager (e.g. via Files)
    *  **.deb** is the Debian/Ubuntu installation file. Just download and install using `sudo apt install /path/to/INAV-Configurator_linux64_x.y.z.deb` or open it with a package manager (e.g. via the File Manager)
-   *  **.tar.gz** is a universal archive. Download and continue with these instructions to install
-3. Change to the directory containing the downloaded **tar.gz** file
+   *  **.zip** is a universal archive. Download and continue with these instructions to install
+3. Change to the directory containing the downloaded **zip** file
 4. download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
-5. Extract **tar.gz** archive
+5. Extract **zip** archive
 ```
-tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
+unzip INAV-Configurator_linuxNN_x.y.z.tar.gz -d /tmp/
 ```
    **NN** is the bits of your OS. **x.y.z** is the INAV Configurator version number.
 
@@ -72,9 +72,10 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for the Mac platform
-1. Extract ZIP archive
-1. Run INAV Configurator
+2. Download Configurator for the Mac platform
+3. Install
+    * Extract ZIP archive and run INAV Configurator
+    * OR use the DMG package for installation
 
 ## Building and running INAV Configurator locally (for development)
 
@@ -92,6 +93,13 @@ Options:
 
 See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
 
+To build the setup program for windows, you have to install [WiX Toolset V3](https://github.com/wixtoolset/wix3/releases) and add the `bin` folder to you `PATH`, e.g.
+```C:\Program Files (x86)\WiX Toolset v3.14\bin```
+
+To build deb and rpm packages for Linux, you have to install the following packages: 
+- Ubuntu/Debian: `dpkg, fakeroot, rpmbuild, build-essential, libudev-dev`
+- OpenSuse/Fedora: `dpkg, fakeroot, rpmbuild, systemd-devel, devel-basis (zypper install -t pattern devel_basis), zip`
+
 Example (note the double -- ):
 ``` npm run make -- --arch="x64" ```
 
@@ -99,7 +107,7 @@ Example (note the double -- ):
 
 To be able to open Inspector, set envorinment variable `NODE_ENV` to `develpoment` or set the flag directly when run `npm start`:
 
-``` NODE_ENV=development npm start ```
+```NODE_ENV=development npm start```
 
 Or use vscode and start a debug session `Debug Configurator` (Just hit F5!)
 

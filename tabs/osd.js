@@ -17,7 +17,7 @@ const Settings = require('./../js/settings');
 const { globalSettings } = require('./../js/globalSettings');
 const { PortHandler } = require('./../js/port_handler');
 const i18n = require('./../js/localization');
-const jBox = require('./../js/libraries/jBox/jBox.min.js');
+const jBox = require('./../js/libraries/jBox/jBox.min');
 
 
 var SYM = SYM || {};

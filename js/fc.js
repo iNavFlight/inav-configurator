@@ -10,8 +10,8 @@ const ProgrammingPidStatus = require('./programmingPidStatus');
 const WaypointCollection = require('./waypointCollection');
 const OutputMappingCollection = require('./outputMapping');
 const SafehomeCollection = require('./safehomeCollection');
-const FwApproachCollection = require('./fwApproachCollection.js')
-const { PLATFORM } = require('./model.js')
+const FwApproachCollection = require('./fwApproachCollection')
+const { PLATFORM } = require('./model')
 const VTX = require('./vtx');
 const BitHelper = require('./bitHelper');
 
@@ -94,7 +94,7 @@ var FC = {
         return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE);
     },
     isMultirotor: function () {
-        return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
+        return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
     },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF
