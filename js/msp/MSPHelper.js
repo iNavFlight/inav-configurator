@@ -2178,8 +2178,8 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_EZ_TUNE_SET:
 
                 buffer.push(FC.EZ_TUNE.enabled);
-                buffer.push(lowByte(FC.EZ_TUNE.filterHz));
-                buffer.push(highByte(FC.EZ_TUNE.filterHz));
+                buffer.push(BitHelper.lowByte(FC.EZ_TUNE.filterHz));
+                buffer.push(BitHelper.highByte(FC.EZ_TUNE.filterHz));
                 buffer.push(FC.EZ_TUNE.axisRatio);
                 buffer.push(FC.EZ_TUNE.response);
                 buffer.push(FC.EZ_TUNE.damping);
