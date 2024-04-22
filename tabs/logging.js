@@ -91,7 +91,7 @@ TABS.logging.initialize = function (callback) {
                             GUI.log(chrome.i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
-                        helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
+                        helper.interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
                         helper.mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);

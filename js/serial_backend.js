@@ -177,7 +177,7 @@ $(document).ready(function () {
                     var wasConnected = CONFIGURATOR.connectionValid;
 
                     helper.timeout.killAll();
-                    helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
+                    helper.interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
                     helper.mspBalancedInterval.flush();
 
                     if (CONFIGURATOR.cliActive) {
@@ -347,6 +347,7 @@ function onOpen(openInfo) {
 
         //Add a timer that every 1s will check if LTM stream is receiving data and display alert if so
         helper.interval.add('ltm-connection-check', function () {
+            console.log('Interval check');
             if (helper.ltmDecoder.isReceiving()) {
                 helper.groundstation.activate($('#main-wrapper'));
             }
