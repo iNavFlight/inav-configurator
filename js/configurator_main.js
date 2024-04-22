@@ -24,7 +24,7 @@ const update = require('./globalUpdates');
 const appUpdater = require('./appUpdater');
 const CliAutoComplete = require('./CliAutoComplete');
 const { SITLProcess } = require('./sitl');
-;
+
 process.on('uncaughtException', function (error) {   
     if (process.env.NODE_ENV !== 'development') {
         GUI.log(i18n.getMessage('unexpectedError', error));
