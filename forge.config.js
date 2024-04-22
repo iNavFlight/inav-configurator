@@ -19,6 +19,20 @@ module.exports = {
       "inav_icon_128.psd",
     ]
   },
+  hooks: {
+    // Uniform artifact file names
+    postMake: async (config, makeResults) => {
+      makeResults.forEach(result => {
+        var baseName = `${result.packageJSON.productName.replace(' ', '-')}_${result.platform}_${result.arch}_${result.packageJSON.version}`;
+        result.artifacts.forEach(artifact => {
+          var artifactStr = artifact.toString();
+          var newPath = path.join(path.dirname(artifactStr), baseName + path.extname(artifactStr));
+          fs.renameSync(artifactStr, newPath);
+          console.log('Artifact: ' + newPath);
+        });
+      });
+    }
+  },
   rebuildConfig: {},
   makers: [
     {
@@ -41,6 +55,7 @@ module.exports = {
             banner: path.join(__dirname, "./assets/windows/banner.jpg")
           }
         },
+        // Standard WiX template appends the unsightly "(Machine - WSI)" to the name, so use our own template
         beforeCreate: (msiCreator) => {
           return new Promise((resolve, reject) => {
             fs.readFile(path.join(__dirname,"./assets/windows/wix.xml"), "utf8" , (err, content) => {

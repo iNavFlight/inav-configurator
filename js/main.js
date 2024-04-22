@@ -4,6 +4,8 @@ const path = require('path');
 const Store = require('electron-store');
 Store.initRenderer();
 
+const { SITLProcess } = require('./sitl');
+
 require('@electron/remote/main').initialize();
 
 const usbBootloaderIds =  [
@@ -152,6 +154,7 @@ app.on('ready', () => {
 app.on('window-all-closed', () => {
   
   if (process.platform !== 'darwin') {
+    SITLProcess.stop();
     app.quit();
   }
   console.log("We're closing...");
