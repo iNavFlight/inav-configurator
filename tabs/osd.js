@@ -1243,7 +1243,21 @@ OSD.constants = {
                                 return FONT.embed_dot('25.6') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
-                }
+                },
+                {
+                    name: 'QNE_ALTITUDE',
+                    id: 147,
+                    preview: function () {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return ' 375' + FONT.symbol(SYM.ALT_FT);
+                            default: // Metric
+                                return ' 114' + FONT.symbol(SYM.ALT_M);
+                        }
+                    }
+                },
             ]
         },
         {
