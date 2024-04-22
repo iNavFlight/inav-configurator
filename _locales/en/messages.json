@@ -2225,7 +2225,7 @@
         "message": "Save Settings"
     },
     "cliMscBtn": {
-        "message": "MSC"
+        "message": "Blackbox (MSC)"
     },
     "cliDiffAllBtn": {
         "message": "Diff All"
@@ -2642,7 +2642,7 @@
         "message": "Set this option if you need an alternate failsafe behavior when the craft is close to Home. For example the author of the feature has a plane that failsafes when the wings detach on landing, when the RTH failsafe behavior normally desired in flight is no longer wanted or needed."
     },
     "failsafeMinDistanceItem": {
-        "message": "Failsafe Minimum Distance in centimeters"
+        "message": "Failsafe Minimum Distance"
     },
     "failsafeMinDistanceHelp": {
         "message": "The craft will use the alternate failsafe behavior when it is between 0 and this minimum distance in centimeters away from Home. For example if set to 2000 centimeters (20 meters), and the craft is at 13 meters, the Failsafe Minimum Distance Procedure will be followed. When the craft is at 25 meters, the normal failsafe procedure will be followed. If set to 0, the normal failsafe procedure will be used at all times. "
@@ -4892,6 +4892,15 @@
     "save": {
         "message": "Save"
     },
+    "copy": {
+        "message": "Copy"
+    },
+    "paste": {
+        "message": "Paste"
+    },
+    "clear": {
+        "message": "Clear"
+    },
     "active": {
         "message": "Active"
     },
@@ -5685,6 +5694,15 @@
     "osdSettingsSaved": {
         "message": "OSD settings saved"
     },
+    "osdLayoutInsertedIntoClipboard": {
+        "message": "Layout has been saved to clipboard"
+    },
+    "osdLayoutPasteFromClipboard": {
+        "message": "Layout has been restored from clipboard"
+    },
+    "osdClearLayout": {
+        "message": "Layout has been cleared"
+    },
     "failedToOpenSerialPort": {
         "message": "<span style=\"color: red\">Failed</span> to open serial port"
     },
@@ -5735,6 +5753,12 @@
     },
     "ezTuneExpo": {
         "message": "Expo"
+    },
+    "ezTuneSnappiness": {
+        "message": "Snappiness"
+    },
+    "ezTuneSnappinessTips": {
+        "message": "Helps to have a snappy stick feeling. Whenever you do a fast stick movement, high Snappiness will accelerate the drone response. Both when you start and stop the manouver. Try different values to find the one that suits you best."
     },
     "ezTuneFilterHzTips": {
         "message": "This sets the base cutoff frequency for all INAV gyro and D-term filters. Higher values will result in lower filter delay and better stabilization, but more noise will go through the filters and motors will get hot, UAV might oscillate and be unfyable. Your goal is to increase this value as high as possible before any negative effects appear. Negative effects include: hot motors, audible osciallations, UAV rapidly shaking, UAV gaining altitude by itself. Usual starting points for 'Filter Hz' are: <strong>3-inch props</strong>: 90, <strong>5-inch props</strong>: 110, <strong>7-inch props</strong>: 90, <strong>10-inch props</strong>: 75, <strong>12-inch props</strong>: 60. Use Blackbox and common sense to find a value that is most suited for your UAV."
