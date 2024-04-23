@@ -59,3 +59,6 @@ BOARD.findDefinition = function (identifier) {
     }
     return DEFAULT_BOARD_DEFINITION;
 };
+
+module.exports = BOARD;
+

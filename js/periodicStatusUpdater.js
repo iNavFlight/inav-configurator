@@ -1,11 +1,18 @@
 'use strict';
 
-var helper = helper || {};
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const CONFIGURATOR = require('./data_storage');
+const MSP = require('./msp');
+const MSPCodes = require('./msp/MSPCodes');
+const mspQueue = require('./serial_queue');
 
-helper.periodicStatusUpdater = (function () {
+ var periodicStatusUpdater = (function () {
 
     var publicScope = {},
         privateScope = {};
+
+    var stoppped = false;
 
     /**
      *
@@ -35,51 +42,51 @@ helper.periodicStatusUpdater = (function () {
 
         if (FC.isModeEnabled('ARM'))
             $(".armedicon").css({
-                'background-image': 'url("../images/icons/cf_icon_armed_active.svg")'
+                'background-image': 'url("./images/icons/cf_icon_armed_active.svg")'
             });
         else
             $(".armedicon").css({
-                'background-image': 'url("../images/icons/cf_icon_armed_grey.svg")'
+                'background-image': 'url("./images/icons/cf_icon_armed_grey.svg")'
             });
         if (FC.isModeEnabled('FAILSAFE'))
             $(".failsafeicon").css({
-                'background-image': 'url("../images/icons/cf_icon_failsafe_active.svg")'
+                'background-image': 'url("./images/icons/cf_icon_failsafe_active.svg")'
             });
         else
             $(".failsafeicon").css({
-                'background-image': 'url("../images/icons/cf_icon_failsafe_grey.svg")'
+                'background-image': 'url("./images/icons/cf_icon_failsafe_grey.svg")'
             });
 
-        if (ANALOG != undefined) {
+        if (FC.ANALOG != undefined) {
             var nbCells;
 
-            nbCells = ANALOG.cell_count;
-            var min = MISC.vbatmincellvoltage * nbCells;
-            var max = MISC.vbatmaxcellvoltage * nbCells;
-            var warn = MISC.vbatwarningcellvoltage * nbCells;
+            nbCells = FC.ANALOG.cell_count;
+            var min = FC.MISC.vbatmincellvoltage * nbCells;
+            var max = FC.MISC.vbatmaxcellvoltage * nbCells;
+            var warn = FC.MISC.vbatwarningcellvoltage * nbCells;
 
             $(".battery-status").css({
-                width: ANALOG.battery_percentage + "%",
+                width: FC.ANALOG.battery_percentage + "%",
                 display: 'inline-block'
             });
         
             if (active) {
                 $(".linkicon").css({
-                    'background-image': 'url("../images/icons/cf_icon_link_active.svg")'
+                    'background-image': 'url("./images/icons/cf_icon_link_active.svg")'
                 });
             } else {
                 $(".linkicon").css({
-                    'background-image': 'url("../images/icons/cf_icon_link_grey.svg")'
+                    'background-image': 'url("./images/icons/cf_icon_link_grey.svg")'
                 });
             }
 
-            if (((ANALOG.use_capacity_thresholds && ANALOG.battery_remaining_capacity <= MISC.battery_capacity_warning - MISC.battery_capacity_critical) || (!ANALOG.use_capacity_thresholds && ANALOG.voltage < warn)) || ANALOG.voltage < min) {
+            if (((FC.ANALOG.use_capacity_thresholds && FC.ANALOG.battery_remaining_capacity <= FC.MISC.battery_capacity_warning - FC.MISC.battery_capacity_critical) || (!FC.ANALOG.use_capacity_thresholds && FC.ANALOG.voltage < warn)) || FC.ANALOG.voltage < min) {
                 $(".battery-status").css('background-color', '#D42133');
             } else {
                 $(".battery-status").css('background-color', '#59AA29');
             }
 
-            $(".battery-legend").text(ANALOG.voltage + " V");
+            $(".battery-legend").text(FC.ANALOG.voltage + " V");
         }
 
         $('#quad-status_wrapper').show();
@@ -95,20 +102,28 @@ helper.periodicStatusUpdater = (function () {
             display: 'inline-block'
         });
 
-        if (GUI.active_tab != 'cli') {
+        if (!stoppped && GUI.active_tab != 'cli') {
 
-            if (helper.mspQueue.shouldDropStatus()) {
+            if (mspQueue.shouldDropStatus()) {
                 return;
             }
 
+            
             MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
             MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_ANALOG, false, false);
+            
 
             privateScope.updateView();
         }
     };
 
+    publicScope.stop = function() {
+        stoppped = true;
+    }
+
     return publicScope;
 })();
+
+module.exports = periodicStatusUpdater;

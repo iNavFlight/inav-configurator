@@ -1,8 +1,7 @@
 'use strict';
 
-var classes = classes || {};
 
-classes.PidController = function () {
+var PidController = function () {
 
     var self = {},
         privateScope = {};
@@ -127,3 +126,5 @@ classes.PidController = function () {
 
     return self;
 };
+
+module.exports = PidController;

@@ -1,8 +1,10 @@
 'use strict';
 
-var helper = helper || {};
+const FC = require('./fc');
+const i18n = require('./localization');
+const bitHelper = require('./bitHelper');
 
-helper.serialPortHelper = (function () {
+const serialPortHelper = (function () {
 
     let publicScope = {},
         privateScope = {};
@@ -209,7 +211,7 @@ helper.serialPortHelper = (function () {
         }
 
         for (var i = 0; i < privateScope.rules.length; i++) {
-            privateScope.rules[i].displayName = chrome.i18n.getMessage('portsFunction_' + privateScope.rules[i].name);
+            privateScope.rules[i].displayName = i18n.getMessage('portsFunction_' + privateScope.rules[i].name);
         }
 
         privateScope.namesGenerated = true;
@@ -242,7 +244,7 @@ helper.serialPortHelper = (function () {
             let key = functions[index];
             let bitIndex = privateScope.functionIDs[key];
             if (bitIndex >= 0) {
-                mask = bit_set(mask, bitIndex);
+                mask = bitHelper.bit_set(mask, bitIndex);
             }
         }
         return mask;
@@ -260,7 +262,7 @@ helper.serialPortHelper = (function () {
         for (let index = 0; index < keys.length; index++) {
             let key = keys[index];
             let bit = privateScope.functionIDs[key];
-            if (bit_check(mask, bit)) {
+            if (bitHelper.bit_check(mask, bit)) {
                 functions.push(key);
             }
         }
@@ -274,8 +276,8 @@ helper.serialPortHelper = (function () {
     publicScope.getPortIdentifiersForFunction = function (functionName) {
         let identifiers = [];
 
-        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
-            let config = SERIAL_CONFIG.ports[index];
+        for (let index = 0; index < FC.SERIAL_CONFIG.ports.length; index++) {
+            let config = FC.SERIAL_CONFIG.ports[index];
             if (config.functions.indexOf(functionName) != -1) {
                 identifiers.push(config.identifier);
             }
@@ -288,8 +290,8 @@ helper.serialPortHelper = (function () {
 
         let list = [];
 
-        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
-            let config = SERIAL_CONFIG.ports[index];
+        for (let index = 0; index < FC.SERIAL_CONFIG.ports.length; index++) {
+            let config = FC.SERIAL_CONFIG.ports[index];
 
             //exclude USB VCP port
             if (config.identifier == 20) {
@@ -310,8 +312,8 @@ helper.serialPortHelper = (function () {
     };
 
     publicScope.getPortByIdentifier = function (identifier) {
-        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
-            let config = SERIAL_CONFIG.ports[index];
+        for (let index = 0; index < FC.SERIAL_CONFIG.ports.length; index++) {
+            let config = FC.SERIAL_CONFIG.ports[index];
             if (config.identifier == identifier) {
                 return config;
             }
@@ -320,8 +322,8 @@ helper.serialPortHelper = (function () {
     };
 
     publicScope.clearByFunction = function (functionName) {
-        for (let index = 0; index < SERIAL_CONFIG.ports.length; index++) {
-            let config = SERIAL_CONFIG.ports[index];
+        for (let index = 0; index < FC.SERIAL_CONFIG.ports.length; index++) {
+            let config = FC.SERIAL_CONFIG.ports[index];
             if (config.functions.indexOf(functionName) != -1) {
                 config.functions = [];
             }
@@ -349,3 +351,5 @@ helper.serialPortHelper = (function () {
 
     return publicScope;
 })();
+
+module.exports = serialPortHelper;

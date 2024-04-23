@@ -1,18 +1,5 @@
-/*global $*/
+
 'use strict';
-
-
-function checkChromeRuntimeError() {
-    if (chrome.runtime.lastError) {
-        console.error(
-            `Chrome API Error: ${chrome.runtime.lastError.message}.\n Traced ${
-                new Error().stack
-            }`
-        );
-        return true;
-    }
-    return false;
-}
 
 function constrain(input, min, max) {
 
@@ -114,3 +101,5 @@ function calculate_new_cooridatnes(coord, bearing, distance)
         lon: rad2Deg(lonNew),
     }
 }
+
+module.exports = { constrain, zeroPad, generateFilename, scaleRangeInt, distanceOnLine, wrap_360, rad2Deg, calculate_new_cooridatnes }

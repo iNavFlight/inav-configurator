@@ -1,6 +1,6 @@
 'use strict';
 
-let ProgrammingPidCollection = function () {
+var ProgrammingPidCollection = function () {
 
     let self = {},
         data = [],
@@ -40,8 +40,6 @@ let ProgrammingPidCollection = function () {
                 self.get()[k].render(k, $table);
             }
         }
-
-        GUI.switchery();
     };
 
     self.update = function(statuses) {
@@ -56,3 +54,5 @@ let ProgrammingPidCollection = function () {
 
     return self;
 };
+
+module.exports = ProgrammingPidCollection;

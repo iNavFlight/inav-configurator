@@ -1,5 +1,7 @@
 'use strict';
 
+const BitHelper = require('./bitHelper');
+
 let FwApproachCollection = function () {
 
     let self = {},
@@ -66,19 +68,19 @@ let FwApproachCollection = function () {
         let fwApproach = data[fwApproachId];
         if (fwApproachId < self.fwApproachCount()) {    
             buffer.push(fwApproach.getNumber());    // sbufReadU8(src);    // number
-            buffer.push(specificByte(fwApproach.getApproachAltAsl(), 0));
-            buffer.push(specificByte(fwApproach.getApproachAltAsl(), 1));
-            buffer.push(specificByte(fwApproach.getApproachAltAsl(), 2));
-            buffer.push(specificByte(fwApproach.getApproachAltAsl(), 3));
-            buffer.push(specificByte(fwApproach.getLandAltAsl(), 0));
-            buffer.push(specificByte(fwApproach.getLandAltAsl(), 1));
-            buffer.push(specificByte(fwApproach.getLandAltAsl(), 2));
-            buffer.push(specificByte(fwApproach.getLandAltAsl(), 3));
+            buffer.push(BitHelper.specificByte(fwApproach.getApproachAltAsl(), 0));
+            buffer.push(BitHelper.specificByte(fwApproach.getApproachAltAsl(), 1));
+            buffer.push(BitHelper.specificByte(fwApproach.getApproachAltAsl(), 2));
+            buffer.push(BitHelper.specificByte(fwApproach.getApproachAltAsl(), 3));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandAltAsl(), 0));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandAltAsl(), 1));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandAltAsl(), 2));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandAltAsl(), 3));
             buffer.push(fwApproach.getApproachDirection());
-            buffer.push(specificByte(fwApproach.getLandHeading1(), 0));
-            buffer.push(specificByte(fwApproach.getLandHeading1(), 1));
-            buffer.push(specificByte(fwApproach.getLandHeading2(), 0));
-            buffer.push(specificByte(fwApproach.getLandHeading2(), 1));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandHeading1(), 0));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandHeading1(), 1));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandHeading2(), 0));
+            buffer.push(BitHelper.specificByte(fwApproach.getLandHeading2(), 1));
             buffer.push(fwApproach.getIsSeaLevelRef());
         } else {
             buffer = Array(15).fill(0);
@@ -90,3 +92,5 @@ let FwApproachCollection = function () {
 
     return self;
 };
+
+module.exports = FwApproachCollection;

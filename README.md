@@ -18,14 +18,6 @@ everything, the hardware is not working, or you have any other _support_ problem
 * [RC Groups Support](https://www.rcgroups.com/forums/showthread.php?2495732-Cleanflight-iNav-(navigation-rewrite)-project)
 * [INAV Official on Telegram](https://t.me/INAVFlight)
 
-## INAV Configurator starts minimized, what should I do?
-
-You have to remove the `C:\Users%Your_UserName%\AppData\Local\inav-configurator` folder and all its content.
-
-[https://www.youtube.com/watch?v=XMoULyiFDp4](https://www.youtube.com/watch?v=XMoULyiFDp4)
-
-Alternatively, on Windows with PowerShell, you can use the `post_install_cleanup.ps1` script that will do the cleaning. (thank you, James Cherrill)
-
 ## Installation
 
 Depending on the target operating system, _INAV Configurator_ is distributed as a  _standalone_ application or Chrome App.
@@ -33,10 +25,12 @@ Depending on the target operating system, _INAV Configurator_ is distributed as 
 ### Windows
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for Windows platform (win32 or win64 is present)
-1. Extract ZIP archive
-1. Run the INAV Configurator app from the unpacked folder
-1. Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
+2. Download Configurator for Windows platform (win32 or win64 is present)
+3. Install
+    * Extract ZIP archive and run the INAV Configurator app from the unpacked folder
+    * OR just use the setup program `INAV Configurator.msi`
+
+4.  Configurator is not signed, so you have to allow Windows to run untrusted applications. There might be a monit for it during the first run
 
 ### Linux
 
@@ -44,12 +38,12 @@ Depending on the target operating system, _INAV Configurator_ is distributed as 
 2. Download Configurator for Linux platform (linux32 and linux64 are present)
    *  **.rpm** is the Fedora installation file. Just download and install using `sudo dnf localinstall /path/to/INAV-Configurator_linux64-x.y.z-x86_64.rpm` or open it with a package manager (e.g. via Files)
    *  **.deb** is the Debian/Ubuntu installation file. Just download and install using `sudo apt install /path/to/INAV-Configurator_linux64_x.y.z.deb` or open it with a package manager (e.g. via the File Manager)
-   *  **.tar.gz** is a universal archive. Download and continue with these instructions to install
-3. Change to the directory containing the downloaded **tar.gz** file
+   *  **.zip** is a universal archive. Download and continue with these instructions to install
+3. Change to the directory containing the downloaded **zip** file
 4. download [this](https://raw.githubusercontent.com/iNavFlight/inav-configurator/master/assets/linux/inav-configurator.desktop) file to the same directory. Its filename should be `inav-configurator.desktop`.
-5. Extract **tar.gz** archive
+5. Extract **zip** archive
 ```
-tar -C /tmp/ -xf INAV-Configurator_linuxNN_x.y.z.tar.gz
+unzip INAV-Configurator_linuxNN_x.y.z.tar.gz -d /tmp/
 ```
    **NN** is the bits of your OS. **x.y.z** is the INAV Configurator version number.
 
@@ -73,26 +67,15 @@ sudo mv inav-configurator.desktop /usr/share/applications/
 ```
 10. Make the following files executable:
    * inav-configurator `chmod +x /opt/inav/inav-configurator/inav-configurator`
-   * (5.0.0+) chrome_crashpad_handler `chmod +x /opt/inav/inav-configurator/chrome_crashpad_handler`
 11. Run the INAV Configurator app from the unpacked folder `/opt/inav/inav-configurator/inav-configurator`
-
-#### Notes
-
-On some Linux distros, you may be missing `libatomic` and/or `NW.JS` (especially `libnode.so`) dependencies. If so, please install `libatomic` using your distro's package manager, e.g:
-
-* Arch Linux: `sudo pacman -S --needed libatomic_ops`
-* Debian / Ubuntu: `sudo apt install libatomic1`
-* Fedora: `sudo dnf install libatomic`
-
-1. Don't forget to add your user to the dialout group "sudo usermod -aG dialout YOUR_USERNAME" for serial access
-2. If you have 3D model animation problems, enable "Override software rendering list" in Chrome flags chrome://flags/#ignore-gpu-blacklist
 
 ### Mac
 
 1. Visit [release page](https://github.com/iNavFlight/inav-configurator/releases)
-1. Download Configurator for the Mac platform
-1. Extract ZIP archive
-1. Run INAV Configurator
+2. Download Configurator for the Mac platform
+3. Install
+    * Extract ZIP archive and run INAV Configurator
+    * OR use the DMG package for installation
 
 ## Building and running INAV Configurator locally (for development)
 
@@ -100,30 +83,33 @@ For local development, the **node.js** build system is used.
 
 1. Install node.js
 1. From the project folder run `npm install`
-1. To build the JS and CSS files and start the configurator:
-    - With NW.js: Run `npm start`.
-    - With Chrome: Run `npm run gulp`. Then open `chrome://extensions`, enable
-    the `Developer mode`, click on the `Load unpacked extension...` button, and select the `inav-configurator` directory.
+1. To build the  and start the configurator:
+    - Run `npm start`.
 
-Other tasks are also defined in `gulpfile.js`. To run a task, use `node ./node_modules/gulp/bin/gulp.js task-name`. Available ones are:
+To build the App run `npm run make` to build for your platform.
 
-- **build**: Generate JS and CSS output files used by the configurator from their sources. It must be run whenever changes are made to any `.js` or `.css` files in order to have those changes appear
-in the configurator. If new files are added, they must be included in `gulpfile.js`. See the comments at the top of `gulpfile.js` to learn how to do so. See also the `watch` task.
-- **watch**: Watch JS and CSS sources for changes and run the `build` task whenever they're edited.
-- **dist**: Create a distribution of the app (valid for packaging both as a Chrome app or NW.js app)
-in the `./dist/` directory.
-- **release**: Create NW.js apps for each supported platform (win32, osx64 and linux64) in the `./apps`
-directory. Running this task on macOS or Linux requires Wine since it's needed to set the icon
-for the Windows app. If you don't have Wine installed, you can create a release by running the **release-only-Linux** task.
-<br>`--installer` argument can be added to build installers for a particular OS. NOTE: MacOS Installer can be built with MacOS only.
+Options:
+* Architecture: --arch  - Allowed values are: "ia32", "x64", "armv7l", "arm64", "universal", or "mips64el". 
 
-To build a specific release, use the command `release --platform="win64"` for example.
+See [Electron Forge CLI Documentation](https://www.electronforge.io/cli#options-2) for details
+
+To build the setup program for windows, you have to install [WiX Toolset V3](https://github.com/wixtoolset/wix3/releases) and add the `bin` folder to you `PATH`, e.g.
+```C:\Program Files (x86)\WiX Toolset v3.14\bin```
+
+To build deb and rpm packages for Linux, you have to install the following packages: 
+- Ubuntu/Debian: `dpkg, fakeroot, rpmbuild, build-essential, libudev-dev`
+- OpenSuse/Fedora: `dpkg, fakeroot, rpmbuild, systemd-devel, devel-basis (zypper install -t pattern devel_basis), zip`
+
+Example (note the double -- ):
+``` npm run make -- --arch="x64" ```
 
 ### Running with debug | Inspector
 
-To be able to open Inspector, you will need SDK flavours of NW.js
+To be able to open Inspector, set envorinment variable `NODE_ENV` to `develpoment` or set the flag directly when run `npm start`:
 
-`npm install nw@0.61.0 --nwjs_build_type=sdk`
+```NODE_ENV=development npm start```
+
+Or use vscode and start a debug session `Debug Configurator` (Just hit F5!)
 
 ## Different map providers
 

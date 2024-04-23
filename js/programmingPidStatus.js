@@ -1,6 +1,6 @@
 'use strict';
 
-let ProgrammingPidStatus = function () {
+var ProgrammingPidStatus = function () {
 
     let self = {},
         data = [];
@@ -31,3 +31,5 @@ let ProgrammingPidStatus = function () {
 
     return self;
 };
+
+module.exports = ProgrammingPidStatus;
