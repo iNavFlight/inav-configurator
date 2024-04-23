@@ -27,7 +27,7 @@ const { SITLProcess } = require('./sitl');
 
 process.on('uncaughtException', function (error) {   
     if (process.env.NODE_ENV !== 'development') {
-        GUI.log(i18n.getMessage('unexpectedError', error));
+        GUI.log(i18n.getMessage('unexpectedError', error.message));
         if (GUI.connected_to || GUI.connecting_to) {
             GUI.log(i18n.getMessage('disconnecting'));
             $('a.connect').trigger('click');

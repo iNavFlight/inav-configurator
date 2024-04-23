@@ -28,11 +28,11 @@ function createDeviceChooser() {
     width: 400,
     height: 400,
     webPreferences: {
-      preload: path.join(__dirname, 'js/libraries/bluetooth-device-chooser/preload.js')
+      preload: path.join(__dirname, 'libraries/bluetooth-device-chooser/preload.js')
     }
   });
   bluetoothDeviceChooser.removeMenu();
-  bluetoothDeviceChooser.loadFile(path.join(__dirname, 'js/libraries/bluetooth-device-chooser/index.html'));
+  bluetoothDeviceChooser.loadFile(path.join(__dirname, 'libraries/bluetooth-device-chooser/index.html'));
 
   bluetoothDeviceChooser.on('closed', () => {
     btDeviceList = null;

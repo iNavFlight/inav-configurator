@@ -40,6 +40,7 @@ module.exports = {
       config: {
         name: "INAV Configurator",
         shortName: "INAV",
+        exe: "inav-configurator",
         description: "Configurator for the open source flight controller software INAV.",
         programFilesFolderName: "inav-configurator",
         shortcutFolderName: "INAV",

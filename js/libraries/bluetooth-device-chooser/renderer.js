@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.electronAPI.deviceSelected(item.id);
                 window.close();
             });
-            item.appendChild(document.createTextNode(device.deviceName + ' (' + device.deviceId + ')'));
+            var text = device.deviceName + ' (' + device.deviceId + ')';
+            item.appendChild(document.createTextNode(text.length > 45 ? device.deviceName.substring(0, 45) : text.substring(0, 45)));
             document.getElementById('list').prepend(item);
         });
     });
