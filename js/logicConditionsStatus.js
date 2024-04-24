@@ -23,3 +23,5 @@ let LogicConditionsStatus = function () {
 
     return self;
 };
+
+module.exports = LogicConditionsStatus;

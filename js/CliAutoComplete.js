@@ -4,13 +4,18 @@
  * Uses: https://github.com/yuku/jquery-textcomplete
  * Check out the docs at https://github.com/yuku/jquery-textcomplete/tree/v1/doc
  */
+
+const FC = require('./fc')
+const CONFIGURATOR = require('./data_storage');
+const timeout = require('./timeouts');
+
 const CliAutoComplete = {
     configEnabled: false,
     builder: { state: 'reset', numFails: 0 },
 };
 
 CliAutoComplete.isEnabled = function() {
-    return this.isBuilding() || (this.configEnabled && CONFIG.flightControllerIdentifier === "INAV" && this.builder.state !== 'fail');
+    return this.isBuilding() || (this.configEnabled && FC.CONFIG.flightControllerIdentifier === "INAV" && this.builder.state !== 'fail');
 };
 
 CliAutoComplete.isBuilding = function() {
@@ -67,7 +72,7 @@ CliAutoComplete._builderWatchdogTouch = function() {
 
     this._builderWatchdogStop();
 
-    helper.timeout.add('autocomplete_builder_watchdog', function() {
+    timeout.add('autocomplete_builder_watchdog', function() {
         if (self.builder.numFails) {
             self.builder.numFails++;
             self.builder.state = 'fail';
@@ -82,7 +87,7 @@ CliAutoComplete._builderWatchdogTouch = function() {
 };
 
 CliAutoComplete._builderWatchdogStop = function() {
-    helper.timeout.remove('autocomplete_builder_watchdog');
+    timeout.remove('autocomplete_builder_watchdog');
 };
 
 CliAutoComplete.builderStart = function() {
@@ -552,3 +557,5 @@ CliAutoComplete._initTextcomplete = function() {
         }),
     ]);
 };
+
+module.exports = CliAutoComplete;

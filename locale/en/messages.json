@@ -2,6 +2,17 @@
     "translation_version": {
         "message": "0"
     },
+    "language_de": {
+        "message": "Deutsch",
+        "comment": "Don't translate!"
+    },
+    "language_en": {
+        "message": "English",
+        "_comment": "Don't translate!"
+    },
+    "language": {
+        "message": "Language"
+    },
     "options_title": {
         "message": "Application Options"
     },
@@ -22,6 +33,12 @@
     },
     "options_render": {
         "message": "Configurator rendering options"
+    },
+    "unexpectedError" : {
+        "message": "Unexpected error: $1"
+    },
+    "disconnecting": {
+        "message": "Disconnecting..."
     },
     "connect": {
         "message": "Connect"
@@ -303,7 +320,7 @@
         "message": "UDP connection timed out."
     },
     "usbDeviceOpened": {
-        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened with ID: $1"
+        "message": "USB device <span style=\"color: #37a8db\">successfully</span> opened"
     },
     "usbDeviceOpenFail": {
         "message": "<span style=\"color: red\">Failed</span> to open USB device!"
@@ -1531,7 +1548,7 @@
         "message": "I-term mechanics"
     },
     "pidTuning_itermRelaxCutoff": {
-        "message": "Iterm Relax Cutoff Frequency"
+        "message": "I-term Relax Cutoff Frequency"
     },
     "pidTuning_itermRelaxCutoffHelp": {
         "message": "Lower values open a longer time window for Iterm Relax to work on and stronger Iterm suppression. Higher values shortens the time windows and reduces suppression."

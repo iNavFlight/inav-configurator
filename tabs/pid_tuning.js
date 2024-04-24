@@ -1,5 +1,22 @@
-/*global chrome,helper,mspHelper*/
 'use strict';
+
+const path = require('path');
+const Store = require('electron-store');
+const store = new Store()
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const features = require('./../js/feature_framework');
+const tabs = require('./../js/tabs');
+const FC = require('./../js/fc');
+const Settings = require('./../js/settings');
+const i18n = require('./../js/localization');
+const { scaleRangeInt } = require('./../js/helpers');
+const SerialBackend = require('./../js/serial_backend');
+const BitHelper = require('./../js/bitHelper');
 
 TABS.pid_tuning = {
 
@@ -26,16 +43,15 @@ TABS.pid_tuning.initialize = function (callback) {
 
     if (GUI.active_tab != 'pid_tuning') {
         GUI.active_tab = 'pid_tuning';
-        googleAnalytics.sendAppView('PID Tuning');
     }
 
     function load_html() {
-        GUI.load("./tabs/pid_tuning.html", Settings.processHtml(process_html));
+        GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
     }
 
     function pid_and_rc_to_form() {
 
-        // Fill in the data from PIDs array
+        // Fill in the data from FC.PIDs array
         var pidNames = FC.getPidNames();
 
         $('[data-pid-bank-position]').each(function () {
@@ -46,13 +62,27 @@ TABS.pid_tuning.initialize = function (callback) {
                 $this.find('td:first').text(pidNames[bankPosition]);
 
                 $this.find('input').each(function (index) {
-                    $(this).val(PIDs[bankPosition][index]);
+                $(this).val(FC.PIDs[bankPosition][index]);
                 });
             }
         });
 
+<<<<<<< HEAD
         $('#tpa').val(RC_tuning.dynamic_THR_PID);
         $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
+=======
+        // Fill in data from FC.RC_tuning object
+        $('#rate-roll').val(FC.RC_tuning.roll_rate);
+        $('#rate-pitch').val(FC.RC_tuning.pitch_rate);
+        $('#rate-yaw').val(FC.RC_tuning.yaw_rate);
+
+        $('#rate-manual-roll').val(FC.RC_tuning.manual_roll_rate);
+        $('#rate-manual-pitch').val(FC.RC_tuning.manual_pitch_rate);
+        $('#rate-manual-yaw').val(FC.RC_tuning.manual_yaw_rate);
+
+        $('#tpa').val(FC.RC_tuning.dynamic_THR_PID);
+        $('#tpa-breakpoint').val(FC.RC_tuning.dynamic_THR_breakpoint);
+>>>>>>> master
     }
 
     function form_to_pid_and_rc() {
@@ -66,13 +96,14 @@ TABS.pid_tuning.initialize = function (callback) {
                 return;
             }
 
-            if (PIDs[bankPosition]) {
+            if (FC.PIDs[bankPosition]) {
                 $this.find('input').each(function (index) {
-                    PIDs[bankPosition][index] = parseFloat($(this).val());
+                    FC.PIDs[bankPosition][index] = parseFloat($(this).val());
                 });
             }
         });
 
+<<<<<<< HEAD
         // catch RC_tuning changes
         RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
         RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
@@ -80,21 +111,33 @@ TABS.pid_tuning.initialize = function (callback) {
 
         RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
         RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
+=======
+        // catch FC.RC_tuning changes
+        FC.RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
+        FC.RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
+        FC.RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
+>>>>>>> master
 
-        RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
-        RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
+        FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
+        FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
 
+<<<<<<< HEAD
         RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
         RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
         RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
+=======
+        FC.RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
+        FC.RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
+        FC.RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
+>>>>>>> master
 
         // Rate Dynamics
-        RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
-        RATE_DYNAMICS.sensitivityEnd = parseInt($('#rate_dynamics_end_sensitivity').val());
-        RATE_DYNAMICS.correctionCenter = parseInt($('#rate_dynamics_center_correction').val());
-        RATE_DYNAMICS.correctionEnd = parseInt($('#rate_dynamics_end_correction').val());
-        RATE_DYNAMICS.weightCenter = parseInt($('#rate_dynamics_center_weight').val());
-        RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
+        FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
+        FC.RATE_DYNAMICS.sensitivityEnd = parseInt($('#rate_dynamics_end_sensitivity').val());
+        FC.RATE_DYNAMICS.correctionCenter = parseInt($('#rate_dynamics_center_correction').val());
+        FC.RATE_DYNAMICS.correctionEnd = parseInt($('#rate_dynamics_end_correction').val());
+        FC.RATE_DYNAMICS.weightCenter = parseInt($('#rate_dynamics_center_weight').val());
+        FC.RATE_DYNAMICS.weightEnd = parseInt($('#rate_dynamics_end_weight').val());
 
     }
     
@@ -147,16 +190,16 @@ TABS.pid_tuning.initialize = function (callback) {
 
     function process_html() {
         // translate to user-selected language
-        localize();
+        i18n.localize();
 
         $('#ez_tune_enabled').on('change', function () {
             if ($(this).is(":checked")) {
-                EZ_TUNE.enabled = 1;
+                FC.EZ_TUNE.enabled = 1;
             } else {
-                EZ_TUNE.enabled = 0;
+                FC.EZ_TUNE.enabled = 0;
             }
 
-            if (EZ_TUNE.enabled) {
+            if (FC.EZ_TUNE.enabled) {
                 $('.for-ez-tune').show();
                 $('.not-for-ez-tune').hide();
             } else {
@@ -174,19 +217,19 @@ TABS.pid_tuning.initialize = function (callback) {
             $('.not-for-multirotor').hide();
         }
 
-        $("#ez_tune_enabled").prop('checked', EZ_TUNE.enabled).trigger('change');
+        $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
 
-        GUI.sliderize($('#ez_tune_filter_hz'), EZ_TUNE.filterHz, 10, 300);
-        GUI.sliderize($('#ez_tune_axis_ratio'), EZ_TUNE.axisRatio, 25, 175);
-        GUI.sliderize($('#ez_tune_response'), EZ_TUNE.response, 0, 200);
-        GUI.sliderize($('#ez_tune_damping'), EZ_TUNE.damping, 0, 200);
-        GUI.sliderize($('#ez_tune_stability'), EZ_TUNE.stability, 0, 200);
-        GUI.sliderize($('#ez_tune_aggressiveness'), EZ_TUNE.aggressiveness, 0, 200);
+        GUI.sliderize($('#ez_tune_filter_hz'), FC.EZ_TUNE.filterHz, 10, 300);
+        GUI.sliderize($('#ez_tune_axis_ratio'), FC.EZ_TUNE.axisRatio, 25, 175);
+        GUI.sliderize($('#ez_tune_response'), FC.EZ_TUNE.response, 0, 200);
+        GUI.sliderize($('#ez_tune_damping'), FC.EZ_TUNE.damping, 0, 200);
+        GUI.sliderize($('#ez_tune_stability'), FC.EZ_TUNE.stability, 0, 200);
+        GUI.sliderize($('#ez_tune_aggressiveness'), FC.EZ_TUNE.aggressiveness, 0, 200);
 
-        GUI.sliderize($('#ez_tune_rate'), EZ_TUNE.rate, 0, 200);
-        GUI.sliderize($('#ez_tune_expo'), EZ_TUNE.expo, 0, 200);
+        GUI.sliderize($('#ez_tune_rate'), FC.EZ_TUNE.rate, 0, 200);
+        GUI.sliderize($('#ez_tune_expo'), FC.EZ_TUNE.expo, 0, 200);
 
-        GUI.sliderize($('#ez_tune_snappiness'), EZ_TUNE.snappiness, 0, 100);
+        GUI.sliderize($('#ez_tune_snappiness'), FC.EZ_TUNE.snappiness, 0, 100);
 
         $('.ez-element').on('updated', function () {
             updatePreview();
@@ -206,26 +249,26 @@ TABS.pid_tuning.initialize = function (callback) {
 
         updatePreview();
 
-        helper.tabs.init($('.tab-pid_tuning'));
+        tabs.init($('.tab-pid_tuning'));
 
         $('.action-resetPIDs').on('click', function() {
 
-            if (confirm(chrome.i18n.getMessage('confirm_reset_pid'))) {
+            if (confirm(i18n.getMessage('confirm_reset_pid'))) {
                 MSP.send_message(MSPCodes.MSP_SET_RESET_CURR_PID, false, false, false);
-                updateActivatedTab();
+                GUI.updateActivatedTab();
             }
         });
 
         $('.action-resetDefaults').on('click', function() {
 
-            if (confirm(chrome.i18n.getMessage('confirm_select_defaults'))) {
+            if (confirm(i18n.getMessage('confirm_select_defaults'))) {
                 mspHelper.setSetting("applied_defaults", 0, function() { 
                     mspHelper.saveToEeprom( function () {
-                        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+                        GUI.log(i18n.getMessage('configurationEepromSaved'));
     
                         GUI.tab_switch_cleanup(function () {
                             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                                GUI.log(i18n.getMessage('deviceRebooting'));
                                 GUI.handleReconnect();
                             });
                         });
@@ -247,7 +290,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             $(this).parent().find('input[name="value-input"]').val(val);
-            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
+            FC.PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = val;
         });
 
         $(".pid-slider-row [name='value-input']").on('change', function () {
@@ -262,7 +305,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             $(this).parent().find('input[name="value-slider"]').val(newVal);
-            PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
+            FC.PIDs[$(this).parent().data('axis')][$(this).parent().data('bank')] = $(this).val();
         });
 
         let axis = 0;
@@ -275,21 +318,21 @@ TABS.pid_tuning.initialize = function (callback) {
                 let $this = $(this);
                 $this.data('axis', axis);
                 $this.data('bank', bank);
-                $this.find('input[name="value-input"]').val(PIDs[axis][bank]).trigger('change');
+                $this.find('input[name="value-input"]').val(FC.PIDs[axis][bank]).trigger('change');
                 bank++;
             });
         
             axis++;
         });
 
-        GUI.sliderize($('#rate_dynamics_center_sensitivity'), RATE_DYNAMICS.sensitivityCenter, 25, 175);
-        GUI.sliderize($('#rate_dynamics_end_sensitivity'), RATE_DYNAMICS.sensitivityEnd, 25, 175);
+        GUI.sliderize($('#rate_dynamics_center_sensitivity'), FC.RATE_DYNAMICS.sensitivityCenter, 25, 175);
+        GUI.sliderize($('#rate_dynamics_end_sensitivity'), FC.RATE_DYNAMICS.sensitivityEnd, 25, 175);
 
-        GUI.sliderize($('#rate_dynamics_center_correction'), RATE_DYNAMICS.correctionCenter, 10, 95);
-        GUI.sliderize($('#rate_dynamics_end_correction'), RATE_DYNAMICS.correctionEnd, 10, 95);
+        GUI.sliderize($('#rate_dynamics_center_correction'), FC.RATE_DYNAMICS.correctionCenter, 10, 95);
+        GUI.sliderize($('#rate_dynamics_end_correction'), FC.RATE_DYNAMICS.correctionEnd, 10, 95);
 
-        GUI.sliderize($('#rate_dynamics_center_weight'), RATE_DYNAMICS.weightCenter, 0, 95);
-        GUI.sliderize($('#rate_dynamics_end_weight'), RATE_DYNAMICS.weightEnd, 0, 95);
+        GUI.sliderize($('#rate_dynamics_center_weight'), FC.RATE_DYNAMICS.weightCenter, 0, 95);
+        GUI.sliderize($('#rate_dynamics_end_weight'), FC.RATE_DYNAMICS.weightEnd, 0, 95);
 
         if (!FC.isRpyFfComponentUsed()) {
             $('.rpy_ff').prop('disabled', 'disabled');
@@ -302,35 +345,35 @@ TABS.pid_tuning.initialize = function (callback) {
 
         // UI Hooks
 
-        $('a.refresh').click(function () {
+        $('a.refresh').on('click', function () {
             $("#content-watermark").remove();
             $(".tab-pid_tuning").remove();
 
             GUI.tab_switch_cleanup(function () {
-                GUI.log(chrome.i18n.getMessage('pidTuningDataRefreshed'));
+                GUI.log(i18n.getMessage('pidTuningDataRefreshed'));
                 TABS.pid_tuning.initialize();
             });
         });
 
         // update == save.
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             form_to_pid_and_rc();
 
             if ($("#ez_tune_enabled").is(":checked")) {
-                EZ_TUNE.enabled = 1;
+                FC.EZ_TUNE.enabled = 1;
             } else {
-                EZ_TUNE.enabled = 0;
+                FC.EZ_TUNE.enabled = 0;
             }
 
-            EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
-            EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
-            EZ_TUNE.response = $('#ez_tune_response').val();
-            EZ_TUNE.damping = $('#ez_tune_damping').val();
-            EZ_TUNE.stability = $('#ez_tune_stability').val();
-            EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
-            EZ_TUNE.rate = $('#ez_tune_rate').val();
-            EZ_TUNE.expo = $('#ez_tune_expo').val();
-            EZ_TUNE.snappiness = $('#ez_tune_snappiness').val();
+            FC.EZ_TUNE.filterHz = $('#ez_tune_filter_hz').val();
+            FC.EZ_TUNE.axisRatio = $('#ez_tune_axis_ratio').val();
+            FC.EZ_TUNE.response = $('#ez_tune_response').val();
+            FC.EZ_TUNE.damping = $('#ez_tune_damping').val();
+            FC.EZ_TUNE.stability = $('#ez_tune_stability').val();
+            FC.EZ_TUNE.aggressiveness = $('#ez_tune_aggressiveness').val();
+            FC.EZ_TUNE.rate = $('#ez_tune_rate').val();
+            FC.EZ_TUNE.expo = $('#ez_tune_expo').val();
+            FC.EZ_TUNE.snappiness = $('#ez_tune_snappiness').val();
 
             function send_rc_tuning_changes() {
                 MSP.send_message(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE, mspHelper.crunch(MSPCodes.MSPV2_INAV_SET_RATE_PROFILE), false, saveRateDynamics);
@@ -350,7 +393,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('pidTuningEepromSaved'));
+                    GUI.log(i18n.getMessage('pidTuningEepromSaved'));
                 });
             }
 

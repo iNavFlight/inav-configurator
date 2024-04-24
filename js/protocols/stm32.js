@@ -7,6 +7,14 @@
 */
 'use strict';
 
+const CONFIGURATOR = require('./../data_storage');
+const { GUI } = require('./../gui');
+const interval = require('./../intervals');
+const { usbDevices, PortHandler } = require('./../port_handler');
+const ConnectionSerial = require('./../connection/connectionSerial');
+const STM32DFU = require('./stm32usbdfu');
+const i18n = require('./../localization');
+
 var STM32_protocol = function () {
     this.baud;
     this.options = {};
@@ -81,7 +89,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
 
                 self.initialize();
             } else {
-                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
+                GUI.log(i18n.getMessage('failedToOpenSerialPort'));
             }
         });
     } else {
@@ -108,7 +116,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                                     retries++;
                                     if (retries > maxRetries) {
                                         clearInterval(interval);
-                                            GUI.log(chrome.i18n.getMessage('failedToFlash') + port);
+                                            GUI.log(i18n.getMessage('failedToFlash') + port);
                                     }
                                 }
                                 // Check for DFU devices
@@ -145,7 +153,7 @@ STM32_protocol.prototype.connect = function (port, baud, hex, options, callback)
                     });
                 });
             } else {
-                GUI.log(chrome.i18n.getMessage('failedToOpenSerialPort'));
+                GUI.log(i18n.getMessage('failedToOpenSerialPort'));
             }
         });
     }
@@ -170,11 +178,11 @@ STM32_protocol.prototype.initialize = function () {
     // lock some UI elements TODO needs rework
     $('select[name="release"]').prop('disabled', true);
 
-    CONFIGURATOR.connection.onReceive.addListener(function (info) {
+    CONFIGURATOR.connection.addOnReceiveCallback(function (info) {
         self.read(info);
     });
 
-    helper.interval.add('STM32_timeout', function () {
+    interval.add('STM32_timeout', function () {
         if (self.upload_process_alive) { // process is running
             self.upload_process_alive = false;
         } else {
@@ -183,10 +191,9 @@ STM32_protocol.prototype.initialize = function () {
             $('span.progressLabel').text('STM32 - timed out, programming: FAILED');
             self.progress_bar_e.addClass('invalid');
 
-            googleAnalytics.sendEvent('Flashing', 'Programming', 'timeout');
 
             // protocol got stuck, clear timer and disconnect
-            helper.interval.remove('STM32_timeout');
+            interval.remove('STM32_timeout');
 
             // exit
             self.upload_procedure(99);
@@ -381,10 +388,10 @@ STM32_protocol.prototype.upload_procedure = function (step) {
             $('span.progressLabel').text('Contacting bootloader ...');
 
             var send_counter = 0;
-            helper.interval.add('stm32_initialize_mcu', function () { // 200 ms interval (just in case mcu was already initialized), we need to break the 2 bytes command requirement
+            interval.add('stm32_initialize_mcu', function () { // 200 ms interval (just in case mcu was already initialized), we need to break the 2 bytes command requirement
                 self.send([0x7F], 1, function (reply) {
                     if (reply[0] == 0x7F || reply[0] == self.status.ACK || reply[0] == self.status.NACK) {
-                        helper.interval.remove('stm32_initialize_mcu');
+                        interval.remove('stm32_initialize_mcu');
                         console.log('STM32 - Serial interface initialized on the MCU side');
 
                         // proceed to next step
@@ -393,7 +400,7 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         $('span.progressLabel').text('Communication with bootloader failed');
                         self.progress_bar_e.addClass('invalid');
 
-                        helper.interval.remove('stm32_initialize_mcu');
+                        interval.remove('stm32_initialize_mcu');
 
                         // disconnect
                         self.upload_procedure(99);
@@ -407,8 +414,8 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                     $('span.progressLabel').text('No response from the bootloader, programming: FAILED');
                     self.progress_bar_e.addClass('invalid');
 
-                    helper.interval.remove('stm32_initialize_mcu');
-                    helper.interval.remove('STM32_timeout');
+                    interval.remove('stm32_initialize_mcu');
+                    interval.remove('STM32_timeout');
 
                     // exit
                     self.upload_procedure(99);
@@ -722,7 +729,6 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         if (verify) {
                             console.log('Programming: SUCCESSFUL');
                             $('span.progressLabel').text('Programming: SUCCESSFUL');
-                            googleAnalytics.sendEvent('Flashing', 'Programming', 'success');
 
                             // update progress bar
                             self.progress_bar_e.addClass('valid');
@@ -732,7 +738,6 @@ STM32_protocol.prototype.upload_procedure = function (step) {
                         } else {
                             console.log('Programming: FAILED');
                             $('span.progressLabel').text('Programming: FAILED');
-                            googleAnalytics.sendEvent('Flashing', 'Programming', 'fail');
 
                             // update progress bar
                             self.progress_bar_e.addClass('invalid');
@@ -769,7 +774,7 @@ STM32_protocol.prototype.upload_procedure = function (step) {
             break;
         case 99:
             // disconnect
-            helper.interval.remove('STM32_timeout'); // stop STM32 timeout timer (everything is finished now)
+            interval.remove('STM32_timeout'); // stop STM32 timeout timer (everything is finished now)
 
             // close connection
             CONFIGURATOR.connection.disconnect(function (result) {
@@ -793,3 +798,5 @@ STM32_protocol.prototype.upload_procedure = function (step) {
 
 // initialize object
 var STM32 = new STM32_protocol();
+
+module.exports = STM32;

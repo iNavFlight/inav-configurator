@@ -1,8 +1,15 @@
 'use strict';
 
-var helper = helper || {};
+const path = require('path');
+const ol = require('openlayers');
 
-helper.groundstation = (function () {
+const { GUI } = require('./gui');
+const ltmDecoder = require('./ltmDecoder');
+const interval = require('./intervals');
+const { globalSettings } = require('./globalSettings');
+const i18n = require('./localization');
+
+const groundstation = (function () {
 
     let publicScope = {},
         privateScope = {};
@@ -37,14 +44,15 @@ helper.groundstation = (function () {
             return;
         }
 
-        helper.interval.add('gsUpdateGui', privateScope.updateGui, 200);
+        interval.add('gsUpdateGui', privateScope.updateGui, 200);
 
         privateScope.$viewport = $viewport;
 
         privateScope.$viewport.find(".tab_container").hide();
         privateScope.$viewport.find('#content').hide();
         privateScope.$viewport.find('#status-bar').hide();
-        privateScope.$viewport.find('#connectbutton a.connect_state').text(chrome.i18n.getMessage('disconnect')).addClass('active');
+        privateScope.$viewport.find('#connectbutton a.connect_state').text(i18n.getMessage('disconnect'));
+        privateScope.$viewport.find('#connectbutton a.connect').addClass('active');
 
         privateScope.$gsViewport = $viewport.find('#view-groundstation');
         privateScope.$gsViewport.show();
@@ -53,7 +61,7 @@ helper.groundstation = (function () {
         setTimeout(privateScope.initMap, 100);
 
         privateScope.activated = true;
-        GUI.log(chrome.i18n.getMessage('gsActivated'));
+        GUI.log(i18n.getMessage('gsActivated'));
     }
 
     privateScope.initMap = function () {
@@ -98,7 +106,7 @@ helper.groundstation = (function () {
             return;
         }
 
-        helper.interval.remove('gsUpdateGui');
+        interval.remove('gsUpdateGui');
 
         if (privateScope.$viewport !== null) {
             privateScope.$viewport.find(".tab_container").show();
@@ -111,12 +119,12 @@ helper.groundstation = (function () {
         }
 
         privateScope.activated = false;
-        GUI.log(chrome.i18n.getMessage('gsDeactivated'));
+        GUI.log(i18n.getMessage('gsDeactivated'));
     }
 
     privateScope.updateGui = function () {
 
-        let telemetry = helper.ltmDecoder.get();
+        let telemetry = ltmDecoder.get();
 
         if (telemetry.gpsFix && telemetry.gpsFix > 1) {
 
@@ -132,7 +140,7 @@ helper.groundstation = (function () {
                         anchor: [0.5, 0.5],
                         opacity: 1,
                         scale: 0.6,
-                        src: '../images/icons/icon_mission_airplane.png'
+                        src: path.join(__dirname, './../images/icons/icon_mission_airplane.png')
                     }))
                 });
                 privateScope.cursorPosition = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
@@ -173,10 +181,10 @@ helper.groundstation = (function () {
             privateScope.$viewport.find("#gs-telemetry-longitude").html(lon);
         }
 
-        privateScope.$viewport.find("#gs-telemetry-altitude").html(telemetry.altitude / 100.0 + 'm');
-        privateScope.$viewport.find("#gs-telemetry-voltage").html(telemetry.voltage / 100.0 + 'V');
+        privateScope.$viewport.find("#gs-telemetry-altitude").html((telemetry.altitude / 100.0).toFixed(2) + 'm');
+        privateScope.$viewport.find("#gs-telemetry-voltage").html((telemetry.voltage / 1000.0).toFixed(2) + 'V');
         privateScope.$viewport.find("#gs-telemetry-sats").html(telemetry.gpsSats);
-        privateScope.$viewport.find("#gs-telemetry-speed").html(telemetry.groundSpeed * 100 + 'm/s');
+        privateScope.$viewport.find("#gs-telemetry-speed").html(telemetry.groundSpeed.toFixed(0) + 'm/s');
 
         let fixText = '';
         if (telemetry.gpsFix == 3) {
@@ -192,3 +200,5 @@ helper.groundstation = (function () {
 
     return publicScope;
 })();
+
+module.exports = groundstation;

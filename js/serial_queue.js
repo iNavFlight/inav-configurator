@@ -1,8 +1,12 @@
 'use strict';
 
-var helper = helper || {};
+const CONFIGURATOR = require('./data_storage');
+const MSPCodes = require('./msp/MSPCodes');
+const SimpleSmoothFilter = require('./simple_smooth_filter');
+const PidController = require('./pid_controller');
+const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
 
-helper.mspQueue = (function (MSP) {
+var mspQueue = function () {
 
     var publicScope = {},
         privateScope = {};
@@ -10,9 +14,9 @@ helper.mspQueue = (function (MSP) {
     privateScope.handlerFrequency = 100;
     privateScope.balancerFrequency = 20;
 
-    privateScope.loadFilter = new classes.SimpleSmoothFilter(1, 0.85);
-    privateScope.roundtripFilter = new classes.SimpleSmoothFilter(20, 0.95);
-    privateScope.hardwareRoundtripFilter = new classes.SimpleSmoothFilter(10, 0.95);
+    privateScope.loadFilter = new SimpleSmoothFilter(1, 0.85);
+    privateScope.roundtripFilter = new SimpleSmoothFilter(20, 0.95);
+    privateScope.hardwareRoundtripFilter = new SimpleSmoothFilter(10, 0.95);
 
     /**
      * Target load for MSP queue. When load is above target, throttling might start to appear
@@ -25,15 +29,18 @@ helper.mspQueue = (function (MSP) {
 
     /**
      * PID controller used to perform throttling
-     * @type {classes.PidController}
+     * @type {PidController}
      */
-    privateScope.loadPidController = new classes.PidController();
+    privateScope.loadPidController = new PidController();
     privateScope.loadPidController.setTarget(privateScope.targetLoad);
     privateScope.loadPidController.setOutput(0, 99, 0);
     privateScope.loadPidController.setGains(5, 6, 3);
     privateScope.loadPidController.setItermLimit(0, 90);
 
     privateScope.dropRatio = 0;
+
+    privateScope.removeCallback = null;
+    privateScope.putCallback = null;
 
     publicScope.computeDropRatio = function () {
         privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
@@ -51,6 +58,14 @@ helper.mspQueue = (function (MSP) {
     privateScope.lockMethod = 'soft';
 
     privateScope.queueLocked = false;
+
+    publicScope.setremoveCallback = function(cb) {
+        privateScope.removeCallback = cb;
+    }
+
+    publicScope.setPutCallback = function(cb) {
+        privateScope.putCallback = cb;
+    }
 
     /**
      * Method locks queue
@@ -121,7 +136,7 @@ helper.mspQueue = (function (MSP) {
         /*
          * Debug
          */
-        helper.eventFrequencyAnalyzer.put("execute");
+        eventFrequencyAnalyzer.put("execute");
 
         privateScope.loadFilter.apply(privateScope.queue.length);
 
@@ -129,7 +144,7 @@ helper.mspQueue = (function (MSP) {
          * if port is blocked or there is no connection, do not process the queue
          */
         if (publicScope.isLocked() || CONFIGURATOR.connection === false) {
-            helper.eventFrequencyAnalyzer.put("port in use");
+            eventFrequencyAnalyzer.put("port in use");
             return false;
         }
 
@@ -148,7 +163,8 @@ helper.mspQueue = (function (MSP) {
                 /*
                  * Remove current callback
                  */
-                MSP.removeCallback(request.code);
+                
+                privateScope.removeCallback(request.code);
 
                 /*
                  * To prevent infinite retry situation, allow retry only while counter is positive
@@ -171,9 +187,9 @@ helper.mspQueue = (function (MSP) {
             /*
              * Set receive callback here
              */
-            MSP.putCallback(request);
+            privateScope.putCallback(request);
 
-            helper.eventFrequencyAnalyzer.put('message sent');
+            eventFrequencyAnalyzer.put('message sent');
 
             /*
              * Send data to serial port
@@ -253,7 +269,7 @@ helper.mspQueue = (function (MSP) {
 
     publicScope.balancer = function () {
         privateScope.currentLoad = privateScope.loadFilter.get();
-        helper.mspQueue.computeDropRatio();
+        publicScope.computeDropRatio();
 
         /*
          * Also, check if port lock if hanging. Free is so
@@ -267,11 +283,11 @@ helper.mspQueue = (function (MSP) {
 
         if (privateScope.softLock !== false && currentTimestamp - privateScope.softLock > threshold) {
             privateScope.softLock = false;
-            helper.eventFrequencyAnalyzer.put('force free soft lock');
+            eventFrequencyAnalyzer.put('force free soft lock');
         }
         if (privateScope.hardLock !== false && currentTimestamp - privateScope.hardLock > threshold) {
             privateScope.hardLock = false;
-            helper.eventFrequencyAnalyzer.put('force free hard lock');
+            eventFrequencyAnalyzer.put('force free hard lock');
         }
 
     };
@@ -305,4 +321,6 @@ helper.mspQueue = (function (MSP) {
     setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancerFrequency));
 
     return publicScope;
-})(MSP);
+}();
+
+module.exports = mspQueue;

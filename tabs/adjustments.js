@@ -1,12 +1,23 @@
-/*global $*/
 'use strict';
+
+const path = require('path');
+const wNumb = require('wnumb/wNumb')
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const mspQueue = require('./../js/serial_queue');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const i18n = require('./../js/localization');
+
 
 TABS.adjustments = {};
 
 TABS.adjustments.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
-    googleAnalytics.sendAppView('Adjustments');
 
     function get_adjustment_ranges() {
         MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
@@ -21,7 +32,7 @@ TABS.adjustments.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load("./tabs/adjustments.html", process_html);
+        GUI.load(path.join(__dirname, "adjustments.html"), process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
@@ -133,7 +144,7 @@ TABS.adjustments.initialize = function (callback) {
 
         var enableElement = $(newAdjustment).find('.enable');
         $(enableElement).data('adjustmentElement', newAdjustment);
-        $(enableElement).change(function() {
+        $(enableElement).on('change', function () {
             var adjustmentElement = $(this).data('adjustmentElement');
             if ($(this).prop("checked")) {
                 $(adjustmentElement).find(':input').prop("disabled", false);
@@ -154,31 +165,31 @@ TABS.adjustments.initialize = function (callback) {
         });
 
         var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end);
-        $(enableElement).prop("checked", isEnabled).change();
+        $(enableElement).prop("checked", isEnabled).trigger('change');
 
         return newAdjustment;
     }
 
     function process_html() {
 
-        var auxChannelCount = RC.active_channels - 4;
+        var auxChannelCount = FC.RC.active_channels - 4;
 
         var modeTableBodyElement = $('.tab-adjustments .adjustments tbody')
-        for (var adjustmentIndex = 0; adjustmentIndex < ADJUSTMENT_RANGES.length; adjustmentIndex++) {
-            var newAdjustment = addAdjustment(adjustmentIndex, ADJUSTMENT_RANGES[adjustmentIndex], auxChannelCount);
+        for (var adjustmentIndex = 0; adjustmentIndex < FC.ADJUSTMENT_RANGES.length; adjustmentIndex++) {
+            var newAdjustment = addAdjustment(adjustmentIndex, FC.ADJUSTMENT_RANGES[adjustmentIndex], auxChannelCount);
             modeTableBodyElement.append(newAdjustment);
         }
 
         // translate to user-selected language
-        localize();
+       i18n.localize();;
 
         // UI Hooks
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
 
             // update internal data structures based on current UI elements
-            var requiredAdjustmentRangeCount = ADJUSTMENT_RANGES.length;
+            var requiredAdjustmentRangeCount = FC.ADJUSTMENT_RANGES.length;
 
-            ADJUSTMENT_RANGES = [];
+            FC.ADJUSTMENT_RANGES = [];
 
             var defaultAdjustmentRange = {
                 slotIndex: 0,
@@ -206,14 +217,14 @@ TABS.adjustments.initialize = function (callback) {
                         adjustmentFunction: parseInt($(this).find('.functionSelection .function').val()),
                         auxSwitchChannelIndex: parseInt($(this).find('.functionSwitchChannel .channel').val())
                     };
-                    ADJUSTMENT_RANGES.push(adjustmentRange);
+                    FC.ADJUSTMENT_RANGES.push(adjustmentRange);
                 } else {
-                    ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
+                    FC.ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
                 }
             });
 
-            for (var adjustmentRangeIndex = ADJUSTMENT_RANGES.length; adjustmentRangeIndex < requiredAdjustmentRangeCount; adjustmentRangeIndex++) {
-                ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
+            for (var adjustmentRangeIndex = FC.ADJUSTMENT_RANGES.length; adjustmentRangeIndex < requiredAdjustmentRangeCount; adjustmentRangeIndex++) {
+                FC.ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
             }
 
             //
@@ -223,7 +234,7 @@ TABS.adjustments.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('adjustmentsEepromSaved'));
+                    GUI.log(i18n.getMessage('adjustmentsEepromSaved'));
                 });
             }
 
@@ -250,7 +261,7 @@ TABS.adjustments.initialize = function (callback) {
         // data pulling functions used inside interval timer
         function get_rc_data() {
 
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 return;
             }
 
@@ -258,10 +269,10 @@ TABS.adjustments.initialize = function (callback) {
         }
 
         function update_ui() {
-            var auxChannelCount = RC.active_channels - 4;
+            var auxChannelCount = FC.RC.active_channels - 4;
 
             for (var auxChannelIndex = 0; auxChannelIndex < auxChannelCount; auxChannelIndex++) {
-                update_marker(auxChannelIndex, RC.channels[auxChannelIndex + 4]);
+                update_marker(auxChannelIndex, FC.RC.channels[auxChannelIndex + 4]);
             }
         }
 
@@ -269,7 +280,7 @@ TABS.adjustments.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        helper.mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
+        mspBalancedInterval.add('aux_data_pull', 50, 1, get_rc_data);
 
         GUI.content_ready(callback);
     }

@@ -1,5 +1,6 @@
-/*global $, MotorMixRule*/
 'use strict';
+
+const MotorMixRule = require('./motorMixRule');
 
 var MotorMixerRuleCollection = function () {
 
@@ -72,3 +73,5 @@ var MotorMixerRuleCollection = function () {
 
     return self;
 };
+
+module.exports = MotorMixerRuleCollection;
