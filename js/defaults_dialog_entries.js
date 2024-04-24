@@ -1,6 +1,6 @@
-var helper = helper || {};
+'use strict';
 
-helper.defaultsDialogData = [
+var defaultsDialogData = [
     {
         "title": 'Mini Quad with 3" propellers',
         "id": 6,
@@ -424,10 +424,6 @@ helper.defaultsDialogData = [
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -633,10 +629,6 @@ helper.defaultsDialogData = [
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -822,10 +814,6 @@ helper.defaultsDialogData = [
                 value: 10
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "STANDARD"
             },
@@ -884,3 +872,5 @@ helper.defaultsDialogData = [
         ]
     }
 ];
+
+module.exports = defaultsDialogData;

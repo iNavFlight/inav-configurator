@@ -1,8 +1,17 @@
-/*global $,MSP,MSPCodes,TABS,GUI,CONFIGURATOR,helper,mspHelper,nwdialog,SDCARD,chrome*/
 'use strict';
 
-var
-    sdcardTimer;
+const path = require('path');
+
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const CONFIGURATOR = require('./../js/data_storage');
+const features = require('./../js/feature_framework');
+const i18n = require('./../js/localization');
+const BitHelper = require('./../js/bitHelper');
+
+var sdcardTimer;
 
 TABS.onboard_logging = {
 };
@@ -30,7 +39,6 @@ TABS.onboard_logging.initialize = function (callback) {
 
     if (GUI.active_tab != 'onboard_logging') {
         GUI.active_tab = 'onboard_logging';
-        googleAnalytics.sendAppView('onboard_logging');
     }
 
     if (CONFIGURATOR.connectionValid) {
@@ -55,7 +63,7 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reboot() {
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function() {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -63,61 +71,61 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function reinitialize() {
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_onboard_logging a'));
     }
 
     function load_html() {
-        GUI.load("./tabs/onboard_logging.html", function() {
+        GUI.load(path.join(__dirname, "onboard_logging.html"), function() {
             // translate to user-selected language
-            localize();
+           i18n.localize();;
 
             var
-                dataflashPresent = DATAFLASH.totalSize > 0,
+                dataflashPresent = FC.DATAFLASH.totalSize > 0,
                 blackboxSupport = false;
 
-            if ((BLACKBOX.supported || DATAFLASH.supported) && bit_check(FEATURES, 19)) {
+            if ((FC.BLACKBOX.supported || FC.DATAFLASH.supported) && BitHelper.bit_check(FC.FEATURES, 19)) {
                 blackboxSupport = true;
             }
 
             $(".tab-onboard_logging")
                 .addClass("serial-supported")
-                .toggleClass("dataflash-supported", DATAFLASH.supported)
+                .toggleClass("dataflash-supported", FC.DATAFLASH.supported)
                 .toggleClass("dataflash-present", dataflashPresent)
-                .toggleClass("sdcard-supported", SDCARD.supported)
-                .toggleClass("blackbox-config-supported", BLACKBOX.supported)
+                .toggleClass("sdcard-supported", FC.SDCARD.supported)
+                .toggleClass("blackbox-config-supported", FC.BLACKBOX.supported)
                 .toggleClass("blackbox-supported", blackboxSupport)
                 .toggleClass("blackbox-unsupported", !blackboxSupport);
 
             if (dataflashPresent) {
                 // UI hooks
-                $('.tab-onboard_logging a.erase-flash').click(ask_to_erase_flash);
+                $('.tab-onboard_logging a.erase-flash').on('click', ask_to_erase_flash);
 
-                $('.tab-onboard_logging a.erase-flash-confirm').click(flash_erase);
-                $('.tab-onboard_logging a.erase-flash-cancel').click(flash_erase_cancel);
+                $('.tab-onboard_logging a.erase-flash-confirm').on('click', flash_erase);
+                $('.tab-onboard_logging a.erase-flash-cancel').on('click', flash_erase_cancel);
 
-                $('.tab-onboard_logging a.save-flash').click(flash_save_begin);
-                $('.tab-onboard_logging a.save-flash-cancel').click(flash_save_cancel);
-                $('.tab-onboard_logging a.save-flash-dismiss').click(dismiss_saving_dialog);
+                $('.tab-onboard_logging a.save-flash').on('click', flash_save_begin);
+                $('.tab-onboard_logging a.save-flash-cancel').on('click', flash_save_cancel);
+                $('.tab-onboard_logging a.save-flash-dismiss').on('click', dismiss_saving_dialog);
             }
 
-            $('.save-blackbox-feature').click(function () {
-                helper.features.reset();
-                helper.features.fromUI($('.require-blackbox-unsupported'));
-                helper.features.execute(save_to_eeprom);
+            $('.save-blackbox-feature').on('click', function () {
+                features.reset();
+                features.fromUI($('.require-blackbox-unsupported'));
+                features.execute(save_to_eeprom);
             });
 
-            if (BLACKBOX.supported) {
-                $(".tab-onboard_logging a.save-settings").click(function() {
+            if (FC.BLACKBOX.supported) {
+                $(".tab-onboard_logging a.save-settings").on('click', function () {
                     var rate = $(".blackboxRate select").val().split('/');
 
-                    BLACKBOX.blackboxRateNum = parseInt(rate[0], 10);
-                    BLACKBOX.blackboxRateDenom = parseInt(rate[1], 10);
-                    BLACKBOX.blackboxDevice = parseInt($(".blackboxDevice select").val(), 10);
-                    BLACKBOX.blackboxIncludeFlags = getIncludeFlags();
-                    helper.features.reset();
-                    helper.features.fromUI($('.require-blackbox-supported'));
-                    helper.features.execute(function () {
+                    FC.BLACKBOX.blackboxRateNum = parseInt(rate[0], 10);
+                    FC.BLACKBOX.blackboxRateDenom = parseInt(rate[1], 10);
+                    FC.BLACKBOX.blackboxDevice = parseInt($(".blackboxDevice select").val(), 10);
+                    FC.BLACKBOX.blackboxIncludeFlags = getIncludeFlags();
+                    features.reset();
+                    features.fromUI($('.require-blackbox-supported'));
+                    features.execute(function () {
                         mspHelper.sendBlackboxConfiguration(save_to_eeprom);
                     });
                 });
@@ -127,7 +135,7 @@ TABS.onboard_logging.initialize = function (callback) {
             const blackboxFieldsDiv = $("#blackBoxFlagsDiv");
             for (let i = 0; i < blackBoxFields.length; i++) {
                 const FIELD_ID = blackBoxFields[i];
-                const isEnabled = (BLACKBOX.blackboxIncludeFlags & 1<<i) !==0;
+                const isEnabled = (FC.BLACKBOX.blackboxIncludeFlags & 1<<i) !==0;
                 const input = $('<input type="checkbox" class="toggle feature" />')
                 input.attr("id",FIELD_ID);
                 input.attr("checked",isEnabled);
@@ -136,7 +144,7 @@ TABS.onboard_logging.initialize = function (callback) {
                 label.attr("for",FIELD_ID)
 
                 const span = $('<span></span>');
-                span.html(chrome.i18n.getMessage(FIELD_ID))
+                span.html(i18n.getMessage(FIELD_ID))
                 label.append(span);
 
                 const checkbox = $('<div class="checkbox"></div>')
@@ -160,20 +168,20 @@ TABS.onboard_logging.initialize = function (callback) {
             deviceSelect = $(".blackboxDevice select").empty();
 
         deviceSelect.append('<option value="0">Serial port</option>');
-        if (DATAFLASH.ready) {
+        if (FC.DATAFLASH.ready) {
             deviceSelect.append('<option value="1">On-board dataflash chip</option>');
         }
-        if (SDCARD.supported) {
+        if (FC.SDCARD.supported) {
             deviceSelect.append('<option value="2">On-board SD card slot</option>');
         }
 
-        deviceSelect.val(BLACKBOX.blackboxDevice);
+        deviceSelect.val(FC.BLACKBOX.blackboxDevice);
     }
 
     function populateLoggingRates() {
         var
-            userRateGCD = gcd(BLACKBOX.blackboxRateNum, BLACKBOX.blackboxRateDenom),
-            userRate = {num: BLACKBOX.blackboxRateNum / userRateGCD, denom: BLACKBOX.blackboxRateDenom / userRateGCD};
+            userRateGCD = gcd(FC.BLACKBOX.blackboxRateNum, FC.BLACKBOX.blackboxRateDenom),
+            userRate = {num: FC.BLACKBOX.blackboxRateNum / userRateGCD, denom: FC.BLACKBOX.blackboxRateDenom / userRateGCD};
 
         // Offer a reasonable choice of logging rates (if people want weird steps they can use CLI)
         var
@@ -253,20 +261,20 @@ TABS.onboard_logging.initialize = function (callback) {
     }
 
     function update_html() {
-        update_bar_width($(".tab-onboard_logging .dataflash-used"), DATAFLASH.usedSize, DATAFLASH.totalSize, "Used space", false);
-        update_bar_width($(".tab-onboard_logging .dataflash-free"), DATAFLASH.totalSize - DATAFLASH.usedSize, DATAFLASH.totalSize, "Free space", false);
+        update_bar_width($(".tab-onboard_logging .dataflash-used"), FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Used space", false);
+        update_bar_width($(".tab-onboard_logging .dataflash-free"), FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize, FC.DATAFLASH.totalSize, "Free space", false);
 
-        update_bar_width($(".tab-onboard_logging .sdcard-other"), SDCARD.totalSizeKB - SDCARD.freeSizeKB, SDCARD.totalSizeKB, "Unavailable space", true);
-        update_bar_width($(".tab-onboard_logging .sdcard-free"), SDCARD.freeSizeKB, SDCARD.totalSizeKB, "Free space for logs", true);
+        update_bar_width($(".tab-onboard_logging .sdcard-other"), FC.SDCARD.totalSizeKB - FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Unavailable space", true);
+        update_bar_width($(".tab-onboard_logging .sdcard-free"), FC.SDCARD.freeSizeKB, FC.SDCARD.totalSizeKB, "Free space for logs", true);
 
-        $(".btn a.erase-flash, .btn a.save-flash").toggleClass("disabled", DATAFLASH.usedSize == 0);
+        $(".btn a.erase-flash, .btn a.save-flash").toggleClass("disabled", FC.DATAFLASH.usedSize == 0);
 
         $(".tab-onboard_logging")
-            .toggleClass("sdcard-error", SDCARD.state == MSP.SDCARD_STATE_FATAL)
-            .toggleClass("sdcard-initializing", SDCARD.state == MSP.SDCARD_STATE_CARD_INIT || SDCARD.state == MSP.SDCARD_STATE_FS_INIT)
-            .toggleClass("sdcard-ready", SDCARD.state == MSP.SDCARD_STATE_READY);
+            .toggleClass("sdcard-error", FC.SDCARD.state == MSP.SDCARD_STATE_FATAL)
+            .toggleClass("sdcard-initializing", FC.SDCARD.state == MSP.SDCARD_STATE_CARD_INIT || FC.SDCARD.state == MSP.SDCARD_STATE_FS_INIT)
+            .toggleClass("sdcard-ready", FC.SDCARD.state == MSP.SDCARD_STATE_READY);
 
-        switch (SDCARD.state) {
+        switch (FC.SDCARD.state) {
             case MSP.SDCARD_STATE_NOT_PRESENT:
                 $(".sdcard-status").text("No card inserted");
             break;
@@ -283,10 +291,10 @@ TABS.onboard_logging.initialize = function (callback) {
                 $(".sdcard-status").text("Filesystem starting...");
             break;
             default:
-                $(".sdcard-status").text("Unknown state " + SDCARD.state);
+                $(".sdcard-status").text("Unknown state " + FC.SDCARD.state);
         }
 
-        if (SDCARD.supported && !sdcardTimer) {
+        if (FC.SDCARD.supported && !sdcardTimer) {
             // Poll for changes in SD card status
             sdcardTimer = setTimeout(function() {
                 sdcardTimer = false;
@@ -344,7 +352,7 @@ TABS.onboard_logging.initialize = function (callback) {
         if (GUI.connected_to) {
             // Begin by refreshing the occupied size in case it changed while the tab was open
             flash_update_summary(function() {
-                const maxBytes = DATAFLASH.usedSize;
+                const maxBytes = FC.DATAFLASH.usedSize;
 
                 prepare_file(function(filename) {
                     const fs = require('fs');
@@ -395,9 +403,15 @@ TABS.onboard_logging.initialize = function (callback) {
                 + zeroPad(date.getDate(), 2) + '_' + zeroPad(date.getHours(), 2) + zeroPad(date.getMinutes(), 2)
                 + zeroPad(date.getSeconds(), 2) + '.TXT';
 
-        nwdialog.setContext(document);
-        nwdialog.saveFileDialog(filename, function(file) {
-            onComplete(file);
+        var options = {
+            defaultPath: filename,
+            filters: [ { name: "TXT file", extensions: ['txt'] } ]
+        };
+        dialog.showSaveDialog(options).then(result => {
+            if (result.canceled) {
+                return;
+            }
+            onComplete(result.filePath);
         });
     }
 
@@ -410,7 +424,7 @@ TABS.onboard_logging.initialize = function (callback) {
     function poll_for_erase_completion() {
         flash_update_summary(function() {
             if (CONFIGURATOR.connectionValid && !eraseCancelled) {
-                if (DATAFLASH.ready) {
+                if (FC.DATAFLASH.ready) {
                     $(".dataflash-confirm-erase")[0].close();
                 } else {
                     setTimeout(poll_for_erase_completion, 500);

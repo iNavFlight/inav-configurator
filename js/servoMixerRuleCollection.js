@@ -1,7 +1,8 @@
-/*global ServoMixRule*/
 'use strict';
 
-let ServoMixerRuleCollection = function () {
+const ServoMixRule = require('./servoMixRule');
+
+var ServoMixerRuleCollection = function () {
 
     let self = {},
         data = [],
@@ -156,3 +157,5 @@ let ServoMixerRuleCollection = function () {
 
     return self;
 };
+
+module.exports = ServoMixerRuleCollection;

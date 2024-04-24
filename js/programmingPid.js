@@ -1,5 +1,7 @@
-/*global $,FC*/
 'use strict';
+
+const FC = require('./fc');
+const { GUI } = require('./gui');
 
 let ProgrammingPid = function (enabled, setpointType, setpointValue, measurementType, measurementValue, gainP, gainI, gainD, gainFF) {
     let self = {};
@@ -140,16 +142,16 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         self.renderOperand(1);
 
         $row.find(".pid_cell__p").html('<input type="number" class="pid_cell__p-gain" step="1" min="0" max="32767" value="0">');
-        $row.find(".pid_cell__p-gain").val(self.getGainP()).change(self.onGainPChange);
+        $row.find(".pid_cell__p-gain").val(self.getGainP()).on('change', self.onGainPChange);
 
         $row.find(".pid_cell__i").html('<input type="number" class="pid_cell__i-gain" step="1" min="0" max="32767" value="0">');
-        $row.find(".pid_cell__i-gain").val(self.getGainI()).change(self.onGainIChange);
+        $row.find(".pid_cell__i-gain").val(self.getGainI()).on('change', self.onGainIChange);
 
         $row.find(".pid_cell__d").html('<input type="number" class="pid_cell__d-gain" step="1" min="0" max="32767" value="0">');
-        $row.find(".pid_cell__d-gain").val(self.getGainD()).change(self.onGainDChange);
+        $row.find(".pid_cell__d-gain").val(self.getGainD()).on('change', self.onGainDChange);
 
         $row.find(".pid_cell__ff").html('<input type="number" class="pid_cell__ff-gain" step="1" min="0" max="32767" value="0">');
-        $row.find(".pid_cell__ff-gain").val(self.getGainFF()).change(self.onGainFFChange);
+        $row.find(".pid_cell__ff-gain").val(self.getGainFF()).on('change', self.onGainFFChange);
 
     }
 
@@ -208,7 +210,7 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
         /*
         * Bind events
         */
-        $t.change(self.onOperatorTypeChange);
+        $t.on('change', self.onOperatorTypeChange);
 
     }
 
@@ -222,3 +224,5 @@ let ProgrammingPid = function (enabled, setpointType, setpointValue, measurement
 
     return self;
 };
+
+module.exports = ProgrammingPid;

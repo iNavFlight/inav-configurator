@@ -1,5 +1,22 @@
-/*global helper,MSP,MSPChainerClass,googleAnalytics,GUI,mspHelper,MOTOR_RULES,TABS,$,MSPCodes,ANALOG,MOTOR_DATA,chrome,PLATFORM_MULTIROTOR,PLATFORM_TRICOPTER,SERVO_RULES,FC,SERVO_CONFIG,SENSOR_DATA,REVERSIBLE_MOTORS,MISC,MIXER_CONFIG,OUTPUT_MAPPING*/
 'use strict';
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue')
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const i18n = require('./../js/localization');
+const BitHelper = require('../js/bitHelper');
+const Settings = require('./../js/settings');
+const features = require('./../js/feature_framework');
+const { mixer, PLATFORM } = require('./../js/model');
+const timeout = require('./../js/timeouts')
+const interval = require('./../js/intervals');
 
 TABS.outputs = {
     allowTestMode: false,
@@ -17,7 +34,6 @@ TABS.outputs.initialize = function (callback) {
 
     if (GUI.active_tab !== 'outputs') {
         GUI.active_tab = 'outputs';
-        googleAnalytics.sendAppView('Outputs');
     }
 
     var loadChainer = new MSPChainerClass();
@@ -30,7 +46,6 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.loadMotorMixRules,
         mspHelper.loadServoMixRules,
         mspHelper.loadMixerConfig,
-        mspHelper.loadServoMixRules,
         mspHelper.loadServoConfiguration,
         mspHelper.loadOutputMapping,
         mspHelper.loadRcData,
@@ -56,12 +71,12 @@ TABS.outputs.initialize = function (callback) {
         mspHelper.saveToEeprom
     ]);
     saveChainer.setExitPoint(function () {
-        GUI.log(chrome.i18n.getMessage('eeprom_saved_ok'));
-        MOTOR_RULES.cleanup();
+        GUI.log(i18n.getMessage('eeprom_saved_ok'));
+        FC.MOTOR_RULES.cleanup();
     });
 
     function load_html() {
-        GUI.load("./tabs/outputs.html", Settings.processHtml(onLoad));
+        GUI.load(path.join(__dirname, "outputs.html"), Settings.processHtml(onLoad));
     }
 
     function saveSettings(onComplete) {
@@ -70,7 +85,7 @@ TABS.outputs.initialize = function (callback) {
 
     function onLoad() {
 
-        self.feature3DEnabled = bit_check(FEATURES, 12);
+        self.feature3DEnabled = BitHelper.bit_check(FC.FEATURES, 12);
 
         process_motors();
         process_servos();
@@ -82,8 +97,8 @@ TABS.outputs.initialize = function (callback) {
     function getMotorOutputValue(value) {
 
         if (!self.feature3DEnabled) {
-            let valueNormalized = value - MISC.mincommand;
-            let maxThrottleNormalized = MISC.maxthrottle - MISC.mincommand;
+            let valueNormalized = value - FC.MISC.mincommand;
+            let maxThrottleNormalized = FC.MISC.maxthrottle - FC.MISC.mincommand;
 
             return Math.round(100 * valueNormalized / maxThrottleNormalized) + "%";
         } else {
@@ -101,17 +116,17 @@ TABS.outputs.initialize = function (callback) {
 
         function handleIdleMessageBox() {
             $idleInfoBox.hide();
-            if (ADVANCED_CONFIG.motorPwmProtocol >= 5) {
+            if (FC.ADVANCED_CONFIG.motorPwmProtocol >= 5) {
                 $('.hide-for-shot').hide();
                 if ($idlePercent.val() > 7.0) {
-                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleDigitalInfo'));
+                    $idleInfoBox.html(i18n.getMessage('throttleIdleDigitalInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
             } else {
                 $('.hide-for-shot').show();
                 if ($idlePercent.val() > 10.0) {
-                    $idleInfoBox.html(chrome.i18n.getMessage('throttleIdleAnalogInfo'));
+                    $idleInfoBox.html(i18n.getMessage('throttleIdleAnalogInfo'));
                     $idleInfoBox.addClass('ok-box');
                     $idleInfoBox.show();
                 }
@@ -120,27 +135,27 @@ TABS.outputs.initialize = function (callback) {
 
         let $escProtocol = $('#esc-protocol');
         
-        for (i in escProtocols) {
+        for (let i in escProtocols) {
             if (escProtocols.hasOwnProperty(i)) {
                 var protocolData = escProtocols[i];
                 $escProtocol.append('<option value="' + i + '">' + protocolData.name + '</option>');
             }
         }
 
-        $escProtocol.val(ADVANCED_CONFIG.motorPwmProtocol);
+        $escProtocol.val(FC.ADVANCED_CONFIG.motorPwmProtocol);
 
-        $escProtocol.change(function () {
-            ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
+        $escProtocol.on('change', function () {
+            FC.ADVANCED_CONFIG.motorPwmProtocol = $(this).val();
         });
 
-        $idlePercent.change(handleIdleMessageBox);
+        $idlePercent.on('change', handleIdleMessageBox);
         handleIdleMessageBox();
 
         $("#esc-protocols").show();
 
         let $servoRate = $('#servo-rate');
 
-        for (i in servoRates) {
+        for (let i in servoRates) {
             if (servoRates.hasOwnProperty(i)) {
                 $servoRate.append('<option value="' + i + '">' + servoRates[i] + '</option>');
             }
@@ -148,18 +163,18 @@ TABS.outputs.initialize = function (callback) {
         /*
          *  If rate from FC is not on the list, add a new entry
          */
-        if ($servoRate.find('[value="' + ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
-            $servoRate.append('<option value="' + ADVANCED_CONFIG.servoPwmRate + '">' + ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
+        if ($servoRate.find('[value="' + FC.ADVANCED_CONFIG.servoPwmRate + '"]').length == 0) {
+            $servoRate.append('<option value="' + FC.ADVANCED_CONFIG.servoPwmRate + '">' + FC.ADVANCED_CONFIG.servoPwmRate + 'Hz</option>');
         }
 
-        $servoRate.val(ADVANCED_CONFIG.servoPwmRate);
-        $servoRate.change(function () {
-            ADVANCED_CONFIG.servoPwmRate = $(this).val();
+        $servoRate.val(FC.ADVANCED_CONFIG.servoPwmRate);
+        $servoRate.on('change', function () {
+            FC.ADVANCED_CONFIG.servoPwmRate = $(this).val();
         });
 
         $('#servo-rate-container').show();
 
-        helper.features.updateUI($('.tab-motors'), FEATURES);
+        features.updateUI($('.tab-motors'), FC.FEATURES);
         GUI.simpleBind();
 
         let $reversibleMotorCheckbox = $('#feature-12');
@@ -174,12 +189,12 @@ TABS.outputs.initialize = function (callback) {
                 $reversibleMotorBox.hide();
             }
         }
-        $reversibleMotorCheckbox.change(showHideReversibleMotorInfo);
+        $reversibleMotorCheckbox.on('change', showHideReversibleMotorInfo);
         showHideReversibleMotorInfo();
 
         let $motorStopCheckbox = $('#feature-4');
         function showHideMotorStopWarning() {
-            const platformNeedsMotorStop = [PLATFORM_AIRPLANE, PLATFORM_ROVER, PLATFORM_BOAT].includes(MIXER_CONFIG.platformType);
+            const platformNeedsMotorStop = [PLATFORM.AIRPLANE, PLATFORM.ROVER, PLATFORM.BOAT].includes(FC.MIXER_CONFIG.platformType);
             const motorStopEnabled = $motorStopCheckbox.is(':checked');
             if (platformNeedsMotorStop && motorStopEnabled || !platformNeedsMotorStop && !motorStopEnabled) {
                 $motorStopWarningBox.hide();
@@ -187,12 +202,12 @@ TABS.outputs.initialize = function (callback) {
                 $motorStopWarningBox.show();
             }
         }
-        $motorStopCheckbox.change(showHideMotorStopWarning);
+        $motorStopCheckbox.on('change', showHideMotorStopWarning);
         showHideMotorStopWarning();
 
-        $('#3ddeadbandlow').val(REVERSIBLE_MOTORS.deadband_low);
-        $('#3ddeadbandhigh').val(REVERSIBLE_MOTORS.deadband_high);
-        $('#3dneutral').val(REVERSIBLE_MOTORS.neutral);
+        $('#3ddeadbandlow').val(FC.REVERSIBLE_MOTORS.deadband_low);
+        $('#3ddeadbandhigh').val(FC.REVERSIBLE_MOTORS.deadband_high);
+        $('#3dneutral').val(FC.REVERSIBLE_MOTORS.neutral);
     }
 
     function update_arm_status() {
@@ -201,7 +216,7 @@ TABS.outputs.initialize = function (callback) {
 
     function initSensorData() {
         for (var i = 0; i < 3; i++) {
-            SENSOR_DATA.accelerometer[i] = 0;
+            FC.SENSOR_DATA.accelerometer[i] = 0;
         }
     }
 
@@ -227,7 +242,7 @@ TABS.outputs.initialize = function (callback) {
             }
         }
         while (data[0].length > 40) {
-            for (i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 data[i].shift();
             }
         }
@@ -235,13 +250,13 @@ TABS.outputs.initialize = function (callback) {
     }
 
     function update_model(val) {
-        if (MIXER_CONFIG.appliedMixerPreset == -1) return;
+        if (FC.MIXER_CONFIG.appliedMixerPreset == -1) return;
 
         const isMotorInverted = self.motorDirectionInverted;
-        const isReversed = isMotorInverted && (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+        const isReversed = isMotorInverted && (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
 
         const path = './resources/motor_order/'
-            + helper.mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
+            + mixer.getById(val).image + (isReversed ? "_reverse" : "") + '.svg';
         $('.mixerPreview img').attr('src', path);
     }
 
@@ -252,7 +267,7 @@ TABS.outputs.initialize = function (callback) {
             $servoConfigTableContainer = $('#servo-config-table-container'),
             $servoConfigTable = $('#servo-config-table');
 
-        if (SERVO_CONFIG.length == 0) {
+        if (FC.SERVO_CONFIG.length == 0) {
             $tabServos.addClass("is-hidden");
             return;
         }
@@ -262,9 +277,9 @@ TABS.outputs.initialize = function (callback) {
             $servoConfigTable.append('\
                 <tr> \
                     <td class="text-center">' + name + '</td>\
-                    <td class="middle"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].middle + '" /></td>\
-                    <td class="min"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].min + '" /></td>\
-                    <td class="max"><input type="number" min="500" max="2500" value="' + SERVO_CONFIG[obj].max + '" /></td>\
+                    <td class="middle"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].middle + '" /></td>\
+                    <td class="min"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].min + '" /></td>\
+                    <td class="max"><input type="number" min="500" max="2500" value="' + FC.SERVO_CONFIG[obj].max + '" /></td>\
                     <td class="text-center rate">\
                     <td class="text-center reverse">\
                     </td>\
@@ -273,18 +288,13 @@ TABS.outputs.initialize = function (callback) {
 
             let $currentRow = $servoConfigTable.find('tr:last');
 
-            //This routine is pre 2.0 only
-            if (SERVO_CONFIG[obj].indexOfChannelToForward >= 0) {
-                $currentRow.find('td.channel input').eq(SERVO_CONFIG[obj].indexOfChannelToForward).prop('checked', true);
-            }
-
             // adding select box and generating options
             $currentRow.find('td.rate').append(
-                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(SERVO_CONFIG[obj].rate) + '" />'
+                '<input class="rate-input" type="number" min="' + FC.MIN_SERVO_RATE + '" max="' + FC.MAX_SERVO_RATE + '" value="' + Math.abs(FC.SERVO_CONFIG[obj].rate) + '" />'
             );
 
             $currentRow.find('td.reverse').append(
-                '<input type="checkbox" class="reverse-input togglemedium" ' + (SERVO_CONFIG[obj].rate < 0 ? ' checked ' : '') + '/>'
+                '<input type="checkbox" class="reverse-input togglemedium" ' + (FC.SERVO_CONFIG[obj].rate < 0 ? ' checked ' : '') + '/>'
             );
 
             $currentRow.data('info', { 'obj': obj });
@@ -294,10 +304,10 @@ TABS.outputs.initialize = function (callback) {
             let output,
                 outputString;
 
-            if (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER) {
-                output = OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
+            if (FC.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || FC.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER) {
+                output = FC.OUTPUT_MAPPING.getMrServoOutput(usedServoIndex);
             } else {
-                output = OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
+                output = FC.OUTPUT_MAPPING.getFwServoOutput(usedServoIndex);
             }
 
             if (output === null) {
@@ -308,7 +318,7 @@ TABS.outputs.initialize = function (callback) {
 
             $currentRow.find('.output').html(outputString);
             //For 2.0 and above hide a row when servo is not configured
-            if (!SERVO_RULES.isServoConfigured(obj)) {
+            if (!FC.SERVO_RULES.isServoConfigured(obj)) {
                 $currentRow.hide();
             } else {
                 usedServoIndex++;
@@ -325,21 +335,19 @@ TABS.outputs.initialize = function (callback) {
                     channelIndex = undefined;
                 }
 
-                SERVO_CONFIG[info.obj].indexOfChannelToForward = channelIndex;
-
-                SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
-                SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
-                SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
+                FC.SERVO_CONFIG[info.obj].middle = parseInt($('.middle input', this).val());
+                FC.SERVO_CONFIG[info.obj].min = parseInt($('.min input', this).val());
+                FC.SERVO_CONFIG[info.obj].max = parseInt($('.max input', this).val());
                 var rate = parseInt($('.rate-input', this).val());
                 if ($('.reverse-input', this).is(':checked')) {
                     rate = -rate;
                 }
-                SERVO_CONFIG[info.obj].rate = rate;
+                FC.SERVO_CONFIG[info.obj].rate = rate;
             });
 
-            REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
-            REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
-            REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
+            FC.REVERSIBLE_MOTORS.deadband_low = parseInt($('#3ddeadbandlow').val());
+            FC.REVERSIBLE_MOTORS.deadband_high = parseInt($('#3ddeadbandhigh').val());
+            FC.REVERSIBLE_MOTORS.neutral = parseInt($('#3dneutral').val());
 
             //Save configuration to FC
             saveChainer.execute();
@@ -350,7 +358,7 @@ TABS.outputs.initialize = function (callback) {
 
         let usedServoIndex = 0;
 
-        for (let servoIndex = 0; servoIndex < SERVO_RULES.getServoCount(); servoIndex++) {
+        for (let servoIndex = 0; servoIndex < FC.SERVO_RULES.getServoCount(); servoIndex++) {
             renderServos('Servo ' + servoIndex, '', servoIndex);
         }
         if (usedServoIndex == 0) {
@@ -363,33 +371,33 @@ TABS.outputs.initialize = function (callback) {
         }
 
         // UI hooks for dynamically generated elements
-        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').change(function () {
+        $('table.directions select, table.directions input, #servo-config-table select, #servo-config-table input').on('change', function () {
             if ($('div.live input').is(':checked')) {
                 // apply small delay as there seems to be some funky update business going wrong
-                helper.timeout.add('servos_update', servos_update, 10);
+                timeout.add('servos_update', servos_update, 10);
             }
         });
 
-        $('a.update').click(function () {
-            helper.features.reset();
-            helper.features.fromUI($('.tab-motors'));
-            helper.features.execute(servos_update);
+        $('a.update').on('click', function () {
+            features.reset();
+            features.fromUI($('.tab-motors'));
+            features.execute(servos_update);
         });
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             saveChainer.setExitPoint(function () {
                 //noinspection JSUnresolvedVariable
-                GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+                GUI.log(i18n.getMessage('configurationEepromSaved'));
 
                 GUI.tab_switch_cleanup(function () {
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.log(i18n.getMessage('deviceRebooting'));
                         GUI.handleReconnect($('.tab_outputs a'));
                     });
                 });
             });
-            helper.features.reset();
-            helper.features.fromUI($('.tab-motors'));
-            helper.features.execute(servos_update);
+            features.reset();
+            features.fromUI($('.tab-motors'));
+            features.execute(servos_update);
         });
 
     }
@@ -404,7 +412,7 @@ TABS.outputs.initialize = function (callback) {
         $motorsEnableTestMode.prop('checked', false);
         $motorsEnableTestMode.prop('disabled', true);
 
-        update_model(MIXER_CONFIG.appliedMixerPreset);
+        update_model(FC.MIXER_CONFIG.appliedMixerPreset);
 
         // Always start with default/empty sensor data array, clean slate all
         initSensorData();
@@ -421,15 +429,15 @@ TABS.outputs.initialize = function (callback) {
             $voltageHelper = $(".current-voltage");
 
         // timer initialization
-        helper.interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
-        helper.mspBalancedInterval.flush();
+        interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+        mspBalancedInterval.flush();
 
-        helper.interval.add('IMU_pull', function () {
+        interval.add('IMU_pull', function () {
 
             /*
             * Enable balancer
             */
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 update_accel_graph();
                 return;
             }
@@ -437,25 +445,25 @@ TABS.outputs.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
         }, 25, true);
 
-        helper.interval.add('ANALOG_pull', function () {
-            $currentHelper.html(ANALOG.amperage.toFixed(2));
-            $voltageHelper.html(ANALOG.voltage.toFixed(2));
+        interval.add('ANALOG_pull', function () {
+            $currentHelper.html(FC.ANALOG.amperage.toFixed(2));
+            $voltageHelper.html(FC.ANALOG.voltage.toFixed(2));
         }, 100, true);
 
         function update_accel_graph() {
 
             if (!accel_offset_established) {
                 for (var i = 0; i < 3; i++) {
-                    accel_offset[i] = SENSOR_DATA.accelerometer[i] * -1;
+                    accel_offset[i] = FC.SENSOR_DATA.accelerometer[i] * -1;
                 }
 
                 accel_offset_established = true;
             }
 
             var accel_with_offset = [
-                accel_offset[0] + SENSOR_DATA.accelerometer[0],
-                accel_offset[1] + SENSOR_DATA.accelerometer[1],
-                accel_offset[2] + SENSOR_DATA.accelerometer[2]
+                accel_offset[0] + FC.SENSOR_DATA.accelerometer[0],
+                accel_offset[1] + FC.SENSOR_DATA.accelerometer[1],
+                accel_offset[2] + FC.SENSOR_DATA.accelerometer[2]
             ];
 
             samples_accel_i = addSampleToData(accel_data, samples_accel_i, accel_with_offset);
@@ -482,7 +490,7 @@ TABS.outputs.initialize = function (callback) {
             $motorSliders = $('.motor-sliders'),
             $motorValues = $('.motor-values');
 
-        for (let i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
+        for (let i = 0; i < FC.MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
             const motorNumber = i + 1;
             motors_wrapper.append('\
                 <div class="m-block motor-' + i + '">\
@@ -504,10 +512,10 @@ TABS.outputs.initialize = function (callback) {
         $motorSliders.append('<div class="motor-slider-container"><input type="range" min="1000" max="2000" value="1000" disabled="disabled" class="master"/></div>');
         $motorValues.append('<li style="font-weight: bold" data-i18n="motorsMaster"></li>');
 
-        for (let i = 0; i < SERVO_RULES.getServoCount(); i++) {
+        for (let i = 0; i < FC.SERVO_RULES.getServoCount(); i++) {
 
             let opacity = "";
-            if (!SERVO_RULES.isServoConfigured(15 - i)) {
+            if (!FC.SERVO_RULES.isServoConfigured(15 - i)) {
                 opacity = ' style="opacity: 0.2"';
             }
 
@@ -527,19 +535,19 @@ TABS.outputs.initialize = function (callback) {
 
         var $slidersInput = $('div.sliders input');
 
-        $slidersInput.prop('min', MISC.mincommand);
-        $slidersInput.prop('max', MISC.maxthrottle);
-        $('div.values li:not(:last)').text(MISC.mincommand);
+        $slidersInput.prop('min', FC.MISC.mincommand);
+        $slidersInput.prop('max', FC.MISC.maxthrottle);
+        $('div.values li:not(:last)').text(FC.MISC.mincommand);
 
         if (self.feature3DEnabled && self.feature3DSupported) {
             //Arbitrary sanity checks
             //Note: values may need to be revisited
-            if (REVERSIBLE_MOTORS.neutral > 1575 || REVERSIBLE_MOTORS.neutral < 1425)
-                REVERSIBLE_MOTORS.neutral = 1500;
+            if (FC.REVERSIBLE_MOTORS.neutral > 1575 || FC.EVERSIBLE_MOTORS.neutral < 1425)
+                FC.REVERSIBLE_MOTORS.neutral = 1500;
 
-            $slidersInput.val(REVERSIBLE_MOTORS.neutral);
+            $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
         } else {
-            $slidersInput.val(MISC.mincommand);
+            $slidersInput.val(FC.MISC.mincommand);
         }
 
         if (self.allowTestMode) {
@@ -555,11 +563,11 @@ TABS.outputs.initialize = function (callback) {
 
                 $('div.values li').eq(index).text(getMotorOutputValue($(this).val()));
 
-                for (i = 0; i < 8; i++) {
+                for (let i = 0; i < 8; i++) {
                     var val = parseInt($('div.sliders input').eq(i).val());
 
-                    buffer.push(lowByte(val));
-                    buffer.push(highByte(val));
+                    buffer.push(BitHelper.lowByte(val));
+                    buffer.push(BitHelper.highByte(val));
                 }
 
                 buffering_set_motor.push(buffer);
@@ -580,13 +588,13 @@ TABS.outputs.initialize = function (callback) {
         $('div.sliders input.master').on('input', function () {
             var val = $(this).val();
             $('div.sliders input:not(:disabled, :last)').val(val);
-            $('div.values li:not(:last)').slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).text(getMotorOutputValue(val));
+            $('div.values li:not(:last)').slice(0, FC.MOTOR_RULES.getNumberOfConfiguredMotors()).text(getMotorOutputValue(val));
             $('div.sliders input:not(:last):first').trigger('input');
         });
 
-        $motorsEnableTestMode.change(function () {
+        $motorsEnableTestMode.on('change', function () {
             if ($(this).is(':checked')) {
-                $slidersInput.slice(0, MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);
+                $slidersInput.slice(0, FC.MOTOR_RULES.getNumberOfConfiguredMotors()).prop('disabled', false);
 
                 // unlock master slider
                 $('div.sliders input:last').prop('disabled', false);
@@ -596,9 +604,9 @@ TABS.outputs.initialize = function (callback) {
 
                 // change all values to default
                 if (self.feature3DEnabled && self.feature3DSupported) {
-                    $slidersInput.val(REVERSIBLE_MOTORS.neutral);
+                    $slidersInput.val(FC.REVERSIBLE_MOTORS.neutral);
                 } else {
-                    $slidersInput.val(MISC.mincommand);
+                    $slidersInput.val(FC.MISC.mincommand);
                 }
 
                 $slidersInput.trigger('input');
@@ -608,14 +616,14 @@ TABS.outputs.initialize = function (callback) {
         // check if motors are already spinning
         var motors_running = false;
 
-        for (var i = 0; i < MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
+        for (var i = 0; i < FC.MOTOR_RULES.getNumberOfConfiguredMotors(); i++) {
             if (!self.feature3DEnabled) {
-                if (MOTOR_DATA[i] > MISC.mincommand) {
+                if (FC.MOTOR_DATA[i] > FC.MISC.mincommand) {
                     motors_running = true;
                     break;
                 }
             } else {
-                if ((MOTOR_DATA[i] < REVERSIBLE_MOTORS.deadband_low) || (MOTOR_DATA[i] > REVERSIBLE_MOTORS.deadband_high)) {
+                if ((FC.MOTOR_DATA[i] < FC.REVERSIBLE_MOTORS.deadband_low) || (FC.MOTOR_DATA[i] > FC.REVERSIBLE_MOTORS.deadband_high)) {
                     motors_running = true;
                     break;
                 }
@@ -630,12 +638,12 @@ TABS.outputs.initialize = function (callback) {
 
             var sliders = $('div.sliders input:not(.master)');
 
-            var master_value = MOTOR_DATA[0];
-            for (var i = 0; i < MOTOR_DATA.length; i++) {
-                if (MOTOR_DATA[i] > 0) {
-                    sliders.eq(i).val(MOTOR_DATA[i]);
+            var master_value = FC.MOTOR_DATA[0];
+            for (var i = 0; i < FC.MOTOR_DATA.length; i++) {
+                if (FC.MOTOR_DATA[i] > 0) {
+                    sliders.eq(i).val(FC.MOTOR_DATA[i]);
 
-                    if (master_value != MOTOR_DATA[i]) {
+                    if (master_value != FC.MOTOR_DATA[i]) {
                         master_value = false;
                     }
                 }
@@ -651,11 +659,11 @@ TABS.outputs.initialize = function (callback) {
             }
         }
 
-        $motorsEnableTestMode.change();
+        $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
 
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 getPeriodicServoOutput();
                 return;
             }
@@ -664,7 +672,7 @@ TABS.outputs.initialize = function (callback) {
         }
 
         function getPeriodicServoOutput() {
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 update_ui();
                 return;
             }
@@ -672,7 +680,7 @@ TABS.outputs.initialize = function (callback) {
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
-        var full_block_scale = MISC.maxthrottle - MISC.mincommand;
+        var full_block_scale = FC.MISC.maxthrottle - FC.MISC.mincommand;
 
         function update_ui() {
             var previousArmState = self.armed,
@@ -683,24 +691,24 @@ TABS.outputs.initialize = function (callback) {
                 color,
                 i;
 
-            for (i = 0; i < MOTOR_DATA.length; i++) {
-                data = MOTOR_DATA[i] - MISC.mincommand;
+            for (let i= 0; i < FC.MOTOR_DATA.length; i++) {
+                data = FC.MOTOR_DATA[i] - FC.MISC.mincommand;
                 margin_top = block_height - (data * (block_height / full_block_scale)).clamp(0, block_height);
                 height = (data * (block_height / full_block_scale)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
 
-                $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(MOTOR_DATA[i]));
+                $('.motor-' + i + ' .label', motors_wrapper).text(getMotorOutputValue(FC.MOTOR_DATA[i]));
                 $('.motor-' + i + ' .indicator', motors_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
             }
 
             // servo indicators are still using old (not flexible block scale), it will be changed in the future accordingly
-            for (i = 0; i < SERVO_DATA.length; i++) {
-                data = SERVO_DATA[i] - 1000;
+            for (let i= 0; i < FC.SERVO_DATA.length; i++) {
+                data = FC.SERVO_DATA[i] - 1000;
                 margin_top = block_height - (data * (block_height / 1000)).clamp(0, block_height);
                 height = (data * (block_height / 1000)).clamp(0, block_height);
                 color = parseInt(data * 0.009);
 
-                $('.servo-' + i + ' .label', servos_wrapper).text(SERVO_DATA[i]);
+                $('.servo-' + i + ' .label', servos_wrapper).text(FC.SERVO_DATA[i]);
                 $('.servo-' + i + ' .indicator', servos_wrapper).css({ 'margin-top': margin_top + 'px', 'height': height + 'px', 'background-color': '#37a8db' + color + ')' });
             }
             //keep the following here so at least we get a visual cue of our motor setup
@@ -718,16 +726,16 @@ TABS.outputs.initialize = function (callback) {
 
             if (previousArmState != self.armed) {
                 console.log('arm state change detected');
-                $motorsEnableTestMode.change();
+                $motorsEnableTestMode.trigger('change');
             }
         }
 
         // enable Status and Motor data pulling
-        helper.interval.add('motor_and_status_pull', getPeriodicMotorOutput, 100, true);
+        interval.add('motor_and_status_pull', getPeriodicMotorOutput, 100, true);
     }
 
     function finalize() {
-        localize();
+       i18n.localize();;
         GUI.content_ready(callback);
     }
 

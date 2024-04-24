@@ -1,10 +1,22 @@
-/*global mspHelper,$,GUI,MSP,chrome*/
 'use strict';
 
-var helper = helper || {};
+const { GUI } = require('./../js/gui');
+const FC = require('./fc');
+const MSP = require('./msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./msp/MSPHelper');
+const MSPChainerClass = require('./msp/MSPchainer');
+const features = require('./feature_framework');
+const periodicStatusUpdater = require('./periodicStatusUpdater');
+const { mixer } = require('./model');
+const jBox = require('./libraries/jBox/jBox.min');
+const i18n = require('./localization');
+const defaultsDialogData = require('./defaults_dialog_entries.js');
+const Settings = require('./settings.js');
+
 var savingDefaultsModal;
 
-helper.defaultsDialog = (function (data) {
+var defaultsDialog = (function () {
 
     let publicScope = {},
         privateScope = {};
@@ -19,17 +31,17 @@ helper.defaultsDialog = (function (data) {
     privateScope.setFeaturesBits = function (selectedDefaultPreset) {
 
         if (selectedDefaultPreset.features && selectedDefaultPreset.features.length > 0) {
-            helper.features.reset();
+            features.reset();
 
             for (const feature of selectedDefaultPreset.features) {
                 if (feature.state) {
-                    helper.features.set(feature.bit);
+                    features.set(feature.bit);
                 } else {
-                    helper.features.unset(feature.bit);
+                    features.unset(feature.bit);
                 }
             }
 
-            helper.features.execute(function () {
+            features.execute(function () {
                 privateScope.setSettings(selectedDefaultPreset);
             });
         } else {
@@ -109,7 +121,7 @@ helper.defaultsDialog = (function (data) {
                 if (typeof savingDefaultsModal !== 'undefined') {
                     savingDefaultsModal.close();
                 }
-                GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                GUI.log(i18n.getMessage('deviceRebooting'));
                 GUI.handleReconnect();
             });
         });
@@ -119,22 +131,21 @@ helper.defaultsDialog = (function (data) {
 
         if (selectedDefaultPreset.wizardPages) {
             privateScope.wizard(selectedDefaultPreset, 0);
+        } else {
+            mspHelper.saveToEeprom(function () {
+                //noinspection JSUnresolvedVariable
+                GUI.log(i18n.getMessage('configurationEepromSaved'));
+                if (selectedDefaultPreset.reboot) {
+                    privateScope.saveAndReboot();
+                }
+            });
         }
-        return;
-        //FIXME enable real flow
-        mspHelper.saveToEeprom(function () {
-            //noinspection JSUnresolvedVariable
-            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
-
-            if (selectedDefaultPreset.wizardPages) {
-                privateScope.wizard(selectedDefaultPreset, 0);
-            } else if (selectedDefaultPreset.reboot) {
-                privateScope.saveAndReboot();
-            }
-        });
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
+        
+        periodicStatusUpdater.stop();
+        
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
 
@@ -151,9 +162,6 @@ helper.defaultsDialog = (function (data) {
                 miscSettings.push(input);
             }
         });
-
-        //Save analytics
-        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title); 
         
         var settingsChainer = MSPChainerClass();
         var chain = [];
@@ -164,44 +172,77 @@ helper.defaultsDialog = (function (data) {
             });
         });
 
-        for (var i = 0; i < 3; i++ ) {
+        
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
             chain.push(function (callback) {
-                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [i], false, callback);
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-            controlProfileSettings.forEach(input => {
-                chain.push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
-            });
-        }
+        });
 
-        for (var i = 0; i < 3; i++ ) {
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [1], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
             chain.push(function (callback) {
-                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [i], false, callback);
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-            batterySettings.forEach(input => {
-                chain.push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [2], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-        }
+        });    
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [0], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [1], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [2], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
         
         // Set Mixers
         if (selectedDefaultPreset.mixerToApply) {
-            let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
+            let currentMixerPreset = mixer.getById(selectedDefaultPreset.mixerToApply);
 
-            helper.mixer.loadServoRules(currentMixerPreset);
-            helper.mixer.loadMotorRules(currentMixerPreset);
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
             
-            MIXER_CONFIG.platformType = currentMixerPreset.platform;
-            MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
-            MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            FC.MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            FC.MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+            FC.MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
-            SERVO_RULES.cleanup();
-            SERVO_RULES.inflate();
-            MOTOR_RULES.cleanup();
-            MOTOR_RULES.inflate();
+            FC.SERVO_RULES.cleanup();
+            FC.SERVO_RULES.inflate();
+            FC.MOTOR_RULES.cleanup();
+            FC.MOTOR_RULES.inflate();
             
             chain = chain.concat([
                 mspHelper.saveMixerConfig,
@@ -229,7 +270,7 @@ helper.defaultsDialog = (function (data) {
     privateScope.onPresetClick = function (event) {
         savingDefaultsModal = new jBox('Modal', {
             width: 400,
-            height: 100,
+            height: 120,
             animation: false,
             closeOnClick: false,
             closeOnEsc: false,
@@ -238,7 +279,7 @@ helper.defaultsDialog = (function (data) {
 
         $container.hide();
 
-        let selectedDefaultPreset = data[$(event.currentTarget).data("index")];
+        let selectedDefaultPreset = defaultsDialogData[$(event.currentTarget).data("index")];
         if (selectedDefaultPreset && selectedDefaultPreset.settings) {
 
             if (selectedDefaultPreset.id == 0) {
@@ -259,9 +300,9 @@ helper.defaultsDialog = (function (data) {
         $container.find('.defaults-dialog__wizard').hide();
         let $place = $container.find('.defaults-dialog__options');
         $place.html("");
-        for (let i in data) {
-            if (data.hasOwnProperty(i)) {
-                let preset = data[i];
+        for (let i in defaultsDialogData) {
+            if (defaultsDialogData.hasOwnProperty(i)) {
+                let preset = defaultsDialogData[i];
                 let $element = $("<div class='default_btn defaults_btn'>\
                         <a class='confirm' href='#'></a>\
                     </div>")
@@ -271,20 +312,24 @@ helper.defaultsDialog = (function (data) {
                 }
 
                 $element.find("a").html(preset.title);
-                $element.data("index", i).click(privateScope.onPresetClick)
+                $element.data("index", i).on('click', privateScope.onPresetClick)
                 $element.appendTo($place);
             }
         }
     }
 
     privateScope.onInitSettingReturned = function (promise) {
-        if (promise.value > 0) {
-            return; //Defaults were applied, we can just ignore
-        }
+
+        //FIXME for now we trigger wizard always
+        // if (promise.value > 0) {
+        //     return; //Defaults were applied, we can just ignore
+        // }
 
         privateScope.render();
         $container.show();
     }
 
     return publicScope;
-})(helper.defaultsDialogData);
+})();
+
+module.exports = defaultsDialog;
