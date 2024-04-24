@@ -67,22 +67,8 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-<<<<<<< HEAD
         $('#tpa').val(RC_tuning.dynamic_THR_PID);
         $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
-=======
-        // Fill in data from FC.RC_tuning object
-        $('#rate-roll').val(FC.RC_tuning.roll_rate);
-        $('#rate-pitch').val(FC.RC_tuning.pitch_rate);
-        $('#rate-yaw').val(FC.RC_tuning.yaw_rate);
-
-        $('#rate-manual-roll').val(FC.RC_tuning.manual_roll_rate);
-        $('#rate-manual-pitch').val(FC.RC_tuning.manual_pitch_rate);
-        $('#rate-manual-yaw').val(FC.RC_tuning.manual_yaw_rate);
-
-        $('#tpa').val(FC.RC_tuning.dynamic_THR_PID);
-        $('#tpa-breakpoint').val(FC.RC_tuning.dynamic_THR_breakpoint);
->>>>>>> master
     }
 
     function form_to_pid_and_rc() {
@@ -103,7 +89,6 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-<<<<<<< HEAD
         // catch RC_tuning changes
         RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
         RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
@@ -111,25 +96,13 @@ TABS.pid_tuning.initialize = function (callback) {
 
         RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
         RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
-=======
-        // catch FC.RC_tuning changes
-        FC.RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
-        FC.RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
-        FC.RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
->>>>>>> master
 
         FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
         FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
 
-<<<<<<< HEAD
         RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
         RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
         RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
-=======
-        FC.RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
-        FC.RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
-        FC.RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
->>>>>>> master
 
         // Rate Dynamics
         FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
