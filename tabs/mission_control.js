@@ -1202,15 +1202,15 @@ TABS.mission_control.initialize = function (callback) {
                     // If one is POI, draw orange line in-between and modulate dashline each time a new POI is defined
                     else if (typeof oldPos !== 'undefined' && activatePoi == true && activateHead != true) {
                         if ((poiList.length % 2) == 0) {
-                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725', lineDash=5);
+                            paintLine(oldPos, coord, element.getNumber(), '#ffb725', 5);
                         }
                         else {
-                            paintLine(oldPos, coord, element.getNumber(), color='#ffb725');
+                            paintLine(oldPos, coord, element.getNumber(), '#ffb725');
                         }
                     }
                     // If one is SET_HEAD, draw labelled line in-between with heading value
                     else if (typeof oldPos !== 'undefined' && activatePoi != true && activateHead == true) {
-                        paintLine(oldPos, coord, element.getNumber(), color='#1497f1', lineDash=0, lineText=String(oldHeading)+"°");
+                        paintLine(oldPos, coord, element.getNumber(), '#1497f1', 0, String(oldHeading)+"°");
                     }
 
                     if (element.getEndMission() == 0xA5) {
@@ -1227,7 +1227,7 @@ TABS.mission_control.initialize = function (callback) {
                 if (element.getAction() == MWNP.WPTYPE.JUMP) {
                     let jumpWPIndex = multiMissionWPNum + element.getP1();
                     let coord = ol.proj.fromLonLat([mission.getWaypoint(jumpWPIndex).getLonMap(), mission.getWaypoint(jumpWPIndex).getLatMap()]);
-                    paintLine(oldPos, coord, element.getNumber(), color='#e935d6', lineDash=5, lineText="Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), selection=false, arrow=true);
+                    paintLine(oldPos, coord, element.getNumber(), '#e935d6', 5, "Repeat x"+(element.getP2() == -1 ? " infinite" : String(element.getP2())), false, true);
                 }
                 // If classic WPs is defined with a heading = -1, change Boolean for POI to false. If it is defined with a value different from -1, activate Heading boolean
                 else if (element.getAction() == MWNP.WPTYPE.SET_HEAD) {
