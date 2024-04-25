@@ -3,6 +3,7 @@
 const ol = require('openlayers');
 
 const MWNP = require('./mwnp');
+const Waypoint = require('./waypoint');
 const BitHelper = require('./bitHelper');
 
 let WaypointCollection = function () {
