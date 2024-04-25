@@ -1,8 +1,9 @@
 'use strict';
 
-var helper = helper || {};
+const mspQueue = require('./serial_queue');
+const interval = require('./intervals');
 
-helper.mspBalancedInterval = (function (mspQueue, intervalHandler) {
+var mspBalancedInterval = (function (mspQueue, intervalHandler) {
 
     var publicScope = {},
         privateScope = {};
@@ -59,7 +60,7 @@ helper.mspBalancedInterval = (function (mspQueue, intervalHandler) {
     };
 
     /**
-     * Real interval cleaning happens win helper.interval.killAll method
+     * Real interval cleaning happens win interval.killAll method
      * both methods have to be executed
      */
     publicScope.flush = function () {
@@ -69,4 +70,6 @@ helper.mspBalancedInterval = (function (mspQueue, intervalHandler) {
     setInterval(publicScope.balancer, Math.round(1000 / privateScope.balancingFrequency));
 
     return publicScope;
-})(helper.mspQueue, helper.interval);
+})(mspQueue, interval);
+
+module.exports = mspBalancedInterval;

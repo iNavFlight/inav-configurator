@@ -1,8 +1,6 @@
 'use strict';
 
-var helper = helper || {};
-
-helper.interval = (function () {
+var interval = function () {
 
     var privateScope = {},
         publicScope = {};
@@ -140,4 +138,6 @@ helper.interval = (function () {
     };
 
     return publicScope;
-})();
+}();
+
+module.exports = interval;

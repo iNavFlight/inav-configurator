@@ -1,5 +1,15 @@
 'use strict';
 
+const path = require('path');
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const i18n = require('./../js/localization');
+const serialPortHelper = require('./../js/serialPortHelper');
+
 TABS.ports = {};
 
 TABS.ports.initialize = function (callback) {
@@ -8,11 +18,10 @@ TABS.ports.initialize = function (callback) {
 
     if (GUI.active_tab != 'ports') {
         GUI.active_tab = 'ports';
-        googleAnalytics.sendAppView('Ports');
     }
 
     mspHelper.loadSerialPorts(function () {
-        GUI.load("./tabs/ports.html", on_tab_loaded_handler)
+        GUI.load(path.join(__dirname, "ports.html"), on_tab_loaded_handler)
     });
 
     function update_ui() {
@@ -23,31 +32,31 @@ TABS.ports.initialize = function (callback) {
             $elements;
 
         $elements = $('select.sensors_baudrate');
-        for (i = 0; i < helper.serialPortHelper.getBauds('SENSOR').length; i++) {
-            $elements.append('<option value="' + helper.serialPortHelper.getBauds('SENSOR')[i] + '">' + helper.serialPortHelper.getBauds('SENSOR')[i] + '</option>');
+        for (i = 0; i < serialPortHelper.getBauds('SENSOR').length; i++) {
+            $elements.append('<option value="' + serialPortHelper.getBauds('SENSOR')[i] + '">' + serialPortHelper.getBauds('SENSOR')[i] + '</option>');
         }
 
         $elements = $('select.msp_baudrate');
-        for (i = 0; i < helper.serialPortHelper.getBauds('MSP').length; i++) {
-            $elements.append('<option value="' + helper.serialPortHelper.getBauds('MSP')[i] + '">' + helper.serialPortHelper.getBauds('MSP')[i] + '</option>');
+        for (i = 0; i < serialPortHelper.getBauds('MSP').length; i++) {
+            $elements.append('<option value="' + serialPortHelper.getBauds('MSP')[i] + '">' + serialPortHelper.getBauds('MSP')[i] + '</option>');
         }
 
         $elements = $('select.telemetry_baudrate');
-        for (i = 0; i < helper.serialPortHelper.getBauds('TELEMETRY').length; i++) {
-            $elements.append('<option value="' + helper.serialPortHelper.getBauds('TELEMETRY')[i] + '">' + helper.serialPortHelper.getBauds('TELEMETRY')[i] + '</option>');
+        for (i = 0; i < serialPortHelper.getBauds('TELEMETRY').length; i++) {
+            $elements.append('<option value="' + serialPortHelper.getBauds('TELEMETRY')[i] + '">' + serialPortHelper.getBauds('TELEMETRY')[i] + '</option>');
         }
 
         $elements = $('select.peripherals_baudrate');
-        for (i = 0; i < helper.serialPortHelper.getBauds('PERIPHERAL').length; i++) {
-            $elements.append('<option value="' + helper.serialPortHelper.getBauds('PERIPHERAL')[i] + '">' + helper.serialPortHelper.getBauds('PERIPHERAL')[i] + '</option>');
+        for (i = 0; i < serialPortHelper.getBauds('PERIPHERAL').length; i++) {
+            $elements.append('<option value="' + serialPortHelper.getBauds('PERIPHERAL')[i] + '">' + serialPortHelper.getBauds('PERIPHERAL')[i] + '</option>');
         }
 
         var ports_e = $('.tab-ports .ports');
         var port_configuration_template_e = $('#tab-ports-templates .portConfiguration');
 
-        for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
+        for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
             var port_configuration_e = port_configuration_template_e.clone();
-            var serialPort = SERIAL_CONFIG.ports[portIndex];
+            var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
 
             port_configuration_e.data('serialPort', serialPort);
 
@@ -59,7 +68,7 @@ TABS.ports.initialize = function (callback) {
                 port_configuration_e.find('select.sensors_baudrate').val(serialPort.sensors_baudrate);
                 port_configuration_e.find('select.peripherals_baudrate').val(serialPort.peripherals_baudrate);
 
-                port_configuration_e.find('.identifier').text(helper.serialPortHelper.getPortName(serialPort.identifier));
+                port_configuration_e.find('.identifier').text(serialPortHelper.getPortName(serialPort.identifier));
                 if (serialPort.identifier >= 30) {
                     port_configuration_e.find('.softSerialWarning').css("display", "inline")
                 } else {
@@ -76,8 +85,8 @@ TABS.ports.initialize = function (callback) {
                     let functions_e_id = "portFunc-" + column + "-" + portIndex;
                     functions_e.attr("id", functions_e_id);
 
-                    for (i = 0; i < helper.serialPortHelper.getRules().length; i++) {
-                        var functionRule = helper.serialPortHelper.getRules()[i];
+                    for (i = 0; i < serialPortHelper.getRules().length; i++) {
+                        var functionRule = serialPortHelper.getRules()[i];
                         var functionName = functionRule.name;
 
                         if (functionRule.groups.indexOf(column) == -1) {
@@ -101,9 +110,14 @@ TABS.ports.initialize = function (callback) {
                             select_e = functions_e.find(selectElementSelector);
                             
                             if (select_e.length == 0) {
-                                functions_e.prepend('<span class="function"><select name="' + selectElementName + '" class="function-select ' + selectElementName + '" onchange="updateDefaultBaud(\'' + functions_e_id + '\', \'' + column + '\')" /></span>');
+                                functions_e.prepend('<span class="function"><select id="' + selectElementName + '" name="' + selectElementName + '" class="function-select ' + selectElementName + '" /></span>');
+                                
+                                functions_e.find('#' + selectElementName).on('change', () => {
+                                    updateDefaultBaud(functions_e_id, column);
+                                });
+                                
                                 select_e = functions_e.find(selectElementSelector);
-                                var disabledText = chrome.i18n.getMessage('portsTelemetryDisabled');
+                                var disabledText = i18n.getMessage('portsTelemetryDisabled');
                                 select_e.append('<option value="">' + disabledText + '</option>');
                             }
                             select_e.append('<option value="' + functionName + '">' + functionRule.displayName + '</option>');
@@ -127,7 +141,7 @@ TABS.ports.initialize = function (callback) {
         let $cT  = $(e.currentTarget);
 
         let functionName = $cT.val();
-        let rule = helper.serialPortHelper.getRuleByName($cT.val());
+        let rule = serialPortHelper.getRuleByName($cT.val());
 
         //if type is checkbox then process only if selected
         if ($cT.is('input[type="checkbox"]') && !$cT.is(':checked')) {
@@ -164,11 +178,11 @@ TABS.ports.initialize = function (callback) {
 
     function on_tab_loaded_handler() {
 
-        localize();
+       i18n.localize();;
 
         update_ui();
 
-        $('a.save').click(on_save_handler);
+        $('a.save').on('click', on_save_handler);
 
         GUI.content_ready(callback);
     }
@@ -176,7 +190,7 @@ TABS.ports.initialize = function (callback) {
    function on_save_handler() {
 
         //Clear ports of any previous for serials different than USB VCP
-        SERIAL_CONFIG.ports = SERIAL_CONFIG.ports.filter(item => item.identifier == 20)
+        FC.SERIAL_CONFIG.ports = FC.SERIAL_CONFIG.ports.filter(item => item.identifier == 20)
 
         $('.tab-ports .portConfiguration').each(function () {
 
@@ -207,10 +221,6 @@ TABS.ports.initialize = function (callback) {
                 functions.push(sensorsFunction);
             }
 
-            if (telemetryFunction.length > 0) {
-                googleAnalytics.sendEvent('Setting', 'Telemetry Protocol', telemetryFunction);
-            }
-
             var serialPort = {
                 functions: functions,
                 msp_baudrate: $(portConfiguration_e).find('.msp_baudrate').val(),
@@ -219,7 +229,7 @@ TABS.ports.initialize = function (callback) {
                 peripherals_baudrate: $(portConfiguration_e).find('.peripherals_baudrate').val(),
                 identifier: oldSerialPort.identifier
             };
-            SERIAL_CONFIG.ports.push(serialPort);
+            FC.SERIAL_CONFIG.ports.push(serialPort);
         });
 
         mspHelper.saveSerialPorts(save_to_eeprom);
@@ -229,7 +239,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_saved_handler() {
-            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+            GUI.log(i18n.getMessage('configurationEepromSaved'));
 
             GUI.tab_switch_cleanup(function() {
                 MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, on_reboot_success_handler);
@@ -237,7 +247,7 @@ TABS.ports.initialize = function (callback) {
         }
 
         function on_reboot_success_handler() {
-            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+            GUI.log(i18n.getMessage('deviceRebooting'));
             GUI.handleReconnect($('.tab_ports a'));
         }
     }
@@ -248,7 +258,7 @@ function updateDefaultBaud(baudSelect, column) {
     let portName = section.find('.function-' + column).val();
     let baudRate = (column === 'telemetry') ? "AUTO" : 115200;;
 
-    let rule = helper.serialPortHelper.getRuleByName(portName);
+    let rule = serialPortHelper.getRuleByName(portName);
 
     if (rule && typeof rule.defaultBaud !== 'undefined') {
         baudRate = rule.defaultBaud;

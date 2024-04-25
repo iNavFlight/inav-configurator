@@ -1,8 +1,6 @@
 'use strict';
 
-var helper = helper || {};
-
-helper.timeout = (function () {
+var timeout = (function () {
 
     var privateScope = {},
         publicScope = {};
@@ -64,3 +62,5 @@ helper.timeout = (function () {
 
     return publicScope;
 })();
+
+module.exports = timeout;

@@ -1,5 +1,7 @@
-/*global $,FC*/
 'use strict';
+
+const FC = require('./fc');
+const { GUI } = require('./../js/gui');
 
 let LogicCondition = function (enabled, activatorId, operation, operandAType, operandAValue, operandBType, operandBValue, flags) {
     let self = {};
@@ -164,7 +166,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
             /*
              * Bind events
              */
-            $t.change(self.onOperatorTypeChange);
+            $t.on('change', self.onOperatorTypeChange);
 
         }
     }
@@ -218,7 +220,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
         if (self.getEnabled()) {
             GUI.renderLogicConditionSelect(
                 $e, 
-                LOGIC_CONDITIONS,
+                FC.LOGIC_CONDITIONS,
                 self.getActivatorId, 
                 self.onActivatorChange,
                 true,
@@ -306,7 +308,7 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
         $t.append('</optgroup>');
 
-        $t.change(self.onOperatorChange);
+        $t.on('change', self.onOperatorChange);
 
         self.renderOperand(0);
         self.renderOperand(1);
@@ -316,3 +318,5 @@ let LogicCondition = function (enabled, activatorId, operation, operandAType, op
 
     return self;
 };
+
+module.exports = LogicCondition;

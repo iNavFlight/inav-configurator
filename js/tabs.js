@@ -1,8 +1,6 @@
 'use strict';
 
-var helper = helper || {};
-
-helper.tabs = (function () {
+ var tabs = (function () {
     let self = {},
         $container;
 
@@ -19,9 +17,11 @@ helper.tabs = (function () {
     self.init = function ($dom) {
         $container = $dom;
 
-        $container.find(".subtab__header_label").click(onHeaderClick);
+        $container.find(".subtab__header_label").on('click', onHeaderClick);
     };
 
     return self;
 
 })();
+
+module.exports = tabs;

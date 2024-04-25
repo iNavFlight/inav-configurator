@@ -1,6 +1,6 @@
 'use strict';
 
-let LogicConditionsCollection = function () {
+var LogicConditionsCollection = function () {
 
     let self = {},
         data = [],
@@ -46,8 +46,6 @@ let LogicConditionsCollection = function () {
                 self.get()[k].render(k, $table);
             }
         }
-
-        GUI.switchery();
     };
 
     self.onSave = function () {
@@ -68,8 +66,8 @@ let LogicConditionsCollection = function () {
     self.init = function ($element) {
         $container = $element;
 
-        $container.find('.logic__save').click(self.onSave);
-        $container.find('.logic__close').click(self.onClose);
+        $container.find('.logic__save').on('click', self.onSave);
+        $container.find('.logic__close').on('click', self.onClose);
 
     };
 
@@ -85,3 +83,5 @@ let LogicConditionsCollection = function () {
 
     return self;
 };
+
+module.exports = LogicConditionsCollection;

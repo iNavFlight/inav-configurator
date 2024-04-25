@@ -2,13 +2,23 @@
 
 'use strict';
 
+const path = require('path');
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const MSP = require('./../js/msp');
+const { GUI, TABS } = require('./../js/gui');
+const FC = require('./../js/fc');
+const interval = require('./../js/intervals');
+const BitHelper = require('./../js/bitHelper');
+const i18n = require('./../js/localization');
+
 TABS.modes = {};
 TABS.modes.initialize = function (callback) {
     var self = this;
 
     if (GUI.active_tab != 'modes') {
         GUI.active_tab = 'modes';
-        googleAnalytics.sendAppView('Modes');
     }
 
     function get_active_box_data() {
@@ -24,7 +34,7 @@ TABS.modes.initialize = function (callback) {
     }
 
     function load_html() {
-        GUI.load("./tabs/modes.html", process_html);
+        GUI.load(path.join(__dirname, "modes.html"), process_html);
     }
 
     MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_active_box_data);
@@ -33,7 +43,7 @@ TABS.modes.initialize = function (callback) {
         // generate heads according to RC count
         var table_head = $('table.boxes .heads');
         var main_head = $('table.boxes .main');
-        for (var i = 0; i < (RC.active_channels - 4); i++) {
+        for (var i = 0; i < (FC.RC.active_channels - 4); i++) {
             table_head.append('<th colspan="3">AUX ' + (i + 1) + '</th>');
 
             // 3 columns per aux channel (this might be requested to change to 6 in the future, so watch out)
@@ -45,15 +55,15 @@ TABS.modes.initialize = function (callback) {
         }
 
         // translate to user-selected language
-        localize();
+       i18n.localize();;
 
         // generate table from the supplied AUX names and AUX data
-        for (var i = 0; i < AUX_CONFIG.length; i++) {
+        for (var i = 0; i < FC.AUX_CONFIG.length; i++) {
             var line = '<tr class="switches">';
-            line += '<td class="name">' + AUX_CONFIG[i] + '</td>';
+            line += '<td class="name">' + FC.AUX_CONFIG[i] + '</td>';
 
             for (var j = 0; j < (RC.active_channels - 4) * 3; j++) {
-                if (bit_check(AUX_CONFIG_values[i], j)) {
+                if (BitHelper.bit_check(FC.AUX_CONFIG_values[i], j)) {
                     line += '<td><input type="checkbox" checked="checked" /></td>';
                 } else {
                     line += '<td><input type="checkbox" /></td>';
@@ -66,21 +76,21 @@ TABS.modes.initialize = function (callback) {
         }
 
         // UI Hooks
-        $('a.update').click(function () {
+        $('a.update').on('click', function () {
             // catch the input changes
             var main_needle = 0,
                 needle = 0;
 
             $('.boxes input').each(function () {
                 if ($(this).is(':checked')) {
-                    AUX_CONFIG_values[main_needle] = bit_set(AUX_CONFIG_values[main_needle], needle);
+                    FC.AUX_CONFIG_values[main_needle] = BitHelper.bit_set(FC.AUX_CONFIG_values[main_needle], needle);
                 } else {
-                    AUX_CONFIG_values[main_needle] = bit_clear(AUX_CONFIG_values[main_needle], needle);
+                    FC.AUX_CONFIG_values[main_needle] = BitHelper.bit_clear(FC.AUX_CONFIG_values[main_needle], needle);
                 }
 
                 needle++;
 
-                if (needle >= (RC.active_channels - 4) * 3) { // 1 aux * 3 checkboxes, 4 AUX = 12 bits per line
+                if (needle >= (FC.RC.active_channels - 4) * 3) { // 1 aux * 3 checkboxes, 4 AUX = 12 bits per line
                     main_needle++;
                     needle = 0;
                 }
@@ -88,7 +98,7 @@ TABS.modes.initialize = function (callback) {
 
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
-                    GUI.log(chrome.i18n.getMessage('auxiliaryEepromSaved'));
+                    GUI.log(i18n.getMessage('auxiliaryEepromSaved'));
                 });
             }
 
@@ -120,21 +130,21 @@ TABS.modes.initialize = function (callback) {
         }
 
         function update_ui() {
-            for (var i = 0; i < AUX_CONFIG.length; i++) {
+            for (var i = 0; i < FC.AUX_CONFIG.length; i++) {
                 if (FC.isModeBitSet(i)) {
                     $('td.name').eq(i).addClass('on').removeClass('off');
                 } else {
                     $('td.name').eq(i).removeClass('on').removeClass('off');
 
-                    if (AUX_CONFIG_values[i] > 0) {
+                    if (FC.AUX_CONFIG_values[i] > 0) {
                         $('td.name').eq(i).addClass('off');
                     }
                 }
 
             }
 
-            for (var i = 0; i < (RC.active_channels - 4); i++) {
-                box_highlight(i, RC.channels[i + 4]);
+            for (var i = 0; i < (FC.RC.active_channels - 4); i++) {
+                box_highlight(i, FC.RC.channels[i + 4]);
             }
         }
 
@@ -142,7 +152,7 @@ TABS.modes.initialize = function (callback) {
         update_ui();
 
         // enable data pulling
-        helper.interval.add('aux_data_pull', get_rc_data, 50);
+        interval.add('aux_data_pull', get_rc_data, 50);
 
         GUI.content_ready(callback);
     }

@@ -1,8 +1,6 @@
 'use strict';
 
-var helper = helper || {};
-
-helper.ltmDecoder = (function () {
+const ltmDecoder = (function () {
 
     let TELEMETRY = {
         //A frame
@@ -258,3 +256,5 @@ helper.ltmDecoder = (function () {
 
     return publicScope;
 })();
+
+module.exports = ltmDecoder;

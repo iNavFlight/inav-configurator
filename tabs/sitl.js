@@ -1,4 +1,11 @@
 'use strict'
+const path = require('path');
+
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+const { Ser2TCP, SITLProcess } = require('./../js/sitl');
+const Store = require('electron-store');
+const store = new Store();
 
 const localhost = "127.0.0.1"
 
@@ -66,22 +73,16 @@ TABS.sitl.initialize = (callback) => {
  
     if (GUI.active_tab != 'sitl') {
         GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
     }
 
-    if (GUI.active_tab != 'sitl') {
-        GUI.active_tab = 'sitl';
-        googleAnalytics.sendAppView('SITL');
-    }
-
-    GUI.load("./tabs/sitl.html", function () {
-        localize();
+    GUI.load(path.join(__dirname, "sitl.html"), function () {
+        i18n.localize();
     
     var os = GUI.operating_system;
     if (os != 'Windows' && os != 'Linux') {
 
         $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${chrome.i18n.getMessage('sitlOSNotSupported')}</h2>`);
+        $('.content_wrapper').append(`<h2>${i18n.getMessage('sitlOSNotSupported')}</h2>`);
         
         GUI.content_ready(callback);
         return;
@@ -117,16 +118,20 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
     }
 
-    $('#sitlLog').val(SITL_LOG);
-    $('#sitlLog').animate({scrollTop: $('#sitlLog').scrollHeight}, "fast");
+    var $sitlLog = $('#sitlLog');
+    $sitlLog.val(SITL_LOG);
+    if ($sitlLog && $sitlLog.length == 1) {
+        $sitlLog.val(SITL_LOG);
+        $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+    }
 
     profiles = stdProfiles.slice(0);
-    chrome.storage.local.get('sitlProfiles', (result) => {
-        if(result.sitlProfiles) 
-            profiles.push(...result.sitlProfiles);
-  
-        initElements(true);
-    });
+    var sitlProfiles = store.get('sitlProfiles', false);
+    if (sitlProfiles) {
+        profiles.push(...sitlProfiles);
+    }
+    initElements(true);
+    
     
     Ser2TCP.resetPortsList();
     Ser2TCP.pollSerialPorts(ports => {
@@ -235,20 +240,20 @@ TABS.sitl.initialize = (callback) => {
         $('.sitlStart').removeClass('disabled');
         Ser2TCP.stop();
         SITLProcess.stop();
-        appendLog(chrome.i18n.getMessage('sitlStopped'));
+        appendLog(i18n.getMessage('sitlStopped'));
     });
 
-    profileSaveBtn_e.on('click', () => {
+    profileSaveBtn_e.on('click', function () {
         saveProfiles();
     });
 
-    profileNewBtn_e.on('click', () => {
-        var name = prompt(chrome.i18n.getMessage('sitlNewProfile'), chrome.i18n.getMessage('sitlEnterName'));
+    profileNewBtn_e.on('click', function () {
+        var name = prompt(i18n.getMessage('sitlNewProfile'), i18n.getMessage('sitlEnterName'));
         if (!name)
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(chrome.i18n.getMessage('sitlProfileExists'))
+            alert(i18n.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -276,10 +281,10 @@ TABS.sitl.initialize = (callback) => {
         saveProfiles();
     });
 
-    profileDeleteBtn_e.on('click', () => {
+    profileDeleteBtn_e.on('click', function () {
 
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantDeleted'));
+            alert(i18n.getMessage('sitlStdProfileCantDeleted'));
             return;
         }
 
@@ -364,17 +369,15 @@ TABS.sitl.initialize = (callback) => {
                 protocollPreset_e.append(`<option value="${protocoll.name}">${protocoll.name}</option>`);
             });
 
-            chrome.storage.local.get('sitlLastProfile', (result) => {
-                if (result.sitlLastProfile) {    
-                    var element = profiles.find(profile => {
-                        return profile.name == result.sitlLastProfile;
-                    });
+            var sitlLastProfile = store.get('sitlLastProfile', false);
+            if (sitlLastProfile) {    
+                var element = profiles.find(profile => {
+                    return profile.name == sitlLastProfile;
+                });
 
-                    if (element)
-                        profiles_e.val(element.name).trigger('change');
-                }
-            });
-
+                if (element)
+                    profiles_e.val(element.name).trigger('change');
+            }
         }
         
         updateCurrentProfile();
@@ -382,7 +385,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(chrome.i18n.getMessage('sitlStdProfileCantOverwritten'));
+            alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];
@@ -391,9 +394,7 @@ TABS.sitl.initialize = (callback) => {
                 profilesToSave.push(profile);
         });
 
-        chrome.storage.local.set({
-            'sitlProfiles': profilesToSave
-        });
+        store.set('sitlProfiles', profilesToSave);
     
     }
 
@@ -461,9 +462,7 @@ TABS.sitl.initialize = (callback) => {
         simIp_e.val(currentProfile.ip).trigger('change'); 
         useImu_e.prop('checked', currentProfile.useImu).trigger('change');
 
-        chrome.storage.local.set({
-            'sitlLastProfile': selected
-        });
+        store.set('sitlLastProfile', selected);
     }
 
     function renderChanMapTable() 
@@ -485,7 +484,7 @@ TABS.sitl.initialize = (callback) => {
 
             row.find(".inavChannel").val(mapping[i]).on('change', (sender) => {
                 mapping[$(sender.target).data('out')] = parseInt($(sender.target).val());
-                chrome.storage.local.set({'sitlMapping': mapping});
+                store.set('sitlMapping', mapping);
             });
         }
     }
@@ -510,8 +509,11 @@ TABS.sitl.initialize = (callback) => {
 
     function appendLog(message){
         SITL_LOG += message;
-        $('#sitlLog').val(SITL_LOG);
-        $('#sitlLog').animate({scrollTop: $('#sitlLog')[0].scrollHeight}, "fast");
+        var $sitlLog = $('#sitlLog');
+        if ($sitlLog && $sitlLog.length == 1) {
+            $sitlLog.val(SITL_LOG);
+            $sitlLog.animate({scrollTop: $sitlLog[0].scrollHeight -  $sitlLog.height()}, "fast");
+        }
     }
 
     GUI.content_ready(callback);
