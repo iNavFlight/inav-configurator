@@ -105,7 +105,7 @@ TABS.logging.initialize = function (callback) {
                             GUI.log(i18n.getMessage('loggingErrorOneProperty'));
                         }
                     } else {
-                        interval.killAll(['global_data_refresh', 'msp-load-update']);
+                        interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
                         mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);

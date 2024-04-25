@@ -429,7 +429,7 @@ TABS.outputs.initialize = function (callback) {
             $voltageHelper = $(".current-voltage");
 
         // timer initialization
-        interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update']);
+        interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
         mspBalancedInterval.flush();
 
         interval.add('IMU_pull', function () {

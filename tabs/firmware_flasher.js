@@ -774,7 +774,7 @@ TABS.firmware_flasher.onValidFirmware = function() {
 
 TABS.firmware_flasher.closeTempConnection = function() {
     timeout.killAll();
-    interval.killAll(['global_data_refresh', 'msp-load-update']);
+    interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
     mspBalancedInterval.flush();
 
     mspQueue.flush();

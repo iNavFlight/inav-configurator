@@ -91,7 +91,7 @@ GUI_control.prototype.log = function (message) {
 GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
 
-    interval.killAll(['global_data_refresh', 'msp-load-update']);
+    interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
     mspBalancedInterval.flush();
 
     if (this.active_tab) {

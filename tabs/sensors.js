@@ -437,7 +437,7 @@ TABS.sensors.initialize = function (callback) {
             });
 
             // timer initialization
-            interval.killAll(['status_pull', 'global_data_refresh', 'msp-load-update']);
+            interval.killAll(['status_pull', 'global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
