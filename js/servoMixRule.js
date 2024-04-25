@@ -1,7 +1,6 @@
-/*global $*/
 'use strict';
 
-let ServoMixRule = function (target, input, rate, speed, condition) {
+var ServoMixRule = function (target, input, rate, speed, condition) {
 
     var self = {};
 
@@ -51,3 +50,5 @@ let ServoMixRule = function (target, input, rate, speed, condition) {
 
     return self;
 };
+
+module.exports = ServoMixRule;

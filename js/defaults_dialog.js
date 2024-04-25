@@ -1,10 +1,20 @@
-/*global mspHelper,$,GUI,MSP,chrome*/
 'use strict';
 
-var helper = helper || {};
+const { GUI } = require('./../js/gui');
+const FC = require('./fc');
+const MSP = require('./msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./msp/MSPHelper');
+const MSPChainerClass = require('./msp/MSPchainer');
+const features = require('./feature_framework');
+const periodicStatusUpdater = require('./periodicStatusUpdater');
+const { mixer } = require('./model');
+const jBox = require('./libraries/jBox/jBox.min');
+const i18n = require('./localization');
+
 var savingDefaultsModal;
 
-helper.defaultsDialog = (function () {
+var defaultsDialog = (function () {
 
     let publicScope = {},
         privateScope = {};
@@ -160,15 +170,43 @@ helper.defaultsDialog = (function () {
                 value: "DSHOT300"
             },
             /*
-            Filtering
+            Ez Tune setup
             */
             {
-                key: "gyro_main_lpf_hz",
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
                 value: 110
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "PT1"
+                key: "ez_axis_ratio",
+                value: 110
+            },
+            {
+                key: "ez_response",
+                value: 92
+            },
+            {
+                key: "ez_damping",
+                value: 108
+            },
+            {
+                key: "ez_stability",
+                value: 110
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 80
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
             },
             /*
             Dynamic gyro LPF
@@ -189,41 +227,6 @@ helper.defaultsDialog = (function () {
                 key: "gyro_dyn_lpf_curve_expo",
                 value: 3
             },
-            /*
-            D-term
-            */
-            {
-                key: "dterm_lpf_hz",
-                value: 110
-            },
-            {
-                key: "dterm_lpf_type",
-                value: "PT3"
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
-            },
-            {
-                key: "dynamic_gyro_notch_q",
-                value: 250
-            },
-            {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 100
-            },
-            {
-                key: "setpoint_kalman_enabled",
-                value: "ON"
-            },
-            {
-                key: "setpoint_kalman_q",
-                value: 200
-            },
-            {
-                key: "smith_predictor_delay",   // Enable Smith Predictor 
-                value: 1.5
-            },   
             /*
             Mechanics
             */
@@ -256,64 +259,6 @@ helper.defaultsDialog = (function () {
                 value: 5
             },
             /*
-            Rates
-            */
-            {
-                key: "rc_yaw_expo",
-                value: 75
-            },
-            {
-                key: "rc_expo",
-                value: 75
-            },
-            {
-                key: "roll_rate",
-                value: 70
-            },
-            {
-                key: "pitch_rate",
-                value: 70
-            },
-            {
-                key: "yaw_rate",
-                value: 60
-            },
-            /*
-            PIDs
-            */
-            {
-                key: "mc_p_pitch",
-                value: 40
-            },
-            {
-                key: "mc_i_pitch",
-                value: 90
-            },
-            {
-                key: "mc_d_pitch",
-                value: 27
-            },
-            {
-                key: "mc_p_roll",
-                value: 36
-            },
-            {
-                key: "mc_i_roll",
-                value: 80
-            },
-            {
-                key: "mc_d_roll",
-                value: 25
-            },
-            {
-                key: "mc_p_yaw",
-                value: 35
-            },
-            {
-                key: "mc_i_yaw",
-                value: 80
-            },
-            /*
              * TPA
              */
             {
@@ -335,11 +280,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
-            },
-            // Ez Tune
-            {
-                key: "ez_filter_hz",
-                value: 110
             }
         ]
     },
@@ -370,52 +310,44 @@ helper.defaultsDialog = (function () {
                 value: "DSHOT300"
             },
             /*
-            Filtering
+            Ez Tune setup
             */
             {
-                key: "gyro_main_lpf_hz",
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
                 value: 90
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "PT1"
+                key: "ez_axis_ratio",
+                value: 110
             },
             {
-                key: "dterm_lpf_hz",
-                value: 80
+                key: "ez_response",
+                value: 101
             },
             {
-                key: "dterm_lpf_type",
-                value: "PT3"
+                key: "ez_damping",
+                value: 115
             },
             {
-                key: "dynamic_gyro_notch_enabled",
-                value: "ON"
+                key: "ez_stability",
+                value: 100
             },
             {
-                key: "dynamic_gyro_notch_mode",
-                value: "3D"
+                key: "ez_aggressiveness",
+                value: 100
             },
             {
-                key: "dynamic_gyro_notch_q",
-                value: 250
+                key: "ez_rate",
+                value: 134
             },
             {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 60
-            },
-            {
-                key: "setpoint_kalman_enabled",
-                value: "ON"
-            },
-            {
-                key: "setpoint_kalman_q",
-                value: 200
-            },
-            {
-                key: "smith_predictor_delay",   // Enable Smith Predictor 
-                value: 1.5
-            },   
+                key: "ez_expo",
+                value: 118
+            }, 
             /*
             Mechanics
             */
@@ -448,64 +380,6 @@ helper.defaultsDialog = (function () {
                 value: 5
             },
             /*
-            Rates
-            */
-            {
-                key: "rc_yaw_expo",
-                value: 75
-            },
-            {
-                key: "rc_expo",
-                value: 75
-            },
-            {
-                key: "roll_rate",
-                value: 70
-            },
-            {
-                key: "pitch_rate",
-                value: 70
-            },
-            {
-                key: "yaw_rate",
-                value: 60
-            },
-            /*
-            PIDs
-            */
-            {
-                key: "mc_p_pitch",
-                value: 44
-            },
-            {
-                key: "mc_i_pitch",
-                value: 85
-            },
-            {
-                key: "mc_d_pitch",
-                value: 28
-            },
-            {
-                key: "mc_p_roll",
-                value: 40
-            },
-            {
-                key: "mc_i_roll",
-                value: 75
-            },
-            {
-                key: "mc_d_roll",
-                value: 26
-            },
-            {
-                key: "mc_p_yaw",
-                value: 40
-            },
-            {
-                key: "mc_i_yaw",
-                value: 80
-            },
-            /*
              * TPA
              */
             {
@@ -527,11 +401,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "failsafe_procedure",
                 value: "DROP"
-            },
-            // Ez Tune
-            {
-                key: "ez_filter_hz",
-                value: 90
             }
         ]
     },
@@ -573,10 +442,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "d_boost_max",
                 value: 1
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
             },
             {
                 key: "dynamic_gyro_notch_enabled",
@@ -720,7 +585,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 5000
+                value: 800
             },
             {
                 key: "nav_wp_max_safe_distance",
@@ -782,10 +647,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "d_boost_max",
                 value: 1
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
             },
             {
                 key: "dynamic_gyro_notch_enabled",
@@ -929,7 +790,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_wp_radius",
-                value: 5000
+                value: 1000
             },
             {
                 key: "nav_wp_max_safe_distance",
@@ -971,10 +832,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "gyro_main_lpf_hz",
                 value: 10
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
             },
             {
                 key: "motor_pwm_protocol",
@@ -1044,17 +901,17 @@ helper.defaultsDialog = (function () {
     privateScope.setFeaturesBits = function (selectedDefaultPreset) {
 
         if (selectedDefaultPreset.features && selectedDefaultPreset.features.length > 0) {
-            helper.features.reset();
+            features.reset();
 
             for (const feature of selectedDefaultPreset.features) {
                 if (feature.state) {
-                    helper.features.set(feature.bit);
+                    features.set(feature.bit);
                 } else {
-                    helper.features.unset(feature.bit);
+                    features.unset(feature.bit);
                 }
             }
 
-            helper.features.execute(function () {
+            features.execute(function () {
                 privateScope.setSettings(selectedDefaultPreset);
             });
         } else {
@@ -1065,7 +922,7 @@ helper.defaultsDialog = (function () {
     privateScope.finalize = function (selectedDefaultPreset) {
         mspHelper.saveToEeprom(function () {
             //noinspection JSUnresolvedVariable
-            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+            GUI.log(i18n.getMessage('configurationEepromSaved'));
 
             if (selectedDefaultPreset.reboot) {
                 GUI.tab_switch_cleanup(function () {
@@ -1074,7 +931,7 @@ helper.defaultsDialog = (function () {
                         if (typeof savingDefaultsModal !== 'undefined') {
                             savingDefaultsModal.close();
                         }
-                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        GUI.log(i18n.getMessage('deviceRebooting'));
                         GUI.handleReconnect();
                     });
                 });
@@ -1083,6 +940,9 @@ helper.defaultsDialog = (function () {
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
+        
+        periodicStatusUpdater.stop();
+        
         var currentControlProfile = parseInt($("#profilechange").val());
         var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
 
@@ -1099,9 +959,6 @@ helper.defaultsDialog = (function () {
                 miscSettings.push(input);
             }
         });
-
-        //Save analytics
-        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title); 
         
         var settingsChainer = MSPChainerClass();
         var chain = [];
@@ -1112,44 +969,77 @@ helper.defaultsDialog = (function () {
             });
         });
 
-        for (var i = 0; i < 3; i++ ) {
+        
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
             chain.push(function (callback) {
-                MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [i], false, callback);
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-            controlProfileSettings.forEach(input => {
-                chain.push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
-            });
-        }
+        });
 
-        for (var i = 0; i < 3; i++ ) {
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [1], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
             chain.push(function (callback) {
-                MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [i], false, callback);
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-            batterySettings.forEach(input => {
-                chain.push(function (callback) {
-                    mspHelper.setSetting(input.key, input.value, callback);
-                });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [2], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
             });
-        }
+        });    
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [0], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [1], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [2], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
         
         // Set Mixers
         if (selectedDefaultPreset.mixerToApply) {
-            let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
+            let currentMixerPreset = mixer.getById(selectedDefaultPreset.mixerToApply);
 
-            helper.mixer.loadServoRules(currentMixerPreset);
-            helper.mixer.loadMotorRules(currentMixerPreset);
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
             
-            MIXER_CONFIG.platformType = currentMixerPreset.platform;
-            MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
-            MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
-            MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+            FC.MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            FC.MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+            FC.MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
 
-            SERVO_RULES.cleanup();
-            SERVO_RULES.inflate();
-            MOTOR_RULES.cleanup();
-            MOTOR_RULES.inflate();
+            FC.SERVO_RULES.cleanup();
+            FC.SERVO_RULES.inflate();
+            FC.MOTOR_RULES.cleanup();
+            FC.MOTOR_RULES.inflate();
             
             chain = chain.concat([
                 mspHelper.saveMixerConfig,
@@ -1177,7 +1067,7 @@ helper.defaultsDialog = (function () {
     privateScope.onPresetClick = function (event) {
         savingDefaultsModal = new jBox('Modal', {
             width: 400,
-            height: 100,
+            height: 120,
             animation: false,
             closeOnClick: false,
             closeOnEsc: false,
@@ -1217,7 +1107,7 @@ helper.defaultsDialog = (function () {
                 }
 
                 $element.find("a").html(preset.title);
-                $element.data("index", i).click(privateScope.onPresetClick)
+                $element.data("index", i).on('click', privateScope.onPresetClick)
                 $element.appendTo($place);
             }
         }
@@ -1234,3 +1124,5 @@ helper.defaultsDialog = (function () {
 
     return publicScope;
 })();
+
+module.exports = defaultsDialog;

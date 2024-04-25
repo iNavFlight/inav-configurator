@@ -10,6 +10,15 @@
                 <div class="settings spacer_right">
                     <select class="osd_layouts">
                     </select>
+                    <span class="btn btn_blue">
+                        <a class="active osd_copy" href="#" data-i18n="copy"></a>
+                    </span>
+                    <span class="btn btn_blue">
+                        <a class="active osd_paste" href="#" data-i18n="paste"></a>
+                    </span>
+                    <span class="btn btn_danger">
+                        <a class="active osd_clear" href="#" data-i18n="clear"></a>
+                    </span>
                     <input class="osd_search" placeholder="Search...">
                 </div>
                 <div class="spacer_right">
@@ -242,6 +251,16 @@
                             <input id="osd_gforce_axis_alarm_max" data-setting="osd_gforce_axis_alarm_max" data-setting-multiplier="1" type="number" data-step="0.1" />
                             <span data-i18n="osd_gforce_axis_alarm_max"></span>
                         </label>
+                        <div for="adsb_distance_warning" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_WARNING"></div>
+                        <label for="adsb_distance_warning">
+                            <input id="adsb_distance_warning" data-setting="osd_adsb_distance_warning" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <span data-i18n="osd_adsb_distance_warning"></span>
+                        </label>
+                        <div for="adsb_distance_alert" class="helpicon cf_tip" data-i18n_title="osdAlarmADSB_MAX_DISTANCE_ALERT"></div>
+                        <label for="adsb_distance_alert">
+                            <input id="adsb_distance_alert" data-setting="osd_adsb_distance_alert" data-unit="m" data-setting-multiplier="1" type="number" data-step="1" />
+                            <span data-i18n="osd_adsb_distance_alert"></span>
+                        </label>
                     </div>
                 </div>
                 <div class="gui_box grey dji-hd-container" id="dji_settings">
@@ -316,7 +335,17 @@
                         </label>
                     </div>
                 </div>
-                <div class="gui_box grey pan-servo-container"> 
+
+
+                <div class="gui_box grey custom-element-container">
+                    <div class="gui_box_titlebar">
+                        <div class="spacer_box_title" data-i18n="osd_custom_element_settings"></div>
+                    </div>
+                    <div class="spacer_box settings" id="osdCustomElements"></div>
+                </div>
+
+
+                <div class="gui_box grey pan-servo-container">
                     <div class="gui_box_titlebar">
                         <div for="osd_pan_servo_settings" class="helpicon cf_tip" data-i18n_title="osd_pan_servo_settings_HELP"></div>
                         <div class="spacer_box_title" data-i18n="osd_pan_servo_settings"></div>
@@ -423,6 +452,12 @@
                 </div>
                 <div class="default_btn green" style="width:100%; float:left; margin-bottom: 0;">
                     <a class="flash_font active" data-i18n="osd_font_upload"></a>
+                </div>
+            </div>
+            <div id="fonttypeselectorcontent" style="display:none; width:712px;">
+                <div class="font-picker" style="margin-bottom: 10px;">
+                    <h1 class="tab_title">Font:</h1>
+                    <div class="content_wrapper font-preview"></div>
                 </div>
             </div>
             <div class="clear-both"></div>

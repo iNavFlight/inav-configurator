@@ -1,5 +1,17 @@
 'use strict';
-/*global chrome,GUI,BOARD_ALIGNMENT,TABS,nwdialog,helper,$*/
+
+const path = require('path');
+
+const MSPChainerClass = require('./../js/msp/MSPchainer');
+const MSP = require('./../js/msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./../js/msp/MSPHelper');
+const mspBalancedInterval = require('./../js/msp_balanced_interval');
+const mspQueue = require('./../js/serial_queue');
+const FC = require('./../js/fc');
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+const { mixer } = require('./../js/model');
 
 TABS.magnetometer = {};
 
@@ -9,7 +21,6 @@ TABS.magnetometer.initialize = function (callback) {
 
     if (GUI.active_tab != 'magnetometer') {
         GUI.active_tab = 'magnetometer';
-        googleAnalytics.sendAppView('MAGNETOMETER');
     }
 
     self.alignmentConfig = {
@@ -36,9 +47,9 @@ TABS.magnetometer.initialize = function (callback) {
         mspHelper.loadMixerConfig,
         mspHelper.loadBoardAlignment,
         function (callback) {
-            self.boardAlignmentConfig.pitch = Math.round(BOARD_ALIGNMENT.pitch / 10);
-            self.boardAlignmentConfig.roll = Math.round(BOARD_ALIGNMENT.roll / 10);
-            self.boardAlignmentConfig.yaw = Math.round(BOARD_ALIGNMENT.yaw / 10);
+            self.boardAlignmentConfig.pitch = Math.round(FC.BOARD_ALIGNMENT.pitch / 10);
+            self.boardAlignmentConfig.roll = Math.round(FC.BOARD_ALIGNMENT.roll / 10);
+            self.boardAlignmentConfig.yaw = Math.round(FC.BOARD_ALIGNMENT.yaw / 10);
             callback();
         },
         mspHelper.loadSensorAlignment,
@@ -79,16 +90,16 @@ TABS.magnetometer.initialize = function (callback) {
 
     var saveChain = [
         function (callback) {
-            BOARD_ALIGNMENT.pitch = self.boardAlignmentConfig.pitch * 10;
-            BOARD_ALIGNMENT.roll = self.boardAlignmentConfig.roll * 10;
-            BOARD_ALIGNMENT.yaw = self.boardAlignmentConfig.yaw * 10;
+            FC.BOARD_ALIGNMENT.pitch = self.boardAlignmentConfig.pitch * 10;
+            FC.BOARD_ALIGNMENT.roll = self.boardAlignmentConfig.roll * 10;
+            FC.BOARD_ALIGNMENT.yaw = self.boardAlignmentConfig.yaw * 10;
             callback();
         },
         mspHelper.saveBoardAlignment,
         // Magnetometer alignment
         function (callback) {
             let orientation_mag_e = $('select.magalign');
-            SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
+            FC.SENSOR_ALIGNMENT.align_mag = parseInt(orientation_mag_e.val());
             callback();
         },
         mspHelper.saveSensorAlignment,
@@ -126,7 +137,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function reboot() {
         //noinspection JSUnresolvedVariable
-        GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+        GUI.log(i18n.getMessage('configurationEepromSaved'));
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, reinitialize);
@@ -134,12 +145,12 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function reinitialize() {
-        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+        GUI.log(i18n.getMessage('deviceRebooting'));
         GUI.handleReconnect($('.tab_magnetometer a'));
     }
 
     function load_html() {
-        GUI.load("./tabs/magnetometer.html", process_html);
+        GUI.load(path.join(__dirname, "magnetometer.html"), process_html);
     }
 
     function generateRange(min, max, step) {
@@ -198,7 +209,7 @@ TABS.magnetometer.initialize = function (callback) {
         var magRotation = new THREE.Euler(-THREE.Math.degToRad(degree[0]-180), THREE.Math.degToRad(-180 - degree[2]), THREE.Math.degToRad(degree[1]), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
         matrix.premultiply(matrix1);  
@@ -215,7 +226,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function updateMagOrientationWithPreset() {
         if (self.isSavePreset) {
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         }
     }
@@ -292,7 +303,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     function process_html() {
 
-        localize();
+       i18n.localize();;
 
         // initialize 3D
         self.initialize3D();
@@ -318,15 +329,15 @@ TABS.magnetometer.initialize = function (callback) {
         self.pitch_e = $('dd.pitch'),
         self.heading_e = $('dd.heading');
 
-        for (i = 0; i < alignments.length; i++) {
+        for (let i = 0; i < alignments.length; i++) {
             self.pageElements.orientation_mag_e.append('<option value="' + (i + 1) + '">' + alignments[i] + '</option>');
         }
-        self.pageElements.orientation_mag_e.val(SENSOR_ALIGNMENT.align_mag);
+        self.pageElements.orientation_mag_e.val(FC.SENSOR_ALIGNMENT.align_mag);
 
         if (areAnglesZero()) {
             //If using a preset, checking if custom values are equal to 0
             //Update the slider, but don't save the value until they will be not modified.
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         }
         else {
@@ -337,15 +348,15 @@ TABS.magnetometer.initialize = function (callback) {
         }
 
 
-        self.pageElements.orientation_board_roll.change(function () {
+        self.pageElements.orientation_board_roll.on('change', function () {
             updateBoardRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_pitch.change(function () {
+        self.pageElements.orientation_board_pitch.on('change', function () {
             updateBoardPitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_board_yaw.change(function () {
+        self.pageElements.orientation_board_yaw.on('change', function () {
             updateBoardYawAxis(clamp(this, -180, 360));
         });
 
@@ -406,7 +417,7 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         const elementToShow = $("#element_to_show");
-        elementToShow.change(function () {
+        elementToShow.on('change', function () {
             const value = parseInt($(this).val());
             self.showMagnetometer = (value == 0);
             self.render3D();
@@ -416,33 +427,33 @@ TABS.magnetometer.initialize = function (callback) {
             return Math.min(Math.max(parseInt($(input).val()), min), max);
         }
 
-        self.pageElements.orientation_mag_e.change(function () {
-            SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+        self.pageElements.orientation_mag_e.on('change', function () {
+            FC.SENSOR_ALIGNMENT.align_mag = parseInt($(this).val());
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         });
 
         self.pageElements.orientation_mag_e.on('mousedown', function () {
-            const degrees = getAxisDegreeWithPresetAndBoardOrientation(SENSOR_ALIGNMENT.align_mag);
+            const degrees = getAxisDegreeWithPresetAndBoardOrientation(FC.SENSOR_ALIGNMENT.align_mag);
             presetUpdated(degrees);
         });
 
-        self.pageElements.orientation_mag_roll.change(function () {
+        self.pageElements.orientation_mag_roll.on('change', function () {
             disableSavePreset();
             updateRollAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_pitch.change(function () {
+        self.pageElements.orientation_mag_pitch.on('change', function () {
             disableSavePreset();
             updatePitchAxis(clamp(this, -180, 360));
         });
 
-        self.pageElements.orientation_mag_yaw.change(function () {
+        self.pageElements.orientation_mag_yaw.on('change', function () {
             disableSavePreset();
             updateYawAxis(clamp(this, -180, 360));
         });
 
-        $('a.save').click(function () {
+        $('a.save').on('click', function () {
             saveChainer.execute()
         });
 
@@ -513,19 +524,19 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         function get_fast_data() {
-            if (helper.mspQueue.shouldDrop()) {
+            if (mspQueue.shouldDrop()) {
                 return;
             }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
-	            self.roll_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[0]]));
-	            self.pitch_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[1]]));
-                self.heading_e.text(chrome.i18n.getMessage('initialSetupAttitude', [SENSOR_DATA.kinematics[2]]));
+	            self.roll_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[0]]));
+	            self.pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
+                self.heading_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[2]]));
                 self.render3D();
             });
         }
 
-        helper.mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
+        mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
 
         GUI.content_ready(callback);
     }
@@ -571,12 +582,12 @@ TABS.magnetometer.initialize3D = function () {
 
     // load the model including materials
     if (useWebGlRenderer) {
-        if (MIXER_CONFIG.appliedMixerPreset === -1) {
+        if (FC.MIXER_CONFIG.appliedMixerPreset === -1) {
             model_file = 'custom';
-            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + chrome.i18n.getMessage("mixerNotConfigured") + "</strong></span>");
+            GUI_control.prototype.log("<span style='color: red; font-weight: bolder'><strong>" + i18n.getMessage("mixerNotConfigured") + "</strong></span>");
         }
         else {
-            model_file = helper.mixer.getById(MIXER_CONFIG.appliedMixerPreset).model;
+            model_file = mixer.getById(FC.MIXER_CONFIG.appliedMixerPreset).model;
         }
     }
     else {
@@ -600,7 +611,7 @@ TABS.magnetometer.initialize3D = function () {
         var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch-180), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
         var matrix = (new THREE.Matrix4()).makeRotationFromEuler(magRotation);
 
-        var boardRotation = new THREE.Euler( THREE.Math.degToRad( -self.boardAlignmentConfig.pitch ), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( -self.boardAlignmentConfig.roll ), 'YXZ');
+        var boardRotation = new THREE.Euler( THREE.Math.degToRad( self.boardAlignmentConfig.pitch), THREE.Math.degToRad( -self.boardAlignmentConfig.yaw ), THREE.Math.degToRad( self.boardAlignmentConfig.roll ), 'YXZ');
         var matrix1 = (new THREE.Matrix4()).makeRotationFromEuler(boardRotation);
 
 /*
@@ -623,7 +634,7 @@ TABS.magnetometer.initialize3D = function () {
         camera.aspect = wrapper.width() / wrapper.height();
         camera.updateProjectionMatrix();
 
-        this.render3D();
+        self.render3D();
     };
 
     $(window).on('resize', this.resize3D);

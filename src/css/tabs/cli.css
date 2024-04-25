@@ -79,6 +79,24 @@
     color: white;
 }
 
+.cli-textcomplete-dropdown {
+    border: 1px solid black;
+    background-color: #4f4f4f;
+    border-radius: 5px;
+    max-height: 50%;
+    overflow: auto;
+    list-style: none;
+    padding: 5px;
+    margin: 0;
+}
+.cli-textcomplete-dropdown a {
+    color: white;
+    cursor: pointer;
+}
+.cli-textcomplete-dropdown .active {
+    background-color: #000000;
+}
+
 @media only screen and (max-width: 1055px) , only screen and (max-device-width: 1055px) {
 
 .tab-cli .content_wrapper {

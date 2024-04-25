@@ -1,5 +1,10 @@
 'use strict';
 
+const ol = require('openlayers');
+
+const MWNP = require('./mwnp');
+const Waypoint = require('./waypoint');
+const BitHelper = require('./bitHelper');
 
 let WaypointCollection = function () {
 
@@ -255,24 +260,24 @@ let WaypointCollection = function () {
         let waypoint = self.getWaypoint(waypointId);
         buffer.push(waypoint.getNumber());    // sbufReadU8(src);    // number
         buffer.push(waypoint.getAction());    // sbufReadU8(src);    // action
-        buffer.push(specificByte(waypoint.getLat(), 0));    // sbufReadU32(src);      // lat
-        buffer.push(specificByte(waypoint.getLat(), 1));
-        buffer.push(specificByte(waypoint.getLat(), 2));
-        buffer.push(specificByte(waypoint.getLat(), 3));
-        buffer.push(specificByte(waypoint.getLon(), 0));    // sbufReadU32(src);      // lon
-        buffer.push(specificByte(waypoint.getLon(), 1));
-        buffer.push(specificByte(waypoint.getLon(), 2));
-        buffer.push(specificByte(waypoint.getLon(), 3));
-        buffer.push(specificByte(waypoint.getAlt(), 0));    // sbufReadU32(src);      // to set altitude (cm)
-        buffer.push(specificByte(waypoint.getAlt(), 1));
-        buffer.push(specificByte(waypoint.getAlt(), 2));
-        buffer.push(specificByte(waypoint.getAlt(), 3));
-        buffer.push(lowByte(waypoint.getP1())); //sbufReadU16(src);       // P1 speed or landing
-        buffer.push(highByte(waypoint.getP1()));
-        buffer.push(lowByte(waypoint.getP2())); //sbufReadU16(src);       // P2
-        buffer.push(highByte(waypoint.getP2()));
-        buffer.push(lowByte(waypoint.getP3())); //sbufReadU16(src);       // P3
-        buffer.push(highByte(waypoint.getP3()));
+        buffer.push(BitHelper.specificByte(waypoint.getLat(), 0));    // sbufReadU32(src);      // lat
+        buffer.push(BitHelper.specificByte(waypoint.getLat(), 1));
+        buffer.push(BitHelper.specificByte(waypoint.getLat(), 2));
+        buffer.push(BitHelper.specificByte(waypoint.getLat(), 3));
+        buffer.push(BitHelper.specificByte(waypoint.getLon(), 0));    // sbufReadU32(src);      // lon
+        buffer.push(BitHelper.specificByte(waypoint.getLon(), 1));
+        buffer.push(BitHelper.specificByte(waypoint.getLon(), 2));
+        buffer.push(BitHelper.specificByte(waypoint.getLon(), 3));
+        buffer.push(BitHelper.specificByte(waypoint.getAlt(), 0));    // sbufReadU32(src);      // to set altitude (cm)
+        buffer.push(BitHelper.specificByte(waypoint.getAlt(), 1));
+        buffer.push(BitHelper.specificByte(waypoint.getAlt(), 2));
+        buffer.push(BitHelper.specificByte(waypoint.getAlt(), 3));
+        buffer.push(BitHelper.lowByte(waypoint.getP1())); //sbufReadU16(src);       // P1 speed or landing
+        buffer.push(BitHelper.highByte(waypoint.getP1()));
+        buffer.push(BitHelper.lowByte(waypoint.getP2())); //sbufReadU16(src);       // P2
+        buffer.push(BitHelper.highByte(waypoint.getP2()));
+        buffer.push(BitHelper.lowByte(waypoint.getP3())); //sbufReadU16(src);       // P3
+        buffer.push(BitHelper.highByte(waypoint.getP3()));
         buffer.push(waypoint.getEndMission()); //sbufReadU8(src);      // future: to set nav flag
 
         return buffer;
@@ -417,7 +422,7 @@ let WaypointCollection = function () {
     self.getElevation = async function(globalSettings) {
         const [nLoop, point2measure, altPoint2measure, namePoint2measure, refPoint2measure] = self.getPoint2Measure(true);
         let lengthMission = self.getDistance(true);
-        let totalMissionDistance = lengthMission[lengthMission.length -1].toFixed(1);
+        let totalMissionDistance = lengthMission.length >= 1 ? lengthMission[lengthMission.length -1].toFixed(1) : 0;
         let samples;
         let sampleMaxNum;
         let sampleDistance;
@@ -442,7 +447,7 @@ let WaypointCollection = function () {
 
         let elevation = "N/A";
         if (globalSettings.mapProviderType == 'bing') {
-            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "ellipsoid" : "sealevel";
 
             if (point2measure.length >1) {
                 const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/Polyline?points='+point2measure+'&heights='+elevationEarthModel+'&samples='+String(samples+1)+'&key='+globalSettings.mapApiKey);
@@ -480,3 +485,6 @@ let WaypointCollection = function () {
 
     return self;
 };
+
+module.exports = WaypointCollection;
+

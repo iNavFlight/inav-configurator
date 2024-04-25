@@ -1,0 +1,185 @@
+name: Build Configurator
+# Don't enable CI on push, just on PR. If you
+# are working on the main repo and want to trigger
+# a CI build submit a draft PR.
+on: pull_request
+
+jobs:
+    build-linux:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup environment
+              env:
+                ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+              run: |
+                # This is the hash of the commit for the PR
+                # when the action is triggered by PR, empty otherwise
+                COMMIT_ID=${{ github.event.pull_request.head.sha }}
+                # This is the hash of the commit when triggered by push
+                # but the hash of refs/pull/<n>/merge, which is different
+                # from the hash of the latest commit in the PR, that's
+                # why we try github.event.pull_request.head.sha first
+                COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+                BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+                VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+                echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+                echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+                echo "BUILD_NAME=inav-configurator_linux_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                check-latest: true
+                cache: 'npm'
+            - name: Install dependencies
+              run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm build-essential libudev-dev
+            - name: Install deps
+              uses: nick-fields/retry@v2
+              with:
+                max_attempts: 3
+                retry_on: error
+                command: npm install
+                timeout_minutes: 10
+            - name: Build Linux
+              run: npm run make
+            - name: Upload Linux deb
+              uses: actions/upload-artifact@v3
+              with:
+                name: ${{ env.BUILD_NAME }}_DEB
+                path: ./out/make/deb/x64/*.deb
+            - name: Upload Linux rpm
+              uses: actions/upload-artifact@v3
+              with:
+                name: ${{ env.BUILD_NAME }}_RPM
+                path: ./out/make/rpm/x64/*.rpm
+            - name: Upload Linux zip
+              uses: actions/upload-artifact@v3
+              with:
+                name: ${{ env.BUILD_NAME }}_ZIP
+                path: ./out/make/zip/linux/x64/*.zip
+    build-mac:
+        runs-on: macos-latest
+        steps:
+        - uses: actions/checkout@v4
+        - name: Setup environment
+          env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+          run: |
+            # This is the hash of the commit for the PR
+            # when the action is triggered by PR, empty otherwise
+            COMMIT_ID=${{ github.event.pull_request.head.sha }}
+            # This is the hash of the commit when triggered by push
+            # but the hash of refs/pull/<n>/merge, which is different
+            # from the hash of the latest commit in the PR, that's
+            # why we try github.event.pull_request.head.sha first
+            COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+            BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+            VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+            echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+            echo "BUILD_NAMEx64=inav-configurator_darwin_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+            echo "BUILD_NAMEarm64=inav-configurator_darwin_arm64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 20
+            check-latest: true
+            cache: 'npm'
+        # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
+        - name: Install Setuptools
+          run: pip install setuptools
+        - name: Install deps
+          uses: nick-fields/retry@v2
+          with:
+            max_attempts: 3
+            retry_on: error
+            command: npm install
+            timeout_minutes: 10
+        - name: Build MacOS x64
+          run: npm run make -- --arch="x64"
+        - name: Build MacOS arm64
+          run: npm run make -- --arch="arm64"
+        - name: Upload MacOS x64 zip
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEx64}}_ZIP
+            path: ./out/make/zip/darwin/x64/*.zip
+        - name: Upload MacOS x64 dmg
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEx64}}_DMG
+            path: ./out/make/*x64*.dmg
+        - name: Upload MacOS arm64 zip
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEarm64}}_ZIP
+            path: ./out/make/zip/darwin/arm64/*.zip
+        - name: Upload MacOS arm64 dmg
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{env.BUILD_NAMEarm64}}_DMG
+            path: ./out/make/*arm64*.dmg
+    build-windows:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install linux utils
+              run: choco install --force -y awk grep sed
+            - name: Setup environment
+              env:
+                ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+              run: |
+                # This is the hash of the commit for the PR
+                # when the action is triggered by PR, empty otherwise
+                COMMIT_ID=${{ github.event.pull_request.head.sha }}
+                # This is the hash of the commit when triggered by push
+                # but the hash of refs/pull/<n>/merge, which is different
+                # from the hash of the latest commit in the PR, that's
+                # why we try github.event.pull_request.head.sha first
+                COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+                BUILD_SUFFIX=ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})
+                VERSION=$(grep version package.json | sed 's/.*"\([0-9][0-9]*.[0-9]*.[0-9]*\)".*/\1/g')
+                echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+                echo "BUILD_SUFFIX=${BUILD_SUFFIX}" >> $GITHUB_ENV
+                echo "BUILD_NAMEx64=inav-configurator_win32_x64_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+                echo "BUILD_NAMEia32=inav-configurator_win32_ia32_${VERSION}_${BUILD_SUFFIX}" >> $GITHUB_ENV
+              shell: bash
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: 'npm'
+            - uses: engineerd/configurator@v0.0.10
+              with: 
+                name: "Wix Toolset 3.1.4"
+                url: "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip"
+                pathInArchive: "/"
+            - name: Install deps
+              uses: nick-fields/retry@v2
+              with:
+                max_attempts: 3
+                retry_on: error
+                command: npm install
+                timeout_minutes: 10
+            - name: Build Win32 x64
+              run: npm run make -- --arch="x64"
+            - name: Build win32 ia32
+              run: npm run make -- --arch="ia32"
+            - name: Upload Windows x64 zip
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{env.BUILD_NAMEx64}}_ZIP
+                path: ./out/make/zip/win32/x64/*.zip
+            - name: Upload Windows x64 msi
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{env.BUILD_NAMEx64}}_MSI
+                path: ./out/make/wix/x64/*.msi
+            - name: Upload Windows ia32 zip
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{env.BUILD_NAMEia32}}_ZIP
+                path: ./out/make/zip/win32/ia32/*.zip
+            - name: Upload Windows ia32 msi
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{env.BUILD_NAMEia32}}_MSI
+                path: ./out/make/wix/ia32/*.msi
+        

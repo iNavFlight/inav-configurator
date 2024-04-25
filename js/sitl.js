@@ -1,8 +1,11 @@
 'use strict'
-
+const path = require('path');
+const { app } = require('@electron/remote');
+const { SerialPort } = require('serialport');
 const { spawn } = require('node:child_process');
-const pathMod = require('path');
 const { chmod, rm } = require('node:fs');
+
+const { GUI } = require('./gui');
 
 const serialRXProtocolls = [
 {
@@ -55,9 +58,9 @@ var Ser2TCP = {
 
         var path;
         if (GUI.operating_system == 'Windows') {
-            path = './resources/sitl/windows/Ser2TCP.exe'
+            path = './../resources/sitl/windows/Ser2TCP.exe'
         } else if (GUI.operating_system == 'Linux') {
-            path = './resources/sitl/linux/Ser2TCP'
+            path = './../resources/sitl/linux/Ser2TCP'
             chmod(path, 0o755, (err) => {
                 if (err)
                     console.log(err);
@@ -124,22 +127,25 @@ var Ser2TCP = {
     },
 
     getDevices: function(callback) {
-        chrome.serial.getDevices((devices_array) => {
+        SerialPort.list().then((ports, error) => {
             var devices = [];
-            devices_array.forEach((device) => {
-
-                if (GUI.operating_system == 'Windows') {
-                    var m = device.path.match(/COM\d?\d/g)
+            if (error) {
+                GUI.log("Unable to list serial ports.");
+            } else {  
+                 ports.forEach((device) => {
+                    if (GUI.operating_system == 'Windows') {
+                        var m = device.path.match(/COM\d?\d/g)
                         if (m)
-                          devices.push(m[0]);
-                } else {
-                    if (device.displayName != null) {
-			var m = device.path.match(/\/dev\/.*/)
-                        if (m)
-                          devices.push(m[0]);
+                            devices.push(m[0]);
+                    } else {
+                        if (device.displayName != null) {
+                            var m = device.path.match(/\/dev\/.*/)
+                            if (m)
+                                devices.push(m[0]);
+                        }
                     }
-		}
-            });
+                });
+            }
             callback(devices);
         });
     },
@@ -188,7 +194,7 @@ var SITLProcess = {
     process: null,
 
     deleteEepromFile(filename) {
-        rm(`${nw.App.dataPath}/${filename}`, error => {
+        rm(`${app.getPath('userData')}/${filename}`, error => {
             if (error) {
                 GUI.log(`Unable to reset Demo mode: ${error.message}`);
             }
@@ -202,11 +208,11 @@ var SITLProcess = {
 
         var sitlExePath, eepromPath;
         if (GUI.operating_system == 'Windows') {
-            sitlExePath = './resources/sitl/windows/inav_SITL.exe'
-            eepromPath = `${nw.App.dataPath}\\${eepromFileName}`
+            sitlExePath = path.join(__dirname, './../resources/sitl/windows/inav_SITL.exe');
+            eepromPath = `${app.getPath('userData')}\\${eepromFileName}`
         } else if (GUI.operating_system == 'Linux') {
-            sitlExePath = './resources/sitl/linux/inav_SITL';
-            eepromPath = `${nw.App.dataPath}/${eepromFileName}`
+            sitlExePath = path.join(__dirname, './../resources/sitl/linux/inav_SITL');
+            eepromPath = `${app.getPath('userData')}/${eepromFileName}`
             chmod(sitlExePath, 0o755, err => {
                 if (err)
                     console.log(err);
@@ -268,3 +274,5 @@ var SITLProcess = {
         }
     }
 };
+
+module.exports = { Ser2TCP, SITLProcess };
