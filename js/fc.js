@@ -1266,6 +1266,12 @@ var FC = {
                 operandType: "Set Flight Parameter",
                 hasOperand: [true, false],
                 output: "raw"
+            },        
+            53: {
+                name: "Disable GPS Sensor Fix",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "boolean"
             },
             54: {
                 name: "Mag calibration",
