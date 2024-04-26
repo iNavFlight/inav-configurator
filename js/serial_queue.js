@@ -294,16 +294,20 @@ var mspQueue = function () {
         var currentTimestamp = new Date().getTime(),
             threshold = publicScope.getHardwareRoundtrip() * 3;
 
-        if (threshold > 1000) {
+        if (threshold > 5000) {
+            threshold = 5000;
+        }
+        if (threshold < 1000) {
             threshold = 1000;
         }
 
         if (privateScope.softLock !== false && currentTimestamp - privateScope.softLock > threshold) {
-            privateScope.softLock = false;
+            publicScope.freeSoftLock();
             eventFrequencyAnalyzer.put('force free soft lock');
         }
         if (privateScope.hardLock !== false && currentTimestamp - privateScope.hardLock > threshold) {
-            privateScope.hardLock = false;
+            console.log('Force free hard lock');
+            publicScope.freeHardLock();
             eventFrequencyAnalyzer.put('force free hard lock');
         }
 

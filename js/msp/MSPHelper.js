@@ -19,6 +19,7 @@ const Safehome = require('./../safehome');
 const { FwApproach } = require('./../fwApproach');
 const Waypoint = require('./../waypoint');
 const mspDeduplicationQueue = require('./mspDeduplicationQueue');
+const mspStatistics = require('./mspStatistics');
 
 var mspHelper = (function () {
     var self = {};
@@ -1619,7 +1620,12 @@ var mspHelper = (function () {
                      */
                     if (dataHandler.callbacks[i]) {
                         mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
-                        mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
+
+                        const hardwareRountrip = new Date().getTime() - dataHandler.callbacks[i].sentOn;
+
+                        mspQueue.putHardwareRoundtrip(hardwareRountrip);
+
+                        mspStatistics.add(dataHandler.code, hardwareRountrip);
                     }
 
                     //remove message from queue as received
@@ -3069,6 +3075,7 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
+        console.log("Getting setting " + name);
         if (FC.SETTINGS[name]) {
             return Promise.resolve(FC.SETTINGS[name]);
         }
