@@ -1,9 +1,11 @@
 'use strict';
 
+const { dialog } = require("@electron/remote");
 const path = require('path');
 
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
+const mspHelper = require("./../js/msp/MSPHelper");
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
