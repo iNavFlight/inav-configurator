@@ -27,6 +27,7 @@ const BOARD = require('./boards');
 const jBox = require('./libraries/jBox/jBox.min');
 const groundstation = require('./groundstation');
 const ltmDecoder = require('./ltmDecoder');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 var SerialBackend = (function () {
 
@@ -239,7 +240,7 @@ var SerialBackend = (function () {
                             mspQueue.flush();
                             mspQueue.freeHardLock();
                             mspQueue.freeSoftLock();
-                            mspQueue.flushMessages();
+                            mspDeduplicationQueue.flush();
 
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
@@ -377,7 +378,7 @@ var SerialBackend = (function () {
                         mspQueue.flush();
                         mspQueue.freeHardLock();
                         mspQueue.freeSoftLock();
-                        mspQueue.flushMessages();
+                        mspDeduplicationQueue.flush();
                         CONFIGURATOR.connection.emptyOutputBuffer();
 
                     $('div.connect_controls a').click(); // disconnect

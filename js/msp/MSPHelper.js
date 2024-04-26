@@ -18,6 +18,7 @@ const ProgrammingPid = require('./../programmingPid');
 const Safehome = require('./../safehome');
 const { FwApproach } = require('./../fwApproach');
 const Waypoint = require('./../waypoint');
+const mspDeduplicationQueue = require('./mspDeduplicationQueue');
 
 var mspHelper = (function () {
     var self = {};
@@ -1622,7 +1623,7 @@ var mspHelper = (function () {
                     }
 
                     //remove message from queue as received
-                    mspQueue.removeMessage(dataHandler.code);
+                    mspDeduplicationQueue.remove(dataHandler.code);
 
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);

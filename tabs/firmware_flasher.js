@@ -22,6 +22,7 @@ const mspQueue = require('./../js/serial_queue');
 const mspHelper = require('./../js/msp/MSPHelper');
 const STM32 = require('./../js/protocols/stm32');
 const STM32DFU = require('./../js/protocols/stm32usbdfu');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -780,7 +781,7 @@ TABS.firmware_flasher.closeTempConnection = function() {
     mspQueue.flush();
     mspQueue.freeHardLock();
     mspQueue.freeSoftLock();
-    mspQueue.flushMessages();
+    mspDeduplicationQueue.flush();
     CONFIGURATOR.connection.emptyOutputBuffer();
 
     CONFIGURATOR.connectionValid = false;

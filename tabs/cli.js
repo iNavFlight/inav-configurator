@@ -13,6 +13,7 @@ const { globalSettings } = require('./../js/globalSettings');
 const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -94,7 +95,7 @@ TABS.cli.initialize = function (callback) {
 
     // Flush MSP queue as well as all MSP registered callbacks
     mspQueue.flush();
-    mspQueue.flushMessages();
+    mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";
