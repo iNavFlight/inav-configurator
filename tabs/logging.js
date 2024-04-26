@@ -7,7 +7,6 @@ const store = new Store();
 
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
@@ -106,7 +105,6 @@ TABS.logging.initialize = function (callback) {
                         }
                     } else {
                         interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-                        mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
                         $(this).text(i18n.getMessage('loggingStart'));

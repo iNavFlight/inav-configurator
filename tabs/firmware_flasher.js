@@ -17,7 +17,6 @@ const CONFIGURATOR = require('./../js/data_storage');
 const SerialBackend = require('./../js/serial_backend');
 const timeout = require('./../js/timeouts');
 const interval = require('./../js/intervals');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspQueue = require('./../js/serial_queue');
 const mspHelper = require('./../js/msp/MSPHelper');
 const STM32 = require('./../js/protocols/stm32');
@@ -776,7 +775,6 @@ TABS.firmware_flasher.onValidFirmware = function() {
 TABS.firmware_flasher.closeTempConnection = function() {
     timeout.killAll();
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-    mspBalancedInterval.flush();
 
     mspQueue.flush();
     mspQueue.freeHardLock();

@@ -5,7 +5,6 @@ const path = require('path');
 const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspQueue = require('./../js/serial_queue')
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
@@ -430,7 +429,6 @@ TABS.outputs.initialize = function (callback) {
 
         // timer initialization
         interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-        mspBalancedInterval.flush();
 
         interval.add('IMU_pull', function () {
 

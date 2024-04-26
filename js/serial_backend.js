@@ -18,7 +18,6 @@ const interval = require('./intervals');
 const periodicStatusUpdater = require('./periodicStatusUpdater');
 const mspQueue = require('./serial_queue');
 const timeout = require('./timeouts');
-const mspBalancedInterval = require('./msp_balanced_interval'); 
 const defaultsDialog = require('./defaults_dialog');
 const { SITLProcess } = require('./sitl');
 const update = require('./globalUpdates');
@@ -218,7 +217,6 @@ var SerialBackend = (function () {
 
                         timeout.killAll();
                         interval.killAll(['global_data_refresh', 'msp-load-update']);
-                        mspBalancedInterval.flush();
 
                         if (CONFIGURATOR.cliActive) {
                             GUI.tab_switch_cleanup(finishDisconnect);
