@@ -59,6 +59,15 @@ var mspQueue = function () {
 
     privateScope.queueLocked = false;
 
+    privateScope.isMessageInQueue = function (code) {
+        for (var i = 0; i < privateScope.queue.length; i++) {
+            if (privateScope.queue[i].code == code) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     publicScope.setremoveCallback = function(cb) {
         privateScope.removeCallback = cb;
     }
@@ -84,6 +93,10 @@ var mspQueue = function () {
 
     publicScope.setLockMethod = function (method) {
         privateScope.lockMethod = method;
+    };
+
+    publicScope.getLockMethod = function () {   
+        return privateScope.lockMethod;
     };
 
     publicScope.setSoftLock = function () {
@@ -223,6 +236,12 @@ var mspQueue = function () {
      */
     publicScope.put = function (mspRequest) {
 
+        console.log(mspRequest.code);
+        if (privateScope.isMessageInQueue(mspRequest.code)) {
+            console.log('Message already in queue: ' + mspRequest.code);
+            return false;
+        }
+
         if (privateScope.queueLocked === true) {
             return false;
         }
@@ -315,6 +334,10 @@ var mspQueue = function () {
         } else {
             return (1000 / availableRate) * messagesInInterval;
         }
+    };
+
+    publicScope.getQueue = function () {
+        return privateScope.queue;
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

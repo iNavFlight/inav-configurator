@@ -35,6 +35,8 @@ var SerialBackend = (function () {
         
     privateScope.isDemoRunning = false;
 
+    privateScope.isWirelessMode = false;
+
     /*
      * Handle "Wireless" mode with strict queueing of messages
      */
