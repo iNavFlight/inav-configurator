@@ -313,14 +313,6 @@ var mspQueue = function () {
 
     };
 
-    publicScope.shouldDrop = function () {
-        return (Math.round(Math.random()*100) < privateScope.dropRatio);
-    };
-
-    publicScope.shouldDropStatus = function () {
-        return (Math.round(Math.random()*100) < (privateScope.dropRatio * privateScope.statusDropFactor));
-    };
-
     /**
      * This method return periodic for polling interval that should populate queue in 80% or less
      * @param {number} requestedInterval

@@ -341,10 +341,6 @@ TABS.mission_control.initialize = function (callback) {
                   return;
               }
 
-              if (mspQueue.shouldDrop()) {
-                  return;
-              }
-
               get_raw_gps_data();
           }, 200);
         }

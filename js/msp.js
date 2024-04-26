@@ -269,7 +269,7 @@ var MSP = {
          */
         timeout.add('delayedFreeHardLock', function() {
             mspQueue.freeHardLock();
-        }, 50);
+        }, 10);
 
         // Reset variables
         this.message_length_received = 0;
