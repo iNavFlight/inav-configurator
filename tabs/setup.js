@@ -123,9 +123,9 @@ TABS.setup.initialize = function (callback) {
                 /*
                  * Enable balancer
                  */
-                if (mspQueue.shouldDrop()) {
-                    return;
-                }
+                // if (mspQueue.shouldDrop()) {
+                //     return;
+                // }
 
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = i18n.getMessage('gpsFixNone');
@@ -146,9 +146,9 @@ TABS.setup.initialize = function (callback) {
             /*
              * Enable balancer
              */
-            if (mspQueue.shouldDrop()) {
-                return;
-            }
+            // if (mspQueue.shouldDrop()) {
+            //     return;
+            // }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
 	            roll_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[0]]));
@@ -159,8 +159,9 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
         mspBalancedInterval.add('setup_data_pull_slow', 250, 1, get_slow_data);
+
+        interval.add('setup_data_pull_fast', get_fast_data, 50);
 
         interval.add('gui_analog_update', function () {
             bat_cells_e.text(i18n.getMessage('initialSetupBatteryDetectedCellsValue', [FC.ANALOG.cell_count]));
