@@ -454,35 +454,36 @@ var SerialBackend = (function () {
         $('.mode-disconnected').hide();
         $('.mode-connected').show();
 
-        MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false);
+        MSP.send_message(MSPCodes.MSP_DATAFLASH_SUMMARY, false, false, function () {
+            $('#sensor-status').show();
+            $('#portsinput').hide();
+            $('#dataflash_wrapper_global').show();
 
-        $('#sensor-status').show();
-        $('#portsinput').hide();
-        $('#dataflash_wrapper_global').show();
+            /*
+            * Get BOXNAMES since it is used for some reason....
+            */
+            MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, function () {
+                /*
+                * Init PIDs bank with a length that depends on the version
+                */
+                let pidCount = 11;
 
-        /*
-        * Get BOXNAMES since it is used for some reason....
-        */
-        MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false);
+                for (let i = 0; i < pidCount; i++) {
+                    FC.PIDs.push(new Array(4));
+                }
 
-        /*
-        * Init PIDs bank with a length that depends on the version
-        */
-        let pidCount = 11;
+                interval.add('msp-load-update', function () {
+                    $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
+                    $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
+                    $('#msp-roundtrip').text("MSP round trip: " + mspQueue.getRoundtrip().toFixed(0));
+                    $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
+                    $('#drop-rate').text("Drop ratio: " + mspQueue.getDropRatio().toFixed(0) + "%");
+                }, 100);
 
-        for (let i = 0; i < pidCount; i++) {
-            FC.PIDs.push(new Array(4));
-        }
+                interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
+            });
+        });
 
-        interval.add('msp-load-update', function () {
-            $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
-            $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
-            $('#msp-roundtrip').text("MSP round trip: " + mspQueue.getRoundtrip().toFixed(0));
-            $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
-            $('#drop-rate').text("Drop ratio: " + mspQueue.getDropRatio().toFixed(0) + "%");
-        }, 100);
-
-        interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
     }
 
     privateScope.onClosed = function (result) {
