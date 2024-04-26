@@ -239,6 +239,7 @@ var SerialBackend = (function () {
                             mspQueue.flush();
                             mspQueue.freeHardLock();
                             mspQueue.freeSoftLock();
+                            mspQueue.flushMessages();
 
                             CONFIGURATOR.connection.disconnect(privateScope.onClosed);
                             MSP.disconnect_cleanup();
@@ -376,6 +377,7 @@ var SerialBackend = (function () {
                         mspQueue.flush();
                         mspQueue.freeHardLock();
                         mspQueue.freeSoftLock();
+                        mspQueue.flushMessages();
                         CONFIGURATOR.connection.emptyOutputBuffer();
 
                     $('div.connect_controls a').click(); // disconnect

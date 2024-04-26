@@ -94,6 +94,7 @@ TABS.cli.initialize = function (callback) {
 
     // Flush MSP queue as well as all MSP registered callbacks
     mspQueue.flush();
+    mspQueue.flushMessages();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";

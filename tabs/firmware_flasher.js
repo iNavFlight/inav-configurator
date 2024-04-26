@@ -780,6 +780,7 @@ TABS.firmware_flasher.closeTempConnection = function() {
     mspQueue.flush();
     mspQueue.freeHardLock();
     mspQueue.freeSoftLock();
+    mspQueue.flushMessages();
     CONFIGURATOR.connection.emptyOutputBuffer();
 
     CONFIGURATOR.connectionValid = false;

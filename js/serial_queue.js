@@ -42,6 +42,38 @@ var mspQueue = function () {
     privateScope.removeCallback = null;
     privateScope.putCallback = null;
 
+    /**
+     * This is the list of all messages that are currently in queue, including being already dispatched via radio and waiting for response
+     */
+    privateScope.messagesInQueue = [];
+
+    //Store new code in the queue
+    publicScope.storeMessage = function (code) {
+        privateScope.messagesInQueue.push(code);
+    };
+
+    //Remove code from the queue
+    publicScope.removeMessage = function (code) {
+        var index = privateScope.messagesInQueue.indexOf(code);
+        if (index > -1) {
+            privateScope.messagesInQueue.splice(index, 1);
+        }
+    };
+
+    //List all messages in the queue
+    publicScope.getMessages = function () {
+        return privateScope.messagesInQueue;
+    };
+
+    //Check if message is in the queue
+    publicScope.isMessageInQueue = function (code) {
+        return privateScope.messagesInQueue.indexOf(code) > -1;
+    };
+
+    publicScope.flushMessages = function () {
+        privateScope.messagesInQueue = [];
+    };
+
     publicScope.computeDropRatio = function () {
         privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
     };
@@ -58,15 +90,6 @@ var mspQueue = function () {
     privateScope.lockMethod = 'soft';
 
     privateScope.queueLocked = false;
-
-    privateScope.isMessageInQueue = function (code) {
-        for (var i = 0; i < privateScope.queue.length; i++) {
-            if (privateScope.queue[i].code == code) {
-                return true;
-            }
-        }
-        return false;
-    };
 
     publicScope.setremoveCallback = function(cb) {
         privateScope.removeCallback = cb;
@@ -173,6 +196,7 @@ var mspQueue = function () {
 
             request.timer = setTimeout(function () {
                 console.log('MSP data request timed-out: ' + request.code);
+                publicScope.removeMessage(request.code);
                 /*
                  * Remove current callback
                  */
@@ -236,11 +260,16 @@ var mspQueue = function () {
      */
     publicScope.put = function (mspRequest) {
 
-        console.log(mspRequest.code);
-        if (privateScope.isMessageInQueue(mspRequest.code)) {
+        console.log('Received message ', mspRequest.code);
+
+        const isMessageInQueue = publicScope.isMessageInQueue(mspRequest.code);
+
+        if (isMessageInQueue) {
             console.log('Message already in queue: ' + mspRequest.code);
             return false;
         }
+
+        publicScope.storeMessage(mspRequest.code);
 
         if (privateScope.queueLocked === true) {
             return false;

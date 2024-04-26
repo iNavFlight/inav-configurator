@@ -1621,6 +1621,9 @@ var mspHelper = (function () {
                         mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
                     }
 
+                    //remove message from queue as received
+                    mspQueue.removeMessage(dataHandler.code);
+
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);
 
