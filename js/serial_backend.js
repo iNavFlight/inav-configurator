@@ -477,7 +477,6 @@ var SerialBackend = (function () {
                     $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
                     $('#msp-roundtrip').text("MSP round trip: " + mspQueue.getRoundtrip().toFixed(0));
                     $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
-                    $('#drop-rate').text("Drop ratio: " + mspQueue.getDropRatio().toFixed(0) + "%");
                 }, 100);
 
                 interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);

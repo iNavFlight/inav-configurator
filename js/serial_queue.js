@@ -3,7 +3,6 @@
 const CONFIGURATOR = require('./data_storage');
 const MSPCodes = require('./msp/MSPCodes');
 const SimpleSmoothFilter = require('./simple_smooth_filter');
-const PidController = require('./pid_controller');
 const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
 const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
@@ -28,28 +27,8 @@ var mspQueue = function () {
 
     privateScope.currentLoad = 0;
 
-    /**
-     * PID controller used to perform throttling
-     * @type {PidController}
-     */
-    privateScope.loadPidController = new PidController();
-    privateScope.loadPidController.setTarget(privateScope.targetLoad);
-    privateScope.loadPidController.setOutput(0, 99, 0);
-    privateScope.loadPidController.setGains(5, 6, 3);
-    privateScope.loadPidController.setItermLimit(0, 90);
-
-    privateScope.dropRatio = 0;
-
     privateScope.removeCallback = null;
     privateScope.putCallback = null;
-
-    publicScope.computeDropRatio = function () {
-        privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
-    };
-
-    publicScope.getDropRatio = function () {
-        return privateScope.dropRatio;
-    };
 
     privateScope.queue = [];
 
@@ -229,12 +208,10 @@ var mspQueue = function () {
      */
     publicScope.put = function (mspRequest) {
 
-        console.log('Received message ', mspRequest.code);
-
         const isMessageInQueue = mspDeduplicationQueue.check(mspRequest.code);
 
         if (isMessageInQueue) {
-            console.log('Message already in queue: ' + mspRequest.code);
+            eventFrequencyAnalyzer.put('MSP Duplicate ' + mspRequest.code);
             return false;
         }
 
@@ -286,7 +263,6 @@ var mspQueue = function () {
 
     publicScope.balancer = function () {
         privateScope.currentLoad = privateScope.loadFilter.get();
-        publicScope.computeDropRatio();
 
         /*
          * Also, check if port lock if hanging. Free is so
