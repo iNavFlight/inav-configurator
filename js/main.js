@@ -53,6 +53,10 @@ function createDeviceChooser() {
 }
 
 app.on('ready', () => {
+  createWindow();
+});
+
+function createWindow() {
 
   let mainWindowState = windowStateKeeper({
     defaultWidth: 800,
@@ -147,7 +151,7 @@ app.on('ready', () => {
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
-});
+}
 
 app.on('window-all-closed', () => {
   

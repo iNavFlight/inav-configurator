@@ -1,4 +1,6 @@
 'use strict';
+const { dialog } = require("@electron/remote");
+
 
 const CONFIGURATOR = require('./data_storage');
 const Switchery = require('./libraries/switchery/switchery')
@@ -528,6 +530,13 @@ GUI_control.prototype.update_dataflash_global = function () {
         });
     }
 };
+
+/**
+* Don't use alert() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
+*/ 
+GUI_control.prototype.alert = function(message) {
+    dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
+}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();
