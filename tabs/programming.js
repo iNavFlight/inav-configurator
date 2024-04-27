@@ -3,13 +3,12 @@
 const path = require('path');
 
 const MSPChainerClass = require('./../js/msp/MSPchainer');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspHelper = require('./../js/msp/MSPHelper');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const tabs = require('./../js/tabs');
 const i18n = require('./../js/localization');
-
+const interval = require('./../js/intervals');
 
 TABS.programming = {};
 
@@ -68,9 +67,9 @@ TABS.programming.initialize = function (callback, scrollPosition) {
             GUI.log(i18n.getMessage('programmingEepromSaved'));
         });
 
-        mspBalancedInterval.add('logic_conditions_pull', 100, 1, function () {
+        interval.add('logic_conditions_pull', function () {
             statusChainer.execute();
-        });
+        }, 100);
 
         GUI.content_ready(callback);
     }

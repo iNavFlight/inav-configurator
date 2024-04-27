@@ -255,8 +255,10 @@ class Connection {
     getTimeout() {
         if (this._bitrate >= 57600) {
             return 3000;
-        } else {
+        } if (this._bitrate >= 19200) {
             return 4000;
+        } else {
+            return 6000;
         }
     }
 }

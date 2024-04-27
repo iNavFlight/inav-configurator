@@ -12,7 +12,6 @@ const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspQueue = require('./../js/serial_queue');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
@@ -29,6 +28,7 @@ const FwApproachCollection = require('./../js/fwApproachCollection');
 const SerialBackend = require('./../js/serial_backend');
 const { distanceOnLine, wrap_360, calculate_new_cooridatnes } = require('./../js/helpers');
 const Plotly = require('./../js/libraries/plotly-latest.min');
+const interval = require('./../js/intervals');
 
 var MAX_NEG_FW_LAND_ALT = -2000; // cm
 
@@ -336,19 +336,15 @@ TABS.mission_control.initialize = function (callback) {
          */
         if(!isOffline)
         {
-          mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
+            interval.add('gps_pull', function gps_update() {
               // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
               if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
                   update_gpsTrack();
                   return;
               }
 
-              if (mspQueue.shouldDrop()) {
-                  return;
-              }
-
               get_raw_gps_data();
-          });
+          }, 200);
         }
 
         GUI.content_ready(callback);

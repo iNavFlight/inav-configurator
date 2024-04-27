@@ -3,8 +3,8 @@
 const CONFIGURATOR = require('./data_storage');
 const MSPCodes = require('./msp/MSPCodes');
 const SimpleSmoothFilter = require('./simple_smooth_filter');
-const PidController = require('./pid_controller');
 const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 var mspQueue = function () {
 
@@ -27,28 +27,8 @@ var mspQueue = function () {
 
     privateScope.currentLoad = 0;
 
-    /**
-     * PID controller used to perform throttling
-     * @type {PidController}
-     */
-    privateScope.loadPidController = new PidController();
-    privateScope.loadPidController.setTarget(privateScope.targetLoad);
-    privateScope.loadPidController.setOutput(0, 99, 0);
-    privateScope.loadPidController.setGains(5, 6, 3);
-    privateScope.loadPidController.setItermLimit(0, 90);
-
-    privateScope.dropRatio = 0;
-
     privateScope.removeCallback = null;
     privateScope.putCallback = null;
-
-    publicScope.computeDropRatio = function () {
-        privateScope.dropRatio = privateScope.loadPidController.run(publicScope.getLoad());
-    };
-
-    publicScope.getDropRatio = function () {
-        return privateScope.dropRatio;
-    };
 
     privateScope.queue = [];
 
@@ -84,6 +64,10 @@ var mspQueue = function () {
 
     publicScope.setLockMethod = function (method) {
         privateScope.lockMethod = method;
+    };
+
+    publicScope.getLockMethod = function () {   
+        return privateScope.lockMethod;
     };
 
     publicScope.setSoftLock = function () {
@@ -160,6 +144,7 @@ var mspQueue = function () {
 
             request.timer = setTimeout(function () {
                 console.log('MSP data request timed-out: ' + request.code);
+                mspDeduplicationQueue.remove(request.code);
                 /*
                  * Remove current callback
                  */
@@ -223,9 +208,18 @@ var mspQueue = function () {
      */
     publicScope.put = function (mspRequest) {
 
+        const isMessageInQueue = mspDeduplicationQueue.check(mspRequest.code);
+
+        if (isMessageInQueue) {
+            eventFrequencyAnalyzer.put('MSP Duplicate ' + mspRequest.code);
+            return false;
+        }
+
         if (privateScope.queueLocked === true) {
             return false;
         }
+
+        mspDeduplicationQueue.put(mspRequest.code);
 
         privateScope.queue.push(mspRequest);
         return true;
@@ -269,7 +263,6 @@ var mspQueue = function () {
 
     publicScope.balancer = function () {
         privateScope.currentLoad = privateScope.loadFilter.get();
-        publicScope.computeDropRatio();
 
         /*
          * Also, check if port lock if hanging. Free is so
@@ -277,27 +270,23 @@ var mspQueue = function () {
         var currentTimestamp = new Date().getTime(),
             threshold = publicScope.getHardwareRoundtrip() * 3;
 
-        if (threshold > 1000) {
+        if (threshold > 5000) {
+            threshold = 5000;
+        }
+        if (threshold < 1000) {
             threshold = 1000;
         }
 
         if (privateScope.softLock !== false && currentTimestamp - privateScope.softLock > threshold) {
-            privateScope.softLock = false;
+            publicScope.freeSoftLock();
             eventFrequencyAnalyzer.put('force free soft lock');
         }
         if (privateScope.hardLock !== false && currentTimestamp - privateScope.hardLock > threshold) {
-            privateScope.hardLock = false;
+            console.log('Force free hard lock');
+            publicScope.freeHardLock();
             eventFrequencyAnalyzer.put('force free hard lock');
         }
 
-    };
-
-    publicScope.shouldDrop = function () {
-        return (Math.round(Math.random()*100) < privateScope.dropRatio);
-    };
-
-    publicScope.shouldDropStatus = function () {
-        return (Math.round(Math.random()*100) < (privateScope.dropRatio * privateScope.statusDropFactor));
     };
 
     /**
@@ -315,6 +304,10 @@ var mspQueue = function () {
         } else {
             return (1000 / availableRate) * messagesInInterval;
         }
+    };
+
+    publicScope.getQueue = function () {
+        return privateScope.queue;
     };
 
     setInterval(publicScope.executor, Math.round(1000 / privateScope.handlerFrequency));

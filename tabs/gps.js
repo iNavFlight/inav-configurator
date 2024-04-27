@@ -8,8 +8,7 @@ const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
-const mspQueue = require('./../js/serial_queue');
+const interval = require('./../js/intervals');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const i18n = require('./../js/localization');
@@ -262,7 +261,6 @@ TABS.gps.initialize = function (callback) {
         }
 
         function update_ui() {
-
             let lat = FC.GPS_DATA.lat / 10000000;
             let lon = FC.GPS_DATA.lon / 10000000;
 
@@ -400,19 +398,15 @@ TABS.gps.initialize = function (callback) {
          * enable data pulling
          * GPS is usually refreshed at 5Hz, there is no reason to pull it much more often, really...
          */
-        mspBalancedInterval.add('gps_pull', 200, 3, function gps_update() {
+        interval.add('gps_pull', function gps_update() {
             // avoid usage of the GPS commands until a GPS sensor is detected for targets that are compiled without GPS support.
             if (!SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
                 update_ui();
                 return;
             }
 
-            if (mspQueue.shouldDrop()) {
-                return;
-            }
-
             get_raw_gps_data();
-        });
+        }, 200);
 
 
         $('a.save').on('click', function () {
