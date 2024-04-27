@@ -138,19 +138,20 @@ var Ser2TCP = {
             var devices = [];
             if (error) {
                 GUI.log("Unable to list serial ports.");
-            } else {  
+            } else {
                  ports.forEach((device) => {
                     if (GUI.operating_system == 'Windows') {
                         var m = device.path.match(/COM\d?\d/g)
                         if (m)
                             devices.push(m[0]);
                     } else {
-                        if (device.displayName != null) {
-                            var m = device.path.match(/\/dev\/.*/)
-                            if (m)
-                                devices.push(m[0]);
+			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+			if (device.pnpId ||
+			    device.path.match(/rfcomm\d*/) ||
+			    device.path.match(/ttyS[0-5]$/)) {
+			    devices.push(device.path);
                         }
-                    }
+		    }
                 });
             }
             callback(devices);
@@ -231,7 +232,7 @@ var SITLProcess = {
                 if (err)
                     console.log(err);
             });
- 
+
         } else {
             alert(GUI.operating_system);
             return;
