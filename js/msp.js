@@ -2,6 +2,8 @@
 
 const MSPCodes = require('./msp/MSPCodes')
 const mspQueue = require('./serial_queue');
+const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
+const timeout = require('./timeouts');
 
 /**
  *
@@ -265,7 +267,9 @@ var MSP = {
         /*
          * Free port
          */
-        mspQueue.freeHardLock();
+        timeout.add('delayedFreeHardLock', function() {
+            mspQueue.freeHardLock();
+        }, 10);
 
         // Reset variables
         this.message_length_received = 0;
@@ -300,6 +304,8 @@ var MSP = {
         var view;
         var checksum;
         var ii;
+
+        eventFrequencyAnalyzer.put('MPS ' + code);
 
         if (!protocolVersion) {
             protocolVersion = this.protocolVersion;

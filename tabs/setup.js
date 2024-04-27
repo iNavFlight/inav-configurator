@@ -9,9 +9,7 @@ const MSP = require('./../js/msp');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const i18n = require('./../js/localization');
 const mspHelper = require('./../js/msp/MSPHelper');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const interval = require('./../js/intervals');
-const mspQueue = require('./../js/serial_queue');
 const SerialBackend = require('./../js/serial_backend');
 const { mixer } = require('./../js/model');
 const BitHelper = require('./../js/bitHelper')
@@ -119,14 +117,6 @@ TABS.setup.initialize = function (callback) {
 
         function get_slow_data() {
             if (SerialBackend.have_sensor(FC.CONFIG.activeSensors, 'gps')) {
-
-                /*
-                 * Enable balancer
-                 */
-                if (mspQueue.shouldDrop()) {
-                    return;
-                }
-
                 MSP.send_message(MSPCodes.MSP_RAW_GPS, false, false, function () {
                     var gpsFixType = i18n.getMessage('gpsFixNone');
                     if (FC.GPS_DATA.fix >= 2)
@@ -142,14 +132,6 @@ TABS.setup.initialize = function (callback) {
         }
 
         function get_fast_data() {
-
-            /*
-             * Enable balancer
-             */
-            if (mspQueue.shouldDrop()) {
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
 	            roll_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[0]]));
 	            pitch_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[1]]));
@@ -159,8 +141,8 @@ TABS.setup.initialize = function (callback) {
             });
         }
 
-        mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
-        mspBalancedInterval.add('setup_data_pull_slow', 250, 1, get_slow_data);
+        interval.add('setup_data_pull_fast', get_fast_data, 50);
+        interval.add('setup_data_pull_slow', get_slow_data, 250);
 
         interval.add('gui_analog_update', function () {
             bat_cells_e.text(i18n.getMessage('initialSetupBatteryDetectedCellsValue', [FC.ANALOG.cell_count]));

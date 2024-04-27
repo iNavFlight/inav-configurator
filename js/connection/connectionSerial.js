@@ -18,13 +18,13 @@ class ConnectionSerial extends Connection {
         super._type = ConnectionType.Serial;
     }
 
-    connectImplementation(path, options, callback) {                       
+    connectImplementation(path, options, callback) {
         try {
             this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
                 if (callback) {
                     callback({
                         connectionId: ++this._connectionId,
-                        bitrate: options.bitrate 
+                        bitrate: options.bitrate
                     });
                 }
             });
@@ -50,12 +50,12 @@ class ConnectionSerial extends Connection {
             this.abort();
             console.log("Serial error: " + error);
             this._onReceiveErrorListeners.forEach(listener => {
-                listener(error);    
+                listener(error);
             });
         });
     }
 
-    disconnectImplementation(callback) {        
+    disconnectImplementation(callback) {
         if (this._serialport && this._serialport.isOpen) {
             this._serialport.close(error => {
                 if (error) {
@@ -68,7 +68,7 @@ class ConnectionSerial extends Connection {
             callback(true);
         }
     }
-    
+
     sendImplementation(data, callback) {
         if (this._serialport && this._serialport.isOpen) {
             this._serialport.write(Buffer.from(data), error => {
@@ -105,14 +105,23 @@ class ConnectionSerial extends Connection {
         this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 
-    static async getDevices(callback) {     
+    static async getDevices(callback) {
         SerialPort.list().then((ports, error) => {
             var devices = [];
             if (error) {
                 GUI.log("Unable to list serial ports.");
             } else {
                 ports.forEach(port => {
-                    devices.push(port.path);
+                    if (GUI.operating_system == 'Linux') {
+			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+			if (port.pnpId ||
+			    port.path.match(/rfcomm\d*/) ||
+			    port.path.match(/ttyS[0-5]$/)) {
+			    devices.push(port.path);
+                        }
+		    } else {
+			devices.push(port.path);
+		    }
                 });
             }
             if (callback)

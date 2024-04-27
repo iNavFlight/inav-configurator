@@ -18,6 +18,8 @@ const ProgrammingPid = require('./../programmingPid');
 const Safehome = require('./../safehome');
 const { FwApproach } = require('./../fwApproach');
 const Waypoint = require('./../waypoint');
+const mspDeduplicationQueue = require('./mspDeduplicationQueue');
+const mspStatistics = require('./mspStatistics');
 
 var mspHelper = (function () {
     var self = {};
@@ -922,7 +924,7 @@ var mspHelper = (function () {
 
                         directions = [];
                         for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
-                            if (bit_check(directionMask, directionLetterIndex)) {
+                            if (BitHelper.bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
                         }
@@ -932,7 +934,7 @@ var mspHelper = (function () {
 
                         functions = [];
                         for (var functionLetterIndex = 0; functionLetterIndex < MSP.ledFunctionLetters.length; functionLetterIndex++) {
-                            if (bit_check(functionMask, functionLetterIndex)) {
+                            if (BitHelper.bit_check(functionMask, functionLetterIndex)) {
                                 functions.push(MSP.ledFunctionLetters[functionLetterIndex]);
                             }
                         }
@@ -962,7 +964,7 @@ var mspHelper = (function () {
 
                         var overlayMask = (mask >> 12) & 0x3F;
                         for (var overlayLetterIndex = 0; overlayLetterIndex < MSP.ledOverlayLetters.length; overlayLetterIndex++) {
-                            if (bit_check(overlayMask, overlayLetterIndex)) {
+                            if (BitHelper.bit_check(overlayMask, overlayLetterIndex)) {
                                 functions.push(MSP.ledOverlayLetters[overlayLetterIndex]);
                             }
                         }
@@ -971,7 +973,7 @@ var mspHelper = (function () {
 
                         directions = [];
                         for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
-                            if (bit_check(directionMask, directionLetterIndex)) {
+                            if (BitHelper.bit_check(directionMask, directionLetterIndex)) {
                                 directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                             }
                         }
@@ -1017,7 +1019,7 @@ var mspHelper = (function () {
 
                     var overlayMask = (mask >> 16) & 0xFF;
                     for (var overlayLetterIndex = 0; overlayLetterIndex < MSP.ledOverlayLetters.length; overlayLetterIndex++) {
-                        if (bit_check(overlayMask, overlayLetterIndex)) {
+                        if (BitHelper.bit_check(overlayMask, overlayLetterIndex)) {
                             functions.push(MSP.ledOverlayLetters[overlayLetterIndex]);
                         }
                     }
@@ -1026,7 +1028,7 @@ var mspHelper = (function () {
 
                     directions = [];
                     for (directionLetterIndex = 0; directionLetterIndex < MSP.ledDirectionLetters.length; directionLetterIndex++) {
-                        if (bit_check(directionMask, directionLetterIndex)) {
+                        if (BitHelper.bit_check(directionMask, directionLetterIndex)) {
                             directions.push(MSP.ledDirectionLetters[directionLetterIndex]);
                         }
                     }
@@ -1618,8 +1620,16 @@ var mspHelper = (function () {
                      */
                     if (dataHandler.callbacks[i]) {
                         mspQueue.putRoundtrip(new Date().getTime() - dataHandler.callbacks[i].createdOn);
-                        mspQueue.putHardwareRoundtrip(new Date().getTime() - dataHandler.callbacks[i].sentOn);
+
+                        const hardwareRountrip = new Date().getTime() - dataHandler.callbacks[i].sentOn;
+
+                        mspQueue.putHardwareRoundtrip(hardwareRountrip);
+
+                        mspStatistics.add(dataHandler.code, hardwareRountrip);
                     }
+
+                    //remove message from queue as received
+                    mspDeduplicationQueue.remove(dataHandler.code);
 
                     // remove object from array
                     dataHandler.callbacks.splice(i, 1);
@@ -2260,7 +2270,7 @@ var mspHelper = (function () {
             buffer.push(BitHelper.lowByte(servoConfiguration.middle));
             buffer.push(BitHelper.highByte(servoConfiguration.middle));
 
-            buffer.push(lowByte(servoConfiguration.rate));
+            buffer.push(BitHelper.lowByte(servoConfiguration.rate));
 
             // prepare for next iteration
             servoIndex++;
@@ -2650,7 +2660,7 @@ var mspHelper = (function () {
 
                 bitIndex = MSP.ledOverlayLetters.indexOf(led.functions[overlayLetterIndex]);
                 if (bitIndex >= 0) {
-                    mask |= bit_set(mask, bitIndex + 16);
+                    mask |= BitHelper.bit_set(mask, bitIndex + 16);
                 }
 
             }
@@ -2662,9 +2672,9 @@ var mspHelper = (function () {
                 bitIndex = MSP.ledDirectionLetters.indexOf(led.directions[directionLetterIndex]);
                 if (bitIndex >= 0) {
                     if(bitIndex < 4) {
-                        mask |= bit_set(mask, bitIndex + 28);
+                        mask |= BitHelper.bit_set(mask, bitIndex + 28);
                     } else {
-                        extra |= bit_set(extra, bitIndex - 4);
+                        extra |= BitHelper.bit_set(extra, bitIndex - 4);
                     }
                 }
             }
@@ -3065,6 +3075,7 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
+        console.log("Getting setting " + name);
         if (FC.SETTINGS[name]) {
             return Promise.resolve(FC.SETTINGS[name]);
         }

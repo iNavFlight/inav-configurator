@@ -6,12 +6,11 @@ const MSPChainerClass = require('./../js/msp/MSPchainer');
 const MSP = require('./../js/msp');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const mspHelper = require('./../js/msp/MSPHelper');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
-const mspQueue = require('./../js/serial_queue');
 const FC = require('./../js/fc');
 const { GUI, TABS } = require('./../js/gui');
 const i18n = require('./../js/localization');
 const { mixer } = require('./../js/model');
+const interval = require('./../js/intervals');
 
 TABS.magnetometer = {};
 
@@ -524,9 +523,6 @@ TABS.magnetometer.initialize = function (callback) {
         });
 
         function get_fast_data() {
-            if (mspQueue.shouldDrop()) {
-                return;
-            }
 
             MSP.send_message(MSPCodes.MSP_ATTITUDE, false, false, function () {
 	            self.roll_e.text(i18n.getMessage('initialSetupAttitude', [FC.SENSOR_DATA.kinematics[0]]));
@@ -536,7 +532,7 @@ TABS.magnetometer.initialize = function (callback) {
             });
         }
 
-        mspBalancedInterval.add('setup_data_pull_fast', 40, 1, get_fast_data);
+        interval.add('setup_data_pull_fast', get_fast_data, 40);
 
         GUI.content_ready(callback);
     }
