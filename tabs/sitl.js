@@ -78,8 +78,6 @@ TABS.sitl.initialize = (callback) => {
     GUI.load(path.join(__dirname, "sitl.html"), function () {
         i18n.localize();
     
-    var os = GUI.operating_system;
-
     var currentSim, currentProfile, profiles;
     var mapping = new Array(28).fill(0);
     var serialProtocolls = Ser2TCP.getProtocolls();
