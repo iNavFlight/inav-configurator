@@ -58,7 +58,7 @@ jobs:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
     build-mac:
-        runs-on: macos-latest
+        runs-on: macos-13-large
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
