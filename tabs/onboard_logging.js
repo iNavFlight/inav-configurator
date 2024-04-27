@@ -1,6 +1,7 @@
 'use strict';
 
 const { dialog } = require("@electron/remote");
+const fs = require('fs');
 const path = require('path');
 
 const MSPCodes = require('./../js/msp/MSPCodes');
@@ -357,7 +358,6 @@ TABS.onboard_logging.initialize = function (callback) {
                 const maxBytes = FC.DATAFLASH.usedSize;
 
                 prepare_file(function(filename) {
-                    const fs = require('fs');
                     let nextAddress = 0;
 
                     show_saving_dialog();

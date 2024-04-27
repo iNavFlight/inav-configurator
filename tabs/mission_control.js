@@ -1,7 +1,9 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const ol = require('openlayers');
+const xml2js = require('xml2js');
 const Store = require('electron-store');
 const store = new Store();
 const { dialog } = require("@electron/remote");
@@ -3161,9 +3163,6 @@ TABS.mission_control.initialize = function (callback) {
     //
     /////////////////////////////////////////////
     function loadMissionFile(filename) {
-        const fs = require('fs');
-        if (!window.xml2js) return GUI.log(i18n.getMessage('errorReadingFileXml2jsNotFound'));
-
         for (let i = FC.SAFEHOMES.getMaxSafehomeCount(); i < FC.FW_APPROACH.getMaxFwApproachCount(); i++) {
             FC.FW_APPROACH.clean(i);
         }
@@ -3174,7 +3173,7 @@ TABS.mission_control.initialize = function (callback) {
                 return console.error(err);
             }
 
-            window.xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
+            xml2js.Parser({ 'explicitChildren': true, 'preserveChildrenOrder': true }).parseString(data, (err, result) => {
                 if (err) {
                     GUI.log(i18n.getMessage('errorParsingFile'));
                     return console.error(err);
@@ -3344,9 +3343,6 @@ TABS.mission_control.initialize = function (callback) {
     }
 
     function saveMissionFile(filename) {
-        const fs = require('fs');
-        if (!window.xml2js) return GUI.log(i18n.getMessage('errorWritingFileXml2jsNotFound'));
-
         var center = ol.proj.toLonLat(map.getView().getCenter());
         var zoom = map.getView().getZoom();
         let multimission = multimissionCount && !singleMissionActive();
@@ -3408,7 +3404,7 @@ TABS.mission_control.initialize = function (callback) {
             approachIdx++;
         }
 
-        var builder = new window.xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
+        var builder = new xml2js.Builder({ 'rootName': 'mission', 'renderOpts': { 'pretty': true, 'indent': '\t', 'newline': '\n' } });
         var xml = builder.buildObject(data);
         xml = xml.replace(/missionitem mission/g, 'meta mission');
         fs.writeFile(filename, xml, (err) => {

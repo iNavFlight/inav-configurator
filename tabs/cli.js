@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { dialog } = require("@electron/remote");
 
 const MSP = require('./../js/msp');
@@ -170,7 +171,6 @@ TABS.cli.initialize = function (callback) {
                     return;
                 }
                 
-                const fs = require('fs');
                 fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
@@ -255,7 +255,6 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    const fs = require('fs');
                     fs.readFile(result.filePaths[0], (err, data) => {
                         if (err) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));
