@@ -65,7 +65,14 @@ var Ser2TCP = {
                 if (err)
                     console.log(err);
             });
+        } else if (GUI.operating_system == 'MacOS') {
+            path = './../resources/sitl/macos/Ser2TCP'
+            chmod(path, 0o755, (err) => {
+                if (err)
+                    console.log(err);
+            });
         } else {
+            alert(GUI.operating_system);
             return;
         }
 
@@ -217,7 +224,16 @@ var SITLProcess = {
                 if (err)
                     console.log(err);
             });
+        } else if (GUI.operating_system == 'MacOS') {
+            sitlExePath = path.join(__dirname, './../resources/sitl/macos/inav_SITL');
+            eepromPath = `${app.getPath('userData')}/${eepromFileName}`
+            chmod(sitlExePath, 0o755, err => {
+                if (err)
+                    console.log(err);
+            });
+ 
         } else {
+            alert(GUI.operating_system);
             return;
         }
 

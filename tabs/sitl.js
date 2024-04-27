@@ -78,17 +78,6 @@ TABS.sitl.initialize = (callback) => {
     GUI.load(path.join(__dirname, "sitl.html"), function () {
         i18n.localize();
     
-    var os = GUI.operating_system;
-    if (os != 'Windows' && os != 'Linux') {
-
-        $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${i18n.getMessage('sitlOSNotSupported')}</h2>`);
-        
-        GUI.content_ready(callback);
-        return;
-    }
-
-
     var currentSim, currentProfile, profiles;
     var mapping = new Array(28).fill(0);
     var serialProtocolls = Ser2TCP.getProtocolls();
