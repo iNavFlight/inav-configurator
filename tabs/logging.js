@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { dialog } = require("@electron/remote");
 const Store = require('electron-store');
 const store = new Store();
@@ -84,7 +85,6 @@ TABS.logging.initialize = function (callback) {
                             }
 
                             interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
-                            const fs = require('fs');
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
 

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const path = require('path');
 const Store = require('electron-store');
@@ -53,6 +53,10 @@ function createDeviceChooser() {
 }
 
 app.on('ready', () => {
+  createWindow();
+});
+
+function createWindow() {
 
   let mainWindowState = windowStateKeeper({
     defaultWidth: 800,
@@ -70,6 +74,24 @@ app.on('ready', () => {
       nodeIntegration: true,
       contextIsolation: false,
     },
+  });
+
+  mainWindow.webContents.on('context-menu', (_, props) => {
+    const menu = new Menu()  ;
+    menu.append(new MenuItem({ label: "Undo", role: "undo", accelerator: 'CmdOrCtrl+Z', visible: props.isEditable }));
+    menu.append(new MenuItem({ label: "Redo", role: "redo", accelerator: 'CmdOrCtrl+Y', visible: props.isEditable }));
+    menu.append(new MenuItem({ type: "separator", visible: props.isEditable }));
+    menu.append(new MenuItem({ label: 'Cut', role: 'cut', accelerator: 'CmdOrCtrl+X', visible: props.isEditable && props.selectionText }));
+    menu.append(new MenuItem({ label: 'Copy', role: 'copy', accelerator: 'CmdOrCtrl+C', visible: props.selectionText }));
+    menu.append(new MenuItem({ label: 'Paste', role: 'paste', accelerator: 'CmdOrCtrl+V', visible: props.isEditable }));
+    menu.append(new MenuItem({ label: "Select all", role: 'selectAll', accelerator: 'CmdOrCtrl+A', visible: props.isEditable}));
+
+    menu.items.forEach(item => {
+      if (item.visible) {
+        menu.popup();
+        return;
+      } 
+    });
   });
 
   mainWindow.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
@@ -147,7 +169,7 @@ app.on('ready', () => {
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
-});
+}
 
 app.on('window-all-closed', () => {
   

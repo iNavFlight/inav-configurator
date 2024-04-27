@@ -1,6 +1,7 @@
 'use strict';
 
 const { marked } = require('marked');
+const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
 const { dialog } = require('@electron/remote');
@@ -254,8 +255,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                 if (result.filePaths.length == 1) {
                     filename = result.filePaths[0];
                 }
-
-                const fs = require('fs');
                 
                 $('div.git_info').slideUp();
 

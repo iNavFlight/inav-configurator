@@ -242,7 +242,7 @@ TABS.sitl.initialize = (callback) => {
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(i18n.getMessage('sitlProfileExists'))
+            GUI.alert(i18n.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -273,7 +273,7 @@ TABS.sitl.initialize = (callback) => {
     profileDeleteBtn_e.on('click', function () {
 
         if (currentProfile.isStdProfile) {
-            alert(i18n.getMessage('sitlStdProfileCantDeleted'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantDeleted'));            
             return;
         }
 
@@ -374,7 +374,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];
