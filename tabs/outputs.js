@@ -431,15 +431,6 @@ TABS.outputs.initialize = function (callback) {
         interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
 
         interval.add('IMU_pull', function () {
-
-            /*
-            * Enable balancer
-            */
-            if (mspQueue.shouldDrop()) {
-                update_accel_graph();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
         }, 25, true);
 
@@ -660,21 +651,10 @@ TABS.outputs.initialize = function (callback) {
         $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
-
-            if (mspQueue.shouldDrop()) {
-                getPeriodicServoOutput();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
         }
 
         function getPeriodicServoOutput() {
-            if (mspQueue.shouldDrop()) {
-                update_ui();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
