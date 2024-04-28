@@ -1,6 +1,7 @@
 'use strict';
 
 const { marked } = require('marked');
+const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
 const { dialog } = require('@electron/remote');
@@ -17,11 +18,11 @@ const CONFIGURATOR = require('./../js/data_storage');
 const SerialBackend = require('./../js/serial_backend');
 const timeout = require('./../js/timeouts');
 const interval = require('./../js/intervals');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspQueue = require('./../js/serial_queue');
 const mspHelper = require('./../js/msp/MSPHelper');
 const STM32 = require('./../js/protocols/stm32');
 const STM32DFU = require('./../js/protocols/stm32usbdfu');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 TABS.firmware_flasher = {};
 TABS.firmware_flasher.initialize = function (callback) {
@@ -254,8 +255,6 @@ TABS.firmware_flasher.initialize = function (callback) {
                 if (result.filePaths.length == 1) {
                     filename = result.filePaths[0];
                 }
-
-                const fs = require('fs');
                 
                 $('div.git_info').slideUp();
 
@@ -775,11 +774,11 @@ TABS.firmware_flasher.onValidFirmware = function() {
 TABS.firmware_flasher.closeTempConnection = function() {
     timeout.killAll();
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-    mspBalancedInterval.flush();
 
     mspQueue.flush();
     mspQueue.freeHardLock();
     mspQueue.freeSoftLock();
+    mspDeduplicationQueue.flush();
     CONFIGURATOR.connection.emptyOutputBuffer();
 
     CONFIGURATOR.connectionValid = false;

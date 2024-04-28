@@ -11,8 +11,8 @@ const FC = require('./../js/fc');
 const i18n = require('./../js/localization');
 const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model');
 const Settings = require('./../js/settings');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const jBox = require('../js/libraries/jBox/jBox.min');
+const interval = require('./../js/intervals');
 
 TABS.mixer = {};
 
@@ -823,9 +823,9 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
 
         FC.LOGIC_CONDITIONS.init($('#logic-wrapper'));
 
-       i18n.localize();;
+        i18n.localize();;
 
-        mspBalancedInterval.add('logic_conditions_pull', 350, 1, getLogicConditionsStatus);
+        interval.add('logic_conditions_pull', getLogicConditionsStatus, 350);
 
         GUI.content_ready(callback);
     }

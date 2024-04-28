@@ -1,13 +1,13 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { dialog } = require("@electron/remote");
 const Store = require('electron-store');
 const store = new Store();
 
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const { GUI, TABS } = require('./../js/gui');
 const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
@@ -84,7 +84,6 @@ TABS.logging.initialize = function (callback) {
                             }
 
                             interval.add('log_data_poll', log_data_poll, parseInt($('select.speed').val()), true); // refresh rate goes here
-                            const fs = require('fs');
                             interval.add('write_data', function write_data() {
                                 if (log_buffer.length && readyToWrite) { // only execute when there is actual data to write
 
@@ -106,7 +105,6 @@ TABS.logging.initialize = function (callback) {
                         }
                     } else {
                         interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-                        mspBalancedInterval.flush();
 
                         $('.speed').prop('disabled', false);
                         $(this).text(i18n.getMessage('loggingStart'));

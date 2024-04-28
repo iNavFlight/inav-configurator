@@ -1,6 +1,7 @@
 'use strict';
 
 const inflection = require( 'inflection' );
+const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
 const mapSeries = require('promise-map-series');
@@ -269,7 +270,6 @@ FONT.openFontFile = function ($preview) {
             }
             
             if (result.filePaths.length == 1) {
-                const fs = require('fs');
                 const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
                 FONT.parseMCMFontFile(fontData.toString());
                 resolve();

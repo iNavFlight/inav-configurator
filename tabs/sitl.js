@@ -78,17 +78,6 @@ TABS.sitl.initialize = (callback) => {
     GUI.load(path.join(__dirname, "sitl.html"), function () {
         i18n.localize();
     
-    var os = GUI.operating_system;
-    if (os != 'Windows' && os != 'Linux') {
-
-        $('.content_wrapper').find('*').remove();
-        $('.content_wrapper').append(`<h2>${i18n.getMessage('sitlOSNotSupported')}</h2>`);
-        
-        GUI.content_ready(callback);
-        return;
-    }
-
-
     var currentSim, currentProfile, profiles;
     var mapping = new Array(28).fill(0);
     var serialProtocolls = Ser2TCP.getProtocolls();
@@ -253,7 +242,7 @@ TABS.sitl.initialize = (callback) => {
             return;
 
         if (profiles.find(e => { return e.name == name })) {
-            alert(i18n.getMessage('sitlProfileExists'))
+            GUI.alert(i18n.getMessage('sitlProfileExists'))
             return;
         }
         var eerpromName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".bin";
@@ -284,7 +273,7 @@ TABS.sitl.initialize = (callback) => {
     profileDeleteBtn_e.on('click', function () {
 
         if (currentProfile.isStdProfile) {
-            alert(i18n.getMessage('sitlStdProfileCantDeleted'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantDeleted'));            
             return;
         }
 
@@ -385,7 +374,7 @@ TABS.sitl.initialize = (callback) => {
 
     function saveProfiles() {
         if (currentProfile.isStdProfile) {
-            alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
+            GUI.alert(i18n.getMessage('sitlStdProfileCantOverwritten'));
             return;
         }        
         var profilesToSave = [];

@@ -230,9 +230,8 @@ TABS.led_strip.initialize = function (callback, scrollPosition) {
 
         $('.colors').on('dblclick', 'button', function(e) {
 
-            var pp = $('.tab-led-strip').position();
-            var moveLeft = $('.tab-led-strip').position().left + ($('.colorDefineSliders').width() / 2);
-            var moveUp =   $('.tab-led-strip').position().top  + $('.colorDefineSliders').height() + 20;
+            var moveLeft = $('.tab-led-strip').offset().left + ($('.colorDefineSliders').width() / 2);
+            var moveUp =   $('.tab-led-strip').offset().top  + $('.colorDefineSliders').height() + 20;
 
             $('.colorDefineSliders').css('left', e.pageX - e.offsetX - moveLeft);
             $('.colorDefineSliders').css('top', e.pageY - e.offsetY - moveUp);

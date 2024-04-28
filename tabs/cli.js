@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { dialog } = require("@electron/remote");
 
 const MSP = require('./../js/msp');
@@ -13,6 +14,7 @@ const { globalSettings } = require('./../js/globalSettings');
 const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
+const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -94,6 +96,7 @@ TABS.cli.initialize = function (callback) {
 
     // Flush MSP queue as well as all MSP registered callbacks
     mspQueue.flush();
+    mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";
@@ -170,7 +173,6 @@ TABS.cli.initialize = function (callback) {
                     return;
                 }
                 
-                const fs = require('fs');
                 fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
@@ -255,7 +257,6 @@ TABS.cli.initialize = function (callback) {
                 }
 
                 if (result.filePaths.length == 1) {
-                    const fs = require('fs');
                     fs.readFile(result.filePaths[0], (err, data) => {
                         if (err) {
                             GUI.log(i18n.getMessage('ErrorReadingFile'));

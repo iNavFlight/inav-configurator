@@ -58,7 +58,7 @@ jobs:
                 name: ${{ env.BUILD_NAME }}_ZIP
                 path: ./out/make/zip/linux/x64/*.zip
     build-mac:
-        runs-on: macos-latest
+        runs-on: macos-13
         steps:
         - uses: actions/checkout@v4
         - name: Setup environment
@@ -85,7 +85,7 @@ jobs:
             cache: 'npm'
         # Workaround due to a bug in node-gyp: https://github.com/electron/rebuild/issues/1116
         - name: Install Setuptools
-          run: pip install setuptools
+          run: python3 -m pip install --break-system-packages setuptools
         - name: Install deps
           uses: nick-fields/retry@v2
           with:
