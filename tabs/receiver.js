@@ -4,8 +4,6 @@ const path = require('path');
 
 const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
-const mspQueue = require('./../js/serial_queue');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
@@ -13,6 +11,7 @@ const FC = require('./../js/fc');
 const CONFIGURATOR = require('./../js/data_storage');
 const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
+const interval = require('./../js/intervals');
 
 TABS.receiver = {
     rateChartHeight: 117
@@ -370,21 +369,10 @@ TABS.receiver.initialize = function (callback) {
         });
 
         function get_rc_data() {
-
-            /*
-             * Throttling
-             */
-            if (mspQueue.shouldDrop()) {
-                update_ui();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_RC, false, false, update_ui);
         }
 
         function update_ui() {
-            var i;
-
             // update bars with latest data
             for (let i = 0; i < FC.RC.active_channels; i++) {
                 meter_fill_array[i].css('width', ((FC.RC.channels[i] - meter_scale.min) / (meter_scale.max - meter_scale.min) * 100).clamp(0, 100) + '%');
@@ -393,7 +381,7 @@ TABS.receiver.initialize = function (callback) {
 
         }
 
-        mspBalancedInterval.add('receiver_pull', 35, 1, get_rc_data);
+        interval.add('receiver_pull', get_rc_data, 25);
 
         GUI.content_ready(callback);
     }

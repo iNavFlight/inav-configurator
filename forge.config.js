@@ -74,7 +74,8 @@ module.exports = {
       name: '@electron-forge/maker-dmg',
       config: {
         name: "INAV Configurator",
-        background: "./assets/osx/dmg-background.png"
+        background: "./assets/osx/dmg-background.png",
+        icon: "./images/inav.icns"
       }
     },
     {

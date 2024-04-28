@@ -442,90 +442,36 @@ TABS.sensors.initialize = function (callback) {
             // data pulling timers
             if (checkboxes[0] || checkboxes[1] || checkboxes[2]) {
                 interval.add('IMU_pull', function () {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_imu_graphs();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_imu_graphs);
                 }, fastest, true);
             }
 
             if (checkboxes[3]) {
                 interval.add('altitude_pull', function altitude_data_pull() {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_altitude_graph();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSP_ALTITUDE, false, false, update_altitude_graph);
                 }, rates.baro, true);
             }
 
             if (checkboxes[4]) {
                 interval.add('sonar_pull', function sonar_data_pull() {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_sonar_graphs();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSP_SONAR, false, false, update_sonar_graphs);
                 }, rates.sonar, true);
             }
 
             if (checkboxes[5]) {
                 interval.add('airspeed_pull', function airspeed_data_pull() {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_airspeed_graphs();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSPV2_INAV_AIR_SPEED, false, false, update_airspeed_graphs);
                 }, rates.airspeed, true);
             }
 
             if (checkboxes[6]) {
                 interval.add('temperature_pull', function temperature_data_pull() {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_temperature_graphs();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSP2_INAV_TEMPERATURES, false, false, update_temperature_graphs);
                 }, 1000, true);
             }
 
             if (checkboxes[7]) {
                 interval.add('debug_pull', function debug_data_pull() {
-
-                    /*
-                     * Enable balancer
-                     */
-                    if (mspQueue.shouldDrop()) {
-                        update_debug_graphs();
-                        return;
-                    }
-
                     MSP.send_message(MSPCodes.MSP2_INAV_DEBUG, false, false, update_debug_graphs);
                 }, rates.debug, true);
             }

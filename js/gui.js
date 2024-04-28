@@ -1,11 +1,12 @@
 'use strict';
+const { dialog } = require("@electron/remote");
+
 
 const CONFIGURATOR = require('./data_storage');
 const Switchery = require('./libraries/switchery/switchery')
 const MSP = require('./msp');
 const FC = require('./fc');
 const interval = require('./intervals');
-const mspBalancedInterval = require('./msp_balanced_interval');
 const { scaleRangeInt } = require('./helpers');
 const i18n = require('./localization');
 
@@ -92,7 +93,6 @@ GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
 
     interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-    mspBalancedInterval.flush();
 
     if (this.active_tab) {
         TABS[this.active_tab].cleanup(callback);
@@ -528,6 +528,13 @@ GUI_control.prototype.update_dataflash_global = function () {
         });
     }
 };
+
+/**
+* Don't use alert() in Electron, it has a nasty bug: https://github.com/electron/electron/issues/31917
+*/ 
+GUI_control.prototype.alert = function(message) {
+    dialog.showMessageBoxSync({ message: message, icon: "./images/inav_icon_128.png" });
+}
 
 // initialize object into GUI variable
 var GUI = new GUI_control();

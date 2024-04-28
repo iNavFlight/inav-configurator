@@ -104,11 +104,6 @@ const mspQueue = require('./serial_queue');
 
         if (!stoppped && GUI.active_tab != 'cli') {
 
-            if (mspQueue.shouldDropStatus()) {
-                return;
-            }
-
-            
             MSP.send_message(MSPCodes.MSP_SENSOR_STATUS, false, false);
             MSP.send_message(MSPCodes.MSPV2_INAV_STATUS, false, false);
             MSP.send_message(MSPCodes.MSP_ACTIVEBOXES, false, false);

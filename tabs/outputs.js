@@ -5,7 +5,6 @@ const path = require('path');
 const MSPChainerClass = require('./../js/msp/MSPchainer');
 const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
-const mspBalancedInterval = require('./../js/msp_balanced_interval');
 const mspQueue = require('./../js/serial_queue')
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
@@ -430,18 +429,8 @@ TABS.outputs.initialize = function (callback) {
 
         // timer initialization
         interval.killAll(['motor_and_status_pull', 'global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
-        mspBalancedInterval.flush();
 
         interval.add('IMU_pull', function () {
-
-            /*
-            * Enable balancer
-            */
-            if (mspQueue.shouldDrop()) {
-                update_accel_graph();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_RAW_IMU, false, false, update_accel_graph);
         }, 25, true);
 
@@ -662,21 +651,10 @@ TABS.outputs.initialize = function (callback) {
         $motorsEnableTestMode.trigger('change');
 
         function getPeriodicMotorOutput() {
-
-            if (mspQueue.shouldDrop()) {
-                getPeriodicServoOutput();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_MOTOR, false, false, getPeriodicServoOutput);
         }
 
         function getPeriodicServoOutput() {
-            if (mspQueue.shouldDrop()) {
-                update_ui();
-                return;
-            }
-
             MSP.send_message(MSPCodes.MSP_SERVO, false, false, update_ui);
         }
 
