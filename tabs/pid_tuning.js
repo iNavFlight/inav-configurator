@@ -9,14 +9,11 @@ const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
-const features = require('./../js/feature_framework');
 const tabs = require('./../js/tabs');
 const FC = require('./../js/fc');
 const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
 const { scaleRangeInt } = require('./../js/helpers');
-const SerialBackend = require('./../js/serial_backend');
-const BitHelper = require('./../js/bitHelper');
 
 TABS.pid_tuning = {
 
@@ -67,8 +64,8 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-        $('#tpa').val(RC_tuning.dynamic_THR_PID);
-        $('#tpa-breakpoint').val(RC_tuning.dynamic_THR_breakpoint);
+        $('#tpa').val(FC.RC_tuning.dynamic_THR_PID);
+        $('#tpa-breakpoint').val(FC.RC_tuning.dynamic_THR_breakpoint);
     }
 
     function form_to_pid_and_rc() {
@@ -90,19 +87,19 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         // catch RC_tuning changes
-        RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
-        RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
-        RC_tuning.yaw_rate = parseFloat($('#rate_yaw_rate').val());
+        FC.RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
+        FC.RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
+        FC.RC_tuning.yaw_rate = parseFloat($('#rate_yaw_rate').val());
 
-        RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
-        RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
+        FC.RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
+        FC.RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
 
         FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
         FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
 
-        RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
-        RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
-        RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
+        FC.RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
+        FC.RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
+        FC.RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
 
         // Rate Dynamics
         FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
@@ -209,16 +206,16 @@ TABS.pid_tuning.initialize = function (callback) {
         });
 
         //Slider rates
-        GUI.sliderize($('#rate_roll_rate'), RC_tuning.roll_rate, 40, 1000);
-        GUI.sliderize($('#rate_pitch_rate'), RC_tuning.pitch_rate, 40, 1000);
-        GUI.sliderize($('#rate_yaw_rate'), RC_tuning.yaw_rate, 40, 1000);
+        GUI.sliderize($('#rate_roll_rate'), FC.RC_tuning.roll_rate, 40, 1000);
+        GUI.sliderize($('#rate_pitch_rate'), FC.RC_tuning.pitch_rate, 40, 1000);
+        GUI.sliderize($('#rate_yaw_rate'), FC.RC_tuning.yaw_rate, 40, 1000);
 
-        GUI.sliderize($('#rate_rollpitch_expo'), RC_tuning.RC_EXPO * 100, 0, 100);
-        GUI.sliderize($('#rate_yaw_expo'), RC_tuning.RC_YAW_EXPO * 100, 0, 100);
+        GUI.sliderize($('#rate_rollpitch_expo'), FC.RC_tuning.RC_EXPO * 100, 0, 100);
+        GUI.sliderize($('#rate_yaw_expo'), FC.RC_tuning.RC_YAW_EXPO * 100, 0, 100);
 
-        GUI.sliderize($('#rate_manual_roll'), RC_tuning.manual_roll_rate, 0, 100);
-        GUI.sliderize($('#rate_manual_pitch'), RC_tuning.manual_pitch_rate, 0, 100);
-        GUI.sliderize($('#rate_manual_yaw'), RC_tuning.manual_yaw_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_roll'), FC.RC_tuning.manual_roll_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_pitch'), FC.RC_tuning.manual_pitch_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_yaw'), FC.RC_tuning.manual_yaw_rate, 0, 100);
 
         updatePreview();
 
