@@ -1,12 +1,35 @@
 'use strict';
 
+const mapSeries = require('promise-map-series')
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const { globalSettings, UnitType } = require('./globalSettings');
+const i18n = require('./localization');
+
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 var Settings = (function () {
     let self = {};
 
     self.fillSelectOption = function(s, ii) {
         var name = (s.setting.table ? s.setting.table.values[ii] : null);
         if (name) {
-            var localizedName = chrome.i18n.getMessage(name);
+            var localizedName = i18n.getMessage(name);
             if (localizedName) {
                 name = localizedName;
             }
@@ -26,7 +49,7 @@ var Settings = (function () {
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
 
@@ -61,6 +84,8 @@ var Settings = (function () {
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
+                    } else if (input.attr('type') == 'radio') {
+                        input.prop( 'checked', s.value == input.attr('value') );
                     } else {
                         input.empty();
                         let option = null;
@@ -123,7 +148,7 @@ var Settings = (function () {
 
                 input.data('setting-info', s.setting);
                 if (input.data('live')) {
-                    input.change(function() {
+                    input.on('change', function () {
                         self.saveInput(input);
                     });
                 }
@@ -515,6 +540,10 @@ var Settings = (function () {
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;
+            } else if (input.attr('type') == 'radio') {
+                if (input.prop('checked')) {
+                    value = parseInt(input.val());
+                }
             } else {
                 value = parseInt(input.val());
             }
@@ -580,7 +609,7 @@ var Settings = (function () {
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             return self.saveInput(input);
         });
     };
@@ -602,7 +631,7 @@ var Settings = (function () {
             helpIcons.push($(this));
         });
 
-        return Promise.mapSeries(helpIcons, function(helpIcon, ii) {
+        return mapSeries(helpIcons, function(helpIcon, ii) {
             let forAtt = helpIcon.attr('for');
 
             if (typeof forAtt !== "undefined" && forAtt !== "") {
@@ -623,3 +652,5 @@ var Settings = (function () {
 
     return self;
 })();
+
+module.exports = Settings;

@@ -1,5 +1,13 @@
-/*global $*/
 'use strict';
+
+const CONFIGURATOR = require('./data_storage');
+const Switchery = require('./libraries/switchery/switchery')
+const MSP = require('./msp');
+const FC = require('./fc');
+const interval = require('./intervals');
+const mspBalancedInterval = require('./msp_balanced_interval');
+const { scaleRangeInt } = require('./helpers');
+const i18n = require('./localization');
 
 var TABS = {}; // filled by individual tab js file
 
@@ -54,16 +62,6 @@ var GUI_control = function () {
     else if (navigator.appVersion.indexOf("X11") != -1)     this.operating_system = "UNIX";
     else this.operating_system = "Unknown";
 
-    this.colorTable = [
-        "#8ecae6",
-        "#2a9d8f",
-        "#e9c46a",
-        "#f4a261",
-        "#e76f51",
-        "#ef476f",
-        "#ffc300"
-    ];
-
 };
 
 // message = string
@@ -93,8 +91,8 @@ GUI_control.prototype.log = function (message) {
 GUI_control.prototype.tab_switch_cleanup = function (callback) {
     MSP.callbacks_cleanup(); // we don't care about any old data that might or might not arrive
 
-    helper.interval.killAll(['global_data_refresh', 'msp-load-update']);
-    helper.mspBalancedInterval.flush();
+    interval.killAll(['global_data_refresh', 'msp-load-update', 'ltm-connection-check']);
+    mspBalancedInterval.flush();
 
     if (this.active_tab) {
         TABS[this.active_tab].cleanup(callback);
@@ -183,7 +181,7 @@ GUI_control.prototype.content_ready = function (callback) {
     const documentationDiv = $('<div>').addClass('cf_doc_version_bt');
     $('<a>').attr('href', 'https://github.com/iNavFlight/inav/wiki')
         .attr('target', '_blank').attr('id', 'button-documentation')
-        .html(chrome.i18n.getMessage('documentation')).appendTo(documentationDiv);
+        .html(i18n.getMessage('documentation')).appendTo(documentationDiv);
     documentationDiv.insertAfter(tabTitle);
 
     // loading tooltip
@@ -249,26 +247,26 @@ GUI_control.prototype.updateStatusBar = function() {
     var activeArmFlags =  [];
     for(var i=0;i<32;i++) {
         var checkBit = (1 << i);
-        if(Object.values(armingFlags).includes(checkBit) && (checkBit & CONFIG.armingFlags)) {
+        if(Object.values(armingFlags).includes(checkBit) && (checkBit & FC.CONFIG.armingFlags)) {
             activeArmFlags.push(Object.keys(armingFlags)[Object.values(armingFlags).indexOf(checkBit)]);
         }
     }
 
-    $('span.i2c-error').text(CONFIG.i2cError);
-    $('span.cycle-time').text(CONFIG.cycleTime);
-    $('span.cpu-load').text(chrome.i18n.getMessage('statusbar_cpu_load', [CONFIG.cpuload]));
+    $('span.i2c-error').text(FC.CONFIG.i2cError);
+    $('span.cycle-time').text(FC.CONFIG.cycleTime);
+    $('span.cpu-load').text(i18n.getMessage('statusbar_cpu_load', [FC.CONFIG.cpuload]));
     $('span.arming-flags').text(activeArmFlags.length ? activeArmFlags.join(', ') : '-');
 };
 
 GUI_control.prototype.updateProfileChange = function(refresh) {
-    $('#mixerprofilechange').val(CONFIG.mixer_profile);
-    $('#profilechange').val(CONFIG.profile);
-    $('#batteryprofilechange').val(CONFIG.battery_profile);
+    $('#mixerprofilechange').val(FC.CONFIG.mixer_profile);
+    $('#profilechange').val(FC.CONFIG.profile);
+    $('#batteryprofilechange').val(FC.CONFIG.battery_profile);
     if (refresh) {
-        GUI.log(chrome.i18n.getMessage('loadedMixerProfile', [CONFIG.mixer_profile + 1]));
-        GUI.log(chrome.i18n.getMessage('pidTuning_LoadedProfile', [CONFIG.profile + 1]));
-        GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [CONFIG.battery_profile + 1]));
-        updateActivatedTab();
+        GUI.log(i18n.getMessage('loadedMixerProfile', [FC.CONFIG.mixer_profile + 1]));
+        GUI.log(i18n.getMessage('pidTuning_LoadedProfile', [FC.CONFIG.profile + 1]));
+        GUI.log(i18n.getMessage('loadedBatteryProfile', [FC.CONFIG.battery_profile + 1]));
+        GUI.updateActivatedTab();
     }
 };
 
@@ -302,7 +300,7 @@ GUI_control.prototype.simpleBind = function () {
             return;
         }
 
-        $this.change(function () {
+        $this.on('change', function () {
             window[toBind[0]][toBind[1]] = $(this).val();
         });
 
@@ -366,7 +364,7 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
             break;
     }
 
-    $container.find('.logic_element__operand--value').change(onChange);
+    $container.find('.logic_element__operand--value').on('change', onChange);
 };
 
 /**
@@ -379,7 +377,7 @@ GUI_control.prototype.renderOperandValue = function ($container, operandMetadata
 GUI_control.prototype.renderLogicConditionSelect = function ($container, logicConditions, current, onChange, withAlways, onlyEnabled) {
 
     let $select = $container.append('<select class="mix-rule-condition">').find("select"),
-        lcCount = logicConditions.getCount();
+        lcCount = logicConditions.getCount(),
         option  = "";
 
     if (withAlways) {
@@ -399,7 +397,7 @@ GUI_control.prototype.renderLogicConditionSelect = function ($container, logicCo
         }
     }
 
-    $select.val(current).change(onChange);
+    $select.val(current).on('change', onChange);
 }
 
 GUI_control.prototype.sliderize = function ($input, value, min, max) {
@@ -488,5 +486,50 @@ GUI_control.prototype.sliderize = function ($input, value, min, max) {
     $input.trigger('change');
 };
 
+GUI_control.prototype.update_dataflash_global = function () {
+    function formatFilesize(bytes) {
+        if (bytes < 1024) {
+            return bytes + "B";
+        }
+        var kilobytes = bytes / 1024;
+
+        if (kilobytes < 1024) {
+            return Math.round(kilobytes) + "kB";
+        }
+
+        var megabytes = kilobytes / 1024;
+
+        return megabytes.toFixed(1) + "MB";
+    }
+
+    var supportsDataflash = FC.DATAFLASH.totalSize > 0;
+
+    if (supportsDataflash){
+        $(".noflash_global").css({
+        display: 'none'
+        });
+
+        $(".dataflash-contents_global").css({
+        display: 'block'
+        });
+
+        $(".dataflash-free_global").css({
+        width: (100-(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize) / FC.DATAFLASH.totalSize * 100) + "%",
+        display: 'block'
+        });
+        $(".dataflash-free_global div").text('Dataflash: free ' + formatFilesize(FC.DATAFLASH.totalSize - FC.DATAFLASH.usedSize));
+    } else {
+        $(".noflash_global").css({
+        display: 'block'
+        });
+
+        $(".dataflash-contents_global").css({
+        display: 'none'
+        });
+    }
+};
+
 // initialize object into GUI variable
 var GUI = new GUI_control();
+
+module.exports = { GUI, TABS };

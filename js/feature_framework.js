@@ -1,7 +1,4 @@
-/*global mspHelper,FEATURES,bit_clear,bit_set*/
 'use strict';
-
-var helper = helper || {};
 
 /*
 Helper to work with FEATURES via MSP
@@ -23,7 +20,12 @@ helper.features.execute(function () {
 });
 
 */
-helper.features = (function() {
+
+const mspHelper = require('./msp/MSPHelper');
+const BitHelper = require('./bitHelper');
+const FC = require('./fc');
+
+var features = (function() {
 
     let publicScope = {},
         privateScope = {};
@@ -48,7 +50,7 @@ helper.features = (function() {
     publicScope.updateUI = function ($container, values) {
         $container.find('[data-bit].feature').each(function () {
             let $this = $(this);
-            $this.prop('checked', bit_check(values, $this.attr("data-bit")));
+            $this.prop('checked', BitHelper.bit_check(values, $this.attr("data-bit")));
         });
     };
 
@@ -73,11 +75,11 @@ helper.features = (function() {
     privateScope.setBits = function () {
 
         for (const bit of toSet) {
-            FEATURES = bit_set(FEATURES, bit);
+            FC.FEATURES = BitHelper.bit_set(FC.FEATURES, bit);
         }
 
         for (const bit of toUnset) {
-            FEATURES = bit_clear(FEATURES, bit);
+            FC.FEATURES = BitHelper.bit_clear(FC.FEATURES, bit);
         }
 
         mspHelper.saveFeatures(exitPoint);
@@ -85,3 +87,5 @@ helper.features = (function() {
 
     return publicScope;
 })();
+
+module.exports = features;

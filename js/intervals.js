@@ -1,8 +1,6 @@
 'use strict';
 
-var helper = helper || {};
-
-helper.interval = (function () {
+var interval = function () {
 
     var privateScope = {},
         publicScope = {};
@@ -113,6 +111,8 @@ helper.interval = (function () {
     publicScope.killAll = function (keep_array) {
         var timers_killed = 0;
 
+        console.log('Killing all intervals except: ' + keep_array);
+
         for (var i = (privateScope.intervals.length - 1); i >= 0; i--) { // reverse iteration
             var keep = false;
             if (keep_array) { // only run through the array if it exists
@@ -133,5 +133,11 @@ helper.interval = (function () {
         return timers_killed;
     };
 
+    publicScope.list = function () {
+        return privateScope.intervals;
+    };
+
     return publicScope;
-})();
+}();
+
+module.exports = interval;
