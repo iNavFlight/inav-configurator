@@ -14,9 +14,10 @@ const FC = require('./../js/fc');
 const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
 const { scaleRangeInt } = require('./../js/helpers');
+const interval = require('./../js/intervals');
 
 TABS.pid_tuning = {
-
+    rateChartHeight: 117
 };
 
 TABS.pid_tuning.initialize = function (callback) {
@@ -44,6 +45,33 @@ TABS.pid_tuning.initialize = function (callback) {
 
     function load_html() {
         GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
+    }
+
+    function drawRollPitchYawExpo() {
+        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+        var context = pitch_roll_curve.getContext("2d");
+
+        var expoAVal = $('.tunings .rate input[name="expo"]');
+        var expoA = parseFloat(expoAVal.val());
+
+        expoA = 0.7;
+
+        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max'))) {
+            return;
+        }
+
+        var rateHeight = TABS.pid_tuning.rateChartHeight;
+
+        // draw
+        context.clearRect(0, 0, 200, rateHeight);
+
+        context.beginPath();
+        context.moveTo(0, rateHeight);
+        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
+        context.lineWidth = 2;
+        // context.strokeStyle = '#f4a261';
+        context.strokeStyle = '#a00000';
+        context.stroke();
     }
 
     function pid_and_rc_to_form() {
@@ -310,6 +338,10 @@ TABS.pid_tuning.initialize = function (callback) {
         if (!FC.isRpyDComponentUsed()) {
             $('.rpy_d').prop('disabled', 'disabled');
         }
+
+        interval.add("drawRollPitchYawExpo", function () {
+            drawRollPitchYawExpo();
+        }, 100);
 
         GUI.simpleBind();
 
