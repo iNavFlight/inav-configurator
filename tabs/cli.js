@@ -14,7 +14,7 @@ const { globalSettings } = require('./../js/globalSettings');
 const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
-const mspDeduplicationQueue = require('./msp/mspDeduplicationQueue');
+const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
 
 TABS.cli = {
     lineDelayMs: 50,
