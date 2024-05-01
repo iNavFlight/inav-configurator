@@ -2091,7 +2091,7 @@
         "message": "Alignment tool"
     },
     "magnetometerHelp": {
-        "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on Flight Controller</u>.<br/>2. Adjust magnetometer orientation to match physical orientation on the aircraft <u>according to \"compass direction\" arrow or axis markings on magnetometer</u>.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
+        "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on Flight Controller</u>.<br/>2. Adjust magnetometer orientation to match physical orientation on the aircraft.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
     },
     "magnetometerOrientationPreset": {
         "message": "Orientation preset (align_mag). Relative to FC orientation"
@@ -2103,7 +2103,7 @@
         "message": "2. Select a preset (align_mag) or create a custom configuration using the sliders<br>(align_mag_roll, align_mag_pitch, align_mag_yaw)"
     },
     "magnetometerElementToShow": {
-        "message": "Element to show: Magnetometer model or axes"
+        "message": "Element to show: Magnetometer model or chip or axes"
     },
 
     "axisTableTitleAxis": {

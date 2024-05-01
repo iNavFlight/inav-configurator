@@ -36,7 +36,7 @@ TABS.magnetometer.initialize = function (callback) {
 
     self.pageElements = {};
     self.isSavePreset = true;
-    self.showMagnetometer = true;
+    self.elementToShow = 0;
     //========================
     // Load chain
     // =======================
@@ -418,7 +418,7 @@ TABS.magnetometer.initialize = function (callback) {
         const elementToShow = $("#element_to_show");
         elementToShow.on('change', function () {
             const value = parseInt($(this).val());
-            self.showMagnetometer = (value == 0);
+            self.elementToShow = value;
             self.render3D();
         });
 
@@ -550,8 +550,7 @@ TABS.magnetometer.initialize3D = function () {
         model_file,
         camera,
         scene,
-        gps,
-        xyz,
+        magModels,
         fc,
         useWebGlRenderer = false;
 
@@ -597,11 +596,10 @@ TABS.magnetometer.initialize3D = function () {
 
     this.render3D = function () {
 
-        if (!gps || !xyz || !fc)
+        if (!magModels || !fc)
             return;
 
-        gps.visible = self.showMagnetometer;
-        xyz.visible = !self.showMagnetometer;
+        magModels.forEach( (m,i) => m.visible = i == self.elementToShow );
         fc.visible = true;
 
         var magRotation = new THREE.Euler(-THREE.Math.degToRad(self.alignmentConfig.pitch-180), THREE.Math.degToRad(-180 - self.alignmentConfig.yaw), THREE.Math.degToRad(self.alignmentConfig.roll), 'YXZ'); 
@@ -615,8 +613,7 @@ TABS.magnetometer.initialize3D = function () {
           matrix.premultiply(matrix1);  //preset specifies orientation relative to FC, align_max_xxx specify absolute orientation 
         }
 */
-        gps.rotation.setFromRotationMatrix(matrix);
-        xyz.rotation.setFromRotationMatrix(matrix);
+        magModels.forEach( (m,i) => m.rotation.setFromRotationMatrix(matrix) );
         fc.rotation.setFromRotationMatrix(matrix1);
 
         // draw
@@ -691,6 +688,11 @@ TABS.magnetometer.initialize3D = function () {
     const manager = new THREE.LoadingManager();
     const loader = new THREE.GLTFLoader(manager);
 
+    const magModelNames = ['xyz', 'ak8963c', 'ak8963n', 'ak8975', 'ak8975c', 'bn_880', 'diatone_mamba_m10_pro', 'flywoo_goku_m10_pro_v3', 'foxeer_m10q_120', 'foxeer_m10q_180', 'foxeer_m10q_250', 
+		'geprc_gep_m10_dq', 'hglrc_m100', 'qmc5883', 'ist8308', 'ist8310', 'lis3mdl', 
+		'mag3110', 'matek_m9n', 'matek_m10q', 'mlx90393', 'mp9250', 'qmc5883', 'flywoo_goku_m10_pro_v3', 'ws_m181'];
+	magModels = [];
+
     //Load the UAV model
     loader.load('./resources/models/' + model_file + '.gltf', (obj) => {
         const model = obj.scene;
@@ -700,30 +702,23 @@ TABS.magnetometer.initialize3D = function () {
 
         const gpsOffset = getDistanceByModelName(model_file);
 
-        //Load the GPS model
-        loader.load('./resources/models/gps.gltf', (obj) => {
-            gps = obj.scene;
-            const scaleFactor = 0.04;
-            gps.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            gps.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
-            gps.traverse(child => {
-                if (child.material) child.material.metalness = 0;
-            });
-            gps.rotation.y = 3 * Math.PI / 2;
-            model.add(gps);
-            this.resize3D();
-        });
-
-        //Load the XYZ model
-        loader.load('./resources/models/xyz.gltf', (obj) => {
-            xyz = obj.scene;
-            const scaleFactor = 0.04;
-            xyz.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            xyz.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
-            xyz.rotation.y = 3 * Math.PI / 2;
-            model.add(xyz);
-            this.render3D();
-        });
+		magModelNames.forEach( (name, i) => 
+		{
+	        //Load the GPS model
+	        loader.load('./resources/models/' + name + '.gltf', (obj) => {
+	            const gps = obj.scene;
+	            const scaleFactor = i==0 ? 0.03 : 0.04;
+	            gps.scale.set(scaleFactor, scaleFactor, scaleFactor);
+	            gps.position.set(gpsOffset[0], gpsOffset[1] + 0.5, gpsOffset[2]);
+	            gps.traverse(child => {
+	                if (child.material) child.material.metalness = 0;
+	            });
+	            gps.rotation.y = 3 * Math.PI / 2;
+	            model.add(gps);
+				magModels[i]=gps;
+	            this.resize3D();
+	        });
+		});
 
         //Load the FC model
         loader.load('./resources/models/fc.gltf', (obj) => {
