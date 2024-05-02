@@ -161,6 +161,7 @@ TABS.magnetometer.initialize = function (callback) {
     }
 
     function toUpperRange(input, max) {
+        if (!Number.isFinite(input)) return 0;
         while (input > max) input -= 360;
         while (input + 360 <= max) input += 360;
         return input;
