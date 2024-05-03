@@ -1341,7 +1341,7 @@
         "message": "Reset PID Controller"
     },
     "pidTuning_PIDgains": {
-        "message": "PID gains"
+        "message": "PID Gains"
     },
     "pidTuning_Name": {
         "message": "Name"
@@ -1506,7 +1506,7 @@
         "message": "Mechanics"
     },
     "pidTuning_ITermMechanics": {
-        "message": "I-term mechanics"
+        "message": "I-term Mechanics"
     },
     "pidTuning_itermRelaxCutoff": {
         "message": "I-term Relax Cutoff Frequency"
@@ -1530,7 +1530,7 @@
         "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
     },
     "pidTuning_dTermMechanics": {
-        "message": "D-term mechanics"
+        "message": "D-term Mechanics"
     },
     "pidTuning_d_boost_min": {
         "message": "D-Boost Min. Scale"
@@ -1557,7 +1557,7 @@
         "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
     },
     "pidTuning_tpaMechanics": {
-        "message": "Thrust PID attenuation"
+        "message": "Thrust PID Attenuation"
     },
     "pidTuning_TPA": {
         "message": "Thrust PID Attenuation (TPA)"
@@ -1572,7 +1572,7 @@
         "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
     },
     "pidTuning_fwLevelTrimMechanics": {
-        "message": "Fixed Wing mechanics"
+        "message": "Fixed Wing Mechanics"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Level Trim [deg]"
@@ -2755,7 +2755,7 @@
         "message": "OSD"
     },
     "configurationSensors": {
-        "message": "Sensors & buses"
+        "message": "Sensors & Buses"
     },
     "sensorAccelerometer": {
         "message": "Accelerometer"
