@@ -972,7 +972,7 @@
         "message": "Minimum Command"
     },
     "configurationVoltageCurrentSensor": {
-        "message": "Voltage and Current Sensors"
+        "message": "Voltage & Current Sensors"
     },
     "configurationBatteryCurrent": {
         "message": "Battery Current"
@@ -1329,10 +1329,10 @@
         "message": "Show all PIDs"
     },
     "pidTuning_PIDmain": {
-        "message": "Main PID gains"
+        "message": "Main PID Gains"
     },
     "pidTuning_PIDother": {
-        "message": "Additional PID gains"
+        "message": "Additional PID Gains"
     },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
@@ -2252,7 +2252,7 @@
         "message": "Your flight controller's firmware does not support Blackbox logging or Blackbox feature is not enabled"
     },
     "blackboxConfiguration": {
-        "message": "Blackbox configuration"
+        "message": "Blackbox Configuration"
     },
     "blackboxButtonSave": {
         "message": "Save and Reboot"
@@ -3530,7 +3530,7 @@
         "message": "Home Position on Arming Screen"
     },
     "osd_hud_settings": {
-        "message": "Heads up Display settings"
+        "message": "Heads-up Display settings"
     },
     "osd_custom_element_settings": {
         "message": "Custom OSD elements"
@@ -3758,13 +3758,13 @@
         "message": "GPS"
     },
     "osdGroupPowerLimits": {
-        "message": "Power limits"
+        "message": "Power Limits"
     },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
     },
     "osdGroupPIDOutputs": {
-        "message": "PID controllers outputs"
+        "message": "PID Controllers Outputs"
     },
     "osdGroupVTX": {
         "message": "VTX"
@@ -3773,10 +3773,10 @@
         "message": "CRSF RX Statistics"
     },
     "osdGroupMapsAndRadars": {
-        "message": "Maps and Radars"
+        "message": "Maps & Radars"
     },
     "osdGroupMapsAndRadars_HELP": {
-        "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
+        "message": "Maps & radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
     },
     "osdElement_ONTIME_FLYTIME": {
         "message": "On Time / Fly Time"
@@ -3791,7 +3791,7 @@
         "message": "Battery Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
-        "message": "Sag Compensated Battery Voltage"
+        "message": "Sag-compensated Battery Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
         "message": "Calculated voltage the battery should be at without load (simulates ideal battery)"
@@ -3806,7 +3806,7 @@
         "message": "Battery Cell Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
-        "message": "Sag Compensated Battery Cell Voltage"
+        "message": "Sag-compensated Battery Cell Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Calculated average cell voltage the battery should be at without load (simulates ideal battery)"
@@ -4586,7 +4586,7 @@
         "message": "Warning:value beyond normal operation range."
     },
     "servoMixer": {
-        "message": "Servo mixer"
+        "message": "Servo Mixer"
     },
     "servoMixerDelete": {
         "message": "Delete"
@@ -4598,13 +4598,13 @@
         "message": "Platform type"
     },
     "platformConfiguration": {
-        "message": "Platform configuration"
+        "message": "Platform Configuration"
     },
     "output_modeTitle": {
         "message": "Output mode"
     },
     "mixerPreset": {
-        "message": "Mixer preset"
+        "message": "Mixer Preset"
     },
     "mixerNotLoaded": {
         "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
@@ -5694,7 +5694,7 @@
         "message": "Cannot prefetch target: No port"
     },
     "timerOutputs": {
-        "message": "Timer outputs"
+        "message": "Timer Outputs"
     },
     "ezTuneFilterHz": {
         "message": "Filter Hz"
