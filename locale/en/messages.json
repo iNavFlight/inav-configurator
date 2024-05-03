@@ -3065,10 +3065,10 @@
         "message": "Wireless mode"
     },
     "rthConfiguration": {
-        "message": "RTH settings"
+        "message": "RTH Settings"
     },
     "autoLandingSettings": {
-        "message": "Automatic landing settings"
+        "message": "Automatic Landing Settings"
     },
     "minRthDistance": {
         "message": "Min. RTH distance"
