@@ -5393,28 +5393,28 @@
         "message": "Dataflash: free space"
     },
     "mixerProfile1": {
-        "message": "Mixer profile 1"
+        "message": "Mixer Profile 1"
     },
     "mixerProfile2": {
-        "message": "Mixer profile 2"
+        "message": "Mixer Profile 2"
     },
     "sensorProfile1": {
-        "message": "PID profile 1"
+        "message": "PID Profile 1"
     },
     "sensorProfile2": {
-        "message": "PID profile 2"
+        "message": "PID Profile 2"
     },
     "sensorProfile3": {
-        "message": "PID profile 3"
+        "message": "PID Profile 3"
     },
     "sensorBatteryProfile1": {
-        "message": "Battery profile 1"
+        "message": "Battery Profile 1"
     },
     "sensorBatteryProfile2": {
-        "message": "Battery profile 2"
+        "message": "Battery Profile 2"
     },
     "sensorBatteryProfile3": {
-        "message": "Battery profile 3"
+        "message": "Battery Profile 3"
     },
     "sensorStatusGyro": {
         "message": "Gyroscope"
