@@ -146,7 +146,7 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
     self.getElevation = async function (globalSettings) {
         let elevation = "N/A";
         if (globalSettings.mapProviderType == 'bing') {
-            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "sealevel" : "ellipsoid";
+            let elevationEarthModel = $('#elevationEarthModel').prop("checked") ? "ellipsoid" : "sealevel";
 
             const response = await fetch('http://dev.virtualearth.net/REST/v1/Elevation/List?points='+self.getLatMap()+','+self.getLonMap()+'&heights='+elevationEarthModel+'&key='+globalSettings.mapApiKey);
             const myJson = await response.json();
