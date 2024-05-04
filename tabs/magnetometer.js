@@ -190,7 +190,7 @@ TABS.magnetometer.initialize = function (callback) {
                 return [180, 0, 180];
             case 0: //ALIGN_DEFAULT = 0
             case 8: //CW270_DEG_FLIP = 5
-            default://If not recognized, returns defualt
+            default://If not recognized, returns default
                 return [180, 0, 270];
         }
     }
@@ -231,11 +231,19 @@ TABS.magnetometer.initialize = function (callback) {
         }
     }
 
+    function updateFCCliString() {
+        var s = " align_board_roll=" + (self.boardAlignmentConfig.roll * 10) +  
+                " align_board_pitch=" + (self.boardAlignmentConfig.pitch * 10) + 
+                " align_board_yaw=" + (self.boardAlignmentConfig.yaw * 10);
+        self.pageElements.cli_settings_fc.text(s);
+    }
+
     function updateBoardRollAxis(value) {
         self.boardAlignmentConfig.roll = Number(value);
         self.pageElements.board_roll_slider.val(self.boardAlignmentConfig.roll);
         self.pageElements.orientation_board_roll.val(self.boardAlignmentConfig.roll);
         updateMagOrientationWithPreset();
+        updateFCCliString();
         self.render3D();
     }
 
@@ -244,6 +252,7 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.board_pitch_slider.val(self.boardAlignmentConfig.pitch);
         self.pageElements.orientation_board_pitch.val(self.boardAlignmentConfig.pitch);
         updateMagOrientationWithPreset();
+        updateFCCliString();
         self.render3D();
     }
 
@@ -252,7 +261,21 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.board_yaw_slider.val(self.boardAlignmentConfig.yaw);
         self.pageElements.orientation_board_yaw.val(self.boardAlignmentConfig.yaw);
         updateMagOrientationWithPreset();
+        updateFCCliString();
         self.render3D();
+    }
+    
+    function updateMagCliString() {
+        var fix = 0;
+        if ( areAnglesZero() )  {
+            fix = 1;  //if all angles are 0, then we have to save yaw = 1 (0.1 deg) to enforce usage of angles, not a usage of preset
+        }
+		var names = ['DEFAULT', 'CW0', 'CW90', 'CW180', 'CW270', 'CW0FLIP', 'CW90FLIP', 'CW180FLIP', 'CW270FLIP'];
+        var s = "align_mag=" + names[FC.SENSOR_ALIGNMENT.align_mag] +  
+                " align_mag_roll=" + (self.alignmentConfig.roll * 10) +  
+                " align_mag_pitch=" + (self.alignmentConfig.pitch * 10) + 
+                " align_mag_yaw=" + (self.alignmentConfig.yaw * 10 + fix);
+        self.pageElements.cli_settings_mag.text(s);
     }
 
     //Called when roll values change
@@ -260,6 +283,7 @@ TABS.magnetometer.initialize = function (callback) {
         self.alignmentConfig.roll = Number(value);
         self.pageElements.roll_slider.val(self.alignmentConfig.roll);
         self.pageElements.orientation_mag_roll.val(self.alignmentConfig.roll);
+        updateMagCliString();
         self.render3D();
     }
 
@@ -268,6 +292,7 @@ TABS.magnetometer.initialize = function (callback) {
         self.alignmentConfig.pitch = Number(value);
         self.pageElements.pitch_slider.val(self.alignmentConfig.pitch);
         self.pageElements.orientation_mag_pitch.val(self.alignmentConfig.pitch);
+        updateMagCliString();
         self.render3D();
     }
 
@@ -276,6 +301,7 @@ TABS.magnetometer.initialize = function (callback) {
         self.alignmentConfig.yaw = Number(value);
         self.pageElements.yaw_slider.val(self.alignmentConfig.yaw);
         self.pageElements.orientation_mag_yaw.val(self.alignmentConfig.yaw);
+        updateMagCliString();
         self.render3D();
     }
 
@@ -283,12 +309,16 @@ TABS.magnetometer.initialize = function (callback) {
         self.isSavePreset = true;
         self.pageElements.orientation_mag_e.css("opacity", 1);
         self.pageElements.orientation_mag_e.css("text-decoration", "");
+        self.pageElements.align_mag_xxx_e.css("opacity", "0.65");
+        self.pageElements.align_mag_xxx_e.css("text-decoration", "line-through");
     }
 
     function disableSavePreset() {
         self.isSavePreset = false;
         self.pageElements.orientation_mag_e.css("opacity", 0.5);
         self.pageElements.orientation_mag_e.css("text-decoration", "line-through");
+        self.pageElements.align_mag_xxx_e.css("opacity", "1");
+        self.pageElements.align_mag_xxx_e.css("text-decoration", "");
     }
 
 
@@ -298,6 +328,7 @@ TABS.magnetometer.initialize = function (callback) {
         updatePitchAxis(degrees[0]);
         updateRollAxis(degrees[1]);
         updateYawAxis(degrees[2]);
+        updateMagCliString();
     }
 
 
@@ -324,6 +355,11 @@ TABS.magnetometer.initialize = function (callback) {
         self.pageElements.roll_slider = $('#roll_slider');
         self.pageElements.pitch_slider = $('#pitch_slider');
         self.pageElements.yaw_slider = $('#yaw_slider');
+
+        self.pageElements.align_mag_xxx_e = $('#align_mag_xxx');
+
+        self.pageElements.cli_settings_fc = $('#cli_settings_fc');
+        self.pageElements.cli_settings_mag = $('#cli_settings_mag');
 
         self.roll_e = $('dd.roll'),
         self.pitch_e = $('dd.pitch'),

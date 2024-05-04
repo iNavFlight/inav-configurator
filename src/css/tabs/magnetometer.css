@@ -119,6 +119,7 @@
     width: 100%;
     table-layout: auto;
     text-align: center;
+    border-bottom: 1px solid #ddd;
 }
 
 .tab-magnetometer .slider {
@@ -176,6 +177,9 @@
 .tab-magnetometer .table-title {
     font-weight: bold;
 }
+#align_mag_xxx {
+    font-weight: normal;
+}
 /*noinspection ALL*/
 progress[value]::-webkit-progress-bar {
     background-color: #d2d2d2;
@@ -210,4 +214,15 @@ progress[value]::-webkit-progress-value {
         float: left;
     }
 
+}
+
+.tab-magnetometer .cli-box {
+    display:flex;
+    justify-content: center;
+    align-items: end;
+    font-style: italic;
+    margin-top: 5px;
+    .cli-settings-title {
+        font-weight: bold;
+    }   
 }
