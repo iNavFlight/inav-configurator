@@ -1376,7 +1376,7 @@ var FC = {
                 default: 0
             },
             5: {
-                name: "Global Variable",
+                name: "Get Global Variable",
                 type: "range",
                 range: [0, 7],
                 default: 0

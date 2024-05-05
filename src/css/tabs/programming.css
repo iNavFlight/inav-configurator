@@ -29,3 +29,12 @@
     color:#fff;
     font-weight: bold;
 }
+
+.logic__table select,
+.logic__table input {
+    width: auto;
+    margin: 0;
+    padding: 2px;
+    margin-right: 1em;
+    font-size: 13px;
+}
