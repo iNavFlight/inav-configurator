@@ -58,7 +58,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     saveChainer.setExitPoint(reboot);
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
+        Settings.saveInputs(onComplete);
     }
 
     function reboot() {

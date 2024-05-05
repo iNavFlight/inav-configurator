@@ -3256,6 +3256,20 @@ TABS.osd.initialize = function (callback) {
         GUI.active_tab = 'osd';
     }
 
+    function save_to_eeprom() {
+        console.log('save_to_eeprom');
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
+            GUI.log(i18n.getMessage('eepromSaved'));
+
+            GUI.tab_switch_cleanup(function () {
+                MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
+                    GUI.log(i18n.getMessage('deviceRebooting'));
+                    GUI.handleReconnect($('.tab_osd a'));
+                });
+            });
+        });
+    }
+
     GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
         // translate to user-selected language
        i18n.localize();
@@ -3274,16 +3288,7 @@ TABS.osd.initialize = function (callback) {
         });
 
         $('a.save').on('click', function () {
-            Settings.saveInputs().then(function () {
-                var self = this;
-                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log(i18n.getMessage('osdSettingsSaved'));
-                var oldText = $(this).text();
-                $(this).html("Saved");
-                setTimeout(function () {
-                    $(self).html(oldText);
-                }, 2000);
-            });
+            Settings.saveInputs(save_to_eeprom);
         });
 
         // Initialise guides checkbox

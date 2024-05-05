@@ -618,7 +618,7 @@ var Settings = (function () {
             var input = inputs.shift();
             var settingPair = self.processInput(input);
             return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {       
-                return self.pickAndSaveSingleInput(inputs);
+                return self.pickAndSaveSingleInput(inputs, finalCallback);
             });
         } else {
             if (finalCallback) {

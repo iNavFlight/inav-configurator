@@ -73,7 +73,7 @@ TABS.gps.initialize = function (callback) {
     ];
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
+        Settings.saveInputs(onComplete);
     }
 
     saveChainer.setChain(saveChain);
