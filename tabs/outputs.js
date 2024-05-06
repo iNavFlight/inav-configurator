@@ -79,7 +79,7 @@ TABS.outputs.initialize = function (callback) {
     }
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
+        Settings.saveInputs(onComplete);
     }
 
     function onLoad() {

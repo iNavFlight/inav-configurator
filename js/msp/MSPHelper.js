@@ -3075,7 +3075,6 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
-        console.log("Getting setting " + name);
         if (FC.SETTINGS[name]) {
             return Promise.resolve(FC.SETTINGS[name]);
         }
