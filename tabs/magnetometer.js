@@ -276,6 +276,8 @@ TABS.magnetometer.initialize = function (callback) {
                 " align_mag_pitch=" + (self.isSavePreset ? 0 : self.alignmentConfig.pitch * 10) + 
                 " align_mag_yaw=" + (self.isSavePreset ? 0 : self.alignmentConfig.yaw * 10 + fix);
         self.pageElements.cli_settings_mag.text(s);
+        self.pageElements.comment_sensor_mag_preset.css("display", !self.isSavePreset ? "none" : "");
+        self.pageElements.comment_sensor_mag_angles.css("display", self.isSavePreset ? "none" : "");
     }
 
     //Called when roll values change
@@ -360,6 +362,9 @@ TABS.magnetometer.initialize = function (callback) {
 
         self.pageElements.cli_settings_fc = $('#cli_settings_fc');
         self.pageElements.cli_settings_mag = $('#cli_settings_mag');
+
+        self.pageElements.comment_sensor_mag_preset = $('#comment_sensor_mag_preset');
+        self.pageElements.comment_sensor_mag_angles = $('#comment_sensor_mag_angles');
 
         self.roll_e = $('dd.roll'),
         self.pitch_e = $('dd.pitch'),

@@ -2114,7 +2114,12 @@
     "axisTableTitleValue": {
         "message": "Value [degree]"
     },
-
+    "configurationSensorMagPreset": {
+        "message": "Orientation is set by: PRESET (align_mag)"
+    },
+    "configurationSensorMagAngles": {
+        "message": "Orientation is set by: ANGLES (align_mag_roll, align_mag_pitch ,align_mag_yaw)"
+    },
     "configurationMagnetometerHelp": {
         "message": "<strong>Note:</strong> Remember to configure a Serial Port (via Ports tab) when using the Magnetometer feature."
     },

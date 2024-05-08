@@ -138,7 +138,7 @@
 .tab-magnetometer #interactive_block {
     position: absolute;
     width: calc(100% - 655px);
-    height: 771px;
+    height: 836px;
     min-height: calc(100% - 200px);
     background-color: #f9f9f9;
     border-radius: 5px;
