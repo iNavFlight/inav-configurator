@@ -24,17 +24,17 @@ function zeroPad(value, width) {
     return value;
 }
 
-function generateFilename(prefix, suffix) {
+function generateFilename(config, prefix, suffix) {
     var date = new Date();
     var filename = prefix;
 
-    if (CONFIG) {
-        if (CONFIG.flightControllerIdentifier) {
-            filename = CONFIG.flightControllerIdentifier + '_' + CONFIG.flightControllerVersion + "_" + filename;
+    if (config) {
+        if (config.flightControllerIdentifier) {
+            filename = config.flightControllerIdentifier + '_' + config.flightControllerVersion + "_" + filename;
         }
-         
-        if (CONFIG.name && CONFIG.name.trim() !== '') {
-            filename = filename + '_' + CONFIG.name.trim().replace(' ', '_');
+
+        if (config.name && config.name.trim() !== '') {
+            filename = filename + '_' + config.name.trim().replace(' ', '_');
         }
     }
 
@@ -65,7 +65,7 @@ function distanceOnLine(start, end, distance)
     var px = start[0] + vx * (mag + distance);
     var py = start[1] + vy * (mag + distance);
 
-    return [px, py]; 
+    return [px, py];
 }
 
 function wrap_360(angle)
@@ -77,7 +77,7 @@ function wrap_360(angle)
     return angle;
 }
 
-function rad2Deg(rad) 
+function rad2Deg(rad)
 {
 	return rad * (180 / Math.PI);
 }
@@ -92,8 +92,8 @@ function calculate_new_cooridatnes(coord, bearing, distance)
     var lat = deg2Rad(coord.lat);
     var lon = deg2Rad(coord.lon);
     bearing = deg2Rad(bearing);
-    var delta = distance / 637100000; // Earth radius in cm 
-    
+    var delta = distance / 637100000; // Earth radius in cm
+
     var latNew = Math.asin(Math.sin(lat) * Math.cos(delta) + Math.cos(lat) * Math.sin(delta) * Math.cos(bearing));
     var lonNew = lon + Math.atan2(Math.sin(bearing) * Math.sin(delta) * Math.cos(lat), Math.cos(delta) - Math.sin(lat) * Math.sin(lat));
     return {
