@@ -15,6 +15,8 @@ const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
+const { zeroPad } = require('./../js/helpers');
+const FC = require('./../js/fc');
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -82,7 +84,7 @@ function copyToClipboard(text) {
     function onCopyFailed(ex) {
         console.warn(ex);
     }
-    
+
     navigator.clipboard.writeText(text)
         .then(onCopySuccessful, onCopyFailed);
 }
@@ -115,8 +117,8 @@ TABS.cli.initialize = function (callback) {
         self.history.add(out_string.trim());
 
         var outputArray = out_string.split("\n");
-        return outputArray.reduce((p, line, index) => 
-            p.then((delay) => 
+        return outputArray.reduce((p, line, index) =>
+            p.then((delay) =>
                 new Promise((resolve) => {
                     timeout.add('CLI_send_slowly', () => {
                         let processingDelay = TABS.cli.lineDelayMs;
@@ -160,11 +162,14 @@ TABS.cli.initialize = function (callback) {
         });
 
         $('.tab-cli .save').on('click', function () {
-            
+            var prefix = 'cli';
+            var suffix = 'txt';
+            var filename = generateFilename(prefix, suffix);
             var options = {
-                filters: [ 
-                    { name: 'CLI', extensions: ['cli'] } ,
-                    { name: 'TXT', extensions: ['txt'] } 
+                defaultPath: filename,
+                filters: [
+                    { name: suffix.toUpperCase(), extensions: [suffix] },
+                    { name: prefix.toUpperCase(), extensions: [prefix] }
                 ],
             };
             dialog.showSaveDialog(options).then(result => {
@@ -172,7 +177,7 @@ TABS.cli.initialize = function (callback) {
                     GUI.log(i18n.getMessage('cliSaveToFileAborted'));
                     return;
                 }
-                
+
                 fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
                         GUI.log(i18n.getMessage('ErrorWritingFile'));
@@ -219,7 +224,7 @@ TABS.cli.initialize = function (callback) {
 
         $('.tab-cli .load').on('click', function () {
             var options = {
-                filters: [ 
+                filters: [
                     { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
                     { name: 'ALL', extensions: ['*'] }
                 ],
@@ -353,14 +358,14 @@ TABS.cli.initialize = function (callback) {
 
         if (CONFIGURATOR.connection.type == ConnectionType.BLE) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
-            if (delay > 0) {    
+            if (delay > 0) {
                 timeout.add('cli_delay', () =>  {
                     self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
                     self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
                 }, 400);
-            } 
+            }
         }
-    
+
         GUI.content_ready(callback);
     });
 };
@@ -409,6 +414,30 @@ function writeLineToOutput(text) {
 
 function setPrompt(text) {
     $('.tab-cli textarea').val(text);
+}
+
+function generateFilename(prefix, suffix) {
+    var date = new Date();
+    var filename = prefix;
+
+    if (FC.CONFIG) {
+        if (FC.CONFIG.flightControllerIdentifier) {
+            filename = FC.CONFIG.flightControllerIdentifier + '_' + FC.CONFIG.flightControllerVersion + "_" + filename;
+        }
+
+        if (FC.CONFIG.name && FC.CONFIG.name.trim() !== '') {
+            filename = filename + '_' + FC.CONFIG.name.trim().replace(' ', '_');
+        }
+    }
+
+    filename = filename + '_' + date.getFullYear()
+        + zeroPad(date.getMonth() + 1, 2)
+        + zeroPad(date.getDate(), 2)
+        + '_' + zeroPad(date.getHours(), 2)
+        + zeroPad(date.getMinutes(), 2)
+        + zeroPad(date.getSeconds(), 2);
+
+    return filename + '.' + suffix;
 }
 
 TABS.cli.read = function (readInfo) {
