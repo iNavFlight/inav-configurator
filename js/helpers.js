@@ -24,17 +24,17 @@ function zeroPad(value, width) {
     return value;
 }
 
-function generateFilename(prefix, suffix) {  // TODO, code used directly in cli.js instead
+function generateFilename(config, prefix, suffix) {
     var date = new Date();
     var filename = prefix;
 
-    if (CONFIG) {
-        if (CONFIG.flightControllerIdentifier) {
-            filename = CONFIG.flightControllerIdentifier + '_' + CONFIG.flightControllerVersion + "_" + filename;
+    if (config) {
+        if (config.flightControllerIdentifier) {
+            filename = config.flightControllerIdentifier + '_' + config.flightControllerVersion + "_" + filename;
         }
 
-        if (CONFIG.name && CONFIG.name.trim() !== '') {
-            filename = filename + '_' + CONFIG.name.trim().replace(' ', '_');
+        if (config.name && config.name.trim() !== '') {
+            filename = filename + '_' + config.name.trim().replace(' ', '_');
         }
     }
 

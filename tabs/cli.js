@@ -17,6 +17,7 @@ const jBox = require('./../js/libraries/jBox/jBox.min');
 const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
 const { zeroPad } = require('./../js/helpers');
 const FC = require('./../js/fc');
+const { generateFilename } = require('./../js/helpers');
 
 TABS.cli = {
     lineDelayMs: 50,
@@ -164,7 +165,7 @@ TABS.cli.initialize = function (callback) {
         $('.tab-cli .save').on('click', function () {
             var prefix = 'cli';
             var suffix = 'txt';
-            var filename = generateFilename(prefix, suffix);
+            var filename = generateFilename(FC.CONFIG, prefix, suffix);
             var options = {
                 defaultPath: filename,
                 filters: [
@@ -414,30 +415,6 @@ function writeLineToOutput(text) {
 
 function setPrompt(text) {
     $('.tab-cli textarea').val(text);
-}
-
-function generateFilename(prefix, suffix) {
-    var date = new Date();
-    var filename = prefix;
-
-    if (FC.CONFIG) {
-        if (FC.CONFIG.flightControllerIdentifier) {
-            filename = FC.CONFIG.flightControllerIdentifier + '_' + FC.CONFIG.flightControllerVersion + "_" + filename;
-        }
-
-        if (FC.CONFIG.name && FC.CONFIG.name.trim() !== '') {
-            filename = filename + '_' + FC.CONFIG.name.trim().replace(' ', '_');
-        }
-    }
-
-    filename = filename + '_' + date.getFullYear()
-        + zeroPad(date.getMonth() + 1, 2)
-        + zeroPad(date.getDate(), 2)
-        + '_' + zeroPad(date.getHours(), 2)
-        + zeroPad(date.getMinutes(), 2)
-        + zeroPad(date.getSeconds(), 2);
-
-    return filename + '.' + suffix;
 }
 
 TABS.cli.read = function (readInfo) {
