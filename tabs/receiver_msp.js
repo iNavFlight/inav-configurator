@@ -1,5 +1,7 @@
 "use strict";
 
+window.$ = window.jQuery = require('jquery');
+
 var
     CHANNEL_MIN_VALUE = 1000,
     CHANNEL_MID_VALUE = 1500,
@@ -7,10 +9,10 @@ var
     
     // What's the index of each channel in the MSP channel list?
     channelMSPIndexes = {
-        roll: 0,
-        pitch: 1,
-        yaw: 3,
-        throttle: 2,
+        Roll: 0,
+        Pitch: 1,
+        Yaw: 3,
+        Throttle: 2,
         ch5: 4,
         ch6: 5,
         ch7: 6,
@@ -23,10 +25,10 @@ var
     
     // Set reasonable initial stick positions (Mode 2)
     stickValues = {
-        throttle: CHANNEL_MIN_VALUE,
-        pitch: CHANNEL_MID_VALUE,
-        roll: CHANNEL_MID_VALUE,
-        yaw: CHANNEL_MID_VALUE,
+        Throttle: CHANNEL_MIN_VALUE,
+        Pitch: CHANNEL_MID_VALUE,
+        Roll: CHANNEL_MID_VALUE,
+        Yaw: CHANNEL_MID_VALUE,
         ch5: CHANNEL_MIN_VALUE,
         ch6: CHANNEL_MIN_VALUE,
         ch7: CHANNEL_MIN_VALUE,
@@ -39,8 +41,8 @@ var
     
     // First the vertical axis, then the horizontal:
     gimbals = [
-        ["throttle", "yaw"],
-        ["pitch", "roll"]
+        ["Throttle", "Yaw"],
+        ["Pitch", "Roll"]
     ],
     
     gimbalElems,
@@ -63,7 +65,7 @@ function transmitChannels() {
     // Callback given to us by the window creator so we can have it send data over MSP for us:
     if (!window.setRawRx(channelValues)) {
         // MSP connection has gone away
-        chrome.app.window.current().close();
+        window.current().close();
     }
 }
 
@@ -118,25 +120,27 @@ function localizeAxisNames() {
         var 
             gimbal = gimbalElems.get(gimbalIndex);
         
-        $(".gimbal-label-vert", gimbal).text(chrome.i18n.getMessage("controlAxis" + gimbals[gimbalIndex][0]));
-        $(".gimbal-label-horz", gimbal).text(chrome.i18n.getMessage("controlAxis" + gimbals[gimbalIndex][1]));
+        $(".gimbal-label-vert", gimbal).text(gimbals[gimbalIndex][0]);
+        $(".gimbal-label-horz", gimbal).text(gimbals[gimbalIndex][1]);
     }
     
     for (var sliderIndex = 0; sliderIndex < 8; sliderIndex++) {
-        $(".slider-label", sliderElems.get(sliderIndex)).text(chrome.i18n.getMessage("radioChannelShort") + (sliderIndex + 5));
+       $(".slider-label", sliderElems.get(sliderIndex)).text("CH " + (sliderIndex + 5));
     }
 }
 
-$(document).ready(function() {
-    $("a.button-enable").click(function() {
-        var
-            shrinkHeight = $(".warning").height();
+$(function() {
+    $("a.button-enable").on('click', function () {
+        
+       
+        var shrinkHeight = $(".warning").height();
         
         $(".warning").slideUp("short", function() {
-            chrome.app.window.current().innerBounds.minHeight -= shrinkHeight;
-            chrome.app.window.current().innerBounds.height -= shrinkHeight;
-            chrome.app.window.current().innerBounds.maxHeight -= shrinkHeight;
+            window.current().innerBounds.minHeight -= shrinkHeight;
+            window.current().innerBounds.height -= shrinkHeight;
+            window.current().innerBounds.maxHeight -= shrinkHeight;
         });
+        
         
         enableTX = true;
     });

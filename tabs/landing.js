@@ -1,26 +1,24 @@
 'use strict';
-/*global $,TABS,GUI,googleAnalytics*/
 
-TABS.landing = {};
-TABS.landing.initialize = function (callback) {
+const path = require('path');
+const { GUI, TABS } = require('./../js/gui');
+const i18n = require('./../js/localization');
+
+const landing = {};
+landing.initialize = function (callback) {
 
     if (GUI.active_tab != 'landing') {
         GUI.active_tab = 'landing';
-        googleAnalytics.sendAppView('Landing');
     }
-
-    GUI.load("./tabs/landing.html", function () {
-        localize();
-
-        $('.tab-landing a').click(function () {
-            googleAnalytics.sendEvent('ExternalUrls', 'Click', $(this).prop('href'));
-        });
-
+    GUI.load(path.join(__dirname, "landing.html"), function () {
+        i18n.localize();
         GUI.content_ready(callback);
     });
 
 };
 
-TABS.landing.cleanup = function (callback) {
+landing.cleanup = function (callback) {
     if (callback) callback();
 };
+
+TABS.landing = landing;

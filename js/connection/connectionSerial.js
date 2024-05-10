@@ -1,139 +1,133 @@
 'use strict'
 
+const { GUI } = require('./../gui');
+
+const { ConnectionType, Connection } = require('./connection')
+const { SerialPort } = require('serialport');
+const { SerialPortStream } = require('@serialport/stream');
+const { autoDetect } = require('@serialport/bindings-cpp')
+const binding = autoDetect();
+
 class ConnectionSerial extends Connection {
-    
     constructor() {
         super();
-
-        this._failed = 0;
+        this._serialport = null;
+        this._errorListeners = [];
+        this._onReceiveListeners = [];
+        this._onErrorListener = [];
+        super._type = ConnectionType.Serial;
     }
 
-    connectImplementation(path, options, callback) {               
-        chrome.serial.connect(path, options, (connectionInfo) => {                 
-            this.checkChromeLastError();
-            if (connectionInfo && !this._openCanceled) {           
-                this.addOnReceiveErrorListener(info => {
-                    console.error(info);
-                        googleAnalytics.sendException('Serial: ' + info.error, false);
+    connectImplementation(path, options, callback) {
+        try {
+            this._serialport = new SerialPortStream({binding, path: path, baudRate: options.bitrate, autoOpen: true}, () => {
+                if (callback) {
+                    callback({
+                        connectionId: ++this._connectionId,
+                        bitrate: options.bitrate
+                    });
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            callback(false);
+        }
 
-                        switch (info.error) {
-                            case 'system_error': // we might be able to recover from this one
-                                if (!this._failed++) {
-                                    chrome.serial.setPaused(this._connectionId, false, function () {
-                                        SerialCom.getInfo((info) => {
-                                            if (info) {
-                                                if (!info.paused) {
-                                                    console.log('SERIAL: Connection recovered from last onReceiveError');
-                                                    googleAnalytics.sendException('Serial: onReceiveError - recovered', false);
-
-                                                    this._failed = 0;
-                                                } else {
-                                                    console.log('SERIAL: Connection did not recover from last onReceiveError, disconnecting');
-                                                    GUI.log(chrome.i18n.getMessage('serialPortUnrecoverable'));
-                                                    googleAnalytics.sendException('Serial: onReceiveError - unrecoverable', false);
-
-                                                    this.abort();
-                                                }
-                                            } else {
-                                                this.checkChromeLastError();
-                                            }
-                                        });
-                                    });
-                                }
-                                break;
-
-                            case 'break': // This occurs on F1 boards with old firmware during reboot
-                            case 'overrun':
-                            case 'frame_error': //Got disconnected
-                                // wait 50 ms and attempt recovery
-                                var error = info.error;
-                                setTimeout(() => {
-                                    chrome.serial.setPaused(info.connectionId, false, function() {
-                                        SerialCom.getInfo(function (info) {
-                                            if (info) {
-                                                if (info.paused) {
-                                                    // assume unrecoverable, disconnect
-                                                    console.log('SERIAL: Connection did not recover from ' + error + ' condition, disconnecting');
-                                                    GUI.log(chrome.i18n.getMessage('serialPortUnrecoverable'));;
-                                                    googleAnalytics.sendException('Serial: ' + error + ' - unrecoverable', false);
-
-                                                    this.abort();    
-                                                } else {
-                                                    console.log('SERIAL: Connection recovered from ' + error + ' condition');
-                                                    googleAnalytics.sendException('Serial: ' + error + ' - recovered', false);
-                                                }
-                                            }
-                                        });
-                                    });
-                                }, 50);
-                                break;
-                                
-                            case 'timeout':
-                                // TODO
-                                break;
-                                
-                            case 'device_lost':
-                            case 'disconnected':
-                            default:
-                                this.abort();
-                        }
+        this._serialport.on('data', buffer => {
+            this._onReceiveListeners.forEach(listener => {
+                listener({
+                    connectionId: this._connectionId,
+                    data: buffer
                 });
-                GUI.log(chrome.i18n.getMessage('connectionConnected', [path]));
-            }
+            });
+        });
 
-            if (callback) {
-                callback(connectionInfo);
-            }
+        this._serialport.on('close', error => {
+            this.abort();
+        });
+
+        this._serialport.on('error', error => {
+            this.abort();
+            console.log("Serial error: " + error);
+            this._onReceiveErrorListeners.forEach(listener => {
+                listener(error);
+            });
         });
     }
 
-    disconnectImplementation(callback) {        
-        chrome.serial.disconnect(this._connectionId, (result) => {
-            if (callback) {
-                callback(result);
-            }
-        });
+    disconnectImplementation(callback) {
+        if (this._serialport && this._serialport.isOpen) {
+            this._serialport.close(error => {
+                if (error) {
+                    console.log("Unable to close serial: " + error)
+                }
+            });
+        }
+
+        if (callback) {
+            callback(true);
+        }
     }
-    
+
     sendImplementation(data, callback) {
-        chrome.serial.send(this._connectionId, data, callback);
+        if (this._serialport && this._serialport.isOpen) {
+            this._serialport.write(Buffer.from(data), error => {
+                var result = 0;
+                var sent = data.byteLength;
+                if (error) {
+                    result = 1;
+                    sent = 0;
+                    console.log("Serial write error: " + error)
+                }
+                if (callback) {
+                    callback({
+                        bytesSent: sent,
+                        resultCode: result
+                    });
+                }
+            });
+        }
     }
 
     addOnReceiveCallback(callback){
-        chrome.serial.onReceive.addListener(callback);
+        this._onReceiveErrorListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        chrome.serial.onReceive.removeListener(callback);
+        this._onReceiveListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
-        chrome.serial.onReceiveError.addListener(callback);
+        this._onReceiveErrorListeners.push(callback);
     }
 
     removeOnReceiveErrorCallback(callback) {
-        chrome.serial.onReceiveError.removeListener(callback);
+        this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 
-    static getDevices(callback) {
-        chrome.serial.getDevices((devices_array) => {
+    static async getDevices(callback) {
+        SerialPort.list().then((ports, error) => {
             var devices = [];
-            devices_array.forEach((device) => {
-                devices.push(device.path);
-            });
-            callback(devices);
+            if (error) {
+                GUI.log("Unable to list serial ports.");
+            } else {
+                ports.forEach(port => {
+                    if (GUI.operating_system == 'Linux') {
+			/* Limit to: USB serial, RFCOMM (BT), 6 legacy devices */
+			if (port.pnpId ||
+			    port.path.match(/rfcomm\d*/) ||
+			    port.path.match(/ttyS[0-5]$/)) {
+			    devices.push(port.path);
+                        }
+		    } else {
+			devices.push(port.path);
+		    }
+                });
+            }
+            if (callback)
+                callback(devices);
         });
     }
-
-    static getInfo(connectionId, callback) {
-        chrome.serial.getInfo(connectionId, callback);
-    }
-
-    static getControlSignals(connectionId, callback) {
-        chrome.serial.getControlSignals(connectionId, callback);
-    }
-
-    static setControlSignals(connectionId, signals, callback) {
-        chrome.serial.setControlSignals(connectionId, signals, callback);
-    }
 }
+
+module.exports = ConnectionSerial;

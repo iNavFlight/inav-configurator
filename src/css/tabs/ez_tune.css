@@ -14,19 +14,21 @@
 }
 
 .ez-tune-preview table {
-    width: 100%;
+    width: 100% !important;
+    float: none !important;
+    border-collapse: separate !important;
 }
 
 .ez-tune-preview table td,
 .ez-tune-preview table th {
-    padding: 0.5em;
-    text-align: center;
+    padding: 0.5em !important;
+    text-align: center !important;
 }
 
 .ez-tune-preview table th {
-    background-color: #3EA5D4;
+    background-color: #3EA5D4 !important;
 }
 
 .ez-tune-preview table td {
-    background-color: #A8D6EC;
+    background-color: #A8D6EC !important;
 }

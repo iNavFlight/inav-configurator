@@ -1,5 +1,10 @@
 'use strict';
 
+const MSPCodes = require('./msp/MSPCodes')
+const mspQueue = require('./serial_queue');
+const eventFrequencyAnalyzer = require('./eventFrequencyAnalyzer');
+const timeout = require('./timeouts');
+
 /**
  *
  * @constructor
@@ -20,10 +25,13 @@ var MspMessageClass = function () {
     return publicScope;
 };
 
-/**
- * @typedef {{state: number, message_direction: number, code: number, message_length_expected: number, message_length_received: number, message_buffer: null, message_buffer_uint8_view: null, message_checksum: number, callbacks: Array, packet_error: number, unsupported: number, ledDirectionLetters: [*], ledFunctionLetters: [*], ledBaseFunctionLetters: [*], ledOverlayLetters: [*], last_received_timestamp: null, analog_last_received_timestamp: number, read: MSP.read, send_message: MSP.send_message, promise: MSP.promise, callbacks_cleanup: MSP.callbacks_cleanup, disconnect_cleanup: MSP.disconnect_cleanup}} MSP
- */
 var MSP = {
+    SDCARD_STATE_NOT_PRESENT:   0,
+    SDCARD_STATE_FATAL:         1,
+    SDCARD_STATE_CARD_INIT:     2,
+    SDCARD_STATE_FS_INIT:       3,
+    SDCARD_STATE_READY:         4,
+        
     symbols: {
         BEGIN: '$'.charCodeAt(0),
         PROTO_V1: 'M'.charCodeAt(0),
@@ -77,6 +85,19 @@ var MSP = {
 
     last_received_timestamp:   null,
     analog_last_received_timestamp: null,
+
+    lastFrameReceivedMs: 0,
+
+    processData: null,
+
+    init() {
+        mspQueue.setPutCallback(this.putCallback);
+        mspQueue.setremoveCallback(this.removeCallback);
+    },
+
+    setProcessData(cb) {
+        this.processData = cb;
+    },
 
     read: function (readInfo) {
         var data = new Uint8Array(readInfo.data);
@@ -220,22 +241,23 @@ var MSP = {
                     /*
                      * Free port
                      */
-                    helper.mspQueue.freeHardLock();
+                    mspQueue.freeHardLock();
                     console.log('Unknown state detected: ' + this.state);
             }
         }
         this.last_received_timestamp = Date.now();
     },
 
-    _initialize_read_buffer: function() {
+    _initialize_read_buffer() {
         this.message_buffer = new ArrayBuffer(this.message_length_expected);
         this.message_buffer_uint8_view = new Uint8Array(this.message_buffer);
     },
 
-    _dispatch_message: function(expected_checksum) {
+    _dispatch_message(expected_checksum) {
         if (this.message_checksum == expected_checksum) {
             // message received, process
-            mspHelper.processData(this);
+            this.processData(this);
+            this.lastFrameReceivedMs = Date.now();
         } else {
             console.log('code: ' + this.code + ' - crc failed');
             this.packet_error++;
@@ -245,7 +267,9 @@ var MSP = {
         /*
          * Free port
          */
-        helper.mspQueue.freeHardLock();
+        timeout.add('delayedFreeHardLock', function() {
+            mspQueue.freeHardLock();
+        }, 10);
 
         // Reset variables
         this.message_length_received = 0;
@@ -256,30 +280,32 @@ var MSP = {
      *
      * @param {MSP} mspData
      */
-    putCallback: function (mspData) {
+    putCallback(mspData) {
         MSP.callbacks.push(mspData);
     },
 
     /**
      * @param {number} code
      */
-    removeCallback: function (code) {
+    removeCallback(code) {
 
         for (var i in this.callbacks) {
-            if (this.callbacks.hasOwnProperty(i) && this.callbacks[i].code == code) {
+            if (MSP.callbacks.hasOwnProperty(i) && this.callbacks[i].code == code) {
                 clearTimeout(this.callbacks[i].timer);
-                this.callbacks.splice(i, 1);
+                MSP.callbacks.splice(i, 1);
             }
         }
     },
 
-    send_message: function (code, data, callback_sent, callback_msp, protocolVersion) {
+    send_message(code, data, callback_sent, callback_msp, protocolVersion) {
         var payloadLength = data && data.length ? data.length : 0;
         var length;
         var buffer;
         var view;
         var checksum;
         var ii;
+
+        eventFrequencyAnalyzer.put('MPS ' + code);
 
         if (!protocolVersion) {
             protocolVersion = this.protocolVersion;
@@ -298,7 +324,7 @@ var MSP = {
                 view[4] = code;
 
                 checksum = view[3] ^ view[4];
-                for (ii = 0; ii < payloadLength; ii++) {
+                for (let ii = 0; ii < payloadLength; ii++) {
                     view[ii + 5] = data[ii];
                     checksum ^= data[ii];
                 }
@@ -316,11 +342,11 @@ var MSP = {
                 view[5] = (code & 0xFF00) >> 8; // code upper byte
                 view[6] = payloadLength & 0xFF; // payloadLength lower byte
                 view[7] = (payloadLength & 0xFF00) >> 8; // payloadLength upper byte
-                for (ii = 0; ii < payloadLength; ii++) {
+                for (let ii = 0; ii < payloadLength; ii++) {
                     view[8+ii] = data[ii];
                 }
                 checksum = 0;
-                for (ii = 3; ii < length-1; ii++) {
+                for (let ii = 3; ii < length-1; ii++) {
                     checksum = this._crc8_dvb_s2(checksum, view[ii]);
                 }
                 view[length-1] = checksum;
@@ -343,11 +369,11 @@ var MSP = {
             message.retryCounter = 10;
         }
 
-        helper.mspQueue.put(message);
+        mspQueue.put(message);
 
         return true;
     },
-     _crc8_dvb_s2: function(crc, ch) {
+     _crc8_dvb_s2(crc, ch) {
         crc ^= ch;
         for (var ii = 0; ii < 8; ++ii) {
             if (crc & 0x80) {
@@ -358,7 +384,7 @@ var MSP = {
         }
         return crc;
     },
-    promise: function(code, data, protocolVersion) {
+    promise(code, data, protocolVersion) {
         var self = this;
         return new Promise(function(resolve) {
             self.send_message(code, data, false, function(data) {
@@ -366,23 +392,25 @@ var MSP = {
             }, protocolVersion);
         });
     },
-    callbacks_cleanup: function () {
+    callbacks_cleanup() {
         for (var i = 0; i < this.callbacks.length; i++) {
             clearInterval(this.callbacks[i].timer);
         }
 
         this.callbacks = [];
     },
-    disconnect_cleanup: function () {
+    disconnect_cleanup() {
         this.state = 0; // reset packet state for "clean" initial entry (this is only required if user hot-disconnects)
         this.packet_error = 0; // reset CRC packet error counter for next session
 
         this.callbacks_cleanup();
+    },
+    isReceiving: function () {
+        return Date.now() - this.lastFrameReceivedMs < 5000;
+    },
+    wasEverReceiving: function () {
+        return this.lastFrameReceivedMs > 0;
     }
 };
 
-MSP.SDCARD_STATE_NOT_PRESENT = 0;
-MSP.SDCARD_STATE_FATAL       = 1;
-MSP.SDCARD_STATE_CARD_INIT   = 2;
-MSP.SDCARD_STATE_FS_INIT     = 3;
-MSP.SDCARD_STATE_READY       = 4;
+module.exports = MSP;

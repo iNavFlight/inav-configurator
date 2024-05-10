@@ -1,4 +1,3 @@
-/*global $*/
 'use strict';
 
 let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endMission=0, isUsed=true, isAttached=false, attachedId="", multiMissionIdx = 0) {
@@ -165,3 +164,5 @@ let Waypoint = function (number, action, lat, lon, alt=0, p1=0, p2=0, p3=0, endM
 
     return self;
 };
+
+module.exports = Waypoint;

@@ -315,7 +315,7 @@
     height: 117px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-image: url(../../../images/paper.jpg);
+    background-image: url(./../../../images/paper.jpg);
     background-size: 200%;
     background-position: center;
 }
@@ -326,7 +326,7 @@
     height: 117px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-image: url(../../../images/paper.jpg);
+    background-image: url(./../../../images/paper.jpg);
     background-size: 200%;
     background-position: center;
 }
