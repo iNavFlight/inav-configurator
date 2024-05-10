@@ -15,7 +15,6 @@ const CliAutoComplete = require('./../js/CliAutoComplete');
 const { ConnectionType } = require('./../js/connection/connection');
 const jBox = require('./../js/libraries/jBox/jBox.min');
 const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
-const { zeroPad } = require('./../js/helpers');
 const FC = require('./../js/fc');
 const { generateFilename } = require('./../js/helpers');
 
