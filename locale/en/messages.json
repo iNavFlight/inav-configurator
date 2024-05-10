@@ -972,7 +972,7 @@
         "message": "Minimum Command"
     },
     "configurationVoltageCurrentSensor": {
-        "message": "Voltage and Current Sensors"
+        "message": "Voltage & Current Sensors"
     },
     "configurationBatteryCurrent": {
         "message": "Battery Current"
@@ -1329,10 +1329,10 @@
         "message": "Show all PIDs"
     },
     "pidTuning_PIDmain": {
-        "message": "Main PID gains"
+        "message": "Main PID Gains"
     },
     "pidTuning_PIDother": {
-        "message": "Additional PID gains"
+        "message": "Additional PID Gains"
     },
     "pidTuning_SelectNewDefaults": {
         "message": "Select New Defaults"
@@ -1341,7 +1341,7 @@
         "message": "Reset PID Controller"
     },
     "pidTuning_PIDgains": {
-        "message": "PID gains"
+        "message": "PID Gains"
     },
     "pidTuning_Name": {
         "message": "Name"
@@ -1506,7 +1506,7 @@
         "message": "Mechanics"
     },
     "pidTuning_ITermMechanics": {
-        "message": "I-term mechanics"
+        "message": "I-term Mechanics"
     },
     "pidTuning_itermRelaxCutoff": {
         "message": "I-term Relax Cutoff Frequency"
@@ -1530,7 +1530,7 @@
         "message": "Freeze yaw Iterm when plane is banked more than this many degrees. This helps to stop the rudder from counteracting turn. 0 disables this feature. Applies only to fixed wing aircraft."
     },
     "pidTuning_dTermMechanics": {
-        "message": "D-term mechanics"
+        "message": "D-term Mechanics"
     },
     "pidTuning_d_boost_min": {
         "message": "D-Boost Min. Scale"
@@ -1557,7 +1557,7 @@
         "message": "Should be set to the frequency of propeller wash oscillations. 5-inch quads work best at around 80Hz, 7-inch quads at around 50Hz"
     },
     "pidTuning_tpaMechanics": {
-        "message": "Thrust PID attenuation"
+        "message": "Thrust PID Attenuation"
     },
     "pidTuning_TPA": {
         "message": "Thrust PID Attenuation (TPA)"
@@ -1572,7 +1572,7 @@
         "message": "TPA smoothing and delay time constant to reflect non-instant speed/throttle response of the plane."
     },
     "pidTuning_fwLevelTrimMechanics": {
-        "message": "Fixed Wing mechanics"
+        "message": "Fixed Wing Mechanics"
     },
     "pidTuning_fw_level_pitch_trim": {
         "message": "Level Trim [deg]"
@@ -2090,7 +2090,7 @@
         "message": "Baud Rate"
     },
     "magnetometerHead": {
-        "message": "Alignment tool"
+        "message": "Alignment Tool"
     },
     "magnetometerHelp": {
         "message": "1. Adjust Flight Controller orientation to match physical orientation on the aircraft <u>according to \"direction\" arrow on the Flight Controller</u>.<br/>2. Adjust magnetometer model, or magnetometer chip, or magnetometer axes orientation to match physical orientation on the aircraft.<br/><strong>Note:</strong> Magnetometer orientation preset (align_mag) is relative to FC. Make sure to align FC first (align_board_pitch, align_board_roll, align_board_yaw).<br/>If preset is not used (orientation is set using align_mag_roll, align_mag_pitch and align_mag_yaw), then magnetometer orientation is independent."
@@ -2129,7 +2129,7 @@
         "message": "Mag Statistics"
     },
     "tabMAGNETOMETER": {
-        "message": "Alignment tool"
+        "message": "Alignment Tool"
     },
     "motors": {
         "message": "Motors"
@@ -2258,7 +2258,7 @@
         "message": "Your flight controller's firmware does not support Blackbox logging or Blackbox feature is not enabled"
     },
     "blackboxConfiguration": {
-        "message": "Blackbox configuration"
+        "message": "Blackbox Configuration"
     },
     "blackboxButtonSave": {
         "message": "Save and Reboot"
@@ -2761,7 +2761,7 @@
         "message": "OSD"
     },
     "configurationSensors": {
-        "message": "Sensors & buses"
+        "message": "Sensors & Buses"
     },
     "sensorAccelerometer": {
         "message": "Accelerometer"
@@ -3071,10 +3071,10 @@
         "message": "Wireless mode"
     },
     "rthConfiguration": {
-        "message": "RTH settings"
+        "message": "RTH Settings"
     },
     "autoLandingSettings": {
-        "message": "Automatic landing settings"
+        "message": "Automatic Landing Settings"
     },
     "minRthDistance": {
         "message": "Min. RTH distance"
@@ -3536,7 +3536,7 @@
         "message": "Home Position on Arming Screen"
     },
     "osd_hud_settings": {
-        "message": "Heads up Display settings"
+        "message": "Heads-up Display settings"
     },
     "osd_custom_element_settings": {
         "message": "Custom OSD elements"
@@ -3764,13 +3764,13 @@
         "message": "GPS"
     },
     "osdGroupPowerLimits": {
-        "message": "Power limits"
+        "message": "Power Limits"
     },
     "osdGroupPIDs": {
         "message": "RC Adjustable Values"
     },
     "osdGroupPIDOutputs": {
-        "message": "PID controllers outputs"
+        "message": "PID Controllers Outputs"
     },
     "osdGroupVTX": {
         "message": "VTX"
@@ -3779,10 +3779,10 @@
         "message": "CRSF RX Statistics"
     },
     "osdGroupMapsAndRadars": {
-        "message": "Maps and Radars"
+        "message": "Maps & Radars"
     },
     "osdGroupMapsAndRadars_HELP": {
-        "message": "Maps and radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
+        "message": "Maps & radars allow laying out additional elements on top of them as long as they don't overlap any of the map parts visible in the preview."
     },
     "osdElement_ONTIME_FLYTIME": {
         "message": "On Time / Fly Time"
@@ -3797,7 +3797,7 @@
         "message": "Battery Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE": {
-        "message": "Sag Compensated Battery Voltage"
+        "message": "Sag-compensated Battery Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_VOLTAGE_HELP": {
         "message": "Calculated voltage the battery should be at without load (simulates ideal battery)"
@@ -3812,7 +3812,7 @@
         "message": "Battery Cell Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE": {
-        "message": "Sag Compensated Battery Cell Voltage"
+        "message": "Sag-compensated Battery Cell Voltage"
     },
     "osdElement_SAG_COMP_MAIN_BATT_CELL_VOLTAGE_HELP": {
         "message": "Calculated average cell voltage the battery should be at without load (simulates ideal battery)"
@@ -4592,7 +4592,7 @@
         "message": "Warning:value beyond normal operation range."
     },
     "servoMixer": {
-        "message": "Servo mixer"
+        "message": "Servo Mixer"
     },
     "servoMixerDelete": {
         "message": "Delete"
@@ -4604,13 +4604,13 @@
         "message": "Platform type"
     },
     "platformConfiguration": {
-        "message": "Platform configuration"
+        "message": "Platform Configuration"
     },
     "output_modeTitle": {
         "message": "Output mode"
     },
     "mixerPreset": {
-        "message": "Mixer preset"
+        "message": "Mixer Preset"
     },
     "mixerNotLoaded": {
         "message": "Mixer not loaded.<br />Click <b>Load and apply</b> or <b>Load mixer</b> to use the selected mixer.<br />Or click <b>Refresh mixer</b> to use your current mixer."
@@ -5399,28 +5399,28 @@
         "message": "Dataflash: free space"
     },
     "mixerProfile1": {
-        "message": "Mixer profile 1"
+        "message": "Mixer Profile 1"
     },
     "mixerProfile2": {
-        "message": "Mixer profile 2"
+        "message": "Mixer Profile 2"
     },
     "sensorProfile1": {
-        "message": "PID profile 1"
+        "message": "PID Profile 1"
     },
     "sensorProfile2": {
-        "message": "PID profile 2"
+        "message": "PID Profile 2"
     },
     "sensorProfile3": {
-        "message": "PID profile 3"
+        "message": "PID Profile 3"
     },
     "sensorBatteryProfile1": {
-        "message": "Battery profile 1"
+        "message": "Battery Profile 1"
     },
     "sensorBatteryProfile2": {
-        "message": "Battery profile 2"
+        "message": "Battery Profile 2"
     },
     "sensorBatteryProfile3": {
-        "message": "Battery profile 3"
+        "message": "Battery Profile 3"
     },
     "sensorStatusGyro": {
         "message": "Gyroscope"
@@ -5700,7 +5700,7 @@
         "message": "Cannot prefetch target: No port"
     },
     "timerOutputs": {
-        "message": "Timer outputs"
+        "message": "Timer Outputs"
     },
     "ezTuneFilterHz": {
         "message": "Filter Hz"
