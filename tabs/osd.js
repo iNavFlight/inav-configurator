@@ -3260,13 +3260,6 @@ TABS.osd.initialize = function (callback) {
         console.log('save_to_eeprom');
         MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
             GUI.log(i18n.getMessage('eepromSaved'));
-
-            GUI.tab_switch_cleanup(function () {
-                MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
-                    GUI.log(i18n.getMessage('deviceRebooting'));
-                    GUI.handleReconnect($('.tab_osd a'));
-                });
-            });
         });
     }
 
