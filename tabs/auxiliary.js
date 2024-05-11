@@ -22,9 +22,8 @@ TABS.auxiliary = {};
 TABS.auxiliary.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'auxiliary';
-    function get_mode_ranges() {
-        MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
-    }
+
+    MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
 
     function get_box_ids() {
         MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
@@ -46,8 +45,6 @@ TABS.auxiliary.initialize = function (callback) {
         sort_modes_for_display();
         GUI.load(path.join(__dirname, "auxiliary.html"), process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
 
     // This object separates out the dividers. This is also used to order the modes
     const modeSections = {};
