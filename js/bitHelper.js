@@ -17,7 +17,7 @@ var BitHelper = function() {
     }
     
     self.bit_check = function (num, bit) {
-        return ((num >> bit) % 2 != 0);
+        return ((1 << bit) & num) != 0;
     }
     
     self.bit_set = function (num, bit) {

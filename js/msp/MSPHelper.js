@@ -1423,6 +1423,7 @@ var mspHelper = (function () {
             case MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS:
                 console.log('OSD custom elements preferences saved');
                 break;
+/*
             case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING:
                 FC.OUTPUT_MAPPING.flush();
                 for (let i = 0; i < data.byteLength; ++i)
@@ -1430,11 +1431,12 @@ var mspHelper = (function () {
                         'timerId': i,
                         'usageFlags': data.getUint8(i)});
                 break;
-            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT:
+ */
+            case MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT2:
                 FC.OUTPUT_MAPPING.flush();
-                for (let i = 0; i < data.byteLength; i += 2) {
+                for (let i = 0; i < data.byteLength; i += 5) {
                     let timerId = data.getUint8(i);
-                    let usageFlags = data.getUint8(i + 1);
+                    let usageFlags = data.getUint32(i + 1, true);
                     FC.OUTPUT_MAPPING.put(
                         {
                             'timerId': timerId,
@@ -2784,11 +2786,12 @@ var mspHelper = (function () {
     };
 
     self.loadOutputMapping = function (callback) {
+        alert('Obsolete MSPHelper.loadOutputMapping call');
         MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING, false, false, callback);
     };
 
     self.loadOutputMappingExt = function (callback) {
-        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT, false, false, callback);
+        MSP.send_message(MSPCodes.MSPV2_INAV_OUTPUT_MAPPING_EXT2, false, false, callback);
     };
 
     self.loadTimerOutputModes = function(callback) {
