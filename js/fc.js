@@ -14,6 +14,7 @@ const FwApproachCollection = require('./fwApproachCollection')
 const { PLATFORM } = require('./model')
 const VTX = require('./vtx');
 const BitHelper = require('./bitHelper');
+const { FLIGHT_MODES } = require('./flightModes');
 
 
 var FC = {
@@ -28,7 +29,7 @@ var FC = {
     RC_MAP: null,
     RC: null,
     RC_tuning: null,
-    AUX_CONFIG: null,
+    AUX_CONFIG: [],
     AUX_CONFIG_IDS: null,
     MODE_RANGES: null,
     ADJUSTMENT_RANGES: null,
@@ -199,47 +200,16 @@ var FC = {
             manual_yaw_rate: 0,
         };
 
-        this.AUX_CONFIG = [
-            "ARM",
-            "PREARM",
-            "MULTI FUNCTION",
-            "ANGLE",
-            "HORIZON",
-            "TURN ASSIST",
-            "HEADING HOLD",
-            "CAMSTAB",
-            "HEADFREE",
-            "HEADADJ",
-            "FPV ANGLE MIX",
-            "NAV POSHOLD",
-            "NAV RTH",
-            "NAV WP",
-            "NAV CRUISE",
-            "NAV COURSE HOLD",
-            "HOME RESET",
-            "GCS NAV",
-            "WP PLANNER",
-            "MISSION CHANGE",
-            "MC BRAKING",
-            "NAV ALTHOLD",
-            "BEEPER",
-            "BEEPER MUTE",
-            "OSD OFF",
-            "BLACKBOX",
-            "FAILSAFE",
-            "CAMERA CONTROL 1",
-            "CAMERA CONTROL 2",
-            "CAMERA CONTROL 3",
-            "USER1",
-            "USER2",
-            "USER3",
-            "USER4",
-            "OSD ALT 1",
-            "OSD ALT 2",
-            "OSD ALT 3",
-            "MIXER PROFILE 2",
-            "MIXER TRANSITION"
-        ];
+        this.generateAuxConfig = function () {
+            console.log('Generating AUX_CONFIG');
+
+            for ( let i = 0; i < FLIGHT_MODES.length; i++ ) {
+                if (this.AUX_CONFIG_IDS.indexOf(FLIGHT_MODES[i].permanentId) > -1) {
+                    this.AUX_CONFIG.push(FLIGHT_MODES[i].boxName);
+                }
+            }
+        };
+
         this.AUX_CONFIG_IDS = [
             0,
             51,

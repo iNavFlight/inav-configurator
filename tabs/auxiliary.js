@@ -23,7 +23,14 @@ TABS.auxiliary.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'auxiliary';
 
-    MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_rc_data);
+    MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
+
+    function get_box_ids() {
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
+            FC.generateAuxConfig();
+            get_rc_data();
+        });
+    }
 
     function get_rc_data() {
         if (FC.SERIAL_CONFIG.ports.length == 0) {
