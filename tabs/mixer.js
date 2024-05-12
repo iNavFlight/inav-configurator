@@ -13,6 +13,8 @@ const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model'
 const Settings = require('./../js/settings');
 const jBox = require('../js/libraries/jBox/jBox.min');
 const interval = require('./../js/intervals');
+const ServoMixRule = require('./../js/servoMixRule');
+const MotorMixRule = require('./../js/motorMixRule');
 
 TABS.mixer = {};
 
@@ -58,7 +60,7 @@ TABS.mixer.initialize = function (callback, scrollPosition) {
     saveChainer.setExitPoint(reboot);
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
+        Settings.saveInputs(onComplete);
     }
 
     function reboot() {

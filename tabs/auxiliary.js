@@ -22,32 +22,32 @@ TABS.auxiliary = {};
 TABS.auxiliary.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'auxiliary';
-    function get_mode_ranges() {
-        MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
-    }
+
+    let LOCAL_AUX_CONFIG = [];
+    let LOCAL_AUX_CONFIG_IDS = [];
+
+    MSP.send_message(MSPCodes.MSP_MODE_RANGES, false, false, get_box_ids);
 
     function get_box_ids() {
-        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
+        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, function () {
+            FC.generateAuxConfig();
+
+            //Copy global settings into local ones
+            LOCAL_AUX_CONFIG = Array.from(FC.AUX_CONFIG);
+            LOCAL_AUX_CONFIG_IDS = Array.from(FC.AUX_CONFIG_IDS);
+
+            get_rc_data();
+        });
     }
 
     function get_rc_data() {
-        if (FC.SERIAL_CONFIG.ports.length == 0) {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, get_ports_data);
-        } else {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
-        }
-    }
-
-    function get_ports_data() {
-        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
     }
 
     function load_html() {
         sort_modes_for_display();
         GUI.load(path.join(__dirname, "auxiliary.html"), process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_mode_ranges);
 
     // This object separates out the dividers. This is also used to order the modes
     const modeSections = {};
@@ -68,21 +68,21 @@ TABS.auxiliary.initialize = function (callback) {
         var found = false;
         var sortedID = 0;
 
-        for (let i=0; i<FC.AUX_CONFIG.length; i++) {
-            tmpAUX_CONFIG[i] = FC.AUX_CONFIG[i];
-            tmpAUX_CONFIG_IDS[i] = FC.AUX_CONFIG_IDS[i];
+        for (let i=0; i<LOCAL_AUX_CONFIG.length; i++) {
+            tmpAUX_CONFIG[i] = LOCAL_AUX_CONFIG[i];
+            tmpAUX_CONFIG_IDS[i] = LOCAL_AUX_CONFIG_IDS[i];
         }
 
-        FC.AUX_CONFIG = [];
-        FC.AUX_CONFIG_IDS = [];
+        LOCAL_AUX_CONFIG = [];
+        LOCAL_AUX_CONFIG_IDS = [];
 
         for (let categoryModesIndex in modeSections) {
             let categoryModes = modeSections[categoryModesIndex];
             for (let cM=0; cM<categoryModes.length; cM++){
                 for(let j=0; j<tmpAUX_CONFIG.length; j++) {
                     if (categoryModes[cM] === tmpAUX_CONFIG[j]) {
-                        FC.AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
-                        FC.AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
+                        LOCAL_AUX_CONFIG[sortedID] = tmpAUX_CONFIG[j];
+                        LOCAL_AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[j];
                         ORIG_AUX_CONFIG_IDS[sortedID++] = j;
 
                         break;
@@ -92,19 +92,19 @@ TABS.auxiliary.initialize = function (callback) {
         }
 
         // There are modes that are missing from the modeSections object. Add them to the end until they are ordered correctly.
-        if (tmpAUX_CONFIG.length > FC.AUX_CONFIG.length) {
+        if (tmpAUX_CONFIG.length > LOCAL_AUX_CONFIG.length) {
             for (let i=0; i<tmpAUX_CONFIG.length; i++) {
                 found = false;
-                for (let j=0; j<FC.AUX_CONFIG.length; j++) {
-                    if (tmpAUX_CONFIG[i] === FC.AUX_CONFIG[j]) {
+                for (let j=0; j<LOCAL_AUX_CONFIG.length; j++) {
+                    if (tmpAUX_CONFIG[i] === LOCAL_AUX_CONFIG[j]) {
                         found = true;
                         break;
                     }
                 }
 
                 if (!found) {
-                    FC.AUX_CONFIG[sortedID] = tmpAUX_CONFIG[i];
-                    FC.AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[i];
+                    LOCAL_AUX_CONFIG[sortedID] = tmpAUX_CONFIG[i];
+                    LOCAL_AUX_CONFIG_IDS[sortedID] = tmpAUX_CONFIG_IDS[i];
                     ORIG_AUX_CONFIG_IDS[sortedID++] = i;
                 }
             }
@@ -123,7 +123,7 @@ TABS.auxiliary.initialize = function (callback) {
     function createMode(modeIndex, modeId) {
         var modeTemplate = $('#tab-auxiliary-templates .mode');
         var newMode = modeTemplate.clone();
-        var modeName = FC.AUX_CONFIG[modeIndex];
+        var modeName = LOCAL_AUX_CONFIG[modeIndex];
 
         // If the runcam split peripheral is used, then adjust the boxname(BOXCAMERA1, BOXCAMERA2, BOXCAMERA3)
         // If platform is fixed wing, rename POS HOLD to LOITER
@@ -135,7 +135,7 @@ TABS.auxiliary.initialize = function (callback) {
         $(newMode).data('index', modeIndex);
         $(newMode).data('id', modeId);
         $(newMode).data('origId', ORIG_AUX_CONFIG_IDS[modeIndex]);
-        $(newMode).data('modeName', FC.AUX_CONFIG[modeIndex]);
+        $(newMode).data('modeName', LOCAL_AUX_CONFIG[modeIndex]);
 
         $(newMode).find('.name').data('modeElement', newMode);
         $(newMode).find('a.addRange').data('modeElement', newMode);
@@ -230,10 +230,10 @@ TABS.auxiliary.initialize = function (callback) {
         let modeSelectionID = "";
         let modeSelectionRange = "";
 
-        for (var modeIndex = 0; modeIndex < FC.AUX_CONFIG.length; modeIndex++) {
+        for (var modeIndex = 0; modeIndex < LOCAL_AUX_CONFIG.length; modeIndex++) {
             // Get current mode category
             for (modeSelectionRange in modeSections) {
-                if (modeSections[modeSelectionRange].indexOf(FC.AUX_CONFIG[modeIndex]) != -1) {
+                if (modeSections[modeSelectionRange].indexOf(LOCAL_AUX_CONFIG[modeIndex]) != -1) {
                     break;
                 }
             }
@@ -245,7 +245,7 @@ TABS.auxiliary.initialize = function (callback) {
                 modeTableBodyElement.append(newSection);
             }
 
-            var modeId = FC.AUX_CONFIG_IDS[modeIndex];
+            var modeId = LOCAL_AUX_CONFIG_IDS[modeIndex];
             var newMode = createMode(modeIndex, modeId);
             modeTableBodyElement.append(newMode);
 
@@ -387,7 +387,7 @@ TABS.auxiliary.initialize = function (callback) {
                 update_marker(i, FC.RC.channels[i + 4]);
             }
 
-            for (var i = 0; i < FC.AUX_CONFIG.length; i++) {
+            for (var i = 0; i < LOCAL_AUX_CONFIG.length; i++) {
                 var modeElement = $('#mode-' + i);
                 let inRange = false;
 
@@ -442,7 +442,7 @@ TABS.auxiliary.initialize = function (callback) {
             }
 
             let hideUnused = hideUnusedModes && hasUsedMode;
-            for (let i = 0; i < FC.AUX_CONFIG.length; i++) {
+            for (let i = 0; i < LOCAL_AUX_CONFIG.length; i++) {
                 let modeElement = $('#mode-' + i);
                 if (modeElement.find(' .range').length == 0) {
                     modeElement.toggle(!hideUnused);

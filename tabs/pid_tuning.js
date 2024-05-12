@@ -122,8 +122,8 @@ TABS.pid_tuning.initialize = function (callback) {
         FC.RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
         FC.RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
 
-        FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpa').val());
-        FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpa-breakpoint').val());
+        FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpaRate').val());
+        FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpaBreakpoint').val());
 
         FC.RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
         FC.RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
@@ -390,7 +390,7 @@ TABS.pid_tuning.initialize = function (callback) {
             }
 
             function saveSettings() {
-                Settings.saveInputs().then(save_to_eeprom);
+                Settings.saveInputs(save_to_eeprom);
             }
 
             function save_to_eeprom() {

@@ -37,7 +37,6 @@ var GUI_control = function () {
         'led_strip',
         'logging',
         'onboard_logging',
-        'modes',
         'outputs',
         'pid_tuning',
         'ports',

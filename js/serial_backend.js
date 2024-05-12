@@ -460,27 +460,22 @@ var SerialBackend = (function () {
             $('#dataflash_wrapper_global').show();
 
             /*
-            * Get BOXNAMES since it is used for some reason....
+            * Init PIDs bank with a length that depends on the version
             */
-            MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, function () {
-                /*
-                * Init PIDs bank with a length that depends on the version
-                */
-                let pidCount = 11;
+            let pidCount = 11;
 
-                for (let i = 0; i < pidCount; i++) {
-                    FC.PIDs.push(new Array(4));
-                }
+            for (let i = 0; i < pidCount; i++) {
+                FC.PIDs.push(new Array(4));
+            }
 
-                interval.add('msp-load-update', function () {
-                    $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
-                    $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
-                    $('#msp-roundtrip').text("MSP round trip: " + mspQueue.getRoundtrip().toFixed(0));
-                    $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
-                }, 100);
+            interval.add('msp-load-update', function () {
+                $('#msp-version').text("MSP version: " + MSP.protocolVersion.toFixed(0));
+                $('#msp-load').text("MSP load: " + mspQueue.getLoad().toFixed(1));
+                $('#msp-roundtrip').text("MSP round trip: " + mspQueue.getRoundtrip().toFixed(0));
+                $('#hardware-roundtrip').text("HW round trip: " + mspQueue.getHardwareRoundtrip().toFixed(0));
+            }, 100);
 
-                interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
-            });
+            interval.add('global_data_refresh', periodicStatusUpdater.run, periodicStatusUpdater.getUpdateInterval(CONFIGURATOR.connection.bitrate), false);
         });
 
     }

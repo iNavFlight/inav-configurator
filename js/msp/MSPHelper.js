@@ -386,21 +386,6 @@ var mspHelper = (function () {
             case MSPCodes.MSP_MOTOR_PINS:
                 console.log(data);
                 break;
-            case MSPCodes.MSP_BOXNAMES:
-                //noinspection JSUndeclaredVariable
-                FC.AUX_CONFIG = []; // empty the array as new data is coming in
-                buff = [];
-                for (let i = 0; i < data.byteLength; i++) {
-                    if (data.getUint8(i) == 0x3B) { // ; (delimeter char)
-                        FC.AUX_CONFIG.push(String.fromCharCode.apply(null, buff)); // convert bytes into ASCII and save as strings
-
-                        // empty buffer
-                        buff = [];
-                    } else {
-                        buff.push(data.getUint8(i));
-                    }
-                }
-                break;
             case MSPCodes.MSP_PIDNAMES:
                 //noinspection JSUndeclaredVariable
                 FC.PID_names = []; // empty the array as new data is coming in
@@ -3075,7 +3060,6 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
-        console.log("Getting setting " + name);
         if (FC.SETTINGS[name]) {
             return Promise.resolve(FC.SETTINGS[name]);
         }

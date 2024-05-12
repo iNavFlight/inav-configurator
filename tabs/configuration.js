@@ -52,7 +52,7 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
     ];
 
     function saveSettings(onComplete) {
-        Settings.saveInputs().then(onComplete);
+        Settings.saveInputs(onComplete);
     }
 
     saveChainer.setChain(saveChain);
