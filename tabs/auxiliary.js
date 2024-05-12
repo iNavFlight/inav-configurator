@@ -35,21 +35,13 @@ TABS.auxiliary.initialize = function (callback) {
             //Copy global settings into local ones
             LOCAL_AUX_CONFIG = Array.from(FC.AUX_CONFIG);
             LOCAL_AUX_CONFIG_IDS = Array.from(FC.AUX_CONFIG_IDS);
-            
+
             get_rc_data();
         });
     }
 
     function get_rc_data() {
-        if (FC.SERIAL_CONFIG.ports.length == 0) {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, get_ports_data);
-        } else {
-            MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
-        }
-    }
-
-    function get_ports_data() {
-        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, load_html);
+        MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
     }
 
     function load_html() {
