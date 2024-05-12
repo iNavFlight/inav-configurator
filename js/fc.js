@@ -950,11 +950,13 @@ var FC = {
         return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
-        for (var i = 0; i < this.AUX_CONFIG.length; i++) {
-            if (this.AUX_CONFIG[i] == name)
-                return i;
+
+        let mode = FLIGHT_MODES.find( mode => mode.boxName === name );
+        if (mode) {
+            return mode.permanentId;
+        } else {
+            return -1;
         }
-        return -1;
     },
     isModeBitSet: function (i) {
         return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);
