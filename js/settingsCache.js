@@ -17,6 +17,7 @@ var settingsCache = (function() {
 
     publicScope.flush = function() {
         store.delete(SETTINGS_KEY);
+        console.log('Settings cache flushed');
     };
 
     publicScope.get = function(settingName) {
