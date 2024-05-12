@@ -224,10 +224,6 @@ $(function() {
                             require('./../tabs/receiver');
                             TABS.receiver.initialize(content_ready);
                             break;
-                        case 'modes':
-                            require('./../tabs/modes');
-                            TABS.modes.initialize(content_ready);
-                            break;
                         case 'gps':
                             require('./../tabs/gps');
                             TABS.gps.initialize(content_ready);
