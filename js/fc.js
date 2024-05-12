@@ -30,7 +30,7 @@ var FC = {
     RC: null,
     RC_tuning: null,
     AUX_CONFIG: [],
-    AUX_CONFIG_IDS: null,
+    AUX_CONFIG_IDS: [],
     MODE_RANGES: null,
     ADJUSTMENT_RANGES: null,
     SERVO_CONFIG: null,
@@ -202,10 +202,11 @@ var FC = {
 
         this.generateAuxConfig = function () {
             console.log('Generating AUX_CONFIG');
-
-            for ( let i = 0; i < FLIGHT_MODES.length; i++ ) {
-                if (this.AUX_CONFIG_IDS.indexOf(FLIGHT_MODES[i].permanentId) > -1) {
-                    this.AUX_CONFIG.push(FLIGHT_MODES[i].boxName);
+            this.AUX_CONFIG = [];
+            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+                if (found) {
+                    this.AUX_CONFIG.push(found.boxName);
                 }
             }
         };
