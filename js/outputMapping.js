@@ -35,6 +35,7 @@ var OutputMappingCollection = function () {
     self.TIMER_OUTPUT_MODE_AUTO = 0;
     self.TIMER_OUTPUT_MODE_MOTORS = 1;
     self.TIMER_OUTPUT_MODE_SERVOS = 2;
+    self.TIMER_OUTPUT_MODE_LED = 3;
 
     self.flushTimerOverrides = function() {
         timerOverrides = {};
@@ -80,10 +81,15 @@ var OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             timerMap[i] = null;
 
-            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+            if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)) {
+                console.log(i + ": LED");
+                timerMap[i] = OUTPUT_TYPE_LED;
+            } else if (servosToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)) {
+                console.log(i + ": SERVO");
                 servosToGo--;
                 timerMap[i] = OUTPUT_TYPE_SERVO;
             } else if (motorsToGo > 0 && BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR)) {
+                console.log(i + ": MOTOR");
                 motorsToGo--;
                 timerMap[i] = OUTPUT_TYPE_MOTOR;
             }
@@ -99,7 +105,7 @@ var OutputMappingCollection = function () {
             outputMap = [],
             offset = getFirstOutputOffset();
 
-
+        console.log("Offset: " + offset)
         for (let i = 0; i < self.getOutputCount(); i++) {
             
             let assignment = timerMap[i + offset];
@@ -130,8 +136,6 @@ var OutputMappingCollection = function () {
 
     self.getOutputCount = function () {
         let retVal = 0;
-        let testFlag = 1 << TIM_USE_LED;
-        testFlag = testFlag + 1;
 
         for (let i = 0; i < data.length; i++) {
             let flags = data[i]['usageFlags'];
@@ -140,7 +144,6 @@ var OutputMappingCollection = function () {
                 BitHelper.bit_check(flags, TIM_USE_SERVO) ||
                 BitHelper.bit_check(flags, TIM_USE_LED)
             ) {
-                //alert("Found motor, servo or led");
                 retVal++;
             };
         }
@@ -152,7 +155,8 @@ var OutputMappingCollection = function () {
         for (let i = 0; i < data.length; i++) {
             if (
                 BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_MOTOR) ||
-                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO)
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_SERVO) ||
+                BitHelper.bit_check(data[i]['usageFlags'], TIM_USE_LED)
             ) {
                 return i;
             }
