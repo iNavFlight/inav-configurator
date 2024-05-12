@@ -13,6 +13,8 @@ const { mixer, platform, PLATFORM, INPUT, STABILIZED } = require('./../js/model'
 const Settings = require('./../js/settings');
 const jBox = require('../js/libraries/jBox/jBox.min');
 const interval = require('./../js/intervals');
+const ServoMixRule = require('./../js/servoMixRule');
+const MotorMixRule = require('./../js/motorMixRule');
 
 TABS.mixer = {};
 
