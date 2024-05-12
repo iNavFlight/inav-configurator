@@ -17,13 +17,7 @@ TABS.adjustments.initialize = function (callback) {
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
 
-    function get_adjustment_ranges() {
-        MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
-    }
-
-    function get_box_ids() {
-        MSP.send_message(MSPCodes.MSP_BOXIDS, false, false, get_rc_data);
-    }
+    MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_rc_data);
 
     function get_rc_data() {
         MSP.send_message(MSPCodes.MSP_RC, false, false, load_html);
@@ -32,8 +26,6 @@ TABS.adjustments.initialize = function (callback) {
     function load_html() {
         GUI.load(path.join(__dirname, "adjustments.html"), process_html);
     }
-
-    MSP.send_message(MSPCodes.MSP_BOXNAMES, false, false, get_adjustment_ranges);
 
     function addAdjustment(adjustmentIndex, adjustmentRange, auxChannelCount) {
 
