@@ -5812,5 +5812,11 @@
     },
     "gsTelemetrySpeed": {
         "message": "Speed"
+    },
+    "maintenance": {
+        "message": "Maintenance"
+    },
+    "maintenanceFlushSettingsCache": {
+        "message": "Flush settings cache"
     }
 }
