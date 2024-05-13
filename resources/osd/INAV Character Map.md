@@ -23,8 +23,8 @@
 | ![Decibel](/resources/osd/digital/default/24x36/018.png)           | SYM_DB                     | SYM.DB                       | Decibel icon                          | 018        | 0x12         |
 | ![Decibel per mW](/resources/osd/digital/default/24x36/019.png)    | SYM_DBM                    | SYM.DBM                      | Decibel per milliwatt icon            | 019        | 0x13         |
 | ![SNR](/resources/osd/digital/default/24x36/020.png)               | SYM_SNR                    | SYM.SNR                      | Signal to Noise Ratio icon            | 020        | 0x14         |
-| ![AHI up arrow](/resources/osd/digital/default/24x36/021.png)      | SYM_AH_DECORATION_UP       | SYM.AH_DECORATION_UP         | AHi up arrow                          | 021        | 0x15         |
-| ![AHI down arrow](/resources/osd/digital/default/24x36/022.png)    | SYM_AH_DECORATION_DOWN     |                              | AHI down arrow                        | 022        | 0x16         |
+| ![AHI up arrow](/resources/osd/digital/default/24x36/021.png)      | SYM_AH_DIRECTION_UP        | SYM.AH_DECORATION_UP         | AHI up arrow                          | 021        | 0x15         |
+| ![AHI down arrow](/resources/osd/digital/default/24x36/022.png)    | SYM_AH_DIRECTION_DOWN      |                              | AHI down arrow                        | 022        | 0x16         |
 | ![Direction](/resources/osd/digital/default/24x36/023.png)         | SYM_DECORATION             | SYM.DECORATION               | Direction little arrows               | 023 - 030  | 0x17 - 0x1E  |
 | ![Direction](/resources/osd/digital/default/24x36/024.png)         |                            |                              |                                       | 024        | 0x18         |
 | ![Direction](/resources/osd/digital/default/24x36/025.png)         |                            |                              |                                       | 025        | 0x19         |
