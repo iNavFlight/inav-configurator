@@ -47,31 +47,45 @@ TABS.pid_tuning.initialize = function (callback) {
         GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
     }
 
-    function drawRollPitchYawExpo() {
-        var pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
-        var context = pitch_roll_curve.getContext("2d");
+    function drawExpoCanvas(value, $element, color, width, height, clear) {
+        let context = $element.getContext("2d");
 
-        var expoAVal = $('.tunings .rate input[name="expo"]');
-        var expoA = parseFloat(expoAVal.val());
-
-        expoA = 0.7;
-
-        if (expoA <= parseFloat(expoAVal.prop('min')) || expoA >= parseFloat(expoAVal.prop('max'))) {
+        if (value < 0 || value > 1) {
             return;
         }
 
-        var rateHeight = TABS.pid_tuning.rateChartHeight;
-
-        // draw
-        context.clearRect(0, 0, 200, rateHeight);
+        if (clear === true) {
+            context.clearRect(0, 0, width, height);
+        }
 
         context.beginPath();
-        context.moveTo(0, rateHeight);
-        context.quadraticCurveTo(110, rateHeight - ((rateHeight / 2) * (1 - expoA)), 200, 0);
+        context.moveTo(0, height);
+        context.quadraticCurveTo(110, height - ((height / 2) * (1 - value)), width, 0);
         context.lineWidth = 2;
-        // context.strokeStyle = '#f4a261';
-        context.strokeStyle = '#a00000';
+        context.strokeStyle = color;
         context.stroke();
+
+    };
+
+    function drawRollPitchYawExpo() {
+        let pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+
+        drawExpoCanvas(
+            parseFloat($('#rate_rollpitch_expo').val()) / 100,
+            pitch_roll_curve,
+            '#a00000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            true
+        );
+        drawExpoCanvas(
+            parseFloat($('#rate_yaw_expo').val()) / 100,
+            pitch_roll_curve,
+            '#00a000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            false
+        );
     }
 
     function pid_and_rc_to_form() {
