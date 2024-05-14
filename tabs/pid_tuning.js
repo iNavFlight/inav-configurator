@@ -114,10 +114,6 @@ TABS.pid_tuning.initialize = function (callback) {
             200,
             true
         );
-
-        // console.log('orig', $('#ez_tune_expo').val());
-        // console.log('scaled', Math.floor(scaleRange($('#ez_tune_expo').val(), 0, 200, 40, 100)) / 100);
-
     }
 
     function pid_and_rc_to_form() {
