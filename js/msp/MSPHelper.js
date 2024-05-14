@@ -20,6 +20,7 @@ const { FwApproach } = require('./../fwApproach');
 const Waypoint = require('./../waypoint');
 const mspDeduplicationQueue = require('./mspDeduplicationQueue');
 const mspStatistics = require('./mspStatistics');
+const settingsCache = require('./../settingsCache');
 
 var mspHelper = (function () {
     var self = {};
@@ -3060,9 +3061,12 @@ var mspHelper = (function () {
     };
 
     self._getSetting = function (name) {
-        if (FC.SETTINGS[name]) {
-            return Promise.resolve(FC.SETTINGS[name]);
+
+        const storedSetting = settingsCache.get(name);
+        if (typeof storedSetting !== 'undefined') {
+            return Promise.resolve(storedSetting);
         }
+
         var data = [];
         self._encodeSettingReference(name, null, data);
         return MSP.promise(MSPCodes.MSP2_COMMON_SETTING_INFO, data).then(function (result) {
@@ -3109,7 +3113,7 @@ var mspHelper = (function () {
                 }
                 setting.table = { values: values };
             }
-            FC.SETTINGS[name] = setting;
+            settingsCache.set(name, setting);
             return setting;
         });
     }
