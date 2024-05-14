@@ -60,7 +60,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
         context.beginPath();
         context.moveTo(0, height);
-        context.quadraticCurveTo(110, height - ((height / 2) * (1 - value)), width, 0);
+        context.quadraticCurveTo(width / 2, height - ((height / 2) * (1 - value)), width, 0);
         context.lineWidth = 2;
         context.strokeStyle = color;
         context.stroke();
@@ -105,6 +105,19 @@ TABS.pid_tuning.initialize = function (callback) {
             TABS.pid_tuning.rateChartHeight,
             false
         );
+
+        drawExpoCanvas(
+            Math.floor(scaleRange($('#ez_tune_expo').val(), 0, 200, 40, 100)) / 100,
+            $('#ez_tune_expo_curve canvas').get(0),
+            '#a00000',
+            250,
+            200,
+            true
+        );
+
+        // console.log('orig', $('#ez_tune_expo').val());
+        // console.log('scaled', Math.floor(scaleRange($('#ez_tune_expo').val(), 0, 200, 40, 100)) / 100);
+
     }
 
     function pid_and_rc_to_form() {
