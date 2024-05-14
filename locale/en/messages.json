@@ -1424,6 +1424,9 @@
     "pidTuning_Expo_Stabilized": {
         "message": "Stabilized Expo"
     },
+    "pidTuning_Expo_Manual": {
+        "message": "Manual Expo"
+    },
     "pidTuning_Expo_RollPitch": {
         "message": "Roll & Pitch (%)"
     },

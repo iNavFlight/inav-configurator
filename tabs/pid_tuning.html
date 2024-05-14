@@ -515,6 +515,29 @@
                 
             </div>
 
+            <div class="pid-sliders-axis not-for-multirotor" data-axis="3">
+                <div style="float: right">
+                    <div class="manual_expo_curve expo-chart">
+                        <canvas width="200" height="117"></canvas>
+                    </div>
+                </div>
+                <h3 data-i18n="pidTuning_Expo_Manual"></h3>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_RollPitch"></span>
+                    <div class="number no-border">
+                        <input id="manual_rollpitch_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+                <div class="pid-slider-row">
+                    <span data-i18n="pidTuning_Expo_Yaw"></span>
+                    <div class="number no-border">
+                        <input id="manual_yaw_expo" class="controlProfileHighlightActive" type="number"/>
+                    </div>
+                    <div class="clear-both"></div>
+                </div>
+            </div>
+
             <div class="pid-sliders-axis only-for-multirotor" data-axis="3">
                 <h3 data-i18n="pidTuning_Other"></h3>
                 <div class="pid-slider-row">

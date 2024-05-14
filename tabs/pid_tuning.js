@@ -69,6 +69,7 @@ TABS.pid_tuning.initialize = function (callback) {
 
     function drawRollPitchYawExpo() {
         let pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+        let manual_expo_curve = $('.manual_expo_curve canvas').get(0);
 
         drawExpoCanvas(
             parseFloat($('#rate_rollpitch_expo').val()) / 100,
@@ -81,6 +82,24 @@ TABS.pid_tuning.initialize = function (callback) {
         drawExpoCanvas(
             parseFloat($('#rate_yaw_expo').val()) / 100,
             pitch_roll_curve,
+            '#00a000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            false
+        );
+
+        drawExpoCanvas(
+            parseFloat($('#manual_rollpitch_expo').val()) / 100,
+            manual_expo_curve,
+            '#a00000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            true
+        );
+
+        drawExpoCanvas(
+            parseFloat($('#manual_yaw_expo').val()) / 100,
+            manual_expo_curve,
             '#00a000',
             200,
             TABS.pid_tuning.rateChartHeight,
@@ -142,6 +161,9 @@ TABS.pid_tuning.initialize = function (callback) {
         FC.RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
         FC.RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
         FC.RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
+
+        FC.RC_tuning.manual_RC_EXPO = $('#manual_rollpitch_expo').val() / 100;
+        FC.RC_tuning.manual_RC_YAW_EXPO = $('#manual_yaw_expo').val() / 100;
 
         // Rate Dynamics
         FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
@@ -258,6 +280,9 @@ TABS.pid_tuning.initialize = function (callback) {
         GUI.sliderize($('#rate_manual_roll'), FC.RC_tuning.manual_roll_rate, 0, 100);
         GUI.sliderize($('#rate_manual_pitch'), FC.RC_tuning.manual_pitch_rate, 0, 100);
         GUI.sliderize($('#rate_manual_yaw'), FC.RC_tuning.manual_yaw_rate, 0, 100);
+
+        GUI.sliderize($('#manual_rollpitch_expo'), FC.RC_tuning.manual_RC_EXPO * 100, 0, 100);
+        GUI.sliderize($('#manual_yaw_expo'), FC.RC_tuning.manual_RC_YAW_EXPO * 100, 0, 100);
 
         updatePreview();
 
