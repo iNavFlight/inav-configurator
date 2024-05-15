@@ -8,7 +8,8 @@ const ConnectionSerial = require('./connection/connectionSerial');
 
 var usbDevices =  [
     { 'vendorId': 1155, 'productId': 57105}, 
-    { 'vendorId': 11836, 'productId': 57105}
+    { 'vendorId': 11836, 'productId': 57105},
+    { 'vendorId': 12619, 'productId': 262}, // APM32 DFU Bootloader
 ];
 
 
