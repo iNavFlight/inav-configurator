@@ -149,10 +149,6 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
-var useBaro         = false;
-var useCRSFRx       = false;
-var usePitot        = false;
-
 var video_type = null;
 var isGuidesChecked = false;
 var FONT = FONT || {};
@@ -951,7 +947,7 @@ OSD.constants = {
                     name: 'AIR_SPEED',
                     id: 27,
                     enabled: function() {
-                        return usePitot;
+                        return HARDWARE.capabilities.usePitot;
                     },
                     preview: function(osd_data) {
                         var speed;
@@ -976,7 +972,7 @@ OSD.constants = {
                     name: 'AIR_MAX_SPEED',
                     id: 127,
                     enabled: function() {
-                        return usePitot;
+                        return HARDWARE.capabilities.usePitot;
                     },
                     preview: function(osd_data) {
                         // 3 chars
@@ -1087,7 +1083,7 @@ OSD.constants = {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
                     enabled: function() {
-                        return useBaro;
+                        return HARDWARE.capabilities.useBaro;
                     },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -1801,7 +1797,7 @@ OSD.constants = {
         {
             name: 'osdGroupCRSF',
             enabled: function() {
-                return useCRSFRx;
+                return HARDWARE.capabilities.useCRSFRx;
             },
             items: [
                 {
@@ -2928,10 +2924,10 @@ OSD.GUI.updateDjiView = function(on) {
 };
 
 OSD.GUI.updateAlarms = function() {
-    $(".osd_use_airspeed_alarm").toggle(usePitot);
-    $(".osd_use_baro_temp_alarm").toggle(useBaro);
+    $(".osd_use_airspeed_alarm").toggle(HARDWARE.capabilities.usePitot);
+    $(".osd_use_baro_temp_alarm").toggle(HARDWARE.capabilities.useBaro);
     $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
-    $(".osd_use_crsf").toggle(useCRSFRx);
+    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSFRx);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -3238,7 +3234,10 @@ HARDWARE.init = function() {
     HARDWARE.capabilities = {
         isDjiHdFpv: false,
         isMspDisplay: false,
-        useESCTelemetry: false
+        useESCTelemetry: false,
+        useCRSFRx: false,
+        useBaro: false,
+        usePitot: false
     };
 };
 
@@ -3259,9 +3258,19 @@ HARDWARE.update = function(callback) {
             }
         });
 
-        if (callback) {
-            callback();
-        }
+        // Update RX data for Crossfire detection
+        mspHelper.loadRxConfig(function() {
+            HARDWARE.capabilities.useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+
+            mspHelper.loadSensorConfig(function () {
+                HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
+                HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
+
+                if (callback) {
+                    callback();
+                }
+            });
+        });        
     });
 };
 
@@ -3451,22 +3460,11 @@ TABS.osd.initialize = function (callback) {
                 OSD.GUI.updateDjiMessageElements(this.checked);
             });
     
-            // Update RX data for Crossfire detection
-            mspHelper.loadRxConfig(function() {
-                useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
-            });
-    
-            // Update SENSOR_CONFIG, used to detect
-            // OSD_AIR_SPEED
-            mspHelper.loadSensorConfig(function () {
-                useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
-                usePitot = (FC.SENSOR_CONFIG.pitot != 0);
-                GUI.content_ready(callback);
-            });
-    
             if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
                 mspHelper.loadOsdCustomElements(createCustomElements);
             }
+
+            GUI.content_ready(callback);
         }));
     });
 };
