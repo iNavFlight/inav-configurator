@@ -149,7 +149,6 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
-var useESCTelemetry = false;
 var useBaro         = false;
 var useCRSFRx       = false;
 var usePitot        = false;
@@ -522,9 +521,7 @@ OSD.initData = function () {
         item_count: 0,
         items: [],
         groups: {},
-        preview: [],
-        isDjiHdFpv: false,
-        isMspDisplay: false
+        preview: []
     };
 };
 
@@ -1010,7 +1007,7 @@ OSD.constants = {
                     id: 106,
                     min_version: '2.3.0',
                     enabled: function() {
-                        return useESCTelemetry;
+                        return HARDWARE.capabilities.useESCTelemetry;
                     },
                     preview: function(){
                         let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
@@ -1106,7 +1103,7 @@ OSD.constants = {
                     id: 107,
                     min_version: '2.5.0',
                     enabled: function() {
-                        return useESCTelemetry;
+                        return HARDWARE.capabilities.useESCTelemetry;
                     },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
@@ -2175,17 +2172,6 @@ OSD.reload = function(callback) {
         }
     };
 
-    MSP.promise(MSPCodes.MSP2_CF_SERIAL_CONFIG).then(function (resp) {
-        $.each(FC.SERIAL_CONFIG.ports, function(index, port){
-            if(port.functions.includes('DJI_FPV')) {
-                OSD.data.isDjiHdFpv = true;
-            }
-            if(port.functions.includes('MSP_DISPLAYPORT')) {
-                OSD.data.isMspDisplay = true;
-            }
-        });
-    });
-
     MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
 
         OSD.msp.decodeLayoutCounts(resp);
@@ -2576,11 +2562,11 @@ OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
 
-    if (!OSD.data.isDjiHdFpv) {
+    if (!HARDWARE.capabilities.isDjiHdFpv) {
         $('#dji_settings').hide();
     }
 
-    if (OSD.data.isMspDisplay) {
+    if (HARDWARE.capabilities.isMspDisplay) {
         if (mspVideoSystem.includes(OSD.data.preferences.video_system) == false) {
             OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('HDZERO');
             OSD.updateDisplaySize();
@@ -2594,7 +2580,7 @@ OSD.GUI.updateVideoMode = function() {
         }
     }
 
-    if (OSD.data.isMspDisplay) {
+    if (HARDWARE.capabilities.isMspDisplay) {
         for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
             if (mspVideoSystem.includes(i))
             {
@@ -2805,7 +2791,7 @@ OSD.GUI.updateFields = function() {
     if ($('#djiUnsupportedElementsToggle').length == false) {
         $('#djiUnsupportedElements').prepend(
             $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
-            .attr('checked', OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay)
+            .attr('checked', HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay)
             .on('change', function () {
                 OSD.GUI.updateDjiView(this.checked);
                 OSD.GUI.updatePreviews();
@@ -2944,7 +2930,7 @@ OSD.GUI.updateDjiView = function(on) {
 OSD.GUI.updateAlarms = function() {
     $(".osd_use_airspeed_alarm").toggle(usePitot);
     $(".osd_use_baro_temp_alarm").toggle(useBaro);
-    $(".osd_use_esc_telemetry").toggle(useESCTelemetry);
+    $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
     $(".osd_use_crsf").toggle(useCRSFRx);
 };
 
@@ -3225,7 +3211,7 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
     OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
-    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv && !OSD.data.isMspDisplay);
+    OSD.GUI.updateDjiView(HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay);
     OSD.GUI.updateAlarms();
 };
 
@@ -3247,6 +3233,38 @@ OSD.GUI.saveConfig = function() {
     });
 };
 
+let HARDWARE = {};
+HARDWARE.init = function() {
+    HARDWARE.capabilities = {
+        isDjiHdFpv: false,
+        isMspDisplay: false,
+        useESCTelemetry: false
+    };
+};
+
+HARDWARE.update = function(callback) {
+
+    HARDWARE.init();
+
+    MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
+        $.each(FC.SERIAL_CONFIG.ports, function(index, port){
+            if(port.functions.includes('DJI_FPV')) {
+                HARDWARE.capabilities.isDjiHdFpv = true;
+            }
+            if(port.functions.includes('MSP_DISPLAYPORT')) {
+                HARDWARE.capabilities.isMspDisplay = true;
+            }
+            if (port.functions.includes('ESC')) {
+                HARDWARE.capabilities.useESCTelemetry = true;
+            }
+        });
+
+        if (callback) {
+            callback();
+        }
+    });
+};
+
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
 
@@ -3263,204 +3281,194 @@ TABS.osd.initialize = function (callback) {
         });
     }
 
-    GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
-        // translate to user-selected language
-       i18n.localize();
-
-        // Open modal window
-        OSD.GUI.jbox = new jBox('Modal', {
-            width: 750, 
-            height: 300,
-            position: {y:'bottom'},
-            offset: {y:-50},
-            closeButton: 'title',
-            animation: false,
-            attach: $('#fontmanager'),
-            title: 'OSD Font Manager',
-            content: $('#fontmanagercontent')
-        });
-
-        $('a.save').on('click', function () {
-            Settings.saveInputs(save_to_eeprom);
-        });
-
-        // Initialise guides checkbox
-        isGuidesChecked = store.get('showOSDGuides', false); 
-        
-        // Setup switch indicators
-        $(".osdSwitchInd_channel option").each(function() {
-            $(this).text("Ch " + $(this).text());
-        });
-
-        // Function when text for switch indicators change
-        $('.osdSwitchIndName').on('keyup', function() {
-            // Make sure that the switch hint only contains A to Z
-            let testExp = new RegExp('^[A-Za-z0-9]');
-            let testText = $(this).val();
-            if (testExp.test(testText.slice(-1))) {
-                $(this).val(testText.toUpperCase());
-            } else {
-                $(this).val(testText.slice(0, -1));
-            }
-
-            // Update the OSD preview
-            refreshOSDSwitchIndicators();
-        });
-
-        // Function to update the OSD layout when the switch text alignment changes
-        $("#switchIndicators_alignLeft").on('change', function() {
-            refreshOSDSwitchIndicators();
-        });
-
-        // Functions for when pan servo settings change
-        $('#osdPanServoIndicatorShowDegrees').on('change', function() {
-            // Update the OSD preview
-            updatePanServoPreview();
-        });
-
-        $('#panServoOutput').on('change', function() {
-            // Update the OSD preview
-            updatePanServoPreview();
-        });
-
-        // Function for when text for craft name changes
-        $('#craft_name').on('keyup', function() {
-            // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
-            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
-            let testText = $(this).val();
-            if (testExp.test(testText.slice(-1))) {
-                $(this).val(testText.toUpperCase());
-            } else {
-                $(this).val(testText.slice(0, -1));
-            }
-
-            // Update the OSD preview
-            updatePilotAndCraftNames();
-        });
-
-        $('#pilot_name').on('keyup', function() {
-            // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
-            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
-            let testText = $(this).val();
-            if (testExp.test(testText.slice(-1))) {
-                $(this).val(testText.toUpperCase());
-            } else {
-                $(this).val(testText.slice(0, -1));
-            }
-
-            // Update the OSD preview
-            updatePilotAndCraftNames();
-        });
-
-        // font preview window
-        var $preview = $('.font-preview');
-
-        //  init structs once, also clears current font
-        FONT.initData();
-
-        var $fontPicker = $('.fontbuttons button');
-        $fontPicker.on('click', function () {
-            if (!$(this).data('font-file')) {
-                return;
-            }
-            $fontPicker.removeClass('active');
-            $(this).addClass('active');
-            $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
-                FONT.parseMCMFontFile(data);
-                FONT.preview($preview);
-                OSD.GUI.update();
+    HARDWARE.update(function () {
+        GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
+            // translate to user-selected language
+           i18n.localize();
+    
+            // Open modal window
+            OSD.GUI.jbox = new jBox('Modal', {
+                width: 750, 
+                height: 300,
+                position: {y:'bottom'},
+                offset: {y:-50},
+                closeButton: 'title',
+                animation: false,
+                attach: $('#fontmanager'),
+                title: 'OSD Font Manager',
+                content: $('#fontmanagercontent')
             });
-            store.set('osd_font', $(this).data('font-file'));
-        });
-
-        // load the last selected font when we change tabs
-        var osd_font = store.get('osd_font', false);
-        var previous_font_button;
-        if (osd_font) {
-            previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
-            if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
-        }
-
-        if (typeof previous_font_button == "undefined") {
-            $fontPicker.first().trigger( "click" );
-        } else {
-            previous_font_button.trigger( "click" );
-        }
-        
-
-        $('button.load_font_file').on('click', function () {
-            $fontPicker.removeClass('active');
-            FONT.openFontFile().then(function () {
-                FONT.preview($preview);
-                OSD.GUI.update();
+    
+            $('a.save').on('click', function () {
+                Settings.saveInputs(save_to_eeprom);
             });
-        });
-
-        // font upload
-        $('a.flash_font').on('click', function () {
-            if (!GUI.connect_lock) { // button disabled while flashing is in progress
-                var progressLabel = $('.progressLabel');
-                var progressBar = $('.progress');
-                var uploading = i18n.getMessage('uploadingCharacters');
-                progressLabel.text(uploading);
-                var progressCallback = function(done, total, percentage) {
-                    progressBar.val(percentage);
-                    if (done == total) {
-                        progressLabel.text(i18n.getMessage('uploadedCharacters'), [total]);
-                    } else {
-                        progressLabel.text(uploading + ' (' + done + '/' + total + ')');
+    
+            // Initialise guides checkbox
+            isGuidesChecked = store.get('showOSDGuides', false); 
+            
+            // Setup switch indicators
+            $(".osdSwitchInd_channel option").each(function() {
+                $(this).text("Ch " + $(this).text());
+            });
+    
+            // Function when text for switch indicators change
+            $('.osdSwitchIndName').on('keyup', function() {
+                // Make sure that the switch hint only contains A to Z
+                let testExp = new RegExp('^[A-Za-z0-9]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+    
+                // Update the OSD preview
+                refreshOSDSwitchIndicators();
+            });
+    
+            // Function to update the OSD layout when the switch text alignment changes
+            $("#switchIndicators_alignLeft").on('change', function() {
+                refreshOSDSwitchIndicators();
+            });
+    
+            // Functions for when pan servo settings change
+            $('#osdPanServoIndicatorShowDegrees').on('change', function() {
+                // Update the OSD preview
+                updatePanServoPreview();
+            });
+    
+            $('#panServoOutput').on('change', function() {
+                // Update the OSD preview
+                updatePanServoPreview();
+            });
+    
+            // Function for when text for craft name changes
+            $('#craft_name').on('keyup', function() {
+                // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+                let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+    
+                // Update the OSD preview
+                updatePilotAndCraftNames();
+            });
+    
+            $('#pilot_name').on('keyup', function() {
+                // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+                let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+    
+                // Update the OSD preview
+                updatePilotAndCraftNames();
+            });
+    
+            // font preview window
+            var $preview = $('.font-preview');
+    
+            //  init structs once, also clears current font
+            FONT.initData();
+    
+            var $fontPicker = $('.fontbuttons button');
+            $fontPicker.on('click', function () {
+                if (!$(this).data('font-file')) {
+                    return;
+                }
+                $fontPicker.removeClass('active');
+                $(this).addClass('active');
+                $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
+                    FONT.parseMCMFontFile(data);
+                    FONT.preview($preview);
+                    OSD.GUI.update();
+                });
+                store.set('osd_font', $(this).data('font-file'));
+            });
+    
+            // load the last selected font when we change tabs
+            var osd_font = store.get('osd_font', false);
+            var previous_font_button;
+            if (osd_font) {
+                previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
+                if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
+            }
+    
+            if (typeof previous_font_button == "undefined") {
+                $fontPicker.first().trigger( "click" );
+            } else {
+                previous_font_button.trigger( "click" );
+            }
+            
+    
+            $('button.load_font_file').on('click', function () {
+                $fontPicker.removeClass('active');
+                FONT.openFontFile().then(function () {
+                    FONT.preview($preview);
+                    OSD.GUI.update();
+                });
+            });
+    
+            // font upload
+            $('a.flash_font').on('click', function () {
+                if (!GUI.connect_lock) { // button disabled while flashing is in progress
+                    var progressLabel = $('.progressLabel');
+                    var progressBar = $('.progress');
+                    var uploading = i18n.getMessage('uploadingCharacters');
+                    progressLabel.text(uploading);
+                    var progressCallback = function(done, total, percentage) {
+                        progressBar.val(percentage);
+                        if (done == total) {
+                            progressLabel.text(i18n.getMessage('uploadedCharacters'), [total]);
+                        } else {
+                            progressLabel.text(uploading + ' (' + done + '/' + total + ')');
+                        }
                     }
+                    FONT.upload(progressCallback);
                 }
-                FONT.upload(progressCallback);
-            }
-        });
-
-        $('.update_preview').on('change', function () {
-            if (OSD.data) {
-                // Force an OSD redraw by saving any element
-                // with a small delay, to make sure the setting
-                // change is performance before the OSD starts
-                // the full redraw.
-                // This will also update all previews
-                setTimeout(function() {
-                    OSD.GUI.saveItem({id: 0});
-                }, 100);
-            }
-        });
-
-        $('#useCraftnameForMessages').on('change', function() {
-            OSD.GUI.updateDjiMessageElements(this.checked);
-        });
-
-        // Update RX data for Crossfire detection
-        mspHelper.loadRxConfig(function() {
-            useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
-        });
-
-        // Get status of ESC Telemetry
-        useESCTelemetry = false;
-        MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
-            for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
-                var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
-                if (serialPort.functions.indexOf("ESC") >= 0) {
-                    useESCTelemetry = true;
-                    break;
+            });
+    
+            $('.update_preview').on('change', function () {
+                if (OSD.data) {
+                    // Force an OSD redraw by saving any element
+                    // with a small delay, to make sure the setting
+                    // change is performance before the OSD starts
+                    // the full redraw.
+                    // This will also update all previews
+                    setTimeout(function() {
+                        OSD.GUI.saveItem({id: 0});
+                    }, 100);
                 }
+            });
+    
+            $('#useCraftnameForMessages').on('change', function() {
+                OSD.GUI.updateDjiMessageElements(this.checked);
+            });
+    
+            // Update RX data for Crossfire detection
+            mspHelper.loadRxConfig(function() {
+                useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+            });
+    
+            // Update SENSOR_CONFIG, used to detect
+            // OSD_AIR_SPEED
+            mspHelper.loadSensorConfig(function () {
+                useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
+                usePitot = (FC.SENSOR_CONFIG.pitot != 0);
+                GUI.content_ready(callback);
+            });
+    
+            if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
+                mspHelper.loadOsdCustomElements(createCustomElements);
             }
-        });
-
-        // Update SENSOR_CONFIG, used to detect
-        // OSD_AIR_SPEED
-        mspHelper.loadSensorConfig(function () {
-            useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
-            usePitot = (FC.SENSOR_CONFIG.pitot != 0);
-            GUI.content_ready(callback);
-        });
-
-        if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
-            mspHelper.loadOsdCustomElements(createCustomElements);
-        }
-    }));
+        }));
+    });
 };
 
 function createCustomElements(){
