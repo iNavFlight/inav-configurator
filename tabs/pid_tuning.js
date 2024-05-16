@@ -9,17 +9,15 @@ const mspHelper = require('./../js/msp/MSPHelper');
 const MSPCodes = require('./../js/msp/MSPCodes');
 const MSP = require('./../js/msp');
 const { GUI, TABS } = require('./../js/gui');
-const features = require('./../js/feature_framework');
 const tabs = require('./../js/tabs');
 const FC = require('./../js/fc');
 const Settings = require('./../js/settings');
 const i18n = require('./../js/localization');
 const { scaleRangeInt } = require('./../js/helpers');
-const SerialBackend = require('./../js/serial_backend');
-const BitHelper = require('./../js/bitHelper');
+const interval = require('./../js/intervals');
 
 TABS.pid_tuning = {
-
+    rateChartHeight: 117
 };
 
 TABS.pid_tuning.initialize = function (callback) {
@@ -32,10 +30,10 @@ TABS.pid_tuning.initialize = function (callback) {
     var loadChain = [
         mspHelper.loadPidData,
         mspHelper.loadRateDynamics,
+        mspHelper.loadRateProfileData,
         mspHelper.loadEzTune,
         mspHelper.loadMixerConfig,
     ];
-    loadChain.push(mspHelper.loadRateProfileData);
 
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
@@ -47,6 +45,75 @@ TABS.pid_tuning.initialize = function (callback) {
 
     function load_html() {
         GUI.load(path.join(__dirname, "pid_tuning.html"), Settings.processHtml(process_html));
+    }
+
+    function drawExpoCanvas(value, $element, color, width, height, clear) {
+        let context = $element.getContext("2d");
+
+        if (value < 0 || value > 1) {
+            return;
+        }
+
+        if (clear === true) {
+            context.clearRect(0, 0, width, height);
+        }
+
+        context.beginPath();
+        context.moveTo(0, height);
+        context.quadraticCurveTo(width / 2, height - ((height / 2) * (1 - value)), width, 0);
+        context.lineWidth = 2;
+        context.strokeStyle = color;
+        context.stroke();
+
+    };
+
+    function drawRollPitchYawExpo() {
+        let pitch_roll_curve = $('.pitch_roll_curve canvas').get(0);
+        let manual_expo_curve = $('.manual_expo_curve canvas').get(0);
+
+        drawExpoCanvas(
+            parseFloat($('#rate_rollpitch_expo').val()) / 100,
+            pitch_roll_curve,
+            '#a00000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            true
+        );
+        drawExpoCanvas(
+            parseFloat($('#rate_yaw_expo').val()) / 100,
+            pitch_roll_curve,
+            '#00a000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            false
+        );
+
+        drawExpoCanvas(
+            parseFloat($('#manual_rollpitch_expo').val()) / 100,
+            manual_expo_curve,
+            '#a00000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            true
+        );
+
+        drawExpoCanvas(
+            parseFloat($('#manual_yaw_expo').val()) / 100,
+            manual_expo_curve,
+            '#00a000',
+            200,
+            TABS.pid_tuning.rateChartHeight,
+            false
+        );
+
+        drawExpoCanvas(
+            Math.floor(scaleRange($('#ez_tune_expo').val(), 0, 200, 40, 100)) / 100,
+            $('#ez_tune_expo_curve canvas').get(0),
+            '#a00000',
+            250,
+            200,
+            true
+        );
     }
 
     function pid_and_rc_to_form() {
@@ -66,15 +133,6 @@ TABS.pid_tuning.initialize = function (callback) {
                 });
             }
         });
-
-        // Fill in data from FC.RC_tuning object
-        $('#rate-roll').val(FC.RC_tuning.roll_rate);
-        $('#rate-pitch').val(FC.RC_tuning.pitch_rate);
-        $('#rate-yaw').val(FC.RC_tuning.yaw_rate);
-
-        $('#rate-manual-roll').val(FC.RC_tuning.manual_roll_rate);
-        $('#rate-manual-pitch').val(FC.RC_tuning.manual_pitch_rate);
-        $('#rate-manual-yaw').val(FC.RC_tuning.manual_yaw_rate);
 
         $('#tpa').val(FC.RC_tuning.dynamic_THR_PID);
         $('#tpa-breakpoint').val(FC.RC_tuning.dynamic_THR_breakpoint);
@@ -98,17 +156,23 @@ TABS.pid_tuning.initialize = function (callback) {
             }
         });
 
-        // catch FC.RC_tuning changes
-        FC.RC_tuning.roll_rate = parseFloat($('#rate-roll').val());
-        FC.RC_tuning.pitch_rate = parseFloat($('#rate-pitch').val());
-        FC.RC_tuning.yaw_rate = parseFloat($('#rate-yaw').val());
+        // catch RC_tuning changes
+        FC.RC_tuning.roll_rate = parseFloat($('#rate_roll_rate').val());
+        FC.RC_tuning.pitch_rate = parseFloat($('#rate_pitch_rate').val());
+        FC.RC_tuning.yaw_rate = parseFloat($('#rate_yaw_rate').val());
+
+        FC.RC_tuning.RC_EXPO = parseFloat($('#rate_rollpitch_expo').val()) / 100;
+        FC.RC_tuning.RC_YAW_EXPO = parseFloat($('#rate_yaw_expo').val()) / 100;
 
         FC.RC_tuning.dynamic_THR_PID = parseInt($('#tpaRate').val());
         FC.RC_tuning.dynamic_THR_breakpoint = parseInt($('#tpaBreakpoint').val());
 
-        FC.RC_tuning.manual_roll_rate = $('#rate-manual-roll').val();
-        FC.RC_tuning.manual_pitch_rate = $('#rate-manual-pitch').val();
-        FC.RC_tuning.manual_yaw_rate = $('#rate-manual-yaw').val();
+        FC.RC_tuning.manual_roll_rate = $('#rate_manual_roll').val();
+        FC.RC_tuning.manual_pitch_rate = $('#rate_manual_pitch').val();
+        FC.RC_tuning.manual_yaw_rate = $('#rate_manual_yaw').val();
+
+        FC.RC_tuning.manual_RC_EXPO = $('#manual_rollpitch_expo').val() / 100;
+        FC.RC_tuning.manual_RC_YAW_EXPO = $('#manual_yaw_expo').val() / 100;
 
         // Rate Dynamics
         FC.RATE_DYNAMICS.sensitivityCenter = parseInt($('#rate_dynamics_center_sensitivity').val());
@@ -189,6 +253,11 @@ TABS.pid_tuning.initialize = function (callback) {
 
         if (!FC.isMultirotor()) {
             $('#ez-tune-switch').hide();
+            $('.only-for-multirotor').hide();
+        }
+
+        if (FC.isMultirotor()) {
+            $('.not-for-multirotor').hide();
         }
 
         $("#ez_tune_enabled").prop('checked', FC.EZ_TUNE.enabled).trigger('change');
@@ -208,6 +277,21 @@ TABS.pid_tuning.initialize = function (callback) {
         $('.ez-element').on('updated', function () {
             updatePreview();
         });
+
+        //Slider rates
+        GUI.sliderize($('#rate_roll_rate'), FC.RC_tuning.roll_rate, 40, 1000);
+        GUI.sliderize($('#rate_pitch_rate'), FC.RC_tuning.pitch_rate, 40, 1000);
+        GUI.sliderize($('#rate_yaw_rate'), FC.RC_tuning.yaw_rate, 40, 1000);
+
+        GUI.sliderize($('#rate_rollpitch_expo'), FC.RC_tuning.RC_EXPO * 100, 0, 100);
+        GUI.sliderize($('#rate_yaw_expo'), FC.RC_tuning.RC_YAW_EXPO * 100, 0, 100);
+
+        GUI.sliderize($('#rate_manual_roll'), FC.RC_tuning.manual_roll_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_pitch'), FC.RC_tuning.manual_pitch_rate, 0, 100);
+        GUI.sliderize($('#rate_manual_yaw'), FC.RC_tuning.manual_yaw_rate, 0, 100);
+
+        GUI.sliderize($('#manual_rollpitch_expo'), FC.RC_tuning.manual_RC_EXPO * 100, 0, 100);
+        GUI.sliderize($('#manual_yaw_expo'), FC.RC_tuning.manual_RC_YAW_EXPO * 100, 0, 100);
 
         updatePreview();
 
@@ -302,6 +386,10 @@ TABS.pid_tuning.initialize = function (callback) {
         if (!FC.isRpyDComponentUsed()) {
             $('.rpy_d').prop('disabled', 'disabled');
         }
+
+        interval.add("drawRollPitchYawExpo", function () {
+            drawRollPitchYawExpo();
+        }, 100);
 
         GUI.simpleBind();
 

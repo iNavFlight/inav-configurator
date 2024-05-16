@@ -1325,6 +1325,24 @@
     "portsFunction_SBUS_OUTPUT": {
         "message": "SBus Output"
     },
+    "pidTuning_Other": {
+        "message": "Other"
+    },
+    "pidTuning_Limits": {
+        "message": "Limits"
+    },
+    "pidTuning_HeadingHold_Rate": {
+        "message": "Heading Hold Rate (°/s)"
+    },
+    "pidTuning_Max_Inclination_Angle": {
+        "message": "Max Inclination Angle"
+    },
+    "pidTuning_Max_Roll": {
+        "message": "Roll (°/10)"
+    },
+    "pidTuning_Max_Pitch": {
+        "message": "Pitch (°/10)"
+    },
     "pidTuning_ShowAllPIDs": {
         "message": "Show all PIDs"
     },
@@ -1390,6 +1408,30 @@
     },
     "pidTuning_RatesAndExpo": {
         "message": "Rates & Expo"
+    },
+    "pidTuning_Rates_Stabilized": {
+        "message": "Stabilized Rates"
+    },
+    "pidTuning_Rates_Roll": {
+        "message": "Roll (°/s)"
+    },
+    "pidTuning_Rates_Pitch": {
+        "message": "Pitch (°/s)"
+    },
+    "pidTuning_Rates_Yaw": {
+        "message": "Yaw (°/s)"
+    },
+    "pidTuning_Expo_Stabilized": {
+        "message": "Stabilized Expo"
+    },
+    "pidTuning_Expo_Manual": {
+        "message": "Manual Expo"
+    },
+    "pidTuning_Expo_RollPitch": {
+        "message": "Roll & Pitch (%)"
+    },
+    "pidTuning_Expo_Yaw": {
+        "message": "Yaw (%)"
     },
     "pidTuning_RateDynamics": {
         "message": "Rate Dynamics"
@@ -1591,6 +1633,18 @@
     },
     "pidTuning_LoadedProfile": {
         "message": "Loaded Profile: <strong style=\"color: #37a8db\">$1</strong>"
+    },
+    "pidTuning_Manual_Rates": {
+        "message": "Manual Rates"
+    },
+    "pidTuning_Manual_Roll": {
+        "message": "Roll (%)"
+    },
+    "pidTuning_Manual_Pitch": {
+        "message": "Pitch (%)"
+    },
+    "pidTuning_Manual_Yaw": {
+        "message": "Yaw (%)"
     },
     "pidTuning_gyro_use_dyn_lpf": {
         "message": "Dynamic gyro LPF"
