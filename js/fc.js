@@ -406,7 +406,8 @@ var FC = {
             maxClimbRate: null,
             maxManualSpeed: null,
             maxManualClimbRate: null,
-            maxBankAngle: null,
+            maxBankAngleRoll: null,
+            maxBankAnglePitch: null,
             useThrottleMidForAlthold: null,
             hoverThrottle: null
         };

@@ -3019,11 +3019,17 @@
     "posholdMaxManualClimbRate": {
         "message": "Max. ALTHOLD climb rate [cm/s]"
     },
-    "posholdMaxBankAngle": {
-        "message": "Multirotor max. banking angle"
+    "posholdMaxRollBankAngle": {
+        "message": "Multirotor max. roll banking angle"
     },
-    "posholdMaxBankAngleHelp": {
+    "posholdMaxPitchBankAngle": {
+        "message": "Multirotor max. pitch banking angle"
+    },
+    "posholdMaxBankAngleRollHelp": {
         "message": "Maximum banking angle in navigation modes. Constrained by maximum ROLL angle in PID tuning tab."
+    },
+    "posholdMaxBankAnglePitchHelp": {
+        "message": "Maximum banking angle in navigation modes. Constrained by maximum PITCH angle in PID tuning tab."
     },
     "posholdHoverThrottle": {
         "message": "Hover throttle"
