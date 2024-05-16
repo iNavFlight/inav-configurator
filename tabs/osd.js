@@ -3028,8 +3028,8 @@ OSD.GUI.updatePreviews = function() {
 
     // crosshairs
     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        crsHNumber = Settings.getInputValue('osd_crosshairs_style');
-       if (crsHNumber == 1) {
+        let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
+        if (crsHNumber == 1) {
             // AIRCRAFT style
             OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
             OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
