@@ -52,7 +52,7 @@ TABS.auxiliary.initialize = function (callback) {
     // This object separates out the dividers. This is also used to order the modes
     const modeSections = {};
         modeSections["Arming"] = ["ARM", "PREARM"];
-        modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL"];
+        modeSections["Flight Modes"] = ["ANGLE", "HORIZON", "MANUAL", "ANGLE HOLD"];
         modeSections["Navigation Modes"] = ["NAV COURSE HOLD", "NAV CRUISE", "NAV POSHOLD", "NAV RTH", "NAV WP", "GCS NAV"];
         modeSections["Flight Mode Modifiers"] = ["NAV ALTHOLD", "HEADING HOLD", "AIR MODE", "SOARING", "SURFACE", "TURN ASSIST"];
         modeSections["Fixed Wing"] = ["AUTO TUNE", "SERVO AUTOTRIM", "AUTO LEVEL TRIM", "NAV LAUNCH", "LOITER CHANGE", "FLAPERON"];
@@ -504,7 +504,7 @@ TABS.auxiliary.initialize = function (callback) {
             })
             .prop("checked", !!hideUnusedModesStore)
             .trigger('change');
-        
+
         // update ui instantly on first load
         update_ui();
 
