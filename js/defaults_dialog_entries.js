@@ -6,7 +6,7 @@ var defaultsDialogData = [
         "id": 76,
         "notRecommended": false,
         "reboot": true,
-        "wizardPages": ['receiver', 'outputs', 'gps', 'filters', 'pids'],
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "applied_defaults",

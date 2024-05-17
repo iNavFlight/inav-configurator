@@ -13,6 +13,8 @@ const jBox = require('./libraries/jBox/jBox.min');
 const i18n = require('./localization');
 const defaultsDialogData = require('./defaults_dialog_entries.js');
 const Settings = require('./settings.js');
+const serialPortHelper = require('./serialPortHelper');
+const wizardUiBindings = require('./wizard_ui_bindings');
 
 var savingDefaultsModal;
 
@@ -22,6 +24,8 @@ var defaultsDialog = (function () {
         privateScope = {};
 
     let $container;
+
+    privateScope.wizardSettings = {};
 
     publicScope.init = function () {
         mspHelper.getSetting("applied_defaults").then(privateScope.onInitSettingReturned);
@@ -50,16 +54,22 @@ var defaultsDialog = (function () {
     };
 
     privateScope.saveWizardStep = function (selectedDefaultPreset, wizardStep) {
-        //TODO add saving logic
+        const steps = selectedDefaultPreset.wizardPages;
+        const stepName = steps[wizardStep];
+
+        if (stepName == "receiver") {
+            let $receiverPort = $container.find('#wizard-receiver-port');
+            let receiverPort = $receiverPort.val();
+
+            if (receiverPort != "-1") {
+                privateScope.wizardSettings['receiverPort'] = receiverPort;
+            }
+
+            privateScope.wizardSettings['receiverProcol'] = $container.find('#wizard-receiver-protocol').val();
+        }
 
         privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
     };
-
-    privateScope.handleTabLoadReceiver = function ($content) {
-        console.log('ready to handle receiver');
-
-
-    },
 
     privateScope.wizard = function (selectedDefaultPreset, wizardStep) {
 
@@ -94,7 +104,10 @@ var defaultsDialog = (function () {
                     });
 
                     if (stepName == "receiver") {
-                        privateScope.handleTabLoadReceiver($content);
+                        /**
+                         * Bindings executed when the receiver wizard tab is loaded
+                         */
+                        wizardUiBindings.receiver($content);
                     }
 
                     Settings.configureInputs().then(
