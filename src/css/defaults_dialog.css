@@ -53,6 +53,12 @@
     display: inline-block;
 }
 
+.defaults-dialog__wizard p {
+    margin-top: 1em;
+    font-size: 0.9em;
+    color:#444;
+}
+
 .defaults-dialog__content--wrapper {
     overflow-y: auto;
 }
