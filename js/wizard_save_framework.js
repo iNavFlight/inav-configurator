@@ -9,11 +9,18 @@ var wizardSaveFramework = (function () {
     let self = {};
 
     self.saveSetting = function (config, callback) {
-        
+        /*
+        serialrx_provider to 2
+        serialrx_provider to 6
+        */
+       
         switch (config.name) {
             case 'receiverPort':
                 serialPortHelper.set(config.value, 'RX_SERIAL', null);
                 mspHelper.saveSerialPorts(callback);
+                break;
+            case 'receiverProtocol':
+                mspHelper.setSetting('serialrx_provider', config.value, callback);
                 break;
             default:
                 callback();

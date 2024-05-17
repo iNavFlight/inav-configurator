@@ -70,7 +70,7 @@ var defaultsDialog = (function () {
 
             privateScope.wizardSettings.push({
                 name: "receiverProtocol",
-                value: $container.find('#wizard-receiver-protocol').val()
+                value: $container.find('#wizard-receiver-protocol option:selected').text()
             });
         }
 

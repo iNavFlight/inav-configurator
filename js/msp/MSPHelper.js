@@ -3231,7 +3231,7 @@ var mspHelper = (function () {
         this.encodeSetting(name, value).then(function (data) {
             return MSP.promise(MSPCodes.MSPV2_SET_SETTING, data).then(callback);
         }).catch(error =>  {
-            console.log("Invalid setting: " + name);
+            console.log("Invalid setting: " + name, error);
             return Promise.resolve().then(callback);
         });
     };
