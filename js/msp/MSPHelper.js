@@ -1847,6 +1847,7 @@ var mspHelper = (function () {
                 break;
 
             case MSPCodes.MSP2_SET_CF_SERIAL_CONFIG:
+                console.log('will crunch', FC.SERIAL_CONFIG);
                 for (let i = 0; i < FC.SERIAL_CONFIG.ports.length; i++) {
                     var serialPort = FC.SERIAL_CONFIG.ports[i];
 

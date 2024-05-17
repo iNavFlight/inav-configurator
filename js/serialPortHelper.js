@@ -332,9 +332,14 @@ const serialPortHelper = (function () {
 
     publicScope.set = function(port, functionName, baudrate) {
 
+        console.log('Start', FC.SERIAL_CONFIG);
+
         publicScope.clearByFunction(functionName);
 
         let config = publicScope.getPortByIdentifier(port);
+
+        console.log('Config to change', config);
+
         if (config) {
 
             config.functions = [functionName];

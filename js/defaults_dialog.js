@@ -13,8 +13,8 @@ const jBox = require('./libraries/jBox/jBox.min');
 const i18n = require('./localization');
 const defaultsDialogData = require('./defaults_dialog_entries.js');
 const Settings = require('./settings.js');
-const serialPortHelper = require('./serialPortHelper');
 const wizardUiBindings = require('./wizard_ui_bindings');
+const wizardSaveFramework = require('./wizard_save_framework');
 
 var savingDefaultsModal;
 
@@ -25,7 +25,7 @@ var defaultsDialog = (function () {
 
     let $container;
 
-    privateScope.wizardSettings = {};
+    privateScope.wizardSettings = [];
 
     publicScope.init = function () {
         mspHelper.getSetting("applied_defaults").then(privateScope.onInitSettingReturned);
@@ -62,10 +62,16 @@ var defaultsDialog = (function () {
             let receiverPort = $receiverPort.val();
 
             if (receiverPort != "-1") {
-                privateScope.wizardSettings['receiverPort'] = receiverPort;
+                privateScope.wizardSettings.push({
+                    name: "receiverPort",
+                    value: receiverPort
+                });
             }
 
-            privateScope.wizardSettings['receiverProcol'] = $container.find('#wizard-receiver-protocol').val();
+            privateScope.wizardSettings.push({
+                name: "receiverProtocol",
+                value: $container.find('#wizard-receiver-protocol').val()
+            });
         }
 
         privateScope.wizard(selectedDefaultPreset, wizardStep + 1);
@@ -77,12 +83,19 @@ var defaultsDialog = (function () {
         const stepsCount = selectedDefaultPreset.wizardPages.length;
         const stepName = steps[wizardStep];
 
-        console.log(steps[wizardStep], wizardStep, stepsCount);
-
         if (wizardStep >= stepsCount) {
             //This is the last step, time to finalize
             $container.hide();
-            privateScope.saveAndReboot();
+
+            wizardSaveFramework.persist(privateScope.wizardSettings, function () {
+                mspHelper.saveToEeprom(function () {
+                    //noinspection JSUnresolvedVariable
+                    GUI.log(i18n.getMessage('configurationEepromSaved'));
+                    if (selectedDefaultPreset.reboot) {
+                        privateScope.reboot();
+                    }
+                });
+            });
         } else {
             const $content = $container.find('.defaults-dialog__wizard');
 
@@ -126,7 +139,7 @@ var defaultsDialog = (function () {
 
     };
 
-    privateScope.saveAndReboot = function () {
+    privateScope.reboot = function () {
 
         GUI.tab_switch_cleanup(function () {
             MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
@@ -149,7 +162,7 @@ var defaultsDialog = (function () {
                 //noinspection JSUnresolvedVariable
                 GUI.log(i18n.getMessage('configurationEepromSaved'));
                 if (selectedDefaultPreset.reboot) {
-                    privateScope.saveAndReboot();
+                    privateScope.reboot();
                 }
             });
         }
