@@ -2,6 +2,19 @@
 
 var defaultsDialogData = [
     {
+        "title": 'Wizard',
+        "id": 76,
+        "notRecommended": false,
+        "reboot": true,
+        "wizardPages": ['receiver', 'outputs', 'gps', 'filters', 'pids'],
+        "settings": [
+            {
+                key: "applied_defaults",
+                value: 1
+            }
+        ]
+    },
+    {
         "title": 'Mini Quad with 3" propellers',
         "id": 6,
         "notRecommended": false,

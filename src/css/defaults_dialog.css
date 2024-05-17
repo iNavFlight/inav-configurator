@@ -40,6 +40,19 @@
     padding: 1em;
 }
 
+.defaults-dialog__wizard {
+    font-size: 1.2em;
+}
+
+.defaults-dialog__wizard > div {
+    margin-top: 1em;
+}
+
+.defaults-dialog__wizard label {
+    min-width: 30%;
+    display: inline-block;
+}
+
 .defaults-dialog__content--wrapper {
     overflow-y: auto;
 }
