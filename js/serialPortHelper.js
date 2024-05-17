@@ -335,6 +335,7 @@ const serialPortHelper = (function () {
         publicScope.clearByFunction(functionName);
 
         let config = publicScope.getPortByIdentifier(port);
+
         if (config) {
 
             config.functions = [functionName];

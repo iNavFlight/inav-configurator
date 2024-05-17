@@ -20,8 +20,12 @@
                 <div class="modal__text" data-i18n="appUpdateNotificationDescription"></div>
             </div>
             <div class="modal__buttons modal__buttons--upbottom">
-                <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" id="update-notification-download" class="modal__button modal__button--main modal__button--main--inline" data-i18n="downloadUpdatesBtn"></a>
-                <a id="update-notification-close" class="modal__button modal__button--main modal__button--main--inline" data-i18n="closeUpdateBtn"></a>
+                <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank"
+                    id="update-notification-download"
+                    class="modal__button modal__button--main modal__button--main--inline"
+                    data-i18n="downloadUpdatesBtn"></a>
+                <a id="update-notification-close" class="modal__button modal__button--main modal__button--main--inline"
+                    data-i18n="closeUpdateBtn"></a>
             </div>
         </div>
         <div class="headerbar">
@@ -53,31 +57,31 @@
                         <div class="dropdown dropdown-dark portsinput__top-element">
                             <!--suppress HtmlFormInputWithoutLabel -->
                             <select class="dropdown-select" id="port" title="Port">
-                            <option value="manual" i18n="mainManual"></option>
-                            <!-- port list gets generated here -->
-                        </select>
+                                <option value="manual" i18n="mainManual"></option>
+                                <!-- port list gets generated here -->
+                            </select>
                         </div>
                         <div class="dropdown dropdown-dark portsinput__top-element">
                             <!--suppress HtmlFormInputWithoutLabel -->
                             <select class="dropdown-select" id="baud" title="Baud Rate">
-                            <option value="115200" selected="selected">115200</option>
-                            <option value="57600">57600</option>
-                            <option value="38400">38400</option>
-                            <option value="28800">28800</option>
-                            <option value="19200">19200</option>
-                            <option value="14400">14400</option>
-                            <option value="9600">9600</option>
-                            <option value="4800">4800</option>
-                            <option value="2400">2400</option>
-                            <option value="1200">1200</option>
-                        </select>
+                                <option value="115200" selected="selected">115200</option>
+                                <option value="57600">57600</option>
+                                <option value="38400">38400</option>
+                                <option value="28800">28800</option>
+                                <option value="19200">19200</option>
+                                <option value="14400">14400</option>
+                                <option value="9600">9600</option>
+                                <option value="4800">4800</option>
+                                <option value="2400">2400</option>
+                                <option value="1200">1200</option>
+                            </select>
                         </div>
                     </div>
                     <div class="portsinput__row">
                         <div class="portsinput__top-element portsinput__top-element--inline">
                             <label for="wireless-mode">
-                            <span class="" data-i18n="wirelessModeSwitch"></span>
-                        </label>
+                                <span class="" data-i18n="wirelessModeSwitch"></span>
+                            </label>
                             <input id="wireless-mode" class=" togglesmall" type="checkbox" />
                         </div>
                     </div>
@@ -106,10 +110,10 @@
                             <form name="profile-change" id="profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select class="dropdown-select" id="profilechange">
-                                <option value="0" i18n="sensorProfile1"></option>
-                                <option value="1" i18n="sensorProfile2"></option>
-                                <option value="2" i18n="sensorProfile3"></option>
-                            </select>
+                                    <option value="0" i18n="sensorProfile1"></option>
+                                    <option value="1" i18n="sensorProfile2"></option>
+                                    <option value="2" i18n="sensorProfile3"></option>
+                                </select>
                             </form>
                         </div>
                     </div>
@@ -118,10 +122,10 @@
                             <form name="battery-profile-change" id="battery-profile-change">
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select class="dropdown-select" id="batteryprofilechange">
-                                <option value="0" i18n="sensorBatteryProfile1"></option>
-                                <option value="1" i18n="sensorBatteryProfile2"></option>
-                                <option value="2" i18n="sensorBatteryProfile3"></option>
-                            </select>
+                                    <option value="0" i18n="sensorBatteryProfile1"></option>
+                                    <option value="1" i18n="sensorBatteryProfile2"></option>
+                                    <option value="2" i18n="sensorBatteryProfile3"></option>
+                                </select>
                             </form>
                         </div>
                     </div>
@@ -228,13 +232,16 @@
                         <a href="#" data-i18n="tabLanding" class="tabicon ic_welcome" title="Welcome"></a>
                     </li>
                     <li class="tab_help">
-                        <a href="https://github.com/iNavFlight/inav/wiki" target="_blank" data-i18n="tabHelp" class="tabicon ic_help" title="Documentation &amp; Support"></a>
+                        <a href="https://github.com/iNavFlight/inav/wiki" target="_blank" data-i18n="tabHelp"
+                            class="tabicon ic_help" title="Documentation &amp; Support"></a>
                     </li>
                     <li class="tab_mission_control">
-                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission" title="Mission Control"></a>
+                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
+                            title="Mission Control"></a>
                     </li>
                     <li class="tab_firmware_flasher">
-                        <a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher" title="Firmware Flasher"></a>
+                        <a href="#" data-i18n="tabFirmwareFlasher" class="tabicon ic_flasher"
+                            title="Firmware Flasher"></a>
                     </li>
                     <li class="tab_sitl">
                         <a href="#" data-i18n="tabSitl" class="tabicon ic_sitl" title="SITL"></a>
@@ -266,7 +273,8 @@
                         <a href="#" data-i18n="tabPidTuning" class="tabicon ic_pid" data-i18n_title="tabPidTuning"></a>
                     </li>
                     <li class="tab_advanced_tuning">
-                        <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced" title="Advanced Tuning"></a>
+                        <a href="#" data-i18n="tabAdvancedTuning" class="tabicon ic_advanced"
+                            title="Advanced Tuning"></a>
                     </li>
                     <li class="tab_programming">
                         <a href="#" data-i18n="tabProgramming" class="tabicon ic_config" title="Programming"></a>
@@ -287,7 +295,8 @@
                         <a href="#" data-i18n="tabMAGNETOMETER" class="tabicon ic_mag" title="MAGNETOMETER"></a>
                     </li>
                     <li class="tab_mission_control">
-                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission" title="Mission Control"></a>
+                        <a href="#" data-i18n="tabMissionControl" class="tabicon ic_mission"
+                            title="Mission Control"></a>
                     </li>
                     <li class="tab_osd">
                         <a href="#" data-i18n="tabOSD" class="tabicon ic_osd" title="OSD"></a>
@@ -359,7 +368,9 @@
         <div data-i18n="savingDefaults"></div>
     </div>
     <div id="defaults-wrapper" style="display: none">
+
         <div class="defaults-dialog__background"></div>
+        <div class="defaults-dialog__wizard"></div>
         <div class="defaults-dialog__content">
             <div class="tab_title" data-i18n="defaultsDialogTitle"></div>
             <div class="defaults-dialog__content--wrapper">
