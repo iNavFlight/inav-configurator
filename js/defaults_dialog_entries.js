@@ -2,25 +2,12 @@
 
 var defaultsDialogData = [
     {
-        "title": 'Wizard',
-        "id": 76,
-        "notRecommended": false,
-        "reboot": true,
-        "wizardPages": ['receiver'],
-        "settings": [
-            {
-                key: "applied_defaults",
-                value: 1
-            }
-        ]
-    },
-    {
         "title": 'Mini Quad with 3" propellers',
         "id": 6,
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
-        "wizardPages": ['receiver', 'outputs', 'gps', 'filters', 'pids'],
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -142,6 +129,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -282,6 +270,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 3,
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -403,6 +392,7 @@ var defaultsDialogData = [
         "id": 3,
         "reboot": true,
         "mixerToApply": 14,
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -608,6 +598,7 @@ var defaultsDialogData = [
         "id": 4,
         "reboot": true,
         "mixerToApply": 8,
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
@@ -813,6 +804,7 @@ var defaultsDialogData = [
         "notRecommended": false,
         "reboot": true,
         "mixerToApply": 31,
+        "wizardPages": ['receiver'],
         "settings": [
             {
                 key: "model_preview_type",
