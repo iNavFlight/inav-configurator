@@ -346,10 +346,9 @@ var defaultsDialog = (function () {
 
     privateScope.onInitSettingReturned = function (promise) {
 
-        //FIXME for now we trigger wizard always
-        // if (promise.value > 0) {
-        //     return; //Defaults were applied, we can just ignore
-        // }
+        if (promise.value > 0) {
+            return; //Defaults were applied, we can just ignore
+        }
 
         privateScope.render();
         $container.show();
