@@ -430,34 +430,211 @@ button {
     left: calc(50% - 197px);
 }
 
-.tab-osd .preview_hd {
+.tab-osd .preview_bfhdcompat {
+    width: 636px !important; /* 12 X char width */
+    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.tab-osd .hd_bfhdcompat_43_left {
+    border-left: 2px solid red;
+    position: absolute;
+    /*left: 77.5px; // Calculated correct position */
+    left: 70px;
+    height: calc(100% - 27px);
+}
+
+.tab-osd .hd_bfhdcompat_43_right {
+    border-right: 2px solid red;
+    position: absolute;
+    /* right: 77.5px; // Calculated correct position */
+    right: 70px;
+    height: calc(100% - 27px);
+}
+
+.tab-osd .preview_bfhdcompat_side {
+	width: calc(50% - 335px) !important;
+}
+
+.tab-osd .preview_avatar {
+    width: 636px !important; /* 12 X char width */
+    left: calc(50% - 335px) !important; /* width / 2 + 17 */
+}
+
+.tab-osd .hd_avatar_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	/*left: 77.5px; // Calculated correct position */
+    left: 30px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .hd_avatar_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	/* right: 77.5px; // Calculated correct position */
+    right: 36px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_avatar_side {
+	width: calc(50% - 335px) !important;
+}
+
+.tab-osd .preview_hdzero {
     width: 600px !important;
     left: calc(50% - 317px) !important;
 }
 
-.tab-osd .hd_43_left {
-	border-left: 1px solid red;
+.tab-osd .hdzero_43_left {
+	border-left: 2px solid red;
 	position: absolute;
 	left: 60px;
 	height: calc(100% - 27px);
 }
 
-.tab-osd .hd_43_right {
-	border-right: 1px solid red;
+.tab-osd .hdzero_43_right {
+	border-right: 2px solid red;
 	position: absolute;
 	right: 60px;
 	height: calc(100% - 27px);
 }
 
-.tab-osd .preview_hd_side {
+.tab-osd .preview_hdzero_side {
 	width: calc(50% - 317px) !important;
+}
+
+.tab-osd .preview_dji_hd {
+    width: 720px !important;
+    left: calc(50% - 377px) !important;
+}
+
+.tab-osd .dji_hd_43_left {
+	border-left: 2px solid red;
+	position: absolute;
+	left: 84px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .dji_hd_43_right {
+	border-right: 2px solid red;
+	position: absolute;
+	right: 84px;
+	height: calc(100% - 27px);
+}
+
+.tab-osd .preview_dji_hd_side {
+	width: calc(50% - 377px) !important;
+}
+
+.tab-osd .hd_3016_top {
+    border-top: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    left: 120px;
+    width: 360px;
+}
+
+.tab-osd .hd_3016_bottom {
+    border-bottom: 2px solid blue;
+    position: absolute;
+    bottom: 18px;
+    left: 120px;
+    width: 360px;
+}
+
+.tab-osd .hd_3016_left {
+    border-left: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    left: 120px;
+    height: 288px;
+}
+
+.tab-osd .hd_3016_right {
+    border-right: 2px solid blue;
+    position: absolute;
+    top: 46px;
+    right: 120px;
+    height: 288px;
+}
+
+.tab-osd .hd_bfhdcompat_bottom {
+    border: 2px solid purple;
+    position: absolute;
+    height: 70px;
+    bottom: 0px;
+    left: 450px;
+    right: 0px;
+    pointer-events: none;
+}
+
+.tab-osd .hd_bfhdcompat_storagebox {
+    border: 2px solid purple;
+    position: absolute;
+    top: 115px;
+    height: 55px;
+    right: 0px;
+    width: 80px;
+    pointer-events: none;
+}
+
+.tab-osd .hd_avatar_bottom {
+    border-bottom: 2px solid purple;
+    position: absolute;
+    bottom: 33px;
+    left: 0px;
+    right: 0px;
+}
+
+.tab-osd .hd_avatar_storagebox_t {
+    border-top: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 1px;
+    right: 34px;
+    width: 48px;
+}
+
+.tab-osd .hd_avatar_storagebox_b {
+    border-bottom: 2px solid purple;
+    position: absolute;
+    top: 88px;
+    height: 1px;
+    right: 34px;
+    width: 48px;
+}
+
+.tab-osd .hd_avatar_storagebox_l {
+    border-left: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 35px;
+    right: 80px;
+    width: 1px;
+}
+
+.tab-osd .hd_avatar_storagebox_r {
+    border-right: 2px solid purple;
+    position: absolute;
+    top: 56px;
+    height: 35px;
+    right: 32px;
+    width: 1px;
+}
+
+.tab-osd .ntsc_bottom {
+    border-bottom: 2px solid green;
+    position: absolute;
+    bottom: 54px;
+    left: 0px;
+    width: 100%;
 }
 
 .tab-osd .preview {
     /* please don't copy the generic background image from another project
      * and replace the one that @nathantsoi took :)
      */
-    background: url(/images/osd-bg-1.jpg);
+    background: url(./../../../images/osd-bg-1.jpg);
     background-size: cover;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -538,8 +715,52 @@ button {
 }
 
 .tab-osd .settings select,
-.tab-osd .settings input, 
+.tab-osd .settings input,
 .tab-osd .osd_settings .switchery,
 .tab-osd .unit_wrapper {
     vertical-align: top;
+}
+
+.osdCustomElement_main_table {
+    width: 100%;
+    table-layout: fixed;
+    max-width: 400px;
+}
+
+.osdCustomElement_main_table td{
+    max-width: 80px;
+}
+
+.osdCustomElement_main_table select, .osdCustomElement_main_table input{
+    width: 100% !important;
+}
+
+.settings .btn a{
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'open_sansbold', Arial, serif;
+    font-size: 12px;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0 9px;
+    line-height: 22px;
+}
+
+.settings .btn_blue a{
+    background-color: #37a8db;
+    border: 1px solid #3394b5;
+}
+
+.settings .btn_danger a{
+    background-color: #e2a2a2;
+    border: 1px solid #e58383;
+}
+
+
+.settings .btn a:hover {
+    background-color: #3394b5;
+    transition: all ease 0.2s;
 }

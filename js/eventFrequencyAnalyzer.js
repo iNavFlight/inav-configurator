@@ -1,12 +1,11 @@
-'use s';
+'use strict';
 
-var helper = helper || {};
 
 /**
  * Simple analyzer that returns frequency of events using 5s buffer
  * Usage: register periodic events with 'put', then call 'get' to get results
  */
-helper.eventFrequencyAnalyzer = (function () {
+var eventFrequencyAnalyzer = (function () {
 
     var privateScope = {},
         publicScope = {},
@@ -75,3 +74,5 @@ helper.eventFrequencyAnalyzer = (function () {
 
     return publicScope;
 })();
+
+module.exports = eventFrequencyAnalyzer;

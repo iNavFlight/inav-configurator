@@ -1,16 +1,67 @@
 'use strict';
 
+const mapSeries = require('promise-map-series')
+
+const mspHelper = require('./../js/msp/MSPHelper');
+const { GUI } = require('./gui');
+const FC = require('./fc');
+const { globalSettings, UnitType } = require('./globalSettings');
+const i18n = require('./localization');
+
+function padZeros(val, length) {
+    let str = val.toString();
+
+    if (str.length < length) {
+        if (str.charAt(0) === '-') {
+            str = "-0" + str.substring(1);
+            str = padZeros(str, length);
+        } else {
+            str = padZeros("0" + str, length);
+        }
+    }
+
+    return str;
+}
+
 var Settings = (function () {
     let self = {};
+
+    self.fillSelectOption = function(s, ii) {
+        var name = (s.setting.table ? s.setting.table.values[ii] : null);
+        if (name) {
+            var localizedName = i18n.getMessage(name);
+            if (localizedName) {
+                name = localizedName;
+            }
+        } else {
+            // Fallback to the number itself
+            name = ii;
+        }
+        var option = $('<option/>').attr('value', ii).text(name);
+        if (ii == s.value) {
+            option.prop('selected', true);
+        }
+        return option;
+    }
 
     self.configureInputs = function() {
         var inputs = [];
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
+        return mapSeries(inputs, function (input, ii) {
             var settingName = input.data('setting');
             var inputUnit = input.data('unit');
+
+            let elementId = input.attr('id');
+            if (elementId === undefined) {
+
+                // If the element ID is not defined, we need to create one
+                // based on the setting name. If this ID exists, we will not create it
+                if ($('#' + settingName).length === 0) {
+                    input.attr('id', settingName);
+                }
+            }
 
             if (globalSettings.showProfileParameters) {
                 if (FC.isBatteryProfileParameter(settingName)) {
@@ -43,24 +94,25 @@ var Settings = (function () {
                 if (input.prop('tagName') == 'SELECT' || s.setting.table) {
                     if (input.attr('type') == 'checkbox') {
                         input.prop('checked', s.value > 0);
+                    } else if (input.attr('type') == 'radio') {
+                        input.prop( 'checked', s.value == input.attr('value') );
                     } else {
                         input.empty();
-                        for (var ii = s.setting.min; ii <= s.setting.max; ii++) {
-                            var name = (s.setting.table ? s.setting.table.values[ii] : null);
-                            if (name) {
-                                var localizedName = chrome.i18n.getMessage(name);
-                                if (localizedName) {
-                                    name = localizedName;
-                                }
-                            } else {
-                                // Fallback to the number itself
-                                name = ii;
+                        let option = null;
+                        if (input.data('setting-invert-select') === true) {
+                            for (var ii = s.setting.max; ii >= s.setting.min; ii--) {
+                                option = null;
+                                option = self.fillSelectOption(s, ii);
+
+                                option.appendTo(input);
                             }
-                            var option = $('<option/>').attr('value', ii).text(name);
-                            if (ii == s.value) {
-                                option.prop('selected', true);
+                        } else {
+                            for (var ii = s.setting.min; ii <= s.setting.max; ii++) {
+                                option = null;
+                                option = self.fillSelectOption(s, ii);
+
+                                option.appendTo(input);
                             }
-                            option.appendTo(input);
                         }
                     }
                 } else if (s.setting.type == 'string') {
@@ -68,107 +120,27 @@ var Settings = (function () {
                     input.attr('maxlength', s.setting.max);
                 } else if (input.data('presentation') == 'range') {
                     
-                    let scaledMax;
-                    let scaledMin;
-                    let scalingThreshold;
-
-                    if (input.data('normal-max')) {
-                        scaledMax = s.setting.max * 2;
-                        scalingThreshold = Math.round(scaledMax * 0.8);
-                        scaledMin = s.setting.min *2;
-                    } else {
-                        scaledMax = s.setting.max;
-                        scaledMin = s.setting.min;
-                        scalingThreshold = scaledMax;
-                    }
-
-                    
-                    let $range = $('<input type="range" min="' + scaledMin + '" max="' + scaledMax + '" value="' + s.value + '"/>');
-                    if (input.data('step')) {
-                        $range.attr('step', input.data('step'));
-                    }
-                    $range.css({
-                        'display': 'block',
-                        'flex-grow': 100,
-                        'margin-left': '1em',
-                        'margin-right': '1em',
-                    });
-                    
-                    input.attr('min', s.setting.min);
-                    input.attr('max', s.setting.max);
-                    input.val(parseInt(s.value));
-                    input.css({
-                        'width': 'auto',
-                        'min-width': '75px',
-                    });
-                    
-                    input.parent().css({
-                        'display': 'flex',
-                        'width': '100%'
-                    });
-                    $range.insertAfter(input);
-
-                    input.parent().find('.helpicon').css({
-                        'top': '5px',
-                        'left': '-10px'
-                    });
-
-                    /*
-                     * Update slider to input
-                     */
-                    $range.on('input', function() {
-                        let val = $(this).val();
-                        let normalMax = parseInt(input.data('normal-max'));
-
-                        if (normalMax) {
-                            if (val <= scalingThreshold) {
-                                val = scaleRangeInt(val, scaledMin, scalingThreshold, s.setting.min, normalMax);
-                            } else {
-                                val = scaleRangeInt(val, scalingThreshold + 1, scaledMax, normalMax + 1, s.setting.max);
-                            }
-                        }
-
-                        input.val(val);
-                    });
-
-                    input.on('change', function() {
-
-                        let val = $(this).val();
-                        let newVal;
-                        let normalMax = parseInt(input.data('normal-max'));
-                        if (normalMax) {
-                            if (val <= normalMax) {
-                                newVal = scaleRangeInt(val, s.setting.min, normalMax, scaledMin, scalingThreshold);
-                            } else {
-                                newVal = scaleRangeInt(val, normalMax + 1, s.setting.max, scalingThreshold + 1, scaledMax);
-                            }
-                        } else {
-                            newVal = val;
-                        }
-
-                        $range.val(newVal);
-                    });
-
-                    input.trigger('change');
+                    GUI.sliderize(input, s.value, s.setting.min, s.setting.max);
 
                 } else if (s.setting.type == 'float') {
                     input.attr('type', 'number');
 
                     let dataStep = input.data("step");
 
-                    if (dataStep !== undefined) {
-                        input.attr('step', dataStep);
-                    } else {
-                        input.attr('step', "0.01");
+                    if (typeof dataStep === 'undefined') {
+                        dataStep = self.countDecimals(s.value);
+                        dataStep = 1 / Math.pow(10, dataStep);
+                        input.data("step", dataStep);
                     }
 
+                    input.attr('step', dataStep);
                     input.attr('min', s.setting.min);
                     input.attr('max', s.setting.max);
-                    input.val(s.value.toFixed(2));
-
+                    input.val(s.value.toFixed(self.countDecimals(dataStep)));
                 } else {
                     var multiplier = parseFloat(input.data('setting-multiplier') || 1);
 
+                    input.data("step", 1);
                     input.val((s.value / multiplier).toFixed(Math.log10(multiplier)));
                     input.attr('type', 'number');
                     if (typeof s.setting.min !== 'undefined' && s.setting.min !== null) {
@@ -186,8 +158,9 @@ var Settings = (function () {
 
                 input.data('setting-info', s.setting);
                 if (input.data('live')) {
-                    input.change(function() {
-                        self.saveInput(input);
+                    input.on('change', function () {
+                        const settingPair = self.processInput(input);
+                        return mspHelper.setSetting(settingPair.setting, settingPair.value);
                     });
                 }
             });
@@ -233,48 +206,101 @@ var Settings = (function () {
 
         const oldValue = element.val();
 
-        //display names for the units
-        const unitDisplayDames = {
+        // Display names for the units
+        const unitDisplayNames = {
             // Misc
-            'us' : "uS",
             'cw' : 'cW',
-            'percent' : '%',
-            'cmss' : 'cm/s/s',
+            'percent'   : '%',
+            'cmss'      : 'cm/s/s',
             // Time
-            'msec' : 'ms',
-            'msec-nc' : 'ms', // Milliseconds, but not converted.
-            'dsec' : 'ds',
-            'sec' : 's',
+            'us'        : "uS",
+            'msec'      : 'ms',
+            'msec-nc'   : 'ms', // Milliseconds, but not converted.
+            'dsec'      : 'ds',
+            'sec'       : 's',
+            'mins'      : 'm',
+            'hours'     : 'h',
+            'tzmins'    : 'm',
+            'tzhours'   : 'hh:mm',
             // Angles
-            'deg' : '&deg;',
-            'decideg' : 'deci&deg;',
-            'decideg-lrg' : 'deci&deg;', // Decidegrees, but always converted to degrees by default
+            'centideg'      : 'centi&deg;',
+            'centideg-deg'  : 'centi&deg;', // Centidegrees, but always converted to degrees by default
+            'deg'           : '&deg;',
+            'decideg'       : 'deci&deg;',
+            'decideg-lrg'   : 'deci&deg;', // Decidegrees, but always converted to degrees by default
             // Rotational speed
-            'degps' : '&deg; per second',
+            'degps'     : '&deg; per second',
             'decadegps' : 'deca&deg; per second',
             // Temperature
-            'decidegc' : 'deci&deg;C',
-            'degc' : '&deg;C',
-            'degf' : '&deg;F',
+            'decidegc'  : 'deci&deg;C',
+            'degc'      : '&deg;C',
+            'degf'      : '&deg;F',
             // Speed
-            'cms' : 'cm/s',
-            'v-cms' : 'cm/s',
-            'ms' : 'm/s',
-            'kmh' : 'Km/h',
-            'mph' : 'mph',
-            'hftmin' : 'x100 ft/min',
-            'fts' : 'ft/s',
-            'kt' : 'Kt',
+            'cms'       : 'cm/s',
+            'v-cms'     : 'cm/s',
+            'ms'        : 'm/s',
+            'kmh'       : 'Km/h',
+            'mph'       : 'mph',
+            'hftmin'    : 'x100 ft/min',
+            'fts'       : 'ft/s',
+            'kt'        : 'Kt',
             // Distance
-            'cm' : 'cm',
-            'm' : 'm',
-            'km' : 'Km',
+            'cm'    : 'cm',
+            'm'     : 'm',
+            'km'    : 'Km',
             'm-lrg' : 'm', // Metres, but converted to larger units
-            'ft' : 'ft',
-            'mi' : 'mi',
-            'nm' : 'NM'
+            'ft'    : 'ft',
+            'mi'    : 'mi',
+            'nm'    : 'NM'
         }
 
+        // Hover full descriptions for the units
+        const unitExpandedNames = {
+            // Misc
+            'cw'        : 'CentiWatts',
+            'percent'   : 'Percent',
+            'cmss'      : 'Centimetres per second, per second',
+            // Time
+            'us'        : "Microseconds",
+            'msec'      : 'Milliseconds',
+            'msec-nc'   : 'Milliseconds',
+            'dsec'      : 'Deciseconds',
+            'sec'       : 'Seconds',
+            'mins'      : 'Minutes',
+            'hours'     : 'Hours',
+            'tzmins'    : 'Minutes',
+            'tzhours'   : 'Hours:Minutes',
+            // Angles
+            'centideg'      : 'CentiDegrees',
+            'centideg-deg'  : 'CentiDegrees',
+            'deg'           : 'Degrees',
+            'decideg'       : 'DeciDegrees',
+            'decideg-lrg'   : 'DeciDegrees',
+            // Rotational speed
+            'degps'     : 'Degrees per second',
+            'decadegps' : 'DecaDegrees per second',
+            // Temperature
+            'decidegc'  : 'DeciDegrees Celsius',
+            'degc'      : 'Degrees Celsius',
+            'degf'      : 'Degrees Fahrenheit',
+            // Speed
+            'cms'       : 'Centimetres per second',
+            'v-cms'     : 'Centimetres per second',
+            'ms'        : 'Metres per second',
+            'kmh'       : 'Kilometres per hour',
+            'mph'       : 'Miles per hour',
+            'hftmin'    : 'Hundred feet per minute',
+            'fts'       : 'Feet per second',
+            'kt'        : 'Knots',
+            // Distance
+            'cm'    : 'Centimetres',
+            'm'     : 'Metres',
+            'km'    : 'Kilometres',
+            'm-lrg' : 'Metres',
+            'ft'    : 'Feet',
+            'mi'    : 'Miles',
+            'nm'    : 'Nautical Miles'
+        }
 
         // Ensure we can do conversions
         if (!inputUnit || !oldValue || !element) {
@@ -319,6 +345,18 @@ var Settings = (function () {
             'dsec' : {
                 'sec' : 10
             },
+            'mins' : {
+                'hours' : 60
+            },
+            'tzmins' : {
+                'tzhours' : 'TZHOURS'
+            },
+            'centideg' : {
+                'deg' : 0.1
+            },
+            'centideg-deg' : {
+                'deg' : 0.1
+            },
             'decideg' : {
                 'deg' : 10
             },
@@ -344,7 +382,11 @@ var Settings = (function () {
                 'v-cms' : 'fts',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'decidegc' : 'degf',
@@ -357,7 +399,11 @@ var Settings = (function () {
                 'v-cms' : 'ms',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decadegps' : 'degps',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'decidegc' : 'degc',
@@ -369,10 +415,14 @@ var Settings = (function () {
                 'cms' : 'mph',
                 'v-cms' : 'ms',
                 'decadegps' : 'degps',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             3:{ //UK
@@ -381,11 +431,15 @@ var Settings = (function () {
                 'm-lrg' : 'mi',
                 'cms' : 'mph',
                 'v-cms' : 'fts',
-                'decadegps' : 'degpd',
+                'decadegps' : 'degps',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             4: { //General aviation
@@ -395,15 +449,22 @@ var Settings = (function () {
                 'cms': 'kt',
                 'v-cms' : 'hftmin',
                 'decadegps' : 'degps',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
                 'decideg' : 'deg',
                 'decideg-lrg' : 'deg',
                 'msec' : 'sec',
                 'dsec' : 'sec',
+                'mins' : 'hours',
+                'tzmins' : 'tzhours',
                 'decidegc' : 'degc',
             },
             default: { //show base units
                 'decadegps' : 'degps',
                 'decideg-lrg' : 'deg',
+                'centideg' : 'deg',
+                'centideg-deg' : 'deg',
+                'tzmins' : 'tzhours',
             }
         };
 
@@ -427,50 +488,58 @@ var Settings = (function () {
         const multiplier = multiObj.multiplier;
         const unitName = multiObj.unitName;
 
+        let decimalPlaces = 0;
         // Update the step, min, and max; as we have the multiplier here.
         if (element.attr('type') == 'number') {
-            let step = element.attr('step') || 1;
-            let decimalPlaces = 0;
+            let step = parseFloat(element.attr('step')) || 1;
             
-            step = step / multiplier;
-            
-            if (step < 1) {
-                decimalPlaces = step.toString().length - step.toString().indexOf(".") - 1;
-                if (parseInt(step.toString().slice(-1)) > 1 ) { 
-                    decimalPlaces--; 
+            if (multiplier !== 1) { 
+                decimalPlaces = Math.min(Math.ceil(multiplier / 100), 3);
+                // Add extra decimal place for non-integer conversions.
+                if (multiplier % 1 != 0 && decimalPlaces < 3) {
+                    decimalPlaces++;
                 }
                 step = 1 / Math.pow(10, decimalPlaces);
             }
             element.attr('step', step.toFixed(decimalPlaces));
 
-            if (multiplier != 'FAHREN') {
-                element.attr('min', (element.attr('min') / multiplier).toFixed(decimalPlaces));
-                element.attr('max', (element.attr('max') / multiplier).toFixed(decimalPlaces));
+            if (multiplier !== 'FAHREN' && multiplier !== 'TZHOURS' && multiplier !== 1) {
+                element.data('default-min', element.attr('min'));
+                element.data('default-max', element.attr('max'));
+                element.attr('min', (parseFloat(element.attr('min')) / multiplier).toFixed(decimalPlaces));
+                element.attr('max', (parseFloat(element.attr('max')) / multiplier).toFixed(decimalPlaces));
             }
         }
 
         // Update the input with a new formatted unit
         let newValue = "";
-        if (multiplier == 'FAHREN') {
-            element.attr('min', toFahrenheit(element.attr('min')).toFixed(2));
-            element.attr('max', toFahrenheit(element.attr('max')).toFixed(2));
-            newValue = toFahrenheit(oldValue).toFixed(2);
+        if (multiplier === 'FAHREN') {
+            element.attr('min', toFahrenheit(element.attr('min')).toFixed(decimalPlaces));
+            element.attr('max', toFahrenheit(element.attr('max')).toFixed(decimalPlaces));
+            newValue = toFahrenheit(oldValue).toFixed(decimalPlaces);
+        } else if (multiplier === 'TZHOURS') {
+            element.attr('type', 'text');
+            element.removeAttr('step');
+            element.attr('pattern', '([0-9]{2}|[-,0-9]{3}):([0-9]{2})');
+            let hours = Math.floor(oldValue/60);
+            let mins = oldValue - (hours*60);
+            newValue = ((hours < 0) ? padZeros(hours, 3) : padZeros(hours, 2)) + ':' + padZeros(mins, 2);
         } else {
-            const convertedValue = Number((oldValue / multiplier).toFixed(2));
-            newValue = Number.isInteger(convertedValue) ? Math.round(convertedValue) : convertedValue;
+            newValue = Number((oldValue / multiplier)).toFixed(decimalPlaces);
         }
+
         element.val(newValue);
         element.data('setting-multiplier', multiplier);
 
         // Now wrap the input in a display that shows the unit
-        element.wrap(`<div data-unit="${unitDisplayDames[unitName]}" class="unit_wrapper unit"></div>`);
+        element.wrap(`<div data-unit="${unitDisplayNames[unitName]}" title="${unitExpandedNames[unitName]}" class="unit_wrapper unit"></div>`);
 
         function toFahrenheit(decidegC) {
             return (decidegC / 10) * 1.8 + 32;
         };
     }
 
-    self.saveInput = function(input) {
+    self.processInput = function(input) {
         var settingName = input.data('setting');
         var setting = input.data('setting-info');
         var value;
@@ -478,10 +547,13 @@ var Settings = (function () {
         if (typeof setting == 'undefined') {
             return null;
         }
-
         if (setting.table) {
             if (input.attr('type') == 'checkbox') {
                 value = input.prop('checked') ? 1 : 0;
+            } else if (input.attr('type') == 'radio') {
+                if (input.prop('checked')) {
+                    value = parseInt(input.val());
+                }
             } else {
                 value = parseInt(input.val());
             }
@@ -491,22 +563,76 @@ var Settings = (function () {
             var multiplier = input.data('setting-multiplier') || 1;
             if (multiplier == 'FAHREN') {
                 value = Math.round(((parseFloat(input.val())-32) / 1.8) * 10);
+            } else if (multiplier === 'TZHOURS') {
+                let inputTZ = input.val().split(':');
+                value = (parseInt(inputTZ[0]) * 60) + parseInt(inputTZ[1]);
+                
+                if (value > parseInt(input.attr('max'))) {
+                    value = parseInt(input.attr('max'));
+                }
+
+                if (value < parseInt(input.attr('min'))) {
+                    value = parseInt(input.attr('min'));
+                }
             } else {
                 multiplier = parseFloat(multiplier);
-                value = Math.round(parseFloat(input.val()) * multiplier);
+                
+                let precision = input.data("step") || 1; // data-step is always based on the default firmware units.
+                precision = self.countDecimals(precision);
+
+                if (precision === 0) {
+                    value = Math.round(parseFloat(input.val()) * multiplier);
+                } else {
+                    value = Math.round((parseFloat(input.val()) * multiplier) * Math.pow(10, precision)) / Math.pow(10, precision);
+                }
+
+                if (value > parseInt(input.data('default-max'))) {
+                    value = parseInt(input.data('default-max'));
+                }
+
+                if (value < parseInt(input.data('default-min'))) {
+                    value = parseInt(input.data('default-min'));
+                }
             }
         }
-        return mspHelper.setSetting(settingName, value);
+        return {setting: settingName, value: value};
     };
 
-    self.saveInputs = function() {
+    self.countDecimals = function(value) {
+        let text = value.toString()
+        // verify if number 0.000005 is represented as "5e-6"
+        if (text.indexOf('e-') > -1) {
+          let [base, trail] = text.split('e-');
+          let deg = parseInt(trail, 10);
+          return deg;
+        }
+        // count decimals for number in representation like "0.123456"
+        if (Math.floor(value) !== value) {
+          return value.toString().split(".")[1].length || 0;
+        }
+        return 0;
+    };
+
+    self.pickAndSaveSingleInput = function(inputs, finalCallback) {
+        if (inputs.length > 0) {
+            var input = inputs.shift();
+            var settingPair = self.processInput(input);
+            return mspHelper.setSetting(settingPair.setting, settingPair.value, function() {       
+                return self.pickAndSaveSingleInput(inputs, finalCallback);
+            });
+        } else {
+            if (finalCallback) {
+                finalCallback();
+            }
+        }
+    };
+
+    self.saveInputs = function(finalCallback) {
         var inputs = [];
         $('[data-setting!=""][data-setting]').each(function() {
             inputs.push($(this));
         });
-        return Promise.mapSeries(inputs, function (input, ii) {
-            return self.saveInput(input);
-        });
+        self.pickAndSaveSingleInput(inputs, finalCallback);
     };
 
     self.processHtml = function(callback) {
@@ -526,7 +652,7 @@ var Settings = (function () {
             helpIcons.push($(this));
         });
 
-        return Promise.mapSeries(helpIcons, function(helpIcon, ii) {
+        return mapSeries(helpIcons, function(helpIcon, ii) {
             let forAtt = helpIcon.attr('for');
 
             if (typeof forAtt !== "undefined" && forAtt !== "") {
@@ -537,7 +663,7 @@ var Settings = (function () {
                 }
 
                 if (typeof dataSettingName !== "undefined" && dataSettingName !== "") {
-                    helpIcon.wrap('<a class="helpiconLink" href="https://github.com/iNavFlight/inav/blob/master/docs/Settings.md#' + dataSettingName + '" target="_blank"></a>');
+                    helpIcon.wrap('<a class="helpiconLink" href="' + globalSettings.docsTreeLocation + 'Settings.md#' + dataSettingName + '" target="_blank"></a>');
                 }
             }
 
@@ -547,3 +673,5 @@ var Settings = (function () {
 
     return self;
 })();
+
+module.exports = Settings;

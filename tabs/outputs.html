@@ -39,7 +39,7 @@
 
                 <div id="motor-stop-warning" data-i18n="motorStopWarning" class="warning-box"></div>
                 <div class="checkbox">
-                    <input type="checkbox" data-bit="4" class="feature toggle" name="MOTOR_STOP" title="MOTOR_STOP" id="feature-4">
+                    <input id="feature-4" type="checkbox" class="toggle" data-setting="motorstop_on_low" />
                     <label for="feature-4">
                         <span data-i18n="featureMOTOR_STOP"></span>
                     </label>
@@ -51,6 +51,14 @@
                     <label for="throttle_idle">
                         <span data-i18n="throttleIdle"></span>
                     </label>
+                </div>
+
+                <div class="number">
+                    <input id="throttle_scale" data-setting="throttle_scale" type="number" data-step="0.01" />
+                    <label for="throttle_scale">
+                        <span data-i18n="throttle_scale"></span>
+                    </label>
+                    <div for="throttle_scale" class="helpicon cf_tip" data-i18n_title="throttle_scale_help"></div>
                 </div>
 
                 <div class="number">
@@ -86,6 +94,7 @@
                         </label>
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="gui_box grey">
@@ -99,10 +108,10 @@
                     <div class="bar-wrapper"></div>
                     <div class="clear-both"></div>
                     <div class="motor_testing">
-                    <div class="sliders motor-sliders"></div>
-                    <div class="values">
-                        <ul class="motor-values"></ul>
-                    </div>
+                        <div class="sliders motor-sliders"></div>
+                        <div class="values">
+                            <ul class="motor-values"></ul>
+                        </div>
                     </div>
                 </div>
                 <div class="motors right">
@@ -114,15 +123,15 @@
                     <div class="half">
                         <table class="output-stats-table">
                             <tr>
-                                <th>Acc. noise RMS</th>
+                                <th i18n="outputStatsTableAcc"></th>
                                 <td class="acc-rms"></td>
                             </tr>
                             <tr>
-                                <th>Current [A]</th>
+                                <th i18n="outputStatsTableCurrent"></th>
                                 <td class="current-current"></td>
                             </tr>
                             <tr>
-                                <th>Voltage [V]</th>
+                                <th i18n="outputStatsTableVoltage"></th>
                                 <td class="current-voltage"></td>
                             </tr>
                         </table>
@@ -184,9 +193,9 @@
         </div>
     </div>
     <div class="content_toolbar">
-            <div class="btn save_btn">
-                <a class="update" href="#" data-i18n="servosButtonSave"></a>
-                <a class="save" href="#" data-i18n="configurationButtonSave"></a>
-            </div>
+        <div class="btn save_btn">
+            <a class="update" href="#" data-i18n="servosButtonSave"></a>
+            <a class="save" href="#" data-i18n="configurationButtonSave"></a>
         </div>
+    </div>
 </div>

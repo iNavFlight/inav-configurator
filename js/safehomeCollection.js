@@ -1,6 +1,8 @@
 'use strict';
 
-let SafehomeCollection = function () {
+const BitHelper = require('./bitHelper');
+
+var SafehomeCollection = function () {
 
     let self = {},
         data = [],
@@ -15,6 +17,7 @@ let SafehomeCollection = function () {
     }
 
     self.put = function (element) {
+        element.setNumber(data.length);
         data.push(element);
     };
 
@@ -30,85 +33,54 @@ let SafehomeCollection = function () {
         data = [];
     };
 
-    self.inflate = function () {
-        while (self.hasFreeSlots()) {
-            self.put(new Safehome(data.length, 0, 0, 0));
-        }
+    self.isEmpty = () => {
+        return data.length == 0;
     };
 
-    self.hasFreeSlots = function () {
-        return data.length < self.getMaxSafehomeCount();
-    };
-
-    self.isSafehomeConfigured = function(safehomeId) {
-
-        for (let safehomeIndex in data) {
-            if (data.hasOwnProperty(safehomeIndex)) {
-                let safehome = data[safehomeIndex];
-
-                if (safehome.getNumber() == safehomeId && safehome.isUsed()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-
-    self.getNumberOfConfiguredSafehome = function () {
-        let count = 0;
-        for (let i = 0; i < self.getMaxSafehomeCount(); i ++) {
-            if (self.isSafehomeConfigured(i)) {
-                count++;
-            }
-        }
-        return count;
-    };
-
-    self.getUsedSafehomeIndexes = function () {
-        let out = [];
-
-        for (let safehomeIndex in data) {
-            if (data.hasOwnProperty(safehomeIndex)) {
-                let safehome = data[safehomeIndex];
-                out.push(safehome.getNumber());
-            }
-        }
-
-        let unique = [...new Set(out)];
-
-        return unique.sort(function(a, b) {
-            return a-b;
-        });
+    self.safehomeCount = () => {
+        return data.length;
     }
-    
-    self.getSafehome = function(safehomeId) {
-        for (let safehomeIndex in data) {
-            if (data.hasOwnProperty(safehomeIndex)) {
-                let safehome = data[safehomeIndex];
-                if (safehome.getNumber() == safehomeId ) {
-                    return safehome;
-                }
+
+    self.drop = (idx) => {
+        data.forEach(safehome => {
+            if (safehome.getNumber() >= idx) {
+                safehome.setNumber(safehome.getNumber() - 1);
             }
-        }
-    };
-    
+        });   
+        data.splice(idx, 1);
+    }
+
+    self.insert = (safehome, idx) => {
+        data.forEach(s => {
+            if (s.getNumber() >= idx) {
+                s.setNumber(s.getNumber() + 1);
+            }
+        });
+        data.splice(idx, 0, safehome);
+    }
+        
     self.updateSafehome = function(newSafehome) {
         data[newSafehome.getNumber()] = newSafehome;
     };
     
     self.extractBuffer = function(safehomeId) {
         let buffer = [];
-        let safehome = self.getSafehome(safehomeId);
-        buffer.push(safehome.getNumber());    // sbufReadU8(src);    // number
-        buffer.push(safehome.getEnabled());    // sbufReadU8(src);    // action
-        buffer.push(specificByte(safehome.getLat(), 0));    // sbufReadU32(src);      // lat
-        buffer.push(specificByte(safehome.getLat(), 1));
-        buffer.push(specificByte(safehome.getLat(), 2));
-        buffer.push(specificByte(safehome.getLat(), 3));
-        buffer.push(specificByte(safehome.getLon(), 0));    // sbufReadU32(src);      // lon
-        buffer.push(specificByte(safehome.getLon(), 1));
-        buffer.push(specificByte(safehome.getLon(), 2));
-        buffer.push(specificByte(safehome.getLon(), 3));
+        let safehome = data[safehomeId];
+        if (safehomeId < self.safehomeCount()) {    
+            buffer.push(safehome.getNumber());    // sbufReadU8(src);    // number
+            buffer.push(1);    
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 0));    // sbufReadU32(src);      // lat
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 1));
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 2));
+            buffer.push(BitHelper.specificByte(safehome.getLat(), 3));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 0));    // sbufReadU32(src);      // lon
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 1));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 2));
+            buffer.push(BitHelper.specificByte(safehome.getLon(), 3));
+        } else {
+            buffer = Array(10).fill(0);
+            buffer[0] = safehomeId;
+        }
         
         return buffer;
     }
@@ -128,3 +100,5 @@ let SafehomeCollection = function () {
 
     return self;
 };
+
+module.exports = SafehomeCollection;

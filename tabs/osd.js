@@ -1,5 +1,25 @@
-/*global $,nwdialog*/
 'use strict';
+
+const inflection = require( 'inflection' );
+const fs = require('fs');
+const path = require('path');
+const semver = require('semver');
+const mapSeries = require('promise-map-series');
+const { dialog } = require("@electron/remote");
+const Store = require('electron-store');
+const store = new Store();
+
+const FC = require('./../js/fc');
+const { GUI, TABS } = require('./../js/gui');
+const MSP = require('./../js/msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./../js/msp/MSPHelper');
+const Settings = require('./../js/settings');
+const { globalSettings } = require('./../js/globalSettings');
+const { PortHandler } = require('./../js/port_handler');
+const i18n = require('./../js/localization');
+const jBox = require('./../js/libraries/jBox/jBox.min');
+
 
 var SYM = SYM || {};
 SYM.LAST_CHAR = 225; // For drawing the font preview
@@ -29,12 +49,17 @@ SYM.MAH_KM_0 = 0x6B;
 SYM.MAH_KM_1 = 0x6C;
 SYM.MAH_MI_0 = 0x93;
 SYM.MAH_MI_1 = 0x94;
+SYM.AH_V_FT_0 = 0xD6;
+SYM.AH_V_FT_1 = 0xD7;
+SYM.AH_V_M_0 = 0xD8;
+SYM.AH_V_M_1 = 0xD9;
 SYM.WH_KM = 0x6E;
 SYM.WH_MI = 0x6F;
 SYM.GPS_SAT1 = 0x08;
 SYM.GPS_SAT2 = 0x09;
 SYM.GPS_HDP1 = 0x0E;
 SYM.GPS_HDP2 = 0x0F;
+SYM.KM = 0x83;
 SYM.KMH = 0x90;
 SYM.KMH_3D = 0x88;
 SYM.MPH = 0x91;
@@ -102,6 +127,19 @@ SYM.VTX_POWER = 0x27;
 SYM.MAX = 0xCE;
 SYM.PROFILE = 0xCF;
 SYM.SWITCH_INDICATOR_HIGH = 0xD2;
+SYM.GLIDE_MINS = 0xD5;
+SYM.GLIDE_RANGE = 0xD4;
+SYM.FLIGHT_MINS_REMAINING = 0xDA;
+SYM.FLIGHT_DIST_REMAINING = 0x167;
+SYM.GROUND_COURSE = 0xDC;
+SYM.ALERT = 0xDD;
+SYM.CROSS_TRACK_ERROR = 0xFC;
+SYM.ADSB = 0xFD;
+SYM.PAN_SERVO_IS_OFFSET_L = 0x1C7;
+SYM.ODOMETER = 0X168;
+SYM.PILOT_LOGO_SML_L = 0x1D5;
+SYM.PILOT_LOGO_SML_C = 0x1D6;
+SYM.PILOT_LOGO_SML_R = 0x1D7;
 
 SYM.AH_AIRCRAFT0 = 0x1A2;
 SYM.AH_AIRCRAFT1 = 0x1A3;
@@ -111,8 +149,13 @@ SYM.AH_AIRCRAFT4 = 0x1A6;
 
 SYM.AH_CROSSHAIRS = new Array(0x166, 0x1A4, new Array(0x190, 0x191, 0x192), new Array(0x193, 0x194, 0x195), new Array(0x196, 0x197, 0x198), new Array(0x199, 0x19A, 0x19B), new Array (0x19C, 0x19D, 0x19E), new Array (0x19F, 0x1A0, 0x1A1));
 
+var video_type = null;
+var isGuidesChecked = false;
 var FONT = FONT || {};
 
+var layout_clipboard = {layout: [], filled: false};
+
+var FONT = FONT || {};
 FONT.initData = function () {
     if (FONT.data) {
         return;
@@ -162,7 +205,7 @@ FONT.parseMCMFontFile = function (data) {
 
     // make sure the font file is valid
     if (data.shift().trim() != 'MAX7456') {
-        var msg = 'that font file doesnt have the MAX7456 header, giving up';
+        var msg = 'that font file doesn\'t have the MAX7456 header, giving up';
         console.debug(msg);
         Promise.reject(msg);
     }
@@ -210,13 +253,24 @@ FONT.parseMCMFontFile = function (data) {
 //noinspection JSUnusedLocalSymbols
 FONT.openFontFile = function ($preview) {
     return new Promise(function (resolve) {
-
-        nwdialog.setContext(document);
-        nwdialog.openFileDialog('.mcm', function(filename) {
-            const fs = require('fs');
-            const fontData = fs.readFileSync(filename, {flag: "r"});
-            FONT.parseMCMFontFile(fontData.toString());
-            resolve();
+        var options = {
+            filters: [ 
+                { name: 'Font file', extensions: ['mcm'] }
+            ],
+        };
+        dialog.showOpenDialog(options).then(result =>  {
+            if (result.canceled) {
+                console.log('No file selected');
+                return;
+            }
+            
+            if (result.filePaths.length == 1) {
+                const fontData = fs.readFileSync(result.filePaths[0], {flag: "r"});
+                FONT.parseMCMFontFile(fontData.toString());
+                resolve();
+            }
+        }).catch (err => {
+            console.log(err);
         });
     });
 };
@@ -315,7 +369,7 @@ FONT.preview = function ($el) {
     $el.empty();
     for (var i = 1; i <= SYM.LAST_CHAR; i++) {
         var url = FONT.data.character_image_urls[i];
-        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + '"></img> ');
+        $el.append('<img src="' + url + '" title="0x' + i.toString(16) + ' (' + i.toString(10) + ') "></img> ');
     }
 };
 
@@ -403,9 +457,11 @@ function osdMainBatteryPreview() {
     return FONT.symbol(SYM.BATT) + FONT.embed_dot(s);
 }
 
-function osdmAhdrawnPreview() {
-    let precision = Settings.getInputValue('osd_mah_used_precision');
-    let preview = "1215075".substring(0, precision);
+function osdmAhPrecisionPreview() {
+    let precision = Settings.getInputValue('osd_mah_precision');
+    let rnd = (Math.floor(10000000000000 + Math.random() * 90000000000000)).toString();
+    rnd = rnd.replace('0', '');
+    let preview = rnd.substring(0, precision);
 
     return preview + FONT.symbol(SYM.MAH);
 }
@@ -453,14 +509,15 @@ OSD.initData = function () {
             imu_temp_alarm_max: null,
             baro_temp_alarm_min: null,
             baro_temp_alarm_max: null,
+            adsb_distance_warning: null,
+            adsb_distance_alert: null,
         },
         layouts: [],
         layout_count: 1, // This needs to be 1 for compatibility with < 2.0
         item_count: 0,
         items: [],
         groups: {},
-        preview: [],
-        isDjiHdFpv: false
+        preview: []
     };
 };
 
@@ -493,6 +550,7 @@ OSD.DjiElements =  {
         "Timers",
         "VTX",
         "CRSF",
+        "SwitchIndicators",
         "GVars",
         "PIDs",
         "PIDOutputs",
@@ -509,7 +567,7 @@ OSD.DjiElements =  {
     craftNameElements: [
         "MESSAGES",
         "THROTTLE_POSITION",
-        "THROTTLE_POSITION_AUTO_THR",
+        "SCALED_THROTTLE_POSITION",
         "3D_SPEED",
         "EFFICIENCY_MAH",
         "TRIP_DIST"
@@ -522,22 +580,38 @@ OSD.constants = {
         'AUTO',
         'PAL',
         'NTSC',
-        'HD'
+        'HDZERO',
+        'DJIWTF',
+        'AVATAR',
+        'BF43COMPAT',
+        'BFHDCOMPAT'
     ],
     VIDEO_LINES: {
         PAL: 16,
         NTSC: 13,
-        HD: 18
+        HDZERO: 18,
+        DJIWTF: 22,
+        AVATAR: 20,
+        BF43COMPAT: 16,
+        BFHDCOMPAT: 20
     },
     VIDEO_COLS: {
         PAL: 30,
         NTSC: 30,
-        HD: 50
+        HDZERO: 50,
+        DJIWTF: 60,
+        AVATAR: 53,
+        BF43COMPAT: 30,
+        BFHDCOMPAT: 53
     },
     VIDEO_BUFFER_CHARS: {
         PAL: 480,
         NTSC: 390,
-        HD: 900
+        HDZERO: 900,
+        DJIWTF: 1320,
+        AVATAR: 1060,
+        BF43COMPAT: 480,
+        BFHDCOMPAT: 1060
     },
     UNIT_TYPES: [
         {name: 'osdUnitImperial', value: 0},
@@ -736,6 +810,24 @@ OSD.constants = {
             min: -55,
             max: 125
         },
+        {
+            name: 'ADSB_MAX_DISTANCE_WARNING',
+            field: 'adsb_distance_warning',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
+        },
+        {
+            name: 'ADSB_MAX_DISTANCE_ALERT',
+            field: 'adsb_distance_alert',
+            step: 1,
+            unit: "meters",
+            min: 1,
+            max: 64000,
+            min_version: '7.1.0',
+        },
     ],
 
     // All display fields, from every version, do not remove elements, only add!
@@ -781,7 +873,7 @@ OSD.constants = {
                 {
                     name: 'REMAINING_FLIGHT_TIME',
                     id: 48,
-                    preview: FONT.symbol(SYM.FLY_M) + '10:35'
+                    preview: FONT.symbol(SYM.FLIGHT_MINS_REMAINING) + '10:35'
                 },
                 {
                     name: 'REMAINING_FLIGHT_DISTANCE',
@@ -790,28 +882,38 @@ OSD.constants = {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
                             case 3: // UK
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
                             case 4: // GA
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
                             default: // Metric
-                                return FONT.symbol(SYM.TRIP_DIST) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
+                                return FONT.symbol(SYM.FLIGHT_DIST_REMAINING) + FONT.embed_dot('1.73') + FONT.symbol(SYM.DIST_KM);
                         }
                     }
                 },
                 {
                     name: 'THROTTLE_POSITION',
                     id: 9,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 69'
+                    preview: ' ' + FONT.symbol(SYM.THR) + ' 69'
                 },
                 {
-                    name: 'THROTTLE_POSITION_AUTO_THR',
+                    name: 'SCALED_THROTTLE_POSITION',
                     id: 33,
-                    preview: FONT.symbol(SYM.THR) + FONT.symbol(SYM.THR1) + ' 51'
+                    preview: FONT.symbol(SYM.SCALE) + FONT.symbol(SYM.THR) + ' 51'
                 },
                 {
                     name: 'CRAFT_NAME',
                     id: 8,
                     preview: '[CRAFT_NAME]'
+                },
+                {
+                    name: 'PILOT_NAME',
+                    id: 142,
+                    preview: '[PILOT_NAME]'
+                },
+                {
+                    name: 'PILOT_LOGO',
+                    id: 146,
+                    preview: FONT.symbol(SYM.PILOT_LOGO_SML_L) + FONT.symbol(SYM.PILOT_LOGO_SML_C) + FONT.symbol(SYM.PILOT_LOGO_SML_R)
                 },
                 {
                     name: 'FLYMODE',
@@ -845,7 +947,7 @@ OSD.constants = {
                     name: 'AIR_SPEED',
                     id: 27,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return HARDWARE.capabilities.usePitot;
                     },
                     preview: function(osd_data) {
                         var speed;
@@ -870,7 +972,7 @@ OSD.constants = {
                     name: 'AIR_MAX_SPEED',
                     id: 127,
                     enabled: function() {
-                        return SENSOR_CONFIG.pitot != 0;
+                        return HARDWARE.capabilities.usePitot;
                     },
                     preview: function(osd_data) {
                         // 3 chars
@@ -900,6 +1002,9 @@ OSD.constants = {
                     name: 'ESC_RPM',
                     id: 106,
                     min_version: '2.3.0',
+                    enabled: function() {
+                        return HARDWARE.capabilities.useESCTelemetry;
+                    },
                     preview: function(){
                         let rpmPreview = '112974'.substr((6 - parseInt(Settings.getInputValue('osd_esc_rpm_precision'))));
                         return FONT.symbol(SYM.RPM) + rpmPreview;
@@ -912,6 +1017,34 @@ OSD.constants = {
                     preview: FONT.symbol(SYM.GLIDESLOPE) + FONT.embed_dot('12.3'),
                 },
                 {
+                    name: 'GLIDE_TIME',
+                    id: 136,
+                    min_version: '5.0.0',
+                    preview: FONT.symbol(SYM.GLIDE_MINS) + '02:34',
+                },
+                {
+                    name: 'GLIDE_RANGE',
+                    id: 137,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 12') + FONT.symbol(SYM.MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 11') + FONT.symbol(SYM.NM);
+                            default: // Metric & Metric + MPH
+                                return FONT.symbol(SYM.GLIDE_RANGE) + FONT.embed_dot(' 21') + FONT.symbol(SYM.KM);
+                        }
+                    }
+                },
+                {
+                    name: 'PAN_SERVO_CENTRED',
+                    id: 143,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES)
+                },
+                {
                     name: 'MISSION INFO',
                     id: 129,
                     min_version: '4.0.0',
@@ -922,6 +1055,12 @@ OSD.constants = {
                     id: 119,
                     min_version: '3.0.0',
                     preview: 'INAV 2.7.0'
+                },
+                {
+                    name: 'MULTI FUNCTION STATUS',
+                    id: 144,
+                    min_version: '6.0.0',
+                    preview: '0 WARNINGS'
                 }
             ]
         },
@@ -943,6 +1082,9 @@ OSD.constants = {
                 {
                     name: 'BARO_TEMPERATURE',
                     id: 87,
+                    enabled: function() {
+                        return HARDWARE.capabilities.useBaro;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -956,6 +1098,9 @@ OSD.constants = {
                     name: 'ESC_TEMPERATURE',
                     id: 107,
                     min_version: '2.5.0',
+                    enabled: function() {
+                        return HARDWARE.capabilities.useESCTelemetry;
+                    },
                     preview: function(osd_data) {
                         switch (OSD.data.preferences.units) {
                             case 0: // Imperial
@@ -1225,7 +1370,7 @@ OSD.constants = {
                     name: 'MAH_DRAWN',
                     id: 12,
                     preview: function() {
-                        return osdmAhdrawnPreview();
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1246,7 +1391,7 @@ OSD.constants = {
                     name: 'MAIN_BATT_REMAINING_CAPACITY',
                     id: 37,
                     preview: function() {
-                        return '1276' + FONT.symbol(SYM.MAH); // 4 chars
+                        return osdmAhPrecisionPreview();
                     }
                 },
                 {
@@ -1278,7 +1423,22 @@ OSD.constants = {
                                 return FONT.embed_dot('1.23') + FONT.symbol(SYM.WH_KM);
                         }
                     }
-                }
+                },
+                {
+                    name: 'CLIMB_EFFICIENCY',
+                    id: 138,
+                    min_version: '5.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                            case 4: // GA
+                                return FONT.embed_dot('0.76') + FONT.symbol(SYM.AH_V_FT_0) + FONT.symbol(SYM.AH_V_FT_1);
+                            default: // Metric & Metric + MPH
+                                return FONT.embed_dot('1.23') + FONT.symbol(SYM.AH_V_M_0) + FONT.symbol(SYM.AH_V_M_1);
+                        }
+                    }
+                },
             ]
         },
         {
@@ -1461,6 +1621,22 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'ODOMETER',
+                    id: 145,
+                    min_version: '6.1.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00016.9') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00014.7') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.ODOMETER) + FONT.embed_dot('00027.2') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
+                },
+                {
                     name: 'GPS_HDOP',
                     id: 31,
                     preview: FONT.symbol(SYM.GPS_HDP1) + FONT.symbol(SYM.GPS_HDP2) + FONT.embed_dot('1.8')
@@ -1518,6 +1694,40 @@ OSD.constants = {
                     name: 'COURSE_HOLD_ADJUSTMENT',
                     id: 52,
                     preview: FONT.symbol(SYM.HEADING) + ' -90' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'GROUND COURSE',
+                    id: 140,
+                    min_version: '6.0.0',
+                    preview: FONT.symbol(SYM.GROUND_COURSE) + '245' + FONT.symbol(SYM.DEGREES)
+                },
+                {
+                    name: 'ADSB_WARNING_MESSAGE',
+                    id: 150,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '19.25' + FONT.symbol(SYM.DIR_TO_HOME+1) + '2.75',
+                },
+                {
+                    name: 'ADSB_INFO',
+                    id: 151,
+                    min_version: '7.1.0',
+                    preview: FONT.symbol(SYM.ADSB) + '2',
+                },
+                {
+                    name: 'CROSS TRACK ERROR',
+                    id: 141,
+                    min_version: '6.0.0',
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                            case 3: // UK
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.98') + FONT.symbol(SYM.DIST_MI);
+                            case 4: // GA
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('0.85') + FONT.symbol(SYM.DIST_NM);
+                            default: // Metric
+                                return FONT.symbol(SYM.CROSS_TRACK_ERROR) + FONT.embed_dot('1.57') + FONT.symbol(SYM.DIST_KM);
+                        }
+                    }
                 },
             ]
         },
@@ -1586,6 +1796,9 @@ OSD.constants = {
         },
         {
             name: 'osdGroupCRSF',
+            enabled: function() {
+                return HARDWARE.capabilities.useCRSFRx;
+            },
             items: [
                 {
                     name: 'CRSF_RSSI_DBM',
@@ -1678,7 +1891,28 @@ OSD.constants = {
                     id: 116,
                     positionable: true,
                     preview: 'G3:30126'
-                }
+                },
+                {
+                    name: 'CUSTOM ELEMENT 1',
+                    id: 147,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_1",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 2',
+                    id: 148,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_2",
+                },
+                {
+                    name: 'CUSTOM ELEMENT 3',
+                    id: 149,
+                    min_version: '7.1.0',
+                    positionable: true,
+                    preview: "CE_3",
+                },
             ]
         },
         {
@@ -1752,27 +1986,27 @@ OSD.constants = {
                     preview: 'TEX   0'
                 },
                 {
-                    name: 'STABILIZED_RC_EXPO',
+                    name: 'STABILIZED.RC_EXPO',
                     id: 64,
                     preview: 'EXP  20'
                 },
                 {
-                    name: 'STABILIZED_RC_YAW_EXPO',
+                    name: 'STABILIZED.RC_YAW_EXPO',
                     id: 65,
                     preview: 'YEX  20'
                 },
                 {
-                    name: 'STABILIZED_PITCH_RATE',
+                    name: 'STABILIZED.PITCH_RATE',
                     id: 67,
                     preview: 'SPR  20'
                 },
                 {
-                    name: 'STABILIZED_ROLL_RATE',
+                    name: 'STABILIZED.ROLL_RATE',
                     id: 68,
                     preview: 'SRR  20'
                 },
                 {
-                    name: 'STABILIZED_YAW_RATE',
+                    name: 'STABILIZED.YAW_RATE',
                     id: 69,
                     preview: 'SYR  20'
                 },
@@ -1835,6 +2069,11 @@ OSD.constants = {
                     name: 'FW_LEVEL_TRIM',
                     id: 135,
                     preview: 'LEVEL  ' + FONT.embed_dot('5.4')
+                },
+                {
+                    name: 'MISSION_INDEX',
+                    id: 139,
+                    preview: 'WP NO 7'
                 },
             ]
         },
@@ -1903,7 +2142,7 @@ OSD.is_item_displayed = function(item, group) {
     if (typeof group.enabled === 'function' && group.enabled() === false) {
         return false;
     }
-    if (item.min_version && !semver.gte(CONFIG.flightControllerVersion, item.min_version)) {
+    if (item.min_version && !semver.gte(FC.CONFIG.flightControllerVersion, item.min_version)) {
         return false;
     }
     if (typeof item.enabled === 'function' && item.enabled() === false) {
@@ -1929,20 +2168,12 @@ OSD.reload = function(callback) {
         }
     };
 
-    MSP.promise(MSPCodes.MSP2_CF_SERIAL_CONFIG).then(function (resp) {
-        $.each(SERIAL_CONFIG.ports, function(index, port){
-            if(port.functions.includes('DJI_FPV')) {
-                OSD.data.isDjiHdFpv = true;
-            }
-        });
-    });
-
     MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS).then(function (resp) {
 
         OSD.msp.decodeLayoutCounts(resp);
         // Get data for all layouts
         var ids = Array.apply(null, {length: OSD.data.layout_count}).map(Number.call, Number);
-        var layouts = Promise.mapSeries(ids, function (layoutIndex, ii) {
+        var layouts = mapSeries(ids, function (layoutIndex, ii) {
             var data = [];
             data.push8(layoutIndex);
             return MSP.promise(MSPCodes.MSP2_INAV_OSD_LAYOUTS, data).then(function (resp) {
@@ -1963,6 +2194,11 @@ OSD.reload = function(callback) {
             });
         });
     });
+
+    if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0'))
+    {
+        MSP.send_message(MSPCodes.MSP2_INAV_CUSTOM_OSD_ELEMENTS);
+    }
 };
 
 OSD.updateSelectedLayout = function(new_layout) {
@@ -1971,7 +2207,7 @@ OSD.updateSelectedLayout = function(new_layout) {
 };
 
 OSD.updateDisplaySize = function () {
-    var video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
+    video_type = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system];
     if (video_type == 'AUTO') {
         video_type = 'PAL';
     }
@@ -1989,7 +2225,6 @@ OSD.updateDisplaySize = function () {
 
     // set the new video type and cols per line
     FONT.constants.SIZES.LINE = OSD.constants.VIDEO_COLS[video_type];
-    OSD.constants.VIDEO_TYPES[OSD.data.video_system] = video_type;
 
     // set the new display size
     OSD.data.display_size = {
@@ -2006,17 +2241,30 @@ OSD.updateDisplaySize = function () {
             var item = OSD.msp.helpers.unpack.position(origPos[jj]);
             // leave element alone if outside of screen (enable and disable element to relocate to 0,0)
             if (item.x < OSD.data.display_size.x && item.y < OSD.data.display_size.y) {
-                items[jj] = item; 
+                items[jj] = item;
             }
         }
     }
 
     // set the preview size based on the video type
-    $('.third_left').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.preview').toggleClass('preview_hd cut43_left', (video_type == 'HD'))
-    $('.third_right').toggleClass('preview_hd_side', (video_type == 'HD'))
-    $('.left_43_margin').toggleClass('hd_43_left', (video_type == 'HD'))
-    $('.right_43_margin').toggleClass('hd_43_right', (video_type == 'HD'))
+    // -- AVATAR
+    $('.third_left').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    $('.preview').toggleClass('preview_avatar cut43_left', (video_type == 'AVATAR'))
+    $('.third_right').toggleClass('preview_avatar_side', (video_type == 'AVATAR'))
+    // -- DJI WTF
+    $('.third_left').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    $('.preview').toggleClass('preview_dji_hd cut43_left', video_type == 'DJIWTF')
+    $('.third_right').toggleClass('preview_dji_hd_side', video_type == 'DJIWTF')
+    // -- HD ZERO
+    $('.third_left').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    $('.preview').toggleClass('preview_hdzero cut43_left', (video_type == 'HDZERO'))
+    $('.third_right').toggleClass('preview_hdzero_side', (video_type == 'HDZERO'))
+    // -- BFHDCOMPAT
+    $('.third_left').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+    $('.preview').toggleClass('preview_bfhdcompat cut43_left', (video_type == 'BFHDCOMPAT'))
+    $('.third_right').toggleClass('preview_bfhdcompat_side', (video_type == 'BFHDCOMPAT'))
+
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
 };
 
 OSD.saveAlarms = function(callback) {
@@ -2090,6 +2338,8 @@ OSD.msp = {
         result.push16(OSD.data.alarms.imu_temp_alarm_max);
         result.push16(OSD.data.alarms.baro_temp_alarm_min);
         result.push16(OSD.data.alarms.baro_temp_alarm_max);
+        result.push16(OSD.data.alarms.adsb_distance_warning);
+        result.push16(OSD.data.alarms.adsb_distance_alert);
         return result;
     },
 
@@ -2109,6 +2359,8 @@ OSD.msp = {
         OSD.data.alarms.imu_temp_alarm_max = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_min = alarms.read16();
         OSD.data.alarms.baro_temp_alarm_max = alarms.read16();
+        OSD.data.alarms.adsb_distance_warning = alarms.read16();
+        OSD.data.alarms.adsb_distance_alert = alarms.read16();
     },
 
     encodePreferences: function() {
@@ -2284,7 +2536,7 @@ OSD.GUI.preview = {
             position += overflows_line;
         }
 
-        $('input.' + item_id + '.position').val(position).change();
+        $('input.' + item_id + '.position').val(position).trigger('change');
     }
 };
 
@@ -2299,22 +2551,57 @@ OSD.GUI.checkAndProcessSymbolPosition = function(pos, charCode) {
     }
 };
 
+const mspVideoSystem = [1,3,4,5,6,7];   // indexes of PAL, HDZERO, DJIWTF, AVATAR, BF43COMPAT & BFHDCOMPAT
+const analogVideoSystem = [0,1,2];  // indexes of AUTO, PAL, & NTSC
+
 OSD.GUI.updateVideoMode = function() {
     // video mode
     var $videoTypes = $('.video-types').empty();
-    for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
 
-        $videoTypes.append(
-            $('<label/>')
-            .append($('<input name="video_system" type="radio"/>' + OSD.constants.VIDEO_TYPES[i] + '</label>')
-                .prop('checked', i === OSD.data.preferences.video_system)
-                .data('type', i)
-            )
-        );
+    if (!HARDWARE.capabilities.isDjiHdFpv) {
+        $('#dji_settings').hide();
     }
 
-    $videoTypes.find(':radio').click(function () {
-        OSD.data.preferences.video_system = $(this).data('type');
+    if (HARDWARE.capabilities.isMspDisplay) {
+        if (mspVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('HDZERO');
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    } else {
+        if (analogVideoSystem.includes(OSD.data.preferences.video_system) == false) {
+            OSD.data.preferences.video_system = OSD.constants.VIDEO_TYPES.indexOf('AUTO')
+            OSD.updateDisplaySize();
+            OSD.GUI.saveConfig();
+        }
+    }
+
+    if (HARDWARE.capabilities.isMspDisplay) {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (mspVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                );
+            }
+        }
+    } else {
+        for (var i = 0; i < OSD.constants.VIDEO_TYPES.length; i++) {
+            if (analogVideoSystem.includes(i))
+            {
+                $videoTypes.append(
+                    $('<option value="' + OSD.constants.VIDEO_TYPES[i] + '">' + OSD.constants.VIDEO_TYPES[i] + '</option>')
+                        .prop('selected', i === OSD.data.preferences.video_system)
+                        .data('type', i)
+                );
+            }
+        }
+    }
+
+    $videoTypes.on('change', function () {
+        OSD.data.preferences.video_system = $(this).find(':selected').data('type');
         OSD.updateDisplaySize();
         OSD.GUI.saveConfig();
     });
@@ -2327,10 +2614,10 @@ OSD.GUI.updateUnits = function() {
 
     for (var i = 0; i < OSD.constants.UNIT_TYPES.length; i++) {
         var unitType = OSD.constants.UNIT_TYPES[i];
-        if (unitType.min_version && semver.lt(CONFIG.flightControllerVersion, unitType.min_version)) {
+        if (unitType.min_version && semver.lt(FC.CONFIG.flightControllerVersion, unitType.min_version)) {
             continue;
         }
-        var name = chrome.i18n.getMessage(unitType.name);
+        var name = i18n.getMessage(unitType.name);
         var $option = $('<option>' + name + '</option>');
         $option.attr('value', name);
         $option.data('type', unitType.value);
@@ -2343,7 +2630,7 @@ OSD.GUI.updateUnits = function() {
         var unitType = OSD.constants.UNIT_TYPES[OSD.data.preferences.units];
         var tip;
         if (unitType.tip) {
-            tip = chrome.i18n.getMessage(unitType.tip);
+            tip = i18n.getMessage(unitType.tip);
         }
         if (tip) {
             $unitTip.attr('title', tip);
@@ -2353,7 +2640,7 @@ OSD.GUI.updateUnits = function() {
         }
     }
     updateUnitHelp();
-    $unitMode.change(function (e) {
+    $unitMode.on('change', function (e) {
         var selected = $(this).find(':selected');
         OSD.data.preferences.units = selected.data('type');
         globalSettings.osdUnits = OSD.data.preferences.units;
@@ -2384,14 +2671,14 @@ OSD.GUI.updateFields = function() {
         var groupContainer = $tmpl.clone().addClass('osd_group').show();
         groupContainer.attr('id', group.name);
         var groupTitleContainer = groupContainer.find('.spacer_box_title');
-        var groupTitle = chrome.i18n.getMessage(group.name);
+        var groupTitle = i18n.getMessage(group.name);
         groupTitleContainer.text(groupTitle);
-        var groupHelp = chrome.i18n.getMessage(group.name + '_HELP');
+        var groupHelp = i18n.getMessage(group.name + '_HELP');
         if (groupHelp) {
             $('<div class="helpicon cf_tip"></div>')
                 .css('margin-top', '1px')
                 .attr('title', groupHelp)
-                .appendTo(groupTitleContainer)
+                .appendTo(groupTitleContainer.parent())
                 .jBox('Tooltip', {
                     delayOpen: 100,
                     delayClose: 100,
@@ -2410,7 +2697,7 @@ OSD.GUI.updateFields = function() {
             var $field = $('<div class="display-field field-' + item.id + '"/>');
             var name = item.name;
             var nameKey = 'osdElement_' + name;
-            var nameMessage = chrome.i18n.getMessage(nameKey);
+            var nameMessage = i18n.getMessage(nameKey);
             if (nameMessage) {
                 name = nameMessage;
             } else {
@@ -2420,7 +2707,7 @@ OSD.GUI.updateFields = function() {
             if (searchTerm.length > 0 && !name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 continue;
             }
-            var help = chrome.i18n.getMessage(nameKey + '_HELP');
+            var help = i18n.getMessage(nameKey + '_HELP');
             if (help) {
                 $('<div class="helpicon cf_tip"></div>')
                     .css('margin-top', '1px')
@@ -2440,7 +2727,7 @@ OSD.GUI.updateFields = function() {
                 $('<input type="checkbox" name="' + item.name + '" class="togglesmall"></input>')
                     .data('item', item)
                     .attr('checked', itemData.isVisible)
-                    .change(function () {
+                    .on('change', function () {
                         var item = $(this).data('item');
                         var itemData = OSD.data.items[item.id];
                         var $position = $(this).parent().find('.position.' + item.name);
@@ -2450,6 +2737,7 @@ OSD.GUI.updateFields = function() {
                             // Ensure the element is inside the viewport, at least partially.
                             // In that case move it to the very first row/col, otherwise there's
                             // no way to reposition items that are outside the viewport.
+                            OSD.msp.helpers.calculate.coords(itemData);
                             if (itemData.x > OSD.data.display_size.x || itemData.y > OSD.data.display_size.y) {
                                 itemData.x = itemData.y = itemData.position = 0;
                             }
@@ -2468,7 +2756,7 @@ OSD.GUI.updateFields = function() {
                     $('<input type="number" class="' + item.id + ' position"></input>')
                         .data('item', item)
                         .val(itemData.position)
-                        .change($.debounce(250, function (e) {
+                        .on('change', $.debounce(250, function (e) {
                             var item = $(this).data('item');
                             var itemData = OSD.data.items[item.id];
                             itemData.position = parseInt($(this).val());
@@ -2479,28 +2767,42 @@ OSD.GUI.updateFields = function() {
             }
             $displayFields.append($field);
         }
-        if (groupContainer.find('.display-fields').children().size() > 0) {
+        if (groupContainer.find('.display-fields').children().length > 0) {
             $tmpl.parent().append(groupContainer);
         }
+    }
+
+    if ($('#videoGuidesToggle').length == false) {
+        $('#videoGuides').prepend(
+            $('<input id="videoGuidesToggle" type="checkbox" class="toggle" />')
+            .attr('checked', isGuidesChecked)
+            .on('change', function () {
+                OSD.GUI.updateGuidesView(this.checked);
+                store.set('showOSDGuides', this.checked);
+                OSD.GUI.updatePreviews();
+            })
+        );
     }
 
     if ($('#djiUnsupportedElementsToggle').length == false) {
         $('#djiUnsupportedElements').prepend(
             $('<input id="djiUnsupportedElementsToggle" type="checkbox" class="toggle" />')
-            .attr('checked', OSD.data.isDjiHdFpv)
+            .attr('checked', HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay)
             .on('change', function () {
                 OSD.GUI.updateDjiView(this.checked);
                 OSD.GUI.updatePreviews();
             })
         );
     }
+
     // TODO: If we add more switches somewhere else, this
     // needs to be called after all of them have been set up
     GUI.switchery();
 
-     // Update the OSD preview
-     refreshOSDSwitchIndicators();
-     updateCraftName();
+    // Update the OSD preview
+    refreshOSDSwitchIndicators();
+    updatePilotAndCraftNames();
+    updatePanServoPreview();
 };
 
 OSD.GUI.removeBottomLines = function(){
@@ -2520,8 +2822,6 @@ OSD.GUI.removeBottomLines = function(){
     });
 };
 
-
-
 OSD.GUI.updateDjiMessageElements = function(on) {
     $('.display-field').each(function(index, element) {
         var name = $(element).find('input').attr('name');
@@ -2540,6 +2840,38 @@ OSD.GUI.updateDjiMessageElements = function(on) {
         }
     });
     OSD.GUI.removeBottomLines();
+};
+
+OSD.GUI.updateGuidesView = function(on) {
+    let isHdZero = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'HDZERO';
+    $('.hd_43_margin_left').toggleClass('hdzero_43_left', (isHdZero && on))
+    $('.hd_43_margin_right').toggleClass('hdzero_43_right', (isHdZero && on))
+    $('.hd_3016_box_top').toggleClass('hd_3016_top', (isHdZero && on))
+    $('.hd_3016_box_bottom').toggleClass('hd_3016_bottom', (isHdZero && on))
+    $('.hd_3016_box_left').toggleClass('hd_3016_left', (isHdZero && on))
+    $('.hd_3016_box_right').toggleClass('hd_3016_right', (isHdZero && on))
+
+    let isDJIWTF = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'DJIWTF';
+    $('.hd_43_margin_left').toggleClass('dji_hd_43_left', (isDJIWTF && on))
+    $('.hd_43_margin_right').toggleClass('dji_hd_43_right', (isDJIWTF && on))
+
+    let isAvatar = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AVATAR';
+    $('.hd_43_margin_left').toggleClass('hd_avatar_43_left', (isAvatar && on))
+    $('.hd_43_margin_right').toggleClass('hd_avatar_43_right', (isAvatar && on))
+    $('.hd_avatar_bottom_bar').toggleClass('hd_avatar_bottom', (isAvatar && on))
+    $('.hd_avatar_storage_box_top').toggleClass('hd_avatar_storagebox_t', (isAvatar && on))
+    $('.hd_avatar_storage_box_bottom').toggleClass('hd_avatar_storagebox_b', (isAvatar && on))
+    $('.hd_avatar_storage_box_left').toggleClass('hd_avatar_storagebox_l', (isAvatar && on))
+    $('.hd_avatar_storage_box_right').toggleClass('hd_avatar_storagebox_r', (isAvatar && on))
+
+    let isBfHdCompat = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'BFHDCOMPAT';
+    $('.hd_43_margin_left').toggleClass('hd_bfhdcompat_43_left', (isBfHdCompat && on));
+    $('.hd_43_margin_right').toggleClass('hd_bfhdcompat_43_right', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_bottom_box').toggleClass('hd_bfhdcompat_bottom', (isBfHdCompat && on));
+    $('.hd_bfhdcompat_storage_box').toggleClass('hd_bfhdcompat_storagebox', (isBfHdCompat && on));
+
+    let isPAL = OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'PAL' || OSD.constants.VIDEO_TYPES[OSD.data.preferences.video_system] == 'AUTO';
+    $('.pal_ntsc_box_bottom').toggleClass('ntsc_bottom', (isPAL && on))
 };
 
 OSD.GUI.updateDjiView = function(on) {
@@ -2571,6 +2903,8 @@ OSD.GUI.updateDjiView = function(on) {
                 $(element).hide();
             }
         });
+
+        $('.switch-indicator-container').hide();
     } else {
         $(OSD.DjiElements.emptyGroups).each(function(index, groupName) {
             $('#osdGroup' + groupName).show();
@@ -2583,8 +2917,17 @@ OSD.GUI.updateDjiView = function(on) {
         $('.settings-container, .alarms-container').find('.settings').children()
             .show()
             .removeClass('no-bottom');
+
+        $('.switch-indicator-container').show();
     }
     OSD.GUI.updateDjiMessageElements($('#useCraftnameForMessages').is(':checked'));
+};
+
+OSD.GUI.updateAlarms = function() {
+    $(".osd_use_airspeed_alarm").toggle(HARDWARE.capabilities.usePitot);
+    $(".osd_use_baro_temp_alarm").toggle(HARDWARE.capabilities.useBaro);
+    $(".osd_use_esc_telemetry").toggle(HARDWARE.capabilities.useESCTelemetry);
+    $(".osd_use_crsf").toggle(HARDWARE.capabilities.useCRSFRx);
 };
 
 OSD.GUI.updateMapPreview = function(mapCenter, name, directionSymbol, centerSymbol) {
@@ -2599,7 +2942,7 @@ OSD.GUI.updatePreviews = function() {
     OSD.data.preview = [];
 
     // clear the buffer
-    for (i = 0; i < OSD.data.display_size.total; i++) {
+    for (let i = 0; i < OSD.data.display_size.total; i++) {
         OSD.data.preview.push([null, ' '.charCodeAt(0)]);
     };
 
@@ -2636,7 +2979,7 @@ OSD.GUI.updatePreviews = function() {
         }
         var x = 0;
         var y = 0;
-        for (i = 0; i < preview.length; i++) {
+        for (let i = 0; i < preview.length; i++) {
             var charCode = preview.charCodeAt(i);
             if (charCode == '\n'.charCodeAt(0)) {
                 x = 0;
@@ -2671,36 +3014,38 @@ OSD.GUI.updatePreviews = function() {
 
     var centerPosition = (OSD.data.display_size.x * OSD.data.display_size.y / 2);
     if (OSD.data.display_size.y % 2 == 0) {
-        centerPosition += OSD.data.display_size.x / 2;
+        centerPosition += Math.floor(OSD.data.display_size.x / 2);
     }
+
+    let hudCenterPosition = centerPosition - (OSD.constants.VIDEO_COLS[video_type] * $('#osd_horizon_offset').val());
 
     // artificial horizon
     if ($('input[name="ARTIFICIAL_HORIZON"]').prop('checked')) {
-        for (i = 0; i < 9; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 4 + i, SYM.AH_BAR9_0 + 4);
+        for (let i = 0; i < 9; i++) {
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 4 + i, SYM.AH_BAR9_0 + 4);
         }
     }
 
     // crosshairs
     if ($('input[name="CROSSHAIRS"]').prop('checked')) {
-        crsHNumber = Settings.getInputValue('osd_crosshairs_style');
-       if (crsHNumber == 1) {
+        let crsHNumber = Settings.getInputValue('osd_crosshairs_style');
+        if (crsHNumber == 1) {
             // AIRCRAFT style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 2, SYM.AH_AIRCRAFT0);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_AIRCRAFT1);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_AIRCRAFT2);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_AIRCRAFT3);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 2, SYM.AH_AIRCRAFT4);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 2, SYM.AH_AIRCRAFT0);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_AIRCRAFT1);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_AIRCRAFT2);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_AIRCRAFT3);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 2, SYM.AH_AIRCRAFT4);
         } else if ((crsHNumber > 1) && (crsHNumber < 8)) {
             // TYPES 3 to 8 (zero indexed)
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CROSSHAIRS[crsHNumber][0]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber][1]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CROSSHAIRS[crsHNumber][2]);
         } else {
             // DEFAULT or unknown style
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - 1, SYM.AH_CENTER_LINE);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - 1, SYM.AH_CENTER_LINE);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition, SYM.AH_CROSSHAIRS[crsHNumber]);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + 1, SYM.AH_CENTER_LINE_RIGHT);
         }
     }
 
@@ -2708,13 +3053,13 @@ OSD.GUI.updatePreviews = function() {
     if ($('input[name="HORIZON_SIDEBARS"]').prop('checked')) {
         var hudwidth = OSD.constants.AHISIDEBARWIDTHPOSITION;
         var hudheight = OSD.constants.AHISIDEBARHEIGHTPOSITION;
-        for (i = -hudheight; i <= hudheight; i++) {
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
-            OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+        for (let i = -hudheight; i <= hudheight; i++) {
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
+            OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth + (i * FONT.constants.SIZES.LINE), SYM.AH_DECORATION);
         }
         // AH level indicators
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition - hudwidth + 1, SYM.AH_LEFT);
-        OSD.GUI.checkAndProcessSymbolPosition(centerPosition + hudwidth - 1, SYM.AH_RIGHT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition - hudwidth + 1, SYM.AH_LEFT);
+        OSD.GUI.checkAndProcessSymbolPosition(hudCenterPosition + hudwidth - 1, SYM.AH_RIGHT);
     }
 
     OSD.GUI.updateMapPreview(centerPosition, 'MAP_NORTH', 'N', SYM.HOME);
@@ -2724,7 +3069,7 @@ OSD.GUI.updatePreviews = function() {
     // render
     var $preview = $('.display-layout .preview').empty();
     var $row = $('<div class="row"/>');
-    for (i = 0; i < OSD.data.display_size.total;) {
+    for (let i = 0; i < OSD.data.display_size.total;) {
         var charCode = OSD.data.preview[i];
         var colorStyle = '';
 
@@ -2749,7 +3094,7 @@ OSD.GUI.updatePreviews = function() {
         $img.find('img').css('pointer-events', 'none');
         if (item && item.positionable !== false) {
             var nameKey = 'osdElement_' + item.name;
-            var nameMessage = chrome.i18n.getMessage(nameKey);
+            var nameMessage = i18n.getMessage(nameKey);
 
             if (!nameMessage) {
                 nameMessage = inflection.titleize(item.name);
@@ -2776,10 +3121,13 @@ OSD.GUI.updateAll = function() {
         return;
     }
     var layouts = $('.osd_layouts');
+    var copy = $('.osd_copy');
+    var paste = $('.osd_paste').hide();
+    var clear = $('.osd_clear');
     if (OSD.data.layout_count > 1) {
         layouts.empty();
         for (var ii = 0; ii < OSD.data.layout_count; ii++) {
-            var name = ii > 0 ? chrome.i18n.getMessage('osdLayoutAlternative', [ii]) : chrome.i18n.getMessage('osdLayoutDefault');
+            var name = ii > 0 ? i18n.getMessage('osdLayoutAlternative', [ii]) : i18n.getMessage('osdLayoutDefault');
             var opt = $('<option/>').val(ii).text(name).appendTo(layouts);
         }
         layouts.val(OSD.data.selected_layout);
@@ -2787,13 +3135,69 @@ OSD.GUI.updateAll = function() {
         layouts.on('change', function() {
             OSD.updateSelectedLayout(parseInt(layouts.val()));
             OSD.GUI.updateFields();
+            OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
             OSD.GUI.updateDjiView($('#djiUnsupportedElements').find('input').is(':checked'));
             OSD.GUI.updatePreviews();
         });
+
+        copy.on('click', function() {
+            if(OSD.data.selected_layout >= 0 && OSD.data.selected_layout < OSD.data.layout_count){
+                layout_clipboard = {layout: JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout])), filled: true};
+                paste.show();
+                GUI.log(chrome.i18n.getMessage('osdLayoutInsertedIntoClipboard'));
+            }
+        });
+
+        paste.on('click', function() {
+            if(layout_clipboard.filled == true){
+
+                var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]))
+                OSD.data.layouts[OSD.data.selected_layout] = JSON.parse(JSON.stringify(layout_clipboard.layout));
+                layouts.trigger('change');
+                OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+                    if(!(item.isVisible === false && oldLayout[index].isVisible === false) && (oldLayout[index].x !== item.x || oldLayout[index].y !== item.y || oldLayout[index].position !== item.position || oldLayout[index].isVisible !== item.isVisible)){
+                        OSD.saveItem({id: index});
+                    }
+                });
+                GUI.log(chrome.i18n.getMessage('osdLayoutPasteFromClipboard'));
+            }
+        });
+
+        clear.on('click', function() {
+            var oldLayout = JSON.parse(JSON.stringify(OSD.data.layouts[OSD.data.selected_layout]));
+
+            var clearedLayout = [];
+            oldLayout.forEach(function(item, index){
+                var itemCopy = JSON.parse(JSON.stringify(item));
+                itemCopy.isVisible = false;
+                clearedLayout[index] = itemCopy;
+            })
+
+            OSD.data.layouts[OSD.data.selected_layout] = clearedLayout;
+            layouts.trigger('change');
+            OSD.data.layouts[OSD.data.selected_layout].forEach(function(item, index){
+                if(oldLayout[index].isVisible === true){
+                    OSD.saveItem({id: index});
+                }
+            });
+            GUI.log(chrome.i18n.getMessage('osdClearLayout'));
+        });
+
+
     } else {
         layouts.hide();
         layouts.off('change');
+
+        copy.hide();
+        copy.off('change');
+
+        paste.hide();
+        paste.off('change');
+
+        clear.hide();
+        clear.off('change');
     }
+
     $('.osd_search').on('input', function() {
         OSD.GUI.updateFields();
     });
@@ -2802,7 +3206,9 @@ OSD.GUI.updateAll = function() {
     OSD.GUI.updateUnits();
     OSD.GUI.updateFields();
     OSD.GUI.updatePreviews();
-    OSD.GUI.updateDjiView(OSD.data.isDjiHdFpv);
+    OSD.GUI.updateGuidesView($('#videoGuides').find('input').is(':checked'));
+    OSD.GUI.updateDjiView(HARDWARE.capabilities.isDjiHdFpv && !HARDWARE.capabilities.isMspDisplay);
+    OSD.GUI.updateAlarms();
 };
 
 OSD.GUI.update = function() {
@@ -2823,222 +3229,497 @@ OSD.GUI.saveConfig = function() {
     });
 };
 
+let HARDWARE = {};
+HARDWARE.init = function() {
+    HARDWARE.capabilities = {
+        isDjiHdFpv: false,
+        isMspDisplay: false,
+        useESCTelemetry: false,
+        useCRSFRx: false,
+        useBaro: false,
+        usePitot: false
+    };
+};
+
+HARDWARE.update = function(callback) {
+
+    HARDWARE.init();
+
+    MSP.send_message(MSPCodes.MSP2_CF_SERIAL_CONFIG, false, false, function() {
+        $.each(FC.SERIAL_CONFIG.ports, function(index, port){
+            if(port.functions.includes('DJI_FPV')) {
+                HARDWARE.capabilities.isDjiHdFpv = true;
+            }
+            if(port.functions.includes('MSP_DISPLAYPORT')) {
+                HARDWARE.capabilities.isMspDisplay = true;
+            }
+            if (port.functions.includes('ESC')) {
+                HARDWARE.capabilities.useESCTelemetry = true;
+            }
+        });
+
+        // Update RX data for Crossfire detection
+        mspHelper.loadRxConfig(function() {
+            HARDWARE.capabilities.useCRSFRx = (FC.RX_CONFIG.serialrx_provider == 6);
+
+            mspHelper.loadSensorConfig(function () {
+                HARDWARE.capabilities.useBaro  = (FC.SENSOR_CONFIG.barometer != 0);
+                HARDWARE.capabilities.usePitot = (FC.SENSOR_CONFIG.pitot != 0);
+
+                if (callback) {
+                    callback();
+                }
+            });
+        });        
+    });
+};
+
 TABS.osd = {};
 TABS.osd.initialize = function (callback) {
+
+    mspHelper.loadServoMixRules();
 
     if (GUI.active_tab != 'osd') {
         GUI.active_tab = 'osd';
     }
 
-    GUI.load("./tabs/osd.html", Settings.processHtml(function () {
-        // translate to user-selected language
-        localize();
-
-        // Open modal window
-        OSD.GUI.jbox = new jBox('Modal', {
-            width: 708,
-            height: 240,
-            position: {y:'bottom'},
-            offset: {y:-50},
-            closeButton: 'title',
-            animation: false,
-            attach: $('#fontmanager'),
-            title: 'OSD Font Manager',
-            content: $('#fontmanagercontent')
+    function save_to_eeprom() {
+        console.log('save_to_eeprom');
+        MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
+            GUI.log(i18n.getMessage('eepromSaved'));
         });
+    }
 
-        $('a.save').click(function () {
-            Settings.saveInputs().then(function () {
-                var self = this;
-                MSP.promise(MSPCodes.MSP_EEPROM_WRITE);
-                GUI.log('OSD settings saved');
-                var oldText = $(this).text();
-                $(this).html("Saved");
-                setTimeout(function () {
-                    $(self).html(oldText);
-                }, 2000);
+    HARDWARE.update(function () {
+        GUI.load(path.join(__dirname, "osd.html"), Settings.processHtml(function () {
+            // translate to user-selected language
+           i18n.localize();
+    
+            // Open modal window
+            OSD.GUI.jbox = new jBox('Modal', {
+                width: 750, 
+                height: 300,
+                position: {y:'bottom'},
+                offset: {y:-50},
+                closeButton: 'title',
+                animation: false,
+                attach: $('#fontmanager'),
+                title: 'OSD Font Manager',
+                content: $('#fontmanagercontent')
             });
-        });
-
-
-        // Setup switch indicators
-        $(".osdSwitchInd_channel option").each(function() {
-            $(this).text("Ch " + $(this).text());
-        });
-
-        // Function when text for switch indicators change
-        $('.osdSwitchIndName').on('keyup', function() {
-            // Make sure that the switch hint only contains A to Z
-            let testExp = new RegExp('^[A-Za-z0-9]');
-            let testText = $(this).val();
-            if (testExp.test(testText.slice(-1))) {
-                $(this).val(testText.toUpperCase());
-            } else {
-                $(this).val(testText.slice(0, -1));
-            }
-
-            // Update the OSD preview
-            refreshOSDSwitchIndicators();
-        });
-
-        // Function to update the OSD layout when the switch text alignment changes
-        $("#switchIndicators_alignLeft").on('change', function() {
-            refreshOSDSwitchIndicators();
-        });
-
-        // Function for when text for craft name changes
-        $('#craft_name').on('keyup', function() {
-            // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
-            let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
-            let testText = $(this).val();
-            if (testExp.test(testText.slice(-1))) {
-                $(this).val(testText.toUpperCase());
-            } else {
-                $(this).val(testText.slice(0, -1));
-            }
-
-            // Update the OSD preview
-            updateCraftName();
-        });
-
-        // font preview window
-        var $preview = $('.font-preview');
-
-        //  init structs once, also clears current font
-        FONT.initData();
-
-        var $fontPicker = $('.fontbuttons button');
-        $fontPicker.click(function (e) {
-            if (!$(this).data('font-file')) {
-                return;
-            }
-            $fontPicker.removeClass('active');
-            $(this).addClass('active');
-            $.get('/resources/osd/' + $(this).data('font-file') + '.mcm', function (data) {
-                FONT.parseMCMFontFile(data);
-                FONT.preview($preview);
-                OSD.GUI.update();
+    
+            $('a.save').on('click', function () {
+                Settings.saveInputs(save_to_eeprom);
             });
-            chrome.storage.local.set({'osd_font': $(this).data('font-file')});
-        });
-
-        // load the last selected font when we change tabs
-        chrome.storage.local.get('osd_font', function (result) {
-            if (result.osd_font != undefined) {
-                previous_font_button = $('.fontbuttons button[data-font-file="' + result.osd_font + '"]');
-                if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
-            }
-
-            if (typeof previous_font_button == "undefined") {
-                $fontPicker.first().click();
-            } else {
-                previous_font_button.click();
-            }
-        });
-
-        $('button.load_font_file').click(function () {
-            $fontPicker.removeClass('active');
-            FONT.openFontFile().then(function () {
-                FONT.preview($preview);
-                OSD.GUI.update();
+    
+            // Initialise guides checkbox
+            isGuidesChecked = store.get('showOSDGuides', false); 
+            
+            // Setup switch indicators
+            $(".osdSwitchInd_channel option").each(function() {
+                $(this).text("Ch " + $(this).text());
             });
-        });
-
-        // font upload
-        $('a.flash_font').click(function () {
-            if (!GUI.connect_lock) { // button disabled while flashing is in progress
-                var progressLabel = $('.progressLabel');
-                var progressBar = $('.progress');
-                var uploading = chrome.i18n.getMessage('uploadingCharacters');
-                progressLabel.text(uploading);
-                var progressCallback = function(done, total, percentage) {
-                    progressBar.val(percentage);
-                    if (done == total) {
-                        progressLabel.text(chrome.i18n.getMessage('uploadedCharacters'), [total]);
-                    } else {
-                        progressLabel.text(uploading + ' (' + done + '/' + total + ')');
-                    }
+    
+            // Function when text for switch indicators change
+            $('.osdSwitchIndName').on('keyup', function() {
+                // Make sure that the switch hint only contains A to Z
+                let testExp = new RegExp('^[A-Za-z0-9]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
                 }
-                FONT.upload(progressCallback);
-            }
-        });
-
-        $(document).on('click', 'span.progressLabel a.save_font', function () {
-            //noinspection JSUnresolvedVariable
-            chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'baseflight', accepts: [
-                {extensions: ['mcm']}
-            ]}, function (fileEntry) {
-                //noinspection JSUnresolvedVariable
-                if (chrome.runtime.lastError) {
-                    //noinspection JSUnresolvedVariable
-                    console.error(chrome.runtime.lastError.message);
+    
+                // Update the OSD preview
+                refreshOSDSwitchIndicators();
+            });
+    
+            // Function to update the OSD layout when the switch text alignment changes
+            $("#switchIndicators_alignLeft").on('change', function() {
+                refreshOSDSwitchIndicators();
+            });
+    
+            // Functions for when pan servo settings change
+            $('#osdPanServoIndicatorShowDegrees').on('change', function() {
+                // Update the OSD preview
+                updatePanServoPreview();
+            });
+    
+            $('#panServoOutput').on('change', function() {
+                // Update the OSD preview
+                updatePanServoPreview();
+            });
+    
+            // Function for when text for craft name changes
+            $('#craft_name').on('keyup', function() {
+                // Make sure that the craft name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+                let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+    
+                // Update the OSD preview
+                updatePilotAndCraftNames();
+            });
+    
+            $('#pilot_name').on('keyup', function() {
+                // Make sure that the pilot name only contains A to Z, 0-9, spaces, and basic ASCII symbols
+                let testExp = new RegExp('^[A-Za-z0-9 !_,:;=@#\\%\\&\\-\\*\\^\\(\\)\\.\\+\\<\\>\\[\\]]');
+                let testText = $(this).val();
+                if (testExp.test(testText.slice(-1))) {
+                    $(this).val(testText.toUpperCase());
+                } else {
+                    $(this).val(testText.slice(0, -1));
+                }
+    
+                // Update the OSD preview
+                updatePilotAndCraftNames();
+            });
+    
+            // font preview window
+            var $preview = $('.font-preview');
+    
+            //  init structs once, also clears current font
+            FONT.initData();
+    
+            var $fontPicker = $('.fontbuttons button');
+            $fontPicker.on('click', function () {
+                if (!$(this).data('font-file')) {
                     return;
                 }
-
-                //noinspection JSUnresolvedVariable
-                chrome.fileSystem.getDisplayPath(fileEntry, function (path) {
-                    console.log('Saving firmware to: ' + path);
-
-                    // check if file is writable
-                    //noinspection JSUnresolvedVariable
-                    chrome.fileSystem.isWritableEntry(fileEntry, function (isWritable) {
-                        if (isWritable) {
-                            var blob = new Blob([intel_hex], {type: 'text/plain'});
-
-                            fileEntry.createWriter(function (writer) {
-                                var truncated = false;
-
-                                writer.onerror = function (e) {
-                                    console.error(e);
-                                };
-
-                                writer.onwriteend = function () {
-                                    if (!truncated) {
-                                        // onwriteend will be fired again when truncation is finished
-                                        truncated = true;
-                                        writer.truncate(blob.size);
-
-                                        return;
-                                    }
-                                };
-
-                                writer.write(blob);
-                            }, function (e) {
-                                console.error(e);
-                            });
-                        } else {
-                            console.log('You don\'t have write permissions for this file, sorry.');
-                            GUI.log('You don\'t have <span style="color: red">write permissions</span> for this file');
-                        }
-                    });
+                $fontPicker.removeClass('active');
+                $(this).addClass('active');
+                $.get('./resources/osd/analogue/' + $(this).data('font-file') + '.mcm', function (data) {
+                    FONT.parseMCMFontFile(data);
+                    FONT.preview($preview);
+                    OSD.GUI.update();
+                });
+                store.set('osd_font', $(this).data('font-file'));
+            });
+    
+            // load the last selected font when we change tabs
+            var osd_font = store.get('osd_font', false);
+            var previous_font_button;
+            if (osd_font) {
+                previous_font_button = $('.fontbuttons button[data-font-file="' + osd_font + '"]');
+                if (previous_font_button.attr('data-font-file') == undefined) previous_font_button = undefined;
+            }
+    
+            if (typeof previous_font_button == "undefined") {
+                $fontPicker.first().trigger( "click" );
+            } else {
+                previous_font_button.trigger( "click" );
+            }
+            
+    
+            $('button.load_font_file').on('click', function () {
+                $fontPicker.removeClass('active');
+                FONT.openFontFile().then(function () {
+                    FONT.preview($preview);
+                    OSD.GUI.update();
                 });
             });
-        });
-
-        $('.update_preview').on('change', function () {
-            if (OSD.data) {
-                // Force an OSD redraw by saving any element
-                // with a small delay, to make sure the setting
-                // change is performance before the OSD starts
-                // the full redraw.
-                // This will also update all previews
-                setTimeout(function() {
-                    OSD.GUI.saveItem({id: 0});
-                }, 100);
+    
+            // font upload
+            $('a.flash_font').on('click', function () {
+                if (!GUI.connect_lock) { // button disabled while flashing is in progress
+                    var progressLabel = $('.progressLabel');
+                    var progressBar = $('.progress');
+                    var uploading = i18n.getMessage('uploadingCharacters');
+                    progressLabel.text(uploading);
+                    var progressCallback = function(done, total, percentage) {
+                        progressBar.val(percentage);
+                        if (done == total) {
+                            progressLabel.text(i18n.getMessage('uploadedCharacters'), [total]);
+                        } else {
+                            progressLabel.text(uploading + ' (' + done + '/' + total + ')');
+                        }
+                    }
+                    FONT.upload(progressCallback);
+                }
+            });
+    
+            $('.update_preview').on('change', function () {
+                if (OSD.data) {
+                    // Force an OSD redraw by saving any element
+                    // with a small delay, to make sure the setting
+                    // change is performance before the OSD starts
+                    // the full redraw.
+                    // This will also update all previews
+                    setTimeout(function() {
+                        OSD.GUI.saveItem({id: 0});
+                    }, 100);
+                }
+            });
+    
+            $('#useCraftnameForMessages').on('change', function() {
+                OSD.GUI.updateDjiMessageElements(this.checked);
+            });
+    
+            if(semver.gte(FC.CONFIG.flightControllerVersion, '7.1.0')) {
+                mspHelper.loadOsdCustomElements(createCustomElements);
             }
-        });
 
-        $('#useCraftnameForMessages').on('change', function() {
-            OSD.GUI.updateDjiMessageElements(this.checked);
-        });
-
-        // Update SENSOR_CONFIG, used to detect
-        // OSD_AIR_SPEED
-        mspHelper.loadSensorConfig(function () {
             GUI.content_ready(callback);
-        });
-    }));
+        }));
+    });
 };
+
+function createCustomElements(){
+    if(FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount == 0){
+        $('.custom-element-container').remove();
+        return;
+    }
+
+    var customElementsContainer = $('#osdCustomElements');
+
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++){
+        var label = $('<label>');
+
+        var customElementTable = $('<table>').addClass('osdCustomElement_main_table');
+        var customElementRowType = $('<tr>').data('row', i);
+        var customElementRowValue = $('<tr>').data('row', i);
+        var customElementLabel = $('<tr>');
+
+        for(var ii = 0; ii < 3; ii++){
+
+            var select = $('<select>').addClass('osdCustomElement-' + i + '-part-' + ii + '-type').data('valueCellClass', 'osdCustomElement-' + i + '-part-' + ii + '-value').html(`
+                        <option value="0">none</option>
+                        <option data-value="text" value="1">Text</option>
+                        <option data-value="ico" value="2">Icon Static</option>
+                        <option data-value="ico_gv" value="3">Icon Global Variable</option>
+                        <option data-value="gv" value="4">Global Variable 00000</option>
+                        <option data-value="gv" value="5">Global Variable 000.00</option>
+                        <option data-value="gv" value="6">Global Variable 000</option>
+                        <option data-value="gv" value="7">Global Variable 0.0</option>
+                        `);
+
+            customElementRowType.append($('<td>').append(select));
+            customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-part-' + ii + '-value').append(
+                $('<input>').addClass('value').addClass('text').attr('type', 'text').attr('maxlength', FC.OSD_CUSTOM_ELEMENTS.settings.customElementTextSize).hide()
+            ).append(
+                $('<input>').addClass('value').addClass('ico').attr('min', 1).attr('max', 255).hide()
+            ).append(
+                $('<select>').addClass('value').addClass('ico_gv').html(getGVoptions()).hide()
+            ).append(
+                $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+            ));
+
+            select.change(function(){
+                var dataValue = $(this).find(':selected').data('value');
+                var valueBlock = $('.' + $(this).data('valueCellClass'))
+                valueBlock.find('.value').hide();
+                valueBlock.find('.' + dataValue).show();
+            });
+        }
+
+        var selectVisibility = $('<select>').addClass('osdCustomElement-' + i + '-visibility-type').data('valueCellClass', 'osdCustomElement-' + i + '-visibility-value').html(`
+            <option value="0">always</option>
+            <option data-value="gv" value="1">Global Variable</option>
+            <option data-value="lc" value="2">Logic Condition</option>
+        `);
+        customElementRowType.append($('<td>').append(selectVisibility));
+        customElementRowValue.append($('<td>').addClass('osdCustomElement-' + i + '-visibility-value').append(
+            $('<select>').addClass('value').addClass('gv').html(getGVoptions()).hide()
+        ).append(
+            $('<select>').addClass('value').addClass('lc').html(getLCoptions()).hide()
+        ));
+
+        selectVisibility.change(function(){
+            var dataValue = $(this).find(':selected').data('value');
+            var valueBlock = $('.' + $(this).data('valueCellClass'))
+            valueBlock.find('.value').hide();
+            valueBlock.find('.' + dataValue).show();
+        });
+
+        customElementLabel.append($('<td>').attr('colspan', 2).append($('<span>').html(i18n.getMessage("custom_element") + ' ' + (i + 1))));
+
+        customElementTable.append(customElementRowType).append(customElementRowValue).append(customElementLabel);
+        label.append(customElementTable);
+        customElementsContainer.append(label);
+    }
+
+    fillCustomElementsValues();
+    customElementsInitCallback();
+}
+
+function fillCustomElementsValues() {
+    for (var i = 0; i < FC.OSD_CUSTOM_ELEMENTS.settings.customElementsCount; i++) {
+        for (var ii = 0; ii < 3; ii++) {
+            $('.osdCustomElement-' + i + '-part-' + ii + '-type').val(FC.OSD_CUSTOM_ELEMENTS.items[i].customElementItems[ii].type).trigger('change');
+
+            var valueCell = $('.osdCustomElement-' + i + '-part-' + ii + '-value');
+            switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].type){
+                case 1:
+                    valueCell.find('.text').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementText).trigger('change');
+                    break;
+                case 2:
+                    valueCell.find('.ico').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 3:
+                    valueCell.find('.ico_gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    valueCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementItems[ii].value).trigger('change');
+                    break;
+            }
+        }
+
+        $('.osdCustomElement-' + i + '-visibility-type').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type).trigger('change');
+        var valueVisibilityCell = $('.osdCustomElement-' + i + '-visibility-value');
+        switch (FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.type){
+            case 1:
+                valueVisibilityCell.find('.gv').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                break;
+            case 2:
+                valueVisibilityCell.find('.lc').val(FC.OSD_CUSTOM_ELEMENTS .items[i].customElementVisibility.value).trigger('change');
+                break;
+        }
+
+        customElementNormaliseRow(i);
+        customElementDisableNonValidOptionsRow(i);
+    }
+}
+
+function customElementsInitCallback() {
+
+    var callback = function(){
+        var row = $(this).closest('tr').data('row');
+
+        customElementNormaliseRow(row);
+        customElementDisableNonValidOptionsRow(row);
+
+        MSP.promise(MSPCodes.MSP2_INAV_SET_CUSTOM_OSD_ELEMENTS, customElementGetDataForRow(row));
+    };
+
+    var customElements = $('#osdCustomElements')
+    customElements.find('input, select').change(callback);
+    customElements.find('input').keyup(callback);
+}
+
+function customElementNormaliseRow(row){
+    for(var i = 0; i < 3; i++){
+        var elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+        var valueCell = $('.' + elementType.data('valueCellClass'));
+
+        switch (parseInt(elementType.val())){
+            case 1:
+                valueCell.find('.text').val(valueCell.find('.text').val().toUpperCase());
+                valueCell.find('.text').val(valueCell.find('.text').val().replace(/[^A-Z0-9!.\* ]/g, ""));
+                break;
+            case 2:
+                valueCell.find('.ico').val(valueCell.find('.ico').val() > 255 ? 255 : valueCell.find('.ico').val());
+                valueCell.find('.ico').val(valueCell.find('.ico').val() < 1 ? 1 : valueCell.find('.ico').val());
+        }
+    }
+}
+
+function customElementDisableNonValidOptionsRow(row){
+
+    var selectedTextIndex = false;
+    for(let i = 0; i < 3; i++){
+        let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+
+        if(parseInt(elementType.val()) === 1)
+        {
+            selectedTextIndex = i;
+            break;
+        }
+    }
+
+    for(let i = 0; i < 3; i++){
+        let elementType = $('.osdCustomElement-' + row + '-part-' + i + '-type');
+        if(i !== selectedTextIndex && selectedTextIndex !== false){
+            elementType.find('option[value="1"]').attr('disabled', 'disabled');
+        }else{
+            elementType.find('option[value="1"]').removeAttr('disabled');
+        }
+    }
+}
+
+function customElementGetDataForRow(row){
+
+    var data = [];
+    data.push8(row);
+
+    var text = "";
+
+    for(var ii = 0; ii < 3; ii++){
+        var elementType = $('.osdCustomElement-' + row + '-part-' + ii + '-type');
+        var valueCell = $('.' + elementType.data('valueCellClass'));
+        var partValue = 0;
+
+        switch (parseInt(elementType.val())){
+            case 1:
+                text = valueCell.find('.text').val();
+                break;
+            case 2:
+                partValue = parseInt(valueCell.find('.ico').val());
+                break;
+            case 3:
+                partValue = parseInt(valueCell.find('.ico_gv').find(':selected').val());
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                partValue = parseInt(valueCell.find('.gv').find(':selected').val());
+                break;
+        }
+
+        data.push8(parseInt(elementType.val()));
+        data.push16(partValue);
+    }
+
+    var elementVisibilityType = $('.osdCustomElement-' + row + '-visibility-type');
+    var valueVisibilityCell = $('.' + elementVisibilityType.data('valueCellClass'));
+    var visibilityValue = null;
+    switch (parseInt(elementVisibilityType.val())){
+        case 1:
+            visibilityValue = parseInt(valueVisibilityCell.find('.gv').find(':selected').val());
+            break;
+        case 2:
+            visibilityValue = parseInt(valueVisibilityCell.find('.lc').find(':selected').val());
+            break;
+    }
+
+    data.push8(parseInt(elementVisibilityType.val()));
+    data.push16(visibilityValue);
+
+    for(var i = 0; i < FC.OSD_CUSTOM_ELEMENTS .settings.customElementTextSize; i++){
+        if(i < text.length){
+            data.push8(text.charCodeAt(i))
+        }else{
+            data.push8(0);
+        }
+    }
+
+    return data;
+}
+
+function getGVoptions(){
+    var result = '';
+    for(var i = 0; i < 8; i++){
+        result += `<option value="` + i + `">GV `+i+`</option>`;
+    }
+    return result;
+}
+
+function getLCoptions(){
+    var result = '';
+    for(var i = 0; i < 64; i++){
+        result += `<option value="` + i + `">LC `+i+`</option>`;
+    }
+    return result;
+}
+
 
 function refreshOSDSwitchIndicators() {
     let group = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
@@ -3063,24 +3744,90 @@ function refreshOSDSwitchIndicators() {
     OSD.GUI.updatePreviews();
 }
 
-function updateCraftName() {
+function updatePilotAndCraftNames() {
+    let foundPilotName = ($('#pilot_name').val() == undefined);
+    let foundCraftName = ($('#craft_name').val() == undefined);
+
+    let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
+        return e.name == "osdGroupGeneral";
+    })[0];
+
+    if (($('#craft_name').val() != undefined) || ($('#pilot_name').val() != undefined)) {
+        for (let si = 0; si < generalGroup.items.length; si++) {
+            if (generalGroup.items[si].name == "CRAFT_NAME") {
+                let nameText = $('#craft_name').val();
+
+                if (nameText == "") {
+                    generalGroup.items[si].preview = "CRAFT_NAME";
+                } else {
+                    generalGroup.items[si].preview = nameText;
+                }
+                foundCraftName = true;
+            }
+
+            if (generalGroup.items[si].name == "PILOT_NAME") {
+                let nameText = $('#pilot_name').val();
+
+                if (nameText == "") {
+                    generalGroup.items[si].preview = "PILOT_NAME";
+                } else {
+                    generalGroup.items[si].preview = nameText;
+                }
+                foundPilotName = true;
+            }
+
+            if (foundCraftName && foundPilotName) {
+                break;
+            }
+        }
+    }
+
+    OSD.GUI.updatePreviews();
+};
+
+function updatePanServoPreview() {
+    // Show or hide the settings, based on of the feature is active.
+    if ($('#panServoOutput').val() === "0") {
+        $('#osd_pan_settings').hide();
+        $('#panServoOutput').parent().addClass('no-bottom');
+    } else {
+        $('#osd_pan_settings').show();
+        $('#panServoOutput').parent().removeClass('no-bottom');
+    }
+
+    // Update the panServoOutput select to be visibly easier to use
+    let servoRules = FC.SERVO_RULES;
+    $('#panServoOutput option').each(function() {
+        let servoIndex = $(this).val();
+
+        if (servoIndex === "0") {
+            $(this).text("OFF");
+        } else {
+            let servo = servoRules.getServoMixRuleFromTarget(servoIndex);
+            if (servo == null) {
+                $(this).remove();
+            } else {
+                let servoInputIndex = parseInt(servo.getInput());
+                $(this).text("Servo " + servoIndex + ": " + FC.getServoMixInputName(servoInputIndex));
+            }
+        }
+    });
+
+    // Update the OSD preview based on settings
     let generalGroup = OSD.constants.ALL_DISPLAY_GROUPS.filter(function(e) {
         return e.name == "osdGroupGeneral";
       })[0];
 
+    for (let si = 0; si < generalGroup.items.length; si++) {
+        if (generalGroup.items[si].name == "PAN_SERVO_CENTRED") {
+            let craftNameText = $('#craft_name').val();
 
-    if ($('#craft_name').val() != undefined) {
-        for (let si = 0; si < generalGroup.items.length; si++) {
-            if (generalGroup.items[si].name == "CRAFT_NAME") {
-                let craftNameText = $('#craft_name').val();
-                
-                if (craftNameText == "") {
-                    generalGroup.items[si].preview = "CRAFT_NAME";
-                } else {
-                    generalGroup.items[si].preview = craftNameText;
-                }
-                break;
+            if ($('#osdPanServoIndicatorShowDegrees').prop('checked')) {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L) + '120' + FONT.symbol(SYM.DEGREES);
+            } else {
+                generalGroup.items[si].preview = FONT.symbol(SYM.PAN_SERVO_IS_OFFSET_L);
             }
+            break;
         }
     }
 

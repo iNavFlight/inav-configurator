@@ -1,18 +1,150 @@
-/*global mspHelper,$,GUI,MSP,chrome*/
 'use strict';
 
-var helper = helper || {};
+const { GUI } = require('./../js/gui');
+const FC = require('./fc');
+const MSP = require('./msp');
+const MSPCodes = require('./../js/msp/MSPCodes');
+const mspHelper = require('./msp/MSPHelper');
+const MSPChainerClass = require('./msp/MSPchainer');
+const features = require('./feature_framework');
+const periodicStatusUpdater = require('./periodicStatusUpdater');
+const { mixer } = require('./model');
+const jBox = require('./libraries/jBox/jBox.min');
+const i18n = require('./localization');
+
 var savingDefaultsModal;
 
-helper.defaultsDialog = (function () {
+var defaultsDialog = (function () {
 
     let publicScope = {},
         privateScope = {};
 
     let $container;
 
-    let data = [{
-        "title": 'Mini Quad with 3"-7" propellers',
+    let data = [
+    {
+        "title": 'Mini Quad with 3" propellers',
+        "id": 6,
+        "notRecommended": false,
+        "reboot": true,
+        "mixerToApply": 3,
+        "settings": [
+            {
+                key: "model_preview_type",
+                value: 3
+            },
+            /*
+            System
+            */
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "looptime",
+                value: 500
+            },
+            {
+                key: "motor_pwm_protocol",
+                value: "DSHOT300"
+            },
+            /*
+            Ez Tune setup
+            */
+            {
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
+                value: 90
+            },
+            {
+                key: "ez_axis_ratio",
+                value: 116
+            },
+            {
+                key: "ez_response",
+                value: 71
+            },
+            {
+                key: "ez_damping",
+                value: 103
+            },
+            {
+                key: "ez_stability",
+                value: 105
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 100
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
+            },
+            /*
+            Mechanics
+            */
+            {
+                key: "airmode_type",
+                value: "THROTTLE_THRESHOLD"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
+                key: "mc_iterm_relax",
+                value: "RP"
+            },
+            {
+                key: "d_boost_min",
+                value: 1.0
+            },
+            {
+                key: "d_boost_max",
+                value: 1.0
+            },
+            {
+                key: "antigravity_gain",
+                value: 2
+            },
+            {
+                key: "antigravity_accelerator",
+                value: 5
+            },
+            /*
+                * TPA
+                */
+            {
+                key: "tpa_rate",
+                value: 20
+            },
+            {
+                key: "tpa_breakpoint",
+                value: 1200
+            },
+            {
+                key: "platform_type",
+                value: "MULTIROTOR"
+            },
+            {
+                key: "applied_defaults",
+                value: 6
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
+            }
+        ]
+    },
+    {
+        "title": 'Mini Quad with 5" propellers',
         "id": 2,
         "notRecommended": false,
         "reboot": true,
@@ -38,56 +170,63 @@ helper.defaultsDialog = (function () {
                 value: "DSHOT300"
             },
             /*
-            Filtering
+            Ez Tune setup
             */
             {
-                key: "gyro_main_lpf_hz",
-                value: 110
-            },
-            {
-                key: "gyro_main_lpf_type",
-                value: "PT1"
-            },
-            {
-                key: "dterm_lpf_hz",
-                value: 110
-            },
-            {
-                key: "dterm_lpf_type",
-                value: "PT3"
-            },
-            {
-                key: "dterm_lpf2_hz",
-                value: 0
-            },
-            {
-                key: "dterm_lpf2_type",
-                value: "PT1"
-            },
-            {
-                key: "dynamic_gyro_notch_enabled",
+                key: "ez_enabled",
                 value: "ON"
             },
             {
-                key: "dynamic_gyro_notch_q",
-                value: 250
+                key: "ez_filter_hz",
+                value: 110
             },
             {
-                key: "dynamic_gyro_notch_min_hz",
-                value: 120
+                key: "ez_axis_ratio",
+                value: 110
             },
             {
-                key: "setpoint_kalman_enabled",
+                key: "ez_response",
+                value: 92
+            },
+            {
+                key: "ez_damping",
+                value: 108
+            },
+            {
+                key: "ez_stability",
+                value: 110
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 80
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
+            },
+            /*
+            Dynamic gyro LPF
+            */
+            {
+                key: "gyro_use_dyn_lpf",
                 value: "ON"
             },
             {
-                key: "setpoint_kalman_q",
-                value: 200
+                key: "gyro_dyn_lpf_min_hz",
+                value: 85
             },
             {
-                key: "smith_predictor_delay",   // Enable Smith Predictor 
-                value: 1.5
-            },   
+                key: "gyro_dyn_lpf_max_hz",
+                value: 300
+            },
+            {
+                key: "gyro_dyn_lpf_curve_expo",
+                value: 3
+            },
             /*
             Mechanics
             */
@@ -105,11 +244,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "d_boost_min",
-                value: 0.8
+                value: 1.0
             },
             {
                 key: "d_boost_max",
-                value: 1.2
+                value: 1.0
             },
             {
                 key: "antigravity_gain",
@@ -118,64 +257,6 @@ helper.defaultsDialog = (function () {
             {
                 key: "antigravity_accelerator",
                 value: 5
-            },
-            /*
-            Rates
-            */
-            {
-                key: "rc_yaw_expo",
-                value: 75
-            },
-            {
-                key: "rc_expo",
-                value: 75
-            },
-            {
-                key: "roll_rate",
-                value: 70
-            },
-            {
-                key: "pitch_rate",
-                value: 70
-            },
-            {
-                key: "yaw_rate",
-                value: 60
-            },
-            /*
-            PIDs
-            */
-            {
-                key: "mc_p_pitch",
-                value: 44
-            },
-            {
-                key: "mc_i_pitch",
-                value: 75
-            },
-            {
-                key: "mc_d_pitch",
-                value: 25
-            },
-            {
-                key: "mc_p_roll",
-                value: 40
-            },
-            {
-                key: "mc_i_roll",
-                value: 60
-            },
-            {
-                key: "mc_d_roll",
-                value: 23
-            },
-            {
-                key: "mc_p_yaw",
-                value: 35
-            },
-            {
-                key: "mc_i_yaw",
-                value: 80
             },
             /*
              * TPA
@@ -195,6 +276,127 @@ helper.defaultsDialog = (function () {
             {
                 key: "applied_defaults",
                 value: 2
+            },
+            {
+                key: "failsafe_procedure",
+                value: "DROP"
+            }
+        ]
+    },
+    {
+        "title": 'Mini Quad with 7" propellers',
+        "id": 5,
+        "notRecommended": false,
+        "reboot": true,
+        "mixerToApply": 3,
+        "settings": [
+            {
+                key: "model_preview_type",
+                value: 3
+            },
+            /*
+            System
+            */
+            {
+                key: "gyro_hardware_lpf",
+                value: "256HZ"
+            },
+            {
+                key: "looptime",
+                value: 500
+            },
+            {
+                key: "motor_pwm_protocol",
+                value: "DSHOT300"
+            },
+            /*
+            Ez Tune setup
+            */
+            {
+                key: "ez_enabled",
+                value: "ON"
+            },
+            {
+                key: "ez_filter_hz",
+                value: 90
+            },
+            {
+                key: "ez_axis_ratio",
+                value: 110
+            },
+            {
+                key: "ez_response",
+                value: 101
+            },
+            {
+                key: "ez_damping",
+                value: 115
+            },
+            {
+                key: "ez_stability",
+                value: 100
+            },
+            {
+                key: "ez_aggressiveness",
+                value: 100
+            },
+            {
+                key: "ez_rate",
+                value: 134
+            },
+            {
+                key: "ez_expo",
+                value: 118
+            }, 
+            /*
+            Mechanics
+            */
+            {
+                key: "airmode_type",
+                value: "THROTTLE_THRESHOLD"
+            },
+            {
+                key: "airmode_throttle_threshold",
+                value: 1150
+            },
+            {
+                key: "mc_iterm_relax",
+                value: "RPY"
+            },
+            {
+                key: "d_boost_min",
+                value: 0.8
+            },
+            {
+                key: "d_boost_max",
+                value: 1.2
+            },
+            {
+                key: "antigravity_gain",
+                value: 2
+            },
+            {
+                key: "antigravity_accelerator",
+                value: 5
+            },
+            /*
+             * TPA
+             */
+            {
+                key: "tpa_rate",
+                value: 20
+            },
+            {
+                key: "tpa_breakpoint",
+                value: 1200
+            },
+            {
+                key: "platform_type",
+                value: "MULTIROTOR"
+            },
+            {
+                key: "applied_defaults",
+                value: 5
             },
             {
                 key: "failsafe_procedure",
@@ -242,10 +444,6 @@ helper.defaultsDialog = (function () {
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -260,6 +458,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "motor_pwm_protocol",
                 value: "STANDARD"
+            },
+            {
+                key: "ahrs_inertia_comp_method",
+                value: "ADAPTIVE"
             },
             {
                 key: "throttle_idle",
@@ -287,19 +489,23 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 25
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 8
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 55
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.5
+                value: 0.4
             },
             {
                 key: "max_angle_inclination_rll",
@@ -343,7 +549,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_p_yaw",
-                value: 20
+                value: 50
             },
             {
                 key: "fw_i_yaw",
@@ -351,19 +557,11 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "fw_d_yaw",
-                value: 0
+                value: 20
             },
             {
                 key: "fw_ff_yaw",
-                value: 100
-            },
-            {
-                key: "imu_acc_ignore_rate",
-                value: 9
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 5
+                value: 255
             },
             {
                 key: "airmode_type",
@@ -386,25 +584,35 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
-                key: "failsafe_mission",
-                value: "ON"
+                key: "nav_wp_radius",
+                value: 800
             },
             {
-                key: "nav_wp_radius",
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 45
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "nav_fw_launch_climb_angle",
+                value: 25
+            },
+        ],
     },
     {
         "title": 'Airplane without a Tail (Wing, Delta, etc)',
         "notRecommended": false,
-        "id": 3,
+        "id": 4,
         "reboot": true,
         "mixerToApply": 8,
         "settings": [
@@ -418,7 +626,7 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "applied_defaults",
-                value: 3
+                value: 4
             },
             {
                 key: "gyro_hardware_lpf",
@@ -441,10 +649,6 @@ helper.defaultsDialog = (function () {
                 value: 1
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "dynamic_gyro_notch_enabled",
                 value: "ON"
             },
@@ -459,6 +663,10 @@ helper.defaultsDialog = (function () {
             {
                 key: "motor_pwm_protocol",
                 value: "STANDARD"
+            },
+            {
+                key: "ahrs_inertia_comp_method",
+                value: "ADAPTIVE"
             },
             {
                 key: "throttle_idle",
@@ -486,19 +694,23 @@ helper.defaultsDialog = (function () {
             },
             {
                 key: "nav_fw_pos_z_p",
-                value: 15
+                value: 35
             },
             {
-                key: "nav_fw_pos_z_d",
+                key: "nav_fw_pos_z_i",
                 value: 5
             },
             {
+                key: "nav_fw_pos_z_d",
+                value: 10
+            },
+            {
                 key: "nav_fw_pos_xy_p",
-                value: 60
+                value: 70
             },
             {
                 key: "fw_turn_assist_pitch_gain",
-                value: 0.2
+                value: 0.3
             },
             {
                 key: "max_angle_inclination_rll",
@@ -557,14 +769,6 @@ helper.defaultsDialog = (function () {
                 value: 100
             },
             {
-                key: "imu_acc_ignore_rate",
-                value: 9
-            },
-            {
-                key: "imu_acc_ignore_slope",
-                value: 5
-            },
-            {
                 key: "airmode_type",
                 value: "STICK_CENTER_ONCE"
             },
@@ -585,20 +789,30 @@ helper.defaultsDialog = (function () {
                 value: 5000
             },
             {
-                key: "failsafe_mission",
-                value: "ON"
+                key: "nav_wp_radius",
+                value: 1000
             },
             {
-                key: "nav_wp_radius",
+                key: "nav_wp_max_safe_distance",
+                value: 500
+            },
+            {
+                key: "nav_fw_launch_max_angle",
+                value: 75
+            },
+            {
+                key: "nav_fw_launch_motor_delay",
+                value: 100
+            },
+            {
+                key: "nav_fw_launch_max_altitude",
                 value: 5000
             },
-        ],
-        "features": [
             {
-                bit: 4, // Enable MOTOR_STOP
-                state: true
-            }
-        ]
+                key: "nav_fw_launch_climb_angle",
+                value: 25
+            },
+        ],
     },
     {
         "title": 'Rovers & Boats',
@@ -620,10 +834,6 @@ helper.defaultsDialog = (function () {
                 value: 10
             },
             {
-                key: "gyro_main_lpf_type",
-                value: "BIQUAD"
-            },
-            {
                 key: "motor_pwm_protocol",
                 value: "STANDARD"
             },
@@ -640,8 +850,8 @@ helper.defaultsDialog = (function () {
                 value: "ROVER"
             },
             {
-                key: "nav_wp_safe_distance",
-                value: 50000
+                key: "nav_wp_max_safe_distance",
+                value: 500
             },
             {
                 key: "nav_fw_loiter_radius",
@@ -691,17 +901,17 @@ helper.defaultsDialog = (function () {
     privateScope.setFeaturesBits = function (selectedDefaultPreset) {
 
         if (selectedDefaultPreset.features && selectedDefaultPreset.features.length > 0) {
-            helper.features.reset();
+            features.reset();
 
             for (const feature of selectedDefaultPreset.features) {
                 if (feature.state) {
-                    helper.features.set(feature.bit);
+                    features.set(feature.bit);
                 } else {
-                    helper.features.unset(feature.bit);
+                    features.unset(feature.bit);
                 }
             }
 
-            helper.features.execute(function () {
+            features.execute(function () {
                 privateScope.setSettings(selectedDefaultPreset);
             });
         } else {
@@ -712,14 +922,16 @@ helper.defaultsDialog = (function () {
     privateScope.finalize = function (selectedDefaultPreset) {
         mspHelper.saveToEeprom(function () {
             //noinspection JSUnresolvedVariable
-            GUI.log(chrome.i18n.getMessage('configurationEepromSaved'));
+            GUI.log(i18n.getMessage('configurationEepromSaved'));
 
             if (selectedDefaultPreset.reboot) {
                 GUI.tab_switch_cleanup(function () {
                     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false, function () {
                         //noinspection JSUnresolvedVariable
-                        savingDefaultsModal.close();
-                        GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+                        if (typeof savingDefaultsModal !== 'undefined') {
+                            savingDefaultsModal.close();
+                        }
+                        GUI.log(i18n.getMessage('deviceRebooting'));
                         GUI.handleReconnect();
                     });
                 });
@@ -728,46 +940,134 @@ helper.defaultsDialog = (function () {
     };
 
     privateScope.setSettings = function (selectedDefaultPreset) {
-        //Save analytics
-        googleAnalytics.sendEvent('Setting', 'Defaults', selectedDefaultPreset.title);
-        Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-            return mspHelper.getSetting(input.key);
-        }).then(function () {
-            Promise.mapSeries(selectedDefaultPreset.settings, function (input, ii) {
-                return mspHelper.setSetting(input.key, input.value);
-            }).then(function () {
+        
+        periodicStatusUpdater.stop();
+        
+        var currentControlProfile = parseInt($("#profilechange").val());
+        var currentBatteryProfile = parseInt($("#batteryprofilechange").val());
 
-                // If default preset is associated to a mixer, apply the mixer as well
-                if (selectedDefaultPreset.mixerToApply) {
-                    let currentMixerPreset = helper.mixer.getById(selectedDefaultPreset.mixerToApply);
+        var controlProfileSettings = [];
+        var batterySettings = [];
+        var miscSettings = [];
 
-                    helper.mixer.loadServoRules(currentMixerPreset);
-                    helper.mixer.loadMotorRules(currentMixerPreset);
-
-                    SERVO_RULES.cleanup();
-                    SERVO_RULES.inflate();
-                    MOTOR_RULES.cleanup();
-                    MOTOR_RULES.inflate();
-
-                    mspHelper.sendServoMixer(function () {
-                        mspHelper.sendMotorMixer(function () {
-                            privateScope.finalize(selectedDefaultPreset);
-                        })
-                    });
-                } else {
-                    privateScope.finalize(selectedDefaultPreset);
-                }
-
-                
-
-            })
+        selectedDefaultPreset.settings.forEach(input => {
+            if (FC.isControlProfileParameter(input.key)) {
+                controlProfileSettings.push(input);
+            } else if (FC.isBatteryProfileParameter(input.key)) {
+                batterySettings.push(input);
+            } else {
+                miscSettings.push(input);
+            }
         });
-    };
+        
+        var settingsChainer = MSPChainerClass();
+        var chain = [];
+
+        miscSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [0], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [1], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [2], false, callback);
+        });
+        controlProfileSettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });    
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [0], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [1], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [2], false, callback);
+        });
+        batterySettings.forEach(input => {
+            chain.push(function (callback) {
+                mspHelper.setSetting(input.key, input.value, callback);
+            });
+        });
+        
+        // Set Mixers
+        if (selectedDefaultPreset.mixerToApply) {
+            let currentMixerPreset = mixer.getById(selectedDefaultPreset.mixerToApply);
+
+            mixer.loadServoRules(FC, currentMixerPreset);
+            mixer.loadMotorRules(FC, currentMixerPreset);
+            
+            FC.MIXER_CONFIG.platformType = currentMixerPreset.platform;
+            FC.MIXER_CONFIG.appliedMixerPreset = selectedDefaultPreset.mixerToApply;
+            FC.MIXER_CONFIG.motorStopOnLow = (currentMixerPreset.motorStopOnLow === true) ? true : false;
+            FC.MIXER_CONFIG.hasFlaps = (currentMixerPreset.hasFlaps === true) ? true : false;
+
+            FC.SERVO_RULES.cleanup();
+            FC.SERVO_RULES.inflate();
+            FC.MOTOR_RULES.cleanup();
+            FC.MOTOR_RULES.inflate();
+            
+            chain = chain.concat([
+                mspHelper.saveMixerConfig,
+                mspHelper.sendServoMixer,
+                mspHelper.sendMotorMixer
+            ]);
+        }
+            
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [currentControlProfile], false, callback);
+        });
+            
+        chain.push(function (callback) {
+            MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [currentBatteryProfile], false, callback);
+        });
+        
+        settingsChainer.setChain(chain);
+        settingsChainer.setExitPoint(function () {
+            privateScope.finalize(selectedDefaultPreset);
+        });
+        
+        settingsChainer.execute();        
+    }
 
     privateScope.onPresetClick = function (event) {
         savingDefaultsModal = new jBox('Modal', {
             width: 400,
-            height: 100,
+            height: 120,
             animation: false,
             closeOnClick: false,
             closeOnEsc: false,
@@ -807,7 +1107,7 @@ helper.defaultsDialog = (function () {
                 }
 
                 $element.find("a").html(preset.title);
-                $element.data("index", i).click(privateScope.onPresetClick)
+                $element.data("index", i).on('click', privateScope.onPresetClick)
                 $element.appendTo($place);
             }
         }
@@ -824,3 +1124,5 @@ helper.defaultsDialog = (function () {
 
     return publicScope;
 })();
+
+module.exports = defaultsDialog;

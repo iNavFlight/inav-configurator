@@ -10,15 +10,25 @@
                     <input id="notificationsOptions" type="checkbox" />
                     <label for="notificationsOptions"><span data-i18n="options_receive_app_notifications"></span></label>
                 </div>
-
+                <!--
                 <div class="checkbox statistics">
                     <input id="improveConfigurator" type="checkbox" />
                     <label for="improveConfigurator"><span data-i18n="options_improve_configurator"></span></label>
                 </div>
-
+                -->
                 <div class="checkbox show_profile_parameters">
                     <input id="showProfileParameters" type="checkbox" />
                     <label for="showProfileParameters"><span data-i18n="options_showProfileParameters"></span></label>
+                </div>
+                <div class="checkbox cli_autocomplete">
+                    <input id="cliAutocomplete" type="checkbox" />
+                    <label for="cliAutocomplete"><span data-i18n="options_cliAutocomplete"></span></label>
+                </div>
+                
+                <div class="select">                    
+                    <select id="languageOption">
+                    </select>
+                    <label for="languageOption" data-i18n="language"></label>
                 </div>
             </div>
         </div>
@@ -64,6 +74,26 @@
                         <option value="metric">Metric</option>
                     </select>
                     <label for="ui-unit-type" data-i18n="options_unit_type"></label>
+                </div>
+            </div>
+        </div>
+        <div class="options-section gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="sitlDemoMode"></div>
+            </div>
+            <div class="spacer_box settings">
+                <div class="default_btn" style="float: none; width: 200px;">
+                    <a id="demoModeReset" href="#" i18n="sitlResetDemoModeData"></a>
+                </div>
+            </div>
+        </div>
+        <div class="options-section gui_box grey">
+            <div class="gui_box_titlebar">
+                <div class="spacer_box_title" data-i18n="maintenance"></div>
+            </div>
+            <div class="spacer_box settings">
+                <div class="default_btn" style="float: none; width: 200px;">
+                    <a id="maintenanceFlushSettingsCache" href="#" i18n="maintenanceFlushSettingsCache"></a>
                 </div>
             </div>
         </div>

@@ -1,8 +1,17 @@
 'use strict';
 
-var usbDevices = {
-    STM32DFU: {'vendorId': 1155, 'productId': 57105}
-};
+const Store = require('electron-store');
+const store = new Store();
+
+const { GUI } = require('./../js/gui');
+const ConnectionSerial = require('./connection/connectionSerial');
+
+var usbDevices =  [
+    { 'vendorId': 1155, 'productId': 57105}, 
+    { 'vendorId': 11836, 'productId': 57105},
+    { 'vendorId': 12619, 'productId': 262}, // APM32 DFU Bootloader
+];
+
 
 var PortHandler = new function () {
     this.initial_ports = false;
@@ -19,7 +28,16 @@ PortHandler.initialize = function () {
 PortHandler.check = function () {
     var self = this;
 
-    ConnectionSerial.getDevices(function(current_ports) {
+    ConnectionSerial.getDevices(function(all_ports) {
+
+        // filter out ports that are not serial
+        let current_ports = [];
+        for (var i = 0; i < all_ports.length; i++) {
+            if (all_ports[i].indexOf(':') === -1) {
+                current_ports.push(all_ports[i]);
+            }
+        }
+        
         // port got removed or initial_ports wasn't initialized yet
         if (self.array_difference(self.initial_ports, current_ports).length > 0 || !self.initial_ports) {
             var removed_ports = self.array_difference(self.initial_ports, current_ports);
@@ -37,7 +55,7 @@ PortHandler.check = function () {
             if (GUI.connected_to) {
                 for (var i = 0; i < removed_ports.length; i++) {
                     if (removed_ports[i] == GUI.connected_to) {
-                        $('div#port-picker a.connect').click();
+                        $('div#port-picker a.connect').trigger( "click" );
                     }
                 }
             }
@@ -63,35 +81,31 @@ PortHandler.check = function () {
 
             // auto-select last used port (only during initialization)
             if (!self.initial_ports) {
-                chrome.storage.local.get('last_used_port', function (result) {
-                    // if last_used_port was set, we try to select it
-                    if (result.last_used_port) {
-                        if (result.last_used_port == "ble" || result.last_used_port == "tcp" || result.last_used_port == "udp") {
-                            $('#port').val(result.last_used_port);
-                        } else {
-                            current_ports.forEach(function(port) {
-                                if (port == result.last_used_port) {
-                                    console.log('Selecting last used port: ' + result.last_used_port);
-                                    $('#port').val(result.last_used_port);
-                                }
-                            });
-                        }
+                var last_used_port = store.get('last_used_port', false);
+                // if last_used_port was set, we try to select it
+                if (last_used_port) {
+                    if (last_used_port == "ble" || last_used_port == "tcp" || last_used_port == "udp" || last_used_port == "sitl" || last_used_port == "sitl-demo") {
+                        $('#port').val(last_used_port);
                     } else {
-                        console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
+                        current_ports.forEach(function(port) {
+                            if (port == last_used_port) {
+                                console.log('Selecting last used port: ' + last_used_port);
+                                $('#port').val(last_used_port);
+                            }
+                        });
                     }
-                });
+                } else {
+                    console.log('Last used port wasn\'t saved "yet", auto-select disabled.');
+                }
+                
+                var last_used_bps = store.get('last_used_bps', false);
+                if (last_used_bps) {
+                    $('#baud').val(last_used_bps);
+                }
 
-                chrome.storage.local.get('last_used_bps', function (result) {
-                    if (result['last_used_bps']) {
-                        $('#baud').val(result['last_used_bps']);
-                    }
-                });
-
-                chrome.storage.local.get('wireless_mode_enabled', function (result) {
-                    if (result['wireless_mode_enabled']) {
-                        $('#wireless-mode').prop('checked', true).change();
-                    }
-                });
+                if (store.get('wireless_mode_enabled', false)) {
+                    $('#wireless-mode').prop('checked', true).trigger('change');
+                }
 
             }
 
@@ -152,23 +166,34 @@ PortHandler.check = function () {
 };
 
 PortHandler.check_usb_devices = function (callback) {
-    chrome.usb.getDevices(usbDevices.STM32DFU, function (result) {
-        if (result.length) {
+    
+    self.dfu_available = false;
+    
+    navigator.usb.getDevices().then(devices => {
+        devices.forEach(device  => {
+            usbDevices.forEach(usbDev => {
+                if (device.vendorId == usbDev.vendorId && device.productId == usbDev.productId) {
+                    self.dfu_available = true;
+                    return;
+                }
+            });
+        });
+
+        if (self.dfu_available) {
             if (!$("div#port-picker #port [value='DFU']").length) {
                 $('div#port-picker #port').append($('<option/>', {value: "DFU", text: "DFU", data: {isDFU: true}}));
                 $('div#port-picker #port').val('DFU');
             }
-            self.dfu_available = true;
         } else {
             if ($("div#port-picker #port [value='DFU']").length) {
-               $("div#port-picker #port [value='DFU']").remove();
+                $("div#port-picker #port [value='DFU']").remove();
             }
-            self.dfu_available = false;
         }
-
-        if(callback) callback(self.dfu_available);
+    
+        if (callback) 
+            callback(self.dfu_available);
     });
-};
+}
 
 PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').html(''); // drop previous one
@@ -181,6 +206,8 @@ PortHandler.update_port_select = function (ports) {
     $('div#port-picker #port').append($("<option/>", {value: 'ble', text: 'BLE', data: {isBle: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'tcp', text: 'TCP', data: {isTcp: true}}));
     $('div#port-picker #port').append($("<option/>", {value: 'udp', text: 'UDP', data: {isUdp: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl', text: 'SITL', data: {isSitl: true}}));
+    $('div#port-picker #port').append($("<option/>", {value: 'sitl-demo', text: 'Demo mode', data: {isSitl: true}}));
 };
 
 PortHandler.port_detected = function(name, code, timeout, ignore_timeout) {
@@ -270,3 +297,5 @@ PortHandler.flush_callbacks = function () {
 
     return killed;
 };
+
+module.exports = { usbDevices, PortHandler };

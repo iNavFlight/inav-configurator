@@ -1,25 +1,26 @@
 'use strict'
 
-const STANDARD_UDP_PORT = 5762;
+const  { ConnectionType, Connection } = require('./connection')
+const dgram = require('node:dgram');
+const socket = dgram.createSocket('udp4');
 
+const { GUI } = require('./../gui');
+const i18n = require('./../localization');
+
+const STANDARD_UDP_PORT = 5761;
 class ConnectionUdp extends Connection {
+    
     constructor() {
         super();
-
+        
         this._connectionIP =  "";
         this._connectionPort =  0;
-        this._timeoutId = false;
-        this._isCli = false;
+        this._onReceiveListeners = [];
+        this._onErrorListener = [];
+        super._type = ConnectionType.UDP;
     }
 
-    /**
-     * @param {boolean} value
-     */
-    set isCli(value) {
-        this._isCli = value;
-    }
-
-    connectImplementation(address, options, callback) {
+    connectImplementation(address, options, callback) {     
         var addr = address.split(':');
         if (addr.length >= 2) {
             this._connectionIP = addr[0];
@@ -29,121 +30,96 @@ class ConnectionUdp extends Connection {
             this._connectionPort = STANDARD_UDP_PORT;
         } 
 
-        chrome.sockets.udp.create({
-            name: "iNavUDP",
-            bufferSize: 65535,
-        }, createInfo => {
-            this.checkChromeLastError();    
-            if (createInfo && !this._openCanceled) { 
-                chrome.sockets.udp.bind(createInfo.socketId, "0.0.0.0", this._connectionPort, result => {
-                    this.checkChromeLastError(); 
-                    if (result == 0) {                   
-                        // UDP connections don't trigger an event if they are interrupted, a simple timeout mechanism must suffice here. 
-                        this.addOnReceiveCallback(() => {
-                            if (this._timeoutId) {
-                                clearTimeout(this._timeoutId);
-                            }
-
-                            this._timeoutId = setTimeout(() => {
-                                if (!this._isCli) { // Disable timeout for CLI
-                                    GUI.log(chrome.i18n.getMessage('connectionUdpTimeout'));
-                                    this.abort();
-                                }
-                            }, 10000);
-                        })
-                        
-                        // Actually useless, but according to chrome documentation also UDP triggers error events ¯\_(ツ)_/¯
-                        this.addOnReceiveErrorListener(info => {
-                            console.error(info);
-                            googleAnalytics.sendException('UDP: ' + info.error, false);
-
-                            let message;
-                            switch (info.resultCode) {
-                                case -15:
-                                    // connection is lost, cannot write to it anymore, preventing further disconnect attempts
-                                    message = 'error: ERR_SOCKET_NOT_CONNECTED';
-                                    console.log(`UDP: ${message}: ${info.resultCode}`);
-                                    this._connectionId = false;
-                                    return;
-                                case -21:
-                                    message = 'error: NETWORK_CHANGED';
-                                    break;
-                                case -100:
-                                    message = 'error: CONNECTION_CLOSED';
-                                    break;
-                                case -102:
-                                    message = 'error: CONNECTION_REFUSED';
-                                    break;
-                                case -105:
-                                    message = 'error: NAME_NOT_RESOLVED';
-                                    break;
-                                case -106:
-                                    message = 'error: INTERNET_DISCONNECTED';
-                                    break;
-                                case -109:
-                                    message = 'error: ADDRESS_UNREACHABLE';
-                                    break;
-                            }
-
-                            let resultMessage = message ? `${message} ${info.resultCode}` : info.resultCode;
-                            console.warn(`UDP: ${resultMessage} ID: ${this._connectionId}`);
-
-                            this.abort();        
-                        });
-                        
-                        GUI.log(chrome.i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
-
-                        if (callback) {
-                            callback({
-                                bitrate: 115200,
-                                connectionId: createInfo.socketId
-                            });
-                        }
-                    } else {
-                        console.error("Unable to open UDP socket: " + result);
-                        if (callback) {
-                            callback(false);
-                        }
-                    }
-                });
-            } else {
-                console.error("Unable to create UDP socket.");
+        try {
+            socket.bind(this._connectionPort, () => {
+                GUI.log(i18n.getMessage('connectionConnected', ["udp://" + this._connectionIP + ":" + this._connectionPort]));
                 if (callback) {
-                    callback(false);
+                    callback({
+                        bitrate: 115200,
+                        connectionId: ++this._connectionId
+                    });
                 }
-            }
+
+            });
+        } catch (error) {
+            console.log(error);
+            callback(false);
+        }
+
+        socket.on('message', (msg, _rinfo) => {
+            this._onReceiveListeners.forEach(listener => {
+                listener({
+                    connectionId: ++this._connectionId,
+                    data: msg
+                });
+            });
+        })
+
+       socket.on('error', (error) => {
+            GUI.log("UDP error: " + error);
+            console.log("UDP error: " + error);
+            this.abort();              
+            this._onReceiveErrorListeners.forEach(listener => {
+                listener(error);    
+            });
         });
     }
 
     disconnectImplementation(callback) {
-        chrome.sockets.udp.close(this._connectionId);  
-        this.checkChromeLastError();    
+        var ret = true;
+        try {
+            socket.disconnect();
+        } catch (error) {
+            console.log("Disconecct error: " + error)
+            ret = false;
+        }
+
         this._connectionIP = "";
         this._connectionPort = 0;
-        clearTimeout(this._timeoutId);
-        this._timeoutId = false;
-        if (callback) {
-            callback(true);
-        }
+
+       if (callback) {
+           callback(ret);
+       }
     }
 
-    sendImplementation(data, callback) {;
-        chrome.sockets.udp.send(this._connectionId, data, this._connectionIP, this._connectionPort, callback);
-    }
+   sendImplementation(data, callback) {;
     
+    try {
+        socket.send(Buffer.from(data), this._connectionPort, this._connectionIP, (error) => {  
+            var result = 0;
+            var sent = data.byteLength;
+            if (error) {
+                result = 1;
+                sent = 0;
+                console.log("Serial wrire error: " + error)
+            }
+            if (callback) {
+                callback({
+                    bytesSent: sent,
+                    resultCode: result
+                });
+            }
+        });
+    } catch (error) {
+        console.log("UDP write error: " +  error)
+    }
+   }
+
     addOnReceiveCallback(callback){
-        chrome.sockets.udp.onReceive.addListener(callback);
+        this._onReceiveErrorListeners.push(callback);
     }
 
     removeOnReceiveCallback(callback){
-        chrome.sockets.udp.onReceive.removeListener(callback);
+        this._onReceiveListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 
     addOnReceiveErrorCallback(callback) {
-        chrome.sockets.udp.onReceiveError.addListener(callback);
+        this._onReceiveErrorListeners.push(callback);
     }
 
     removeOnReceiveErrorCallback(callback) {
-        chrome.sockets.udp.onReceiveError.removeListener(callback);
+        this._onReceiveErrorListeners = this._onReceiveErrorListeners.filter(listener => listener !== callback);
     }
 }
+
+module.exports = ConnectionUdp;

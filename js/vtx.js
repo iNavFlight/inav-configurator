@@ -37,3 +37,5 @@ var VTX = (function() {
 
     return self;
 })();
+
+module.exports = VTX;

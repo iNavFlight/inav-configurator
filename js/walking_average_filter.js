@@ -1,8 +1,6 @@
 'use strict';
 
-var classes = classes || {};
-
-classes.WalkingAverageFilter = function (maxLength) {
+var WalkingAverageFilter = function (maxLength) {
 
     var table = [],
         self = {};
@@ -31,3 +29,4 @@ classes.WalkingAverageFilter = function (maxLength) {
 
     return self;
 };
+module.exports = WalkingAverageFilter;

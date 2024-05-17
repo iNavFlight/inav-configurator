@@ -81,18 +81,22 @@
     background-color: #e4e4e4;
     border-bottom: 5px solid white;
     color: grey;
-    min-width: 100px;
+    height: 85px;
+    width: 130px;
+    padding: 0px 5px;
 }
 
 .tab-auxiliary .mode .info .name {
     font-weight: bold;
     font-size: 1.0em;
+    padding-bottom: 5px;
 }
 
 .tab-auxiliary .mode .info .buttons {
     position: absolute;
     bottom: 14px;
     width: 100%;
+    margin-left:-5px;
 }
 
 .tab-auxiliary .mode .info .buttons a {
@@ -199,7 +203,7 @@
     float: right;
     margin-right: 5px;
     margin-top: -9px;
-    background: url('../../../images/icons/close1.svg') no-repeat center 100%;
+    background: url('./../../../images/icons/close1.svg') no-repeat center 100%;
     display: block;
 }
 

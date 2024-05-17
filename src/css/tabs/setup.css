@@ -40,6 +40,21 @@
     float: left;
 }
 
+.attitude_note1 {
+   position: absolute;
+   left: 130px;
+   top: 29px;
+   font-size: 10px;
+}
+
+.attitude_note2 {
+   position: absolute;
+   left: 130px;
+   top: 13px;
+   font-size: 10px;
+}
+
+
 #interactive_block a.reset {
     position: absolute;
     display: block;
@@ -67,7 +82,7 @@
     height: 100%;
     top: 0;
     left: 0;
-    background: url(../../../images/paper.jpg) center;
+    background: url(./../../../images/paper.jpg) center;
     border-radius: 5px;
     background-size: contain;
 }
@@ -278,7 +293,7 @@
     float: right;
     height: 15px;
     width: 15px;
-    background-image:url(../../../images/icons/pass.svg);
+    background-image:url(./../../../images/icons/pass.svg);
     background-size:contain;
     background-position:center;
     background-repeat:no-repeat;
@@ -289,7 +304,7 @@
     margin-top: 3px;
     height: 15px;
     width: 15px;
-    background-image:url(../../../images/icons/nopass.svg);
+    background-image:url(./../../../images/icons/nopass.svg);
     background-size:contain;
     background-position:center;
     background-repeat:no-repeat;

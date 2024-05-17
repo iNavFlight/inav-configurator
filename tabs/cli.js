@@ -1,5 +1,23 @@
 'use strict';
-/*global chrome,GUI,TABS,nwdialog,$*/
+
+const path = require('path');
+const fs = require('fs');
+const { dialog } = require("@electron/remote");
+
+const MSP = require('./../js/msp');
+const mspQueue =  require('./../js/serial_queue');
+const { GUI, TABS } = require('./../js/gui');
+const CONFIGURATOR = require('./../js/data_storage');
+var timeout = require('./../js/timeouts');
+const i18n = require('./../js/localization');
+const { globalSettings } = require('./../js/globalSettings');
+const CliAutoComplete = require('./../js/CliAutoComplete');
+const { ConnectionType } = require('./../js/connection/connection');
+const jBox = require('./../js/libraries/jBox/jBox.min');
+const mspDeduplicationQueue = require('./../js/msp/mspDeduplicationQueue');
+const FC = require('./../js/fc');
+const { generateFilename } = require('./../js/helpers');
+
 TABS.cli = {
     lineDelayMs: 50,
     profileSwitchDelayMs: 100,
@@ -49,7 +67,7 @@ function copyToClipboard(text) {
         const button = $('.tab-cli .copy');
         const origText = button.text();
         const origWidth = button.css("width");
-        button.text(chrome.i18n.getMessage("cliCopySuccessful"));
+        button.text(i18n.getMessage("cliCopySuccessful"));
         button.css({
             width: origWidth,
             textAlign: "center",
@@ -67,49 +85,8 @@ function copyToClipboard(text) {
         console.warn(ex);
     }
 
-    function nwCopy(text) {
-        try {
-            let clipboard = require('nw.gui').Clipboard.get();
-            clipboard.set(text, "text");
-            onCopySuccessful();
-        } catch (ex) {
-            onCopyFailed(ex);
-        }
-    }
-
-    function webCopy(text) {
-        navigator.clipboard.writeText(text)
-            .then(onCopySuccessful, onCopyFailed);
-    }
-
-    let copyFunc;
-    try {
-        let nwGui = require('nw.gui');
-        copyFunc = nwCopy;
-    } catch (e) {
-        copyFunc = webCopy;
-    }
-    copyFunc(text);
-}
-
-function sendLinesWithDelay(outputArray) {
-    return (delay, line, index) => {
-        return new Promise((resolve) => {
-            helper.timeout.add('CLI_send_slowly', () => {
-                let processingDelay = TABS.cli.lineDelayMs;
-                if (line.toLowerCase().startsWith('profile')) {
-                    processingDelay = TABS.cli.profileSwitchDelayMs;
-                }
-                const isLastCommand = outputArray.length === index + 1;
-                if (isLastCommand && TABS.cli.cliBuffer) {
-                    line = getCliCommand(line, TABS.cli.cliBuffer);
-                }
-                TABS.cli.sendLine(line, () => {
-                    resolve(processingDelay);
-                });
-            }, delay);
-        });
-    };
+    navigator.clipboard.writeText(text)
+        .then(onCopySuccessful, onCopyFailed);
 }
 
 TABS.cli.initialize = function (callback) {
@@ -117,11 +94,11 @@ TABS.cli.initialize = function (callback) {
 
     if (GUI.active_tab != 'cli') {
         GUI.active_tab = 'cli';
-        googleAnalytics.sendAppView('CLI');
     }
 
     // Flush MSP queue as well as all MSP registered callbacks
-    helper.mspQueue.flush();
+    mspQueue.flush();
+    mspDeduplicationQueue.flush();
     MSP.callbacks_cleanup();
 
     self.outputHistory = "";
@@ -135,79 +112,125 @@ TABS.cli.initialize = function (callback) {
         return !(nwGui == null && !navigator.clipboard)
         })();
 
+
     function executeCommands(out_string) {
         self.history.add(out_string.trim());
 
         var outputArray = out_string.split("\n");
-        Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
+        return outputArray.reduce((p, line, index) =>
+            p.then((delay) =>
+                new Promise((resolve) => {
+                    timeout.add('CLI_send_slowly', () => {
+                        let processingDelay = TABS.cli.lineDelayMs;
+                        if (line.toLowerCase().startsWith('profile')) {
+                            processingDelay = TABS.cli.profileSwitchDelayMs;
+                        }
+                        const isLastCommand = outputArray.length === index + 1;
+                        if (isLastCommand && TABS.cli.cliBuffer) {
+                            line = getCliCommand(line, TABS.cli.cliBuffer);
+                        }
+                        TABS.cli.sendLine(line, () => {
+                            resolve(processingDelay);
+                        });
+                    }, delay);
+                })
+            ), Promise.resolve(0),
+        );
     }
 
-    GUI.load("./tabs/cli.html", function () {
+    GUI.load(path.join(__dirname, "cli.html"), function () {
         // translate to user-selected language
-        localize();
+       i18n.localize();
+
+        $('.cliDocsBtn').attr('href', globalSettings.docsTreeLocation + 'Settings.md');
 
         CONFIGURATOR.cliActive = true;
 
         var textarea = $('.tab-cli textarea[name="commands"]');
+        CliAutoComplete.initialize(textarea, self.sendLine.bind(self), writeToOutput);
+        $(CliAutoComplete).on('build:start', function() {
+            textarea
+                .val('')
+                .attr('placeholder', i18n.getMessage('cliInputPlaceholderBuilding'))
+                .prop('disabled', true);
+        });
+        $(CliAutoComplete).on('build:stop', function() {
+            textarea
+                .attr('placeholder', i18n.getMessage('cliInputPlaceholder'))
+                .prop('disabled', false)
+                .focus();
+        });
 
-        $('.tab-cli .save').click(function() {
+        $('.tab-cli .save').on('click', function () {
             var prefix = 'cli';
             var suffix = 'txt';
-
-            var filename = generateFilename(prefix, suffix);
-
-            var accepts = [{
-                description: suffix.toUpperCase() + ' files', extensions: [suffix],
-            }];
-
-            nwdialog.setContext(document);
-            nwdialog.saveFileDialog(filename, accepts, '', function(result) {
-                if (!result) {
-                    GUI.log(chrome.i18n.getMessage('cliSaveToFileAborted'));
+            var filename = generateFilename(FC.CONFIG, prefix, suffix);
+            var options = {
+                defaultPath: filename,
+                filters: [
+                    { name: suffix.toUpperCase(), extensions: [suffix] },
+                    { name: prefix.toUpperCase(), extensions: [prefix] }
+                ],
+            };
+            dialog.showSaveDialog(options).then(result => {
+                if (result.canceled) {
+                    GUI.log(i18n.getMessage('cliSaveToFileAborted'));
                     return;
                 }
-                const fs = require('fs');
 
-                fs.writeFile(result, self.outputHistory, (err) => {
+                fs.writeFile(result.filePath, self.outputHistory, (err) => {
                     if (err) {
-                        GUI.log('<span style="color: red">Error writing file</span>');
+                        GUI.log(i18n.getMessage('ErrorWritingFile'));
                         return console.error(err);
                     }
-                    GUI.log('File saved');
+                    GUI.log(i18n.getMessage('FileSaved'));
                 });
 
+            }).catch (err => {
+                console.log(err);
             });
         });
 
-        $('.tab-cli .exit').click(function() {
+        $('.tab-cli .exit').on('click', function () {
             self.send(getCliCommand('exit\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .savecmd').click(function() {
+        $('.tab-cli .savecmd').on('click', function () {
             self.send(getCliCommand('save\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .msc').click(function() {
+        $('.tab-cli .msc').on('click', function () {
             self.send(getCliCommand('msc\n', TABS.cli.cliBuffer));
         });
 
-        $('.tab-cli .clear').click(function() {
+        $('.tab-cli .diffall').on('click', function () {
+            self.outputHistory = "";
+            $('.tab-cli .window .wrapper').empty();
+            self.send(getCliCommand('diff all\n', TABS.cli.cliBuffer));
+        });
+
+        $('.tab-cli .clear').on('click', function () {
             self.outputHistory = "";
             $('.tab-cli .window .wrapper').empty();
         });
 
         if (clipboardCopySupport) {
-            $('.tab-cli .copy').click(function() {
+            $('.tab-cli .copy').on('click', function () {
                 copyToClipboard(self.outputHistory);
             });
         } else {
             $('.tab-cli .copy').hide();
         }
 
-        $('.tab-cli .load').click(function() {
-            nwdialog.setContext(document);
-            nwdialog.openFileDialog(".txt", false, '', function(result) {
-                if (!result) {
+        $('.tab-cli .load').on('click', function () {
+            var options = {
+                filters: [
+                    { name: 'CLI/TXT', extensions: ['cli', 'txt'] },
+                    { name: 'ALL', extensions: ['*'] }
+                ],
+            };
+            dialog.showOpenDialog(options).then( result => {
+                if (result.canceled) {
                     console.log('No file selected');
                     return;
                 }
@@ -229,63 +252,83 @@ TABS.cli.initialize = function (callback) {
                             closeButton: 'title',
                             animation: false,
                             isolateScroll: false,
-                            title: chrome.i18n.getMessage("cliConfirmSnippetDialogTitle"),
+                            title: i18n.getMessage("cliConfirmSnippetDialogTitle"),
                             content: $('#snippetpreviewcontent'),
-                            onCreated: () => $("#snippetpreviewcontent a.confirm").click(() => executeSnippet()),
+                            onCreated: () => $("#snippetpreviewcontent a.confirm").on('click', executeSnippet),
                         });
                     }
                     previewArea.val(result);
                     self.GUI.snippetPreviewWindow.open();
                 }
 
-                const fs = require('fs');
+                if (result.filePaths.length == 1) {
+                    fs.readFile(result.filePaths[0], (err, data) => {
+                        if (err) {
+                            GUI.log(i18n.getMessage('ErrorReadingFile'));
+                            return console.error(err);
+                        }
 
-                fs.readFile(result, (err, data) => {
-                    if (err) {
-                        GUI.log('<span style="color: red">Error reading file</span>');
-                        return console.error(err);
-                    }
-
-                    previewCommands(data);
-                });
+                        previewCommands(data);
+                    });
+                }
+            }).catch (err => {
+                console.log(err);
             });
         });
 
         // Tab key detection must be on keydown,
         // `keypress`/`keyup` happens too late, as `textarea` will have already lost focus.
-        textarea.keydown(function (event) {
+        textarea.on('keydown', function (event) {
             const tabKeyCode = 9;
             if (event.which == tabKeyCode) {
                 // prevent default tabbing behaviour
                 event.preventDefault();
-                const outString = textarea.val();
-                const lastCommand = outString.split("\n").pop();
-                const command = getCliCommand(lastCommand, self.cliBuffer);
-                if (command) {
-                    self.sendAutoComplete(command);
-                    textarea.val('');
+                if (!CliAutoComplete.isEnabled()) {
+                    const outString = textarea.val();
+                    const lastCommand = outString.split("\n").pop();
+                    const command = getCliCommand(lastCommand, self.cliBuffer);
+                    if (command) {
+                        self.sendAutoComplete(command);
+                        textarea.val('');
+                    }
+                }
+                else if (!CliAutoComplete.isOpen() && !CliAutoComplete.isBuilding()) {
+                    // force show autocomplete on Tab
+                    CliAutoComplete.openLater(true);
                 }
             }
         });
 
-        textarea.keypress(function (event) {
+        textarea.on('keypress', function (event) {
             const enterKeyCode = 13;
             if (event.which == enterKeyCode) {
                 event.preventDefault(); // prevent the adding of new line
 
+                if (CliAutoComplete.isBuilding()) {
+                    return; // silently ignore commands if autocomplete is still building
+                }
+
                 var out_string = textarea.val();
                 self.history.add(out_string.trim());
 
-                var outputArray = out_string.split("\n");
-                Promise.reduce(outputArray, sendLinesWithDelay(outputArray), 0);
+                if (out_string.trim().toLowerCase() == "cls" || out_string.trim().toLowerCase() == "clear") {
+                    self.outputHistory = "";
+                    $('.tab-cli .window .wrapper').empty();
+                } else {
+                    executeCommands(out_string);
+                }
 
                 textarea.val('');
             }
         });
 
-        textarea.keyup(function (event) {
+        textarea.on('keyup', function (event) {
             var keyUp = {38: true},
                 keyDown = {40: true};
+
+                if (CliAutoComplete.isOpen()) {
+                    return; // disable history keys if autocomplete is open
+                }
 
             if (event.keyCode in keyUp) {
                 textarea.val(self.history.prev());
@@ -299,7 +342,7 @@ TABS.cli.initialize = function (callback) {
         // give input element user focus
         textarea.focus();
 
-        helper.timeout.add('enter_cli', function enter_cli() {
+        timeout.add('enter_cli', function enter_cli() {
             // Enter CLI mode
             var bufferOut = new ArrayBuffer(1);
             var bufView = new Uint8Array(bufferOut);
@@ -315,14 +358,14 @@ TABS.cli.initialize = function (callback) {
 
         if (CONFIGURATOR.connection.type == ConnectionType.BLE) {
             let delay = CONFIGURATOR.connection.deviceDescription.delay;
-            if (delay > 0) {    
-                helper.timeout.add('cli_delay', () =>  {
+            if (delay > 0) {
+                timeout.add('cli_delay', () =>  {
                     self.send(getCliCommand("cli_delay " +  delay + '\n', TABS.cli.cliBuffer));
-                    self.send(getCliCommand('# ' + chrome.i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
+                    self.send(getCliCommand('# ' + i18n.getMessage('connectionBleCliEnter') + '\n', TABS.cli.cliBuffer));
                 }, 400);
-            } 
+            }
         }
-    
+
         GUI.content_ready(callback);
     });
 };
@@ -357,6 +400,11 @@ function writeToOutput(text) {
 }
 
 function writeLineToOutput(text) {
+    if (CliAutoComplete.isBuilding()) {
+        CliAutoComplete.builderParseLine(text);
+        return; // suppress output if in building state
+    }
+
     if (text.startsWith("### ERROR: ")) {
         writeToOutput('<span class="error_message">' + text + '</span><br>');
     } else {
@@ -431,22 +479,34 @@ TABS.cli.read = function (readInfo) {
                 this.cliBuffer += currentChar;
         }
 
-        this.outputHistory += currentChar;
+        if (!CliAutoComplete.isBuilding()) {
+            // do not include the building dialog into the history
+            this.outputHistory += currentChar;
+        }
 
         if (this.cliBuffer == 'Rebooting') {
             CONFIGURATOR.cliActive = false;
             CONFIGURATOR.cliValid = false;
-            GUI.log(chrome.i18n.getMessage('cliReboot'));
-            GUI.log(chrome.i18n.getMessage('deviceRebooting'));
+            GUI.log(i18n.getMessage('cliReboot'));
+            GUI.log(i18n.getMessage('deviceRebooting'));
             GUI.handleReconnect();
         }
 
     }
 
     if (!CONFIGURATOR.cliValid && validateText.indexOf('CLI') !== -1) {
-        GUI.log(chrome.i18n.getMessage('cliEnter'));
+        GUI.log(i18n.getMessage('cliEnter'));
         CONFIGURATOR.cliValid = true;
-        validateText = "";
+
+        if (CliAutoComplete.isEnabled() && !CliAutoComplete.isBuilding()) {
+            // start building autoComplete
+            CliAutoComplete.builderStart();
+        }
+    }
+
+    // fallback to native autocomplete
+    if (!CliAutoComplete.isEnabled()) {
+        setPrompt(removePromptHash(this.cliBuffer));
     }
 
     setPrompt(removePromptHash(this.cliBuffer));
@@ -481,9 +541,12 @@ TABS.cli.cleanup = function (callback) {
         // (another approach is however much more complicated):
         // we can setup an interval asking for data lets say every 200ms, when data arrives, callback will be triggered and tab switched
         // we could probably implement this someday
-        helper.timeout.add('waiting_for_bootup', function waiting_for_bootup() {
+        timeout.add('waiting_for_bootup', function waiting_for_bootup() {
             if (callback) callback();
         }, 1000); // if we dont allow enough time to reboot, CRC of "first" command sent will fail, keep an eye for this one
         CONFIGURATOR.cliActive = false;
+
+        CliAutoComplete.cleanup();
+        $(CliAutoComplete).off();
     });
 };

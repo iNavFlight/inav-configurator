@@ -1,6 +1,6 @@
 'use strict';
 
-let GlobalVariablesStatus = function () {
+var GlobalVariablesStatus = function () {
 
     let self = {},
         data = [];
@@ -51,3 +51,5 @@ let GlobalVariablesStatus = function () {
 
     return self;
 };
+
+module.exports = GlobalVariablesStatus;

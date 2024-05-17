@@ -1,80 +1,101 @@
 'use strict';
 
-// define all the global variables that are uses to hold FC state
-var CONFIG,
-    LED_STRIP,
-    LED_COLORS,
-    LED_MODE_COLORS,
-    PID,
-    PID_names,
-    PIDs,
-    RC_MAP,
-    RC,
-    RC_tuning,
-    AUX_CONFIG,
-    AUX_CONFIG_IDS,
-    MODE_RANGES,
-    ADJUSTMENT_RANGES,
-    SERVO_CONFIG,
-    SERVO_RULES,
-    MOTOR_RULES,
-    LOGIC_CONDITIONS,
-    LOGIC_CONDITIONS_STATUS,
-    GLOBAL_FUNCTIONS,
-    GLOBAL_VARIABLES_STATUS,
-    PROGRAMMING_PID,
-    PROGRAMMING_PID_STATUS,
-    SERIAL_CONFIG,
-    SENSOR_DATA,
-    MOTOR_DATA,
-    SERVO_DATA,
-    GPS_DATA,
-    MISSION_PLANNER,
-    ANALOG,
-    ARMING_CONFIG,
-    FC_CONFIG,
-    MISC,
-    REVERSIBLE_MOTORS,
-    DATAFLASH,
-    SDCARD,
-    BLACKBOX,
-    RC_deadband,
-    SENSOR_ALIGNMENT,
-    RX_CONFIG,
-    FAILSAFE_CONFIG,
-    RXFAIL_CONFIG,
-    VTX_CONFIG,
-    ADVANCED_CONFIG,
-    INAV_PID_CONFIG,
-    PID_ADVANCED,
-    FILTER_CONFIG,
-    SENSOR_STATUS,
-    SENSOR_CONFIG,
-    NAV_POSHOLD,
-    CALIBRATION_DATA,
-    POSITION_ESTIMATOR,
-    RTH_AND_LAND_CONFIG,
-    FW_CONFIG,
-    DEBUG_TRACE,
-    MIXER_CONFIG,
-    BATTERY_CONFIG,
-    OUTPUT_MAPPING,
-    SETTINGS,
-    BRAKING_CONFIG,
-    SAFEHOMES,
-    BOARD_ALIGNMENT,
-    CURRENT_METER_CONFIG,
-    FEATURES;
+const ServoMixerRuleCollection = require('./servoMixerRuleCollection');
+const MotorMixerRuleCollection = require('./motorMixerRuleCollection');
+const LogicConditionsCollection = require('./logicConditionsCollection');
+const LogicConditionsStatus = require('./logicConditionsStatus');
+const GlobalVariablesStatus = require('./globalVariablesStatus');
+const ProgrammingPidCollection = require('./programmingPidCollection');
+const ProgrammingPidStatus = require('./programmingPidStatus');
+const WaypointCollection = require('./waypointCollection');
+const OutputMappingCollection = require('./outputMapping');
+const SafehomeCollection = require('./safehomeCollection');
+const FwApproachCollection = require('./fwApproachCollection')
+const { PLATFORM } = require('./model')
+const VTX = require('./vtx');
+const BitHelper = require('./bitHelper');
+const { FLIGHT_MODES } = require('./flightModes');
+
 
 var FC = {
+    // define all the global variables that are uses to hold FC state
+    CONFIG: null,
+    LED_STRIP: null,
+    LED_COLORS: null,
+    LED_MODE_COLORS: null,
+    PID: null,
+    PID_names: null,
+    PIDs: null,
+    RC_MAP: null,
+    RC: null,
+    RC_tuning: null,
+    AUX_CONFIG: [],
+    AUX_CONFIG_IDS: [],
+    MODE_RANGES: null,
+    ADJUSTMENT_RANGES: null,
+    SERVO_CONFIG: null,
+    SERVO_RULES: null,
+    MOTOR_RULES: null,
+    LOGIC_CONDITIONS: null,
+    LOGIC_CONDITIONS_STATUS: null,
+    GLOBAL_FUNCTIONS: null,
+    GLOBAL_VARIABLES_STATUS: null,
+    PROGRAMMING_PID: null,
+    PROGRAMMING_PID_STATUS: null,
+    SERIAL_CONFIG: null,
+    SENSOR_DATA: null,
+    MOTOR_DATA: null,
+    SERVO_DATA: null,
+    GPS_DATA: null,
+    ADSB_VEHICLES: null,
+    MISSION_PLANNER: null,
+    ANALOG: null,
+    ARMING_CONFIG: null,
+    FC_CONFIG: null,
+    MISC: null,
+    REVERSIBLE_MOTORS: null,
+    DATAFLASH: null,
+    SDCARD: null,
+    BLACKBOX: null,
+    RC_deadband: null,
+    SENSOR_ALIGNMENT: null,
+    RX_CONFIG: null,
+    FAILSAFE_CONFIG: null,
+    RXFAIL_CONFIG: null,
+    VTX_CONFIG: null,
+    ADVANCED_CONFIG: null,
+    INAV_PID_CONFIG: null,
+    PID_ADVANCED: null,
+    FILTER_CONFIG: null,
+    SENSOR_STATUS: null,
+    SENSOR_CONFIG: null,
+    NAV_POSHOLD: null,
+    CALIBRATION_DATA: null,
+    POSITION_ESTIMATOR: null,
+    RTH_AND_LAND_CONFIG: null,
+    FW_CONFIG: null,
+    DEBUG_TRACE: null,
+    MIXER_CONFIG: null,
+    BATTERY_CONFIG: null,
+    OUTPUT_MAPPING: null,
+    BRAKING_CONFIG: null,
+    SAFEHOMES: null,
+    BOARD_ALIGNMENT: null,
+    CURRENT_METER_CONFIG: null,
+    FEATURES: null,
+    RATE_DYNAMICS: null,
+    EZ_TUNE: null,
+    FLIGHT_MODES: null,
+
     restartRequired: false,
     MAX_SERVO_RATE: 125,
     MIN_SERVO_RATE: 0,
+
     isAirplane: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_AIRPLANE);
+        return (this.MIXER_CONFIG.platformType == PLATFORM.AIRPLANE);
     },
     isMultirotor: function () {
-        return (MIXER_CONFIG.platformType == PLATFORM_MULTIROTOR || MIXER_CONFIG.platformType == PLATFORM_TRICOPTER);
+        return (this.MIXER_CONFIG.platformType == PLATFORM.MULTIROTOR || this.MIXER_CONFIG.platformType == PLATFORM.TRICOPTER);
     },
     isRpyFfComponentUsed: function () {
         return true; // Currently all planes have roll, pitch and yaw FF
@@ -83,7 +104,7 @@ var FC = {
         return true; // Currently all platforms use D term
     },
     resetState: function () {
-        SENSOR_STATUS = {
+        this.SENSOR_STATUS = {
             isHardwareHealthy: 0,
             gyroHwStatus: 0,
             accHwStatus: 0,
@@ -92,11 +113,10 @@ var FC = {
             gpsHwStatus: 0,
             rangeHwStatus: 0,
             speedHwStatus: 0,
-            flowHwStatus: 0,
-            imu2HwStatus: 0
+            flowHwStatus: 0
         };
 
-        SENSOR_CONFIG = {
+        this.SENSOR_CONFIG = {
             accelerometer: 0,
             barometer: 0,
             magnetometer: 0,
@@ -105,7 +125,7 @@ var FC = {
             opflow: 0
         };
 
-        CONFIG = {
+        this.CONFIG = {
             apiVersion: "0.0.0",
             flightControllerIdentifier: '',
             flightControllerVersion: '',
@@ -118,48 +138,49 @@ var FC = {
             i2cError: 0,
             activeSensors: 0,
             mode: [],
-            profile: 0,
-            battery_profile: 0,
+            mixer_profile: -1,
+            profile: -1,
+            battery_profile: -1,
             uid: [0, 0, 0],
             accelerometerTrims: [0, 0],
             armingFlags: 0,
             name: ''
         };
 
-        BOARD_ALIGNMENT = {
+        this.BOARD_ALIGNMENT = {
             roll: 0,
             pitch: 0,
             yaw: 0
         };
 
-        CURRENT_METER_CONFIG = {
+        this.CURRENT_METER_CONFIG = {
             scale: 0,
             offset: 0,
             type: 0,
             capacity: 0
         };
 
-        LED_STRIP = [];
-        LED_COLORS = [];
-        LED_MODE_COLORS = [];
+        this.LED_STRIP = [];
+        this.LED_COLORS = [];
+        this.LED_MODE_COLORS = [];
 
-        FEATURES = 0;
+        this.FEATURES = 0;
 
-        PID = {
+        this.PID = {
         };
 
-        PID_names = [];
-        PIDs = [];
-        RC_MAP = [];
+        this.PID_names = [];
+        this.PIDs = [];
+        this.RC_MAP = [];
 
         // defaults
         // roll, pitch, yaw, throttle, aux 1, ... aux n
-        RC = {
+        this.RC = {
             active_channels: 0,
             channels: new Array(32)
         };
 
-        RC_tuning = {
+        this.RC_tuning = {
             RC_RATE: 0,
             RC_EXPO: 0,
             roll_pitch_rate: 0, // pre 1.7 api only
@@ -178,24 +199,33 @@ var FC = {
             manual_yaw_rate: 0,
         };
 
-        AUX_CONFIG = [];
-        AUX_CONFIG_IDS = [];
+        this.generateAuxConfig = function () {
+            console.log('Generating AUX_CONFIG');
+            this.AUX_CONFIG = [];
+            for ( let i = 0; i < this.AUX_CONFIG_IDS.length; i++ ) {
+                let found = FLIGHT_MODES.find( mode => mode.permanentId === this.AUX_CONFIG_IDS[i] );
+                if (found) {
+                    this.AUX_CONFIG.push(found.boxName);
+                }
+            }
+        };
 
-        MODE_RANGES = [];
-        ADJUSTMENT_RANGES = [];
+        this.MODE_RANGES = [];
+        this.ADJUSTMENT_RANGES = [];
 
-        SERVO_CONFIG = [];
-        SERVO_RULES             = new ServoMixerRuleCollection();
-        MOTOR_RULES             = new MotorMixerRuleCollection();
-        LOGIC_CONDITIONS        = new LogicConditionsCollection();
-        LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
-        GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
-        PROGRAMMING_PID         = new ProgrammingPidCollection();
-        PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
+        this.SERVO_CONFIG = [];
+        this.SERVO_RULES             = new ServoMixerRuleCollection();
+        this.MOTOR_RULES             = new MotorMixerRuleCollection();
+        this.LOGIC_CONDITIONS        = new LogicConditionsCollection();
+        this.LOGIC_CONDITIONS_STATUS = new LogicConditionsStatus();
+        this.GLOBAL_VARIABLES_STATUS = new GlobalVariablesStatus();
+        this.PROGRAMMING_PID         = new ProgrammingPidCollection();
+        this.PROGRAMMING_PID_STATUS  = new ProgrammingPidStatus();
 
-        MIXER_CONFIG = {
+        this.MIXER_CONFIG = {
             yawMotorDirection: 0,
             yawJumpPreventionLimit: 0,
+            motorStopOnLow: false,
             platformType: -1,
             hasFlaps: false,
             appliedMixerPreset: -1,
@@ -203,7 +233,7 @@ var FC = {
             numberOfServos: 0
         },
 
-        SERIAL_CONFIG = {
+        this.SERIAL_CONFIG = {
             ports: [],
 
             // pre 1.6 settings
@@ -213,7 +243,7 @@ var FC = {
             cliBaudRate: 0
         };
 
-        SENSOR_DATA = {
+        this.SENSOR_DATA = {
             gyroscope: [0, 0, 0],
             accelerometer: [0, 0, 0],
             magnetometer: [0, 0, 0],
@@ -226,10 +256,10 @@ var FC = {
             debug: [0, 0, 0, 0]
         };
 
-        MOTOR_DATA = new Array(8);
-        SERVO_DATA = new Array(16);
+        this.MOTOR_DATA = new Array(8);
+        this.SERVO_DATA = new Array(16);
 
-        GPS_DATA = {
+        this.GPS_DATA = {
             fix: 0,
             numSat: 0,
             lat: 0,
@@ -248,10 +278,16 @@ var FC = {
             timeouts: 0,
             packetCount: 0
         };
+        
+        this.ADSB_VEHICLES = {
+            vehiclesCount: 0,
+            callsignLength: 0,
+            vehicles: []
+        };
 
-        MISSION_PLANNER = new WaypointCollection();
+        this.MISSION_PLANNER = new WaypointCollection();
 
-        ANALOG = {
+        this.ANALOG = {
             voltage: 0,
             mAhdrawn: 0,
             mWhdrawn: 0,
@@ -266,16 +302,11 @@ var FC = {
             battery_flags: 0
         };
 
-        ARMING_CONFIG = {
-            auto_disarm_delay: 0,
-            disarm_kill_switch: 0
-        };
-
-        FC_CONFIG = {
+        this.FC_CONFIG = {
             loopTime: 0
         };
 
-        MISC = {
+        this.MISC = {
             midrc: 0,
             minthrottle: 0,
             maxthrottle: 0,
@@ -300,7 +331,7 @@ var FC = {
             battery_capacity_unit: 'mAh'
         };
 
-        BATTERY_CONFIG = {
+        this.BATTERY_CONFIG = {
             vbatscale: 0,
             vbatdetectcellvoltage: 0,
             vbatmincellvoltage: 0,
@@ -314,7 +345,7 @@ var FC = {
             capacity_unit: 0
         };
 
-        VTX_CONFIG = {
+        this.VTX_CONFIG = {
             device_type: VTX.DEV_UNKNOWN,
             band: 0,
             channel: 1,
@@ -323,7 +354,7 @@ var FC = {
             low_power_disarm: 0,
         };
 
-        ADVANCED_CONFIG = {
+        this.ADVANCED_CONFIG = {
             gyroSyncDenominator: null,
             pidProcessDenom: null,
             useUnsyncedPwm: null,
@@ -333,7 +364,7 @@ var FC = {
             gyroSync: null
         };
 
-        FILTER_CONFIG = {
+        this.FILTER_CONFIG = {
             gyroSoftLpfHz: null,
             dtermLpfHz: null,
             yawLpfHz: null,
@@ -348,7 +379,7 @@ var FC = {
             gyroStage2LowpassHz: null
         };
 
-        PID_ADVANCED = {
+        this.PID_ADVANCED = {
             rollPitchItermIgnoreRate: null,
             yawItermIgnoreRate: null,
             yawPLimit: null,
@@ -358,7 +389,7 @@ var FC = {
             pidSumLimit: null
         };
 
-        INAV_PID_CONFIG = {
+        this.INAV_PID_CONFIG = {
             asynchronousMode: null,
             accelerometerTaskFrequency: null,
             attitudeTaskFrequency: null,
@@ -369,7 +400,7 @@ var FC = {
             accSoftLpfHz: null
         };
 
-        NAV_POSHOLD = {
+        this.NAV_POSHOLD = {
             userControlMode: null,
             maxSpeed: null,
             maxClimbRate: null,
@@ -380,7 +411,7 @@ var FC = {
             hoverThrottle: null
         };
 
-        CALIBRATION_DATA = {
+        this.CALIBRATION_DATA = {
             acc: {
                 Pos0: null,
                 Pos1: null,
@@ -414,7 +445,7 @@ var FC = {
             }
         };
 
-        RTH_AND_LAND_CONFIG = {
+        this.RTH_AND_LAND_CONFIG = {
              minRthDistance: null,
              rthClimbFirst: null,
              rthClimbIgnoreEmergency: null,
@@ -429,14 +460,14 @@ var FC = {
              emergencyDescentRate: null
         };
 
-        REVERSIBLE_MOTORS = {
+        this.REVERSIBLE_MOTORS = {
             deadband_low: 0,
             deadband_high: 0,
             neutral: 0,
             deadband_throttle: 0
         };
 
-        DATAFLASH = {
+        this.DATAFLASH = {
             ready: false,
             supported: false,
             sectors: 0,
@@ -444,7 +475,7 @@ var FC = {
             usedSize: 0
         };
 
-        SDCARD = {
+        this.SDCARD = {
             supported: false,
             state: 0,
             filesystemLastError: 0,
@@ -452,27 +483,27 @@ var FC = {
             totalSizeKB: 0
         };
 
-        BLACKBOX = {
+        this.BLACKBOX = {
             supported: false,
             blackboxDevice: 0,
             blackboxRateNum: 1,
             blackboxRateDenom: 1
         };
 
-        RC_deadband = {
+        this.RC_deadband = {
             deadband: 0,
             yaw_deadband: 0,
             alt_hold_deadband: 0
         };
 
-        SENSOR_ALIGNMENT = {
+        this.SENSOR_ALIGNMENT = {
             align_gyro: 0,
             align_acc: 0,
             align_mag: 0,
             align_opflow: 0
         };
 
-        RX_CONFIG = {
+        this.RX_CONFIG = {
             receiver_type: 0,
             serialrx_provider: 0,
             maxcheck: 0,
@@ -486,7 +517,7 @@ var FC = {
             spirx_channel_count: 0,
         };
 
-        POSITION_ESTIMATOR = {
+        this.POSITION_ESTIMATOR = {
             w_z_baro_p: null,
             w_z_gps_p: null,
             w_z_gps_v: null,
@@ -496,7 +527,7 @@ var FC = {
             use_gps_velned: null
         };
 
-        FAILSAFE_CONFIG = {
+        this.FAILSAFE_CONFIG = {
             failsafe_delay: 0,
             failsafe_off_delay: 0,
             failsafe_throttle: 0,
@@ -512,7 +543,7 @@ var FC = {
             failsafe_min_distance_procedure: 0
         };
 
-        FW_CONFIG = {
+        this.FW_CONFIG = {
             cruiseThrottle: null,
             minThrottle: null,
             maxThrottle: null,
@@ -523,7 +554,7 @@ var FC = {
             loiterRadius: null
         };
 
-        BRAKING_CONFIG = {
+        this.BRAKING_CONFIG = {
             speedThreshold: null,
             disengageSpeed: null,
             timeout: null,
@@ -534,13 +565,42 @@ var FC = {
             bankAngle: null
         }
 
-        RXFAIL_CONFIG = [];
+        this.RXFAIL_CONFIG = [];
 
-        OUTPUT_MAPPING = new OutputMappingCollection();
+        this.OUTPUT_MAPPING = new OutputMappingCollection();
 
-        SETTINGS = {};
+        this.SAFEHOMES = new SafehomeCollection();
 
-        SAFEHOMES = new SafehomeCollection();
+        this.RATE_DYNAMICS = {
+            sensitivityCenter: null,
+            sensitivityEnd: null,
+            correctionCenter: null,
+            correctionEnd: null,
+            weightCenter: null, 
+            weightEnd: null
+        };
+
+        this.EZ_TUNE = {
+            enabled: null,
+            filterHz: null,
+            axisRatio: null,
+            response: null,
+            damping: null,
+            stability: null,
+            aggressiveness: null,
+            rate: null,
+            expo: null,
+            snappiness: null,
+        };
+
+
+        this.FW_APPROACH = new FwApproachCollection();
+
+        this.OSD_CUSTOM_ELEMENTS = {
+           settings: {customElementsCount: 0, customElementTextSize: 0},
+           items: [],
+        };
+
     },
     getOutputUsages: function() {
         return {
@@ -555,7 +615,6 @@ var FC = {
     getFeatures: function () {
         var features = [
             {bit: 1, group: 'batteryVoltage', name: 'VBAT'},
-            {bit: 4, group: 'other', name: 'MOTOR_STOP'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', haveTip: true, showNameInTip: true},
             {bit: 7, group: 'other', name: 'GPS', haveTip: true},
             {bit: 10, group: 'other', name: 'TELEMETRY', showNameInTip: true},
@@ -583,7 +642,7 @@ var FC = {
             features = this.getFeatures();
         }
         for (var i = 0; i < features.length; i++) {
-            if (features[i].name == featureName && bit_check(FEATURES, features[i].bit)) {
+            if (features[i].name == featureName && BitHelper.bit_check(this.FEATURES, features[i].bit)) {
                 return true;
             }
         }
@@ -594,13 +653,10 @@ var FC = {
     },
     getGpsProtocols: function () {
         return [
-            'NMEA',
             'UBLOX',
-            'I2C-NAV',
-            'DJI NAZA',
             'UBLOX7',
-            'MTK',
-            'MSP'
+            'MSP',
+            'FAKE'
         ];
     },
     getGpsBaudRates: function () {
@@ -619,6 +675,7 @@ var FC = {
             'North American WAAS',
             'Japanese MSAS',
             'Indian GAGAN',
+            'SouthPAN (AU/NZ)',
             'Disabled'
         ];
     },
@@ -767,6 +824,24 @@ var FC = {
 
         return retVal;
     },
+    getAccelerometerCalibrated: function () {
+        var calibrated = true;
+        var flagNames = FC.getArmingFlags();
+
+        if (this.CALIBRATION_DATA.accGain.X === 4096 && this.CALIBRATION_DATA.accGain.Y === 4096 && this.CALIBRATION_DATA.accGain.Z === 4096 && 
+            this.CALIBRATION_DATA.accZero.X === 0 && this.CALIBRATION_DATA.accZero.Y === 0 && this.CALIBRATION_DATA.accZero.Z === 0
+           ) {
+            calibrated = false;
+        }
+
+        if ((calibrated) && flagNames.hasOwnProperty(13)) {
+            if (BitHelper.bit_check(this.CONFIG.armingFlags, 13)) {
+                calibrated = false;
+            }
+        }
+
+        return calibrated;
+    },
     getUserControlMode: function () {
         return [
             "Attitude",
@@ -865,20 +940,23 @@ var FC = {
             'GVAR 5',               // 35
             'GVAR 6',               // 36
             'GVAR 7',               // 37
+            'Mixer Transition',     // 38
         ];
     },
     getServoMixInputName: function (input) {
         return this.getServoMixInputNames()[input];
     },
     getModeId: function (name) {
-        for (var i = 0; i < AUX_CONFIG.length; i++) {
-            if (AUX_CONFIG[i] == name)
-                return i;
+
+        let mode = FLIGHT_MODES.find( mode => mode.boxName === name );
+        if (mode) {
+            return mode.permanentId;
+        } else {
+            return -1;
         }
-        return -1;
     },
     isModeBitSet: function (i) {
-        return bit_check(CONFIG.mode[Math.trunc(i / 32)], i % 32);
+        return BitHelper.bit_check(this.CONFIG.mode[Math.trunc(i / 32)], i % 32);
     },
     isModeEnabled: function (name) {
         return this.isModeBitSet(this.getModeId(name));
@@ -892,19 +970,19 @@ var FC = {
                 output: "boolean"
             },
             1: {
-                name: "Equal",
+                name: "Equal (A = B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             2: {
-                name: "Greater Than",
+                name: "Greater Than (A > B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
             },
             3: {
-                name: "Lower Than",
+                name: "Lower Than (A < B)",
                 operandType: "Comparison",
                 hasOperand: [true, true],
                 output: "boolean"
@@ -1162,6 +1240,54 @@ var FC = {
                 hasOperand: [true, true],
                 output: "boolean"
             },
+            47: {
+                name: "Edge",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            48: {
+                name: "Delay",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            49: {
+                name: "Timer",
+                operandType: "Logic Switches",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            50: {
+                name: "Delta (|A| >= B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            51: {
+                name: "Approx Equals (A ~ B)",
+                operandType: "Comparison",
+                hasOperand: [true, true],
+                output: "boolean"
+            },
+            52: {
+                name: "LED Pin PWM",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "raw"
+            },        
+            53: {
+                name: "Disable GPS Sensor Fix",
+                operandType: "Set Flight Parameter",
+                hasOperand: [true, false],
+                output: "boolean"
+            },
+            54: {
+                name: "Mag calibration",
+                operandType: "Set Flight Parameter",
+                hasOperand: [false, false],
+                output: "boolean"
+            },
         }
     },
     getOperandTypes: function () {
@@ -1208,24 +1334,25 @@ var FC = {
                     20: "Is Controlling Position",
                     21: "Is Emergency Landing",
                     22: "Is RTH",
-                    23: "Is WP",
-                    24: "Is Landing",
-                    25: "Is Failsafe",
-                    26: "Stabilized Roll",
-                    27: "Stabilized Pitch",
-                    28: "Stabilized Yaw",
-                    29: "Current Waypoint Index",
-                    30: "Current Waypoint Action",
-                    31: "3D home distance [m]",
-                    32: "CRSF LQ",
-                    33: "CRSF SNR",
-                    34: "GPS Valid Fix",
-                    35: "Loiter Radius [cm]",
-                    36: "Active Profile",
-                    37: "Battery cells",
-                    38: "AGL status [0/1]",
-                    39: "AGL [cm]",
-                    40: "Rangefinder [cm]",
+                    23: "Is Landing",
+                    24: "Is Failsafe",
+                    25: "Stabilized Roll",
+                    26: "Stabilized Pitch",
+                    27: "Stabilized Yaw",
+                    28: "3D home distance [m]",
+                    29: "CRSF LQ",
+                    30: "CRSF SNR",
+                    31: "GPS Valid Fix",
+                    32: "Loiter Radius [cm]",
+                    33: "Active PIDProfile",
+                    34: "Battery cells",
+                    35: "AGL status [0/1]",
+                    36: "AGL [cm]",
+                    37: "Rangefinder [cm]",
+                    38: "Active MixerProfile",
+                    39: "MixerTransition Active",
+                    40: "Yaw [deg]",
+                    41: "FW Land State"
                 }
             },
             3: {
@@ -1243,17 +1370,22 @@ var FC = {
                     7: "Horizon",
                     8: "Air",
                     9: "USER 1",
-                    10: "USER 2"
+                    10: "USER 2",
+                    11: "Course Hold",
+                    12: "USER 3",
+                    13: "USER 4",
+                    14: "Acro",
+                    15: "Waypoint Mission",
                 }
             },
             4: {
                 name: "Logic Condition",
                 type: "range",
-                range: [0, 31],
+                range: [0, (this.LOGIC_CONDITIONS.getMaxLogicConditionCount()-1)],
                 default: 0
             },
             5: {
-                name: "Global Variable",
+                name: "Get Global Variable",
                 type: "range",
                 range: [0, 7],
                 default: 0
@@ -1263,7 +1395,28 @@ var FC = {
                 type: "range",
                 range: [0, 3],
                 default: 0
-            }
+            },
+            7: {
+                name: "Waypoints",
+                type: "dictionary",
+                default: 0,
+                values: {
+                    0: "Is WP",
+                    1: "Current Waypoint Index",
+                    2: "Current Waypoint Action",
+                    3: "Next Waypoint Action",
+                    4: "Distance to next Waypoint [m]",
+                    5: "Distance from last Waypoint [m]",
+                    6: "Current WP has User Action 1",
+                    7: "Current WP has User Action 2",
+                    8: "Current WP has User Action 3",
+                    9: "Current WP has User Action 4",
+                    10: "Next WP has User Action 1",
+                    11: "Next WP has User Action 2",
+                    12: "Next WP has User Action 3",
+                    13: "Next WP has User Action 4",
+                }
+            },
         }
     },
     getBatteryProfileParameters: function () {
@@ -1282,7 +1435,6 @@ var FC = {
             'throttle_idle',
             'turtle_mode_power_factor',
             'failsafe_throttle',
-            'fw_min_throttle_down_pitch',
             'nav_mc_hover_thr',
             'nav_fw_cruise_thr',
             'nav_fw_min_thr',
@@ -1339,11 +1491,8 @@ var FC = {
             'max_angle_inclination_pit',
             'dterm_lpf_hz',
             'dterm_lpf_type',
-            'dterm_lpf2_hz',
-            'dterm_lpf2_type',
             'yaw_lpf_hz',
             'fw_iterm_throw_limit',
-            'fw_loiter_direction',
             'fw_reference_airspeed',
             'fw_turn_assist_yaw_gain',
             'fw_turn_assist_pitch_gain',
@@ -1424,3 +1573,5 @@ var FC = {
         return ($.inArray(paramName, this.getControlProfileParameters()) != -1);
     }
 };
+
+module.exports = FC;

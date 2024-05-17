@@ -1,9 +1,11 @@
 'use strict';
 
+const FC = require('./fc');
+
 // return true if user has choose a special peripheral
 function isPeripheralSelected(peripheralName) {
-    for (var portIndex = 0; portIndex < SERIAL_CONFIG.ports.length; portIndex++) {
-        var serialPort = SERIAL_CONFIG.ports[portIndex];
+    for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+        var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
         if (serialPort.functions.indexOf(peripheralName) >= 0) {
             return true;
         }
@@ -23,10 +25,17 @@ function adjustBoxNameIfPeripheralWithModeID(modeId, defaultName) {
             case 41: // BOXCAMERA3
                 return "CAMERA CHANGE MODE";
             default:
-                return defaultName;
+                break;
         }
-    } 
+    }
     
-    return defaultName;
-    
+    if (modeId === 11) {
+        if (FC.isAirplane()) {
+            return "NAV LOITER";
+        }
+    }
+
+    return defaultName;  
 }
+
+module.exports = adjustBoxNameIfPeripheralWithModeID ;
